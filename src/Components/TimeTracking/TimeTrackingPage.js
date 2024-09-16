@@ -1,0 +1,833 @@
+import React, { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Select2 from 'react-select2-wrapper';
+import { Lightbox } from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/dist/styles.css";
+import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown } from "react-bootstrap";
+import { Fullscreen } from "yet-another-react-lightbox/dist/plugins/Fullscreen";
+import { FaPlay, FaCheck } from "react-icons/fa";
+import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
+import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
+import Spinner from 'react-bootstrap/Spinner';
+import { selectboxObserver } from "../../helpers/commonfunctions";
+import { socket, refreshSocket } from "../../helpers/auth";
+import { getMemberdata } from "../../helpers/commonfunctions";
+function TimeTrackingPage() {
+  let totalhours = 0;
+  let totalProjecthours = 0
+  const currentMember = getMemberdata();
+  const [spinner, setSpinner] = useState(false)
+  const [isActive, setIsActive] = useState(false);
+  const handleClick = (activity) => {
+    setIsActive(current => !current);
+    setCurrentActivity( activity)
+  };
+  const options = { day: '2-digit', month: 'long', year: 'numeric' };
+  const [currentActivity, setCurrentActivity] = useState(false);
+  const dispatch = useDispatch()
+  const fullscreenRef = React.useRef(null);
+  const [activeTab, setActiveTab] = useState("Live");
+  const [screenshotTab, setScreenshotTab] = useState("Screenshots");
+  const [activeInnerTab, setActiveInnerTab] = useState("InnerLive");
+  const [open, setOpen] = useState(false);
+  const [postMedia, setPostMedia] = useState('');
+  const activitystate = useSelector((state) => state.activity)
+  const [liveactivities, setLiveactivities] = useState([])
+  const [ recordedactivities, setRecordedActivities] = useState([])
+  const [currentPage, setCurrentPage] = useState(0);
+  const [searchTerm, setsearchTerm] = useState("");
+  const [ filters, setFilters] = useState({});
+  const [showFilter, setFilterShow] = useState(false);
+  const handleFilterClose = () => setFilterShow(false);
+  const handleFilterShow = () => setFilterShow(true);
+
+  const [showSearch, setSearchShow] = useState(false);
+  const handleSearchClose = () => setSearchShow(false);
+  const handleSearchShow = () => setSearchShow(true);
+
+  const videoRef = useRef(null);
+    const peerConnections = {}
+
+    function startsharing(userID, status){
+      socket.emit('joinRoom', userID)
+     if( status === true ){
+      setTimeout(function(){        
+        socket.emit('watcher', socket.id, userID, userID, currentMember.role?.slug)
+     },800)
+     }
+     
+   }
+
+   function leaveRoom(room){
+     socket.emit('leaveRoom', socket.id, room )
+   }
+  const handleLiveActivityList = async () => {
+    let selectedfilters = { currentPage: currentPage, status: 'live' }
+    if (Object.keys(filters).length > 0) {
+        selectedfilters = { ...selectedfilters, ...filters }
+    }
+    await dispatch(getliveActivity(selectedfilters))
+    setSpinner(false)
+  }
+  
+
+  const handleRecordedActivity = async () => {
+    setSpinner(true)
+    await dispatch(getRecoredActivity(currentActivity._id))
+      setSpinner(false)
+  }
+
+  function formattotalTime(time){
+    const hours = Math.floor(time / (1000 * 60 * 60));
+    const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
+
+    let formattedTime = '';
+    if (hours > 0) {
+        formattedTime += `${hours}h `;
+    }
+    if (minutes > 0 || hours > 0) {
+        formattedTime += `${minutes}m`;
+    }
+    
+    return formattedTime.trim();
+}
+
+  useEffect(() => { 
+      
+         
+    //});
+        if(currentActivity !== false ){ 
+           startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
+        }
+   
+
+   },[currentActivity])
+
+   useEffect(() => {
+
+    if (Object.keys(filters).length > 0 && !showFilter) {
+        handleLiveActivityList()
+    }
+
+  }, [filters])
+
+
+
+
+  useEffect(() => {
+    refreshSocket()
+    selectboxObserver()
+    handleLiveActivityList()
+
+    // socket.on('userStatusUpdate', ({ userId, status, projectTitle, total_time }) => { 
+      
+    //   // handleLiveActivityList()
+    // });
+
+    socket.on('trackerstateUpdate', (memberId) => {
+      handleLiveActivityList()
+    })
+
+    socket.on('offer', function (id, description, roomId) {
+      if(peerConnections[id]){ 
+         peerConnections[id].close();
+         delete peerConnections[id];
+      }
+      
+      if( !peerConnections[id] ){
+          peerConnections[id] = new RTCPeerConnection({ // User stun server for connection with different networks
+              iceServers: [
+                  // { 'urls': 'stun:stun.services.mozilla.com' },
+                  // { 'urls': 'stun:stun.l.google.com:19302' },
+                  {
+                    urls: 'turn:64.227.189.65:3478',
+                    username: 'web1experts',  // Optional if using 'lt-cred-mech'
+                    credential: 'PtJJc0FUvuKP3jkn' // Optional if using 'lt-cred-mech'
+                  },
+              ]
+          });
+          
+      }
+
+          
+
+          peerConnections[id].setRemoteDescription(new RTCSessionDescription(description))
+              .then(() => peerConnections[id].createAnswer())
+              .then(sdp => peerConnections[id].setLocalDescription(sdp))
+              .then(function () {
+                  socket.emit('answer', id, peerConnections[id].localDescription, roomId);
+              });
+          peerConnections[id].onaddstream = function (event) {
+            if(event.stream){
+              videoRef.current.srcObject = event.stream;
+              videoRef.current.onloadedmetadata = () => videoRef.current.play();
+            }
+          };
+          peerConnections[id].onicecandidate = function (event) {
+              if (event.candidate) {
+                  socket.emit('candidate', id, event.candidate, roomId,'viwers');
+              }
+          };
+
+          peerConnections[id].addEventListener('iceconnectionstatechange', () => {console.log('ICE Connection State:', peerConnections[id].iceConnectionState);
+            if (peerConnections[id].iceConnectionState === 'connected' || peerConnections[id].iceConnectionState === 'completed' || peerConnections[id].iceConnectionState === 'disconnected' || peerConnections[id].iceConnectionState === 'failed') {
+                console.log('WebRTC connection is complete!');
+                
+            }
+        });
+      
+  });
+
+
+
+  socket.on('candidate', function (id, candidate, roomId) {
+    if(peerConnections[id]){
+      const rtcPeerConnection = peerConnections[id]
+      peerConnections[id].addIceCandidate(new RTCIceCandidate(candidate))
+          .catch(e => console.error(e));
+    }
+      
+  });
+
+  setSpinner(true)
+  }, [])
+
+
+
+  useEffect(() => {
+    if (activitystate?.liveactivities?.memberData) { 
+      setLiveactivities(activitystate.liveactivities.memberData)
+      if (currentActivity && Object.keys(currentActivity).length > 0) {
+        activitystate.liveactivities.memberData.forEach((a, inx) => {
+            if (a._id === currentActivity._id) {
+                setCurrentActivity(a);
+                return;
+            }
+        })
+
+      }
+    }
+
+    if( activitystate?.recordedActivity ){
+      setRecordedActivities(activitystate?.recordedActivity)
+    }
+
+  }, [activitystate])
+
+  const handlefilterchange = (name, value) => {
+    if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
+        setFilters({ ...filters, [name]: value })
+    }
+}
+
+  const handleLightBox = (media) => {
+    const data = [{ src: media }];
+    setPostMedia(data)
+    setOpen(true)
+  }
+  
+  useEffect(() => {
+    selectboxObserver();
+
+  }, [activeTab])
+
+  useEffect(() => {
+    console.log('activeInnerTab: ', activeInnerTab)
+    if( activeInnerTab === "InnerRecorded"){
+      handleRecordedActivity()
+    }
+
+  }, [activeInnerTab])
+
+  const showTabs = () => {
+    if (activeTab === 'Recorded') {
+      return (
+        <>
+          <ListGroup.Item key="filter-key-1" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('show_for', event.target.value)} value={filters['show_for'] || 'all'}>
+                <option value="all">Team Projects</option>
+                <option value="my">My Projects</option>
+            </Form.Select>
+            
+          </ListGroup.Item>
+          <ListGroup.Item key="filter-key-2" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+          <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
+              <option value="all">View All</option>
+              <option value="active">Active</option>
+              <option value="pause">Paused</option>
+              <option value="inactive">Inactive</option>
+          </Form.Select>
+            
+          </ListGroup.Item>
+          
+          <ListGroup.Item key="filter-key-4" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+            <Form>
+              <Form.Group className="mb-0 form-group">
+                <Form.Control type="date" name="date" />
+              </Form.Group>
+            </Form>
+          </ListGroup.Item>
+          <ListGroup.Item key="filter-key-5" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+            <Form>
+              <Form.Group className="mb-0 form-group">
+                <Form.Control type="text" name="search" placeholder="Search by name" />
+              </Form.Group>
+            </Form>
+          </ListGroup.Item>
+        </>
+      )
+    } else {
+      return (
+        <>
+          <ListGroup.Item key="filter-key-6" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('tracker_status', event.target.value)} value={filters['status'] || 'all'}>
+                <option value="all">View All</option>
+                <option value="active">Active</option>
+                <option value="pause">Paused</option>
+                <option value="inactive">Inactive</option>
+            </Form.Select>
+            
+          </ListGroup.Item>
+          <ListGroup.Item key="filter-key-7" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+            <Form>
+              <Form.Group className="mb-0 form-group">
+                <Form.Control type="text" name="search" placeholder="Search by name" onChange={(event) => handlefilterchange('search', event.target.value)} />
+              </Form.Group>
+            </Form>
+          </ListGroup.Item>
+        </>
+      )
+    }
+  }
+
+  const showDate = () => {
+    if (activeInnerTab === 'InnerRecorded') {
+      return (
+        <>
+          <ListGroup.Item className="no--style">
+            <Form>
+              <Form.Group className="mb-0 form-group">
+                <Form.Control type="date" name="date" />
+              </Form.Group>
+            </Form>
+          </ListGroup.Item>
+        </>
+      )
+    } else {
+      return (
+        <>
+
+        </>
+      )
+    }
+  }
+
+  return (
+    <>
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        slides={postMedia}
+        plugins={[Fullscreen]}
+        fullscreen={{ ref: fullscreenRef }}
+        on={{
+          click: () => fullscreenRef.current?.enter(),
+        }}
+      />
+
+
+      <div className={isActive ? "show--details team--page" : "team--page"}>
+        <div className={isActive ? 'page--title px-md-2 pt-3 pb-0 pb-md-0 mb-3' : 'page--title p-md-3 pt-3 pb-0 pb-md-0 mb-3'}>
+          <Container fluid>
+            <Row>
+              <Col sm={12}>
+                <h2>Activity
+                  <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
+                  <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button>
+                  <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
+                    <ListGroup.Item action active={activeTab === "Live"} onClick={() => {
+                      if( currentActivity && Object.keys(currentActivity)){
+                        const cact = currentActivity
+                        leaveRoom(currentActivity?._id)
+                        setCurrentActivity(cact);
+                      }
+                        
+                      
+                      setActiveTab("Live")}}>Live</ListGroup.Item>
+                    <ListGroup.Item action active={activeTab === "Recorded"} onClick={() => {setActiveTab("Recorded")}}>Recorded</ListGroup.Item>
+                    {showTabs()}
+                  </ListGroup>
+                </h2>
+              </Col>
+            </Row>
+          </Container>
+        </div>
+        <div className='page--wrapper daily--reports activity--table p-md-3 py-3'>
+          {
+              spinner &&
+              <div class="loading-bar">
+                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+              </div>
+          }
+          <Container fluid className={isActive ? 'ps-0' : ''}>
+            {activeTab === "Live" && (
+              <>
+                <p className="d-flex d-md-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
+                <Table responsive="lg" className="activity--table">
+                  <thead>
+                    <tr key="tracking-table-header">
+                      <th scope="col" width={200}>Member Name</th>
+                      <th scope="col" width={200} className="onHide">Project Name</th>
+                      <th scope="col" width={200} className="onHide">Task Name</th>
+                      <th scope="col" width={200} className="onHide">Project Time</th>
+                      <th scope="col" width={200} className="onHide">Total Time</th>
+                      <th scope="col" className="onHide">Status</th>
+                      <th scope="col" width={140} className="onHide">View</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      liveactivities.length > 0 ?
+
+                        liveactivities.map((activity, index) => {
+                          totalhours += Number(activity?.totalDuration || 0)
+                          totalProjecthours += Number(activity?.latestActivity?.duration || 0)
+                          return (
+                            <>
+                              <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
+                                <td data-label="Member Name" onClick={() => {
+                                      if (isActive) {
+                                        leaveRoom(currentActivity?._id)
+                                        setCurrentActivity(activity);
+                                      }
+                                  }} >{activity.name} 
+                                  {
+                                    activity?.latestActivity?.status ? 
+                                    <span className="status--circle active--color"></span>
+                                    :
+                                    activity?.latestActivity?.status === false  ?
+                                    <span className="status--circle info--color"></span>
+                                    :
+                                    null
+                                  }
+                                  </td>
+                                <td data-label="Project Name" className="onHide">{ activity?.latestActivity?.project?.title || '--' }</td>
+                                <td data-label="Task Name" className="onHide">{ activity?.latestActivity?.task || '--' }</td>
+                                <td data-label="Task Time" className="onHide">{ formattotalTime(activity?.latestActivity?.duration) || '00:00'}</td>
+                                <td data-label="Total Time" className="onHide">{ formattotalTime(activity?.totalDuration) || '00:00'}</td>
+                                <td data-label="Status" className="onHide">
+                                  { 
+                                    (activity?.latestActivity?.status) ? 
+                                    <Badge bg="success">Active</Badge> : 
+                                    (activity?.latestActivity?.status === false ) ?
+                                    <Badge bg="warning">Pause</Badge>
+                                    :
+                                    <Badge bg="danger">Inactive</Badge>
+                                    }
+                                </td>
+                                <td className="onHide"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
+                              </tr>
+                              
+                            </>
+                          )
+                        })
+                        :
+                        !spinner && liveactivities.length === 0  &&
+                          <tr key={`noresults-row`}>
+                            <td colSpan={7} className="text-center"><h3>No Results</h3> </td>
+                          </tr>
+                    }
+                    <tr className="onHide bg-light mobile--hide" key={'hiddenkey'}>
+                                <td></td>
+                                <td></td>
+                                <td>Total Hours</td>
+                                <td>{ formattotalTime(totalProjecthours) || '00:00'}</td>
+                                <td>{ formattotalTime(totalhours) || '00:00'}</td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                  </tbody>
+                </Table>
+              </>
+            )}
+            {activeTab === "Recorded" && (
+              <>
+                <p className="d-flex d-md-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
+                <Table responsive="lg" className="activity--table">
+                  <thead>
+                    <tr key={'recorded-table-header'}>
+                      <th scope="col" width={200}>Member Name</th>
+                      <th scope="col" className="onHide">Total Time</th>
+                      <th scope="col" width={140} className="onHide">View</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr key={'recorded-row'}>
+                      <td data-label="Member Name">Hitesh Kumar <span className="status--circle active--color"></span></td>
+                      <td data-label="Total Time" className="onHide">05 hrs 00 min</td>
+                      <td className="onHide"><Button variant="primary" onClick={handleClick}>View Activity</Button></td>
+                    </tr>
+                    
+                  </tbody>
+                </Table>
+              </>
+
+            )}
+          </Container>
+        </div>
+      </div>
+      <div className="details--wrapper">
+        <div className="wrapper--title">
+          <ListGroup horizontal className="live--tabs">
+            <ListGroup.Item key={'live-key'} action active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
+             if( currentActivity && Object.keys(currentActivity)){
+              const cact = currentActivity
+              leaveRoom(currentActivity?._id)
+              startsharing(currentActivity?._id, currentActivity?.latestActivity?.status)
+            }
+            }}>
+              Live
+            </ListGroup.Item>
+            <ListGroup.Item key={'recored-key'} action active={activeInnerTab === "InnerRecorded"} onClick={() => {setActiveInnerTab("InnerRecorded")
+              if( currentActivity && Object.keys(currentActivity)){
+                leaveRoom(currentActivity?._id)
+              }
+            }}>
+              Recorded
+            </ListGroup.Item>
+            {showDate()}
+          </ListGroup>
+          <ListGroup horizontal>
+            <ListGroup.Item key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false)}}>
+              <MdOutlineClose />
+            </ListGroup.Item>
+          </ListGroup>
+        </div>
+        <div className="rounded--box activity--box">
+          {activeInnerTab === "InnerLive" && (
+            <>
+              <div className="current--player p-2" key={`activity-${currentActivity?._id}`}>
+                <div className="timer--task">
+                  <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task || '--' }</small></h5>
+                  <span className="ml-3 p-2">{ currentActivity?.latestActivity?.app_version}</span>
+                  <p className="task--timer">
+                    <span><strong>{ formattotalTime(currentActivity?.totalDuration) || '00:00'}</strong></span>
+                  </p>
+                </div>
+                {
+                  currentActivity?.latestActivity?.status ? 
+                  <video ref={videoRef} id='remoteVideo' width="100%"  className="video" 
+                  preload="auto"
+                        autoPlay
+                        muted>video not available</video>
+
+                        :
+                        currentActivity?.latestActivity?.status === false ?
+                        <p className="text-center">The member is paused</p>
+                        :
+                        <p className="text-center">Member is not currently active</p>
+                }
+                
+                
+              </div>
+            </>
+          )}
+          {activeInnerTab === "InnerRecorded" && (
+            <>
+              {screenshotTab === "Screenshots" && (
+                <>
+                  <div className="wrapper--title screens--tabs">
+                    <p><span>Project: Wp Dynamic Gallery</span><strong>04 September 2023</strong><small>9:00 AM - 10:45 AM</small></p>
+                    <ListGroup horizontal>
+                      <ListGroup.Item key={'screenshots-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
+                        Screenshots
+                      </ListGroup.Item>
+                      <ListGroup.Item key={'videos-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
+                        Videos
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </div>
+                  <div className="shots--list">
+                    <CardGroup>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                    </CardGroup>
+                  </div>
+                  <hr />
+                  <div className="wrapper--title screens--tabs">
+                    <p><span>Project: Wp Dynamic Gallery</span><strong>04 September 2023</strong><small>9:00 AM - 10:45 AM</small></p>
+                    <ListGroup horizontal>
+                      <ListGroup.Item key={'screenshots-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
+                        Screenshots
+                      </ListGroup.Item>
+                      <ListGroup.Item key={'videos-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
+                        Videos
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </div>
+                  <div className="shots--list">
+                    <CardGroup>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                      <Card>
+                        <Card.Body>
+                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
+                        </Card.Body>
+                      </Card>
+                    </CardGroup>
+                  </div>
+                </>
+              )}
+              {screenshotTab === "Videos" && (
+                <>
+                {
+                  recordedactivities && recordedactivities.length > 0 ? 
+                    recordedactivities.map((recording, index) => {
+                      return (
+                      <>
+                        <div className="wrapper--title screens--tabs">
+                          <p><span>Project: {recording?.project?.title}</span><strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong><small>{ formattotalTime(recording?.duration) || '00:00'}</small></p>
+                          <ListGroup horizontal>
+                            <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
+                              Screenshots
+                            </ListGroup.Item>
+                            <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
+                              Videos
+                            </ListGroup.Item>
+                          </ListGroup>
+                        </div>
+
+                        <div className="shots--list pt-3">
+                          <CardGroup>
+                          {
+                            recording?.activityMeta && recording?.activityMeta.length > 0 &&
+                            recording.activityMeta.map((meta, i) => {
+                              // Check if meta_key is 'videos'
+                              if (meta.meta_key === 'videos' && meta.meta_value.length > 0) {
+                                return meta.meta_value.map((videoData, j) => (
+
+                                  <Card key={`card-${i}-${j}`}>
+                                    <Card.Body>
+                                      {/* <span className="video--icon"><FaPlay /></span> */}
+                                      <video controls height={'175px'}>
+                                        <source src={videoData?.url} type="video/webm" />
+                                        Your browser does not support the video tag.
+                                      </video>
+                                      <p><strong>Task Name:</strong> {recording.task} <br />  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}</p>
+                                    </Card.Body>
+                                  </Card>
+                                ));
+                              }
+                              return null; // Return null if meta_key is not 'videos'
+                            })
+                          }
+                          </CardGroup>
+                        </div>
+                      </>
+                      )
+                    })
+                    
+
+                  :
+                  null
+                }
+                  
+                  
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+      {/*--=-=Filter Modal**/}
+      <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Filters</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ListGroup>
+            <ListGroup.Item key="filter-key-1" className="mt-0">
+              <Dropdown className="select--dropdown">
+                <Dropdown.Toggle variant="success">Team Projects</Dropdown.Toggle>
+                <Dropdown.Menu>
+                <div className="drop--scroll">
+                  <Form>
+                    <Form.Group className="form-group mb-3">
+                      <Form.Control type="text" placeholder="Search here.." />
+                    </Form.Group>
+                  </Form>
+                  <Dropdown.Item className="selected--option" href="#/action-1">Team Projects <FaCheck /></Dropdown.Item>
+                  <Dropdown.Item href="#/action-2">My Projects</Dropdown.Item>
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+              {/* <Select2
+                defaultValue={1}
+                data={[
+                  { text: 'Team Projects', id: 1 },
+                  { text: 'My Projects', id: 2 },
+                ]}
+                options={{
+                  placeholder: 'Team Projects',
+                }}
+              /> */}
+            </ListGroup.Item>
+            <ListGroup.Item key="filter-key-2" className="mt-3">
+              <Dropdown className="select--dropdown">
+                <Dropdown.Toggle variant="success">View All</Dropdown.Toggle>
+                <Dropdown.Menu>
+                <div className="drop--scroll">
+                  <Form>
+                    <Form.Group className="form-group mb-3">
+                      <Form.Control type="text" placeholder="Search here.." />
+                    </Form.Group>
+                  </Form>
+                  <Dropdown.Item className="selected--option" href="#/action-1">View All <FaCheck /></Dropdown.Item>
+                  <Dropdown.Item href="#/action-2">Active</Dropdown.Item>
+                  <Dropdown.Item href="#/action-2">Paused</Dropdown.Item>
+                  <Dropdown.Item href="#/action-2">Inactive</Dropdown.Item>
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
+            <ListGroup.Item key="filter-key-3" className="mt-3">
+              <Dropdown className="select--dropdown">
+                <Dropdown.Toggle variant="success">All Projects</Dropdown.Toggle>
+                <Dropdown.Menu>
+                <div className="drop--scroll">
+                  <Form>
+                    <Form.Group className="form-group mb-3">
+                      <Form.Control type="text" placeholder="Search here.." />
+                    </Form.Group>
+                  </Form>
+                  <Dropdown.Item className="selected--option" href="#/action-1">All Projects <FaCheck /></Dropdown.Item>
+                  <Dropdown.Item href="#/action-2">The Galaxy</Dropdown.Item>
+                  <Dropdown.Item href="#/action-2">On Teams</Dropdown.Item>
+                  <Dropdown.Item href="#/action-2">Ticket</Dropdown.Item>
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
+            <ListGroup.Item key="filter-key-4" className="mt-3">
+              <Form>
+                <Form.Group className="mb-0 form-group">
+                  <Form.Control type="date" name="date" />
+                </Form.Group>
+              </Form>
+            </ListGroup.Item>
+          </ListGroup>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleFilterClose}>Cancel</Button>
+          <Button variant="primary">Save</Button>
+        </Modal.Footer>
+      </Modal>
+      {/*--=-=Search Modal**/}
+      <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Search</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ListGroup>
+            <ListGroup.Item className="border-0 p-0" key="filter-key-5">
+              <Form>
+                <Form.Group className="mb-0 form-group">
+                  <Form.Control type="text" name="search" placeholder="Search by name" />
+                </Form.Group>
+              </Form>
+            </ListGroup.Item>
+          </ListGroup>
+        </Modal.Body>
+      </Modal>
+    </>
+  );
+}
+
+export default TimeTrackingPage;
