@@ -24,7 +24,7 @@ function InvoicePage() {
     <>
 
       <div className={isActive ? 'show--details team--page' : 'team--page'}>
-        <div className='page--title p-md-3 py-3 pb-0'>
+        <div className='page--title px-md-2 pt-3'>
           <Container fluid>
             <Row>
               <Col sm={12}>
@@ -33,12 +33,12 @@ function InvoicePage() {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper p-md-3 py-3'>
+        <div className='page--wrapper px-md-2 py-3'>
           <Container fluid>
             <Table responsive="lg" className="invoice--table">
               <thead>
                 <tr>
-                  <th width={30}>
+                  <th width={20}>
                     <Form.Check type='checkbox' name="check" className="form-check" />
                   </th>
                   <th scope="col">Invoice #</th>

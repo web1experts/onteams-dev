@@ -6,13 +6,7 @@ import { publicRoutes, privateRoutes, hideSidebarRoutes } from "./routes";
 import { parseIfValidJSON } from "./helpers/commonfunctions";
 import SidebarPanel from "./Components/Sidebar/Sidebar";
 import { REFRESH_DASHBOARDS } from "./redux/actions/types";
-import {
-  socket,
-  isAuth,
-  encryptJsonData,
-  decryptJsonData,
-  setupDashboards,
-} from "./helpers/auth";
+import { isAuth } from "./helpers/auth";
 import { refreshUserWorkspace } from "./redux/actions/auth.actions";
 import { checkifUserhasworkspace } from "./helpers/commonfunctions";
 import ToastAlerts from "./Components/toasts";

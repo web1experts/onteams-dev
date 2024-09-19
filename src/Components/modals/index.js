@@ -705,7 +705,8 @@ export const  WorkFlowModal =  React.memo((props) => {
                             {
                               Object.keys(selectedWorkflow).length > 0 && showWorkflow &&
                             <>
-                            <DragDropContext onDragEnd={handleDragEnd}>
+                              <ListGroup className='workflow--list'>
+                                <DragDropContext onDragEnd={handleDragEnd}>
                                   <Droppable droppableId="droppabletabs" type="droppableTabsItem" direction="horizontal">
                                     {(provided) => (
                                       <ListGroup
@@ -763,11 +764,11 @@ export const  WorkFlowModal =  React.memo((props) => {
                                   </Droppable>
                                 </DragDropContext>
 
-                            
-                              <ListGroup.Item>
-                                  <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
-                              </ListGroup.Item>
-                              </>
+                                <ListGroup.Item className='ms-auto'>
+                                    <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
+                                </ListGroup.Item>
+                              </ListGroup>
+                            </>
                         }
                         </Form.Group>
                 </Modal.Body>
@@ -999,7 +1000,7 @@ export const FilesModal = () => {
                     <Form.Control type="file" multiple name="images[]" onChange={(e) => {handleSelectedFiles(Array.from(e.target.files))} } {...getInputProps()} id="attachments-new" />
                     <Form.Label className="file--upload" htmlFor="attachments-new" onClick="handleLabelClick(event)">
                         <span><FaUpload /></span>
-                        <p>Drop your files here or <strong>browsesee</strong></p>
+                        <p>Drop your files here or <strong>browse</strong></p>
                     </Form.Label>
                 </Form.Group>
 

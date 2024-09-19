@@ -13,7 +13,6 @@ import ProjectsPage from "../Components/Projects/ProjectsPage"
 import HolidaysPage from "../Components/Holidays/HolidaysPage";
 import AttendancePage from "../Components/Attendance/AttendancePage";
 import Invite from "../Components/invite";
-import Invitation from "../Components/TeamMembers/Invitation";
 import InvitationList from "../Components/invite/invitationslist"
 import MemberSignUp from "../Components/Auth/MemberSignup";
 import InvoicePage from "../Components/Invoice/InvoicePage";

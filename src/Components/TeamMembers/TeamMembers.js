@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table } from "react-bootstrap";
-import { FaList, FaPlus, FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
+import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
+import { FiEdit } from "react-icons/fi";
 import { getMemberdata } from "../../helpers/commonfunctions";
 import { BsGrid } from "react-icons/bs";
 import { MdOutlineClose, MdSearch } from "react-icons/md";
@@ -11,13 +12,9 @@ import { useNavigate } from "react-router-dom";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { createMember } from "../../redux/actions/members.action";
-import { useToast } from "../../context/ToastContext";
 import Invitation from "./Invitation";
-import { getloggedInUser } from "../../helpers/auth";
 import { AlertDialog, TransferOnwerShip } from "../modals";
-import useFilledClass from "../customHooks/useFilledclass";
-import Spinner from 'react-bootstrap/Spinner';
-import { selectboxObserver, cleanupCustomDropdown } from "../../helpers/commonfunctions";
+import { selectboxObserver } from "../../helpers/commonfunctions";
 
 function EditableField({ selectedMember, field, label, value, onChange, isEditing, onEditClick, error, roles, printval }) {
   const inputRef = useRef(null);
@@ -26,75 +23,76 @@ function EditableField({ selectedMember, field, label, value, onChange, isEditin
 
   useEffect(() => {
     // if( !value ){
-      function handleClickOutside(event) {
-        if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-          if (inputRef.current && inputRef.current.contains(event.target)) {
-            return; // Click is inside the select box or input field
-          }
-          if (inputRef.current.value.trim() === "") {
-            onChange(originalValue);
-          }
-          
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        if (inputRef.current && inputRef.current.contains(event.target)) {
+          return; // Click is inside the select box or input field
         }
-      }
-  
-      if (isEditing) {
-        setOriginalValue(value);
-        if (inputRef.current) {
-          inputRef.current.focus();
+        if (inputRef.current.value.trim() === "") {
+          onChange(originalValue);
         }
-        document.addEventListener("mousedown", handleClickOutside);
-        selectboxObserver()
-      } else {
-        document.removeEventListener("mousedown", handleClickOutside);
-        if(document.querySelector('.conditional-box')){document.querySelector('.conditional-box').remove()}
+
       }
-        
-  
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
+    }
+
+    if (isEditing) {
+      setOriginalValue(value);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+      document.addEventListener("mousedown", handleClickOutside);
+      selectboxObserver()
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+      if (document.querySelector('.conditional-box')) { document.querySelector('.conditional-box').remove() }
+    }
+
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
     // }
-    
+
   }, [isEditing]);
 
-  if (field === "role") { console.log('Error: ', error)
+  if (field === "role") {
+    console.log('Error: ', error)
     return (
       <ListGroup.Item ref={wrapperRef}>
         <strong>Role</strong>
         {isEditing ? (
           <>
-          <Form.Group className="mb-0 form-group">
-          <Form.Select
-            ref={inputRef}
-            className={
-                error
-                ? "input-error form-control custom-selectbox conditional-box"
-                : "form-control custom-selectbox conditional-box"
-            }
-            defaultValue={value}
-            onChange={(e) => onChange(e.target.value)}
-            name="role"
-          >
-            <option value="none">None</option>
-            {roles.map((role, index) => (
-              <option key={index} value={role._id}>
-                {role.name}
-              </option>
-            ))}
-          </Form.Select>
-          
-          <span className="error">{error}</span>
-          </Form.Group>
+            <Form.Group className="mb-0 form-group pb-0">
+              <Form.Select
+                ref={inputRef}
+                className={
+                  error
+                    ? "input-error form-control custom-selectbox conditional-box"
+                    : "form-control custom-selectbox conditional-box"
+                }
+                defaultValue={value}
+                onChange={(e) => onChange(e.target.value)}
+                name="role"
+              >
+                <option value="none">None</option>
+                {roles.map((role, index) => (
+                  <option key={index} value={role._id}>
+                    {role.name}
+                  </option>
+                ))}
+              </Form.Select>
+
+              <span className="error">{error}</span>
+            </Form.Group>
           </>
         ) : (
           <>
             {printval}
-            <FaRegEdit
+            <FiEdit
               onClick={() => onEditClick(true)}
               style={{ cursor: "pointer" }}
             />
-            
+
           </>
         )}
       </ListGroup.Item>
@@ -119,7 +117,7 @@ function EditableField({ selectedMember, field, label, value, onChange, isEditin
         ) : (
           <>
             {value}
-            <FaRegEdit
+            <FiEdit
               onClick={() => onEditClick(true)}
               style={{ cursor: "pointer" }}
             />
@@ -150,7 +148,7 @@ function TeamMembersPage() {
     }
   };
 
-  const [isActiveView, setIsActiveView] = useState(1);
+  const [isActiveView, setIsActiveView] = useState(2);
   const [rows, setRows] = useState([{ email: "", role: "" }]);
   const [errors, setErrors] = useState([]);
   let fieldErrors = {};
@@ -188,12 +186,12 @@ function TeamMembersPage() {
   const [showdialog, setShowDialog] = useState(false);
   const [roles, setRoles] = useState([]);
   const handleListMember = async () => {
-    if( activeTab === "Members"){
+    if (activeTab === "Members") {
       setMemberFeed([])
-      
+
       await dispatch(Listmembers(currentPage, searchTerm));
       setShowloader(false);
-    } 
+    }
   };
 
   const [showSearch, setSearchShow] = useState(false);
@@ -224,7 +222,7 @@ function TeamMembersPage() {
 
   useEffect(() => {
     if (currentPage !== "") {
-      setShowloader( true )
+      setShowloader(true)
       handleListMember();
     }
   }, [currentPage, searchTerm]);
@@ -240,7 +238,7 @@ function TeamMembersPage() {
     if (apiResult.success) {
       // setDisable(false);
       setLoader(false);
-      setUpdateLoader( false )
+      setUpdateLoader(false)
       setRows([{ email: "", role: "" }]);
       setErrors([]);
       setShow(false);
@@ -310,7 +308,8 @@ function TeamMembersPage() {
         [field]: value,
       }));
 
-      if (field === "role") { console.log('role value: ', value)
+      if (field === "role") {
+        console.log('role value: ', value)
         const matchingRole = roles.find(role => role._id === value);
         setEditedMember((prevState) => ({
           ...prevState,
@@ -425,7 +424,7 @@ function TeamMembersPage() {
   };
 
   useEffect(() => {
-    if( rows.length > 0){
+    if (rows.length > 0) {
       selectboxObserver();
     }
   }, [rows])
@@ -494,65 +493,60 @@ function TeamMembersPage() {
 
   const pagetopbar = () => {
     return (
-      <div className={isActive ? 'page--title px-md-2 pt-3 pb-0 pb-md-0 mb-3' : 'page--title p-md-3 pt-3 pb-0 pb-md-0 mb-3'}>
-          <Container fluid>
-            <Row>
-              <Col sm={12}>
-                <h2>
-                  Members
-                  <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none ms-auto ms-md-2'} onClick={handleSearchShow}><MdSearch /></Button>
-                  <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
-                  <ListGroup horizontal className={isActive ? "d-none" : "ms-auto d-none d-md-flex"}>
-                  <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Members"} onClick={() => {setsearchTerm('');setActiveTab("Members")}}>Members</ListGroup.Item>
-                    <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Invitees"} onClick={() => {setsearchTerm('');setActiveTab("Invitees")}}>Invitations</ListGroup.Item>
-                    <ListGroup.Item className='d-none d-lg-block'>
-                      <Form>
-                        <Form.Group className="mb-0 form-group">
-                          <Form.Control type="text" placeholder={activeTab === "Members" ? "Search Member.." : "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)} />
-                        </Form.Group>
-                      </Form>
-                    </ListGroup.Item>
-                    <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
-                    <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
-                    
-                  </ListGroup>
-                </h2>
-              </Col>
-              <Col sm={12} className={isActive ? "d-none" : "page--title"}>
-                <ListGroup horizontal className='d-flex mt-3 mt-lg-0 d-md-none list-group--two'>
-                  <ListGroup.Item action active={activeTab === "Members"} onClick={() => {setsearchTerm('');setActiveTab("Members")}}>Members</ListGroup.Item>
-                  <ListGroup.Item action active={activeTab === "Invitees"} onClick={() => {setsearchTerm('');setActiveTab("Invitees")}}>Invitations</ListGroup.Item>
+      <div className='page--title px-md-2 pt-3'>
+        <Container fluid>
+          <Row>
+            <Col sm={12}>
+              <h2>
+                Members
+                <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none ms-auto ms-md-2'} onClick={handleSearchShow}><MdSearch /></Button>
+                <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
+                <ListGroup horizontal className={isActive ? "d-none" : "ms-auto d-none d-md-flex"}>
+                  <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Members"} onClick={() => { setsearchTerm(''); setActiveTab("Members") }}>Members</ListGroup.Item>
+                  <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Invitees"} onClick={() => { setsearchTerm(''); setActiveTab("Invitees") }}>Invitations</ListGroup.Item>
+                  <ListGroup.Item className='d-none d-lg-block'>
+                    <Form>
+                      <Form.Group className="mb-0 form-group">
+                        <Form.Control type="text" placeholder={activeTab === "Members" ? "Search Member.." : "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)} />
+                      </Form.Group>
+                    </Form>
+                  </ListGroup.Item>
+                  <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                  <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+
                 </ListGroup>
-              </Col>
-            </Row>
-          </Container>
-        </div>
+              </h2>
+            </Col>
+            <Col sm={12} className={isActive ? "d-none" : "page--title"}>
+              <ListGroup horizontal className='d-flex mt-3 mt-lg-0 d-md-none list-group--two'>
+                <ListGroup.Item action active={activeTab === "Members"} onClick={() => { setsearchTerm(''); setActiveTab("Members") }}>Members</ListGroup.Item>
+                <ListGroup.Item action active={activeTab === "Invitees"} onClick={() => { setsearchTerm(''); setActiveTab("Invitees") }}>Invitations</ListGroup.Item>
+              </ListGroup>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     )
   }
 
   return (
     <>
-
-        {/* <div class="loading-bar">
-          <img src="images/OnTeam-icon-gray.png" className="flipchar" />
-        </div> */}
-          
-            {activeTab === "Members" && (
-              <div className={isActive ? 'show--details team--page' : 'team--page'}>
-              {pagetopbar()}
-              <div className="page--wrapper p-md-3 py-3">
-              {
-                  showloader &&
-                  <div className="loading-bar">
-                      <img src="images/OnTeam-icon-gray.png" className="flipchar" />
-                  </div>
-              }
-              <Container fluid className={isActive ? 'px-0' : ''}>
+      {activeTab === "Members" && (
+        <div className={isActive ? 'show--details team--page' : 'team--page'}>
+          {pagetopbar()}
+          <div className="page--wrapper px-md-2 py-3">
+            {
+              showloader &&
+              <div className="loading-bar">
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+              </div>
+            }
+            <Container fluid>
               <>
                 <Table responsive="lg" className={isActiveView === 1 ? 'project--grid--table clients--grid--table' : isActiveView === 2 ? 'project--table clients--table' : 'project--table clients--table'}>
                   <thead>
                     <tr>
-                      <th>#</th>
+                      <th width={20}>#</th>
                       <th>Member Name</th>
                       <th className="onHide">Role</th>
                       <th className="onHide">Email Address</th>
@@ -564,7 +558,7 @@ function TeamMembersPage() {
                       memberFeeds.map((member, idx) => (
                         <tr key={`member-table-row-${idx}`} className={member._id === selectedMember?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(member) : () => { return false; }}>
                           <td>{idx + 1}</td>
-                          <td>
+                          <td className="cursor--pointer">
                             <span className="onHide">
                               <img variant="top" src={member.avatar || "./images/default.jpg"} />
                             </span>
@@ -575,42 +569,38 @@ function TeamMembersPage() {
                           </td>
                           <td className="onHide">{member.email}</td>
                           <td className="onHide">
-                            <Button variant="primary" onClick={() => { handleTableToggle(member); setIsActive(true)}}>View</Button>
+                            <Button variant="primary" onClick={() => { handleTableToggle(member); setIsActive(true) }}>View</Button>
                           </td>
                         </tr>
                       ))
-                    ) : !showloader && memberFeeds && memberFeeds.length === 0 && 
-                      
-                        <tr>
-                          <td colSpan={5}>
-                            <h2 className="mt-2 text-center">
-                              Members Not Found
-                            </h2>
-                          </td>
-                        </tr>
-                      }
+                    ) : !showloader && memberFeeds && memberFeeds.length === 0 &&
+                    <tr>
+                      <td colSpan={5}>
+                        <h2 className="mt-2 text-center">
+                          Members Not Found
+                        </h2>
+                      </td>
+                    </tr>
+                    }
                   </tbody>
                 </Table>
               </>
-              </Container>
-              </div>
-              </div>
-            )}
-            {activeTab === "Invitees" && (
-             
-              <Invitation
-                activeTab={activeTab}
-                topbar={pagetopbar}
-                activeSubTab={isActiveView}
-                searchTerm={searchTerm}
-                listfor="company"
-                handleIsActive={setIsActive}
-                toggleActive={setIsActive}
-              />
-              
-            )}
-          
-      
+            </Container>
+          </div>
+        </div>
+      )}
+      {activeTab === "Invitees" && (
+        <Invitation
+          activeTab={activeTab}
+          topbar={pagetopbar}
+          activeSubTab={isActiveView}
+          searchTerm={searchTerm}
+          listfor="company"
+          handleIsActive={setIsActive}
+          toggleActive={setIsActive}
+        />
+      )}
+
       <div className="details--member--view">
         <div className="wrapper--title">
           <h3>Member Details</h3>
@@ -671,8 +661,6 @@ function TeamMembersPage() {
         </div>
       </div>
 
-      
-
       <Modal show={show} onHide={handleClose} centered size="lg" className="add--team--member--modal add--member--modal" onShow={() => selectboxObserver()}>
         <Modal.Header closeButton>
           <Modal.Title>Add Member</Modal.Title>
@@ -700,7 +688,7 @@ function TeamMembersPage() {
                   </FloatingLabel>
                   {showError([index], "email")}
                 </Form.Group>
-                <Form.Group className="mb-0 form-group">
+                <Form.Group className="mb-0 form-group pb-0">
                   <Form.Select
                     placeholder="Select role"
                     area-label="Role"

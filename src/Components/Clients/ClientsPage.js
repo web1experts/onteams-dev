@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table } from "react-bootstrap";
-import { FaList, FaPlus, FaRegEdit, FaTrashAlt } from "react-icons/fa";
+import { FaList, FaPlus, FaTrashAlt } from "react-icons/fa";
+import { FiEdit } from "react-icons/fi";
 import { BsGrid } from "react-icons/bs";
 import { MdOutlineClose, MdSearch } from "react-icons/md";
 import { ListClients, createClient, deleteClient, updateClient } from "../../redux/actions/client.action";
@@ -54,7 +55,7 @@ function EditableField({ field, label, value, onChange, isEditing, onEditClick, 
 
       ) : (
         <>
-          <strong>{label}</strong> {value} <FaRegEdit onClick={() => onEditClick(true)} />
+          <strong>{label}</strong> {value} <FiEdit onClick={() => onEditClick(true)} />
           <p className='error'><span className='error'>{error}</span></p>
         </>
       )}
@@ -83,7 +84,7 @@ function ClientsPage() {
     }
   });
 
-  const [isActiveView, setIsActiveView] = useState(1);
+  const [isActiveView, setIsActiveView] = useState(2);
   const [rows, setRows] = useState([{ name: '' }]);
   const [errors, setErrors] = useState([]);
   const [fieldserrors, setFieldErrors] = useState({ name: '' });
@@ -398,7 +399,7 @@ function ClientsPage() {
     <>
 
       <div className={isActive ? 'show--details team--page' : 'team--page'}>
-        <div className={isActive ? 'page--title px-md-2 pt-3 pb-0 pb-md-0 mb-3' : 'page--title p-md-3 pt-3 pb-0 pb-md-0 mb-3'}>
+        <div className='page--title px-md-2 pt-3'>
           <Container fluid>
             <Row>
               <Col sm={12}>
@@ -421,18 +422,18 @@ function ClientsPage() {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper p-md-3 py-3'>
+        <div className='page--wrapper px-md-2 py-3'>
           {
               spinner &&
               <div className="loading-bar">
                   <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
           }
-          <Container fluid className={isActive ? 'px-0' : ''}>
+          <Container fluid>
             <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table clients--grid--table' : isActiveView === 2 ? 'project--table clients--table' : 'project--table clients--table'}>
               <thead>
                 <tr key={'client-table-header'}>
-                  <th width={50}>#</th>
+                  <th width={20}>#</th>
                   <th>Member Name</th>
                   <th className="onHide" width={50}>Action</th>
                 </tr>
@@ -444,7 +445,7 @@ function ClientsPage() {
                       return (<>
                         <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={isActive ? () => handleClick(client) : () => { return false; }}>
                           <td>{index + 1}</td>
-                          <td><span className="onHide"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span>{client.name}</td>
+                          <td className="cursor--pointer"><span className="onHide"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span>{client.name}</td>
                           <td className="onHide"><Button variant="primary" onClick={() => handleClick(client)}>View</Button></td>
                         </tr>
                       </>)

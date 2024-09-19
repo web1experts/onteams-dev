@@ -556,7 +556,7 @@ function SingleProject(props) {
                     </ListGroup>
                     <ListGroup horizontal>
                         <Button variant="outline-primary" className="btn--view" onClick={() => props.closeview(1)}>Tasks</Button>
-                        <Button variant="outline-primary" className="ms-2 active btn--view" onClick={() => setIsActive(2)}>View</Button>
+                        <Button variant="outline-primary" className="active btn--view" onClick={() => setIsActive(2)}>View</Button>
                         <ListGroup.Item key={`closekey`} onClick={() => props.closeview(0)}><MdOutlineClose /></ListGroup.Item>
                     </ListGroup>
                 </div>

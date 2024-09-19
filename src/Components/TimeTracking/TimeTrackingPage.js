@@ -337,7 +337,7 @@ function TimeTrackingPage() {
 
 
       <div className={isActive ? "show--details team--page" : "team--page"}>
-        <div className={isActive ? 'page--title px-md-2 pt-3 pb-0 pb-md-0 mb-3' : 'page--title p-md-3 pt-3 pb-0 pb-md-0 mb-3'}>
+        <div className='page--title px-md-2 pt-3'>
           <Container fluid>
             <Row>
               <Col sm={12}>
@@ -362,20 +362,21 @@ function TimeTrackingPage() {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper daily--reports activity--table p-md-3 py-3'>
+        <div className='page--wrapper daily--reports activity--table px-md-2 py-3'>
           {
               spinner &&
               <div class="loading-bar">
                   <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
           }
-          <Container fluid className={isActive ? 'ps-0' : ''}>
+          <Container fluid>
             {activeTab === "Live" && (
               <>
-                <p className="d-flex d-md-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
+                <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
                 <Table responsive="lg" className="activity--table">
                   <thead>
                     <tr key="tracking-table-header">
+                      <th scope="col" width={20}>#</th>
                       <th scope="col" width={200}>Member Name</th>
                       <th scope="col" width={200} className="onHide">Project Name</th>
                       <th scope="col" width={200} className="onHide">Task Name</th>
@@ -395,6 +396,7 @@ function TimeTrackingPage() {
                           return (
                             <>
                               <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
+                                <td key={`index-${index}`}>{index + 1} </td>
                                 <td data-label="Member Name" onClick={() => {
                                       if (isActive) {
                                         leaveRoom(currentActivity?._id)
@@ -411,8 +413,8 @@ function TimeTrackingPage() {
                                     null
                                   }
                                   </td>
-                                <td data-label="Project Name" className="onHide">{ activity?.latestActivity?.project?.title || '--' }</td>
-                                <td data-label="Task Name" className="onHide">{ activity?.latestActivity?.task || '--' }</td>
+                                <td data-label="Project Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
+                                <td data-label="Task Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.task || '--' }</span></td>
                                 <td data-label="Task Time" className="onHide">{ formattotalTime(activity?.latestActivity?.duration) || '00:00'}</td>
                                 <td data-label="Total Time" className="onHide">{ formattotalTime(activity?.totalDuration) || '00:00'}</td>
                                 <td data-label="Status" className="onHide">
@@ -434,28 +436,29 @@ function TimeTrackingPage() {
                         :
                         !spinner && liveactivities.length === 0  &&
                           <tr key={`noresults-row`}>
-                            <td colSpan={7} className="text-center"><h3>No Results</h3> </td>
+                            <td colSpan={8} className="text-center"><h3>No Results</h3> </td>
                           </tr>
                     }
                     <tr className="onHide bg-light mobile--hide" key={'hiddenkey'}>
-                                <td></td>
-                                <td></td>
-                                <td>Total Hours</td>
-                                <td>{ formattotalTime(totalProjecthours) || '00:00'}</td>
-                                <td>{ formattotalTime(totalhours) || '00:00'}</td>
-                                <td></td>
-                                <td></td>
-                              </tr>
+                      <td></td>
+                      <td></td>
+                      <td><strong>Total Hours</strong></td>
+                      <td><strong>{ formattotalTime(totalProjecthours) || '00:00'}</strong></td>
+                      <td><strong>{ formattotalTime(totalhours) || '00:00'}</strong></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
                   </tbody>
                 </Table>
               </>
             )}
             {activeTab === "Recorded" && (
               <>
-                <p className="d-flex d-md-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
+                <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
                 <Table responsive="lg" className="activity--table">
                   <thead>
                     <tr key={'recorded-table-header'}>
+                      <th scope="col" width={20}>#</th>
                       <th scope="col" width={200}>Member Name</th>
                       <th scope="col" className="onHide">Total Time</th>
                       <th scope="col" width={140} className="onHide">View</th>
@@ -463,15 +466,14 @@ function TimeTrackingPage() {
                   </thead>
                   <tbody>
                     <tr key={'recorded-row'}>
+                      <td>1</td>
                       <td data-label="Member Name">Hitesh Kumar <span className="status--circle active--color"></span></td>
                       <td data-label="Total Time" className="onHide">05 hrs 00 min</td>
                       <td className="onHide"><Button variant="primary" onClick={handleClick}>View Activity</Button></td>
                     </tr>
-                    
                   </tbody>
                 </Table>
               </>
-
             )}
           </Container>
         </div>

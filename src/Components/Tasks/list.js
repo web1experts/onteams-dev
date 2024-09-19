@@ -26,7 +26,6 @@ const TasksList = React.memo(( props ) => {
         <div className="task--list">
             {
                 currentProject && Object.keys(currentProject).length > 0 && currentProject?.workflow?.tabs?.length > 0 &&
-
                 currentProject?.workflow?.tabs.map((tab, index ) => (
                     <>
                         <div className="task--grid">
@@ -44,17 +43,16 @@ const TasksList = React.memo(( props ) => {
                                 <li onClick={handleProjectShow} className="task--button">responsive="lg" issues fixes</li>
                             </ul>
                         </div>
-                        
-                        </>
+                    </>
                 ))
             }
-            
         </div>
     )}
     {props?.activeTab === 'ListView' && (
         <Accordion defaultActiveKey="0" className="bg-light p-3">
             <Accordion.Item eventKey="0">
-                <Accordion.Header>Assigned Task <span type="button" variant="primary" onClick={handleTaskShow}><FaPlus /></span></Accordion.Header>
+                <Accordion.Header>Assigned Task</Accordion.Header>
+                <span type="button" variant="primary" className="btn btn-primary" onClick={handleTaskShow}><FaPlus /></span>
                 <Accordion.Body>
                     <ListGroup>
                         <ListGroup.Item key={"design"} className="active--task">

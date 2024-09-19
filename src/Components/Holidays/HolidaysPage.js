@@ -37,7 +37,7 @@ function HolidaysPage() {
     <>
 
       <div className='team--page'>
-        <div className='page--title p-md-3 py-3 pb-0'>
+        <div className='page--title px-md-2 pt-3'>
           <Container fluid>
             <Row className="align-items-center">
               <Col xs={6} md={5}>
@@ -62,12 +62,12 @@ function HolidaysPage() {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper p-md-3 py-3'>
+        <div className='page--wrapper px-md-2 py-3'>
           <Container fluid>
             <Table responsive="lg" className="holiday--table">
               <thead>
                 <tr>
-                  <th scope="col" width={50}>#</th>
+                  <th scope="col" width={20}>#</th>
                   <th scope="col">Date</th>
                   <th scope="col">Occasion</th>
                   <th scope="col">Type</th>

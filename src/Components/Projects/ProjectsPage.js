@@ -24,7 +24,7 @@ import TasksList from "../Tasks/list";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS } from "../../redux/actions/types";
 function ProjectsPage() {
-    const [isActiveView, setIsActiveView] = useState(1);
+    const [isActiveView, setIsActiveView] = useState(2);
     const dispatch = useDispatch();
     const [projects, setProjects] = useState([]);
     const [filters, setFilters] = useState({})
@@ -301,12 +301,7 @@ function ProjectsPage() {
         handleFilterClose()
         selectboxObserver()
     }
-
-    // const onDrop = useCallback(acceptedFiles => {
-    //     handleSelectedFiles(acceptedFiles)
-    // }, [])
-    // const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-
+    
     const handleChange = ({ target: { name, value, type, files } }) => {
         // setFields({ ...fields, [name]: value });
         dispatch( updateStateData( PROJECT_FORM,  {[name]: value }))
@@ -393,8 +388,6 @@ function ProjectsPage() {
             setLoader(false)
             setErrors(fieldErrors);
         } else {
-            // console.log('All Fields:: ', fields)
-            // return;
             const formData = new FormData();
             for (const [key, value] of Object.entries(fields)) {
                 if (typeof value === 'object' && key === 'images') {
@@ -450,22 +443,6 @@ function ProjectsPage() {
         }
     }, [projects]);
 
-    // useEffect(() => {
-    //     if (currentProject && Object.keys(currentProject).length > 0) {
-    //         if (currentProject.members && currentProject.members.length > 0) { 
-    //             let membersdrop = {};
-    //             currentProject.members.forEach(member => {
-    //                 const { _id, name } = member;
-    //                 membersdrop[_id] = name;
-    //             });
-    //             setselectedMembers(membersdrop);
-    //         }else{
-    //             setselectedMembers({});
-    //         }    
-    //     }
-    // }, [currentProject]);
-
-
     const handleattachfiles = (e) => {
         handleUploadClose()
     }
@@ -496,7 +473,6 @@ function ProjectsPage() {
         console.log(type)
         const { src, _id } = preview;
         const mimetype = (preview.mimetype) ? preview.mimetype : src.split('.').pop().toLowerCase();
-
         const previewComponents = {
             image: (
                 <div className="preview--cell">
@@ -525,7 +501,6 @@ function ProjectsPage() {
                         type !== "new" &&
                         <Button variant="secondary" className="ms-auto"><a target="_blank" className="btn-secondary" download={preview?.filename} href={src}><MdFileDownload /></a></Button>
                     }
-
                     <Button variant="primary" onClick={() => type === "new" ? handleRemove(index) : handleRemovefiles(_id)}><FaRegTrashAlt /></Button>
                 </div>
             ),
@@ -536,7 +511,6 @@ function ProjectsPage() {
                         type !== "new" &&
                         <Button variant="secondary" className="ms-auto"><a target="_blank" className="btn-secondary" download={preview?.filename} href={src}><MdFileDownload /></a></Button>
                     }
-
                     <Button variant="primary" onClick={() => type === "new" ? handleRemove(index) : handleRemovefiles(_id)}><FaRegTrashAlt /></Button>
                 </div>
             ),
@@ -558,17 +532,16 @@ function ProjectsPage() {
 
     const MemberInitials = ({ id, children, title }) => { 
         return (
-            <OverlayTrigger overlay={<Tooltip id={id}>{title}</Tooltip>}>
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
                 {children}
             </OverlayTrigger>
         )
     };
 
-    
     return (
         <>
             <div className={isActive === 1 ? 'show--details team--page' : isActive === 2 ? ' view--project team--page' : 'team--page'}>
-                <div className={isActive ? 'page--title px-md-2 pt-2 pb-0 pb-md-0 mb-3' : 'page--title p-md-2 pt-3 pb-0 pb-md-0 mb-3'}>
+                <div className='page--title px-md-2 pt-3'>
                     <Container fluid>
                         <Row>
                             <Col sm={12} lg={12}>
@@ -619,7 +592,7 @@ function ProjectsPage() {
                         </Row>
                     </Container>
                 </div>
-                <div className={isActive ? 'page--wrapper px-md-2 py-3' : 'page--wrapper p-md-2 py-3'}>
+                <div className='page--wrapper px-md-2 py-3'>
                     {
                         spinner &&
                         <div className="loading-bar">
@@ -630,8 +603,8 @@ function ProjectsPage() {
                         <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table' : 'project--table'}>
                             <thead>
                                 <tr key="project-table-header">
-                                    <th scope="col" width={50} key="project-hash-header">#</th>
-                                    <th scope="col" key="project-name-header">Project Name</th>
+                                    <th scope="col" width={20} key="project-hash-header">#</th>
+                                    <th scope="col" width={400} key="project-name-header">Project Name</th>
                                     <th scope="col" key="project-client-header" className="onHide">Client Name</th>
                                     <th scope="col" key="project-member-header" className="onHide">Assigned Members</th>
                                     <th scope="col" key="project-status-header" className="onHide th--minwidth">Status</th>
@@ -640,16 +613,15 @@ function ProjectsPage() {
                             </thead>
                             <tbody>
                                 {
-                                    
                                         (!spinner && projects && projects.length > 0)
                                             ? projects.map((project, index) => {
 
                                                 return (<>
                                                     <tr key={`project-row-${project._id}`} onClick={() => {setCurrentProject(project)}} className={project._id === currentProject?._id ? 'project--active' : ''}>
                                                         <td key={`index-${index}`}>{index + 1} </td>
-                                                        <td key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>{project.title}</td>
+                                                        <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span>{project.title}</span></td>
                                                         <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
-                                                        <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide">
+                                                        <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
                                                             <ListGroup horizontal>
                                                                 {
                                                                     project.members && project.members.length > 0 && (
@@ -658,7 +630,7 @@ function ProjectsPage() {
                                                                                 return (
                                                                                     <ListGroup.Item action key={`member-${memberindex}`}>
                                                                                         <MemberInitials title={member.name} id={`member-${member._id}`}>
-                                                                                        <span className="team--initial nm-k">{member.name?.substring(0, 1)}</span>
+                                                                                            <span className="team--initial nm-k">{member.name?.substring(0, 1)}</span>
                                                                                         </MemberInitials>
                                                                                         
                                                                                         <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
@@ -672,16 +644,18 @@ function ProjectsPage() {
                                                                                             <FaEllipsisV />
                                                                                         </Dropdown.Toggle>
                                                                                         <Dropdown.Menu>
-                                                                                            {project.members.slice(3).map((member, memberindex) => (
-                                                                                                <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                                                                                                    <ListGroup.Item action key={`action-${project._id}`}>
-                                                                                                        <MemberInitials title={member.name} id={`member-${member._id}`}>
-                                                                                                            <span className="team--initial nm-s">{member.name?.substring(0, 1)}</span>
-                                                                                                        </MemberInitials>
-                                                                                                        <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
-                                                                                                    </ListGroup.Item>
-                                                                                                </Dropdown.Item>
-                                                                                            ))}
+                                                                                            <div className="over--scroll">
+                                                                                                {project.members.slice(3).map((member, memberindex) => (
+                                                                                                    <Dropdown.Item key={`dropdown-member-${memberindex}`}>
+                                                                                                        <ListGroup.Item action key={`action-${project._id}`}>
+                                                                                                            <MemberInitials title={member.name} id={`member-${member._id}`}>
+                                                                                                                <span className="team--initial nm-s">{member.name?.substring(0, 1)}</span>
+                                                                                                            </MemberInitials>
+                                                                                                            <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
+                                                                                                        </ListGroup.Item>
+                                                                                                    </Dropdown.Item>
+                                                                                                ))}
+                                                                                            </div>
                                                                                         </Dropdown.Menu>
                                                                                     </Dropdown>
                                                                                 </ListGroup.Item>
@@ -705,7 +679,6 @@ function ProjectsPage() {
                                                         <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
                                                             <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
                                                             <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
-                                                           
                                                         </td>
                                                     </tr>
                                                 </>)
@@ -726,12 +699,9 @@ function ProjectsPage() {
                         </Table>
                         {
                             isActiveView === 1 && !spinner && projects && projects.length == 0 &&
-                                                
                             <div className="text-center mt-5">
                                 <h2>No Projects Found</h2>
                             </div>
-                            
-                        
                         }
                     </Container>
                 </div>
@@ -741,7 +711,7 @@ function ProjectsPage() {
                     <h3 className="projecttitle">{currentProject?.title}
                          <span>{currentProject?.client?.name}</span>
                     </h3>
-                    <ListGroup horizontal className="members--list me-md-0 me-lg-auto ms-auto ms-md-2 ms-lg-5">
+                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 ms-xl-5">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
                             (currentProject?.members && currentProject?.members.length > 0) &&
@@ -760,9 +730,9 @@ function ProjectsPage() {
                             <Button variant="primary" onClick={handleAssignShow}><FaPlus /></Button>
                         </ListGroup.Item>
                     </ListGroup>
-                    <ListGroup horizontal className="ms-auto ms-lg-0 mt-3 mt-lg-0">
+                    <ListGroup horizontal className="ms-auto ms-xl-0 mt-3 mt-xl-0">
                         <Button variant="outline-primary" className="active btn--view" onClick={() => { setIsActive(1); }}>Tasks</Button>
-                        <Button variant="outline-primary" className="ms-2 btn--view" onClick={() => setIsActive(2)}>View</Button>
+                        <Button variant="outline-primary" className="btn--view" onClick={() => setIsActive(2)}>View</Button>
                         <ListGroup.Item key={`settingskey`} onClick={handleSettingShow}><FaCog /></ListGroup.Item>
                         <ListGroup.Item key={`gridview`} className="gridView ms-1" action active={activeTab === 'GridView'} onClick={() => setActiveTab('GridView')}><BsGrid /></ListGroup.Item>
                         <ListGroup.Item key={`listview`} className="ListView ms-1" action active={activeTab === 'ListView'} onClick={() => setActiveTab('ListView')}><FaList /></ListGroup.Item>
@@ -773,7 +743,6 @@ function ProjectsPage() {
             </div>
 
             <SingleProject key={`single-project-view-${currentProject?._id}`} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} />
-
             <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>
                     <Modal.Title>{currentProject?._id ? 'Edit Project' : 'Create New Project'}</Modal.Title>
@@ -878,20 +847,9 @@ function ProjectsPage() {
                     </div>
                 </Modal.Body>
             </Modal>
-            {/*<StatusModal key="create-project-status" showStatus={showStatus} currentStatus={fields['status']} onhide={handleStatusClose} callback={(status) => {
-                handleStatusCallback( status )
-            }} />
-             <MemberModal members={members} showAssign={showAssign} currentProject={currentProject} handleAssignClose={handleAssignClose} selectCallback={addMember} iseditModal={isActive} removeCallback={removeMember} selectedMembers={selectedMembers} />
-             <WorkFlowModal showWorkflow={showWorkflow} toggle={setWorkflowShow} handleSelect={handleWorkflowSelect} />
-             */}
             <StatusModal key="create-project-status" />
             <MemberModal />
             <WorkFlowModal />
-            {/*--=-=Edit Workstep Modal**/}
-            
-            {/*--=-=Assign Task Modal**/}
-
-            {/*--=-=Upload Files Modal**/}
             <FilesModal />
             {/*--=-=Delete Modal**/}
             <Modal show={showDelete} onHide={handleDeleteClose} centered size="md" className="add--member--modal">
@@ -908,8 +866,6 @@ function ProjectsPage() {
                     <Button variant="danger">Delete</Button>
                 </Modal.Footer>
             </Modal>
-            {/* /*-=--Create Task Modal-=-*/}
-            
             {/*--=-=Setting Modal**/}
             <Modal show={showSetting} onHide={handleSettingClose} centered size="lg" className="add--workflow--modal">
                 <Modal.Header closeButton>
@@ -1002,7 +958,6 @@ function ProjectsPage() {
                 </Modal.Body>
             </Modal>
             {/*--=-=File Preview Modal**/}
-            
             <>
                 <AlertDialog
                     showdialog={showdialog}
