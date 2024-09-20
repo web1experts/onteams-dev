@@ -23,7 +23,7 @@ function AttendancePage() {
     <>
 
       <div className='team--page'>
-        <div className='page--title p-md-3 py-3'>
+        <div className='page--title px-md-2 pt-3'>
           <Container fluid>
             <Row>
               <Col sm={12}>
@@ -51,7 +51,7 @@ function AttendancePage() {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper p-md-3 py-3 pt-0'>
+        <div className='page--wrapper px-md-2 py-3'>
           <Container fluid>
             <div class="perf--badge">
               <h5 class="ms-auto">Attendance: <strong>28.57%</strong></h5>

@@ -1,39 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Modal,
-  Form,
-  FloatingLabel,
-  Card,
-  Tabs,
-  Tab,
-  ListGroup,
-  Table,
-  Dropdown,
-} from "react-bootstrap";
-import {
-  FaEllipsisV,
-  FaList,
-  FaPlus,
-  FaRegEdit,
-  FaRegSave,
-  FaRegTrashAlt,
-} from "react-icons/fa";
-import SidebarPanel from "../Sidebar/Sidebar";
+import { Container, Row, Col, Card, Tabs,Tab, Table,Dropdown } from "react-bootstrap";
+import { FaEllipsisV,FaList } from "react-icons/fa";
 import { BsGrid } from "react-icons/bs";
-import { MdOutlineClose } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "../../context/ToastContext";
-import {
-  acceptCompanyinvite,
-  listCompanyinvite,
-  deleteInvite,
-  resendInvite,
-} from "../../redux/actions/members.action";
+import { acceptCompanyinvite, listCompanyinvite, deleteInvite, resendInvite } from "../../redux/actions/members.action";
 import Spinner from 'react-bootstrap/Spinner';
 function InvitationList(props) {
   const [activeSubTab, setActiveSubTab] = useState("Grid");
@@ -230,7 +200,7 @@ function InvitationList(props) {
                             <>
                               <tr>
                                 <td>{index+1}</td>
-                                <td>{invitation.email}</td>
+                                <td className="project--title--td"><span>{invitation.email}</span></td>
                                 <td width="33%">
                                   {invitation.role?.name?.replace(
                                     /\b\w/g,

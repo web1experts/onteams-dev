@@ -56,11 +56,10 @@ function ReportsPage() {
         }}
       />
 
-
       <div className='team--page'>
-        <div className='page--title p-md-3 py-3 pb-0'>
+        <div className='page--title px-md-2 pt-3'>
           <Container fluid>
-            <Row className="align-items-center">
+            <Row>
               <Col>
                 <h2>Reports <Button variant="primary" className='d-flex d-xl-none' onClick={handleFilterShow}><MdFilterList /></Button></h2>
               </Col>
@@ -97,7 +96,7 @@ function ReportsPage() {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper daily--reports p-md-3 py-3'>
+        <div className='page--wrapper daily--reports px-md-2 py-3'>
           <Container fluid>
             <Accordion defaultActiveKey="0">
               <Accordion.Item eventKey="0">
@@ -106,31 +105,31 @@ function ReportsPage() {
                   <Row>
                     <Col sm={12}>
                       <div className="report--info">
-                        <p>
+                        <p className="p--card">
                           <label>Project Name</label>
                           <p>The Galaxy</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Member Name</label>
                           <p>Gagandeep Singh</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Report Time</label>
                           <p>06:10 PM</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Client Name</label>
                           <p>Daniel</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Time Spent</label>
                           <p>2 hrs 30 Min</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Client Updated</label>
                           <p>Yes I Did</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Time Tested</label>
                           <p>4</p>
                         </p>
@@ -177,31 +176,31 @@ function ReportsPage() {
                   <Row>
                     <Col sm={12}>
                       <div className="report--info">
-                        <p>
+                        <p className="p--card">
                           <label>Project Name</label>
                           <p>The Galaxy</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Member Name</label>
                           <p>Gagandeep Singh</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Report Time</label>
                           <p>06:10 PM</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Client Name</label>
                           <p>Daniel</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Time Spent</label>
                           <p>2 hrs 30 Min</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Client Updated</label>
                           <p>Yes I Did</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Time Tested</label>
                           <p>4</p>
                         </p>
@@ -243,31 +242,31 @@ function ReportsPage() {
                   <Row>
                     <Col sm={12}>
                       <div className="report--info">
-                        <p>
+                        <p className="p--card">
                           <label>Project Name</label>
                           <p>The Galaxy</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Member Name</label>
                           <p>Gagandeep Singh</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Report Time</label>
                           <p>06:10 PM</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Client Name</label>
                           <p>Daniel</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Time Spent</label>
                           <p>2 hrs 30 Min</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Client Updated</label>
                           <p>Yes I Did</p>
                         </p>
-                        <p>
+                        <p className="p--card">
                           <label>Time Tested</label>
                           <p>4</p>
                         </p>

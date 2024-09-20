@@ -98,21 +98,21 @@ function Invitation(props) {
     <>
     <div className={isActive ? 'view--invitee team--page' : 'team--page'}>
     {props.topbar()}
-    <div className="page--wrapper p-md-3 py-3">
+    <div className="page--wrapper px-md-2 pt-3">
     {
         showloader &&
         <div class="loading-bar">
             <img src="images/OnTeam-icon-gray.png" className="flipchar" />
         </div>
     }
-    <Container fluid className={isActive ? 'px-0' : ''}>
+    <Container fluid>
       {props.activeTab === "Invitees" && (
          
         <>
             <Table responsive="lg" className={props.activeSubTab === 1 ? 'project--grid--table clients--grid--table' : props.activeSubTab === 2 ? 'project--table clients--table' : 'project--table clients--table'}>
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th width={20}>#</th>
                   <th className="onHide">Role</th>
                   <th>Email Address</th>
                   <th className="onHide">Action</th>

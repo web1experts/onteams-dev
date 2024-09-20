@@ -684,7 +684,8 @@ export const  WorkFlowModal =  (props) => {
                             {
                               Object.keys(selectedWorkflow).length > 0 && showWorkflow &&
                             <>
-                            <DragDropContext onDragEnd={handleDragEnd}>
+                              <ListGroup className='workflow--list'>
+                                <DragDropContext onDragEnd={handleDragEnd}>
                                   <Droppable droppableId="droppabletabs" type="droppableTabsItem" direction="horizontal">
                                     {(provided) => (
                                       <ListGroup
@@ -742,11 +743,11 @@ export const  WorkFlowModal =  (props) => {
                                   </Droppable>
                                 </DragDropContext>
 
-                            
-                              <ListGroup.Item>
-                                  <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
-                              </ListGroup.Item>
-                              </>
+                                <ListGroup.Item className='ms-auto'>
+                                    <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
+                                </ListGroup.Item>
+                              </ListGroup>
+                            </>
                         }
                         </Form.Group>
                 </Modal.Body>
