@@ -10,6 +10,7 @@ import {
     SHOW_WORKFLOW_MODAL,
     SHOW_STATUS_MODAL,
     ALL_MEMBERS,
+    ALL_CLIENTS,
     PROJECT_FORM,
     TASK_FORM,
     ACTIVE_FORM_TYPE,
@@ -38,7 +39,7 @@ export default (state = initialState, action) => {
     case CURRENT_PROJECT :
         return {
             ...state,
-            currentProject: action.payload.currentProject
+            currentProject: action.payload
           };
           
     case SELECTED_MEMBERS :
@@ -92,6 +93,11 @@ export default (state = initialState, action) => {
         return {
             ...state,
             allmembers: action.payload
+        }
+    case ALL_CLIENTS: 
+        return {
+            ...state,
+            allclients: action.payload
         }
     case PROJECT_FORM: 
         return {

@@ -193,7 +193,7 @@ export function StatusModal(props){
   return (
     <>
       {/*--=-=Status Modal**/}
-      <Modal show={showStatus} onHide={props.onhide} centered size="md" className="status--modal">
+      <Modal show={showStatus} onHide={() => { dispatch( togglePopups('status', false ))}} centered size="md" className="status--modal">
                 <Modal.Header closeButton>
                     <Modal.Title>Set Status</Modal.Title>
                 </Modal.Header>
@@ -267,7 +267,7 @@ export function MemberModal( props){
   },[ commonState.selectedMembers])
 
   useEffect(() =>{
-    if( commonState?.projectForm?.members ){ console.log('ehelhr:: ', commonState.projectForm.members)
+    if( commonState?.projectForm?.members ){
       // setSelectedMembers(commonState.projectForm.members)
       // Assume `members` is an array of objects and `commonState.projectForm.members` is an array of IDs
       const selectedMembers = members.reduce((acc, member) => {
@@ -278,7 +278,6 @@ export function MemberModal( props){
         }
         return acc;
       }, {});
-      console.log('selectedMembers:::: ', selectedMembers)
       // Set the selected members
       setSelectedMembers(selectedMembers);
     }
@@ -432,7 +431,7 @@ export function MemberModal( props){
   )
 }
 
-export const  WorkFlowModal =  React.memo((props) => {
+export const  WorkFlowModal =  (props) => {
   const dispatch = useDispatch()
   const modalstate = useSelector(state => state.common.workflowmodal);
   const commonState = useSelector( state => state.common)
@@ -443,6 +442,7 @@ export const  WorkFlowModal =  React.memo((props) => {
   const [showEdit, setEditShow] = useState(false);
   const [showAdd, setAddShow] = useState(false);
   const [ workflows, setWorkflows] = useState([])
+  const [currentflow, setCurrentflow ] = useState(false )
   const [ selectedWorkflow, setSelectedWorkflow] = useState({})
   const[ filteredWorkflows , setFilteredWorkflows ] = useState([])
   const workflowstate = useSelector(state => state.workflow)
@@ -456,19 +456,13 @@ export const  WorkFlowModal =  React.memo((props) => {
   }}, []);
   const handleWorkflowShow = useCallback(() => setWorkflowShow(true), []);
   const handleEditClose = useCallback(() => setEditShow(false), []);
-  const handleEditShow = useCallback((index,tab) => { setSelectedTab({index, tab}); setEditShow(true)}, []);
+  const handleEditShow = useCallback((index,tab) => { setSelectedTab({index, tab}); setFields({...fields, 'workspace_title': tab}); setEditShow(true)}, []);
   const handleAddClose = useCallback(() => setAddShow(false), []);
   const handleAddShow = useCallback(() => setAddShow(true), []);
 
   useEffect( () => {
     dispatch(ListWorkflows())
   }, [])
-
-  // useEffect(() =>{
-  //   if( commonState?.projectForm?.workflow ){
-  //     setSelected(commonState.projectForm.status)
-  //   }
-  // },[commonState.projectForm]);
 
   useEffect(() => {
     if(commonState.active_formtype){
@@ -481,37 +475,11 @@ export const  WorkFlowModal =  React.memo((props) => {
     setWorkflowShow(modalstate)
   }, [modalstate])
 
-  useEffect(() =>{
-    // if( props.showWorkflow ){
-      setWorkflowShow( props.showWorkflow || false  )
-    // }
-
-    if( props.selectedworkflow && Object.keys(props.selectedworkflow).length > 0 ) {
-      setSelectedWorkflow({
-        _id: props.selectedworkflow._id,
-        title: props.selectedworkflow.title,
-        tabs: props.selectedworkflow.tabs
-      })
-    }
-  }, [ props ])
 
   useEffect(() => {
     if( workflowstate && workflowstate.workflows && workflowstate.workflows.length > 0){
       setWorkflows( workflowstate.workflows )
-      // if (props.selectedworkflow) {
-      //   // Create a merged array with selectedWorkflow at the first index
-      //   const mergedWorkflows = [props.selectedworkflow, ...workflowstate.workflows];
-        
-      //   // Update the state with the merged array
-      //   setFilteredWorkflows(mergedWorkflows);
-      // } else {
-        setFilteredWorkflows(workflowstate.workflows)
-      // }
-      
-
-      // if( !props.selectedworkflow || Object.keys(props.selectedworkflow).length === 0 ){
-      //   setSelectedWorkflow(workflowstate.workflows[0])
-      // }
+      setFilteredWorkflows(workflowstate.workflows)
     }
   }, [ workflowstate ])
 
@@ -538,13 +506,15 @@ export const  WorkFlowModal =  React.memo((props) => {
   const handleSelect = () => {
     dispatch(updateStateData( PROJECT_FORM, { workflow: selectedWorkflow}))
     dispatch( togglePopups('workflow', false))
-    // if( props.handleSelect ){
-    //   props.handleSelect(selectedWorkflow);
-    // }
-    // if( props.toggle){
-    //   props.toggle(false)
-    // }
   }
+
+  useEffect(() => {
+    if(commonState.currentProject && commonState.currentProject.workflow){
+      setCurrentflow(commonState.currentProject.workflow)
+      setSelectedWorkflow(commonState.currentProject.workflow)
+    }
+    
+  },[commonState.currentProject])
 
   const saveWorkstep = (e) => {
     e.preventDefault();
@@ -590,29 +560,30 @@ export const  WorkFlowModal =  React.memo((props) => {
     e.preventDefault();
     if(!fields['workspace_title'] || fields['workspace_title'] === ""){
       setErrors({...error, ['workspace_title']: 'Title is required'})
-    }
+    }else{
 
-    setSelectedWorkflow({
-      ...selectedWorkflow,
-      tabs: selectedWorkflow.tabs.map((item, index) => {
-        if (index === selectedTab?.index) {
-          // Check if the item is an object
-          if (typeof item === 'object' && item !== null) {
-            // Return updated object with the new title
-            return { ...item, title: fields['workspace_title'] };
-          } else {
-            // Return the updated simple value
-            return fields['workspace_title'];
+      setSelectedWorkflow({
+        ...selectedWorkflow,
+        tabs: selectedWorkflow.tabs.map((item, index) => {
+          if (index === selectedTab?.index) {
+            // Check if the item is an object
+            if (typeof item === 'object' && item !== null) {
+              // Return updated object with the new title
+              return { ...item, title: fields['workspace_title'] };
+            } else {
+              // Return the updated simple value
+              return fields['workspace_title'];
+            }
           }
-        }
-        // Return the item unchanged if index does not match
-        return item;
-      }),
-    });
-    
-    setEditShow( false )
-    setFields({})
-    setErrors({})
+          // Return the item unchanged if index does not match
+          return item;
+        }),
+      });
+      
+      setEditShow( false )
+      setFields({})
+      setErrors({})
+    }
   }
 
   const showError = (name) => {
@@ -667,14 +638,22 @@ export const  WorkFlowModal =  React.memo((props) => {
                             <Form.Label>Select Workflow</Form.Label>
                             <Dropdown className="select--dropdown">
                                 <Dropdown.Toggle variant="success">
-                                  {/* { 
-                                    selectedWorkflow?._id && selectedWorkflow?._id === props?.selectedworkflow?._id ? 
+                                  { 
+                                    selectedWorkflow?._id && selectedWorkflow?._id === currentflow?._id ? 
                                       'Current Workflow'
-                                    : */}
-                                  {
+                                    :
+                                    selectedWorkflow && selectedWorkflow._id ?
+                                      <>
+                                      {selectedWorkflow.title}
+                                      </>
+                                    :
+                                    'Select'
+                                  }
+
+                                  {/* {
                                     selectedWorkflow?.title || 'Select'
 
-                                  }
+                                  } */}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <div className="drop--scroll">
@@ -684,8 +663,8 @@ export const  WorkFlowModal =  React.memo((props) => {
                                             </Form.Group>
                                         </Form>
                                         {
-                                          props.selectedworkflow &&
-                                          <Dropdown.Item onClick={() => handleSelectworkflow(props.selectedworkflow)} className={ (selectedWorkflow && selectedWorkflow?._id === props.selectedworkflow._id ) ? 'selected--option' : ''} > Current Workflow { (selectedWorkflow && selectedWorkflow?._id === props.selectedworkflow._id ) ? <FaCheck /> : null }</Dropdown.Item>
+                                          currentflow &&
+                                          <Dropdown.Item onClick={() => handleSelectworkflow(currentflow)} className={ (selectedWorkflow && selectedWorkflow?._id === currentflow?._id ) ? 'selected--option' : ''} > Current Workflow { (selectedWorkflow && selectedWorkflow?._id === currentflow?._id ) ? <FaCheck /> : null }</Dropdown.Item>
                                         }
 
                                         {
@@ -784,7 +763,7 @@ export const  WorkFlowModal =  React.memo((props) => {
                     <Form onSubmit={updateWorkstep}>
                         <Form.Group className="mb-3 form-group">
                             <Form.Label>Workstep Title</Form.Label>
-                            <Form.Control type="text" name='workspace_title' value={fields['workspace_title'] || selectedTab?.tab || ''}  onChange={handleChange} />
+                            <Form.Control type="text" name='workspace_title' value={fields['workspace_title'] || ''}  onChange={handleChange} />
                             {showError('workspace_title')}
                         </Form.Group>
                     </Form>
@@ -816,25 +795,24 @@ export const  WorkFlowModal =  React.memo((props) => {
             </>
 
   )
-})
+}
 
 export const FilesModal = () => {
   const modalstate = useSelector(state => state.common.filesmodal);
-  const previewmodalstate = useSelector(state => state.common.previewfilesmodal);
   const commonState = useSelector( state => state.common)
   const [formtype, setFormType] = useState(false)
   const dispatch = useDispatch()
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [ showfileModal, setShowfilemodal] = useState( false )
+  const [fields, setFields] = useState({ images: [] });
   const [filetoPreview, setFiletoPreview] = useState(null);
   const [showPreview, setPreviewShow] = useState(false);
-  const [ showfileModal, setShowfilemodal] = useState( false )
-  const handlePreviewClose = () => setPreviewShow(false);
-  const [fields, setFields] = useState({ images: [] });
-  const [errors, setErrors] = useState({ title: '' });
   const handlePreviewShow = (file) => {
+    // dispatch( togglePopups('filepreview', true))
       setFiletoPreview(file)
       setPreviewShow(true)
+      
   };
   const onDrop = useCallback(acceptedFiles => {
     handleSelectedFiles(acceptedFiles)  
@@ -850,9 +828,7 @@ export const FilesModal = () => {
     setShowfilemodal(modalstate)
   }, [modalstate])
 
-  useEffect(() => {
-    setPreviewShow( previewmodalstate)
-  },[ previewmodalstate ])
+
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
   useEffect(() => {
@@ -876,32 +852,39 @@ export const FilesModal = () => {
 
   useEffect(() => {
     if (selectedFiles?.length > 0) {
-        // setFields({ ...fields, images: selectedFiles });
-        dispatch( updateStateData(PROJECT_FORM,  { images: selectedFiles}))
-        const previews = [];
-        for (let i = 0; i < selectedFiles.length; i++) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const fileExtension = selectedFiles[i].name.split('.').pop().toLowerCase();
-                previews.push({
-                    src: e.target.result,
-                    file: selectedFiles[i],
-                    mimetype: fileExtension,
-                    filename: selectedFiles[i].name,
-                    _id: i
+        const loadPreviews = async () => {
+            const previews = await Promise.all(selectedFiles.map((file, index) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const fileExtension = file.name.split('.').pop().toLowerCase();
+                        resolve({
+                            src: e.target.result,
+                            file,
+                            mimetype: fileExtension,
+                            filename: file.name,
+                            _id: index
+                        });
+                    };
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsDataURL(file);
                 });
-                if (previews.length === selectedFiles.length) {
-                    setImagePreviews(previews);
-                }
-            };
-            reader.readAsDataURL(selectedFiles[i]);
-        }
-    }else{
-        // const { images, ...updatedFields } = fields;
-        dispatch( updateStateData(PROJECT_FORM,  { images: []}))
-        // setFields(updatedFields);           
+            }));
+
+            console.log('File previews: ', previews);
+            setImagePreviews(previews);
+        };
+
+        loadPreviews();
+
+        // Update the state with selected files
+        dispatch(updateStateData(PROJECT_FORM, { images: selectedFiles }));
+    } else {
+        // Clear the images when no files are selected
+        dispatch(updateStateData(PROJECT_FORM, { images: [] }));
     }
-  }, [selectedFiles])
+}, [selectedFiles, dispatch]);
+
 
   const handleRemove = (indexToRemove) => {
     // Filter out the file to remove from both selectedFiles and imagePreviews
@@ -911,12 +894,11 @@ export const FilesModal = () => {
     setImagePreviews(updatedImagePreviews);
   };
 
-  const handleRemovefiles = (id) => {
-    let previousfiles = fields['images']
-    const updatedFiles = previousfiles.filter(file => file !== id);
-    dispatch( updateStateData(PROJECT_FORM, { images: updatedFiles}))
-    // setFields({ ...fields, ['files']: updatedFiles })
-  }
+  useEffect(() => {
+    console.log('imagePreviews data: ', imagePreviews)
+  },[imagePreviews])
+
+
 
   const handleattachfiles = () => {
     dispatch( updateStateData(PROJECT_FORM, { images: selectedFiles}))
@@ -936,7 +918,7 @@ export const FilesModal = () => {
                     type !== "new" &&
                     <Button variant="secondary" className="ms-auto"><a target="_blank" className="btn-secondary" download={preview?.filename} href={src}><MdFileDownload /></a></Button>
                 }
-                <Button variant="primary" onClick={() => type === "new" ? handleRemove(index) : handleRemovefiles(_id)}><FaRegTrashAlt /></Button>
+                <Button variant="primary" onClick={ () => handleRemove(index)}><FaRegTrashAlt /></Button>
             </div>
         ),
         video: (
@@ -946,7 +928,7 @@ export const FilesModal = () => {
                     type !== "new" &&
                     <Button variant="secondary" className="ms-auto"><a target="_blank" className="btn-secondary" download={preview?.filename} href={src}><MdFileDownload /></a></Button>
                 }
-                <Button variant="primary" onClick={() => type === "new" ? handleRemove(index) : handleRemovefiles(_id)}><FaRegTrashAlt /></Button>
+                <Button variant="primary" onClick={ () => handleRemove(index)}><FaRegTrashAlt /></Button>
             </div>
         ),
         pdf: (
@@ -957,7 +939,7 @@ export const FilesModal = () => {
                     <Button variant="secondary" className="ms-auto"><a target="_blank" className="btn-secondary" download={preview?.filename} href={src}><MdFileDownload /></a></Button>
                 }
 
-                <Button variant="primary" onClick={() => type === "new" ? handleRemove(index) : handleRemovefiles(_id)}><FaRegTrashAlt /></Button>
+                <Button variant="primary" onClick={ () => handleRemove(index)}><FaRegTrashAlt /></Button>
             </div>
         ),
         other: (
@@ -968,7 +950,7 @@ export const FilesModal = () => {
                     <Button variant="secondary" className="ms-auto"><a target="_blank" className="btn-secondary" download={preview?.filename} href={src}><MdFileDownload /></a></Button>
                 }
 
-                <Button variant="primary" onClick={() => type === "new" ? handleRemove(index) : handleRemovefiles(_id)}><FaRegTrashAlt /></Button>
+                <Button variant="primary" onClick={ () => handleRemove(index)}><FaRegTrashAlt /></Button>
             </div>
         ),
     };
@@ -988,7 +970,7 @@ export const FilesModal = () => {
 
 
   return (
-    <>
+      <>
       <Modal show={showfileModal} onHide={handleUploadClose} centered size="md" className="upload--status">
         <Modal.Header closeButton>
             <Modal.Title>Attach Files</Modal.Title>
@@ -999,12 +981,12 @@ export const FilesModal = () => {
                     <Form.Control type="file" multiple name="images[]" onChange={(e) => {handleSelectedFiles(Array.from(e.target.files))} } {...getInputProps()} id="attachments-new" />
                     <Form.Label className="file--upload" htmlFor="attachments-new" onClick="handleLabelClick(event)">
                         <span><FaUpload /></span>
-                        <p>Drop your files here or <strong>browsesee</strong></p>
+                        <p>Drop your files here or <strong>browse</strong></p>
                     </Form.Label>
                 </Form.Group>
 
             </Form>
-            <div className="preview--grid">
+            <div className="preview--grid" data-length={imagePreviews.length}>
                 {imagePreviews.map((preview, index) => (
                     <div key={`uploaded-preview-${index}`} className="file-preview">{renderPreview('new', preview, index)}</div>
                 ))}
@@ -1015,7 +997,77 @@ export const FilesModal = () => {
             <Button variant="primary" onClick={handleattachfiles}>Attach</Button>
         </Modal.Footer>
     </Modal>
+    <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews}  toggle={setPreviewShow} filetoPreview={filetoPreview} />
+    </>
+  )
+}
 
+
+export const FilesPreviewModal = React.memo((props) => {
+  const commonState = useSelector( state => state.common)
+  const [formtype, setFormType] = useState(false)
+  const dispatch = useDispatch()
+  const [fields, setFields] = useState({ images: [] });
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [filetoPreview, setFiletoPreview] = useState(null);
+  const [showPreview, setPreviewShow] = useState(false);
+  const handlePreviewClose = () => {setPreviewShow(false)
+    if( props.toggle){
+      props.toggle()
+    }
+  }
+  const handlePreviewShow = (file) => {
+    dispatch( togglePopups('filepreview', true))
+      setFiletoPreview(file)
+      setPreviewShow(true)
+  };
+
+
+  useEffect(() => { 
+    if( commonState.projectForm){
+        setFields(commonState.projectForm)
+    }
+  },[ commonState.projectForm])
+
+  useEffect(() => {console.log("props.selectedFiles:: ", props.selectedFiles)
+    setPreviewShow(props.showPreview)
+    
+  }, [props.showPreview])
+
+  useEffect(() => {
+    setFiletoPreview(props.filetoPreview)
+  }, [props.filetoPreview])
+
+  useEffect(() => {
+    setImagePreviews(props.imagePreviews)
+  },[props.imagePreviews])
+ 
+  useEffect(() => {
+    if(commonState.active_formtype){
+      setFormType(commonState.active_formtype)
+    }
+  }, [ commonState.active_formtype])
+
+
+  const handleRemove = (indexToRemove) => {
+    // Filter out the file to remove from both selectedFiles and imagePreviews
+    // const updatedSelectedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
+    // const updatedImagePreviews = imagePreviews.filter((_, index) => index !== indexToRemove);
+    // setSelectedFiles(updatedSelectedFiles);
+    // setImagePreviews(updatedImagePreviews);
+  };
+
+  const handleRemovefiles = (id) => {
+    let previousfiles = fields['images']
+    console.log("previousfiles:: ", previousfiles)
+    const updatedFiles = previousfiles.filter(file => file !== id);
+    dispatch( updateStateData(PROJECT_FORM, { images: updatedFiles}))
+    // setFields({ ...fields, ['files']: updatedFiles })
+  }
+
+  return (
+    <>
     <Modal show={showPreview} onHide={handlePreviewClose} size="xl" className="file--preview--modal">
       <Modal.Header closeButton>
           <Modal.Title>{filetoPreview?.filename}
@@ -1064,7 +1116,7 @@ export const FilesModal = () => {
   </Modal>
     </>
   )
-}
+})
 
 
 

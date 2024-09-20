@@ -10,7 +10,7 @@ import { ListProjects, createProject, updateProject, deleteProject } from "../..
 import { Listmembers } from "../../redux/actions/members.action";
 import { getMemberdata } from "../../helpers/commonfunctions";
 import { formatStatus } from "../../utils/common";
-import { StatusModal, MemberModal, WorkFlowModal, FilesModal } from "../modals";
+import { StatusModal, MemberModal, WorkFlowModal, FilesModal, FilesPreviewModal } from "../modals";
 import { ListClients } from "../../redux/actions/client.action";
 import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
@@ -22,7 +22,7 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import SingleProject from "./singleProject";
 import TasksList from "../Tasks/list";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
-import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS } from "../../redux/actions/types";
+import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS } from "../../redux/actions/types";
 function ProjectsPage() {
     const [isActiveView, setIsActiveView] = useState(1);
     const dispatch = useDispatch();
@@ -60,6 +60,7 @@ function ProjectsPage() {
     useEffect(() => {
         if(clientFeed && clientFeed.clientData && clientFeed.clientData.length > 0 ){
             setClientList(clientFeed.clientData)
+            dispatch( updateStateData( ALL_CLIENTS, clientFeed.clientData))
         }   
     }, [clientFeed])
 
@@ -136,7 +137,7 @@ function ProjectsPage() {
     const [show, setShow] = useState(false);
     const handleClose = () => {
         dispatch( updateStateData(ACTIVE_FORM_TYPE, null) )
-        dispatch( updateStateData(RESET_FORMS,) )
+        dispatch( updateStateData(RESET_FORMS) )
         setSelectedFiles([])
         setselectedMembers([])
         setImagePreviews([])
@@ -149,6 +150,7 @@ function ProjectsPage() {
             setImagePreviews([])
             setFields({ title: '', status: 'in-progress', members: [] });
             dispatch( updateStateData(ACTIVE_FORM_TYPE, 'project') )
+            dispatch( updateStateData(PROJECT_FORM, {}) )
         }
         setShow(true);
     }
@@ -197,6 +199,7 @@ function ProjectsPage() {
     const handlePreviewShow = (file) => {
         setFiletoPreview(file)
         setPreviewShow(true)
+        // dispatch( togglePopups('filepreview', true))
     };
 
     // const handleStatusCallback = ( status ) => {
@@ -241,8 +244,8 @@ function ProjectsPage() {
     // };
 
     useEffect(() => {
-        if (commonState.projectForm.files?.length > 0) {
-            const selectedFiles = commonState.projectForm.files
+        if (commonState.projectForm.images?.length > 0) {
+            const selectedFiles = commonState.projectForm.images
             const previews = [];
             for (let i = 0; i < selectedFiles.length; i++) {
                 const reader = new FileReader();
@@ -265,7 +268,7 @@ function ProjectsPage() {
             const { images, ...updatedFields } = fields;
             setFields(updatedFields);           
         }
-    }, [commonState.projectForm.files])
+    }, [commonState.projectForm.images])
 
     const handleRemove = (indexToRemove) => {
         // Filter out the file to remove from both selectedFiles and imagePreviews
@@ -450,20 +453,11 @@ function ProjectsPage() {
         }
     }, [projects]);
 
-    // useEffect(() => {
-    //     if (currentProject && Object.keys(currentProject).length > 0) {
-    //         if (currentProject.members && currentProject.members.length > 0) { 
-    //             let membersdrop = {};
-    //             currentProject.members.forEach(member => {
-    //                 const { _id, name } = member;
-    //                 membersdrop[_id] = name;
-    //             });
-    //             setselectedMembers(membersdrop);
-    //         }else{
-    //             setselectedMembers({});
-    //         }    
-    //     }
-    // }, [currentProject]);
+    useEffect(() => {
+        if (currentProject && Object.keys(currentProject).length > 0) {
+            dispatch( updateStateData(CURRENT_PROJECT, currentProject))
+        }
+    }, [currentProject]);
 
 
     const handleattachfiles = (e) => {
@@ -564,6 +558,12 @@ function ProjectsPage() {
         )
     };
 
+    const handleProjectChange = (project) => {
+        dispatch( updateStateData(ACTIVE_FORM_TYPE, 'project') )
+        dispatch( updateStateData(RESET_FORMS) )
+        setCurrentProject(project)
+    }
+
     
     return (
         <>
@@ -645,7 +645,7 @@ function ProjectsPage() {
                                             ? projects.map((project, index) => {
 
                                                 return (<>
-                                                    <tr key={`project-row-${project._id}`} onClick={() => {setCurrentProject(project)}} className={project._id === currentProject?._id ? 'project--active' : ''}>
+                                                    <tr key={`project-row-${project._id}`} onClick={() => {handleProjectChange(project)}} className={project._id === currentProject?._id ? 'project--active' : ''}>
                                                         <td key={`index-${index}`}>{index + 1} </td>
                                                         <td key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>{project.title}</td>
                                                         <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
@@ -893,6 +893,7 @@ function ProjectsPage() {
 
             {/*--=-=Upload Files Modal**/}
             <FilesModal />
+            <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews}  toggle={setPreviewShow}  filetoPreview={filetoPreview} />
             {/*--=-=Delete Modal**/}
             <Modal show={showDelete} onHide={handleDeleteClose} centered size="md" className="add--member--modal">
                 <Modal.Header closeButton>

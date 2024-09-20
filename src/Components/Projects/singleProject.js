@@ -6,18 +6,20 @@ import { MdFileDownload, MdOutlineClose } from "react-icons/md";
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
 import { updateProject, deleteProject } from "../../redux/actions/project.action"
-import { StatusModal, MemberModal, WorkFlowModal } from "../modals";
 import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
-import { AlertDialog } from "../modals";
+import { AlertDialog, MemberModal, StatusModal, WorkFlowModal, FilesModal, FilesPreviewModal } from "../modals";
 import { useDropzone } from 'react-dropzone'
 import fileIcon from './../../images/file-icon-image.jpg'
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
+import { togglePopups, updateStateData } from "../../redux/actions/common.action";
+import {  ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT } from "../../redux/actions/types";
 
 function SingleProject(props) {
     const dispatch = useDispatch();
+    const commonState = useSelector( state => state.common)
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [], client: '' });
     const [errors, setErrors] = useState({ title: '' });
     const [loader, setLoader] = useState(false);
@@ -34,31 +36,18 @@ function SingleProject(props) {
     const [showdialog, setShowDialog] = useState(false);
     const [allMembers, setAllmembers] = useState([{ value: 'all', label: 'All Members' }])
     const [showStatus, setStatusShow] = useState(false);
-    const handleStatusClose = () => setStatusShow(false);
-    const handleStatusShow = () => setStatusShow(true);
+    const handleStatusClose = () =>  dispatch(togglePopups('status', false));
+    const handleStatusShow = () => dispatch(togglePopups('status', true));
     const [isEdit, setIsEdit] = useState(false)
     const [showClient, setClientShow] = useState(false);
     const handleClientClose = () => setClientShow(false);
     const handleClientShow = () => setClientShow(true);
     const [ selectedworkflow, setSelectedWorkflow] = useState({})
     const [showWorkflow, setWorkflowShow] = useState(false);
-    const handleWorkflowClose = () => setWorkflowShow(false);
-    const handleWorkflowShow = () => setWorkflowShow(true);
-
-    const [showSetting, setSettingShow] = useState(false);
-    const handleSettingClose = () => setSettingShow(false);
-    const handleSettingShow = () => setSettingShow(true);
-
-    const [showEdit, setEditShow] = useState(false);
-    const handleEditClose = () => setEditShow(false);
-    const handleEditShow = () => setEditShow(true);
-
-    const [showAdd, setAddShow] = useState(false);
-    const handleAddClose = () => setAddShow(false);
-    const handleAddShow = () => setAddShow(true);
-
+    const handleWorkflowClose = () => dispatch( togglePopups('workflow',false ));
+    const handleWorkflowShow = () => dispatch( togglePopups('workflow',true));
+    
     const [showAssign, setAssignShow] = useState(false);
-    const handleAssignClose = () => setAssignShow(false);
     const handleAssignShow = () => setAssignShow(true);
 
     const [showUpload, setUploadShow] = useState(false);
@@ -70,7 +59,6 @@ function SingleProject(props) {
     const [filetoPreview, setFiletoPreview] = useState(null);
     const [showPreview, setPreviewShow] = useState(false);
     const handlePreviewClose = () => setPreviewShow(false);
-    const [show, setShow] = useState(false);
     const [clientsearchTerm, setClientSearchTerm] = useState('');
     let fieldErrors = {};
 
@@ -82,22 +70,35 @@ function SingleProject(props) {
     }, [fields]);
 
     useEffect(() => {
-        if (props.currentProject) {
+        if (commonState.currentProject) {
             setIsEditor(false);
-            setEditorMode( false)
-            setCurrentProject(props.currentProject)
-            setSelectedWorkflow(props.currentProject?.workflow || {} )
+            setEditorMode( false);
+            setCurrentProject(commonState.currentProject)
+            setSelectedWorkflow(commonState.currentProject?.workflow || {} )
         }
 
-    }, [props.currentProject])
+    }, [commonState.currentProject])
 
     useEffect(() => {
-        if (props.clientlist.length > 0) {
-            setClientList(props.clientlist)
+        if (commonState.allclients && commonState.allclients.length > 0) {
+            setClientList(commonState.allclients)
         } else {
             setClientList([])
         }
-    }, [props.clientlist])
+    }, [commonState.allclients])
+
+    useEffect(() => {
+        if( commonState.selectedMembers){
+            setselectedMembers(commonState.selectedMembers)
+        }
+      },[ commonState.selectedMembers])
+
+      useEffect(() => {
+        if( commonState.projectForm){
+            setFields(commonState.projectForm)
+        }
+      },[ commonState.projectForm])
+
 
     useEffect(() => {
         if (currentProject && Object.keys(currentProject).length > 0) {
@@ -139,10 +140,11 @@ function SingleProject(props) {
             }, 150)
 
             // Update fields state merging existing fields with new fieldsSetup
-            setFields(prevFields => ({
-                ...prevFields,
-                ...fieldsSetup
-            }));
+            // setFields(prevFields => ({
+            //     ...prevFields,
+            //     ...fieldsSetup
+            // }));
+            dispatch ( updateStateData( PROJECT_FORM, fieldsSetup))
         }
     }, [currentProject]);
 
@@ -243,10 +245,12 @@ function SingleProject(props) {
 
     // Function to remove the last member
     const removeMember = (member) => {
-        setFields(prevFields => ({
-            ...prevFields,
-            members: prevFields.members.filter(m => m !== member)
-        }));
+        // setFields(prevFields => ({
+        //     ...prevFields,
+        //     members: prevFields.members.filter(m => m !== member)
+        // }));
+
+        dispatch( updateStateData( PROJECT_FORM, {...commonState.projectForm, members: commonState.projectForm.members.filter(m => m !== member)}))
 
         setselectedMembers((prevSelectedMembers) => {
             if (typeof prevSelectedMembers !== 'object' || prevSelectedMembers === null) {
@@ -319,7 +323,8 @@ function SingleProject(props) {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
     const handleChange = ({ target: { name, value, type, files } }) => {
-        setFields({ ...fields, [name]: value });
+        // setFields({ ...fields, [name]: value });
+        dispatch( updateStateData( PROJECT_FORM,  {[name]: value }))
         setErrors({ ...errors, [name]: '' })
     };
 
@@ -374,8 +379,8 @@ function SingleProject(props) {
             setLoader(false)
             setErrors(fieldErrors);
         } else {
-
-
+            console.log('Updated Project Fields:: ', fields)
+            return;
             const formData = new FormData();
             for (const [key, value] of Object.entries(fields)) {
                 if (typeof value === 'object' && key === 'images') {
@@ -409,10 +414,6 @@ function SingleProject(props) {
     const handledeleteProject = () => {
         dispatch(deleteProject(currentProject._id))
     }
-
-
-
-
 
     const handleRemovefiles = (id) => {
         let previousfiles = fields['files']
@@ -551,7 +552,7 @@ function SingleProject(props) {
                             </>
                         )}
                         <ListGroup.Item className="add--member" key="addmember">
-                            <Button variant="primary" onClick={() => { setIsEdit(false); handleAssignShow() }}><FaPlus /></Button>
+                            <Button variant="primary" onClick={() => {dispatch(togglePopups('members', true))}}><FaPlus /></Button>
                         </ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal>
@@ -673,7 +674,7 @@ function SingleProject(props) {
                     <div className="project--form--actions">
                         <h4>Actions</h4>
                         <ListGroup>
-                            <ListGroup.Item key="assign-membermodal-key" onClick={() => { setIsEdit(true); handleAssignShow() }}><FaPlus /> Assign to</ListGroup.Item>
+                            <ListGroup.Item key="assign-membermodal-key" onClick={() => {dispatch(togglePopups('members', true))}}><FaPlus /> Assign to</ListGroup.Item>
                             <p className="m-0 d-flex align-items-center">
                                 {selectedMembers && Object.keys(selectedMembers).length > 0 && (
                                     <>
@@ -763,7 +764,7 @@ function SingleProject(props) {
 
             {/* <MemberModal members={props?.members} showAssign={showAssign} currentProject={currentProject} handleAssignClose={handleAssignClose} selectCallback={addMember} isedit={isEdit} removeCallback={removeMember} selectedMembers={selectedMembers} /> */}
             
-            <WorkFlowModal showWorkflow={showWorkflow} selectedworkflow={selectedworkflow} toggle={setWorkflowShow} handleSelect={handleWorkflowSelect} />
+            <WorkFlowModal />
             
             {/*--=-=Assign Task Modal**/}
 

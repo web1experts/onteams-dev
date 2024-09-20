@@ -40,6 +40,9 @@ export const togglePopups = ( popup, popup_state ) => {
             case 'files':
                 await dispatch({ type: SHOW_FILES_MODAL, payload: popup_state });
                 break;
+            case "filepreview":
+                await dispatch({ type: SHOW_PREVIEW_MODAL, payload: popup_state });
+                break;
             default:
                 break;
         }
