@@ -15,7 +15,7 @@ import { selectboxObserver } from "../../helpers/commonfunctions";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
-import {  ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT } from "../../redux/actions/types";
+import {  EDIT_PROJECT_FORM, ASSIGN_MEMBER } from "../../redux/actions/types";
 
 function SingleProject(props) {
     const dispatch = useDispatch();
@@ -46,10 +46,8 @@ function SingleProject(props) {
     const [showWorkflow, setWorkflowShow] = useState(false);
     const handleWorkflowClose = () => dispatch( togglePopups('workflow',false ));
     const handleWorkflowShow = () => dispatch( togglePopups('workflow',true));
-    
     const [showAssign, setAssignShow] = useState(false);
     const handleAssignShow = () => setAssignShow(true);
-
     const [showUpload, setUploadShow] = useState(false);
     const handleUploadClose = () => {
         setUploadShow(false);
@@ -87,21 +85,15 @@ function SingleProject(props) {
         }
     }, [commonState.allclients])
 
-    useEffect(() => {
-        if( commonState.selectedMembers){
-            setselectedMembers(commonState.selectedMembers)
-        }
-      },[ commonState.selectedMembers])
-
       useEffect(() => {
-        if( commonState.projectForm){
-            setFields(commonState.projectForm)
+        if( commonState.editProjectForm){
+            setFields(commonState.editProjectForm)
         }
-      },[ commonState.projectForm])
+      },[ commonState.editProjectForm])
 
 
     useEffect(() => {
-        if (currentProject && Object.keys(currentProject).length > 0) {
+        if (currentProject && Object.keys(currentProject).length > 0) { console.log('here at project')
             setSelectedFiles([]);
             setImagePreviews([]);
             let fieldsSetup = {
@@ -111,7 +103,8 @@ function SingleProject(props) {
                 description: currentProject.description || '',
                 start_date: currentProject.start_date ? new Date(currentProject.start_date).toISOString().split('T')[0] : '',
                 due_date: currentProject.due_date ? new Date(currentProject.due_date).toISOString().split('T')[0] : '',
-                files: currentProject.files ? currentProject.files.map(image => image._id) : []
+                files: currentProject.files ? currentProject.files.map(image => image._id) : [],
+                workflow: currentProject.workflow ? currentProject.workflow : {}
             };
 
             if (currentProject.description && currentProject.description !== "") {
@@ -129,22 +122,16 @@ function SingleProject(props) {
                     membersdrop[_id] = name;
                 });
 
-                fieldsSetup.members = projectMembers;
-                setselectedMembers(membersdrop);
+                fieldsSetup.members = membersdrop;
+               // setselectedMembers(membersdrop);
             } else {
                 fieldsSetup.members = [];
-                setselectedMembers({});
+                //setselectedMembers({});
             }
             setTimeout(function () {
                 selectboxObserver()
             }, 150)
-
-            // Update fields state merging existing fields with new fieldsSetup
-            // setFields(prevFields => ({
-            //     ...prevFields,
-            //     ...fieldsSetup
-            // }));
-            dispatch ( updateStateData( PROJECT_FORM, fieldsSetup))
+            dispatch ( updateStateData( EDIT_PROJECT_FORM, fieldsSetup))
         }
     }, [currentProject]);
 
@@ -155,11 +142,8 @@ function SingleProject(props) {
 
     useEffect(() => {
         if (apiResult.success) {
-            // setSelectedFiles([]);
-            // setImagePreviews([]);
             setShowDialog(false)
         }
-
     }, [apiResult])
 
     function handleLabelClick(event) {
@@ -167,26 +151,26 @@ function SingleProject(props) {
         document.getElementById('updateattachments').click();
     }
 
-    const addMember = (member) => {
-        setFields(prevFields => ({
-            ...prevFields,
-            members: Array.from(new Set([...prevFields.members, member._id]))
-        }));
+    // const addMember = (member) => {
+    //     setFields(prevFields => ({
+    //         ...prevFields,
+    //         members: Array.from(new Set([...prevFields.members, member._id]))
+    //     }));
 
-        const { _id, name } = member;
-        setselectedMembers((prevSelectedMembers = {}) => {
-            // Check if the memberId is not already in the selectedMembers object
-            if (!prevSelectedMembers.hasOwnProperty(_id)) {
-                return {
-                    ...prevSelectedMembers,
-                    [_id]: name,
-                };
-            } else {
-                return prevSelectedMembers;
-            }
-        });
+    //     const { _id, name } = member;
+    //     setselectedMembers((prevSelectedMembers = {}) => {
+    //         // Check if the memberId is not already in the selectedMembers object
+    //         if (!prevSelectedMembers.hasOwnProperty(_id)) {
+    //             return {
+    //                 ...prevSelectedMembers,
+    //                 [_id]: name,
+    //             };
+    //         } else {
+    //             return prevSelectedMembers;
+    //         }
+    //     });
 
-    };
+    // };
 
     const handleDownload = (url) => {
         const link = document.createElement('a');
@@ -198,10 +182,7 @@ function SingleProject(props) {
         document.body.removeChild(link);
     };
 
-
     useEffect(() => {
-
-
         if (apiClient.createClient) {
             setFields({ ...fields, client: apiClient.createClient })
             handleChange({ target: { name: 'client', value: apiClient.createClient } });
@@ -241,30 +222,16 @@ function SingleProject(props) {
     useEffect(() => {
     }, [selectedMembers])
 
-
-
     // Function to remove the last member
-    const removeMember = (member) => {
-        // setFields(prevFields => ({
-        //     ...prevFields,
-        //     members: prevFields.members.filter(m => m !== member)
-        // }));
-
-        dispatch( updateStateData( PROJECT_FORM, {...commonState.projectForm, members: commonState.projectForm.members.filter(m => m !== member)}))
-
-        setselectedMembers((prevSelectedMembers) => {
-            if (typeof prevSelectedMembers !== 'object' || prevSelectedMembers === null) {
-                // Handle the case where prevSelectedMembers is not an object or is null
-                console.error("Invalid state for selectedMembers:", prevSelectedMembers);
-                return {};
-            }
-
-            // Create a new object excluding the member with the specified ID
-            const { [member]: deletedMember, ...updatedMembers } = prevSelectedMembers;
-
-            return updatedMembers;
-        });
-
+    const removeMember = (member, directUpdate = false) => {
+        const updatedSelectedMembers = { ...commonState.editProjectForm  .members };
+            delete updatedSelectedMembers[member];
+        if( directUpdate === true ){
+            const memberIds = Object.keys(updatedSelectedMembers);
+            dispatch(updateProject(currentProject._id, { members: memberIds }))
+        }else{
+            dispatch( updateStateData( EDIT_PROJECT_FORM, {...commonState.editProjectForm, members: updatedSelectedMembers}))
+        }
     };
 
 
@@ -294,13 +261,6 @@ function SingleProject(props) {
         setClientSearchTerm(e.target.value);
     };
 
-    // const handleSelect = (itemValue) => {
-    //     setSelectedValue(itemValue);
-    //     if (onChange) {
-    //         onChange(itemValue);
-    //     }
-    // };
-
     const filteredItems = clientlist.filter(item =>
         item.name.toLowerCase().includes(clientsearchTerm.toLowerCase())
     );
@@ -324,7 +284,7 @@ function SingleProject(props) {
 
     const handleChange = ({ target: { name, value, type, files } }) => {
         // setFields({ ...fields, [name]: value });
-        dispatch( updateStateData( PROJECT_FORM,  {[name]: value }))
+        dispatch( updateStateData( EDIT_PROJECT_FORM,  {[name]: value }))
         setErrors({ ...errors, [name]: '' })
     };
 
@@ -379,13 +339,18 @@ function SingleProject(props) {
             setLoader(false)
             setErrors(fieldErrors);
         } else {
-            console.log('Updated Project Fields:: ', fields)
-            return;
+            // console.log('Updated Project Fields:: ', fields)
+            // return;
             const formData = new FormData();
             for (const [key, value] of Object.entries(fields)) {
                 if (typeof value === 'object' && key === 'images') {
                     value.forEach(attach => {
                         formData.append('images[]', attach);
+                    });
+                }else if (typeof value === 'object' && key === 'members') {
+                    const memberids = Object.keys(fields['members'])
+                    memberids.forEach(item => {
+                        formData.append(`members[]`, item); // Append with the same key for non-empty arrays
                     });
                 } else if (Array.isArray(value)) { // Check if the value is an array
                     if (value.length === 0) {
@@ -506,9 +471,9 @@ function SingleProject(props) {
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 ms-lg-5">
                         <ListGroup.Item key={`project-assign-${currentProject?._id}`} className="me-3">Members</ListGroup.Item>
                         
-                        {selectedMembers && Object.keys(selectedMembers).length > 0 && (
+                        {fields['members'] && Object.keys(fields.members).length > 0 && (
                             <>
-                                {Object.entries(selectedMembers).slice(0, 3).map(([id, name], memberindex) => (
+                                {Object.entries(fields.members).slice(0, 3).map(([id, name], memberindex) => (
                                     <ListGroup.Item action key={`member-${memberindex}`}>
                                         <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
                                             <span className="team--initial nm-k">{name?.substring(0, 1)}</span>
@@ -516,20 +481,20 @@ function SingleProject(props) {
                                         <span
                                             className="remove-icon"
                                             id={`member-${currentProject?._id}-${id}`}
-                                            onClick={() => removeMember(id)}
+                                            onClick={() => removeMember(id, true)}
                                         >
                                             <MdOutlineClose />
                                         </span>
                                     </ListGroup.Item>
                                 ))}
-                                {Object.keys(selectedMembers).length > 3 && (
+                                {Object.keys(fields.members).length > 3 && (
                                     <ListGroup.Item key={`more-member-${currentProject?._id}`} className="more--member">
                                         <Dropdown>
                                             <Dropdown.Toggle variant="primary">
                                                 <FaEllipsisV />
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
-                                                {Object.entries(selectedMembers).slice(3).map(([id, name], memberindex) => (
+                                                {Object.entries(fields.members).slice(3).map(([id, name], memberindex) => (
                                                     <Dropdown.Item key={`dropdown-member-${memberindex}`}>
                                                         <ListGroup.Item action key={`action-${currentProject?._id}`}>
                                                             <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
@@ -552,7 +517,7 @@ function SingleProject(props) {
                             </>
                         )}
                         <ListGroup.Item className="add--member" key="addmember">
-                            <Button variant="primary" onClick={() => {dispatch(togglePopups('members', true))}}><FaPlus /></Button>
+                            <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
                         </ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal>
@@ -639,7 +604,7 @@ function SingleProject(props) {
                                 <Form.Label>
                                     <small>Workflow</small>
                                     <div className="workflow--modal" onClick={handleWorkflowShow}>
-                                        <span className="workflow--selected">{fields['workflow']?.title || currentProject?.workflow?.title ? 'Current Workflow' : 'Select'} <FaChevronDown /></span>
+                                        <span className="workflow--selected">{fields['workflow']?.title  ? 'Current Workflow' : 'Select'} <FaChevronDown /></span>
                                     </div>
                                 </Form.Label>
                             </Form.Group>
@@ -647,7 +612,7 @@ function SingleProject(props) {
                                 <Form.Label className="w-100 m-0">
                                     <small>Description</small>
                                     <strong className="add-descrp" onClick={handleEditor}><FiFileText /> Add a description</strong>
-                                    <div className={(isEditor || isEditor && fields['description'] && fields['description'] !== "") ? 'text--editor' : 'text--editor show--editor'}>
+                                    <div className={(isEditor || isEditor && fields['description'] && fields['description'] !== "") ? 'text--editor show--editor' : 'text--editor'}>
                                         <textarea className="form-control" placeholder="Add a title" rows="2" name="description" onChange={handleChange} value={fields['description'] || ''}>{fields['description'] || ''}</textarea>
                                         <ul className="editor--options">
                                             <li><a href="javascript:;"><FaBold /></a></li>
@@ -676,9 +641,9 @@ function SingleProject(props) {
                         <ListGroup>
                             <ListGroup.Item key="assign-membermodal-key" onClick={() => {dispatch(togglePopups('members', true))}}><FaPlus /> Assign to</ListGroup.Item>
                             <p className="m-0 d-flex align-items-center">
-                                {selectedMembers && Object.keys(selectedMembers).length > 0 && (
+                                {fields.members && Object.keys(fields.members).length > 0 && (
                                     <>
-                                        {Object.entries(selectedMembers).slice(0, 3).map(([id, name], memberindex) => (
+                                        {Object.entries(fields.members).slice(0, 3).map(([id, name], memberindex) => (
                                             <ListGroup.Item action key={`member-${memberindex}`}>
                                                 <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
                                                     <span className="team--initial nm-k">{name?.substring(0, 1)}</span>
@@ -692,14 +657,14 @@ function SingleProject(props) {
                                                 </span>
                                             </ListGroup.Item>
                                         ))}
-                                        {Object.keys(selectedMembers).length > 3 && (
+                                        {Object.keys(fields.members).length > 3 && (
                                             <ListGroup.Item key={`more-member-${currentProject?._id}`} className="more--member">
                                                 <Dropdown>
                                                     <Dropdown.Toggle variant="primary">
                                                         <FaEllipsisV />
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        {Object.entries(selectedMembers).slice(3).map(([id, name], memberindex) => (
+                                                        {Object.entries(fields.members).slice(3).map(([id, name], memberindex) => (
                                                             <Dropdown.Item key={`dropdown-member-${memberindex}`}>
                                                                 <ListGroup.Item action key={`action-${currentProject?._id}`}>
                                                                     <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
@@ -749,25 +714,8 @@ function SingleProject(props) {
                 </div>
             </div>
 
-
-            {/* <StatusModal key="update-project-status" showStatus={showStatus} currentStatus={fields['status']} onhide={handleStatusClose} callback={(status) => {
-                if (currentProject && Object.keys(currentProject).length > 0 && isActive !== 2) {
-                    handleStatusClose()
-                    dispatch(updateProject(currentProject._id, { status: status }))
-                } else {
-                    setFields({ ...fields, ['status']: status });
-                    handleStatusClose()
-                }
-
-            }} /> */}
-
-
-            {/* <MemberModal members={props?.members} showAssign={showAssign} currentProject={currentProject} handleAssignClose={handleAssignClose} selectCallback={addMember} isedit={isEdit} removeCallback={removeMember} selectedMembers={selectedMembers} /> */}
-            
             <WorkFlowModal />
             
-            {/*--=-=Assign Task Modal**/}
-
             {/*--=-=Upload Files Modal**/}
             <Modal show={showUpload} onHide={handleUploadClose} centered size="md" className="upload--status">
                 <Modal.Header closeButton>

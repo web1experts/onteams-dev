@@ -9,6 +9,7 @@ import {
     SHOW_FILES_MODAL,
     SHOW_PREVIEW_MODAL,
     SHOW_WORKFLOW_MODAL,
+    SHOW_TASK_MODAL,
     SHOW_STATUS_MODAL,
     ALL_MEMBERS,
     PROJECT_FORM,
@@ -42,6 +43,9 @@ export const togglePopups = ( popup, popup_state ) => {
                 break;
             case "filepreview":
                 await dispatch({ type: SHOW_PREVIEW_MODAL, payload: popup_state });
+                break;
+            case "taskform":
+                await dispatch({ type: SHOW_TASK_MODAL, payload: popup_state });
                 break;
             default:
                 break;

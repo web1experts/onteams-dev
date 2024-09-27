@@ -2,23 +2,25 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {  Button, ListGroup, Accordion } from "react-bootstrap";
 import { FaPlus, FaPlay, FaPause} from "react-icons/fa";
-
+import {  ALL_MEMBERS, ACTIVE_FORM_TYPE, EDIT_PROJECT_FORM, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ASSIGN_MEMBER } from "../../redux/actions/types";
+import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 const TasksList = React.memo(( props ) => {
-
+    const dispatch = useDispatch()
+    const commonState = useSelector( state => state.common)
     const [showProject, setProjectShow] = useState(false);
     const handleProjectClose = () => setProjectShow(false);
     const handleProjectShow = () => setProjectShow(true);
     const [showTask, setTaskShow] = useState(false);
     const handleTaskClose = () => setTaskShow(false);
-    const handleTaskShow = () => setTaskShow(true);
+    const handleTaskShow = () => dispatch(togglePopups('taskform', true))
     const [currentProject, setCurrentProject] = useState({})
 
     useEffect(() => {
-        if (props.currentProject) {
-            setCurrentProject(props.currentProject)
+        if (commonState.currentProject) {
+            setCurrentProject(commonState.currentProject)
         }
 
-    }, [props.currentProject])
+    }, [commonState.currentProject])
 
     return (
         <>
