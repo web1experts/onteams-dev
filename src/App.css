@@ -395,7 +395,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .details--projects--view .project--form {
   background: #ffffff;
   padding: 2rem 1.2rem;
-  height: calc(100% - 80px);
+  height: calc(100% - 100px);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
 }
@@ -593,6 +593,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   font-weight: 600;
   max-width: 300px;
   min-width: 300px;
+  min-height: 50px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
