@@ -615,11 +615,11 @@ function ProjectsPage() {
                             <thead>
                                 <tr key="project-table-header">
                                     <th scope="col" width={20} key="project-hash-header">#</th>
-                                    <th scope="col" width={400} key="project-name-header">Project Name</th>
-                                    <th scope="col" key="project-client-header" className="onHide">Client Name</th>
-                                    <th scope="col" key="project-member-header" className="onHide">Assigned Members</th>
-                                    <th scope="col" key="project-status-header" className="onHide th--minwidth">Status</th>
-                                    <th scope="col" key="project-action-header" className="onHide text-md-end th--minwidth">Actions</th>
+                                    <th scope="col" width='25%' key="project-name-header">Project Name</th>
+                                    <th scope="col" width='25%' key="project-client-header" className="onHide">Client Name</th>
+                                    <th scope="col" width='20%' key="project-member-header" className="onHide">Assigned Members</th>
+                                    <th scope="col" key="project-status-header" className="onHide">Status</th>
+                                    <th scope="col" key="project-action-header" className="onHide text-md-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
