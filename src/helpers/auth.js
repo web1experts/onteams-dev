@@ -227,6 +227,11 @@ export const SendComment = (text, postId, userId,parentCommentId) => {
   socket.emit('comment', { text, postId, userId,parentCommentId });
 };
 
+export const UpdateComment = (postId, text ) => {
+  // console.log('text, postId, userId',text, postId, userId,parentCommentId)
+  socket.emit('update_comment', { text, postId });
+};
+
 export const SendReplyComment = (text, postId, userId, parentCommentId) => {
   // console.log('text, postId, userId',text, postId, userId,parentCommentId)
   socket.emit('new_reply', { text, postId, userId,parentCommentId });

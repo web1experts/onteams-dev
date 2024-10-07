@@ -257,6 +257,7 @@ export function StatusModal(props){
 export function MemberModal( props){
   const modalstate = useSelector(state => state.common.membersModal);
   const commonState = useSelector( state => state.common);
+  const currentTask = useSelector( state => state.task.currentTask);
   const [ members, setMembers ] = useState(commonState.allmembers)
   const currentProject = useSelector(state => state.common.currentProject);
   const [formtype, setFormType] = useState(commonState.active_formtype || false)
@@ -355,9 +356,9 @@ export function MemberModal( props){
     if( commonState.active_formtype === "edit_project" && currentProject && Object.keys(currentProject).length > 0 && isEdit === true){
       const memberIds = Object.keys(membersModalState.selectedMembers);
       dispatch(updateProject(currentProject._id, { members: memberIds }))
-    }else if( commonState.active_formtype === "task_edit" && commonState.currentTask && Object.keys(commonState.currentTask).length > 0){ 
+    }else if( commonState.active_formtype === "task_edit" && currentTask && Object.keys(currentTask).length > 0){ 
       const memberIds = Object.keys(membersModalState.selectedMembers);
-      dispatch(updateTask(commonState.currentTask._id, { members: memberIds }))
+      dispatch(updateTask(currentTask._id, { members: memberIds }))
     }else{
       if( dataObject[commonState.active_formtype]){
         dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], {
@@ -934,6 +935,7 @@ export const  WorkFlowModal =  (props) => {
 export const FilesModal = () => {
   const modalstate = useSelector(state => state.common.filesmodal);
   const commonState = useSelector( state => state.common)
+  const currentTask = useSelector( state => state.task.currentTask);
   const [formtype, setFormType] = useState(false)
   const dispatch = useDispatch()
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -1054,9 +1056,18 @@ export const FilesModal = () => {
 
   const handleattachfiles = () => {
     setImagePreviews([]); 
-    if( dataObject[commonState.active_formtype]){
-      dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], { images: filesModalState.selectedFiles || []} ));
+    if( commonState.active_formtype === "task_edit" && filesModalState.selectedFiles.length > 0 && currentTask && Object.keys(currentTask).length > 0){
+      const formData = new FormData();
+      for (const attach of filesModalState.selectedFiles){
+        formData.append('images[]', attach);
+      }
+      dispatch(updateTask(currentTask._id, formData))
+    }else{
+      if( dataObject[commonState.active_formtype]){
+        dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], { images: filesModalState.selectedFiles || []} ));
+      }
     }
+    
     handleUploadClose()
   }
 

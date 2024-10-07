@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup} from "react-bootstrap";
+import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup, Dropdown} from "react-bootstrap";
 import { MdFileDownload, MdOutlineClose } from "react-icons/md";
-import { FaBold, FaChevronDown, FaItalic, FaPlus, FaRegTrashAlt, FaTrashAlt } from "react-icons/fa";
+import { FaBold, FaEllipsisV, FaItalic, FaPlus, FaRegTrashAlt, FaTrashAlt } from "react-icons/fa";
 import { selectboxObserver, getMemberdata } from "../../helpers/commonfunctions";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
@@ -13,7 +13,8 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import { FilesPreviewModal } from '../modals';
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { updateTask, deleteTask } from '../../redux/actions/task.action';
-import { socket, SendComment, DeleteComment } from '../../helpers/auth';
+import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 export const TaskForm = () => {
     const dispatch = useDispatch()
@@ -38,6 +39,7 @@ export const TaskForm = () => {
     const [ enablesubtaskedit, setEnableSubtakEdit ] = useState({})
     const [ShowCommentModel, setShowCommentModel] = useState(false);
     const handleCloseCommentModel = () => setShowCommentModel(false);
+    const [ editmessage, setEditMessage] = useState({})
     const [comments, setComments] = useState([]);
     const handleNewComment = (event) => {
         setComments(event.target.value);
@@ -61,12 +63,14 @@ export const TaskForm = () => {
     useEffect(() => {
         if (apiResult.currentTask) {
             setCurrentTask(apiResult.currentTask)
-            setImagePreviews([]);
-            setSubtasks([])
+            // setImagePreviews([]);
+            // setSubtasks([])
             
         }
 
     }, [apiResult.currentTask])
+
+
     useEffect(() => {
         if (currentTask && Object.keys(currentTask).length > 0) { 
             
@@ -158,17 +162,17 @@ export const TaskForm = () => {
     };
 
     useEffect(() => { 
-        if (commonState.taskForm) {
+        if (taskForm) { console.log('Tasks form:: ', taskForm)
             setFields(prevFields => {
                 const updatedFields = {
                     ...prevFields, // Retain the existing properties of fields
-                    ...commonState.taskForm // Merge properties from commonState.taskForm
+                    ...taskForm // Merge properties from commonState.taskForm
                 };
                 return updatedFields; // Return the new state
             });
             
         }
-    }, [commonState?.taskForm]);
+    }, [taskForm]);
 
   
     useEffect(() => { 
@@ -427,47 +431,87 @@ export const TaskForm = () => {
         dispatch( updateTask( currentTask._id, { subtasks: newSubtasks}))
     }
 
+    const handleDragEnd = (result) => {
+        const { source, destination } = result;
+
+        // Check if the item was dropped outside the list or in the same place
+        if (!destination || (source.index === destination.index)) {
+            return; // Do nothing if not moved
+        }
+
+        // Create a new array to update subtasks
+        const newSubtasks = Array.from(subtasks);
+        // Move the dragged subtask to the new position
+        const [removed] = newSubtasks.splice(source.index, 1);
+        newSubtasks.splice(destination.index, 0, removed);
+
+        // Update the order for each subtask based on the new index
+        const updatedSubtasks = newSubtasks.map((subtask, index) => ({
+            ...subtask,
+            order: index // Set the order to the current index
+        }));
+
+        // Update the state with the new order
+        setSubtasks(updatedSubtasks);
+        dispatch( updateTask( currentTask._id, { subtasks: updatedSubtasks}))
+    };
+
 
     const renderSubtasks = () => { 
+        
         return subtasks.map((subtask, index) => (
-            <>
-                <Form.Group className="mb-0 form-group" key={`subtask-${index}`}>
+            
+            <Draggable
+                key={`subtaskindex-${index}`}
+                draggableId={`sub-task-${index}`}
+                index={index}
+            >
+                {(provided) => (
+                <li 
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                ><Form.Group className="mb-0 form-group" key={`subtask-${index}`}>
                         {
                             (typeof subtask === 'object' ) &&
                             <input type='checkbox' onChange={(e) => {updateSubtask(e.target.checked, index)}} checked={
                                 subtask?.status || false
                             } />
                         }
-                    <FloatingLabel label="Subtask Title *">
-                        
-                        <textarea 
-                            className="form-control" 
-                            rows="2" 
-                            readonly={((typeof subtask === 'object') && enablesubtaskedit[subtask._id] === false || typeof subtask === 'object' && !enablesubtaskedit[subtask._id] )} 
-                            onClick={() => {
-                                if (typeof subtask === 'object') {
-                                    setEnableSubtakEdit({ [subtask._id]: true });
-                                }
-                            }}
-                            onBlur={() => {
-                                if (typeof subtask === 'object') {
-                                    setEnableSubtakEdit({ [subtask._id]: false });
-                                } else {
-                                    handleBlur(index);
-                                }
-                            }}
-                            name={`subtask-${index}`} 
-                            placeholder="Enter subtask" 
-                            value={typeof subtask === 'object' ? subtask.title : subtask} 
-                            onChange={({ target: { value } }) => handlesubtaskChange(index, subtask, value)} 
-                        />
+                         
+                            <FloatingLabel label="Subtask Title *">
+                                
+                                <textarea 
+                                    className="form-control" 
+                                    rows="2" 
+                                    readonly={((typeof subtask === 'object') && enablesubtaskedit[subtask._id] === false || typeof subtask === 'object' && !enablesubtaskedit[subtask._id] )} 
+                                    onClick={() => {
+                                        if (typeof subtask === 'object') {
+                                            setEnableSubtakEdit({ [subtask._id]: true });
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        if (typeof subtask === 'object') {
+                                            setEnableSubtakEdit({ [subtask._id]: false });
+                                        } else {
+                                            handleBlur(index);
+                                        }
+                                    }}
+                                    name={`subtask-${index}`} 
+                                    placeholder="Enter subtask" 
+                                    value={typeof subtask === 'object' ? subtask.title : subtask} 
+                                    onChange={({ target: { value } }) => handlesubtaskChange(index, subtask, value)} 
+                                />
 
-                    </FloatingLabel>
+                            </FloatingLabel>
                     <button type="button"  variant="primary" onClick={() => removeSubtask(index)}>
                         <FaRegTrashAlt />
                     </button>
                 </Form.Group>
-            </>
+                </li>
+                )}
+                </Draggable>
+           
             
         ));
     };
@@ -482,7 +526,7 @@ export const TaskForm = () => {
             <Modal.Body>
                 <div className="project--form">
                     <div className="project--form--inputs" data-tabid={fields['tab']}>
-                        <Form onSubmit={handleSubmit} key={`taskform-${commonState?.taskForm?.tab}`}>
+                        <Form onSubmit={() => {return false}} key={`taskform-${commonState?.taskForm?.tab}`}>
                             <Form.Group className="mb-0 form-group">
                                 <FloatingLabel label="Task Title *">
                                     <Form.Control type="text" key={`task-title-${commonState?.taskForm?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || ""} onChange={handleChange} onBlur={(e) => {
@@ -558,7 +602,24 @@ export const TaskForm = () => {
                                 </Form.Label>
                             </Form.Group>
                             
-                            {renderSubtasks()}
+                            <DragDropContext onDragEnd={handleDragEnd}>
+                                <Droppable droppableId={`droppable-subtasks-List-${currentTask?._id}`} type="SUBTASKS">
+                                    {(provided) => (
+                                        <div className='subtasks-List' ref={provided.innerRef} {...provided.droppableProps}>
+                                            <ul
+                                                id={`subtasks-ul`}
+                                                className="subtasks--list"
+                                                style={{ overflowY: 'auto', height: '100%' }}
+                                            >
+                                                {renderSubtasks()}
+                                                {provided.placeholder} {/* Important for spacing during drag */}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
+
+                           
                             <small
                                 className="add-subtasks"
                                 style={{ cursor: 'pointer', opacity: subtasks.length && subtasks.some(subtask => subtask === '') ? 0.5 : 1 }}
@@ -578,7 +639,60 @@ export const TaskForm = () => {
                                         <Col sm={12} lg={6}>
                                         {
                                             currentTask.comments.map((comment, index) => {
-                                                return <p key={`comment-${index}`}>{comment.text} <FaTrashAlt onClick={() => handleDelteComment(comment?._id, currentTask?._id)}></FaTrashAlt></p>
+                                                if( editmessage[comment._id] && editmessage[comment._id]['show'] === true ){
+                                                    return (
+                                                        <>
+                                                        <Form.Control type='text' value={editmessage[comment._id].msg} onChange={(e) => {
+                                                            setEditMessage(prev => ({
+                                                                ...prev, // Spread the previous state
+                                                                [comment._id]: {
+                                                                    show: true,
+                                                                    msg: e.target.value // Update with the current input value
+                                                                }
+                                                            }));
+                                                        }}
+                                                        ></Form.Control>
+                                                        <ListGroup horizontal>
+                                                        <ListGroup.Item key={`edit-comment-${comment._id}`} className="more--actions">
+                                                            <Button variant='info' onClick={(e) => {
+                                                                setEditMessage(prev => ({
+                                                                    ...prev, // Spread the previous state
+                                                                    [comment._id]: {
+                                                                        show: false,
+                                                                        msg: e.target.value // Update with the current input value
+                                                                    }
+                                                                }));
+                                                            }}>Cancel</Button>
+                                                            </ListGroup.Item>
+                                                            <ListGroup.Item key={`delete-comment-${comment?._id}`} className="more--actions">
+                                                                <Button variant='primary' onClick={() => {
+                                                                    UpdateComment(comment._id, editmessage[comment?._id]['msg'])
+                                                                    setEditMessage({[comment._id]: { show: false, msg: editmessage[comment?._id]['msg']}})
+                                                                }}>Save</Button>
+                                                            </ListGroup.Item>
+                                                        </ListGroup>
+                                                        </>
+                                                    )
+                                                }else{
+                                                    return (
+                                                        <p key={`comment-${comment._id}`}>{comment.text} 
+                                                            <Dropdown>
+                                                                <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
+                                                                    <FaEllipsisV />
+                                                                </Dropdown.Toggle>
+                                                                <Dropdown.Menu>
+                                                                    <div className="over--scroll">
+                                                                        <Dropdown.Item key={`dropdown-member-${index}`}>
+                                                                            <Button onClick={() => {setEditMessage({[comment._id]: {show: true, msg: comment.text}})}}>Edit message</Button>
+                                                                            <Button onClick={() => handleDelteComment(comment?._id, currentTask?._id)}>Delete message</Button>
+                                                                        </Dropdown.Item>
+                                                                        
+                                                                    </div>
+                                                                </Dropdown.Menu>
+                                                            </Dropdown>
+                                                        </p>
+                                                    )
+                                                }
                                             })
                                         }
                                            
