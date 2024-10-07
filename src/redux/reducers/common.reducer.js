@@ -2,7 +2,7 @@ import {
     CURRENT_PROJECT,
     SELECTED_MEMBERS,
     SELECTED_STATUS,
-    SELECTED_WORKFLOW,
+    DIRECT_UPDATE,
     SELECTED_FILES,
     CURRENT_TASK,
     SHOW_MEMBERS_MODAL,
@@ -12,10 +12,15 @@ import {
     ALL_MEMBERS,
     ALL_CLIENTS,
     PROJECT_FORM,
+    EDIT_PROJECT_FORM,
     TASK_FORM,
     ACTIVE_FORM_TYPE,
     RESET_FORMS,
-    SHOW_PREVIEW_MODAL
+    SHOW_PREVIEW_MODAL,
+    ASSIGN_MEMBER,
+    TASK_FORM_TYPE,
+    SHOW_TASK_MODAL,
+    CREATE_POST_LIST_COMMENT
 } from "../actions/types";
 
 const initialState = {
@@ -30,8 +35,11 @@ const initialState = {
     membersModal: false,
     allmembers: [],
     projectForm: {},
+    editProjectForm: {},
     taskForm: {},
     active_formtype: null,
+    task_formtype: null,
+    assign_members_direct: false,
 };
 
 export default (state = initialState, action) => {
@@ -41,7 +49,13 @@ export default (state = initialState, action) => {
             ...state,
             currentProject: action.payload
           };
-          
+      
+    case ASSIGN_MEMBER :
+        return {
+            ...state,
+            assign_members_direct: action.payload
+            };
+    
     case SELECTED_MEMBERS :
         return {
             ...state,
@@ -69,11 +83,7 @@ export default (state = initialState, action) => {
             ...state,
             files: action.payload.files
         }
-    case CURRENT_TASK: 
-        return {
-            ...state,
-            files: action.payload.currentTask
-        }
+    
     case SHOW_STATUS_MODAL: 
         return {
             ...state,
@@ -104,17 +114,56 @@ export default (state = initialState, action) => {
             ...state,
             projectForm: { ...state.projectForm, ...action.payload }
         }
+    case TASK_FORM: 
+      
+        return {
+            ...state,
+            taskForm: { ...state.taskForm, ...action.payload }
+        }
+    case EDIT_PROJECT_FORM: 
+        return {
+            ...state,
+            editProjectForm: { ...state.editProjectForm, ...action.payload }
+        }
     case ACTIVE_FORM_TYPE: 
         return {
             ...state,
             active_formtype: action.payload
         }
+    case SHOW_TASK_MODAL: 
+        return {
+            ...state,
+            taskmodal: action.payload
+        }
     case RESET_FORMS: 
+    if(action.payload === "edit_project"){
+        return {
+            ...state,
+            currentProject: false,
+            editProjectForm: {},
+        }
+    }else if(action.payload === "task"){
+        return {
+            ...state,
+            taskForm: {},
+        }
+    }else{
         return {
             ...state,
             projectForm: {},
-            taskForm: {}
         }
+    }
+    case DIRECT_UPDATE:
+        return {
+            ...state,
+            directUpdate: action.payload
+        }
+    case TASK_FORM_TYPE: 
+        return {
+            ...state,
+            task_formtype: action.payload
+        }
+    
     default: return state;
   }
 };

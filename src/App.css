@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 * {
   margin: 0;
@@ -11,7 +11,7 @@
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
   background: #ffffff;
   color: #454545;
   font-size: 1rem;
@@ -270,16 +270,16 @@ body {
 }
 
 .page--wrapper table td.project--title--td span {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  max-width: 220px;
   cursor: pointer;
-  display: block;
   border-radius: 0;
   height: auto;
   margin: 0;
-  width: max-content;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .page--wrapper .clients--grid--table td.project--title--td span {
@@ -369,6 +369,7 @@ Collapsible Action CSS-=-=
   -webkit-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   -moz-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   z-index: 2;
+  height: 100%;
 }
 
 .show--details ~ .details--wrapper,
@@ -432,11 +433,9 @@ button.input-error.dropdown-toggle.btn.btn-success {
   opacity: 1;
 }
 
-.details--projects--view .project--form--actions>.btn {
-  display: block;
+.details--projects--view .project--form--actions .btn {
   width: auto;
   min-width: 220px;
-  align-self: center;
 }
 
 .details--projects--view .project--form--actions .btn+.btn {
@@ -465,7 +464,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   background: #fff;
 }
 
-.project--form--actions .list-group:last-child .list-group-item {
+/* .project--form--actions .list-group:last-child .list-group-item {
   margin-bottom: 0;
   padding: 0;
   display: flex;
@@ -475,7 +474,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   border: 0;
   gap: 10px;
   text-decoration: none;
-}
+} */
 
 .show--details .page--wrapper .nav-tabs,
 .view--project .page--wrapper .nav-tabs {
@@ -658,6 +657,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -1192,6 +1192,7 @@ table tr.active td {
 
 .projects--page .table .list-group-item .remove-icon,
 .project--form--actions .list-group-item .remove-icon,
+.tasks-form-action .list-group-item .remove-icon,
 .wrapper--title .members--list .list-group-item .remove-icon {
   position: absolute;
   right: 0;
@@ -1212,7 +1213,7 @@ table tr.active td {
   cursor: pointer;
 }
 
-.project--form--actions button.list-group-item {
+.project--form--actions button.list-group-item, .tasks-form-action button.list-group-item {
   padding: 0;
   text-decoration: none;
   width: max-content;
@@ -1222,7 +1223,7 @@ table tr.active td {
   margin-bottom: 0;
 }
 
-.project--form--actions button.list-group-item+button.list-group-item {
+.project--form--actions button.list-group-item+button.list-group-item, .tasks-form-action button.list-group-item+button.list-group-item {
   margin-left: .5rem;
 }
 
@@ -1231,7 +1232,7 @@ table tr.active td {
   margin-left: .5rem;
 }
 
-.project--form--actions .more--member .btn {
+.project--form--actions .more--member .btn, .tasks-form-action .more--member .btn {
   border-radius: 100px;
   -webkit-border-radius: 100px;
   padding: 0;
@@ -1242,7 +1243,7 @@ table tr.active td {
   justify-content: center;
 }
 
-.project--form--actions .more--member svg {
+.project--form--actions .more--member svg, .tasks-form-action .more--member svg {
   margin-right: 0;
   font-size: .85rem;
 }
@@ -1250,7 +1251,8 @@ table tr.active td {
 .projects--page .table .list-group-item .team--initial,
 .projects--page .table .list-group-item .team--image,
 .projects--page .table .list-group-item .btn,
-.project--form--actions .list-group-item .team--initial {
+.project--form--actions .list-group-item .team--initial,
+.tasks-form-action .list-group-item .team--initial {
   width: 35px;
   text-decoration: none;
   height: 35px;
@@ -1277,7 +1279,7 @@ table tr.active td {
   background: #de0606;
 }
 
-.project--form--actions .list-group-item .remove-icon svg {
+.project--form--actions .list-group-item .remove-icon svg, .tasks-form-action .list-group-item .remove-icon svg{
   margin-right: 0;
   font-size: .55rem;
 }
@@ -1322,6 +1324,7 @@ Project Task View CSS=-=-=
   scrollbar-width: thin;
   -ms-overflow-style: none;
   gap: 1rem;
+  height: calc(100% - 90px);
 }
 
 .projects--grid .task--list::-webkit-scrollbar {
@@ -1335,8 +1338,9 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list .task--grid {
-  flex: 0 0 33.333%;
-  max-width: 33.333%;
+  flex: 1 1;
+  max-width: 30%;
+  min-width: 330px;
   margin: 0;
   background: #ffffff;
   padding: 1rem;
@@ -1389,7 +1393,7 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list .task--grid ul {
-  max-height: calc(100vh - 185px);
+  max-height: calc(100% - 65px);
   overflow-y: auto;
   margin-top: 1rem;
   padding-bottom: 0.5rem;
@@ -1408,15 +1412,20 @@ Project Task View CSS=-=-=
   padding: 1rem;
   margin-bottom: 0.6rem;
   cursor: pointer;
-  background: #7BCCB810;
+  background: #ffffff90;
   position: relative;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
   border-radius: 0.5rem;
   -webkit-border-radius: 0.5rem;
-  box-shadow: 0px 2px 2px 0px rgba(99, 99, 99, 0.1);
-  -webkit-box-shadow: 0px 2px 2px 0px rgba(99, 99, 99, 0.1);
+  box-shadow: 0px 4px 5px rgba(99, 99, 99, 0.15);
+  -webkit-box-shadow: 0px 4px 5px rgba(99, 99, 99, 0.15);
+  border: 1px solid #00000010;
+}
+
+.projects--grid .task--list ul li .tasks-form-action {
+  margin-left: auto;
 }
 
 .projects--grid .task--list ul li:last-child {
@@ -1781,7 +1790,7 @@ pre {
   margin: 0;
   margin-top: 0.5rem;
   white-space: pre-line;
-  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .AddReportModal ul li {
@@ -2040,13 +2049,12 @@ pre {
   line-height: 35px;
 }
 
-.show--details .page--wrapper table .project--title--td span,
-.view--project .page--wrapper table .project--title--td span,
-.view--invitee .page--wrapper table .project--title--td span {
+.show--details .page--wrapper table .project--title--td span, .view--project .page--wrapper table .project--title--td span, .view--invitee .page--wrapper table .project--title--td span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 180px;
+  max-width: 170px;
+  display: block;
 }
 
 .show--details table td .status--circle,
@@ -2521,7 +2529,7 @@ pre {
 }
 
 .onteamsio--page .dropdown .dropdown-menu .menu--scroll {
-  max-height: 500px;
+  max-height: calc(100vh - 130px);
   overflow-y: auto;
 }
 
@@ -3043,10 +3051,6 @@ Media CSS-=-==
   .wrapper--title {
     flex-flow: row wrap;
   }
-
-  .page--wrapper table td.project--title--td span {
-    max-width: 170px;
-  }
 }
 
 @media screen and (max-width:992px) {
@@ -3350,6 +3354,10 @@ Media CSS-=-==
   .show--details table td::before, .view--project table td::before, 
   .view--invitee table td::before, .view--invitee table td::before {
     display: none;
+  }
+
+  .projects--grid .task--list {
+    height: calc(100% - 150px);
   }
 }
 

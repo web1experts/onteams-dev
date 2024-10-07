@@ -8,7 +8,6 @@ import { GrAttachment } from "react-icons/gr";
 import { BsGrid } from "react-icons/bs";
 import { ListProjects, createProject, updateProject, deleteProject } from "../../redux/actions/project.action"
 import { Listmembers } from "../../redux/actions/members.action";
-import { getMemberdata } from "../../helpers/commonfunctions";
 import { formatStatus } from "../../utils/common";
 import { StatusModal, MemberModal, WorkFlowModal, FilesModal, FilesPreviewModal } from "../modals";
 import { ListClients } from "../../redux/actions/client.action";
@@ -16,16 +15,18 @@ import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
 import fileIcon from './../../images/file-icon-image.jpg'
-import { selectboxObserver } from "../../helpers/commonfunctions";
+import { selectboxObserver, getMemberdata } from "../../helpers/commonfunctions";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import SingleProject from "./singleProject";
+import { TaskForm } from "../Tasks/taskform";
 import TasksList from "../Tasks/list";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
-import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS } from "../../redux/actions/types";
+import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE } from "../../redux/actions/types";
 function ProjectsPage() {
     const [isActiveView, setIsActiveView] = useState(2);
     const dispatch = useDispatch();
+    const memberdata = getMemberdata()
     const [projects, setProjects] = useState([]);
     const [filters, setFilters] = useState({})
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [] });
@@ -39,12 +40,13 @@ function ProjectsPage() {
     const clientFeed = useSelector(state => state.client.clients);
     const apiClient = useSelector(state => state.client)
     const memberFeed = useSelector((state) => state.member.members);
-    const commonState = useSelector( state => state.common)
-    const [ clientlist, setClientList] = useState([])
+    const commonState = useSelector(state => state.common)
+    const projectform = useSelector( state => state.common.projectForm)
+    const [clientlist, setClientList] = useState([])
     const [members, setMembers] = useState([])
     const [currentPage, setCurrentPage] = useState(0);
+    const [isEdit, setIsEdit] = useState(false)
     const [total, setTotal] = useState(0)
-    const currentMember = getMemberdata()
     const [isActive, setIsActive] = useState(0);
     const [currentProject, setCurrentProject] = useState({})
     const [showdialog, setShowDialog] = useState(false);
@@ -52,77 +54,58 @@ function ProjectsPage() {
     const [spinner, setSpinner] = useState(false)
     let fieldErrors = {};
     let active = 2;
-
-    useEffect(() => {
-        selectboxObserver()
-        dispatch ( updateStateData( PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
-    }, []);
-    useEffect(() => {
-        if(clientFeed && clientFeed.clientData && clientFeed.clientData.length > 0 ){
-            setClientList(clientFeed.clientData)
-            dispatch( updateStateData( ALL_CLIENTS, clientFeed.clientData))
-        }   
-    }, [clientFeed])
-
-    // const addMember = (member) => {
-    //     setFields(prevFields => ({
-    //         ...prevFields,
-    //         members: Array.from(new Set([...prevFields.members, member._id]))
-    //     }));
-
-    //     const { _id, name } = member;
-    //     setselectedMembers((prevSelectedMembers) => {
-    //         // Check if the memberId is not already in the selectedMembers object
-    //         if (!prevSelectedMembers.hasOwnProperty(_id)) {
-    //             return {
-    //                 ...prevSelectedMembers,
-    //                 [_id]: name,
-    //             };
-    //         } else {
-    //             return prevSelectedMembers;
-    //         }
-    //     });
-    // };
+    const workflowstate = useSelector(state => state.workflow)
     
     useEffect(() => {
+        selectboxObserver()
+        dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
+    }, []);
+    useEffect(() => {
+        if (clientFeed && clientFeed.clientData && clientFeed.clientData.length > 0) {
+            setClientList(clientFeed.clientData)
+            dispatch(updateStateData(ALL_CLIENTS, clientFeed.clientData))
+        }
+    }, [clientFeed])
+
+    useEffect(() => {
         if (apiClient.createClient) {
-            setFields({...fields, client: apiClient.createClient})
+            setFields({ ...fields, client: apiClient.createClient })
             handleChange({ target: { name: 'client', value: apiClient.createClient } });
-            setTimeout(function(){
+            setTimeout(function () {
                 selectboxObserver()
             }, 200)
         }
     }, [apiClient]);
 
     useEffect(() => {
-        if( commonState.selectedMembers){
+        if (commonState.selectedMembers) {
             setselectedMembers(commonState.selectedMembers)
         }
-      },[ commonState.selectedMembers])
+    }, [commonState.selectedMembers])
 
-      useEffect(() => {
-        if( commonState.projectForm){
-            setFields(commonState.projectForm)
+    useEffect(() => { 
+        if (commonState.projectForm) {
+            setFields(prevFields => {
+                const updatedFields = {
+                    ...prevFields, // Retain the existing properties of fields
+                    ...commonState.projectForm // Merge properties from commonState.projectForm
+                };
+            
+                // Log updated fields for debugging
+                // console.log("Updated Fields:", updatedFields);
+            
+                return updatedFields; // Return the new state
+            });
+            
         }
-      },[ commonState.projectForm])
+    }, [projectform]);
+    
+
 
     // Function to remove the last member
     const removeMember = (member) => {
-        setFields(prevFields => ({
-            ...prevFields,
-            members: prevFields.members.filter(m => m !== member)
-        }));
-
-        setselectedMembers((prevSelectedMembers) => {
-            if (typeof prevSelectedMembers !== 'object' || prevSelectedMembers === null) {
-                // Handle the case where prevSelectedMembers is not an object or is null
-                console.error("Invalid state for selectedMembers:", prevSelectedMembers);
-                return {};
-            }
-            // Create a new object excluding the member with the specified ID
-            const { [member]: deletedMember, ...updatedMembers } = prevSelectedMembers;
-            return updatedMembers;
-        });
+        delete fields['members'][member]
+        dispatch(updateStateData(PROJECT_FORM, { members: fields['members'] || {} }))
     };
 
     const [isdescEditor, setIsDescEditor] = useState(false);
@@ -136,28 +119,30 @@ function ProjectsPage() {
 
     const [show, setShow] = useState(false);
     const handleClose = () => {
-        dispatch( updateStateData(ACTIVE_FORM_TYPE, null) )
-        dispatch( updateStateData(RESET_FORMS) )
+        setFields({ title: '', status: 'in-progress', members: [] })
+        dispatch(updateStateData(ACTIVE_FORM_TYPE, null))
+        dispatch(updateStateData(RESET_FORMS))
         setSelectedFiles([])
         setselectedMembers([])
         setImagePreviews([])
         setShow(false);
     }
-    const handleShow = (type) => {
+    const handleShow = async (type) => {
+       
+        await dispatch(updateStateData(ACTIVE_FORM_TYPE, 'project'))
+        await dispatch(updateStateData(RESET_FORMS, 'project'))
+        setFields({ title: '', status: 'in-progress', members: [] })
+        await dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
         if (type === "new") {
             setCurrentProject({})
             setselectedMembers({})
             setImagePreviews([])
-            setFields({ title: '', status: 'in-progress', members: [] });
-            dispatch( updateStateData(ACTIVE_FORM_TYPE, 'project') )
-            dispatch( updateStateData(PROJECT_FORM, {}) )
+
         }
         setShow(true);
     }
 
-    const [showStatus, setStatusShow] = useState(false);
-    const [ actionfor, SetActionFor ] = useState('project')
-    const handleStatusClose = () =>  dispatch(togglePopups('status', false));
+    const handleStatusClose = () => dispatch(togglePopups('status', false));
     const handleStatusShow = () => dispatch(togglePopups('status', true));
     const selectedStatus = useSelector(state => state.common.selectedStatus)
 
@@ -165,8 +150,8 @@ function ProjectsPage() {
     const handleClientClose = () => setClientShow(false);
     const handleClientShow = () => setClientShow(true);
     const [showWorkflow, setWorkflowShow] = useState(false);
-    const handleWorkflowClose = () => dispatch( togglePopups('workflow',false ));
-    const handleWorkflowShow = () => dispatch( togglePopups('workflow',true));
+    const handleWorkflowClose = () => dispatch(togglePopups('workflow', false));
+    const handleWorkflowShow = () => dispatch(togglePopups('workflow', true));
     const [showSetting, setSettingShow] = useState(false);
     const handleSettingClose = () => setSettingShow(false);
     const handleSettingShow = () => setSettingShow(true);
@@ -183,7 +168,7 @@ function ProjectsPage() {
     const handleUploadClose = () => {
         setUploadShow(false);
     }
-    const handleUploadShow = () => dispatch( togglePopups('files', true )) //setUploadShow(true);
+    const handleUploadShow = () => dispatch(togglePopups('files', true)) //setUploadShow(true);
     const [showDelete, setDeleteShow] = useState(false);
     const handleDeleteClose = () => setDeleteShow(false);
     const [showFilter, setFilterShow] = useState(false);
@@ -199,25 +184,17 @@ function ProjectsPage() {
     const handlePreviewShow = (file) => {
         setFiletoPreview(file)
         setPreviewShow(true)
-        // dispatch( togglePopups('filepreview', true))
     };
 
-    // const handleStatusCallback = ( status ) => {
-        // if( actionfor === "project"){
-        useEffect(() => {
-            if (currentProject && Object.keys(currentProject).length > 0 && isActive !== 2) {
-                handleStatusClose()
-                dispatch(updateProject(currentProject._id, { status: selectedStatus }))
-            } else {
-                setFields({ ...fields, ['status']: selectedStatus });
-                handleStatusClose()
-            }
-        },[selectedStatus]);
-        // }else if(actionfor === "project"){
-
-        // }
-        
-    // }
+    useEffect(() => {
+        if (currentProject && Object.keys(currentProject).length > 0 && isActive !== 2) {
+            handleStatusClose()
+            dispatch(updateProject(currentProject._id, { status: selectedStatus }))
+        } else {
+            setFields({ ...fields, ['status']: selectedStatus });
+            handleStatusClose()
+        }
+    }, [selectedStatus]);
 
     const handleListProjects = async () => {
         let selectedfilters = { currentPage: currentPage }
@@ -231,19 +208,11 @@ function ProjectsPage() {
     useEffect(() => {
         dispatch(Listmembers(0, '', false));
         dispatch(ListClients());
-    },[])
+    }, [])
 
-    // const handleSelectedFiles = (acceptedFiles) => { console.log('acceptedFiles: ', acceptedFiles)
-    //     //const newFiles = Array.from(event.target.files);
-    //     setSelectedFiles((prevSelectedFiles) => {
-    //         // Filter out duplicates by comparing file names or other unique properties
-    //         const uniqueFiles = Array.from(new Set([...prevSelectedFiles, ...acceptedFiles]));
 
-    //         return uniqueFiles;
-    //     });
-    // };
 
-    useEffect(() => {
+    useEffect(() => { 
         if (commonState.projectForm.images?.length > 0) {
             const selectedFiles = commonState.projectForm.images
             const previews = [];
@@ -264,32 +233,34 @@ function ProjectsPage() {
                 };
                 reader.readAsDataURL(selectedFiles[i]);
             }
-        }else{
+        } else {
             const { images, ...updatedFields } = fields;
-            setFields(updatedFields);           
+            setFields(updatedFields);
         }
-    }, [commonState.projectForm.images])
+    }, [projectform.images])
 
     const handleRemove = (indexToRemove) => {
         // Filter out the file to remove from both selectedFiles and imagePreviews
+        const selectedFiles = commonState.projectForm.images
         const updatedSelectedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
         const updatedImagePreviews = imagePreviews.filter((_, index) => index !== indexToRemove);
-        setSelectedFiles(updatedSelectedFiles);
+        // setSelectedFiles(updatedSelectedFiles);
+        dispatch(updateStateData(PROJECT_FORM, { images: updatedSelectedFiles }))
         setImagePreviews(updatedImagePreviews);
     };
 
     useEffect(() => {
         setProjects([])
         handleListProjects()
-        setSpinner( true )
-        
+        setSpinner(true)
+
     }, [])
 
     useEffect(() => {
-        if (currentPage > 0 ) { 
+        if (currentPage > 0) {
             setProjects([])
             handleListProjects()
-            setSpinner( true )
+            setSpinner(true)
         }
     }, [currentPage])
 
@@ -304,10 +275,10 @@ function ProjectsPage() {
         handleFilterClose()
         selectboxObserver()
     }
-    
+
     const handleChange = ({ target: { name, value, type, files } }) => {
-        // setFields({ ...fields, [name]: value });
-        dispatch( updateStateData( PROJECT_FORM,  {[name]: value }))
+        setFields({...fields, [name]: value})
+        dispatch(updateStateData(PROJECT_FORM, { [name]: value }))
         setErrors({ ...errors, [name]: '' })
     };
 
@@ -334,19 +305,20 @@ function ProjectsPage() {
         if (projectFeed && projectFeed.projectData) {
             setProjects(projectFeed.projectData)
             setTotal(projectFeed.total)
-            if (currentProject && Object.keys(currentProject).length > 0) {
-                let hasopened = false;
-                projectFeed.projectData.forEach((p, inx) => {
-                    if (p._id === currentProject._id) {
-                        setCurrentProject(p);
-                        hasopened = true;
-                        return;
-                    }
-                })
-                if( hasopened === false ){
-                    setIsActive(0)
-                }
-            }
+            // if (currentProject && Object.keys(currentProject).length > 0) {
+            //     let hasopened = false;
+            //     projectFeed.projectData.forEach((p, inx) => {
+            //         if (p._id === currentProject._id) {
+            //             setCurrentProject(p);
+            //             dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project'))
+            //             hasopened = true;
+            //             return;
+            //         }
+            //     })
+            //     if (hasopened === false) {
+            //         setIsActive(0)
+            //     }
+            // }
         }
     }, [projectFeed])
 
@@ -357,7 +329,7 @@ function ProjectsPage() {
             .filter(member => member._id !== memberId)
             .map(member => member._id);
         await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }))
-        document.getElementById(targetelement).classList.remove('disabled-pointer'); 
+        document.getElementById(targetelement).classList.remove('disabled-pointer');
     }
 
     const showError = (name) => {
@@ -365,7 +337,7 @@ function ProjectsPage() {
         return null
     }
 
-    const handleSubmit = async (e) => { //console.log('fields: ', fields); return;
+    const handleSubmit = async (e) => { 
         e.preventDefault();
         setLoader(true)
         const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
@@ -395,8 +367,13 @@ function ProjectsPage() {
             for (const [key, value] of Object.entries(fields)) {
                 if (typeof value === 'object' && key === 'images') {
                     value.forEach(attach => {
-                        console.log('attach: ', attach)
+                       
                         formData.append('images[]', attach);
+                    });
+                } else if (typeof value === 'object' && key === 'members') {
+                    const memberids = Object.keys(fields['members'])
+                    memberids.forEach(item => {
+                        formData.append(`members[]`, item); // Append with the same key for non-empty arrays
                     });
                 } else if (Array.isArray(value)) { // Check if the value is an array
                     if (value.length === 0) {
@@ -406,14 +383,14 @@ function ProjectsPage() {
                             formData.append(`${key}[]`, item); // Append with the same key for non-empty arrays
                         });
                     }
-                }else if (typeof value === 'object'){
+                } else if (typeof value === 'object') {
                     formData.append(key, JSON.stringify(value))
                 } else {
                     formData.append(key, value)
                 }
             }
             let payload = formData;
-            
+
             if (currentProject && currentProject._id) {
                 await dispatch(updateProject(currentProject._id, payload))
                 setLoader(false)
@@ -437,40 +414,48 @@ function ProjectsPage() {
     useEffect(() => {
         // Example: Set currentProject initially if not already set
         if (currentProject && projects.length > 0 && Object.keys(currentProject).length > 0) {
+            let found = false;
+            let hasopened = false;
             projects.forEach((p, inx) => {
                 if (p._id === currentProject._id) {
+                    found = true;
+                    hasopened = true;
                     setCurrentProject(p);
+                    dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project'))
                     return;
                 }
             })
+            if (hasopened === false) {
+                setIsActive(0)
+            }
+            if( found === false ){
+                setCurrentProject({})
+            }
         }
     }, [projects]);
-
-    useEffect(() => {
-        if (currentProject && Object.keys(currentProject).length > 0) {
-            dispatch( updateStateData(CURRENT_PROJECT, currentProject))
-        }
-    }, [currentProject]);
-
 
     const handleattachfiles = (e) => {
         handleUploadClose()
     }
 
     useEffect(() => {
-        if( apiResult.deletedProject){ 
+        if (apiResult.deletedProject) {
             setIsActive(0)
             setCurrentPage({})
         }
-        
+
         if (apiResult.success) {
+            setIsDescEditor( false )
+            // dispatch(updateStateData(DIRECT_UPDATE, false));
+            // dispatch(updateStateData(RESET_FORMS))
+            setFields({ title: '', status: 'in-progress', members: [] })
             handleClose()
             setSelectedFiles([]);
             setImagePreviews([]);
             setShowDialog(false)
             handleListProjects()
         }
-        
+
     }, [apiResult])
 
     const handleRemovefiles = (id) => {
@@ -480,7 +465,7 @@ function ProjectsPage() {
     }
 
     const renderPreview = (type, preview, index) => {
-        console.log(type)
+       
         const { src, _id } = preview;
         const mimetype = (preview.mimetype) ? preview.mimetype : src.split('.').pop().toLowerCase();
         const previewComponents = {
@@ -539,8 +524,15 @@ function ProjectsPage() {
         return null;
     };
 
+    useEffect(() => {
+        if (currentProject && Object.keys(currentProject).length > 0) {
 
-    const MemberInitials = ({ id, children, title }) => { 
+            dispatch(updateStateData(CURRENT_PROJECT, currentProject))
+        }
+    }, [currentProject]);
+
+
+    const MemberInitials = ({ id, children, title }) => {
         return (
             <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
                 {children}
@@ -549,12 +541,11 @@ function ProjectsPage() {
     };
 
     const handleProjectChange = (project) => {
-        dispatch( updateStateData(ACTIVE_FORM_TYPE, 'project') )
-        dispatch( updateStateData(RESET_FORMS) )
+        dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project'))
         setCurrentProject(project)
     }
 
-    
+
     return (
         <>
             <div className={isActive === 1 ? 'show--details team--page' : isActive === 2 ? ' view--project team--page' : 'team--page'}>
@@ -567,19 +558,22 @@ function ProjectsPage() {
                                     <Button variant="primary" className={isActive !== 0 ? 'd-flex' : 'd-lg-none'} onClick={handleFilterShow}><MdFilterList /></Button>
                                     <Button variant="primary" onClick={() => handleShow('new')}><FaPlus /></Button>
                                     <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
-                                        <ListGroup.Item key="showfor-filter-list">
+                                        {/* <ListGroup.Item key="showfor-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('show_for', event.target.value)} value={filters['show_for'] || 'all'}>
                                                 <option value="all">All Projects</option>
                                                 <option value="my">My Projects</option>
                                             </Form.Select>
-                                        </ListGroup.Item>
+                                        </ListGroup.Item> */}
                                         <ListGroup.Item key="member-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
+                                                <option value="my">My Projects</option>
                                                 {
                                                     allMembers.map((member, index) => {
-                                                        return <option value={member.value}>{member.label}</option>
+                                                        return <option key={`member-projects-${index}`} value={member.value}>{member.label}</option>
                                                     })
                                                 }
+                                                
+                                                <option value="unassigned">Unassigned</option>
                                             </Form.Select>
                                         </ListGroup.Item>
                                         <ListGroup.Item key="status-filter-list">
@@ -621,96 +615,96 @@ function ProjectsPage() {
                             <thead>
                                 <tr key="project-table-header">
                                     <th scope="col" width={20} key="project-hash-header">#</th>
-                                    <th scope="col" width={400} key="project-name-header">Project Name</th>
-                                    <th scope="col" key="project-client-header" className="onHide">Client Name</th>
-                                    <th scope="col" key="project-member-header" className="onHide">Assigned Members</th>
-                                    <th scope="col" key="project-status-header" className="onHide th--minwidth">Status</th>
-                                    <th scope="col" key="project-action-header" className="onHide text-md-end th--minwidth">Actions</th>
+                                    <th scope="col" width='25%' key="project-name-header">Project Name</th>
+                                    <th scope="col" width='25%' key="project-client-header" className="onHide">Client Name</th>
+                                    <th scope="col" width='20%' key="project-member-header" className="onHide">Assigned Members</th>
+                                    <th scope="col" key="project-status-header" className="onHide">Status</th>
+                                    <th scope="col" key="project-action-header" className="onHide text-md-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
-                                        (!spinner && projects && projects.length > 0)
-                                            ? projects.map((project, index) => {
+                                    (!spinner && projects && projects.length > 0)
+                                        ? projects.map((project, index) => {
 
-                                                return (<>
-                                                    <tr key={`project-row-${project._id}`} onClick={() => {handleProjectChange(project)}} className={project._id === currentProject?._id ? 'project--active' : ''}>
-                                                        <td key={`index-${index}`}>{index + 1} </td>
-                                                        <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span>{project.title}</span></td>
-                                                        <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
-                                                        <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                            <ListGroup horizontal>
-                                                                {
-                                                                    project.members && project.members.length > 0 && (
-                                                                        <>
-                                                                            {project.members.slice(0, 3).map((member, memberindex) => {
-                                                                                return (
-                                                                                    <ListGroup.Item action key={`member-${memberindex}`}>
-                                                                                        <MemberInitials title={member.name} id={`member-${member._id}`}>
-                                                                                            <span className="team--initial nm-k">{member.name?.substring(0, 1)}</span>
-                                                                                        </MemberInitials>
-                                                                                        
-                                                                                        <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
-                                                                                    </ListGroup.Item>
-                                                                                );
-                                                                            })}
-                                                                            {project.members.length > 3 && (
-                                                                                <ListGroup.Item key={`more-member-${project._id}`} className="more--member">
-                                                                                    <Dropdown>
-                                                                                        <Dropdown.Toggle variant="primary" id={`toogle-btn-${project._id}`}>
-                                                                                            <FaEllipsisV />
-                                                                                        </Dropdown.Toggle>
-                                                                                        <Dropdown.Menu>
-                                                                                            <div className="over--scroll">
-                                                                                                {project.members.slice(3).map((member, memberindex) => (
-                                                                                                    <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                                                                                                        <ListGroup.Item action key={`action-${project._id}`}>
-                                                                                                            <MemberInitials title={member.name} id={`member-${member._id}`}>
-                                                                                                                <span className="team--initial nm-s">{member.name?.substring(0, 1)}</span>
-                                                                                                            </MemberInitials>
-                                                                                                            <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
-                                                                                                        </ListGroup.Item>
-                                                                                                    </Dropdown.Item>
-                                                                                                ))}
-                                                                                            </div>
-                                                                                        </Dropdown.Menu>
-                                                                                    </Dropdown>
+                                            return (<>
+                                                <tr key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
+                                                    <td key={`index-${index}`}>{index + 1} </td>
+                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span>{project.title}</span></td>
+                                                    <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
+                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
+                                                        <ListGroup horizontal>
+                                                            {
+                                                                project.members && project.members.length > 0 && (
+                                                                    <>
+                                                                        {project.members.slice(0, 3).map((member, memberindex) => {
+                                                                            return (
+                                                                                <ListGroup.Item action key={`member-${memberindex}`}>
+                                                                                    <MemberInitials title={member.name} id={`member-${member._id}`}>
+                                                                                        <span className="team--initial nm-k">{member.name?.substring(0, 1)}</span>
+                                                                                    </MemberInitials>
+
+                                                                                    <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
                                                                                 </ListGroup.Item>
-                                                                            )}
-                                                                        </>
-                                                                    )
-                                                                }
+                                                                            );
+                                                                        })}
+                                                                        {project.members.length > 3 && (
+                                                                            <ListGroup.Item key={`more-member-${project._id}`} className="more--member">
+                                                                                <Dropdown>
+                                                                                    <Dropdown.Toggle variant="primary" id={`toogle-btn-${project._id}`}>
+                                                                                        <FaEllipsisV />
+                                                                                    </Dropdown.Toggle>
+                                                                                    <Dropdown.Menu>
+                                                                                        <div className="over--scroll">
+                                                                                            {project.members.slice(3).map((member, memberindex) => (
+                                                                                                <Dropdown.Item key={`dropdown-member-${memberindex}`}>
+                                                                                                    <ListGroup.Item action key={`action-${project._id}`}>
+                                                                                                        <MemberInitials title={member.name} id={`member-${member._id}`}>
+                                                                                                            <span className="team--initial nm-s">{member.name?.substring(0, 1)}</span>
+                                                                                                        </MemberInitials>
+                                                                                                        <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
+                                                                                                    </ListGroup.Item>
+                                                                                                </Dropdown.Item>
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    </Dropdown.Menu>
+                                                                                </Dropdown>
+                                                                            </ListGroup.Item>
+                                                                        )}
+                                                                    </>
+                                                                )
+                                                            }
 
-                                                                <ListGroup.Item key={`assign-members-${project._id}`} className="add--member">
-                                                                    <Button variant="primary" onClick={handleAssignShow}><FaPlus /></Button>
-                                                                </ListGroup.Item>
-                                                            </ListGroup>
-                                                        </td>
-                                                        <td key={`status-index-${index}`} data-label="Status" className="onHide">
-                                                        
-                                                            <Dropdown className="select--dropdown" key='status-key'>
-                                                                <Dropdown.Toggle onClick={handleStatusShow} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                                
-                                                            </Dropdown>
-                                                        </td>
-                                                        <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                            <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
-                                                            <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
-                                                        </td>
-                                                    </tr>
-                                                </>)
-                                            })
-                                            :
-                                            
-                                            !spinner && isActiveView === 2 &&
-                                                <>
-                                                    <tr key={`noresults-row`}>
-                                                        <td key={`empty-index`} colSpan={9} className="text-center">
-                                                            <h2 className="mt-2 text-center">No Projects Found</h2>
-                                                        </td>
-                                                    </tr>
-                                                </>
-                                            
+                                                            <ListGroup.Item key={`assign-members-${project._id}`} className="add--member">
+                                                                <Button variant="primary" onClick={() => { { dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true)) } }}><FaPlus /></Button>
+                                                            </ListGroup.Item>
+                                                        </ListGroup>
+                                                    </td>
+                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide">
+
+                                                        <Dropdown className="select--dropdown" key='status-key'>
+                                                            <Dropdown.Toggle onClick={() => {dispatch(updateStateData(DIRECT_UPDATE, true));handleStatusShow()}} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+
+                                                        </Dropdown>
+                                                    </td>
+                                                    <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
+                                                        <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
+                                                        <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
+                                                    </td>
+                                                </tr>
+                                            </>)
+                                        })
+                                        :
+
+                                        !spinner && isActiveView === 2 &&
+                                        <>
+                                            <tr key={`noresults-row`}>
+                                                <td key={`empty-index`} colSpan={9} className="text-center">
+                                                    <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                </td>
+                                            </tr>
+                                        </>
+
                                 }
                             </tbody>
                         </Table>
@@ -726,13 +720,13 @@ function ProjectsPage() {
             <div className="details--projects--grid projects--grid">
                 <div className="wrapper--title">
                     <h3 className="projecttitle">{currentProject?.title}
-                         <span>{currentProject?.client?.name}</span>
+                        <span>{currentProject?.client?.name}</span>
                     </h3>
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 ms-xl-5">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
                             (currentProject?.members && currentProject?.members.length > 0) &&
-                            currentProject.members.map((member, memberindex) => {
+                            currentProject.members.slice(0, 3).map((member, memberindex) => {
                                 return (
                                     <ListGroup.Item action key={`member${memberindex}`}>
                                         <MemberInitials title={member.name} id={`current_member-${member._id}`}>
@@ -743,23 +737,47 @@ function ProjectsPage() {
                                 )
                             })
                         }
+                        {currentProject?.members && currentProject.members.length > 3 && (
+                                <ListGroup.Item key={`more-member-${currentProject._id}`} className="more--member">
+                                    <Dropdown>
+                                        <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentProject._id}`}>
+                                            <FaEllipsisV />
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            <div className="over--scroll">
+                                                {currentProject.members.slice(3).map((member, memberindex) => (
+                                                    <Dropdown.Item key={`dropdown-member-${memberindex}`}>
+                                                        <ListGroup.Item action key={`action-${currentProject._id}`}>
+                                                            <MemberInitials title={member.name} id={`member-${member._id}`}>
+                                                                <span className="team--initial nm-s">{member.name?.substring(0, 1)}</span>
+                                                            </MemberInitials>
+                                                            <span className="remove-icon" id={`member--${currentProject._id}-${member._id}`} onClick={(event) => handleRemoveMember(currentProject, member._id ? member._id : '', `member--${currentProject._id}-${member._id}`)}><MdOutlineClose /></span>
+                                                        </ListGroup.Item>
+                                                    </Dropdown.Item>
+                                                ))}
+                                            </div>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </ListGroup.Item>
+                            )}
                         <ListGroup.Item className="add--member" key="addmember">
-                            <Button variant="primary" onClick={handleAssignShow}><FaPlus /></Button>
+                            <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
                         </ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-3 mt-xl-0">
                         <Button variant="outline-primary" className="active btn--view" onClick={() => { setIsActive(1); }}>Tasks</Button>
                         <Button variant="outline-primary" className="btn--view" onClick={() => setIsActive(2)}>View</Button>
-                        <ListGroup.Item key={`settingskey`} onClick={handleSettingShow}><FaCog /></ListGroup.Item>
+                        <ListGroup.Item key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true));dispatch( togglePopups('workflow', true))}}><FaCog /></ListGroup.Item>
                         <ListGroup.Item key={`gridview`} className="gridView ms-1" action active={activeTab === 'GridView'} onClick={() => setActiveTab('GridView')}><BsGrid /></ListGroup.Item>
                         <ListGroup.Item key={`listview`} className="ListView ms-1" action active={activeTab === 'ListView'} onClick={() => setActiveTab('ListView')}><FaList /></ListGroup.Item>
                         <ListGroup.Item key={`closekey`} onClick={() => setIsActive(0)}><MdOutlineClose /></ListGroup.Item>
                     </ListGroup>
                 </div>
-                <TasksList activeTab = {activeTab} currentProject = {currentProject} />
+                <TasksList activeTab={activeTab} currentProject={currentProject} />
             </div>
 
             <SingleProject key={`single-project-view-${currentProject?._id}`} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} />
+            <TaskForm />
             <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>
                     <Modal.Title>{currentProject?._id ? 'Edit Project' : 'Create New Project'}</Modal.Title>
@@ -802,16 +820,20 @@ function ProjectsPage() {
                                     <Form.Label>
                                         <small>Workflow</small>
                                         <div className="workflow--modal" onClick={(handleWorkflowShow)}>
-                                            <span className="workflow--selected">{fields['workflow']?.title || 'Select'} <FaChevronDown /></span>
+                                            <span className="workflow--selected">{fields['workflow']?.title ? fields['workflow']?.title  : workflowstate?.workflows?.[0]?.title || 'Select' } <FaChevronDown /></span>
                                         </div>
                                     </Form.Label>
                                 </Form.Group>
                                 <Form.Group className="mb-0 form-group">
                                     <Form.Label className="w-100 m-0">
                                         <small>Description</small>
-                                        <strong className="add-descrp" onClick={setIsDescEditor}><FiFileText /> Add a description</strong>
+                                        {
+                                            !isdescEditor &&
+                                            <strong className="add-descrp" onClick={setIsDescEditor}><FiFileText /> Add a description</strong>
+                                        }
+                                       
                                         <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
-                                            <textarea className="form-control" placeholder="Add a title" rows="2" name="description"  value={fields['description'] || ''} onChange={handleChange}>{fields['description'] || ''}</textarea>
+                                            <textarea className="form-control" placeholder="Add a title" rows="2" name="description" value={fields['description'] || ''} onChange={handleChange}>{fields['description'] || ''}</textarea>
                                             <ul className="editor--options">
                                                 <li><a href="javascript:;"><FaBold /></a></li>
                                                 <li><a href="javascript:;"><FaItalic /></a></li>
@@ -837,19 +859,22 @@ function ProjectsPage() {
                         <div className="project--form--actions">
                             <h4>Actions</h4>
                             <ListGroup>
-                                <ListGroup.Item onClick={() => {dispatch(togglePopups('members', true))}}><FaPlus /> Assign to</ListGroup.Item>
+                                <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                                 <p className="m-0">
-                                    {Object.keys(selectedMembers)?.length > 0 &&
-                                        Object.entries(selectedMembers).map(([key, value]) => (
+                                    {fields['members'] && Object.keys(fields['members']).length > 0 && (
+                                        Object.entries(fields['members']).map(([key, value]) => (
                                             <ListGroup.Item action key={`key-member-${key}`}>
                                                 <MemberInitials title={value} id={`assign_member-${key}`}>
-                                                    <span className="team--initial nm-k">{value?.substring(0, 1)}</span>
+                                                    <span className="team--initial nm-k">{value?.charAt(0)}</span>
                                                 </MemberInitials>
-                                                <span className="remove-icon" onClick={() => removeMember(key)}><MdOutlineClose /></span>
+                                                <span className="remove-icon" onClick={() => removeMember(key)}>
+                                                    <MdOutlineClose />
+                                                </span>
                                             </ListGroup.Item>
                                         ))
-                                    }
+                                    )}
                                 </p>
+
                                 <ListGroup.Item onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
                                 <div className="output--file-preview">
                                     <div className="preview--grid">
@@ -865,10 +890,10 @@ function ProjectsPage() {
                 </Modal.Body>
             </Modal>
             <StatusModal key="create-project-status" />
-            <MemberModal />
+            <MemberModal isedit={isEdit} />
             <WorkFlowModal />
             <FilesModal />
-            <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews}  toggle={setPreviewShow}  filetoPreview={filetoPreview} />
+            <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews} toggle={setPreviewShow} filetoPreview={filetoPreview} />
             {/*--=-=Delete Modal**/}
             <Modal show={showDelete} onHide={handleDeleteClose} centered size="md" className="add--member--modal">
                 <Modal.Header closeButton>
@@ -933,22 +958,22 @@ function ProjectsPage() {
                                 <option value="my">My Projects</option>
                             </Form.Select>
                         </ListGroup.Item>
-                        
+
                         <ListGroup.Item key="member-filter-list">
                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'} >
                                 {
                                     allMembers.map((member, index) => {
-                                        return <option value={member.value}>{member.label}</option>
+                                        return <option key={`member-option--${index}`} value={member.value}>{member.label}</option>
                                     })
                                 }
                             </Form.Select>
                         </ListGroup.Item>
                         <ListGroup.Item key="status-filter-list">
-                            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)}  value={filters['status'] || 'all'}>
-                                <option value="all">View All</option>
-                                <option value="in-progress">In Progress</option>
-                                <option value="on-hold">On Hold</option>
-                                <option value="completed">Completed</option>
+                            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
+                                <option key={`view-all--option`} value="all">View All</option>
+                                <option key={`progress--option`} value="in-progress">In Progress</option>
+                                <option key={`hold--option`} value="on-hold">On Hold</option>
+                                <option key={`completed--option`} value="completed">Completed</option>
                             </Form.Select>
                         </ListGroup.Item>
                     </ListGroup>

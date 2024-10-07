@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { withRouter } from "./Components/wrapper";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { publicRoutes, privateRoutes, hideSidebarRoutes } from "./routes";
+import { socket } from "./helpers/auth";
 import { parseIfValidJSON } from "./helpers/commonfunctions";
 import SidebarPanel from "./Components/Sidebar/Sidebar";
 import { REFRESH_DASHBOARDS } from "./redux/actions/types";
@@ -16,7 +17,7 @@ import './Styles/common.css';
 import './Styles/Sidebar.css';
 import './Styles/ModalStyle.css';
 import './App.css';
-
+import {CREATE_POST_LIST_COMMENT, CREATE_LIST_COMMENT, DELETE_COMMENT } from "./redux/actions/types";
 
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function App(props) {
@@ -99,6 +100,43 @@ function App(props) {
     checkIfSidebarShouldBeVisible();
   }, [location]);
 
+  useEffect(() => {
+    const handleCommentReceived = (data) => {
+      if (data.success) {
+        props.createComment(data);
+      } else {
+        // toast.error(data.error);
+      }
+    };
+
+    socket.on('comment_received', handleCommentReceived);
+
+    // Cleanup function to remove the socket listener when the component unmounts
+    return () => {
+      socket.off('comment_received', handleCommentReceived);
+    };
+
+    
+  }, [props.createComment]);
+
+  useEffect(() => {
+    const handleCommentDeleted = (data) => {
+      if (data.success) {
+        props.deleteComment(data); // You can dispatch or use props function
+      } else {
+        
+      }
+    };
+
+    // Listening for the comment_deleted event from the socket
+    socket.on('comment_deleted', handleCommentDeleted);
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      socket.off('comment_deleted', handleCommentDeleted);
+    };
+  }, [dispatch, props.deleteComment]);
+
   
 
   /************************   helping functions  ***********************************/
@@ -167,6 +205,8 @@ function App(props) {
 }
 
 const mapDispatchToProps = (dispatch) => ({
+  createComment: async payload => { await dispatch({ type: CREATE_POST_LIST_COMMENT, payload }) },
+  deleteComment: async payload => { await dispatch({ type: DELETE_COMMENT, payload }) },
   //trackingStatus: async payload => { await dispatch({ type: TIME_TRACKING_STATUS, payload }) }
 });
 

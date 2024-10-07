@@ -5,13 +5,15 @@ import useFilledClass from "../customHooks/useFilledclass";
 import {updateProject} from "../../redux/actions/project.action"
 import { Button, Modal, Form, ListGroup, FloatingLabel, Dropdown } from "react-bootstrap";
 import { selectboxObserver } from "../../helpers/commonfunctions";
-import { FaCheck, FaPlusCircle, FaTimesCircle, FaUpload, FaRegTrashAlt, FaEllipsisV, FaTrashAlt } from "react-icons/fa";
+import { FaCheck, FaPlusCircle, FaTimesCircle, FaUpload, FaRegTrashAlt, FaEllipsisV, FaTrashAlt, FaRegTimesCircle } from "react-icons/fa";
 import fileIcon from './../../images/file-icon-image.jpg'
 import { ListWorkflows } from '../../redux/actions/workflow.action';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
-import { SELECTED_STATUS, SELECTED_MEMBERS, PROJECT_FORM } from '../../redux/actions/types';
-import { MdFileDownload, MdFilterList, MdOutlineClose, MdSearch } from "react-icons/md";
+import { updateTask } from '../../redux/actions/task.action';
+import { PROJECT_FORM, EDIT_PROJECT_FORM } from '../../redux/actions/types';
+import { MdFileDownload } from "react-icons/md";
+import { dataObject } from '../../helpers/objectdata';
 import { useDropzone } from 'react-dropzone'
 export function AlertDialog(props) {
   const [open, setOpen] = useState(false);
@@ -154,15 +156,34 @@ export function TransferOnwerShip(props) {
 export function StatusModal(props){
   const modalstate = useSelector(state => state.common.statusModal);
   const commonState = useSelector( state => state.common)
-  const [showStatus, setStatusShow] = useState(false);
-  const [formtype, setFormType] = useState(false)
-  const [selected, setSelected] = useState('')
   useFilledClass('.form-floating .form-control');
   const [search, setSearch] = useState('');
   const dispatch = useDispatch()
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
   };
+
+  const refreshstates = (formtype) => { 
+    switch (formtype) {
+      case 'project':
+        const stateObject = {}
+        stateObject['status'] = commonState.projectForm.status
+        stateObject['formtype'] = formtype
+       return stateObject
+       
+      case 'edit_project':
+        
+        
+        const editstateObject = {}
+        editstateObject['status'] = commonState.editProjectForm.status || "in-progress"
+        editstateObject['title'] = commonState.editProjectForm.title
+        editstateObject['formtype'] = formtype
+        
+       return editstateObject
+    }
+  }
+
+  const [statusModalState, setStatusModalState] = useState({})
 
   const statuses = [
     { key: 'in-progress', label: 'In Progress', circleClass: 'progress--circle' },
@@ -173,27 +194,24 @@ export function StatusModal(props){
   const filteredStatuses = statuses.filter(status => 
     status.label.toLowerCase().includes(search.toLowerCase())
   );
-  useEffect(() =>{
-    if( commonState?.projectForm?.status ){
-      setSelected(commonState.projectForm.status)
-    }
-  },[commonState.projectForm]);
 
   useEffect(() => {
-    if(commonState.active_formtype){
-      setFormType(commonState.active_formtype)
+    if( commonState.active_formtype === "project"){ 
+      const updatedState = refreshstates(commonState.active_formtype);
+      console.log('yhjaa: ', updatedState)
+        setStatusModalState(updatedState);
+    }else if( commonState.active_formtype === "edit_project"){
+      const updatedState = refreshstates(commonState.active_formtype);
+      setStatusModalState(updatedState);
     }
-    
-  }, [ commonState.active_formtype])
+  },[ commonState.projectForm, commonState.editProjectForm])
 
-  useEffect(() => {
-    setStatusShow(modalstate)
-  }, [modalstate])
+  
 
   return (
     <>
       {/*--=-=Status Modal**/}
-      <Modal show={showStatus} onHide={() => { dispatch( togglePopups('status', false ))}} centered size="md" className="status--modal">
+      <Modal show={modalstate} onHide={() => { dispatch( togglePopups('status', false ))}} centered size="md" className="status--modal">
                 <Modal.Header closeButton>
                     <Modal.Title>Set Status</Modal.Title>
                 </Modal.Header>
@@ -206,20 +224,26 @@ export function StatusModal(props){
                     <ListGroup className="status--list">
                     {
                       filteredStatuses.map(status => (
-                        <ListGroup.Item key={`status-${status.key}`} className={selected == status.key ? "status--active": ""} onClick={() => {
-                          setSelected(status.key);
-                          // props.callback(status.key)
-                          // dispatch( updateStateData(SELECTED_STATUS, status.key))
-                          if(formtype === 'project'){
+                        <ListGroup.Item key={`status-${status.key}`} className={statusModalState?.status == status.key ? "status--active": ""} onClick={() => {
+                          
+                          if(statusModalState?.formtype === 'project'){ 
                             dispatch( updateStateData(PROJECT_FORM, { 'status': status.key} ))
                            
-                          }else if(formtype === 'task'){
+                          }else if(statusModalState?.formtype === 'edit_project'){ 
+                            if( commonState?.directUpdate === true){
+                              dispatch( updateProject(commonState?.currentProject?._id, { 'status': status.key} ))
+                            }else{
+                              dispatch( updateStateData(EDIT_PROJECT_FORM, { 'status': status.key} ))
+                            }
+                            
+                           
+                          }else if(statusModalState?.formtype === 'task'){
 
                           }
                           dispatch(togglePopups('status', false))
                           }}>
                             <span className={`${status.circleClass} status--circle`}></span>
-                            <p>{status.label} {selected === status.key && <FaCheck />}</p>
+                            <p>{status.label} {statusModalState?.status === status.key && <FaCheck />}</p>
                         </ListGroup.Item>
                        ))}
                         
@@ -232,158 +256,157 @@ export function StatusModal(props){
 
 export function MemberModal( props){
   const modalstate = useSelector(state => state.common.membersModal);
-  const [ members, setMembers ] = useState([])
-  const commonState = useSelector( state => state.common)
-  const [formtype, setFormType] = useState(false)
+  const commonState = useSelector( state => state.common);
+  const [ members, setMembers ] = useState(commonState.allmembers)
+  const currentProject = useSelector(state => state.common.currentProject);
+  const [formtype, setFormType] = useState(commonState.active_formtype || false)
   const [showAssign, setAssignShow] = useState(false);
-  const handleAssignClose = () => setAssignShow(false);
   const dispatch = useDispatch()
-  const [ currentmembers, setCurrentMembers ] = useState([])
   const [selectedMembers, setSelectedMembers] = useState({});
   const [search, setSearch] = useState('');
+  const [isEdit, setIsEdit] = useState(false)
+
+  const refreshstates = (formtype) => {
+    const stateObject = {selectedMembers: {}}
+    switch (formtype) {
+      case 'project':
+        
+        const curerntmembers = Object.keys(commonState.projectForm.members || {})
+        stateObject['selectedMembers'] = commonState.allmembers.reduce((acc, member) => {
+          // Check if the member ID is present in `commonState.projectForm.members`
+         
+          if (curerntmembers.includes(member._id)) {
+            // Add the member to the result object with `id` as key and `name` as value
+            acc[member._id] = member.name;
+          }
+          return acc;
+        }, {});
+       return stateObject
+        break;
+      case 'edit_project':
+        const editcurerntmembers = Object.keys(commonState.editProjectForm.members || {})
+          stateObject['selectedMembers'] = commonState.allmembers.reduce((acc, member) => {
+            // Check if the member ID is present in `commonState.projectForm.members`
+          
+            if (editcurerntmembers.includes(member._id)) {
+              // Add the member to the result object with `id` as key and `name` as value
+              acc[member._id] = member.name;
+            }
+            return acc;
+          }, {});
+          
+        return stateObject
+      case 'task_edit':
+        const curernttaskmembers = Object.keys(commonState.taskForm.members || {})
+        stateObject['selectedMembers'] = commonState.allmembers.reduce((acc, member) => {
+          // Check if the member ID is present in `commonState.projectForm.members`
+         
+          if (curernttaskmembers.includes(member._id)) {
+            // Add the member to the result object with `id` as key and `name` as value
+            acc[member._id] = member.name;
+          }
+          return acc;
+        }, {});
+       return stateObject
+          
+    }
+  }
+
+  const [membersModalState, setMembersModalState] = useState(refreshstates(commonState.active_formtype || false))
+
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
   };
 
-  useEffect(() => {
-    if( commonState.allmembers){
-      setMembers(commonState.allmembers)
-    }
-  },[ commonState.allmembers])
-
-
-  useEffect(() => {
-    if(commonState.active_formtype){
-      setFormType(commonState.active_formtype)
+  useEffect(() => { 
+    if( modalstate === true ){
+      setMembersModalState(refreshstates(commonState.active_formtype))
     }
     
-  }, [ commonState.active_formtype])
+  },[ modalstate])
 
   useEffect(() => {
-    if( commonState.selectedMembers){
-      setSelectedMembers(commonState.selectedMembers)
-    }
-  },[ commonState.selectedMembers])
+    setMembersModalState(refreshstates(commonState.active_formtype))
+  },[ commonState?.projectForm?.members, commonState?.editProjectForm?.members])
 
-  useEffect(() =>{
-    if( commonState?.projectForm?.members ){
-      // setSelectedMembers(commonState.projectForm.members)
-      // Assume `members` is an array of objects and `commonState.projectForm.members` is an array of IDs
-      const selectedMembers = members.reduce((acc, member) => {
-        // Check if the member ID is present in `commonState.projectForm.members`
-        if (commonState.projectForm.members.includes(member._id)) {
-          // Add the member to the result object with `id` as key and `name` as value
-          acc[member._id] = member.name;
-        }
-        return acc;
-      }, {});
-      // Set the selected members
-      setSelectedMembers(selectedMembers);
-    }
-  },[commonState.projectForm]);
+  
+  let filteredMembers = commonState.allmembers
 
-  let filteredMembers = []
-  //useEffect(() => { console.log(props.members)
-    if(members && members.length > 0){
-      filteredMembers = members.filter(member => 
+    if(commonState.allmembers && commonState.allmembers.length > 0){
+      filteredMembers = commonState.allmembers.filter(member => 
         member.name.toLowerCase().includes(search.toLowerCase())
       );
     }
-  //},[props.members])
-
-  // useEffect(() => {
-  //   if(props.currentProject && Object.keys(props.currentProject).length > 0){
-  //     const mm_arr = [];
-  //     //const mm_obj = {}
-  //     if( props.currentProject.members && props.currentProject.members.length > 0 ){
-  //       props.currentProject.members.forEach((member, index) => {
-  //         mm_arr.push(member._id)
-  //         //mm_obj[member._id] = member.name
-  //       })
-  //     }
-     
-  //     setCurrentMembers( mm_arr)
-  //     setSelectedMembers( props.currentProject.members || [])
-  //   }
-    
-  // }, [props.currentProject])
-
-  // useEffect(() => {
-  //   if(props.selectedMembers && Object.keys(props.selectedMembers).length > 0){ 
-  //     const mm_arr = Object.keys(props.selectedMembers);
-  //     setCurrentMembers( mm_arr)
-  //     setSelectedMembers( props.selectedMembers)
-  //   } else if(props.selectedMembers && Object.keys(props.selectedMembers).length === 0){
-  //     setCurrentMembers( [])
-  //     setSelectedMembers( {})
-  //   }
-    
-  // }, [ props.selectedMembers])
-  
+ 
   useEffect(() => {
     setAssignShow(modalstate)
   }, [modalstate])
 
 
+
+  useEffect(() => {
+    setIsEdit(commonState.assign_members_direct)
+},[commonState.assign_members_direct])
+
   useFilledClass('.form-floating .form-control');
   const handleDone = () => {
-    const membersarr = []
-    // selectedMembers.forEach(member => {
-    //   membersarr.push( member._id )
-    //   props.selectCallback(member);
-    // });
-
-    /*
-    Object.entries(selectedMembers).forEach(([id, name]) => {
-      membersarr.push(id);
-      props.selectCallback({ _id: id, name: name });
-    });
-    setSelectedMembers({}); // Clear selected members after adding
-    setCurrentMembers([]);
-
-    if( props.currentProject && Object.keys(props.currentProject).length > 0 && props?.isedit !== true){
-      dispatch(updateProject(props.currentProject._id, { members: membersarr }))
+    
+    if( commonState.active_formtype === "edit_project" && currentProject && Object.keys(currentProject).length > 0 && isEdit === true){
+      const memberIds = Object.keys(membersModalState.selectedMembers);
+      dispatch(updateProject(currentProject._id, { members: memberIds }))
+    }else if( commonState.active_formtype === "task_edit" && commonState.currentTask && Object.keys(commonState.currentTask).length > 0){ 
+      const memberIds = Object.keys(membersModalState.selectedMembers);
+      dispatch(updateTask(commonState.currentTask._id, { members: memberIds }))
+    }else{
+      if( dataObject[commonState.active_formtype]){
+        dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], {
+          ...commonState[dataObject[commonState.active_formtype]['form_key']],
+          members: membersModalState.selectedMembers // Set the array of member IDs
+        }));
+      }
     }
-    props.handleAssignClose(); // Close modal after done*/
-    dispatch( updateStateData(SELECTED_MEMBERS, selectedMembers))
     dispatch( togglePopups( 'members', false ))
   };
 
   const handleMemberSelect = (member) => {
-    // Check if member is already selected
-    if (!selectedMembers[member._id]) {
-       
-        // setSelectedMembers(prevSelectedMembers => ({ ...prevSelectedMembers, [member._id]: member.name }));
-        // setCurrentMembers(prevcurrentMembers => [...prevcurrentMembers, member._id]);
-        dispatch(updateStateData(PROJECT_FORM, {
-          ...commonState.projectForm,
-          members: [...(commonState.projectForm.members || []), member._id] // Append new ID to members array
-        }));
+    const isMemberSelected = membersModalState?.selectedMembers?.[member._id];
+  
+    if (!isMemberSelected) {
+      // Add the member if not selected
+      handleAddMember(member);
     } else {
-        handleRemove(member._id);
+      // Remove the member if already selected
+      handleRemove(member._id);
     }
-};
-
-  const handleRemove = (memberId) => {
-      dispatch(updateStateData(PROJECT_FORM, {
-        ...commonState.projectForm,
-        members: (commonState.projectForm.members || []).filter(id => id !== memberId) // Remove the matched memberId
-      }));
-
-      // setSelectedMembers(prevMembers => {
-      //     const updatedMembers = { ...prevMembers };
-      //     delete updatedMembers[memberId];
-      //     return updatedMembers;
-      // });
-      // setCurrentMembers(prevMembers => prevMembers.filter(id => id !== memberId));
-      // Call any remove logic or callback function here if needed
   };
-
-
+  
+  const handleAddMember = (member) => {
+    setMembersModalState(prevMembersModalState => ({
+      ...prevMembersModalState,
+      selectedMembers: {
+        ...prevMembersModalState?.selectedMembers,
+        [member._id]: member.name
+      }
+    }));
+  };
+  
+  const handleRemove = (memberId) => {
+    setMembersModalState(prevMembersModalState => {
+      const updatedSelectedMembers = { ...prevMembersModalState.selectedMembers };
+      delete updatedSelectedMembers[memberId];
+  
+      return {
+        ...prevMembersModalState,
+        selectedMembers: updatedSelectedMembers
+      };
+    });
+  };
+  
+  
   return (
-    // <Modal show={showAssign} onHide={() => {setSelectedMembers({});setCurrentMembers([]);props.handleAssignClose()}} centered size="md" className="status--modal assign--task--modal">
-    <Modal show={showAssign} onHide={() => {setSelectedMembers({});setCurrentMembers([]);dispatch(togglePopups('members', false))}} centered size="md" className="status--modal assign--task--modal">
+    
+    <Modal show={showAssign} onHide={() => {setSelectedMembers({});dispatch(togglePopups('members', false))}} centered size="md" className="status--modal assign--task--modal">
       <Modal.Header closeButton>
           <Modal.Title>Assign task to</Modal.Title>
       </Modal.Header>
@@ -396,8 +419,8 @@ export function MemberModal( props){
               </Form.Group>
           </Form>
           <ListGroup className="added--list">
-          {selectedMembers && Object.keys(selectedMembers).length > 0 &&
-            Object.entries(selectedMembers).map(([id, name], index) => (
+          {membersModalState?.selectedMembers && Object.keys(membersModalState?.selectedMembers).length > 0 &&
+            Object.entries(membersModalState.selectedMembers).map(([id, name], index) => (
                 <ListGroup.Item key={`listkey-${index}`} onClick={() => handleRemove(id)}>
                     <span><img src="../images/default.jpg" alt="" /></span>
                     <p>{name} <FaTimesCircle /></p>
@@ -407,22 +430,24 @@ export function MemberModal( props){
 
           </ListGroup>
           <ListGroup className="status--list">
-          {
-              filteredMembers && filteredMembers.length > 0 && (
-                filteredMembers.map((member, idx) => (
-                <ListGroup.Item  key={`listkey-${idx}`} onClick={() => handleMemberSelect(member)} className={Object.keys(selectedMembers).length > 0 && selectedMembers[member._id] ? "status--active": ""}>
-                    <span><img src="../images/default.jpg" alt="" /></span>
-                    <p>{ member.name } 
-                      {
-                         Object.keys(selectedMembers).length > 0 && selectedMembers[member._id] && 
-                          <FaCheck />
-                      }
-                    </p>
+            {filteredMembers && filteredMembers.length > 0 && (
+              filteredMembers.map((member) => (
+                <ListGroup.Item  
+                  key={member?._id || `listkey-${member.name}`} 
+                  onClick={() => handleMemberSelect(member)} 
+                  className={membersModalState?.selectedMembers?.[member?._id] ? "status--active" : ""}
+                >
+                  <span>
+                    <img src={member?.avatar || '../images/default.jpg'} alt={member?.name || 'Default'} />
+                  </span>
+                  <p>{ member?.name } 
+                    {membersModalState?.selectedMembers?.[member?._id] && <FaCheck />}
+                  </p>
                 </ListGroup.Item>
-                ))
-              )}
-              
+              ))
+            )}
           </ListGroup>
+
       </Modal.Body>
       <Modal.Footer>
           <Button variant="primary" onClick={handleDone}>Done</Button>
@@ -435,7 +460,7 @@ export const  WorkFlowModal =  (props) => {
   const dispatch = useDispatch()
   const modalstate = useSelector(state => state.common.workflowmodal);
   const commonState = useSelector( state => state.common)
-  const [formtype, setFormType] = useState(false)
+  const [formtype, setFormType] = useState(commonState.active_formtype || false)
   const [showWorkflow, setWorkflowShow] = useState(false);
   const [fields, setFields] = useState({})
   const [ error, setErrors ] = useState({})
@@ -448,12 +473,37 @@ export const  WorkFlowModal =  (props) => {
   const workflowstate = useSelector(state => state.workflow)
   const [search, setSearch] = useState('');
   const [ selectedTab, setSelectedTab] = useState({})
+
+  const refreshstates = (formtype) => {
+    const stateObject = {}
+    switch (formtype) {
+      case 'project':
+        if( !commonState.projectForm.workflow){ 
+          if( filteredWorkflows.length > 0){
+            setCurrentflow(filteredWorkflows[0])
+            dispatch(updateStateData( PROJECT_FORM, { workflow: filteredWorkflows[0]}))
+          }
+        }
+        stateObject['workflow'] = commonState.projectForm.workflow || {}
+       
+       return stateObject
+      case 'edit_project':
+        stateObject['workflow'] = commonState.editProjectForm.workflow || {}
+        
+       return stateObject
+      break;
+      default:
+        return {}
+    }
+  }
+
+  const [workflowModalState, setWorkflowModalState] = useState(refreshstates(commonState.active_formtype || false))
+
   // Memoize handlers to prevent unnecessary re-creations
   const handleWorkflowClose = useCallback(() => {
     dispatch( togglePopups( 'workflow', false ))
-     if( props.toggle){
-    props.toggle(false)
-  }}, []);
+  })
+    
   const handleWorkflowShow = useCallback(() => setWorkflowShow(true), []);
   const handleEditClose = useCallback(() => setEditShow(false), []);
   const handleEditShow = useCallback((index,tab) => { setSelectedTab({index, tab}); setFields({...fields, 'workspace_title': tab}); setEditShow(true)}, []);
@@ -464,17 +514,18 @@ export const  WorkFlowModal =  (props) => {
     dispatch(ListWorkflows())
   }, [])
 
-  useEffect(() => {
-    if(commonState.active_formtype){
-      setFormType(commonState.active_formtype)
+  useEffect(() => { 
+    if( modalstate === true ){ 
+      if( commonState.active_formtype === "edit_project"){ 
+        setCurrentflow( commonState.currentProject?.workflow)
+        
+      }
+      
+      const updatedState = refreshstates(commonState.active_formtype);
+      setWorkflowModalState(updatedState);
+      setWorkflowShow(modalstate)
     }
-    
-  }, [ commonState.active_formtype])
-
-  useEffect(() => {
-    setWorkflowShow(modalstate)
   }, [modalstate])
-
 
   useEffect(() => {
     if( workflowstate && workflowstate.workflows && workflowstate.workflows.length > 0){
@@ -489,13 +540,20 @@ export const  WorkFlowModal =  (props) => {
   };  
 
   const handleSelectworkflow = (workflow) => {
-    setSelectedWorkflow( workflow )
+    setWorkflowModalState(prevWorkflowModalState => {
+     
+        return {
+          ...prevWorkflowModalState,
+          workflow: workflow
+        };
+      
+    });
   }
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     let filteredflows = [];
-    if( workflows && workflows.length > 0 ){ console.log('search here')
+    if( workflows && workflows.length > 0 ){ 
       filteredflows = workflows.filter(workflow => 
         workflow.title.toLowerCase().includes(e.target.value.toLowerCase())
       );
@@ -504,87 +562,129 @@ export const  WorkFlowModal =  (props) => {
   };
 
   const handleSelect = () => {
-    dispatch(updateStateData( PROJECT_FORM, { workflow: selectedWorkflow}))
+    if( commonState.active_formtype === "edit_project"){
+      if( commonState?.directUpdate === true){
+        dispatch( updateProject(commonState?.currentProject?._id, { 'workflow': JSON.stringify(workflowModalState['workflow']) }) )
+      }else{
+        dispatch(updateStateData( EDIT_PROJECT_FORM, { workflow: workflowModalState['workflow']}))
+      }
+      
+    }else{
+      dispatch(updateStateData( PROJECT_FORM, { workflow: workflowModalState['workflow']}))
+    }
+    
     dispatch( togglePopups('workflow', false))
   }
 
-  useEffect(() => {
-    if(commonState.currentProject && commonState.currentProject.workflow){
-      setCurrentflow(commonState.currentProject.workflow)
-      setSelectedWorkflow(commonState.currentProject.workflow)
-    }
+    const saveWorkstep = (e) => {
+      e.preventDefault();
     
-  },[commonState.currentProject])
-
-  const saveWorkstep = (e) => {
-    e.preventDefault();
-    if(!fields['workspace_title'] || fields['workspace_title'] === ""){
-      setErrors({...error, ['workspace_title']: 'Title is required'})
-    }
-
-    // setSelectedWorkflow({
-    //   ...selectedWorkflow,
-    //   tabs: [...selectedWorkflow.tabs, {title: fields['workspace_title'], _id: false, order: selectedWorkflow.tabs.length}]
-    // });
-    // Create the new tab object
-    // Get the last tab and its order
-    const lastTab = selectedWorkflow.tabs[selectedWorkflow.tabs.length - 1];
-    const newOrder = lastTab ? lastTab.order - 1 : 0; // If there's no last tab, start with order 0
-
-    // Create the new tab object
-    const newTab = {
-      title: fields['workspace_title'],
-      _id: false,
-      order: newOrder,
+      // Check if the workspace title field is empty
+      if (!fields['workspace_title'] || fields['workspace_title'] === "") {
+        setErrors({ ...error, ['workspace_title']: 'Title is required' });
+        return; // Exit the function if the title is not valid
+      }
+    
+      // Get the last tab and its order based on the type (object or simple array)
+      const lastTab = workflowModalState?.workflow?.tabs.length 
+        ? workflowModalState?.workflow?.tabs[workflowModalState?.workflow?.tabs.length - 1] 
+        : null;
+    
+      const lastOrder = (typeof lastTab === 'object' && lastTab?.order !== undefined)
+        ? lastTab.order
+        : workflowModalState?.workflow?.tabs.length - 1; // Fallback to length-based index if tabs are a simple array
+    
+      const newOrder = lastTab ? lastOrder + 1 : 0; // Set the order for the new tab
+    
+      // Create the new tab object
+      const newTab = (typeof lastTab === 'object' && lastTab !== null) ? {
+        title: fields['workspace_title'],
+        _id: false,
+        order: newOrder,
+      } : fields['workspace_title']; // Use simple title if tabs is a simple array
+    
+      // Insert the new tab before the last tab
+      const updatedTabs = Array.isArray(workflowModalState?.workflow?.tabs)
+        ? [
+            ...workflowModalState?.workflow?.tabs.slice(0, -1), // All tabs except the last one
+            newTab, // Insert the new tab
+            lastTab // Add the last tab
+          ]
+        : [newTab]; // If tabs is empty, start with just the new tab
+    
+      
+    
+      // Update the state with the new array
+      setWorkflowModalState(prevWorkflowModalState => ({
+        ...prevWorkflowModalState,
+        workflow: {
+          ...prevWorkflowModalState?.workflow,
+          tabs: updatedTabs.map((tab, index) => {
+            // If tab is an object, update its order; otherwise, return simple tab
+            return typeof tab === 'object'
+              ? { ...tab, order: index }
+              : tab;
+          }) // Ensure correct order sequence
+        }
+      }));
+    
+      // Reset modal state
+      setAddShow(false);
+      setFields({});
+      setErrors({});
     };
+    
 
-    // Create a new array with the new tab inserted before the last tab
-    const updatedTabs = [
-      ...selectedWorkflow.tabs.slice(0, -1), // All tabs except the last one
-      newTab, // Insert the new tab
-      lastTab // Add the last tab
-    ];
-
-    // Update the state with the new array
-    setSelectedWorkflow({
-      ...selectedWorkflow,
-      tabs: updatedTabs.map((tab, index) => ({ ...tab, order: index })) // Update all orders to ensure correct order sequence
-    });
-
-    setAddShow( false )
-    setFields({})
-    setErrors({})
-  }
-
-  const updateWorkstep = (e) => {
-    e.preventDefault();
-    if(!fields['workspace_title'] || fields['workspace_title'] === ""){
-      setErrors({...error, ['workspace_title']: 'Title is required'})
-    }else{
-
-      setSelectedWorkflow({
-        ...selectedWorkflow,
-        tabs: selectedWorkflow.tabs.map((item, index) => {
+    const updateWorkstep = (e) => {
+      e.preventDefault();
+    
+      // Validation for workspace title
+      if (!fields['workspace_title'] || fields['workspace_title'] === "") {
+        setErrors({ ...error, ['workspace_title']: 'Title is required' });
+        return; // Exit if title is missing
+      }
+    
+      // Update workflow modal state
+      setWorkflowModalState((prevWorkflowModalState) => {
+        // Update the tabs by mapping through the current ones
+        const updatedTabs = prevWorkflowModalState?.workflow?.tabs.map((tab, index) => {
+          // If the index matches the selected tab, update the title
           if (index === selectedTab?.index) {
-            // Check if the item is an object
-            if (typeof item === 'object' && item !== null) {
+            if (typeof tab === 'object' && tab !== null) {
               // Return updated object with the new title
-              return { ...item, title: fields['workspace_title'] };
+              return { ...tab, title: fields['workspace_title'] };
             } else {
-              // Return the updated simple value
+              // Return updated simple value (for string or non-object tabs)
               return fields['workspace_title'];
             }
           }
-          // Return the item unchanged if index does not match
-          return item;
-        }),
+          // Return the original tab if not the selected one
+          return tab;
+        });
+    
+        // Return the new state with updated tabs
+        return {
+          ...prevWorkflowModalState,
+          workflow: {
+            ...prevWorkflowModalState?.workflow,
+            tabs: updatedTabs.map((tab, index) => {
+              // Ensure correct order sequence, but only for object tabs
+              if (typeof tab === 'object' && tab !== null) {
+                return { ...tab, order: index };
+              }
+              // Return the tab unchanged if it's not an object
+              return tab;
+            }),
+          },
+        };
       });
-      
-      setEditShow( false )
-      setFields({})
-      setErrors({})
-    }
-  }
+    
+      // Reset state and errors
+      setEditShow(false);
+      setFields({});
+      setErrors({});
+    };
+    
 
   const showError = (name) => {
     if (error[name]) return (<span className="error">{error[name]}</span>)
@@ -598,12 +698,12 @@ export const  WorkFlowModal =  (props) => {
     if (!destination || destination.index === source.index) return;
 
     const isDropInvalid =
-      destination.index === 0 || destination.index === selectedWorkflow.tabs.length - 1;
+      destination.index === 0 || destination.index === workflowModalState?.workflow.tabs.length - 1;
 
     if (isDropInvalid) return;
   
     // Rearrange the array based on drag result
-    const reorderedTabs = Array.from(selectedWorkflow.tabs);
+    const reorderedTabs = Array.from(workflowModalState?.workflow.tabs);
     const [removed] = reorderedTabs.splice(source.index, 1);
     reorderedTabs.splice(destination.index, 0, removed);
   
@@ -615,45 +715,68 @@ export const  WorkFlowModal =  (props) => {
       });
     }
   
-    // Update the tabs in selectedWorkflow
-    const updatedWorkflow = {
-      ...selectedWorkflow,
-      tabs: reorderedTabs
-    };
+    setWorkflowModalState(prevWorkflowModalState => {
+     
+      return {
+        ...prevWorkflowModalState,
+        workflow: {
+          ...prevWorkflowModalState?.workflow,
+          tabs: reorderedTabs // Update all orders to ensure correct order sequence
+        }
+      };
+    
+    });
+  };
+
+  const removetab = (indexToRemove) => {
+    // Update workflow modal state
+    setWorkflowModalState((prevWorkflowModalState) => {
+      // Filter out the tab that matches the provided index
+      const updatedTabs = prevWorkflowModalState?.workflow?.tabs
+        .filter((_, index) => index !== indexToRemove) // Remove the tab with the matching index
+        .map((tab, index) => {
+          // Reorder the remaining tabs, ensuring correct order sequence
+          if (typeof tab === 'object' && tab !== null) {
+            return { ...tab, order: index };
+          }
+          return tab; // Return the tab unchanged if it's not an object
+        });
   
-    // Set the new state
-    setSelectedWorkflow(updatedWorkflow);
+      // Return the new state with updated and reordered tabs
+      return {
+        ...prevWorkflowModalState,
+        workflow: {
+          ...prevWorkflowModalState?.workflow,
+          tabs: updatedTabs, // Set the reordered tabs array
+        },
+      };
+    });
   };
   
-
-   
   return (
     <>      
-      <Modal show={showWorkflow} onHide={handleWorkflowClose} centered size="lg" className="add--workflow--modal">
+      <Modal show={modalstate} onHide={handleWorkflowClose} centered size="lg" className="add--workflow--modal">
                 <Modal.Header closeButton>
                     <Modal.Title>Workflows</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                  { commonState.active_formtype !== "edit_project" &&
                         <Form.Group className="mb-3 form-group">
                             <Form.Label>Select Workflow</Form.Label>
                             <Dropdown className="select--dropdown">
                                 <Dropdown.Toggle variant="success">
                                   { 
-                                    selectedWorkflow?._id && selectedWorkflow?._id === currentflow?._id ? 
+                                    workflowModalState?.workflow?._id && workflowModalState?.workflow?._id === currentflow?._id ? 
                                       'Current Workflow'
                                     :
-                                    selectedWorkflow && selectedWorkflow._id ?
+                                    workflowModalState?.workflow && workflowModalState?.workflow?._id ?
                                       <>
-                                      {selectedWorkflow.title}
+                                      {workflowModalState?.workflow?.title}
                                       </>
                                     :
                                     'Select'
                                   }
 
-                                  {/* {
-                                    selectedWorkflow?.title || 'Select'
-
-                                  } */}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <div className="drop--scroll">
@@ -663,14 +786,14 @@ export const  WorkFlowModal =  (props) => {
                                             </Form.Group>
                                         </Form>
                                         {
-                                          currentflow &&
-                                          <Dropdown.Item onClick={() => handleSelectworkflow(currentflow)} className={ (selectedWorkflow && selectedWorkflow?._id === currentflow?._id ) ? 'selected--option' : ''} > Current Workflow { (selectedWorkflow && selectedWorkflow?._id === currentflow?._id ) ? <FaCheck /> : null }</Dropdown.Item>
+                                          currentflow && currentflow?._id && commonState.active_formtype === "edit_project" &&
+                                          <Dropdown.Item key={`currentflow`} onClick={() => handleSelectworkflow(currentflow)} className={ (workflowModalState?.workflow && workflowModalState?.workflow?._id === currentflow?._id ) ? 'selected--option' : ''} > Current Workflow { (workflowModalState?.workflow && workflowModalState?.workflow?._id === currentflow?._id ) ? <FaCheck /> : null }</Dropdown.Item>
                                         }
 
                                         {
                                           filteredWorkflows.length > 0 &&
                                           filteredWorkflows.map(workflow => (
-                                            <Dropdown.Item onClick={() => handleSelectworkflow(workflow)} className={ (selectedWorkflow && selectedWorkflow?._id === workflow._id ) ? 'selected--option' : ''} >{workflow.title} { (selectedWorkflow && selectedWorkflow?._id === workflow._id ) ? <FaCheck /> : null }</Dropdown.Item>
+                                            <Dropdown.Item key={`flow-${workflow?._id}`} onClick={() => handleSelectworkflow(workflow)} className={ (workflowModalState?.workflow && workflowModalState?.workflow?._id === workflow._id ) ? 'selected--option' : ''} >{workflow.title} { (workflowModalState?.workflow && workflowModalState?.workflow?._id === workflow._id ) ? <FaCheck /> : null }</Dropdown.Item>
                                           ))
                                         }
                                     </div>
@@ -678,11 +801,12 @@ export const  WorkFlowModal =  (props) => {
                             </Dropdown>
                            
                         </Form.Group>
+                      }
                         <Form.Group className="mb-0 form-group" >
                             <Form.Label><strong>Taskboard setup</strong></Form.Label>
                             <p>Add, remove, reorder and rename the worksteps to reflect the way you work.</p>
                             {
-                              Object.keys(selectedWorkflow).length > 0 && showWorkflow &&
+                              workflowModalState?.workflow && Object.keys(workflowModalState?.workflow).length > 0 && showWorkflow &&
                             <>
                               <ListGroup className='workflow--list'>
                                 <DragDropContext onDragEnd={handleDragEnd}>
@@ -693,18 +817,19 @@ export const  WorkFlowModal =  (props) => {
                                         ref={provided.innerRef}
                                         {...provided.droppableProps}
                                       >
-                                        {Object.keys(selectedWorkflow).length > 0 &&
-                                          selectedWorkflow.tabs.map((tab, index) => (
+                                        {Object.keys(workflowModalState?.workflow).length > 0 && workflowModalState?.workflow?._id && workflowModalState?.workflow?.tabs?.length > 0 &&
+                                          workflowModalState?.workflow?.tabs.map((tab, index) => (
                                             <Draggable
                                               key={`tabitem-${index}`}
                                               draggableId={`tab-${index}-${Date.now()}`} // Unique draggableId
                                               index={index}
                                               isDragDisabled={
-                                                index === 0 || index === selectedWorkflow.tabs.length - 1
+                                                index === 0 || index === workflowModalState?.workflow?.tabs.length - 1
                                               } // Disable drag for first and last items
                                             >
                                               {(provided) => (
                                                 <ListGroup.Item
+                                                  key={`tab-item-${index}`}
                                                   ref={provided.innerRef}
                                                   {...provided.draggableProps}
                                                   {...provided.dragHandleProps}
@@ -712,6 +837,11 @@ export const  WorkFlowModal =  (props) => {
                                                 >
                                                   {typeof tab === 'object' && tab !== null ? (
                                                     <>
+                                                    {
+                                                      index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
+                                                      <span className="delete--workstep" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
+                                                    }
+                                                    
                                                       {tab.title}
                                                       <small
                                                         type="button"
@@ -723,6 +853,10 @@ export const  WorkFlowModal =  (props) => {
                                                     </>
                                                   ) : (
                                                     <>
+                                                    {
+                                                      index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
+                                                      <span className="delete--workstep" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
+                                                    }
                                                       {tab}
                                                       <small
                                                         type="button"
@@ -743,7 +877,7 @@ export const  WorkFlowModal =  (props) => {
                                   </Droppable>
                                 </DragDropContext>
 
-                                <ListGroup.Item className='ms-auto'>
+                                <ListGroup.Item className='ms-auto' key={`addflow-btn`}>
                                     <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
                                 </ListGroup.Item>
                               </ListGroup>
@@ -794,7 +928,6 @@ export const  WorkFlowModal =  (props) => {
                 </Modal.Footer>
             </Modal>
             </>
-
   )
 }
 
@@ -809,6 +942,24 @@ export const FilesModal = () => {
   const [fields, setFields] = useState({ images: [] });
   const [filetoPreview, setFiletoPreview] = useState(null);
   const [showPreview, setPreviewShow] = useState(false);
+
+  const refreshstates = (formtype) => { 
+    const stateObject = {selectedFiles: []}
+    if( dataObject[commonState.active_formtype]){
+     
+      stateObject['selectedFiles'] = commonState[dataObject[commonState.active_formtype]?.form_key].images || []
+    }else{
+      stateObject['selectedFiles'] = []
+    }
+  }
+
+  const [filesModalState, setFilesModalState] = useState(refreshstates(commonState.active_formtype || false))
+  
+  useEffect(() => {
+    const updatedState = refreshstates(commonState.active_formtype);
+    setFilesModalState(updatedState);
+  }, [commonState.active_formtype]);
+  
   const handlePreviewShow = (file) => {
     // dispatch( togglePopups('filepreview', true))
       setFiletoPreview(file)
@@ -819,11 +970,6 @@ export const FilesModal = () => {
     handleSelectedFiles(acceptedFiles)  
   }, [])
 
-  useEffect(() => {
-    if( commonState.projectForm){
-        setFields(commonState.projectForm)
-    }
-  },[ commonState.projectForm])
 
   useEffect(() => {
     setShowfilemodal(modalstate)
@@ -842,19 +988,30 @@ export const FilesModal = () => {
     dispatch( togglePopups('files', false))
   }
 
-  const handleSelectedFiles = (acceptedFiles) => { console.log('acceptedFiles: ', acceptedFiles)
-    setSelectedFiles((prevSelectedFiles) => {
-        // Filter out duplicates by comparing file names or other unique properties
-        const uniqueFiles = Array.from(new Set([...prevSelectedFiles, ...acceptedFiles]));
-
-        return uniqueFiles;
+  const handleSelectedFiles = (acceptedFiles) => {
+ 
+    setFilesModalState((prevFilesModalState) => {
+      const allFiles = [...prevFilesModalState?.selectedFiles || [], ...acceptedFiles];
+    
+      // Filter out duplicate files based on a unique property (e.g., file.name)
+      const uniqueFiles = allFiles.filter(
+        (file, index, self) => 
+          index === self.findIndex(f => f.name === file.name) // Use `file.name` for uniqueness
+      );
+    
+      // Return the updated state, preserving the previous state structure
+      return {
+        ...prevFilesModalState,
+        selectedFiles: uniqueFiles
+      };
     });
+    
   };
 
   useEffect(() => {
-    if (selectedFiles?.length > 0) {
+    if (filesModalState?.selectedFiles && filesModalState.selectedFiles?.length > 0) {
         const loadPreviews = async () => {
-            const previews = await Promise.all(selectedFiles.map((file, index) => {
+            const previews = await Promise.all(filesModalState.selectedFiles.map((file, index) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = (e) => {
@@ -871,43 +1028,40 @@ export const FilesModal = () => {
                     reader.readAsDataURL(file);
                 });
             }));
-
-            console.log('File previews: ', previews);
             setImagePreviews(previews);
         };
 
         loadPreviews();
-
-        // Update the state with selected files
-        dispatch(updateStateData(PROJECT_FORM, { images: selectedFiles }));
     } else {
         // Clear the images when no files are selected
         dispatch(updateStateData(PROJECT_FORM, { images: [] }));
     }
-}, [selectedFiles, dispatch]);
+}, [filesModalState?.selectedFiles, dispatch]);
 
 
   const handleRemove = (indexToRemove) => {
     // Filter out the file to remove from both selectedFiles and imagePreviews
-    const updatedSelectedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
+    const updatedSelectedFiles = filesModalState?.selectedFiles.filter((_, index) => index !== indexToRemove);
     const updatedImagePreviews = imagePreviews.filter((_, index) => index !== indexToRemove);
-    setSelectedFiles(updatedSelectedFiles);
+  
+    setFilesModalState(prevFilesModalState => ({
+      ...prevFilesModalState,   // Spread the previous state to retain other properties
+      selectedFiles: updatedSelectedFiles // Update only the `selectedFiles` property
+    }));
     setImagePreviews(updatedImagePreviews);
   };
 
-  useEffect(() => {
-    console.log('imagePreviews data: ', imagePreviews)
-  },[imagePreviews])
-
-
 
   const handleattachfiles = () => {
-    dispatch( updateStateData(PROJECT_FORM, { images: selectedFiles}))
+    setImagePreviews([]); 
+    if( dataObject[commonState.active_formtype]){
+      dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], { images: filesModalState.selectedFiles || []} ));
+    }
     handleUploadClose()
   }
 
   const renderPreview = (type, preview, index) => {
-    console.log(type)
+ 
     const { src, _id } = preview;
     const mimetype = (preview.mimetype) ? preview.mimetype : src.split('.').pop().toLowerCase();
 
@@ -980,7 +1134,7 @@ export const FilesModal = () => {
             <Form {...getRootProps()}>
                 <Form.Group>
                     <Form.Control type="file" multiple name="images[]" onChange={(e) => {handleSelectedFiles(Array.from(e.target.files))} } {...getInputProps()} id="attachments-new" />
-                    <Form.Label className="file--upload" htmlFor="attachments-new" onClick="handleLabelClick(event)">
+                    <Form.Label className="file--upload" htmlFor="attachments-new">
                         <span><FaUpload /></span>
                         <p>Drop your files here or <strong>browse</strong></p>
                     </Form.Label>
@@ -994,7 +1148,7 @@ export const FilesModal = () => {
             </div>
         </Modal.Body>
         <Modal.Footer>
-            <Button variant="secondary" onClick={() => { setSelectedFiles([]); setImagePreviews([]); handleUploadClose(); }}>Cancel</Button>
+            <Button variant="secondary" onClick={() => { setFilesModalState({'selectedFiles': []}); setImagePreviews([]); handleUploadClose(); }}>Cancel</Button>
             <Button variant="primary" onClick={handleattachfiles}>Attach</Button>
         </Modal.Footer>
     </Modal>
@@ -1025,13 +1179,7 @@ export const FilesPreviewModal = React.memo((props) => {
   };
 
 
-  useEffect(() => { 
-    if( commonState.projectForm){
-        setFields(commonState.projectForm)
-    }
-  },[ commonState.projectForm])
-
-  useEffect(() => {console.log("props.selectedFiles:: ", props.selectedFiles)
+  useEffect(() => {
     setPreviewShow(props.showPreview)
     
   }, [props.showPreview])
@@ -1050,21 +1198,14 @@ export const FilesPreviewModal = React.memo((props) => {
     }
   }, [ commonState.active_formtype])
 
-
-  const handleRemove = (indexToRemove) => {
-    // Filter out the file to remove from both selectedFiles and imagePreviews
-    // const updatedSelectedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
-    // const updatedImagePreviews = imagePreviews.filter((_, index) => index !== indexToRemove);
-    // setSelectedFiles(updatedSelectedFiles);
-    // setImagePreviews(updatedImagePreviews);
-  };
-
   const handleRemovefiles = (id) => {
     let previousfiles = fields['images']
-    console.log("previousfiles:: ", previousfiles)
     const updatedFiles = previousfiles.filter(file => file !== id);
-    dispatch( updateStateData(PROJECT_FORM, { images: updatedFiles}))
-    // setFields({ ...fields, ['files']: updatedFiles })
+    if( dataObject[commonState.active_formtype]){
+      dispatch( updateStateData(dataObject[commonState.active_formtype]['state_key'], { images: updatedFiles}))
+    }
+    
+    
   }
 
   return (
@@ -1130,95 +1271,7 @@ export const addTask = React.memo(( props ) => {
   
   return (
     <>
-    {/* <Modal show={showTask} onHide={handleTaskClose} centered size="lg" className="add--member--modal add--task--modal">
-                <Modal.Header closeButton>
-                    <Modal.Title>Create New Task</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="project--form">
-                        <div className="project--form--inputs">
-                            <Form>
-                                <Form.Group className="mb-0 form-group">
-                                    <FloatingLabel label="Task Title *">
-                                        <Form.Control type="text" placeholder="Task Title" />
-                                    </FloatingLabel>
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label>
-                                        <small>Status</small>
-                                        <div className="status--modal" onClick={handleStatusShow}>
-                                            <span className="hold--circle status--circle"></span> On Hold <FaChevronDown />
-                                        </div>
-                                    </Form.Label>
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label>
-                                        <div className="assign--modal" onClick={handleAssignShow}>
-                                            <span className="member--icon"><img src="../images/default.jpg" alt="..." /></span>
-                                            <label>
-                                                <small>Assigned to</small>
-                                                <span className="modal--pop">Assign the task</span>
-                                            </label>
-                                        </div>
-                                    </Form.Label>
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label className="w-100 m-0">
-                                        <small>Description</small>
-                                        <strong className="add-descrp" onClick={setIsDescEditor}><FiFileText /> Add a description</strong>
-                                        <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
-                                            <textarea className="form-control" placeholder="Add a title"  rows="2"></textarea>
-                                            <ul className="editor--options">
-                                                <li><a href="javascript:;"><FaBold /></a></li>
-                                                <li><a href="javascript:;"><FaItalic /></a></li>
-                                            </ul>
-                                        </div>
-                                    </Form.Label>
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label>
-                                        <small>Start/Due Date</small>
-                                    </Form.Label>
-                                    <Row>
-                                        <Col sm={12} lg={6}>
-                                            <Form.Control type="date" name="startdate" />
-                                        </Col>
-                                        <Col sm={12} lg={6} className="mt-3 mt-lg-0">
-                                            <Form.Control type="date" name="enddate" />
-                                        </Col>
-                                    </Row>
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label className="w-100 m-0">
-                                        <small>Subtasks</small>
-                                        <strong className="add-descrp" onClick={handleTaskEditor}><FaPlusCircle /> Add subtasks</strong>
-                                        <div className={isTaskEditor ? 'subtask--editor show--editor' : 'subtask--editor'}>
-                                            <textarea className="form-control" rows="1" placeholder="Add subtask"></textarea>
-                                        </div>
-                                    </Form.Label>
-                                </Form.Group>
-                            </Form>
-                        </div>
-                        <div className="project--form--actions">
-                            <h4>Actions</h4>
-                            <ListGroup>
-                                <ListGroup.Item onClick={handleAssignShow}><FaPlus /> Assign to</ListGroup.Item>
-                                <ListGroup.Item onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
-                                <div className="output--file-preview">
-                                    <div className="preview--grid">
-                                       
-                                        {imagePreviews.map((preview, index) => (
-                                            <div key={`uploaded-preview-${index}`} className="file-preview">{renderPreview('new', preview, index)}</div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <ListGroup.Item onClick={handleDeleteShow} className="text-danger"><FaRegTrashAlt /> Delete task</ListGroup.Item>
-                            </ListGroup>
-                            <Button variant="primary">Save</Button>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal> */}
+   
     </>
   )
 })
