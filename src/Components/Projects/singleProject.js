@@ -15,7 +15,7 @@ import { selectboxObserver } from "../../helpers/commonfunctions";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
-import {  EDIT_PROJECT_FORM, ASSIGN_MEMBER } from "../../redux/actions/types";
+import {  EDIT_PROJECT_FORM, ASSIGN_MEMBER, RESET_FORMS, CURRENT_PROJECT, DIRECT_UPDATE } from "../../redux/actions/types";
 
 function SingleProject(props) {
     const dispatch = useDispatch();
@@ -45,7 +45,10 @@ function SingleProject(props) {
     const [ selectedworkflow, setSelectedWorkflow] = useState({})
     const [showWorkflow, setWorkflowShow] = useState(false);
     const handleWorkflowClose = () => dispatch( togglePopups('workflow',false ));
-    const handleWorkflowShow = () => dispatch( togglePopups('workflow',true));
+    const handleWorkflowShow = async () => {
+       await dispatch( updateStateData(DIRECT_UPDATE, false))
+        dispatch( togglePopups('workflow',true));
+    }
     const [showAssign, setAssignShow] = useState(false);
     const handleAssignShow = () => setAssignShow(true);
     const [showUpload, setUploadShow] = useState(false);
@@ -93,7 +96,7 @@ function SingleProject(props) {
 
 
     useEffect(() => {
-        if (currentProject && Object.keys(currentProject).length > 0) { console.log('here at project')
+        if (currentProject && Object.keys(currentProject).length > 0) { console.log('here at project:: ', currentProject)
             setSelectedFiles([]);
             setImagePreviews([]);
             let fieldsSetup = {
@@ -224,7 +227,7 @@ function SingleProject(props) {
 
     // Function to remove the last member
     const removeMember = (member, directUpdate = false) => {
-        const updatedSelectedMembers = { ...commonState.editProjectForm  .members };
+        const updatedSelectedMembers = { ...commonState.editProjectForm.members };
             delete updatedSelectedMembers[member];
         if( directUpdate === true ){
             const memberIds = Object.keys(updatedSelectedMembers);
@@ -283,7 +286,7 @@ function SingleProject(props) {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
     const handleChange = ({ target: { name, value, type, files } }) => {
-        // setFields({ ...fields, [name]: value });
+        setFields({ ...fields, [name]: value });
         dispatch( updateStateData( EDIT_PROJECT_FORM,  {[name]: value }))
         setErrors({ ...errors, [name]: '' })
     };
@@ -313,6 +316,8 @@ function SingleProject(props) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true)
+
+       
         const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
             // Get rules for the current field
             const rules = getFieldRules('project', fieldName);
@@ -349,9 +354,13 @@ function SingleProject(props) {
                     });
                 }else if (typeof value === 'object' && key === 'members') {
                     const memberids = Object.keys(fields['members'])
-                    memberids.forEach(item => {
-                        formData.append(`members[]`, item); // Append with the same key for non-empty arrays
-                    });
+                    if( memberids.length > 0){
+                        memberids.forEach(item => {
+                            formData.append(`members[]`, item); // Append with the same key for non-empty arrays
+                        });
+                    }else{
+                        formData.append(`members`, '[]');
+                    }
                 } else if (Array.isArray(value)) { // Check if the value is an array
                     if (value.length === 0) {
                         formData.append(`${key}[]`, []); // Append an empty array
@@ -376,8 +385,11 @@ function SingleProject(props) {
         }
     }
 
-    const handledeleteProject = () => {
-        dispatch(deleteProject(currentProject._id))
+    const handledeleteProject = async () => {
+        await dispatch(deleteProject(currentProject._id))
+        await dispatch( updateStateData(CURRENT_PROJECT, {}))
+        await dispatch(updateStateData(RESET_FORMS, 'edit_project'))
+        //props.closeview(0)
     }
 
     const handleRemovefiles = (id) => {
@@ -611,7 +623,11 @@ function SingleProject(props) {
                             <Form.Group className="mb-0 form-group">
                                 <Form.Label className="w-100 m-0">
                                     <small>Description</small>
-                                    <strong className="add-descrp" onClick={handleEditor}><FiFileText /> Add a description</strong>
+                                    {
+                                        !isEditor &&
+                                        <strong className="add-descrp" onClick={handleEditor}><FiFileText /> Add a description</strong>
+                                    }
+                                   
                                     <div className={(isEditor || isEditor && fields['description'] && fields['description'] !== "") ? 'text--editor show--editor' : 'text--editor'}>
                                         <textarea className="form-control" placeholder="Add a title" rows="2" name="description" onChange={handleChange} value={fields['description'] || ''}>{fields['description'] || ''}</textarea>
                                         <ul className="editor--options">

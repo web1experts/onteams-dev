@@ -13,6 +13,7 @@ export default function ToastAlerts() {
     const apiResultProject = useSelector(state => state.project);
     const apiResultClient = useSelector(state => state.client);
     const workspace = useSelector(state => state.workspace)
+    const apiResultTask = useSelector(state => state.task);
     const dispatch = useDispatch();
     const { currentMember } = useSelector(state => state.member);
     const [loggedIn, setLoggedIn] = useState(false);
@@ -37,16 +38,7 @@ export default function ToastAlerts() {
           addToast(apiResultAuth.message, apiResultAuth.message_variant);
         handleClearMessages()
       }
-        // if( apiResultAuth.error ){ 
-        //     addToast(apiResultAuth.message, 'danger');
-        //     handleClearMessages()
-          
-        // }
-        // if(workspace.error){console.log("workspace")
-        //     addToast(workspace.message, 'danger');
-        //   handleClearMessages()
-          
-        // }
+        
         if( workspace.message ){ 
             addToast(workspace.message, workspace.message_variant);
             handleClearMessages()
@@ -60,16 +52,7 @@ export default function ToastAlerts() {
           dispatch(getSingleMemberByUserAndCompanyId())
         }
         
-        // if(apiResultProject.error){
-        //     addToast(apiResultProject.message, 'danger');
-        //   handleClearMessages()
-        // }
-    
-        // if(apiResultClient.error){
-        //     addToast(apiResultClient.message, 'danger');
-        //   handleClearMessages()
-        // }
-    
+      
         if(apiResultMember.message){
           
             addToast(apiResultMember.message, apiResultMember.message_variant)
@@ -79,10 +62,7 @@ export default function ToastAlerts() {
             }
             handleClearMessages()
         }
-      //   if(apiResultMember.error){ console.log("member")
-      //     addToast(apiResultMember.message, 'danger');
-      //     handleClearMessages()
-      // }
+      
       
         if(apiResultClient.message){
             addToast(apiResultClient.message, apiResultClient.message_variant);
@@ -92,8 +72,12 @@ export default function ToastAlerts() {
             addToast(apiResultProject.message, apiResultProject.message_variant);
             handleClearMessages()
         }
+        if(apiResultTask.message){
+          addToast(apiResultTask.message, apiResultTask.message_variant);
+          handleClearMessages()
+        }
     
-      },[apiResultMember, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, dispatch]);
+      },[apiResultMember, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask, dispatch]);
 
       const clearMessages = () => ({
         type: CLEAR_MESSAGES,

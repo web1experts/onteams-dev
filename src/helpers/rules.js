@@ -93,6 +93,22 @@ export const formRules = {
         }
         
     },
+    task: {
+        rules: {
+            title: {
+                required: true,
+                minLength: 2
+            }
+        },
+        msg: {
+            title: {
+                required: 'Task title is required',
+                minLength: 'Task title should be atleast 2 characters long',
+            },
+            
+        }
+        
+    },
     member_signup: {
         rules:{
             name: {

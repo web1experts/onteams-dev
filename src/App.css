@@ -465,7 +465,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   background: #fff;
 }
 
-.project--form--actions .list-group:last-child .list-group-item {
+/* .project--form--actions .list-group:last-child .list-group-item {
   margin-bottom: 0;
   padding: 0;
   display: flex;
@@ -475,7 +475,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   border: 0;
   gap: 10px;
   text-decoration: none;
-}
+} */
 
 .show--details .page--wrapper .nav-tabs,
 .view--project .page--wrapper .nav-tabs {
@@ -1191,6 +1191,7 @@ table tr.active td {
 
 .projects--page .table .list-group-item .remove-icon,
 .project--form--actions .list-group-item .remove-icon,
+.tasks-form-action .list-group-item .remove-icon,
 .wrapper--title .members--list .list-group-item .remove-icon {
   position: absolute;
   right: 0;
@@ -1211,7 +1212,7 @@ table tr.active td {
   cursor: pointer;
 }
 
-.project--form--actions button.list-group-item {
+.project--form--actions button.list-group-item, .tasks-form-action button.list-group-item {
   padding: 0;
   text-decoration: none;
   width: max-content;
@@ -1221,7 +1222,7 @@ table tr.active td {
   margin-bottom: 0;
 }
 
-.project--form--actions button.list-group-item+button.list-group-item {
+.project--form--actions button.list-group-item+button.list-group-item, .tasks-form-action button.list-group-item+button.list-group-item {
   margin-left: .5rem;
 }
 
@@ -1230,7 +1231,7 @@ table tr.active td {
   margin-left: .5rem;
 }
 
-.project--form--actions .more--member .btn {
+.project--form--actions .more--member .btn, .tasks-form-action .more--member .btn {
   border-radius: 100px;
   -webkit-border-radius: 100px;
   padding: 0;
@@ -1241,7 +1242,7 @@ table tr.active td {
   justify-content: center;
 }
 
-.project--form--actions .more--member svg {
+.project--form--actions .more--member svg, .tasks-form-action .more--member svg {
   margin-right: 0;
   font-size: .85rem;
 }
@@ -1249,7 +1250,8 @@ table tr.active td {
 .projects--page .table .list-group-item .team--initial,
 .projects--page .table .list-group-item .team--image,
 .projects--page .table .list-group-item .btn,
-.project--form--actions .list-group-item .team--initial {
+.project--form--actions .list-group-item .team--initial,
+.tasks-form-action .list-group-item .team--initial {
   width: 35px;
   text-decoration: none;
   height: 35px;
@@ -1276,7 +1278,7 @@ table tr.active td {
   background: #de0606;
 }
 
-.project--form--actions .list-group-item .remove-icon svg {
+.project--form--actions .list-group-item .remove-icon svg, .tasks-form-action .list-group-item .remove-icon svg{
   margin-right: 0;
   font-size: .55rem;
 }

@@ -18,7 +18,9 @@ import {
     RESET_FORMS,
     SHOW_PREVIEW_MODAL,
     ASSIGN_MEMBER,
-    SHOW_TASK_MODAL
+    TASK_FORM_TYPE,
+    SHOW_TASK_MODAL,
+    CREATE_POST_LIST_COMMENT
 } from "../actions/types";
 
 const initialState = {
@@ -36,8 +38,8 @@ const initialState = {
     editProjectForm: {},
     taskForm: {},
     active_formtype: null,
+    task_formtype: null,
     assign_members_direct: false,
-    taskForm: {}
 };
 
 export default (state = initialState, action) => {
@@ -81,11 +83,7 @@ export default (state = initialState, action) => {
             ...state,
             files: action.payload.files
         }
-    case CURRENT_TASK: 
-        return {
-            ...state,
-            files: action.payload.currentTask
-        }
+    
     case SHOW_STATUS_MODAL: 
         return {
             ...state,
@@ -144,6 +142,11 @@ export default (state = initialState, action) => {
             currentProject: false,
             editProjectForm: {},
         }
+    }else if(action.payload === "task"){
+        return {
+            ...state,
+            taskForm: {},
+        }
     }else{
         return {
             ...state,
@@ -155,7 +158,12 @@ export default (state = initialState, action) => {
             ...state,
             directUpdate: action.payload
         }
-
+    case TASK_FORM_TYPE: 
+        return {
+            ...state,
+            task_formtype: action.payload
+        }
+    
     default: return state;
   }
 };

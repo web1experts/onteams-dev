@@ -62,7 +62,7 @@ export const createTask = (payload) =>{
     console.log('Payload: ', payload)
     return async (dispatch)=>{
         try{
-            const response = await API.apiPost('project', payload , config);
+            const response = await API.apiPost('task', payload);
             if(response.data && response.data.success){
                 await dispatch({ type: CREATE_TASK_SUCCESS, payload:response.data});
             }else{
@@ -73,3 +73,50 @@ export const createTask = (payload) =>{
         }
     }
 }
+
+export const reorderTasks  = (payload) => {
+    
+    return async (dispatch) => {
+      try {
+        const response = await API.apiPutUrl('task', `/reorder`, payload);
+        if(response.data && response.data.success){
+          await dispatch({ type: PUT_TASK_SUCCESS, payload: response.data});
+        } else {
+          await dispatch({ type: PUT_TASK_FAILED, payload: response.data.message });
+        }
+      } catch (error) {
+        errorRequest(error, dispatch);
+      }
+    }
+  }
+
+export const updateTask  = (task_id, payload) => {
+    
+    return async (dispatch) => {
+      try {
+        const response = await API.apiPutUrl('task', `/update/${task_id}`, payload);
+        if(response.data && response.data.success){
+          await dispatch({ type: PUT_TASK_SUCCESS, payload: response.data});
+        } else {
+          await dispatch({ type: PUT_TASK_FAILED, payload: response.data.message });
+        }
+      } catch (error) {
+        errorRequest(error, dispatch);
+      }
+    }
+  }
+
+  export const deleteTask = (task_id) => {
+    return async (dispatch)=>{
+      try{
+          const response = await API.apiDeleteUrl('task', `/${task_id}`);
+          if(response.data && response.data.success){
+              await dispatch({ type: DELETE_TASK_SUCCESS, payload:response.data});
+          }else{
+              await dispatch({ type: DELETE_TASK_FAILED, payload:response.data.message });
+          }
+      }catch (err){
+          errorRequest(err, dispatch);
+      }
+  }
+  }
