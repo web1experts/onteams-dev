@@ -456,6 +456,25 @@ export const TaskForm = () => {
         dispatch( updateTask( currentTask._id, { subtasks: updatedSubtasks}))
     };
 
+    // // Function to handle editing the task's content
+    // const handleEditTask = (e, index) => {
+    //     const newSubtasks = [...subtasks];
+    //     newSubtasks[index].title = e.target.innerText; // Update the task's title
+    //     setSubtasks(newSubtasks); // Update state with the new task list
+    // };
+
+    // // Function to enable editing for a specific subtask
+    // const enableEditing = (subtaskId) => {
+    //     setEditingSubtaskId(subtaskId);
+    // };
+
+    // // Function to save the task when the user finishes editing (optional)
+    // const handlesubtaskBlur = (index) => {
+    //     setEditingSubtaskId(null); // Disable editing mode
+    //     // You can perform save operation here, for example:
+    //     console.log('Task saved:', subtasks[index]);
+    // };
+
 
     const renderSubtasks = () => { 
         
@@ -479,9 +498,9 @@ export const TaskForm = () => {
                             } />
                         }
                          
-                            <FloatingLabel label="Subtask Title *">
+                            
                                 
-                                <textarea 
+                                {/* <textarea 
                                     className="form-control" 
                                     rows="2" 
                                     readonly={((typeof subtask === 'object') && enablesubtaskedit[subtask._id] === false || typeof subtask === 'object' && !enablesubtaskedit[subtask._id] )} 
@@ -501,9 +520,59 @@ export const TaskForm = () => {
                                     placeholder="Enter subtask" 
                                     value={typeof subtask === 'object' ? subtask.title : subtask} 
                                     onChange={({ target: { value } }) => handlesubtaskChange(index, subtask, value)} 
-                                />
+                                /> */}
 
-                            </FloatingLabel>
+                                    <div
+                                        className="form-control"
+                                        contentEditable={typeof subtask === 'object' && enablesubtaskedit[subtask._id] === true} // Enable editing if clicked
+                                        suppressContentEditableWarning={true} // Suppress contentEditable warning
+                                        onClick={() => {
+                                            if (typeof subtask === 'object') {
+                                                setEnableSubtakEdit({ [subtask._id]: true }); // Enable editing for clicked subtask
+
+                                                // Use setTimeout to ensure React updates DOM, then move the caret to the end
+                                                setTimeout(() => {
+                                                    const editableDiv = document.getElementById(`editable-subtask-${subtask._id}`);
+                                                    editableDiv.focus(); // Focus the editable div
+
+                                                    // Place caret at the end
+                                                    const range = document.createRange();
+                                                    const selection = window.getSelection();
+                                                    range.selectNodeContents(editableDiv);
+                                                    range.collapse(false); // Collapse the range to the end (false)
+                                                    selection.removeAllRanges(); // Clear any current selections
+                                                    selection.addRange(range); // Apply the new range
+                                                }, 0);
+                                            }
+                                        }}
+                                        onBlur={(e) => {
+                                            if (typeof subtask === 'object') {
+                                                setEnableSubtakEdit({ [subtask._id]: false }); // Disable editing after blur
+                                                handlesubtaskChange(index, subtask, e.target.innerText); // Save the updated value
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault(); // Prevent new line on Enter
+                                                e.target.blur(); // Trigger blur to save and disable editing
+                                            }
+                                        }}
+                                        id={`editable-subtask-${subtask._id}`} // Use an ID for easier focus targeting
+                                        style={{
+                                            cursor: enablesubtaskedit[subtask._id] ? 'text' : 'pointer', // Change cursor when editable
+                                            border: enablesubtaskedit[subtask._id] ? '1px solid #ccc' : 'none', // Indicate editability with border
+                                            padding: '0.5rem',
+                                            minHeight: '2rem',
+                                            overflowWrap: 'break-word', // Ensure long words wrap
+                                        }}
+                                        placeholder="Enter subtask"
+                                        dangerouslySetInnerHTML={{
+                                            __html: typeof subtask === 'object' ? subtask.title : subtask,
+                                        }} // Set subtask title as HTML content for editable div
+                                    ></div>
+
+
+
                     <button type="button"  variant="primary" onClick={() => removeSubtask(index)}>
                         <FaRegTrashAlt />
                     </button>
@@ -568,10 +637,16 @@ export const TaskForm = () => {
                            
                             <Form.Group className="mb-0 form-group">
                                 <Form.Label className="w-100 m-0">
-                                    <small>Description</small>
-                                    <strong className="add-descrp" onClick={() => {
+                                    <small onClick={() => {
                                         setIsDescEditor(prevState => !prevState);
-                                    }}><FiFileText /> Add a description</strong>
+                                    }}>Description</small>
+                                    {
+                                        !isdescEditor &&
+                                        <strong className="add-descrp" onClick={() => {
+                                            setIsDescEditor(prevState => !prevState);
+                                        }}><FiFileText /> Add a description</strong>
+                                    }
+                                    
                                     <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
                                         <textarea className="form-control" key={`task-desc-${commonState?.taskForm?.tab}`} placeholder="Add a title" rows="2" name="description" value={fields['description'] || ''} onBlur={async (e) => {
                                             await dispatch(updateTask(currentTask._id, {description: e.target?.value}))

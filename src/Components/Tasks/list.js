@@ -10,6 +10,7 @@ import { getFieldRules, validateField } from '../../helpers/rules';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { MdOutlineClose } from "react-icons/md";
+import { TiInputChecked } from "react-icons/ti";
 const TasksList = React.memo(( props ) => {
     const dispatch = useDispatch()
     const [fields, setFields] = useState({title: ''})
@@ -318,6 +319,18 @@ const TasksList = React.memo(( props ) => {
                                                                 ))
                                                             )}
                                                         </p>
+                                                        {
+                                                            task.subtasks && task.subtasks.length > 0 && (
+                                                                <>
+                                                                    <TiInputChecked />
+                                                                    <span className="subtask-count" key={`subtask-count-${task._id}`}>
+                                                                        {/* Calculate completed subtasks */}
+                                                                        {task.subtasks.filter(subtask => subtask.status === true).length} / {task.subtasks.length}
+                                                                    </span>
+                                                                </>
+                                                            )
+                                                        }
+
                                                     </div>
                                                 </li>
                                             )}
