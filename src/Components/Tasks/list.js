@@ -105,10 +105,8 @@ const TasksList = React.memo((props) => {
                 ...taskslists,
                 [sourceTabId]: { ...taskslists[sourceTabId], tasks: reorderedTasks }
             });
-            console.log(`Task ${taskId} moved within tab ${sourceTabId} from position ${source.index} to ${destination.index}`);
-            if (replacedTaskId) {
-                console.log(`Task ${replacedTaskId} was replaced at position ${destination.index}`);
-            }
+            
+           
             const tasksToUpdate =
             {
                 task_id: taskId,

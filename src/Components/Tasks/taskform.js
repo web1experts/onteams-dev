@@ -457,26 +457,7 @@ export const TaskForm = () => {
         dispatch( updateTask( currentTask._id, { subtasks: updatedSubtasks}))
     };
 
-    // // Function to handle editing the task's content
-    // const handleEditTask = (e, index) => {
-    //     const newSubtasks = [...subtasks];
-    //     newSubtasks[index].title = e.target.innerText; // Update the task's title
-    //     setSubtasks(newSubtasks); // Update state with the new task list
-    // };
-
-    // // Function to enable editing for a specific subtask
-    // const enableEditing = (subtaskId) => {
-    //     setEditingSubtaskId(subtaskId);
-    // };
-
-    // // Function to save the task when the user finishes editing (optional)
-    // const handlesubtaskBlur = (index) => {
-    //     setEditingSubtaskId(null); // Disable editing mode
-    //     // You can perform save operation here, for example:
-    //     console.log('Task saved:', subtasks[index]);
-    // };
-
-
+   
     const renderSubtasks = () => { 
         
         return subtasks.map((subtask, index) => (

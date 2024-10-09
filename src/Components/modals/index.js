@@ -814,7 +814,7 @@ export const  WorkFlowModal =  (props) => {
                             <>
                               <ListGroup className='workflow--list'>
                                 <DragDropContext onDragEnd={handleDragEnd}>
-                                  <Droppable droppableId="droppabletabs" type="droppableTabsItem" direction="horizontal">
+                                  <Droppable droppableId="droppabletabs" type="droppableTabsItem" direction="vertical">
                                     {(provided) => (
                                       <ListGroup
                                         className="workflow--list"
@@ -841,7 +841,7 @@ export const  WorkFlowModal =  (props) => {
                                             )}
                                             <Draggable
                                               key={`tabitem-${index}`}
-                                              draggableId={`tab-${index}-${Date.now()}`} // Unique draggableId
+                                              draggableId={`tab-${index}`} // Unique draggableId
                                               index={index}
                                               isDragDisabled={
                                                 index === 0 || index === workflowModalState?.workflow?.tabs.length - 1
