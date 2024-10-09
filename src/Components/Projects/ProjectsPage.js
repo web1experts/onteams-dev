@@ -909,42 +909,7 @@ function ProjectsPage() {
                     <Button variant="danger">Delete</Button>
                 </Modal.Footer>
             </Modal>
-            {/*--=-=Setting Modal**/}
-            <Modal show={showSetting} onHide={handleSettingClose} centered size="lg" className="add--workflow--modal">
-                <Modal.Header closeButton>
-                    <Modal.Title>Workflow Settings</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group className="mb-0 form-group">
-                            <p>Add, remove, reorder and rename the worksteps to reflect the way you work.</p>
-                            <ListGroup className="workflow--list">
-                                <ListGroup.Item className="border--top--plan">Planned
-                                    <small type="button" title="Filter" onClick={handleEditShow}>Edit</small>
-                                </ListGroup.Item>
-                                <ListGroup.Item className="border--top--progress">
-                                    <span className="delete--workstep"><FaTimes /></span> In Progress
-                                    <small type="button" title="Filter" onClick={handleEditShow}>Edit</small>
-                                </ListGroup.Item>
-                                <ListGroup.Item className="border--top--review">
-                                    <span className="delete--workstep"><FaTimes /></span>In Review
-                                    <small type="button" title="Filter" onClick={handleEditShow}>Edit</small>
-                                </ListGroup.Item>
-                                <ListGroup.Item className="border--top--complete">Completed
-                                    <small type="button" title="Filter" onClick={handleEditShow}>Edit</small>
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                    <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
-                                </ListGroup.Item>
-                            </ListGroup>
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleWorkflowClose}>Cancel</Button>
-                    <Button variant="primary">Save</Button>
-                </Modal.Footer>
-            </Modal>
+            
             {/*--=-=Filter Modal**/}
             <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>

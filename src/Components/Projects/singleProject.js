@@ -730,8 +730,6 @@ function SingleProject(props) {
                 </div>
             </div>
 
-            <WorkFlowModal />
-            
             {/*--=-=Upload Files Modal**/}
             <Modal show={showUpload} onHide={handleUploadClose} centered size="md" className="upload--status">
                 <Modal.Header closeButton>
