@@ -349,6 +349,7 @@ Collapsible Action CSS-=-=
 .view--invitee .table-responsive-xl {
   overflow-y: auto;
   scrollbar-width: thin;
+  overflow-x: hidden;
   height: 100%;
   max-height: calc(100vh - 110px);
 }
@@ -3038,7 +3039,7 @@ Media CSS-=-==
   }
 
   .modal-body {
-    max-height: calc(100vh - 180px);
+    max-height: calc(100vh - 260px);
   }
 
   .page--wrapper .project--grid--table tbody th,
@@ -3502,7 +3503,7 @@ Media CSS-=-==
     height: 100%;
     overflow-y: auto;
     z-index: 1;
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
   }
 
   .details--projects--view .project--form {

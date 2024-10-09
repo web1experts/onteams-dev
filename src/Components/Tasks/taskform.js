@@ -702,9 +702,9 @@ export const TaskForm = () => {
                                                                 }));
                                                             }}
                                                             ></Form.Control>
-                                                            <ListGroup horizontal>
+                                                            <ListGroup horizontal className='task--action--buttons'>
                                                                 <ListGroup.Item key={`edit-comment-${comment._id}`} className="more--actions">
-                                                                    <Button variant='info' onClick={(e) => {
+                                                                    <Button variant='secondary' onClick={(e) => {
                                                                         setEditMessage(prev => ({
                                                                             ...prev, // Spread the previous state
                                                                             [comment._id]: {

@@ -367,6 +367,38 @@ ul#subtasks-ul .form-group {
     gap: 15px;
 }
 
+ul#subtasks-ul li {
+    border-bottom: 1px solid #dddddd;
+    margin-bottom: .5rem;
+}
+
+ul#subtasks-ul .form-group .form-control:focus, ul#subtasks-ul .form-group .form-control:focus-visible {
+    border: 0;
+    box-shadow: none;
+    outline: 0;
+}
+
+.task--action--buttons {
+    justify-content: flex-end;
+    margin: 1rem 0;
+    column-gap: 10px;
+}
+
+.task--action--buttons .more--actions {
+    border: 0;
+    padding: 0;
+}
+
+.add--member--modal form .task--action--buttons .btn {
+    color: #ffffff;
+    padding: .25rem 1rem;
+    font-size: 14px;
+}
+
+ul#subtasks-ul .form-group input[type="checkbox"]:checked + .form-control {
+    text-decoration: line-through;
+}
+
 ul#subtasks-ul .form-group button {
     border: 0;
     color: #de0606;
