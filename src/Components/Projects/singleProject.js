@@ -616,7 +616,7 @@ function SingleProject(props) {
                                 <Form.Label>
                                     <small>Workflow</small>
                                     <div className="workflow--modal" onClick={handleWorkflowShow}>
-                                        <span className="workflow--selected">{fields['workflow']?.title  ? 'Current Workflow' : 'Select'} <FaChevronDown /></span>
+                                        <span className="workflow--selected">{fields['workflow']?.title  ? 'Current Workflow' : 'Current Workflow'} <FaChevronDown /></span>
                                     </div>
                                 </Form.Label>
                             </Form.Group>
@@ -721,7 +721,7 @@ function SingleProject(props) {
                             </div>
                         </ListGroup>
                         <ListGroup className="mt-auto mb-0">
-                            <ListGroup.Item>
+                            <ListGroup.Item className="text-center">
                                 <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
                                 <Button variant="danger" key='delete-key' onClick={() => setShowDialog(true)}>Delete</Button>
                             </ListGroup.Item>

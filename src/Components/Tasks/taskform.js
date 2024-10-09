@@ -8,6 +8,7 @@ import { updateStateData, togglePopups } from '../../redux/actions/common.action
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
+import { FaPaperPlane } from "react-icons/fa";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { FilesPreviewModal } from '../modals';
@@ -498,30 +499,20 @@ export const TaskForm = () => {
                             } />
                         }
                          
-                            
+                            {typeof subtask !== 'object' ?
                                 
-                                {/* <textarea 
+                                <textarea 
                                     className="form-control" 
                                     rows="2" 
-                                    readonly={((typeof subtask === 'object') && enablesubtaskedit[subtask._id] === false || typeof subtask === 'object' && !enablesubtaskedit[subtask._id] )} 
-                                    onClick={() => {
-                                        if (typeof subtask === 'object') {
-                                            setEnableSubtakEdit({ [subtask._id]: true });
-                                        }
-                                    }}
                                     onBlur={() => {
-                                        if (typeof subtask === 'object') {
-                                            setEnableSubtakEdit({ [subtask._id]: false });
-                                        } else {
-                                            handleBlur(index);
-                                        }
+                                        handleBlur(index);
                                     }}
                                     name={`subtask-${index}`} 
                                     placeholder="Enter subtask" 
-                                    value={typeof subtask === 'object' ? subtask.title : subtask} 
+                                    value={subtask} 
                                     onChange={({ target: { value } }) => handlesubtaskChange(index, subtask, value)} 
-                                /> */}
-
+                                />
+                                    :
                                     <div
                                         className="form-control"
                                         contentEditable={typeof subtask === 'object' && enablesubtaskedit[subtask._id] === true} // Enable editing if clicked
@@ -570,7 +561,7 @@ export const TaskForm = () => {
                                             __html: typeof subtask === 'object' ? subtask.title : subtask,
                                         }} // Set subtask title as HTML content for editable div
                                     ></div>
-
+                                }
 
 
                     <button type="button"  variant="primary" onClick={() => removeSubtask(index)}>
@@ -704,48 +695,48 @@ export const TaskForm = () => {
                             </small>
 
                             
-                            <Form.Group className="mb-0 form-group">
+                            <Form.Group className="mb-0 mt-2 form-group">
                                 <Form.Label>
                                     <small>Task chat</small>
                                 </Form.Label>
                                 {
                                     currentTask && currentTask.comments && currentTask.comments.length > 0 &&
                                     <Row>
-                                        <Col sm={12} lg={6}>
+                                        <Col sm={12}>
                                         {
                                             currentTask.comments.map((comment, index) => {
                                                 if( editmessage[comment._id] && editmessage[comment._id]['show'] === true ){
                                                     return (
                                                         <>
-                                                        <Form.Control type='text' value={editmessage[comment._id].msg} onChange={(e) => {
-                                                            setEditMessage(prev => ({
-                                                                ...prev, // Spread the previous state
-                                                                [comment._id]: {
-                                                                    show: true,
-                                                                    msg: e.target.value // Update with the current input value
-                                                                }
-                                                            }));
-                                                        }}
-                                                        ></Form.Control>
-                                                        <ListGroup horizontal>
-                                                        <ListGroup.Item key={`edit-comment-${comment._id}`} className="more--actions">
-                                                            <Button variant='info' onClick={(e) => {
+                                                            <Form.Control type='text' value={editmessage[comment._id].msg} onChange={(e) => {
                                                                 setEditMessage(prev => ({
                                                                     ...prev, // Spread the previous state
                                                                     [comment._id]: {
-                                                                        show: false,
+                                                                        show: true,
                                                                         msg: e.target.value // Update with the current input value
                                                                     }
                                                                 }));
-                                                            }}>Cancel</Button>
-                                                            </ListGroup.Item>
-                                                            <ListGroup.Item key={`delete-comment-${comment?._id}`} className="more--actions">
-                                                                <Button variant='primary' onClick={() => {
-                                                                    UpdateComment(comment._id, editmessage[comment?._id]['msg'])
-                                                                    setEditMessage({[comment._id]: { show: false, msg: editmessage[comment?._id]['msg']}})
-                                                                }}>Save</Button>
-                                                            </ListGroup.Item>
-                                                        </ListGroup>
+                                                            }}
+                                                            ></Form.Control>
+                                                            <ListGroup horizontal>
+                                                                <ListGroup.Item key={`edit-comment-${comment._id}`} className="more--actions">
+                                                                    <Button variant='info' onClick={(e) => {
+                                                                        setEditMessage(prev => ({
+                                                                            ...prev, // Spread the previous state
+                                                                            [comment._id]: {
+                                                                                show: false,
+                                                                                msg: e.target.value // Update with the current input value
+                                                                            }
+                                                                        }));
+                                                                    }}>Cancel</Button>
+                                                                    </ListGroup.Item>
+                                                                    <ListGroup.Item key={`delete-comment-${comment?._id}`} className="more--actions">
+                                                                        <Button variant='primary' onClick={() => {
+                                                                            UpdateComment(comment._id, editmessage[comment?._id]['msg'])
+                                                                            setEditMessage({[comment._id]: { show: false, msg: editmessage[comment?._id]['msg']}})
+                                                                        }}>Save</Button>
+                                                                    </ListGroup.Item>
+                                                            </ListGroup>
                                                         </>
                                                     )
                                                 }else{
@@ -761,7 +752,6 @@ export const TaskForm = () => {
                                                                             <Button onClick={() => {setEditMessage({[comment._id]: {show: true, msg: comment.text}})}}>Edit message</Button>
                                                                             <Button onClick={() => handleDelteComment(comment?._id, currentTask?._id)}>Delete message</Button>
                                                                         </Dropdown.Item>
-                                                                        
                                                                     </div>
                                                                 </Dropdown.Menu>
                                                             </Dropdown>
@@ -776,16 +766,14 @@ export const TaskForm = () => {
                                 }
                                 
                                 <Row>
-                                    <Col sm={12} lg={6}>
-                                        <InputGroup className="mb-3">
+                                    <Col sm={12}>
+                                        <InputGroup className="mb-0">
                                             <Form.Control
-                                            placeholder="Message"
-                                            name="message"
-                                            onChange={handleNewComment} value={comments || ''}
+                                                placeholder="Message"
+                                                name="message"
+                                                onChange={handleNewComment} value={comments || ''}
                                             />
-                                            <Button variant="outline-secondary" id="send-message" onClick={(() => handleCommentSubmit())}>
-                                                Send
-                                            </Button>
+                                            <Button variant="outline-secondary" id="send-message" onClick={(() => handleCommentSubmit())}><FaPaperPlane /></Button>
                                         </InputGroup>
                                     </Col>
                                 </Row>

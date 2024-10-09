@@ -332,6 +332,46 @@
     border: 0;
 }
 
+.add--member--modal form .input-group {
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: 50px;
+    -webkit-border-radius: 50px;
+}
+
+.add--member--modal form .input-group #send-message {
+    background: #eeeeee;
+    border: 0;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    margin: auto .15rem auto auto;
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
+    color: #777777;
+}
+
+.add--member--modal form .input-group #send-message:hover {
+    background: #5ead9a;
+    color: #ffffff;
+}
+
+.add--member--modal form .input-group .form-control {
+    border: 0;
+}
+
+ul#subtasks-ul .form-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+ul#subtasks-ul .form-group button {
+    border: 0;
+    color: #de0606;
+    background: none;
+    box-shadow: none;
+}
+
 @media screen and (max-width:1199px) {
     .file--preview--modal .file--flex .list-group {
         max-width: 40%;

@@ -614,12 +614,12 @@ function ProjectsPage() {
                         <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table' : 'project--table'}>
                             <thead>
                                 <tr key="project-table-header">
-                                    <th scope="col" width={20} key="project-hash-header">#</th>
-                                    <th scope="col" width='25%' key="project-name-header">Project Name</th>
-                                    <th scope="col" width='25%' key="project-client-header" className="onHide">Client Name</th>
-                                    <th scope="col" width='20%' key="project-member-header" className="onHide">Assigned Members</th>
+                                    <th scope="col" width='10px' key="project-hash-header">#</th>
+                                    <th scope="col" width='20%' key="project-name-header">Project Name</th>
+                                    <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
+                                    <th scope="col" width='15%' key="project-member-header" className="onHide">Assigned Members</th>
                                     <th scope="col" key="project-status-header" className="onHide">Status</th>
-                                    <th scope="col" key="project-action-header" className="onHide text-md-end">Actions</th>
+                                    <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>

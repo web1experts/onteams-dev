@@ -13,6 +13,9 @@ import { updateStateData, togglePopups } from '../../redux/actions/common.action
 import { updateTask } from '../../redux/actions/task.action';
 import { PROJECT_FORM, EDIT_PROJECT_FORM } from '../../redux/actions/types';
 import { MdFileDownload } from "react-icons/md";
+import { CiEdit } from "react-icons/ci";
+import { MdArrowDownward } from "react-icons/md";
+import { GrDrag } from "react-icons/gr";
 import { dataObject } from '../../helpers/objectdata';
 import { useDropzone } from 'react-dropzone'
 export function AlertDialog(props) {
@@ -820,6 +823,22 @@ export const  WorkFlowModal =  (props) => {
                                       >
                                         {Object.keys(workflowModalState?.workflow).length > 0 && workflowModalState?.workflow?._id && workflowModalState?.workflow?.tabs?.length > 0 &&
                                           workflowModalState?.workflow?.tabs.map((tab, index) => (
+                                           <>
+                                           {index == 1 && (
+                                              <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0 arrow--icon'>
+                                                <MdArrowDownward />
+                                              </ListGroup.Item>
+                                            )}
+                                           {index === workflowModalState?.workflow?.tabs.length - 1 && (
+                                              <>
+                                              <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0' key={`addflow-btn`}>
+                                                <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
+                                              </ListGroup.Item>
+                                              <ListGroup.Item className='border-0 justify-content-center pt-0 pt-0 pb-0 arrow--icon'>
+                                                <MdArrowDownward />
+                                              </ListGroup.Item>
+                                              </>
+                                            )}
                                             <Draggable
                                               key={`tabitem-${index}`}
                                               draggableId={`tab-${index}-${Date.now()}`} // Unique draggableId
@@ -838,39 +857,45 @@ export const  WorkFlowModal =  (props) => {
                                                 >
                                                   {typeof tab === 'object' && tab !== null ? (
                                                     <>
-                                                    {
-                                                      index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
-                                                      <span className="delete--workstep" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
-                                                    }
-                                                    
-                                                      {tab.title}
+                                                      <span className='drag--icon'><GrDrag /></span>
+                                                      <span className='nm-b flow--circle'></span> {tab.title}
                                                       <small
+                                                        className='ms-auto'
                                                         type="button"
                                                         title={tab.title}
                                                         onClick={() => handleEditShow(index, tab.title)}
                                                       >
-                                                        Edit
+                                                        <CiEdit />
                                                       </small>
+                                                      {
+                                                      index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
+                                                        <span className="delete--workstep ms-2" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
+                                                      }
+                                                      
                                                     </>
                                                   ) : (
                                                     <>
-                                                    {
-                                                      index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
-                                                      <span className="delete--workstep" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
-                                                    }
-                                                      {tab}
+                                                      <span className='drag--icon'><GrDrag /></span>
+                                                      <span className='nm-r flow--circle'></span> {tab}
                                                       <small
+                                                        className='ms-auto'
                                                         type="button"
                                                         title="Filter"
                                                         onClick={() => handleEditShow(index, tab)}
                                                       >
-                                                        Edit
+                                                        <CiEdit />
                                                       </small>
+                                                      {
+                                                      index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
+                                                        <span className="delete--workstep ms-2" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
+                                                      }
+                                                      
                                                     </>
                                                   )}
                                                 </ListGroup.Item>
                                               )}
                                             </Draggable>
+                                            </>
                                           ))}
                                         {provided.placeholder}
                                       </ListGroup>
@@ -878,9 +903,7 @@ export const  WorkFlowModal =  (props) => {
                                   </Droppable>
                                 </DragDropContext>
 
-                                <ListGroup.Item className='ms-auto' key={`addflow-btn`}>
-                                    <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
-                                </ListGroup.Item>
+                                
                               </ListGroup>
                             </>
                         }
@@ -891,7 +914,7 @@ export const  WorkFlowModal =  (props) => {
                     <Button variant="primary" onClick={handleSelect}>Select</Button>
                 </Modal.Footer>
             </Modal>
-    <Modal show={showEdit} onHide={handleEditClose} centered size="md" className="add--workflow--modal">
+            <Modal show={showEdit} onHide={handleEditClose} centered size="md" className="add--workflow--modal">
                 <Modal.Header closeButton>
                     <Modal.Title>Edit Workstep</Modal.Title>
                 </Modal.Header>

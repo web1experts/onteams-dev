@@ -14,7 +14,7 @@ body {
   font-family: "Poppins", sans-serif;
   background: #ffffff;
   color: #454545;
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: 400;
   line-height: 1.5;
   height: 100vh;
@@ -267,6 +267,7 @@ body {
   vertical-align: middle;
   line-height: 30px;
   padding: .4rem .5rem;
+  font-weight: 400;
 }
 
 .page--wrapper table td.project--title--td span {
@@ -364,7 +365,7 @@ Collapsible Action CSS-=-=
   position: absolute;
   right: -100%;
   top: 0;
-  opacity: 0;
+  display: none;
   transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   -webkit-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   -moz-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
@@ -379,7 +380,7 @@ Collapsible Action CSS-=-=
 .view--invitee ~ .details--invitee--view {
   position: relative;
   right: 0;
-  opacity: 1;
+  display: block;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   -webkit-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -395,7 +396,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 
 .details--projects--view .project--form {
   background: #ffffff;
-  padding: 2rem 1.2rem;
+  padding: 1rem 1.2rem;
   height: calc(100% - 100px);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
@@ -434,8 +435,8 @@ button.input-error.dropdown-toggle.btn.btn-success {
 }
 
 .details--projects--view .project--form--actions .btn {
-  width: auto;
-  min-width: 220px;
+  width: 100%;
+  max-width: 220px;
 }
 
 .details--projects--view .project--form--actions .btn+.btn {
@@ -448,9 +449,9 @@ button.input-error.dropdown-toggle.btn.btn-success {
 }
 
 .details--projects--view .project--form--actions .list-group {
-  padding-bottom: 3rem;
+  padding-bottom: 0;
   display: flex;
-  max-height: calc(100vh - 220px);
+  max-height: calc(100% - 160px);
   overflow-y: auto;
 }
 
@@ -461,7 +462,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   position: absolute;
   bottom: 0;
   width: 100%;
-  background: #fff;
+  background: none
 }
 
 /* .project--form--actions .list-group:last-child .list-group-item {
@@ -568,9 +569,9 @@ button.input-error.dropdown-toggle.btn.btn-success {
 
 .wrapper--title .ListView,
 .wrapper--title .gridView {
-  background: none;
+  background: #ffffff;
   color: #7BCCB8;
-  border: 2px solid #7BCCB8;
+  border: 1px solid #7BCCB8;
 }
 
 .wrapper--title .active,
@@ -582,7 +583,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .wrapper--title .ListView:hover,
 .wrapper--title .gridView:hover,
 .wrapper--title .active:hover {
-  border: 2px solid #5ead9a;
+  border: 1px solid #5ead9a;
   background: #5ead9a;
 }
 
@@ -619,6 +620,12 @@ button.input-error.dropdown-toggle.btn.btn-success {
   cursor: pointer;
   margin-left: 0.25rem;
   margin-right: 0.25rem;
+  background: #ffffff;
+}
+
+.wrapper--title .btn--view.active {
+  background: #7BCCB8;
+  color: #ffffff;
 }
 
 .disabled-pointer {
@@ -655,10 +662,8 @@ button.input-error.dropdown-toggle.btn.btn-success {
 
 .preview--grid .preview--cell p {
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
+  display: block;
+  max-width: 250px;
   text-overflow: ellipsis;
   overflow: hidden;
 }
@@ -691,13 +696,18 @@ button.input-error.dropdown-toggle.btn.btn-success {
   margin-right: .5rem;
 }
 
-.output--file-preview .preview--grid .preview--cell .btn+.btn {
-  margin-left: 0;
-}
-
 .output--file-preview .preview--grid .preview--cell .btn {
   opacity: 0;
   margin-top: 0;
+  max-width: max-content;
+  margin: 0;
+  position: relative;
+  width: max-content;
+  bottom: auto;
+}
+
+.output--file-preview .preview--grid .preview--cell .btn+.btn {
+  margin-left: 0.5rem;
 }
 
 .output--file-preview .preview--grid .preview--cell:hover .btn {
@@ -1213,6 +1223,11 @@ table tr.active td {
   cursor: pointer;
 }
 
+.tasks-form-action .list-group-item .remove-icon {
+  width: 14px;
+  height: 14px;
+}
+
 .project--form--actions button.list-group-item, .tasks-form-action button.list-group-item {
   padding: 0;
   text-decoration: none;
@@ -1264,6 +1279,11 @@ table tr.active td {
   color: #ffffff;
   overflow: hidden;
   padding: 0;
+}
+
+.tasks-form-action .list-group-item .team--initial {
+  width: 25px;
+  height: 25px;
 }
 
 .projects--page .table .project--label {
@@ -1368,6 +1388,26 @@ Project Task View CSS=-=-=
   border-top: 10px solid darkblue;
 }
 
+.projects--grid .task--list .task--grid:nth-child(6) {
+  border-top: 8px solid rgb(193, 236, 129);
+}
+
+.projects--grid .task--list .task--grid:nth-child(7) {
+  border-top: 8px solid #f6cf87;
+}
+
+.projects--grid .task--list .task--grid:nth-child(8) {
+  border-top: 8px solid #9398f3;
+}
+
+.projects--grid .task--list .task--grid:nth-child(9) {
+  border-top: 8px solid #36c1f8;
+}
+
+.projects--grid .task--list .task--grid:nth-child(10) {
+  border-top: 10px solid rgb(245, 158, 99);
+}
+
 .projects--grid .task--list .task--grid h5 {
   display: flex;
   align-items: center;
@@ -1422,10 +1462,29 @@ Project Task View CSS=-=-=
   box-shadow: 0px 4px 5px rgba(99, 99, 99, 0.15);
   -webkit-box-shadow: 0px 4px 5px rgba(99, 99, 99, 0.15);
   border: 1px solid #00000010;
+  flex-flow: row wrap;
+}
+
+.projects--grid .task--list ul .task--button form {
+  width: 100%;
+}
+
+.projects--grid .task--list ul .task--button .form-group {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.projects--grid .task--list ul .task--button .form-group .form-floating {
+  flex: 1 1;
 }
 
 .projects--grid .task--list ul li .tasks-form-action {
-  margin-left: auto;
+  display: flex;
+  align-items: center;
+  flex: 1 1 100%;
+  max-width: 100%;
 }
 
 .projects--grid .task--list ul li:last-child {
@@ -2053,7 +2112,7 @@ pre {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 170px;
+  max-width: 180px;
   display: block;
 }
 
@@ -2905,6 +2964,12 @@ Media CSS-=-==
 ==-=-=-=-=-*/
 
 
+@media (max-width:1499px) {
+  .preview--grid .preview--cell p {
+    max-width: 110px;
+  }
+}
+
 @media screen and (max-width:1399px) {
   .main--login .login--image img {
     height: 100%;
@@ -2966,11 +3031,6 @@ Media CSS-=-==
 
   .modal-body {
     max-height: calc(100vh - 180px);
-  }
-
-  .page--wrapper table th,
-  .page--wrapper table td {
-    min-width: 160px;
   }
 
   .page--wrapper .project--grid--table tbody th,
@@ -3050,6 +3110,11 @@ Media CSS-=-==
 
   .wrapper--title {
     flex-flow: row wrap;
+  }
+
+  .details--projects--view .project--form--actions .btn+.btn {
+    margin-top: 0;
+    margin-left: 1rem;
   }
 }
 
@@ -3359,6 +3424,15 @@ Media CSS-=-==
   .projects--grid .task--list {
     height: calc(100% - 150px);
   }
+
+  .details--projects--view .project--form--actions .btn+.btn {
+    margin-top: 1rem;
+    margin-left: 0;
+  }
+
+  .output--file-preview .preview--grid .preview--cell .btn+.btn {
+    margin-top: 0;
+  }
 }
 
 @media screen and (max-width:767px) {
@@ -3416,7 +3490,7 @@ Media CSS-=-==
 
   .details--projects--view .project--form {
     height: auto;
-    padding: 2rem 1rem;
+    padding: 1rem;
   }
 
   .setting--page {
@@ -3515,5 +3589,9 @@ Media CSS-=-==
     width: max-content;
     max-width: 160px;
     margin: 0;
+  }
+
+  .details--projects--view .project--form--actions .list-group:last-child {
+    position: relative;
   }
 }
