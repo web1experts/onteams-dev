@@ -173,6 +173,7 @@
 .modal.show {
     z-index: 777777;
 }
+
 .tooltip {
     z-index: 999999;
 }
@@ -324,7 +325,8 @@
     border: 0;
 }
 
-.file--preview--modal .modal-title .btn:focus, .file--preview--modal .modal-title .btn:hover {
+.file--preview--modal .modal-title .btn:focus,
+.file--preview--modal .modal-title .btn:hover {
     background: #7BCCB8;
     color: #ffffff;
     box-shadow: none;
@@ -361,7 +363,7 @@
 
 ul#subtasks-ul .form-group {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 15px;
 }
 
@@ -372,11 +374,68 @@ ul#subtasks-ul .form-group button {
     box-shadow: none;
 }
 
+.task--message .dropdown {
+    margin-left: auto;
+}
+
+.task--message .dropdown .btn {
+    color: #ffffff;
+    padding: 0.35rem .35rem;
+    border-radius: .25rem;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task--message .dropdown .dropdown-menu {
+    right: 0;
+    margin-top: 10px;
+    padding: 0;
+    box-shadow: none;
+    background: none;
+    padding: 0;
+    min-width: max-content;
+}
+
+.task--message .dropdown .dropdown-menu::before {
+    border: 8px solid;
+    border-color: transparent transparent #7BCCB8;
+    content: "";
+    height: 0;
+    right: 5px;
+    margin: auto;
+    position: absolute;
+    top: -16px;
+    width: 0;
+}
+
+.task--message .dropdown .dropdown-item {
+    color: #454545;
+    font-weight: 400;
+    font-size: 1rem;
+    background: none;
+    border-bottom: 0;
+    display: block;
+    padding: 0;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.task--message .dropdown .dropdown-item button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border-radius: 0;
+    padding: 0.5rem .75rem;
+}
+
 @media screen and (max-width:1199px) {
     .file--preview--modal .file--flex .list-group {
         max-width: 40%;
     }
-    
+
     .file--preview--modal .file--preview {
         max-width: 60%;
     }
@@ -387,7 +446,7 @@ ul#subtasks-ul .form-group button {
         max-width: 100%;
         flex: none;
     }
-    
+
     .file--preview--modal .file--preview {
         max-width: 100%;
     }

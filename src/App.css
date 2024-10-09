@@ -616,6 +616,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   width: auto;
   height: auto;
   display: flex;
+  align-items: center;
   padding: .45rem 1.5rem;
   cursor: pointer;
   margin-left: 0.25rem;
@@ -2106,6 +2107,13 @@ pre {
 .view--invitee .table td {
   position: relative;
   line-height: 35px;
+  min-width: 210px;
+}
+
+.show--details table td:first-child,
+.view--project table td:first-child,
+.view--invitee .table td:first-child {
+  min-width: 0px;
 }
 
 .show--details .page--wrapper table .project--title--td span, .view--project .page--wrapper table .project--title--td span, .view--invitee .page--wrapper table .project--title--td span {
@@ -3445,12 +3453,20 @@ Media CSS-=-==
   }
 
   .team--page .page--title h2,
-  .wrapper--title {
+  .wrapper--title h3 {
     padding-left: 1rem;
   }
 
   .rounded--box {
     height: auto;
+  }
+
+  .wrapper--title .btn--view {
+    padding: .35rem 1rem;
+  }
+
+  .wrapper--title h3 {
+    min-height: 0;
   }
 }
 
@@ -3486,6 +3502,7 @@ Media CSS-=-==
     height: 100%;
     overflow-y: auto;
     z-index: 1;
+    padding-bottom: 2rem;
   }
 
   .details--projects--view .project--form {
@@ -3593,5 +3610,10 @@ Media CSS-=-==
 
   .details--projects--view .project--form--actions .list-group:last-child {
     position: relative;
+  }
+
+  .dashboard--page .btn--group {
+    flex-flow: column wrap;
+    align-items: stretch;
   }
 }

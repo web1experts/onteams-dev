@@ -491,7 +491,8 @@ export const TaskForm = () => {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                ><Form.Group className="mb-0 form-group" key={`subtask-${index}`}>
+                >
+                    <Form.Group className="mb-0 form-group pb-0" key={`subtask-${index}`}>
                         {
                             (typeof subtask === 'object' ) &&
                             <input type='checkbox' onChange={(e) => {updateSubtask(e.target.checked, index)}} checked={
@@ -505,7 +506,9 @@ export const TaskForm = () => {
                                     className="form-control" 
                                     rows="2" 
                                     onBlur={() => {
+                                        
                                         handleBlur(index);
+                                        
                                     }}
                                     name={`subtask-${index}`} 
                                     placeholder="Enter subtask" 
@@ -552,7 +555,7 @@ export const TaskForm = () => {
                                         style={{
                                             cursor: enablesubtaskedit[subtask._id] ? 'text' : 'pointer', // Change cursor when editable
                                             border: enablesubtaskedit[subtask._id] ? '1px solid #ccc' : 'none', // Indicate editability with border
-                                            padding: '0.5rem',
+                                            padding: '0.5rem 0',
                                             minHeight: '2rem',
                                             overflowWrap: 'break-word', // Ensure long words wrap
                                         }}
@@ -567,7 +570,7 @@ export const TaskForm = () => {
                     <button type="button"  variant="primary" onClick={() => removeSubtask(index)}>
                         <FaRegTrashAlt />
                     </button>
-                </Form.Group>
+                    </Form.Group>
                 </li>
                 )}
                 </Draggable>
@@ -662,9 +665,9 @@ export const TaskForm = () => {
                                 </Row>
                             </Form.Group>
 
-                            <Form.Group className="mb-0 form-group">
+                            <Form.Group className="mb-0 form-group pb-0">
                                 <Form.Label className="w-100 m-0">
-                                    <strong>Subtasks</strong>
+                                    <small>Subtasks</small>
                                 </Form.Label>
                             </Form.Group>
                             
@@ -695,8 +698,8 @@ export const TaskForm = () => {
                             </small>
 
                             
-                            <Form.Group className="mb-0 mt-2 form-group">
-                                <Form.Label>
+                            <Form.Group className="mb-0 mt-3 form-group">
+                                <Form.Label className="w-100 m-0">
                                     <small>Task chat</small>
                                 </Form.Label>
                                 {
@@ -741,7 +744,7 @@ export const TaskForm = () => {
                                                     )
                                                 }else{
                                                     return (
-                                                        <p key={`comment-${comment._id}`}>{comment.text} 
+                                                        <p className='d-flex align-items-center task--message' key={`comment-${comment._id}`}>{comment.text} 
                                                             <Dropdown>
                                                                 <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
                                                                     <FaEllipsisV />
