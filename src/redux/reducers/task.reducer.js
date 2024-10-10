@@ -13,7 +13,9 @@ import {
     CLEAR_MESSAGES,
     CREATE_POST_LIST_COMMENT,
     CURRENT_TASK,
-    DELETE_COMMENT
+    DELETE_COMMENT,
+    TASK_REORDER_ERROR,
+    TASK_REORDER
 
 } from "../actions/types";
     
@@ -84,6 +86,14 @@ import {
             return{
                 message: action.payload,
                 message_variant: 'danger',
+            }
+        case TASK_REORDER:
+            return {
+                success: 'success'
+            }
+        case TASK_REORDER_FAILED:
+            return{
+                success: 'fail'
             }
         case TASK_COMMON_ERROR: 
             return {
