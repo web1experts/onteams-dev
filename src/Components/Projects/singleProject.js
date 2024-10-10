@@ -485,10 +485,10 @@ function SingleProject(props) {
                         
                         {fields['members'] && Object.keys(fields.members).length > 0 && (
                             <>
-                                {Object.entries(fields.members).slice(0, 3).map(([id, name], memberindex) => (
+                                {Object.entries(fields.members).slice(0, 5).map(([id, name], memberindex) => (
                                     <ListGroup.Item action key={`member-${memberindex}`}>
                                         <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
-                                            <span className="team--initial nm-k">{name?.substring(0, 1)}</span>
+                                            <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
                                         </MemberInitials>
                                         <span
                                             className="remove-icon"
@@ -499,7 +499,7 @@ function SingleProject(props) {
                                         </span>
                                     </ListGroup.Item>
                                 ))}
-                                {Object.keys(fields.members).length > 3 && (
+                                {Object.keys(fields.members).length > 5 && (
                                     <ListGroup.Item key={`more-member-${currentProject?._id}`} className="more--member">
                                         <Dropdown>
                                             <Dropdown.Toggle variant="primary">
@@ -507,11 +507,11 @@ function SingleProject(props) {
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
                                                 <div className="over--scroll">
-                                                    {Object.entries(fields.members).slice(3).map(([id, name], memberindex) => (
+                                                    {Object.entries(fields.members).slice(5).map(([id, name], memberindex) => (
                                                         <Dropdown.Item key={`dropdown-member-${memberindex}`}>
                                                             <ListGroup.Item action key={`action-${currentProject?._id}`}>
                                                                 <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
-                                                                    <span className="team--initial nm-s">{name?.substring(0, 1)}</span>
+                                                                    <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
                                                                 </MemberInitials>
                                                                 <span
                                                                     className="remove-icon"
@@ -664,7 +664,7 @@ function SingleProject(props) {
                                         {Object.entries(fields.members).slice(0, 3).map(([id, name], memberindex) => (
                                             <ListGroup.Item action key={`member-${memberindex}`}>
                                                 <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
-                                                    <span className="team--initial nm-k">{name?.substring(0, 1)}</span>
+                                                    <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
                                                 </MemberInitials>
                                                 <span
                                                     className="remove-icon"
@@ -687,7 +687,7 @@ function SingleProject(props) {
                                                                 <Dropdown.Item key={`dropdown-member-${memberindex}`}>
                                                                     <ListGroup.Item action key={`action-${currentProject?._id}`}>
                                                                         <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
-                                                                            <span className="team--initial nm-s">{name?.substring(0, 1)}</span>
+                                                                            <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
                                                                         </MemberInitials>
                                                                         <span
                                                                             className="remove-icon"

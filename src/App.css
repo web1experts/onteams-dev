@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500&display=swap');
 
 * {
   margin: 0;
@@ -15,7 +15,7 @@ body {
   background: #ffffff;
   color: #454545;
   font-size: 15px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.5;
   height: 100vh;
 }
@@ -267,7 +267,7 @@ body {
   vertical-align: middle;
   line-height: 30px;
   padding: .4rem .5rem;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .page--wrapper table th abbr, .page--wrapper table td abbr {
@@ -379,6 +379,16 @@ Collapsible Action CSS-=-=
   -moz-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   z-index: 2;
   height: 100%;
+}
+
+.details--wrapper .loading-bar,
+.details--projects--grid .loading-bar,
+.details--projects--view .loading-bar,
+.details--member--view .loading-bar,
+.details--invitee--view .loading-bar {
+  position: absolute;
+  width: 100%;
+  left: 0;
 }
 
 .show--details ~ .details--wrapper,
@@ -599,19 +609,25 @@ button.input-error.dropdown-toggle.btn.btn-success {
   font-size: 1.5rem;
   margin: 0;
   font-weight: 600;
-  max-width: 300px;
-  min-width: 300px;
   min-height: 50px;
-  overflow: hidden;
+  flex: 1 1;
+  max-width: 20%;
+}
+
+.wrapper--title h3 strong {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: hidden;
 }
 
 .wrapper--title h3 span {
   display: block;
   font-size: 70%;
   color: #5ead9a;
-  font-weight: 400;
+  font-weight: 500;
   min-height: 20px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -625,7 +641,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   height: auto;
   display: flex;
   align-items: center;
-  padding: .45rem 1.5rem;
+  padding: .45rem 1rem;
   cursor: pointer;
   margin-left: 0.25rem;
   margin-right: 0.25rem;
@@ -893,7 +909,7 @@ table tr.active td {
   display: block;
   width: 100%;
   font-size: 15px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.5;
   color: var(--bs-body-color);
   appearance: none;
@@ -914,7 +930,7 @@ table tr.active td {
   padding: .5rem 3rem .5rem 1rem;
   display: block;
   font-size: 15px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.5;
   color: var(--bs-body-color);
   appearance: none;
@@ -1149,6 +1165,7 @@ table tr.active td {
   width: auto;
   position: relative;
   background: none;
+  margin-right: -13px;
 }
 
 .projects--page .table .more--member .dropdown-menu, .project--form--actions .more--member .dropdown-menu, .wrapper--title .members--list .dropdown-menu {
@@ -1227,9 +1244,9 @@ table tr.active td {
   right: 0;
   transform: translate(6px, -3px);
   top: 0;
-  border: 1px solid #ffffff;
-  width: 16px;
-  height: 16px;
+  border: 0;
+  width: 15px;
+  height: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1240,11 +1257,44 @@ table tr.active td {
   font-weight: 600;
   font-size: .55rem;
   cursor: pointer;
+  opacity: 0;
+  z-index: 111;
+}
+
+.projects--page .table .list-group-item:hover .remove-icon,
+.project--form--actions .list-group-item:hover .remove-icon,
+.tasks-form-action .list-group-item:hover .remove-icon,
+.wrapper--title .members--list .list-group-item:hover .remove-icon {
+  opacity: 1;
+}
+
+.tooltip {
+  position: fixed !important;
 }
 
 .tasks-form-action .list-group-item .remove-icon {
   width: 14px;
   height: 14px;
+  display: none;
+}
+
+.projects--grid .task--list ul li .tasks-form-action p {
+  display: flex;
+  align-items: center;
+}
+
+.projects--grid .task--list ul li .tasks-form-action p  .more--member {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333333;
+  font-size: 12px;
+  letter-spacing: -1px;
+  color: #ffffff;
+  border-radius: 100px;
+  border: 1px solid #ffffff;
 }
 
 .project--form--actions button.list-group-item, .tasks-form-action button.list-group-item {
@@ -1255,10 +1305,7 @@ table tr.active td {
   display: inline-block;
   background: none;
   margin-bottom: 0;
-}
-
-.project--form--actions button.list-group-item+button.list-group-item, .tasks-form-action button.list-group-item+button.list-group-item {
-  margin-left: .5rem;
+  margin-right: -5px;
 }
 
 .project--form--actions .more--member {
@@ -1298,6 +1345,7 @@ table tr.active td {
   color: #ffffff;
   overflow: hidden;
   padding: 0;
+  border: 1px solid #ffffff;
 }
 
 .tasks-form-action .list-group-item .team--initial {
@@ -1573,13 +1621,19 @@ Project Task View CSS=-=-=
   -webkit-box-shadow: none;
 }
 
+.wrapper--title .members--list .list-group-item:first-child {
+  margin-right: 0;
+  border: 0;
+}
+
 .wrapper--title .members--list .list-group-item {
   background: none;
-  margin-left: 0.25rem;
-  border: 0;
+  margin-left: 0;
+  margin-right: -5px;
   color: #333333;
   width: auto;
   height: auto;
+  border: 1px solid #ffffff;
 }
 
 .wrapper--title .members--list .list-group-item .team--initial,
@@ -1595,6 +1649,25 @@ Project Task View CSS=-=-=
   color: #ffffff;
   overflow: hidden;
   padding: 0;
+}
+
+.wrapper--title .members--list .more--member, .projects--page .table .more--member {
+  width: 40px;
+  height: 40px;
+  background: #999999;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.projects--page .table .more--member {
+  width: 35px;
+  height: 35px
 }
 
 .accordion {
@@ -1653,7 +1726,7 @@ Project Task View CSS=-=-=
 .accordion .accordion-button.collapsed {
   color: #333333;
   background: #ffffff;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .accordion .accordion-body {
@@ -1772,7 +1845,7 @@ Project Task View CSS=-=-=
   display: block;
   color: #888888;
   font-size: 90%;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -1805,7 +1878,7 @@ Project Task View CSS=-=-=
 
 .daily--reports .accordion label {
   display: inline-flex;
-  font-weight: 400;
+  font-weight: 500;
   margin: 0;
   background: #28666a0f;
   padding: 0.2rem 0.5rem;
@@ -2387,7 +2460,7 @@ pre {
   border-bottom: 1px solid #89ccb830;
   padding: .85rem 1.5rem;
   color: #89ccb8;
-  font-weight: 400;
+  font-weight: 500;
   text-transform: capitalize;
 }
 
@@ -2620,7 +2693,7 @@ pre {
 
 .onteamsio--page .dropdown .dropdown-item {
   color: #454545;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 1rem;
   background: none;
   border-bottom: 1px solid #7bccb840;
@@ -2638,7 +2711,7 @@ pre {
   color: #ffffff;
   display: inline-flex;
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 500;
   height: 2.2rem;
   justify-content: center;
   margin-right: .5rem;
@@ -3026,10 +3099,8 @@ Media CSS-=-==
 
 @media screen and (max-width:1199px) {
   .wrapper--title h3 {
-    font-size: 1rem;
-    min-height: 30px;
+    max-width: 50%;
   }
-
   .wrapper--title .btn--view {
     padding: .35rem 1rem;
   }
@@ -3161,10 +3232,6 @@ Media CSS-=-==
 @media screen and (max-width:992px) {
   .common--form {
     padding: 2rem;
-  }
-
-  .wrapper--title h3 {
-    min-width: fit-content
   }
 
   .page--title .list-group {
@@ -3489,6 +3556,15 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:767px) {
+  .wrapper--title h3 {
+    max-width: 100%;
+    flex: 1 1 100%;
+    margin-bottom: .75rem;
+  }
+
+  .wrapper--title h3 span {
+    display: none;
+  }
 
   .holiday--table tbody tr,
   .project--table tbody tr,
@@ -3497,17 +3573,13 @@ Media CSS-=-==
     max-width: calc(50% - 8px);
   }
 
-  .team--page .page--title h2,
-  .wrapper--title h3 {
-    padding-left: 1rem;
-  }
-
   .rounded--box {
     height: auto;
   }
 
   .wrapper--title .btn--view {
-    padding: .35rem 1rem;
+    padding: .15rem .75rem;
+    font-size: 13px;
   }
 
   .wrapper--title h3 {
@@ -3520,6 +3592,10 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:575px) {
+  .team--page .page--title h2,
+  .wrapper--title h3 {
+    padding-left: 1rem;
+  }
 
   .show--details,
   .view--project {

@@ -306,7 +306,6 @@ const TasksList = React.memo((props) => {
                                                                             <>
                                                                                 <span className="subtask-count" key={`subtask-count-${task._id}`}>
                                                                                     <TiInputChecked />
-                                                                                    {/* Calculate completed subtasks */}
                                                                                     {task.subtasks.filter(subtask => subtask.status === true).length} / {task.subtasks.length}
                                                                                 </span>
                                                                             </>
@@ -318,13 +317,18 @@ const TasksList = React.memo((props) => {
                                                                                 <ListGroup.Item action key={`key-member-${index}`}>
                                                                                     {/* Assuming `member` is an object with a `name` or `title` */}
                                                                                     <MemberInitials title={member.name || member} id={`assign_member-${index}`}>
-                                                                                        <span className="team--initial nm-k">{(member.name || member)?.charAt(0)}</span>
+                                                                                        <span className={`team--initial nm-${member.name.charAt(0).toLowerCase()}`}>{(member.name || member)?.charAt(0).toUpperCase()}</span>
                                                                                     </MemberInitials>
                                                                                     <span className="remove-icon" onClick={(e) => { e.stopPropagation(); removeMember(member._id, task) }}>
                                                                                         <MdOutlineClose />
                                                                                     </span>
                                                                                 </ListGroup.Item>
                                                                             ))
+                                                                        )}
+                                                                        {task?.members.length > 3 && (
+                                                                            <ListGroup.Item key={`more-member-${task._id}`} className="more--member">
+                                                                                <span>+{task.members.slice(3).length}</span>
+                                                                            </ListGroup.Item>
                                                                         )}
                                                                     </p>
                                                                 </div>
