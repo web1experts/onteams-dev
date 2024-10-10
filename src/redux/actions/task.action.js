@@ -13,6 +13,8 @@ import {
     GET_SINGLE_TASK_SUCCESS,
     GET_SINGLE_TASK_FAILED,
     TASK_COMMON_ERROR,
+    TASK_REORDER_ERROR,
+    TASK_REORDER
 } from "./types";
 
 const config = {
@@ -80,9 +82,9 @@ export const reorderTasks  = (payload) => {
       try {
         const response = await API.apiPutUrl('task', `/reorder`, payload);
         if(response.data && response.data.success){
-          await dispatch({ type: PUT_TASK_SUCCESS, payload: response.data});
+          await dispatch({ type: TASK_REORDER, payload: response.data});
         } else {
-          await dispatch({ type: PUT_TASK_FAILED, payload: response.data.message });
+          await dispatch({ type: TASK_REORDER_ERROR, payload: response.data.message });
         }
       } catch (error) {
         errorRequest(error, dispatch);
