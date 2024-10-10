@@ -91,9 +91,9 @@ import {
             return {
                 success: 'success'
             }
-        case TASK_REORDER_FAILED:
+        case TASK_REORDER_ERROR:
             return{
-                success: 'fail'
+                success: 'success'
             }
         case TASK_COMMON_ERROR: 
             return {
