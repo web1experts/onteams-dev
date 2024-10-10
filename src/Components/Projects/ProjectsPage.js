@@ -617,7 +617,7 @@ function ProjectsPage() {
                                     {/* <th scope="col" width={20} key="project-hash-header">#</th> */}
                                     <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Project Name</th>
                                     <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
-                                    <th scope="col" width='15%' key="project-member-header" className="onHide">Assigned Members</th>
+                                    <th scope="col" width='30%' key="project-member-header" className="onHide">Assigned Members</th>
                                     <th scope="col" key="project-status-header" className="onHide">Status</th>
                                     <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
                                 </tr>
@@ -637,38 +637,21 @@ function ProjectsPage() {
                                                             {
                                                                 project.members && project.members.length > 0 && (
                                                                     <>
-                                                                        {project.members.slice(0, 3).map((member, memberindex) => {
+                                                                        {project.members.slice(0, 5).map((member, memberindex) => {
                                                                             return (
                                                                                 <ListGroup.Item action key={`member-${memberindex}`}>
                                                                                     <MemberInitials title={member.name} id={`member-${member._id}`}>
-                                                                                        <span className="team--initial nm-k">{member.name?.substring(0, 1)}</span>
+                                                                                        <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>{member.name?.substring(0, 1).toUpperCase()}</span>
                                                                                     </MemberInitials>
 
                                                                                     <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
                                                                                 </ListGroup.Item>
                                                                             );
                                                                         })}
-                                                                        {project.members.length > 3 && (
+                                                                        {project.members.length > 5 && (
                                                                             <ListGroup.Item key={`more-member-${project._id}`} className="more--member">
-                                                                                <Dropdown>
-                                                                                    <Dropdown.Toggle variant="primary" id={`toogle-btn-${project._id}`}>
-                                                                                        <FaEllipsisV />
-                                                                                    </Dropdown.Toggle>
-                                                                                    <Dropdown.Menu>
-                                                                                        <div className="over--scroll">
-                                                                                            {project.members.slice(3).map((member, memberindex) => (
-                                                                                                <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                                                                                                    <ListGroup.Item action key={`action-${project._id}`}>
-                                                                                                        <MemberInitials title={member.name} id={`member-${member._id}`}>
-                                                                                                            <span className="team--initial nm-s">{member.name?.substring(0, 1)}</span>
-                                                                                                        </MemberInitials>
-                                                                                                        <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
-                                                                                                    </ListGroup.Item>
-                                                                                                </Dropdown.Item>
-                                                                                            ))}
-                                                                                        </div>
-                                                                                    </Dropdown.Menu>
-                                                                                </Dropdown>
+                                                                                <span className="d-none d-xl-block">+{project.members.slice(5).length}</span>
+                                                                                <span className="d-block d-xl-none">+{project.members.slice(3).length}</span>
                                                                             </ListGroup.Item>
                                                                         )}
                                                                     </>
@@ -719,45 +702,31 @@ function ProjectsPage() {
             </div>
             <div className="details--projects--grid projects--grid">
                 <div className="wrapper--title">
-                    <h3 className="projecttitle">{currentProject?.title}
+                    <h3 className="projecttitle">
+                        <strong>{currentProject?.title}</strong>
                         <span>{currentProject?.client?.name}</span>
                     </h3>
-                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 ms-xl-5">
+                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 ms-xl-auto">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
                             (currentProject?.members && currentProject?.members.length > 0) &&
-                            currentProject.members.slice(0, 3).map((member, memberindex) => {
+                            currentProject.members.slice(0, 5).map((member, memberindex) => {
+                            const additionalClass = (memberindex === 2 || memberindex === 3 || memberindex === 4) ? 'd-none d-xxl-block' : '';
                                 return (
-                                    <ListGroup.Item action key={`member${memberindex}`}>
+                                    <ListGroup.Item action key={`member${memberindex}`} className={additionalClass}>
                                         <MemberInitials title={member.name} id={`current_member-${member._id}`}>
-                                            <span className="team--initial nm-k">{member.name?.substring(0, 1)}</span>
+                                            <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>{member.name?.substring(0, 1).toUpperCase()}</span>
                                         </MemberInitials>
                                         <span className="remove-icon" id={`remove-member-${currentProject._id}-${member._id}`} onClick={(event) => handleRemoveMember(currentProject, member._id ? member._id : '', `remove-member-${currentProject._id}-${member._id}`)}><MdOutlineClose /></span>
                                     </ListGroup.Item>
                                 )
                             })
                         }
-                        {currentProject?.members && currentProject.members.length > 3 && (
+                       
+                        {currentProject?.members && currentProject.members.length > 5 && (
                                 <ListGroup.Item key={`more-member-${currentProject._id}`} className="more--member">
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentProject._id}`}>
-                                            <FaEllipsisV />
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            <div className="over--scroll">
-                                                {currentProject.members.slice(3).map((member, memberindex) => (
-                                                    <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                                                        <ListGroup.Item action key={`action-${currentProject._id}`}>
-                                                            <MemberInitials title={member.name} id={`member-${member._id}`}>
-                                                                <span className="team--initial nm-s">{member.name?.substring(0, 1)}</span>
-                                                            </MemberInitials>
-                                                            <span className="remove-icon" id={`member--${currentProject._id}-${member._id}`} onClick={(event) => handleRemoveMember(currentProject, member._id ? member._id : '', `member--${currentProject._id}-${member._id}`)}><MdOutlineClose /></span>
-                                                        </ListGroup.Item>
-                                                    </Dropdown.Item>
-                                                ))}
-                                            </div>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
+                                    <span className="d-none d-xxl-block">+{currentProject.members.slice(5).length}</span>
+                                    <span className="d-block d-xxl-none">+{currentProject.members.slice(2).length}</span>
                                 </ListGroup.Item>
                             )}
                         <ListGroup.Item className="add--member" key="addmember">
@@ -865,7 +834,7 @@ function ProjectsPage() {
                                         Object.entries(fields['members']).map(([key, value]) => (
                                             <ListGroup.Item action key={`key-member-${key}`}>
                                                 <MemberInitials title={value} id={`assign_member-${key}`}>
-                                                    <span className="team--initial nm-k">{value?.charAt(0)}</span>
+                                                    <span className={`team--initial nm-${value?.charAt(0).toLowerCase()}`}>{value?.charAt(0).toUpperCase()}</span>
                                                 </MemberInitials>
                                                 <span className="remove-icon" onClick={() => removeMember(key)}>
                                                     <MdOutlineClose />

@@ -369,7 +369,7 @@ ul#subtasks-ul .form-group {
 
 ul#subtasks-ul li {
     border-bottom: 1px solid #dddddd50;
-    margin-bottom: .5rem;
+    margin-bottom: 0;
 }
 
 ul#subtasks-ul .form-group .form-control:focus, ul#subtasks-ul .form-group .form-control:focus-visible {
@@ -394,6 +394,10 @@ ul#subtasks-ul .form-group .form-control:focus, ul#subtasks-ul .form-group .form
     color: #ffffff;
     padding: .25rem 1rem;
     font-size: 14px;
+}
+
+ul#subtasks-ul {
+    margin-bottom: .5rem;
 }
 
 ul#subtasks-ul .form-group input[type="checkbox"]:checked + .form-control {
@@ -421,6 +425,19 @@ ul#subtasks-ul .form-group button:hover {
 
 ul#subtasks-ul .form-group:hover button {
     opacity: 1;
+}
+
+ul#subtasks-ul li textarea.form-control {
+    border: 0;
+    padding: 0;
+    padding-top: .5rem;
+    resize: none;
+    box-shadow: none;
+    height: 35px;
+}
+
+ul#subtasks-ul li textarea.form-control+button {
+    display: none;
 }
 
 .task--message {

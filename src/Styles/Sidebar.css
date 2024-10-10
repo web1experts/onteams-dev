@@ -115,7 +115,7 @@ Sidebar CSS-=-=
 
 .navbar-brand .dropdown .dropdown-item {
   color: #454545;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 1rem;
   background: none;
   border-bottom: 1px solid #7bccb840;
@@ -148,7 +148,7 @@ Sidebar CSS-=-=
   color: #ffffff;
   display: inline-flex;
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 500;
   height: 2.2rem;
   justify-content: center;
   margin-right: .5rem;
@@ -202,8 +202,8 @@ Sidebar CSS-=-=
 }
 
 .navbar-light .navbar-nav .nav-link {
-  color: #454545;
-  font-weight: 400;
+  color: #333333;
+  font-weight: 500;
   font-size: 14px;
   padding: 1.5rem 1.25rem;
   text-align: center;
@@ -261,7 +261,7 @@ Sidebar CSS-=-=
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 400;
+  font-weight: 500;
   height: 3.75rem;
   left: 1.5625rem;
   padding: .625rem;
