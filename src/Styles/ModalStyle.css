@@ -368,7 +368,7 @@ ul#subtasks-ul .form-group {
 }
 
 ul#subtasks-ul li {
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd50;
     margin-bottom: .5rem;
 }
 
@@ -380,13 +380,14 @@ ul#subtasks-ul .form-group .form-control:focus, ul#subtasks-ul .form-group .form
 
 .task--action--buttons {
     justify-content: flex-end;
-    margin: 1rem 0;
+    margin: .5rem 0 0;
     column-gap: 10px;
 }
 
 .task--action--buttons .more--actions {
     border: 0;
     padding: 0;
+    background: none;
 }
 
 .add--member--modal form .task--action--buttons .btn {
@@ -399,11 +400,42 @@ ul#subtasks-ul .form-group input[type="checkbox"]:checked + .form-control {
     text-decoration: line-through;
 }
 
+#subtasks-ul .form-group .form-control:focus, #subtasks-ul .form-group .form-control:focus-visible, #subtasks-ul .form-group .form-control:focus-within {
+    outline: none;
+    border: 0;
+    box-shadow: none;
+}
+
 ul#subtasks-ul .form-group button {
     border: 0;
-    color: #de0606;
+    color: #99998E;
     background: none;
     box-shadow: none;
+    font-size: 14px;
+    opacity: 0;
+}
+
+ul#subtasks-ul .form-group button:hover {
+    color: #de0606;
+}
+
+ul#subtasks-ul .form-group:hover button {
+    opacity: 1;
+}
+
+.task--message {
+    margin-bottom: 0;
+}
+
+.task--message+.task--message {
+    border-top: 1px solid #dddddd50;
+    margin: 0;
+    margin-top: .5rem;
+    padding-top: .5rem;
+}
+
+.task--message:last-child {
+    margin-bottom: 1rem;
 }
 
 .task--message .dropdown {
@@ -418,6 +450,11 @@ ul#subtasks-ul .form-group button {
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+}
+
+.task--message:hover .btn {
+    opacity: 1;
 }
 
 .task--message .dropdown .dropdown-menu {
@@ -461,6 +498,13 @@ ul#subtasks-ul .form-group button {
     text-align: left;
     border-radius: 0;
     padding: 0.5rem .75rem;
+}
+
+.message--edit {
+    background: #6fccb81a;
+    padding: .5rem;
+    border-radius: 0.5rem;
+    margin: .5rem 0 .75rem;
 }
 
 @media screen and (max-width:1199px) {

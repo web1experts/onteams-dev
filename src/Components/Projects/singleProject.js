@@ -506,22 +506,24 @@ function SingleProject(props) {
                                                 <FaEllipsisV />
                                             </Dropdown.Toggle>
                                             <Dropdown.Menu>
-                                                {Object.entries(fields.members).slice(3).map(([id, name], memberindex) => (
-                                                    <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                                                        <ListGroup.Item action key={`action-${currentProject?._id}`}>
-                                                            <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
-                                                                <span className="team--initial nm-s">{name?.substring(0, 1)}</span>
-                                                            </MemberInitials>
-                                                            <span
-                                                                className="remove-icon"
-                                                                id={`member-${currentProject?._id}-${id}`}
-                                                                onClick={() => removeMember(id)}
-                                                            >
-                                                                <MdOutlineClose />
-                                                            </span>
-                                                        </ListGroup.Item>
-                                                    </Dropdown.Item>
-                                                ))}
+                                                <div className="over--scroll">
+                                                    {Object.entries(fields.members).slice(3).map(([id, name], memberindex) => (
+                                                        <Dropdown.Item key={`dropdown-member-${memberindex}`}>
+                                                            <ListGroup.Item action key={`action-${currentProject?._id}`}>
+                                                                <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
+                                                                    <span className="team--initial nm-s">{name?.substring(0, 1)}</span>
+                                                                </MemberInitials>
+                                                                <span
+                                                                    className="remove-icon"
+                                                                    id={`member-${currentProject?._id}-${id}`}
+                                                                    onClick={() => removeMember(id)}
+                                                                >
+                                                                    <MdOutlineClose />
+                                                                </span>
+                                                            </ListGroup.Item>
+                                                        </Dropdown.Item>
+                                                    ))}
+                                                </div>
                                             </Dropdown.Menu>
                                         </Dropdown>
                                     </ListGroup.Item>
@@ -532,7 +534,7 @@ function SingleProject(props) {
                             <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
                         </ListGroup.Item>
                     </ListGroup>
-                    <ListGroup horizontal>
+                    <ListGroup horizontal className="ms-auto">
                         <Button variant="outline-primary" className="btn--view" onClick={() => props.closeview(1)}>Tasks</Button>
                         <Button variant="outline-primary" className="active btn--view" onClick={() => setIsActive(2)}>View</Button>
                         <ListGroup.Item key={`closekey`} onClick={() => props.closeview(0)}><MdOutlineClose /></ListGroup.Item>
@@ -680,22 +682,24 @@ function SingleProject(props) {
                                                         <FaEllipsisV />
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
-                                                        {Object.entries(fields.members).slice(3).map(([id, name], memberindex) => (
-                                                            <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                                                                <ListGroup.Item action key={`action-${currentProject?._id}`}>
-                                                                    <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
-                                                                        <span className="team--initial nm-s">{name?.substring(0, 1)}</span>
-                                                                    </MemberInitials>
-                                                                    <span
-                                                                        className="remove-icon"
-                                                                        id={`member-${currentProject?._id}-${id}`}
-                                                                        onClick={() => removeMember(id)}
-                                                                    >
-                                                                        <MdOutlineClose />
-                                                                    </span>
-                                                                </ListGroup.Item>
-                                                            </Dropdown.Item>
-                                                        ))}
+                                                        <div className="over--scroll">
+                                                            {Object.entries(fields.members).slice(3).map(([id, name], memberindex) => (
+                                                                <Dropdown.Item key={`dropdown-member-${memberindex}`}>
+                                                                    <ListGroup.Item action key={`action-${currentProject?._id}`}>
+                                                                        <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
+                                                                            <span className="team--initial nm-s">{name?.substring(0, 1)}</span>
+                                                                        </MemberInitials>
+                                                                        <span
+                                                                            className="remove-icon"
+                                                                            id={`member-${currentProject?._id}-${id}`}
+                                                                            onClick={() => removeMember(id)}
+                                                                        >
+                                                                            <MdOutlineClose />
+                                                                        </span>
+                                                                    </ListGroup.Item>
+                                                                </Dropdown.Item>
+                                                            ))}
+                                                        </div>
                                                     </Dropdown.Menu>
                                                 </Dropdown>
                                             </ListGroup.Item>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, ListGroup, Accordion, Form, FloatingLabel } from "react-bootstrap";
-import { FaPlus, FaPlay, FaPause, FaRegTimesCircle } from "react-icons/fa";
+import { Button, ListGroup, Accordion, Form, FloatingLabel, Dropdown } from "react-bootstrap";
+import { FaPlus, FaPlay, FaPause, FaRegTimesCircle, FaEllipsisV } from "react-icons/fa";
 import { TASK_FORM, RESET_FORMS, TASK_FORM_TYPE, ACTIVE_FORM_TYPE, CURRENT_TASK } from "../../redux/actions/types";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 import { ListTasks, updateTask, createTask, reorderTasks } from "../../redux/actions/task.action";
@@ -313,8 +313,8 @@ const TasksList = React.memo((props) => {
                                                                         )
                                                                     }
                                                                     <p className="m-0 ms-auto">
-                                                                        {task.members && task.members.length > 0 && (
-                                                                            task.members.map((member, index) => (
+                                                                        {task?.members && task?.members.length > 0 && (
+                                                                            task.members.slice(0, 3).map((member, index) => (
                                                                                 <ListGroup.Item action key={`key-member-${index}`}>
                                                                                     {/* Assuming `member` is an object with a `name` or `title` */}
                                                                                     <MemberInitials title={member.name || member} id={`assign_member-${index}`}>
