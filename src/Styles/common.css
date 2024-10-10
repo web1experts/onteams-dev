@@ -161,6 +161,12 @@ fieldset:disabled .btn {
   box-shadow: none;
 }
 
+input[type="checkbox"] {
+  accent-color: paleturquoise;
+  height: 18px;
+  width: 18px;
+}
+
 /*-=-==-=
 Login Forms CSS-=-=
 -=-=-=-=*/

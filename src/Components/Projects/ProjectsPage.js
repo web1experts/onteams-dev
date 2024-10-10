@@ -614,8 +614,8 @@ function ProjectsPage() {
                         <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table' : 'project--table'}>
                             <thead>
                                 <tr key="project-table-header">
-                                    <th scope="col" width={20} key="project-hash-header">#</th>
-                                    <th scope="col" width='20%' key="project-name-header">Project Name</th>
+                                    {/* <th scope="col" width={20} key="project-hash-header">#</th> */}
+                                    <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Project Name</th>
                                     <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
                                     <th scope="col" width='15%' key="project-member-header" className="onHide">Assigned Members</th>
                                     <th scope="col" key="project-status-header" className="onHide">Status</th>
@@ -629,8 +629,8 @@ function ProjectsPage() {
 
                                             return (<>
                                                 <tr key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
-                                                    <td key={`index-${index}`}>{index + 1} </td>
-                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span>{project.title}</span></td>
+                                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}</abbr> {project.title}</span></td>
                                                     <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
                                                     <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
                                                         <ListGroup horizontal>
@@ -764,10 +764,10 @@ function ProjectsPage() {
                             <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
                         </ListGroup.Item>
                     </ListGroup>
-                    <ListGroup horizontal className="ms-auto ms-xl-0 mt-3 mt-xl-0">
+                    <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
                         <Button variant="outline-primary" className="active btn--view" onClick={() => { setIsActive(1); }}>Tasks</Button>
                         <Button variant="outline-primary" className="btn--view" onClick={() => setIsActive(2)}>View</Button>
-                        <ListGroup.Item key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true));dispatch( togglePopups('workflow', true))}}><FaCog /></ListGroup.Item>
+                        <ListGroup.Item className="d-none d-xl-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true));dispatch( togglePopups('workflow', true))}}><FaCog /></ListGroup.Item>
                         <ListGroup.Item key={`gridview`} className="gridView ms-1" action active={activeTab === 'GridView'} onClick={() => setActiveTab('GridView')}><BsGrid /></ListGroup.Item>
                         <ListGroup.Item key={`listview`} className="ListView ms-1" action active={activeTab === 'ListView'} onClick={() => setActiveTab('ListView')}><FaList /></ListGroup.Item>
                         <ListGroup.Item key={`closekey`} onClick={() => setIsActive(0)}><MdOutlineClose /></ListGroup.Item>

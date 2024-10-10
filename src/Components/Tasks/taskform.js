@@ -535,7 +535,7 @@ export const TaskForm = () => {
                                         id={`editable-subtask-${subtask._id}`} // Use an ID for easier focus targeting
                                         style={{
                                             cursor: enablesubtaskedit[subtask._id] ? 'text' : 'pointer', // Change cursor when editable
-                                            border: enablesubtaskedit[subtask._id] ? '1px solid #ccc' : 'none', // Indicate editability with border
+                                            border: 'none', // Indicate editability with border
                                             padding: '0.5rem 0',
                                             minHeight: '2rem',
                                             overflowWrap: 'break-word', // Ensure long words wrap
@@ -687,64 +687,65 @@ export const TaskForm = () => {
                                     currentTask && currentTask.comments && currentTask.comments.length > 0 &&
                                     <Row>
                                         <Col sm={12}>
-                                        {
-                                            currentTask.comments.map((comment, index) => {
-                                                if( editmessage[comment._id] && editmessage[comment._id]['show'] === true ){
-                                                    return (
-                                                        <>
-                                                            <Form.Control type='text' value={editmessage[comment._id].msg} onChange={(e) => {
-                                                                setEditMessage(prev => ({
-                                                                    ...prev, // Spread the previous state
-                                                                    [comment._id]: {
-                                                                        show: true,
-                                                                        msg: e.target.value // Update with the current input value
-                                                                    }
-                                                                }));
-                                                            }}
-                                                            ></Form.Control>
-                                                            <ListGroup horizontal className='task--action--buttons'>
-                                                                <ListGroup.Item key={`edit-comment-${comment._id}`} className="more--actions">
-                                                                    <Button variant='secondary' onClick={(e) => {
+                                            
+                                                {
+                                                    currentTask.comments.map((comment, index) => {
+                                                        if( editmessage[comment._id] && editmessage[comment._id]['show'] === true ){
+                                                            return (
+                                                                <div className='message--edit'>
+                                                                    <Form.Control type='text' value={editmessage[comment._id].msg} onChange={(e) => {
                                                                         setEditMessage(prev => ({
                                                                             ...prev, // Spread the previous state
                                                                             [comment._id]: {
-                                                                                show: false,
+                                                                                show: true,
                                                                                 msg: e.target.value // Update with the current input value
                                                                             }
                                                                         }));
-                                                                    }}>Cancel</Button>
-                                                                    </ListGroup.Item>
-                                                                    <ListGroup.Item key={`delete-comment-${comment?._id}`} className="more--actions">
-                                                                        <Button variant='primary' onClick={() => {
-                                                                            UpdateComment(comment._id, editmessage[comment?._id]['msg'])
-                                                                            setEditMessage({[comment._id]: { show: false, msg: editmessage[comment?._id]['msg']}})
-                                                                        }}>Save</Button>
-                                                                    </ListGroup.Item>
-                                                            </ListGroup>
-                                                        </>
-                                                    )
-                                                }else{
-                                                    return (
-                                                        <p className='d-flex align-items-center task--message' key={`comment-${comment._id}`}>{comment.text} 
-                                                            <Dropdown>
-                                                                <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
-                                                                    <FaEllipsisV />
-                                                                </Dropdown.Toggle>
-                                                                <Dropdown.Menu>
-                                                                    <div className="over--scroll">
-                                                                        <Dropdown.Item key={`dropdown-member-${index}`}>
-                                                                            <Button onClick={() => {setEditMessage({[comment._id]: {show: true, msg: comment.text}})}}>Edit message</Button>
-                                                                            <Button onClick={() => handleDelteComment(comment?._id, currentTask?._id)}>Delete message</Button>
-                                                                        </Dropdown.Item>
-                                                                    </div>
-                                                                </Dropdown.Menu>
-                                                            </Dropdown>
-                                                        </p>
-                                                    )
+                                                                    }}
+                                                                    ></Form.Control>
+                                                                    <ListGroup horizontal className='task--action--buttons'>
+                                                                        <ListGroup.Item key={`edit-comment-${comment._id}`} className="more--actions">
+                                                                            <Button variant='secondary' onClick={(e) => {
+                                                                                setEditMessage(prev => ({
+                                                                                    ...prev, // Spread the previous state
+                                                                                    [comment._id]: {
+                                                                                        show: false,
+                                                                                        msg: e.target.value // Update with the current input value
+                                                                                    }
+                                                                                }));
+                                                                            }}>Cancel</Button>
+                                                                            </ListGroup.Item>
+                                                                            <ListGroup.Item key={`delete-comment-${comment?._id}`} className="more--actions">
+                                                                                <Button variant='primary' onClick={() => {
+                                                                                    UpdateComment(comment._id, editmessage[comment?._id]['msg'])
+                                                                                    setEditMessage({[comment._id]: { show: false, msg: editmessage[comment?._id]['msg']}})
+                                                                                }}>Save</Button>
+                                                                            </ListGroup.Item>
+                                                                    </ListGroup>
+                                                                </div>
+                                                            )
+                                                        }else{
+                                                            return (
+                                                                <p className='d-flex align-items-center task--message' key={`comment-${comment._id}`}>{comment.text} 
+                                                                    <Dropdown>
+                                                                        <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
+                                                                            <FaEllipsisV />
+                                                                        </Dropdown.Toggle>
+                                                                        <Dropdown.Menu>
+                                                                            <div className="over--scroll">
+                                                                                <Dropdown.Item key={`dropdown-member-${index}`}>
+                                                                                    <Button onClick={() => {setEditMessage({[comment._id]: {show: true, msg: comment.text}})}}>Edit message</Button>
+                                                                                    <Button onClick={() => handleDelteComment(comment?._id, currentTask?._id)}>Delete message</Button>
+                                                                                </Dropdown.Item>
+                                                                            </div>
+                                                                        </Dropdown.Menu>
+                                                                    </Dropdown>
+                                                                </p>
+                                                            )
+                                                        }
+                                                    })
                                                 }
-                                            })
-                                        }
-                                           
+                                            
                                         </Col>
                                     </Row>
                                 }
