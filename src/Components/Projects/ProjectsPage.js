@@ -764,7 +764,6 @@ function ProjectsPage() {
                                         <option value="none">None</option>
                                         {
                                             clientlist && clientlist.length > 0 &&
-
                                             clientlist.map((client, index) => {
                                                 return <option key={client._id} value={client._id}>{client.name}</option>
                                             })

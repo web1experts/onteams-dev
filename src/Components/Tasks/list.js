@@ -235,7 +235,7 @@ const TasksList = React.memo((props) => {
                     <div className="task--list">
                         {currentProject && Object.keys(currentProject).length > 0 && currentProject?.workflow?.tabs?.length > 0 &&
                             currentProject?.workflow?.tabs.map((tab, index) => (
-                                <div key={tab._id} className="task--grid">
+                                <div key={tab._id} className={`task--grid workflow--color-${index}`}>
                                     <h5>
                                         {tab.title}
                                         <Button

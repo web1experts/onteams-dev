@@ -865,12 +865,11 @@ export const  WorkFlowModal =  (props) => {
                                                   ref={provided.innerRef}
                                                   {...provided.draggableProps}
                                                   {...provided.dragHandleProps}
-                                                  className="border--top--plan"
                                                 >
                                                   {typeof tab === 'object' && tab !== null ? (
                                                     <>
                                                       <span className='drag--icon'><GrDrag /></span>
-                                                      <span className='nm-b flow--circle'></span> {tab.title}
+                                                      <span className={`flow--circle workflow--color-${index}`}></span> {tab.title}
                                                       <small
                                                         className='ms-auto'
                                                         type="button"
@@ -905,7 +904,7 @@ export const  WorkFlowModal =  (props) => {
                                                   ) : (
                                                     <>
                                                       <span className='drag--icon'><GrDrag /></span>
-                                                      <span className='nm-r flow--circle'></span> {tab}
+                                                      <span className={`flow--circle workflow--color-${index}`}></span> {tab}
                                                       <small
                                                         className='ms-auto'
                                                         type="button"

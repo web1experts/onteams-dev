@@ -517,14 +517,15 @@ Add Project Modal CSS-=-=-
   margin-left: 0.25rem;
 }
 
-.project--form--inputs form .status--circle {
-  height: 18px;
+.project--form--inputs form .status--circle, .project--form--actions .list-group-item .status--circle {
+  height: 14px;
   margin-right: .5rem;
-  margin-top: 0;
-  width: 18px;
+  margin-top: -2px;
+  width: 14px;
   border-radius: 100px;
   -webkit-border-radius: 100px;
   display: inline-block;
+  vertical-align: middle;
 }
 
 .progress--circle {
@@ -645,9 +646,9 @@ Add Project Modal CSS-=-=-
 
 .project--form--actions .list-group-item {
   border: 0;
-  text-decoration: underline;
+  text-decoration: none;
   color: #333333;
-  margin-bottom: .5rem;
+  margin-bottom: 0;
   padding-left: 0;
   background: #ffffff;
   cursor: pointer;
@@ -725,10 +726,10 @@ Add Project Modal CSS-=-=-
 }
 
 .status--modal .status--list .list-group-item .status--circle {
-  height: 18px;
+  height: 15px;
   margin-right: .5rem;
-  margin-top: 2px;
-  width: 18px;
+  margin-top: 0px;
+  width: 15px;
   border-radius: 100px;
   -webkit-border-radius: 100px;
   display: inline-block;
@@ -1040,16 +1041,16 @@ span.status--circle.info--color {
   background-color: #ffc107;
 }
 
-.edit--task--modal .modal-dialog {
+.modal-dialog {
   margin: auto;
   height: 100%;
 }
 
-.edit--task--modal .modal-content {
-  height: calc(100% - 20px);
+.modal-content {
+  max-height: calc(100vh - 20px);
 }
 
-.edit--task--modal .modal-body {
+.modal-body {
   max-height: 100%;
   overflow-y: visible;
 }
@@ -1089,11 +1090,30 @@ span.status--circle.info--color {
   .project--form--inputs {
     overflow-y: visible;
   }
+
+  .edit--task--modal .project--form {
+    height: auto;
+  }
+
+  .edit--task--modal .project--form--inputs {
+    max-height: 100%;
+    overflow-y: visible;
+    padding-top: 0;
+  }
+
+  .modal-body {
+    max-height: 100%;
+    overflow-y: scroll;
+  }
 }
 
 @media screen and (max-width:767px) {
   .project--form--actions .btn {
     position: relative;
     bottom: auto;
+  }
+
+  .modal-dialog {
+    max-width: calc(100% - 10px);
   }
 }

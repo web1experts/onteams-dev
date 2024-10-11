@@ -298,6 +298,12 @@ body {
   overflow: visible;
 }
 
+@media (min-width:768px) {
+  .page--wrapper table td.member--circles {
+    min-height: 80px;
+  }
+}
+
 .page--wrapper table td button {
   padding: 0.25rem .85rem;
   line-height: 25px;
@@ -586,12 +592,13 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .wrapper--title .gridView.active {
   background: #7BCCB8;
   color: #ffffff;
+  border: 1px solid #7BCCB8;
 }
 
 .wrapper--title .ListView:hover,
 .wrapper--title .gridView:hover,
 .wrapper--title .active:hover {
-  border: 1px solid #5ead9a;
+  border: 0 solid #5ead9a;
   background: #5ead9a;
 }
 
@@ -646,6 +653,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .wrapper--title .btn--view.active {
   background: #7BCCB8;
   color: #ffffff;
+  border: 1px solid #7BCCB8;
 }
 
 .disabled-pointer {
@@ -658,7 +666,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   grid-template-columns: repeat(1, 1fr);
   gap: 10px;
   grid-auto-rows: minmax(auto, auto);
-  margin-top: .5rem;
+  margin-top: 0;
 }
 
 .preview--grid .preview--cell {
@@ -686,6 +694,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   max-width: 170px;
   text-overflow: ellipsis;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .preview--cell embed,
@@ -1430,44 +1439,164 @@ Project Task View CSS=-=-=
   -webkit-border-radius: 0.5rem;
 }
 
-.projects--grid .task--list .task--grid:nth-child(1) {
+.projects--grid .task--list .workflow--color-0 {
   border-top: 8px solid #91C8E4;
 }
 
-.projects--grid .task--list .task--grid:nth-child(2) {
+.projects--grid .task--list .workflow--color-1 {
   border-top: 8px solid #FEBBCC;
 }
 
-.projects--grid .task--list .task--grid:nth-child(3) {
+.projects--grid .task--list .workflow--color-2 {
   border-top: 8px solid #ecc259;
 }
 
-.projects--grid .task--list .task--grid:nth-child(4) {
+.projects--grid .task--list .workflow--color-3 {
   border-top: 8px solid #CECE5A;
 }
 
-.projects--grid .task--list .task--grid:nth-child(5) {
+.projects--grid .task--list .workflow--color-4 {
   border-top: 10px solid darkblue;
 }
 
-.projects--grid .task--list .task--grid:nth-child(6) {
+.projects--grid .task--list .workflow--color-5 {
   border-top: 8px solid rgb(193, 236, 129);
 }
 
-.projects--grid .task--list .task--grid:nth-child(7) {
+.projects--grid .task--list .workflow--color-6 {
   border-top: 8px solid #f6cf87;
 }
 
-.projects--grid .task--list .task--grid:nth-child(8) {
+.projects--grid .task--list .workflow--color-7 {
   border-top: 8px solid #9398f3;
 }
 
-.projects--grid .task--list .task--grid:nth-child(9) {
+.projects--grid .task--list .workflow--color-8 {
   border-top: 8px solid #36c1f8;
 }
 
-.projects--grid .task--list .task--grid:nth-child(10) {
+.projects--grid .task--list .workflow--color-9 {
   border-top: 10px solid rgb(245, 158, 99);
+}
+
+.projects--grid .task--list .workflow--color-10 {
+  border-top: 8px solid #5d58f3;
+}
+
+.projects--grid .task--list .workflow--color-11 {
+  border-top: 8px solid #615055;
+}
+
+.projects--grid .task--list .workflow--color-12 {
+  border-top: 8px solid #ecb72e;
+}
+
+.projects--grid .task--list .workflow--color-13 {
+  border-top: 8px solid #f45555;
+}
+
+.projects--grid .task--list .workflow--color-14 {
+  border-top: 10px solid rgb(234, 130, 50);
+}
+
+.projects--grid .task--list .workflow--color-15 {
+  border-top: 8px solid rgb(71, 190, 237);
+}
+
+.projects--grid .task--list .workflow--color-16 {
+  border-top: 8px solid #49a0e3;
+}
+
+.projects--grid .task--list .workflow--color-17 {
+  border-top: 8px solid #b6d215;
+}
+
+.projects--grid .task--list .workflow--color-18 {
+  border-top: 8px solid #0a86b7;
+}
+
+.projects--grid .task--list .workflow--color-19 {
+  border-top: 10px solid rgb(195, 84, 9);
+}
+
+.workflow--color-0 {
+  background: #91C8E4;
+}
+
+.workflow--color-1 {
+  background: #FEBBCC;
+}
+
+.workflow--color-2 {
+  background: #ecc259;
+}
+
+.workflow--color-3 {
+  background: #CECE5A;
+}
+
+.workflow--color-4 {
+  background:  darkblue;
+}
+
+.workflow--color-5 {
+  background: rgb(193, 236, 129);
+}
+
+.workflow--color-6 {
+  background: #f6cf87;
+}
+
+.workflow--color-7 {
+  background: #9398f3;
+}
+
+.workflow--color-8 {
+  background: #36c1f8;
+}
+
+.workflow--color-9 {
+  background: rgb(245, 158, 99);
+}
+
+.workflow--color-10 {
+  background: #5d58f3;
+}
+
+.workflow--color-11 {
+  background: #615055;
+}
+
+.workflow--color-12 {
+  background: #ecb72e;
+}
+
+.workflow--color-13 {
+  background: #f45555;
+}
+
+.workflow--color-14 {
+  background: rgb(234, 130, 50);
+}
+
+.workflow--color-15 {
+  background: rgb(71, 190, 237);
+}
+
+.workflow--color-16 {
+  background: #49a0e3;
+}
+
+.workflow--color-17 {
+  background: #b6d215;
+}
+
+.workflow--color-18 {
+  background: #0a86b7;
+}
+
+.workflow--color-19 {
+  background: rgb(195, 84, 9);
 }
 
 .projects--grid .task--list .task--grid h5 {
@@ -2012,17 +2141,12 @@ pre {
   background: #1e7e34;
 }
 
-.modal-body {
-  max-height: calc(100vh - 180px);
-  overflow-y: auto;
-}
-
 .add--team--member--modal .modal-body {
   min-height: 350px;
 }
 
 .timeSheetModal .modal-dialog {
-  margin: 0 0 0 auto;
+  margin: 0 auto;
   max-width: 900px;
   height: 100%;
 }
@@ -2040,11 +2164,6 @@ pre {
 .timeSheetModal .modal-content {
   height: 100%;
   border-radius: 0;
-}
-
-.timeSheetModal .modal-body {
-  max-height: calc(100vh - 70px);
-  overflow-y: auto;
 }
 
 .timeSheetModal .card-group {
@@ -2868,8 +2987,11 @@ pre {
 }
 
 .project--grid--table thead,
-.project--grid--table th,
-.project--grid--table td:first-child {
+.project--grid--table th {
+  display: none;
+}
+
+.page--wrapper .project--grid--table td abbr {
   display: none;
 }
 
@@ -3063,6 +3185,10 @@ Media CSS-=-==
   .preview--grid .preview--cell p {
     max-width: 110px;
   }
+
+  .projecttitle {
+    max-width: 25%;
+  }
 }
 
 @media screen and (max-width:1399px) {
@@ -3103,12 +3229,6 @@ Media CSS-=-==
     padding: .35rem 1rem;
   }
 
-  .projects--grid .task--list .task--grid {
-    flex: 1 1 100%;
-    max-width: 33.333%;
-    min-width: 270px;
-  }
-
   .rounded--box .card .card-body {
     flex: 1 1 100%;
     padding: 0;
@@ -3127,10 +3247,6 @@ Media CSS-=-==
 
   .page--title .list-group {
     flex-wrap: wrap;
-  }
-
-  .modal-body {
-    max-height: calc(100vh - 260px);
   }
 
   .page--wrapper .project--grid--table tbody th,
@@ -3168,7 +3284,7 @@ Media CSS-=-==
   .team--page .page--title .select--dropdown .btn,
   .modal .select--dropdown .btn,
   .rounded--box .select--dropdown .btn {
-    min-width: 145px;
+    min-width: 125px;
   }
 
   .project--form--inputs {
@@ -3178,6 +3294,7 @@ Media CSS-=-==
     border-bottom: 1px solid #00000014;
     padding-bottom: 2rem;
     margin-bottom: 2rem;
+    width: 100%;
   }
 
   .project--form--actions {
@@ -3602,6 +3719,10 @@ Media CSS-=-==
   .wrapper--title h3 {
     padding-left: 1rem;
   }
+
+  .project--grid--table td::before {
+    margin-bottom: 2px;
+  }
 }
 
 @media screen and (max-width:575px) {
@@ -3729,5 +3850,13 @@ Media CSS-=-==
   .dashboard--page .btn--group {
     flex-flow: column wrap;
     align-items: stretch;
+  }
+
+  .projects--grid .task--list .task--grid {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex-basis: 90%;
+    flex-shrink: 0;
   }
 }

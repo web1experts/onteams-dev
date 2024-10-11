@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup, Dropdown} from "react-bootstrap";
+import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup, Dropdown, ListGroupItem} from "react-bootstrap";
 import { MdFileDownload, MdOutlineClose } from "react-icons/md";
 import { FaBold, FaEllipsisV, FaItalic, FaPlus, FaRegTrashAlt, FaTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
 import { selectboxObserver, getMemberdata } from "../../helpers/commonfunctions";
@@ -528,7 +528,6 @@ export const TaskForm = () => {
                         }
                          
                             {typeof subtask !== 'object' ?
-                                
                                 <input 
                                     className="form-control" 
                                     rows="2" 
@@ -631,7 +630,7 @@ export const TaskForm = () => {
                                 {showError('title')}
                                 <span className='pencil--edit'><BiSolidPencil /></span>
                             </Form.Group>
-                            <Form.Group className="mb-0 form-group">
+                            {/* <Form.Group className="mb-0 form-group">
                                 <Form.Label>
                                     <small>Workflow status</small>
                                     {
@@ -645,34 +644,16 @@ export const TaskForm = () => {
                                                 // Directly compare and return if matched
                                                 status._id === commonState?.taskForm?.tab ? (
                                                     <div key={`status-${index}`} className="status-item">
-                                                        <span className="status--circle"></span>
+                                                        <span className={`status--circle workflow--color-${index}`}></span>
                                                         {status.title} <FaChevronDown />
                                                     </div>
                                                 ) : null // Return null for non-matching items
                                             )}
                                             
                                         </div>
-                                        // <Form.Select  key={`taskform-select-${commonState?.taskForm?.tab}`} className="custom-selectbox" name='tab' onChange={async (event) => {
-                                        //     await dispatch(updateTask(currentTask._id, {tab: event.target.value}))
-                                        // }} defaultValue={commonState?.taskForm?.tab || ""}>
-                            
-                                        //     {
-                                        //         commonState.currentProject.workflow.tabs.map((tab, index) => {
-                                        //             return (
-                                        //                 <option 
-                                        //                     key={`tab-${index}`} 
-                                        //                     value={tab._id}
-                                        //                 >
-                                        //                     {tab.title}
-                                        //                 </option>
-                                        //             );
-                                                    
-                                        //         })
-                                        //     }
-                                        // </Form.Select>
                                     }
                                 </Form.Label>
-                            </Form.Group>
+                            </Form.Group> */}
                             
                            
                             <Form.Group className="mb-0 form-group">
@@ -712,7 +693,7 @@ export const TaskForm = () => {
                                     </div>
                                 </Form.Label>
                             </Form.Group>
-                            <Form.Group className="mb-0 form-group">
+                            {/* <Form.Group className="mb-0 form-group">
                                 <Form.Label>
                                     <small>Due Date</small>
                                 </Form.Label>
@@ -723,7 +704,7 @@ export const TaskForm = () => {
                                         }} value={fields['due_date'] || ''} />
                                     </Col>
                                 </Row>
-                            </Form.Group>
+                            </Form.Group> */}
 
                             <Form.Group className="mb-0 form-group pb-0">
                                 <Form.Label className="w-100 m-0">
@@ -885,14 +866,47 @@ export const TaskForm = () => {
                                     ))}
                                 </div>
                             </div>
+                            <ListGroup.Item>
+                                <label for='due--date'><GrAttachment /> Due date</label>
+                                <Form.Control type="date" id='due--date' name="due_date" onChange={async (e) => {await dispatch(updateTask(currentTask._id, {due_date: e.target?.value}))}} value={fields['due_date'] || ''} />
+                            </ListGroup.Item>
+                            <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
+                                <GrAttachment /> Workflow status
+                                <Form.Group className="mb-0 form-group pb-0">
+                                    <Form.Label>
+                                        {
+                                            commonState.currentProject && commonState.currentProject.workflow && commonState.currentProject.workflow.tabs && commonState.currentProject.workflow.tabs.length > 0 &&
+                                            <div className="status--modal" >
+                                                {commonState.currentProject.workflow.tabs.map((status, index) => 
+                                                    // Directly compare and return if matched
+                                                    status._id === commonState?.taskForm?.tab ? (
+                                                        <div key={`status-${index}`} className="status-item">
+                                                            <span className={`status--circle workflow--color-${index}`}></span>
+                                                            {status.title} <FaChevronDown />
+                                                        </div>
+                                                    ) : null // Return null for non-matching items
+                                                )}
+                                                
+                                            </div>
+                                        }
+                                    </Form.Label>
+                                </Form.Group>
+                            </ListGroup.Item>
+                            <ListGroup.Item className='text-danger' onClick={async () => {
+                                setLoader( true)
+                                await dispatch(deleteTask(currentTask._id))
+                                setLoader( false)
+                                dispatch(togglePopups('taskform', false))
+                                }} disabled={loader}><FaRegTrashAlt 
+                            /> {loader ? 'Please wait...' : 'Delete'}</ListGroup.Item>
                         </ListGroup>
-                        {/* <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button> */}
-                        <Button variant="danger" onClick={async () => {
+                        
+                        {/* <Button variant="danger" onClick={async () => {
                             setLoader( true)
                             await dispatch(deleteTask(currentTask._id))
                             setLoader( false)
                             dispatch(togglePopups('taskform', false))
-                        }} disabled={loader}>{loader ? 'Please wait...' : 'Delete'}</Button>
+                        }} disabled={loader}>{loader ? 'Please wait...' : 'Delete'}</Button> */}
                     </div>
                 </div>
             </Modal.Body>
@@ -910,12 +924,12 @@ export const TaskForm = () => {
                     </Form>
                     <ListGroup className="status--list">
                     {
-                      filteredStatuses.map(status => (
+                      filteredStatuses.map((status, index) => (
                         <ListGroup.Item key={`status-${status._id}`} className={commonState?.taskForm?.tab == status._id ? "status--active": ""} onClick={async () => {
                             await dispatch(updateTask(currentTask._id, {tab: status._id}))
                             setWorkflowStatus( false )
                           }}>
-                            <p>{status.title} {commonState?.taskForm?.tab === status._id && <FaCheck />}</p>
+                            <p><span class={`workflow--color-${index} status--circle`}></span> {status.title} {commonState?.taskForm?.tab === status._id && <FaCheck />}</p>
                         </ListGroup.Item>
                        ))}
                         
