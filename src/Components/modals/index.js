@@ -1294,18 +1294,3 @@ export const FilesPreviewModal = React.memo((props) => {
   )
 })
 
-
-
-
-export const addTask = React.memo(( props ) => {
-  const [showTask, setTaskShow] = useState(false);
-  const handleTaskClose = () => setTaskShow(false);
-  const handleTaskShow = () => setTaskShow(true);
-
-  
-  return (
-    <>
-   
-    </>
-  )
-})

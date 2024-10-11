@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown } from "react-bootstrap";
 import { FaBold, FaChevronDown, FaItalic, FaPlus, FaList, FaRegTrashAlt, FaPlusCircle, FaTimes, FaCog, FaEllipsisV, FaTrashAlt } from "react-icons/fa";
@@ -22,6 +22,7 @@ import SingleProject from "./singleProject";
 import { TaskForm } from "../Tasks/taskform";
 import TasksList from "../Tasks/list";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
+import { MemberInitials } from "../common/memberInitials";
 import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE } from "../../redux/actions/types";
 function ProjectsPage() {
     const [isActiveView, setIsActiveView] = useState(2);
@@ -322,15 +323,49 @@ function ProjectsPage() {
         }
     }, [projectFeed])
 
-    const handleRemoveMember = async (project, memberId, targetelement = null) => {
-        document.getElementById(targetelement).classList.add('disabled-pointer');
-        const currentMembers = project.members;
-        const updatedMembers = currentMembers
-            .filter(member => member._id !== memberId)
-            .map(member => member._id);
-        await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }))
-        document.getElementById(targetelement).classList.remove('disabled-pointer');
-    }
+    // const handleRemoveMember = async (project, memberId, targetelement = null) => {
+    //     document.getElementById(targetelement).classList.add('disabled-pointer');
+    //     const currentMembers = project.members;
+    //     const updatedMembers = currentMembers
+    //         .filter(member => member._id !== memberId)
+    //         .map(member => member._id);
+    //     await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }))
+    //     document.getElementById(targetelement).classList.remove('disabled-pointer');
+    // }
+
+
+    const handleRemoveMember = useCallback(async (project, memberId, targetelement = null) => {
+        try {
+            const targetElement = document.getElementById(targetelement);
+    
+            if (targetElement) {
+                // Disable the button or make it non-interactive
+                targetElement.classList.add('disabled-pointer');
+            }
+    
+            const currentMembers = project.members;
+            const updatedMembers = currentMembers
+                .filter(member => member._id !== memberId)
+                .map(member => member._id);
+    
+            // Dispatch the async action to update the project members
+            await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }));
+    
+            if (targetElement) {
+                // Re-enable the button or make it interactive again
+                targetElement.classList.remove('disabled-pointer');
+            }
+    
+        } catch (error) {
+            console.error("Error removing member:", error);
+    
+            // Ensure target element is re-enabled even if there's an error
+            const targetElement = document.getElementById(targetelement);
+            if (targetElement) {
+                targetElement.classList.remove('disabled-pointer');
+            }
+        }
+    }, [dispatch]);
 
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
@@ -532,13 +567,13 @@ function ProjectsPage() {
     }, [currentProject]);
 
 
-    const MemberInitials = ({ id, children, title }) => {
-        return (
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
-                {children}
-            </OverlayTrigger>
-        )
-    };
+    // const MemberInitials = ({ id, children, title }) => {
+    //     return (
+    //         <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
+    //             {children}
+    //         </OverlayTrigger>
+    //     )
+    // };
 
     const handleProjectChange = (project) => {
         dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project'))
@@ -633,35 +668,8 @@ function ProjectsPage() {
                                                     <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}</abbr> {project.title}</span></td>
                                                     <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
                                                     <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                        <ListGroup horizontal>
-                                                            {
-                                                                project.members && project.members.length > 0 && (
-                                                                    <>
-                                                                        {project.members.slice(0, 5).map((member, memberindex) => {
-                                                                            return (
-                                                                                <ListGroup.Item action key={`member-${memberindex}`}>
-                                                                                    <MemberInitials title={member.name} id={`member-${member._id}`}>
-                                                                                        <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>{member.name?.substring(0, 1).toUpperCase()}</span>
-                                                                                    </MemberInitials>
+                                                        <MemberInitials key={`MemberNames-${index}-${project._id}`} members={project.members} showAssignBtn={true} postId={project._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} />
 
-                                                                                    <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
-                                                                                </ListGroup.Item>
-                                                                            );
-                                                                        })}
-                                                                        {project.members.length > 5 && (
-                                                                            <ListGroup.Item key={`more-member-${project._id}`} className="more--member">
-                                                                                <span className="d-none d-xl-block">+{project.members.slice(5).length}</span>
-                                                                                <span className="d-block d-xl-none">+{project.members.slice(3).length}</span>
-                                                                            </ListGroup.Item>
-                                                                        )}
-                                                                    </>
-                                                                )
-                                                            }
-
-                                                            <ListGroup.Item key={`assign-members-${project._id}`} className="add--member">
-                                                                <Button variant="primary" onClick={() => { { dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true)) } }}><FaPlus /></Button>
-                                                            </ListGroup.Item>
-                                                        </ListGroup>
                                                     </td>
                                                     <td key={`status-index-${index}`} data-label="Status" className="onHide">
 
@@ -710,20 +718,22 @@ function ProjectsPage() {
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
                             (currentProject?.members && currentProject?.members.length > 0) &&
-                            currentProject.members.slice(0, 5).map((member, memberindex) => {
-                            const additionalClass = (memberindex === 2 || memberindex === 3 || memberindex === 4) ? 'd-none d-xxl-block' : '';
-                                return (
-                                    <ListGroup.Item action key={`member${memberindex}`} className={additionalClass}>
-                                        <MemberInitials title={member.name} id={`current_member-${member._id}`}>
-                                            <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>{member.name?.substring(0, 1).toUpperCase()}</span>
-                                        </MemberInitials>
-                                        <span className="remove-icon" id={`remove-member-${currentProject._id}-${member._id}`} onClick={(event) => handleRemoveMember(currentProject, member._id ? member._id : '', `remove-member-${currentProject._id}-${member._id}`)}><MdOutlineClose /></span>
-                                    </ListGroup.Item>
-                                )
-                            })
+                            <MemberInitials key={`MemberNames-header-${currentProject?._id}`} members={currentProject?.members} showAssignBtn={true} postId={currentProject?._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `remove-member-${currentProject._id}-${memberid}`)} />
+
+                            // currentProject.members.slice(0, 5).map((member, memberindex) => {
+                            // const additionalClass = (memberindex === 2 || memberindex === 3 || memberindex === 4) ? 'd-none d-xxl-block' : '';
+                            //     return (
+                            //         <ListGroup.Item action key={`member${memberindex}`} className={additionalClass}>
+                            //             <MemberInitials title={member.name} id={`current_member-${member._id}`}>
+                            //                 <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>{member.name?.substring(0, 1).toUpperCase()}</span>
+                            //             </MemberInitials>
+                            //             <span className="remove-icon" id={`remove-member-${currentProject._id}-${member._id}`} onClick={(event) => handleRemoveMember(currentProject, member._id ? member._id : '', `remove-member-${currentProject._id}-${member._id}`)}><MdOutlineClose /></span>
+                            //         </ListGroup.Item>
+                            //     )
+                            // })
                         }
                        
-                        {currentProject?.members && currentProject.members.length > 5 && (
+                        {/* {currentProject?.members && currentProject.members.length > 5 && (
                                 <ListGroup.Item key={`more-member-${currentProject._id}`} className="more--member">
                                     <span className="d-none d-xxl-block">+{currentProject.members.slice(5).length}</span>
                                     <span className="d-block d-xxl-none">+{currentProject.members.slice(2).length}</span>
@@ -731,7 +741,7 @@ function ProjectsPage() {
                             )}
                         <ListGroup.Item className="add--member" key="addmember">
                             <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
-                        </ListGroup.Item>
+                        </ListGroup.Item> */}
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
                         <Button variant="outline-primary" className="active btn--view" onClick={() => { setIsActive(1); }}>Tasks</Button>
@@ -831,16 +841,18 @@ function ProjectsPage() {
                                 <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                                 <p className="m-0">
                                     {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                        Object.entries(fields['members']).map(([key, value]) => (
-                                            <ListGroup.Item action key={`key-member-${key}`}>
-                                                <MemberInitials title={value} id={`assign_member-${key}`}>
-                                                    <span className={`team--initial nm-${value?.charAt(0).toLowerCase()}`}>{value?.charAt(0).toUpperCase()}</span>
-                                                </MemberInitials>
-                                                <span className="remove-icon" onClick={() => removeMember(key)}>
-                                                    <MdOutlineClose />
-                                                </span>
-                                            </ListGroup.Item>
-                                        ))
+                                        <MemberInitials key={`MemberNames-header-new`}  showall={true} members={fields['members']} showAssignBtn={false} postId="new" onMemberClick={(memberid, extraparam = false) =>  removeMember(memberid)} />
+
+                                        // Object.entries(fields['members']).map(([key, value]) => (
+                                        //     <ListGroup.Item action key={`key-member-${key}`}>
+                                        //         <MemberInitials title={value} id={`assign_member-${key}`}>
+                                        //             <span className={`team--initial nm-${value?.charAt(0).toLowerCase()}`}>{value?.charAt(0).toUpperCase()}</span>
+                                        //         </MemberInitials>
+                                        //         <span className="remove-icon" onClick={() => removeMember(key)}>
+                                        //             <MdOutlineClose />
+                                        //         </span>
+                                        //     </ListGroup.Item>
+                                        // ))
                                     )}
                                 </p>
 

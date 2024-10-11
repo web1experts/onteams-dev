@@ -16,6 +16,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 import {  EDIT_PROJECT_FORM, ASSIGN_MEMBER, RESET_FORMS, CURRENT_PROJECT, DIRECT_UPDATE } from "../../redux/actions/types";
+import { MemberInitials } from "../common/memberInitials";
 
 function SingleProject(props) {
     const dispatch = useDispatch();
@@ -463,14 +464,14 @@ function SingleProject(props) {
     };
 
 
-    const MemberInitials = ({ id, children, title }) => {
-        return (
-            <OverlayTrigger overlay={<Tooltip id={id}>{title}</Tooltip>}>
-                {children}
-            </OverlayTrigger>
+    // const MemberInitials = ({ id, children, title }) => {
+    //     return (
+    //         <OverlayTrigger overlay={<Tooltip id={id}>{title}</Tooltip>}>
+    //             {children}
+    //         </OverlayTrigger>
 
-        )
-    };
+    //     )
+    // };
 
 
     return (
@@ -484,55 +485,57 @@ function SingleProject(props) {
                         <ListGroup.Item key={`project-assign-${currentProject?._id}`} className="me-3">Members</ListGroup.Item>
                         
                         {fields['members'] && Object.keys(fields.members).length > 0 && (
-                            <>
-                                {Object.entries(fields.members).slice(0, 5).map(([id, name], memberindex) => (
-                                    <ListGroup.Item action key={`member-${memberindex}`}>
-                                        <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
-                                            <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
-                                        </MemberInitials>
-                                        <span
-                                            className="remove-icon"
-                                            id={`member-${currentProject?._id}-${id}`}
-                                            onClick={() => removeMember(id, true)}
-                                        >
-                                            <MdOutlineClose />
-                                        </span>
-                                    </ListGroup.Item>
-                                ))}
-                                {Object.keys(fields.members).length > 5 && (
-                                    <ListGroup.Item key={`more-member-${currentProject?._id}`} className="more--member">
-                                        <Dropdown>
-                                            <Dropdown.Toggle variant="primary">
-                                                <FaEllipsisV />
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu>
-                                                <div className="over--scroll">
-                                                    {Object.entries(fields.members).slice(5).map(([id, name], memberindex) => (
-                                                        <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                                                            <ListGroup.Item action key={`action-${currentProject?._id}`}>
-                                                                <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
-                                                                    <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
-                                                                </MemberInitials>
-                                                                <span
-                                                                    className="remove-icon"
-                                                                    id={`member-${currentProject?._id}-${id}`}
-                                                                    onClick={() => removeMember(id)}
-                                                                >
-                                                                    <MdOutlineClose />
-                                                                </span>
-                                                            </ListGroup.Item>
-                                                        </Dropdown.Item>
-                                                    ))}
-                                                </div>
-                                            </Dropdown.Menu>
-                                        </Dropdown>
-                                    </ListGroup.Item>
-                                )}
-                            </>
+                            <MemberInitials members={currentProject?.members} showAssignBtn={true} postId={currentProject?._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `member--${currentProject?._id}-${memberid}`)} />
+
+                            // <>
+                            //     {Object.entries(fields.members).slice(0, 5).map(([id, name], memberindex) => (
+                            //         <ListGroup.Item action key={`member-${memberindex}`}>
+                            //             <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
+                            //                 <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
+                            //             </MemberInitials>
+                            //             <span
+                            //                 className="remove-icon"
+                            //                 id={`member-${currentProject?._id}-${id}`}
+                            //                 onClick={() => removeMember(id, true)}
+                            //             >
+                            //                 <MdOutlineClose />
+                            //             </span>
+                            //         </ListGroup.Item>
+                            //     ))}
+                            //     {Object.keys(fields.members).length > 5 && (
+                            //         <ListGroup.Item key={`more-member-${currentProject?._id}`} className="more--member">
+                            //             <Dropdown>
+                            //                 <Dropdown.Toggle variant="primary">
+                            //                     <FaEllipsisV />
+                            //                 </Dropdown.Toggle>
+                            //                 <Dropdown.Menu>
+                            //                     <div className="over--scroll">
+                            //                         {Object.entries(fields.members).slice(5).map(([id, name], memberindex) => (
+                            //                             <Dropdown.Item key={`dropdown-member-${memberindex}`}>
+                            //                                 <ListGroup.Item action key={`action-${currentProject?._id}`}>
+                            //                                     <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
+                            //                                         <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
+                            //                                     </MemberInitials>
+                            //                                     <span
+                            //                                         className="remove-icon"
+                            //                                         id={`member-${currentProject?._id}-${id}`}
+                            //                                         onClick={() => removeMember(id)}
+                            //                                     >
+                            //                                         <MdOutlineClose />
+                            //                                     </span>
+                            //                                 </ListGroup.Item>
+                            //                             </Dropdown.Item>
+                            //                         ))}
+                            //                     </div>
+                            //                 </Dropdown.Menu>
+                            //             </Dropdown>
+                            //         </ListGroup.Item>
+                            //     )}
+                            // </>
                         )}
-                        <ListGroup.Item className="add--member" key="addmember">
+                        {/* <ListGroup.Item className="add--member" key="addmember">
                             <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
-                        </ListGroup.Item>
+                        </ListGroup.Item> */}
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto">
                         <Button variant="outline-primary" className="btn--view" onClick={() => props.closeview(1)}>Tasks</Button>
@@ -659,7 +662,12 @@ function SingleProject(props) {
                         <ListGroup>
                             <ListGroup.Item key="assign-membermodal-key" onClick={() => {dispatch(togglePopups('members', true))}}><FaPlus /> Assign to</ListGroup.Item>
                             <p className="m-0 d-flex align-items-center">
-                                {fields.members && Object.keys(fields.members).length > 0 && (
+                                    {
+                                        fields.members && Object.keys(fields.members).length > 0 && 
+                                        <MemberInitials members={fields['members']} showall={true} showAssignBtn={false} postId={`edit-${currentProject?._id}`} type = "project" onMemberClick={(memberid, extraparam = false) => removeMember( memberid)} />
+
+                                    }
+                                {/* {fields.members && Object.keys(fields.members).length > 0 && (
                                     <>
                                         {Object.entries(fields.members).slice(0, 3).map(([id, name], memberindex) => (
                                             <ListGroup.Item action key={`member-${memberindex}`}>
@@ -705,7 +713,7 @@ function SingleProject(props) {
                                             </ListGroup.Item>
                                         )}
                                     </>
-                                )}
+                                )} */}
                             </p>
                             <ListGroup.Item key="assign-files-key" onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
                             <div className="output--file-preview">

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup, Dropdown} from "react-bootstrap";
 import { MdFileDownload, MdOutlineClose } from "react-icons/md";
-import { FaBold, FaEllipsisV, FaItalic, FaPlus, FaRegTrashAlt, FaTrashAlt } from "react-icons/fa";
+import { FaBold, FaEllipsisV, FaItalic, FaPlus, FaRegTrashAlt, FaTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
 import { selectboxObserver, getMemberdata } from "../../helpers/commonfunctions";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
@@ -16,10 +16,12 @@ import { getFieldRules, validateField } from '../../helpers/rules';
 import { updateTask, deleteTask } from '../../redux/actions/task.action';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { MemberInitials } from '../common/memberInitials';
 
 export const TaskForm = () => {
     const dispatch = useDispatch()
     const memberdata = getMemberdata()
+    const [workflowstatus, setWorkflowStatus]  = useState(false)
     const modalstate = useSelector(state => state.common.taskmodal);
     const taskForm = useSelector( state => state.common.taskForm)
     const apiResult = useSelector(state => state.task);
@@ -42,9 +44,20 @@ export const TaskForm = () => {
     const handleCloseCommentModel = () => setShowCommentModel(false);
     const [ editmessage, setEditMessage] = useState({})
     const [comments, setComments] = useState([]);
+    const [workflowstatuses, setFlowstatus ] =  useState([])
     const handleNewComment = (event) => {
         setComments(event.target.value);
     }
+
+    const [search, setSearch] = useState('');
+    const handleSearchChange = (e) => {
+        setSearch(e.target.value);
+    };
+
+    const filteredStatuses = workflowstatuses.filter(status => 
+        status.title.toLowerCase().includes(search.toLowerCase())
+    );
+    
     const handleShowCommentModel = (image) => {
         // handleSelectedImage(image);
         setShowCommentModel(true);
@@ -286,13 +299,13 @@ export const TaskForm = () => {
         return null
     }
 
-    const MemberInitials = ({ id, children, title }) => {
-        return (
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
-                {children}
-            </OverlayTrigger>
-        )
-    };
+    // const MemberInitials = ({ id, children, title }) => {
+    //     return (
+    //         <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
+    //             {children}
+    //         </OverlayTrigger>
+    //     )
+    // };
 
     const handleRemovefiles = (id) => {
         let previousfiles = fields['files']
@@ -389,6 +402,7 @@ export const TaskForm = () => {
         setFields({...fields, ['subtasks']: newSubtasks})
         // Dispatch the updated subtasks to global state
         dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks }));
+       
         
     }
 
@@ -418,6 +432,7 @@ export const TaskForm = () => {
             removeSubtask(index);
         }else{
              dispatch(updateTask(currentTask._id, {subtasks: subtasks}))
+             addSubtask()
         }
     };
 
@@ -483,7 +498,7 @@ export const TaskForm = () => {
                          
                             {typeof subtask !== 'object' ?
                                 
-                                <textarea 
+                                <input 
                                     className="form-control" 
                                     rows="2" 
                                     onBlur={() => {
@@ -495,6 +510,12 @@ export const TaskForm = () => {
                                     placeholder="Enter subtask" 
                                     value={subtask} 
                                     onChange={({ target: { value } }) => handlesubtaskChange(index, subtask, value)} 
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter') {
+                                            event.preventDefault(); // Prevent the default behavior (like form submission)
+                                            handleBlur(index); // Call your function to handle the Enter press
+                                        }
+                                    }}
                                 />
                                     :
                                     <div
@@ -587,24 +608,40 @@ export const TaskForm = () => {
                                     <small>Workflow status</small>
                                     {
                                         commonState.currentProject && commonState.currentProject.workflow && commonState.currentProject.workflow.tabs && commonState.currentProject.workflow.tabs.length > 0 &&
-                                        <Form.Select  key={`taskform-select-${commonState?.taskForm?.tab}`} className="custom-selectbox" name='tab' onChange={async (event) => {
-                                            await dispatch(updateTask(currentTask._id, {tab: event.target.value}))
-                                        }} defaultValue={commonState?.taskForm?.tab || ""}>
+                                        
+                                        <div className="status--modal" onClick={() => {
+                                            setFlowstatus(commonState.currentProject.workflow.tabs);
+                                            setWorkflowStatus( true )
+                                        }}>
+                                             {commonState.currentProject.workflow.tabs.map((status, index) => 
+                                                // Directly compare and return if matched
+                                                status._id === commonState?.taskForm?.tab ? (
+                                                    <div key={`status-${index}`} className="status-item">
+                                                        <span className="status--circle"></span>
+                                                        {status.title} <FaChevronDown />
+                                                    </div>
+                                                ) : null // Return null for non-matching items
+                                            )}
+                                            
+                                        </div>
+                                        // <Form.Select  key={`taskform-select-${commonState?.taskForm?.tab}`} className="custom-selectbox" name='tab' onChange={async (event) => {
+                                        //     await dispatch(updateTask(currentTask._id, {tab: event.target.value}))
+                                        // }} defaultValue={commonState?.taskForm?.tab || ""}>
                             
-                                            {
-                                                commonState.currentProject.workflow.tabs.map((tab, index) => {
-                                                    return (
-                                                        <option 
-                                                            key={`tab-${index}`} 
-                                                            value={tab._id}
-                                                        >
-                                                            {tab.title}
-                                                        </option>
-                                                    );
+                                        //     {
+                                        //         commonState.currentProject.workflow.tabs.map((tab, index) => {
+                                        //             return (
+                                        //                 <option 
+                                        //                     key={`tab-${index}`} 
+                                        //                     value={tab._id}
+                                        //                 >
+                                        //                     {tab.title}
+                                        //                 </option>
+                                        //             );
                                                     
-                                                })
-                                            }
-                                        </Form.Select>
+                                        //         })
+                                        //     }
+                                        // </Form.Select>
                                     }
                                 </Form.Label>
                             </Form.Group>
@@ -757,6 +794,12 @@ export const TaskForm = () => {
                                                 placeholder="Message"
                                                 name="message"
                                                 onChange={handleNewComment} value={comments || ''}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === 'Enter') {
+                                                        event.preventDefault(); // Prevent the default behavior (like form submission)
+                                                        handleCommentSubmit()// Call your function to handle the Enter press
+                                                    }
+                                                }}
                                             />
                                             <Button variant="outline-secondary" id="send-message" onClick={(() => handleCommentSubmit())}><FaPaperPlane /></Button>
                                         </InputGroup>
@@ -771,16 +814,18 @@ export const TaskForm = () => {
                             <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                             <p className="m-0">
                                 {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                    Object.entries(fields['members']).map(([key, value]) => (
-                                        <ListGroup.Item action key={`key-member-${key}`}>
-                                            <MemberInitials title={value} id={`assign_member-${key}`}>
-                                                <span className="team--initial nm-k">{value?.charAt(0)}</span>
-                                            </MemberInitials>
-                                            <span className="remove-icon" onClick={() => removeMember(key)}>
-                                                <MdOutlineClose />
-                                            </span>
-                                        </ListGroup.Item>
-                                    ))
+                                    <MemberInitials members={fields['members']}  showall={true} showAssign={false} postId={`edit-${currentTask?._id}`} type = "task" onMemberClick={(memberid, extraparam = false) => removeMember( memberid)} />
+
+                                    // Object.entries(fields['members']).map(([key, value]) => (
+                                    //     <ListGroup.Item action key={`key-member-${key}`}>
+                                    //         <MemberInitials title={value} id={`assign_member-${key}`}>
+                                    //             <span className="team--initial nm-k">{value?.charAt(0)}</span>
+                                    //         </MemberInitials>
+                                    //         <span className="remove-icon" onClick={() => removeMember(key)}>
+                                    //             <MdOutlineClose />
+                                    //         </span>
+                                    //     </ListGroup.Item>
+                                    // ))
                                 )}
                             </p>
 
@@ -811,6 +856,31 @@ export const TaskForm = () => {
             </Modal.Body>
         </Modal>
         <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews}  toggle={setPreviewShow} filetoPreview={filetoPreview} />
+            <Modal show={workflowstatus} onHide={() => { setWorkflowStatus( false )}} centered size="md" className="status--modal">
+                <Modal.Header closeButton>
+                    <Modal.Title>Workflow status</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group>
+                            <Form.Control type="text" placeholder="Search here" value={search} onChange={handleSearchChange} />
+                        </Form.Group>
+                    </Form>
+                    <ListGroup className="status--list">
+                    {
+                      filteredStatuses.map(status => (
+                        <ListGroup.Item key={`status-${status._id}`} className={commonState?.taskForm?.tab == status._id ? "status--active": ""} onClick={async () => {
+                            await dispatch(updateTask(currentTask._id, {tab: status._id}))
+                            setWorkflowStatus( false )
+                          }}>
+                            <p>{status.title} {commonState?.taskForm?.tab === status._id && <FaCheck />}</p>
+                        </ListGroup.Item>
+                       ))}
+                        
+                    </ListGroup>
+                </Modal.Body>
+            </Modal>                
+
         </>
     )
 }
