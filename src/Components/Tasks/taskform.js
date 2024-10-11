@@ -9,6 +9,8 @@ import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../re
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
 import { FaPaperPlane } from "react-icons/fa";
+import { BiSolidPencil } from "react-icons/bi";
+import { GrDrag } from "react-icons/gr";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { FilesPreviewModal } from '../modals';
@@ -491,9 +493,12 @@ export const TaskForm = () => {
                     <Form.Group className="mb-0 form-group pb-0" key={`subtask-${index}`}>
                         {
                             (typeof subtask === 'object' ) &&
-                            <input type='checkbox' onChange={(e) => {updateSubtask(e.target.checked, index)}} checked={
-                                subtask?.status || false
-                            } />
+                            <>
+                                <GrDrag />
+                                <input type='checkbox' onChange={(e) => {updateSubtask(e.target.checked, index)}} checked={
+                                    subtask?.status || false
+                                } />
+                            </>
                         }
                          
                             {typeof subtask !== 'object' ?
@@ -567,11 +572,9 @@ export const TaskForm = () => {
                                         }} // Set subtask title as HTML content for editable div
                                     ></div>
                                 }
-
-
-                    <button type="button"  variant="primary" onClick={() => removeSubtask(index)}>
-                        <FaRegTrashAlt />
-                    </button>
+                        <button type="button"  variant="primary" onClick={() => removeSubtask(index)}>
+                            <FaRegTrashAlt />
+                        </button>
                     </Form.Group>
                 </li>
                 )}
@@ -584,24 +587,23 @@ export const TaskForm = () => {
 
     return (
         <>
-        <Modal show={modalstate} onHide={() => { dispatch(updateStateData(CURRENT_TASK, {}));dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project')); dispatch(togglePopups('taskform', false));}} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
+        <Modal show={modalstate} onHide={() => { dispatch(updateStateData(CURRENT_TASK, {}));dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project')); dispatch(togglePopups('taskform', false));}} centered size="lg" className="add--member--modal edit--task--modal modalbox" onShow={() => selectboxObserver()}>
             <Modal.Header closeButton>
-                <Modal.Title>{currentTask?._id ? 'Edit Task' : 'Create New Task'}</Modal.Title>
+                {/* <Modal.Title>{currentTask?._id ? '' : 'Create New Task'}</Modal.Title> */}
             </Modal.Header>
             <Modal.Body>
                 <div className="project--form">
                     <div className="project--form--inputs" data-tabid={fields['tab']}>
                         <Form onSubmit={() => {return false}} key={`taskform-${commonState?.taskForm?.tab}`}>
-                            <Form.Group className="mb-0 form-group">
-                                <FloatingLabel label="Task Title *">
-                                    <Form.Control type="text" key={`task-title-${commonState?.taskForm?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || ""} onChange={handleChange} onBlur={(e) => {
-                                        if(currentTask.title !== fields['title']){
-                                            dispatch( updateTask( currentTask._id, {title: fields['title']}))
-                                        }
-                                        
-                                    }} />
-                                </FloatingLabel>
+                            <Form.Group className="mb-0 form-group task--title">
+                                <Form.Label><small>Title</small></Form.Label>
+                                <Form.Control type="text" key={`task-title-${commonState?.taskForm?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || ""} onChange={handleChange} onBlur={(e) => {
+                                    if(currentTask.title !== fields['title']){
+                                        dispatch( updateTask( currentTask._id, {title: fields['title']}))
+                                    }
+                                }} />
                                 {showError('title')}
+                                <span className='pencil--edit'><BiSolidPencil /></span>
                             </Form.Group>
                             <Form.Group className="mb-0 form-group">
                                 <Form.Label>
