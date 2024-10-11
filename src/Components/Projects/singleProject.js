@@ -658,10 +658,10 @@ function SingleProject(props) {
                         <h4>Actions</h4>
                         <ListGroup>
                             <ListGroup.Item key="assign-membermodal-key" onClick={() => {dispatch(togglePopups('members', true))}}><FaPlus /> Assign to</ListGroup.Item>
-                            <p className="m-0 d-flex align-items-center">
+                            <div className="m-0 d-flex align-items-center flex-wrap">
                                 {fields.members && Object.keys(fields.members).length > 0 && (
                                     <>
-                                        {Object.entries(fields.members).slice(0, 3).map(([id, name], memberindex) => (
+                                        {Object.entries(fields.members).slice(0).map(([id, name], memberindex) => (
                                             <ListGroup.Item action key={`member-${memberindex}`}>
                                                 <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
                                                     <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
@@ -675,38 +675,10 @@ function SingleProject(props) {
                                                 </span>
                                             </ListGroup.Item>
                                         ))}
-                                        {Object.keys(fields.members).length > 3 && (
-                                            <ListGroup.Item key={`more-member-${currentProject?._id}`} className="more--member">
-                                                <Dropdown>
-                                                    <Dropdown.Toggle variant="primary">
-                                                        <FaEllipsisV />
-                                                    </Dropdown.Toggle>
-                                                    <Dropdown.Menu>
-                                                        <div className="over--scroll">
-                                                            {Object.entries(fields.members).slice(3).map(([id, name], memberindex) => (
-                                                                <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                                                                    <ListGroup.Item action key={`action-${currentProject?._id}`}>
-                                                                        <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
-                                                                            <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
-                                                                        </MemberInitials>
-                                                                        <span
-                                                                            className="remove-icon"
-                                                                            id={`member-${currentProject?._id}-${id}`}
-                                                                            onClick={() => removeMember(id)}
-                                                                        >
-                                                                            <MdOutlineClose />
-                                                                        </span>
-                                                                    </ListGroup.Item>
-                                                                </Dropdown.Item>
-                                                            ))}
-                                                        </div>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            </ListGroup.Item>
-                                        )}
+                                        
                                     </>
                                 )}
-                            </p>
+                            </div>
                             <ListGroup.Item key="assign-files-key" onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
                             <div className="output--file-preview">
                                 <div className="preview--grid">

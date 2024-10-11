@@ -469,31 +469,20 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .details--projects--view .project--form--actions .list-group {
   padding-bottom: 0;
   display: flex;
-  max-height: calc(100% - 160px);
-  overflow-y: auto;
+  flex: 1 1;
 }
 
 .details--projects--view .project--form--actions .list-group:last-child {
-  max-height: max-content;
-  padding-bottom: 0;
-  overflow-y: visible;
-  position: absolute;
-  bottom: 0;
   width: 100%;
+  flex: none;
   background: none
 }
 
-/* .project--form--actions .list-group:last-child .list-group-item {
-  margin-bottom: 0;
-  padding: 0;
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  align-items: center;
-  border: 0;
-  gap: 10px;
-  text-decoration: none;
-} */
+.details--projects--view .project--form--actions .list-group .output--file-preview .preview--grid {
+  max-height: calc(100vh - 470px);
+  overflow-y: auto;
+  padding-bottom: 1rem;
+}
 
 .show--details .page--wrapper .nav-tabs,
 .view--project .page--wrapper .nav-tabs {
@@ -543,6 +532,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 30px;
 }
 
 .wrapper--title .list-group-item,
@@ -605,13 +595,18 @@ button.input-error.dropdown-toggle.btn.btn-success {
   background: #5ead9a;
 }
 
+.projecttitle {
+  max-width: 33.33%;
+  flex: 1 1;
+}
+
 .wrapper--title h3 {
   font-size: 1.5rem;
   margin: 0;
   font-weight: 600;
   min-height: 50px;
-  flex: 1 1;
-  max-width: 20%;
+  max-width: 340px;
+  width: 100%;
 }
 
 .wrapper--title h3 strong {
@@ -688,7 +683,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .preview--grid .preview--cell p {
   margin: 0;
   display: block;
-  max-width: 250px;
+  max-width: 170px;
   text-overflow: ellipsis;
   overflow: hidden;
 }
@@ -2018,7 +2013,7 @@ pre {
 }
 
 .modal-body {
-  max-height: calc(100vh - 150px);
+  max-height: calc(100vh - 180px);
   overflow-y: auto;
 }
 
@@ -2208,11 +2203,12 @@ pre {
 }
 
 .show--details .page--wrapper table .project--title--td span, .view--project .page--wrapper table .project--title--td span, .view--invitee .page--wrapper table .project--title--td span {
-  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 180px;
-  display: block;
+  overflow: hidden;
 }
 
 .show--details table td .status--circle,
@@ -3095,12 +3091,14 @@ Media CSS-=-==
   .output--file-preview .preview--grid .preview--cell .btn {
     opacity: 1;
   }
+
+  .projecttitle {
+    max-width: 100%;
+    flex: 1 1;
+  }
 }
 
 @media screen and (max-width:1199px) {
-  .wrapper--title h3 {
-    max-width: 50%;
-  }
   .wrapper--title .btn--view {
     padding: .35rem 1rem;
   }
@@ -3462,10 +3460,6 @@ Media CSS-=-==
     background: #ffffff90;
   }
 
-  .show--details .page--wrapper table .project--title--td span, .view--project .page--wrapper table .project--title--td span, .view--invitee .page--wrapper table .project--title--td span {
-    max-width: 100%;
-  }
-
   .page--wrapper table td.project--title--td span {
     max-width: 100%;
   }
@@ -3556,11 +3550,6 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:767px) {
-  .wrapper--title h3 {
-    max-width: 100%;
-    flex: 1 1 100%;
-    margin-bottom: .75rem;
-  }
 
   .wrapper--title h3 span {
     display: none;
@@ -3589,32 +3578,11 @@ Media CSS-=-==
   .details--projects--view .project--form--actions .btn {
     max-width: 120px;
   }
-}
-
-@media screen and (max-width:575px) {
-  .team--page .page--title h2,
-  .wrapper--title h3 {
-    padding-left: 1rem;
-  }
 
   .show--details,
   .view--project {
     flex: 1 1;
     max-width: 100%;
-  }
-
-  .projects--page .page--title .list-group-item {
-    flex: 1 1 100%;
-    max-width: calc(50% - 5px);
-  }
-
-  .project--grid--table tr,
-  .activity--box .card-group .card {
-    max-width: calc(100% - 0px);
-  }
-
-  .module__wrapper {
-    height: 100%;
   }
 
   .show--details~.details--wrapper,
@@ -3628,6 +3596,27 @@ Media CSS-=-==
     overflow-y: auto;
     z-index: 1;
     padding-bottom: 1rem;
+  }
+
+  .team--page .page--title h2,
+  .wrapper--title h3 {
+    padding-left: 1rem;
+  }
+}
+
+@media screen and (max-width:575px) {
+  .projects--page .page--title .list-group-item {
+    flex: 1 1 100%;
+    max-width: calc(50% - 5px);
+  }
+
+  .project--grid--table tr,
+  .activity--box .card-group .card {
+    max-width: calc(100% - 0px);
+  }
+
+  .module__wrapper {
+    height: 100%;
   }
 
   .details--projects--view .project--form {

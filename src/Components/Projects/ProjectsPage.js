@@ -591,11 +591,11 @@ function ProjectsPage() {
                                                 </Form.Group>
                                             </Form>
                                         </ListGroup.Item>
-                                        <ListGroup.Item action className="d-none d-xl-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
-                                        <ListGroup.Item action className="d-none d-xl-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                                     </ListGroup>
                                 </h2>
-                                <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex d-xl-none mt-3 mt-xl-0'}>
+                                <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-none mt-3 mt-xl-0'}>
                                     <ListGroup.Item action className="view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                                     <ListGroup.Item action className="view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                                 </ListGroup>
@@ -637,27 +637,29 @@ function ProjectsPage() {
                                                             {
                                                                 project.members && project.members.length > 0 && (
                                                                     <>
-                                                                        {project.members.slice(0, 5).map((member, memberindex) => {
+                                                                        {project.members.slice(0, project.members.length > 6 ? 5 : 6).map((member, memberindex) => {
                                                                             return (
                                                                                 <ListGroup.Item action key={`member-${memberindex}`}>
                                                                                     <MemberInitials title={member.name} id={`member-${member._id}`}>
                                                                                         <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>{member.name?.substring(0, 1).toUpperCase()}</span>
                                                                                     </MemberInitials>
 
-                                                                                    <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}><MdOutlineClose /></span>
+                                                                                    <span className="remove-icon" id={`member--${project._id}-${member._id}`} onClick={(event) => handleRemoveMember(project, member._id ? member._id : '', `member--${project._id}-${member._id}`)}>
+                                                                                        <MdOutlineClose />
+                                                                                    </span>
                                                                                 </ListGroup.Item>
                                                                             );
                                                                         })}
-                                                                        {project.members.length > 5 && (
+                                                                        {project.members.length > 6 && (
                                                                             <ListGroup.Item key={`more-member-${project._id}`} className="more--member">
-                                                                                <span className="d-none d-xl-block">+{project.members.slice(5).length}</span>
-                                                                                <span className="d-block d-xl-none">+{project.members.slice(3).length}</span>
+                                                                                <span>+{project.members.length - 5}</span>
                                                                             </ListGroup.Item>
                                                                         )}
                                                                     </>
                                                                 )
                                                             }
 
+                                                            
                                                             <ListGroup.Item key={`assign-members-${project._id}`} className="add--member">
                                                                 <Button variant="primary" onClick={() => { { dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true)) } }}><FaPlus /></Button>
                                                             </ListGroup.Item>
@@ -702,18 +704,20 @@ function ProjectsPage() {
             </div>
             <div className="details--projects--grid projects--grid">
                 <div className="wrapper--title">
-                    <h3 className="projecttitle">
-                        <strong>{currentProject?.title}</strong>
-                        <span>{currentProject?.client?.name}</span>
-                    </h3>
-                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 ms-xl-auto">
-                        <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
+                    <div className="projecttitle">
+                        <h3>
+                            <strong>{currentProject?.title}</strong>
+                            <span>{currentProject?.client?.name}</span>
+                        </h3>
+                    </div>
+                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
+                    <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
                             (currentProject?.members && currentProject?.members.length > 0) &&
-                            currentProject.members.slice(0, 5).map((member, memberindex) => {
-                            const additionalClass = (memberindex === 2 || memberindex === 3 || memberindex === 4) ? 'd-none d-xxl-block' : '';
+                            // Display the first 5 members if more than 6, otherwise display all up to 6
+                            currentProject.members.slice(0, currentProject.members.length > 6 ? 5 : 6).map((member, memberindex) => {
                                 return (
-                                    <ListGroup.Item action key={`member${memberindex}`} className={additionalClass}>
+                                    <ListGroup.Item action key={`member${memberindex}`}>
                                         <MemberInitials title={member.name} id={`current_member-${member._id}`}>
                                             <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>{member.name?.substring(0, 1).toUpperCase()}</span>
                                         </MemberInitials>
@@ -722,21 +726,22 @@ function ProjectsPage() {
                                 )
                             })
                         }
-                       
-                        {currentProject?.members && currentProject.members.length > 5 && (
+                        {
+                            // If there are more than 6 members, show the count of remaining members
+                            currentProject?.members && currentProject.members.length > 6 && (
                                 <ListGroup.Item key={`more-member-${currentProject._id}`} className="more--member">
-                                    <span className="d-none d-xxl-block">+{currentProject.members.slice(5).length}</span>
-                                    <span className="d-block d-xxl-none">+{currentProject.members.slice(2).length}</span>
+                                    <span>+{currentProject.members.length - 5}</span>
                                 </ListGroup.Item>
-                            )}
+                            )
+                        }
                         <ListGroup.Item className="add--member" key="addmember">
                             <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
                         </ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
-                        <Button variant="outline-primary" className="active btn--view" onClick={() => { setIsActive(1); }}>Tasks</Button>
-                        <Button variant="outline-primary" className="btn--view" onClick={() => setIsActive(2)}>View</Button>
-                        <ListGroup.Item className="d-none d-xl-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true));dispatch( togglePopups('workflow', true))}}><FaCog /></ListGroup.Item>
+                        <Button variant="outline-primary" className="active btn--view d-none d-lg-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
+                        <Button variant="outline-primary" className="btn--view d-none d-lg-flex" onClick={() => setIsActive(2)}>View</Button>
+                        <ListGroup.Item className="d-none d-lg-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true));dispatch( togglePopups('workflow', true))}}><FaCog /></ListGroup.Item>
                         <ListGroup.Item key={`gridview`} className="gridView ms-1" action active={activeTab === 'GridView'} onClick={() => setActiveTab('GridView')}><BsGrid /></ListGroup.Item>
                         <ListGroup.Item key={`listview`} className="ListView ms-1" action active={activeTab === 'ListView'} onClick={() => setActiveTab('ListView')}><FaList /></ListGroup.Item>
                         <ListGroup.Item key={`closekey`} onClick={() => setIsActive(0)}><MdOutlineClose /></ListGroup.Item>
