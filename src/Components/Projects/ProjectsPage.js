@@ -717,33 +717,11 @@ function ProjectsPage() {
                         </h3>
                     </div>
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
-                    <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
+                        <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
                             (currentProject?.members && currentProject?.members.length > 0) &&
                             <MemberInitials key={`MemberNames-header-${currentProject?._id}`} members={currentProject?.members} showAssignBtn={true} postId={currentProject?._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `remove-member-${currentProject._id}-${memberid}`)} />
-
-                            // currentProject.members.slice(0, 5).map((member, memberindex) => {
-                            // const additionalClass = (memberindex === 2 || memberindex === 3 || memberindex === 4) ? 'd-none d-xxl-block' : '';
-                            //     return (
-                            //         <ListGroup.Item action key={`member${memberindex}`} className={additionalClass}>
-                            //             <MemberInitials title={member.name} id={`current_member-${member._id}`}>
-                            //                 <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>{member.name?.substring(0, 1).toUpperCase()}</span>
-                            //             </MemberInitials>
-                            //             <span className="remove-icon" id={`remove-member-${currentProject._id}-${member._id}`} onClick={(event) => handleRemoveMember(currentProject, member._id ? member._id : '', `remove-member-${currentProject._id}-${member._id}`)}><MdOutlineClose /></span>
-                            //         </ListGroup.Item>
-                            //     )
-                            // })
                         }
-                       
-                        {/* {currentProject?.members && currentProject.members.length > 5 && (
-                                <ListGroup.Item key={`more-member-${currentProject._id}`} className="more--member">
-                                    <span>+{currentProject.members.length - 5}</span>
-                                </ListGroup.Item>
-                            )
-                        }
-                        <ListGroup.Item className="add--member" key="addmember">
-                            <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
-                        </ListGroup.Item> */}
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
                         <Button variant="outline-primary" className="active btn--view d-none d-lg-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>

@@ -32,7 +32,7 @@ export const MemberInitials = React.memo(( props ) => {
         
             { members && members.length > 0 && Array.isArray(members) ?  (
                 <>
-                <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 ms-lg-5">
+                <ListGroup horizontal className="members--list">
                 {
                     (props.showall && props.showall === true) ? (
                         members.map((member, memberIndex) => (

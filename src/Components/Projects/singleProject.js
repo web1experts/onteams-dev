@@ -478,64 +478,19 @@ function SingleProject(props) {
         <>
             <div className="details--projects--view">
                 <div className="wrapper--title">
-                    <h3 key={`project-title-${currentProject?._id}`}>{currentProject?.title}
-                        <span>{currentProject?.client?.name}</span>
-                    </h3>
-                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 ms-lg-5">
+                    <div className="projecttitle">
+                        <h3 key={`project-title-${currentProject?._id}`}>
+                            <strong>{currentProject?.title}</strong>
+                            <span>{currentProject?.client?.name}</span>
+                        </h3>
+                    </div>
+                    
+                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`project-assign-${currentProject?._id}`} className="me-3">Members</ListGroup.Item>
                         
                         {fields['members'] && Object.keys(fields.members).length > 0 && (
                             <MemberInitials members={currentProject?.members} showAssignBtn={true} postId={currentProject?._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `member--${currentProject?._id}-${memberid}`)} />
-
-                            // <>
-                            //     {Object.entries(fields.members).slice(0, 5).map(([id, name], memberindex) => (
-                            //         <ListGroup.Item action key={`member-${memberindex}`}>
-                            //             <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
-                            //                 <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
-                            //             </MemberInitials>
-                            //             <span
-                            //                 className="remove-icon"
-                            //                 id={`member-${currentProject?._id}-${id}`}
-                            //                 onClick={() => removeMember(id, true)}
-                            //             >
-                            //                 <MdOutlineClose />
-                            //             </span>
-                            //         </ListGroup.Item>
-                            //     ))}
-                            //     {Object.keys(fields.members).length > 5 && (
-                            //         <ListGroup.Item key={`more-member-${currentProject?._id}`} className="more--member">
-                            //             <Dropdown>
-                            //                 <Dropdown.Toggle variant="primary">
-                            //                     <FaEllipsisV />
-                            //                 </Dropdown.Toggle>
-                            //                 <Dropdown.Menu>
-                            //                     <div className="over--scroll">
-                            //                         {Object.entries(fields.members).slice(5).map(([id, name], memberindex) => (
-                            //                             <Dropdown.Item key={`dropdown-member-${memberindex}`}>
-                            //                                 <ListGroup.Item action key={`action-${currentProject?._id}`}>
-                            //                                     <MemberInitials title={name} id={`currentmember-${id}-${memberindex}`}>
-                            //                                         <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
-                            //                                     </MemberInitials>
-                            //                                     <span
-                            //                                         className="remove-icon"
-                            //                                         id={`member-${currentProject?._id}-${id}`}
-                            //                                         onClick={() => removeMember(id)}
-                            //                                     >
-                            //                                         <MdOutlineClose />
-                            //                                     </span>
-                            //                                 </ListGroup.Item>
-                            //                             </Dropdown.Item>
-                            //                         ))}
-                            //                     </div>
-                            //                 </Dropdown.Menu>
-                            //             </Dropdown>
-                            //         </ListGroup.Item>
-                            //     )}
-                            // </>
                         )}
-                        {/* <ListGroup.Item className="add--member" key="addmember">
-                            <Button variant="primary" onClick={() => {dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true))}}><FaPlus /></Button>
-                        </ListGroup.Item> */}
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto">
                         <Button variant="outline-primary" className="btn--view" onClick={() => props.closeview(1)}>Tasks</Button>
