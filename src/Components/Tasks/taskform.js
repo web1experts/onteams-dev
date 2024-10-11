@@ -20,7 +20,31 @@ import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MemberInitials } from '../common/memberInitials';
 
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+        
+
 export const TaskForm = () => {
+    const modules = {
+        toolbar: [
+          
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          ['blockquote', 'code-block'],
+      
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'align': [] }],
+          ['clean'],                                         // remove formatting button
+          ['link']                                  // link and image buttons
+        ]
+      };
+
+      const formats = [
+         'bold', 'italic', 'underline', 'strike', 'blockquote',
+        'list', 'bullet', 'indent'
+      ];
+      
+
+      
     const dispatch = useDispatch()
     const memberdata = getMemberdata()
     const [workflowstatus, setWorkflowStatus]  = useState(false)
@@ -391,7 +415,9 @@ export const TaskForm = () => {
         const updatedSelectedMembers = { ...commonState.taskForm.members };
         delete updatedSelectedMembers[member];
         delete fields['members'][member]
-        dispatch(updateStateData(TASK_FORM, { members: updatedSelectedMembers }))
+        // dispatch(updateStateData(TASK_FORM, { members: updatedSelectedMembers }))
+       
+         dispatch(updateTask(currentTask._id, {members: Object.keys(updatedSelectedMembers)}))
     };
     
     const [taskModalState, setTaskModalState] = useState(refreshstates(commonState.active_formtype || false))
@@ -428,7 +454,7 @@ export const TaskForm = () => {
     };
 
     // Function to handle blur event on subtask input
-    const handleBlur = (index) => { console.log('bluer tirgger')
+    const handleBlur = (index) => { 
         const subtaskValue = subtasks[index];
         if (subtaskValue === '') {
             removeSubtask(index);
@@ -662,13 +688,27 @@ export const TaskForm = () => {
                                     }
                                     
                                     <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
-                                        <textarea className="form-control" key={`task-desc-${commonState?.taskForm?.tab}`} placeholder="Add a title" rows="2" name="description" value={fields['description'] || ''} onBlur={async (e) => {
+                                    <ReactQuill 
+                                        value={fields['description'] || ''}
+                                        onChange={(value) => {
+                                            setFields({...fields, ['description']: value})
+                                            dispatch(updateStateData(TASK_FORM, { ['description']: value }));
+                                            setErrors({ ...errors, ['description']: '' });
+                                        }}
+                                        formats={formats} 
+                                        modules={modules}
+                                        onBlur={async (e) => {
+                                            await dispatch(updateTask(currentTask._id, {description: fields['description']}))
+                                        }}
+                                    />
+
+                                        {/* <textarea className="form-control" key={`task-desc-${commonState?.taskForm?.tab}`} placeholder="Add a title" rows="2" name="description" value={fields['description'] || ''} onBlur={async (e) => {
                                             await dispatch(updateTask(currentTask._id, {description: e.target?.value}))
                                         }} onChange={handleChange}>{fields['description'] || ''}</textarea>
                                         <ul className="editor--options">
                                             <li><a href="javascript:;"><FaBold /></a></li>
                                             <li><a href="javascript:;"><FaItalic /></a></li>
-                                        </ul>
+                                        </ul> */}
                                     </div>
                                 </Form.Label>
                             </Form.Group>
@@ -816,7 +856,7 @@ export const TaskForm = () => {
                             <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                             <p className="m-0">
                                 {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                    <MemberInitials members={fields['members']}  showall={true} showAssign={false} postId={`edit-${currentTask?._id}`} type = "task" onMemberClick={(memberid, extraparam = false) => removeMember( memberid)} />
+                                    <MemberInitials members={fields['members']} showRemove={true}  showall={true} showAssign={false} postId={`edit-${currentTask?._id}`} type = "task" onMemberClick={(memberid, extraparam = false) => removeMember( memberid, true)} />
 
                                     // Object.entries(fields['members']).map(([key, value]) => (
                                     //     <ListGroup.Item action key={`key-member-${key}`}>

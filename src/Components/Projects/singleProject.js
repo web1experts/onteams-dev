@@ -489,7 +489,7 @@ function SingleProject(props) {
                         <ListGroup.Item key={`project-assign-${currentProject?._id}`} className="me-3">Members</ListGroup.Item>
                         
                         {fields['members'] && Object.keys(fields.members).length > 0 && (
-                            <MemberInitials members={currentProject?.members} showAssignBtn={true} postId={currentProject?._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `member--${currentProject?._id}-${memberid}`)} />
+                            <MemberInitials showRemove={true} members={currentProject?.members} showAssignBtn={true} postId={currentProject?._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `member--${currentProject?._id}-${memberid}`)} />
                         )}
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto">
@@ -619,7 +619,7 @@ function SingleProject(props) {
                             <div className="m-0 d-flex align-items-center flex-wrap">
                                     {
                                         fields.members && Object.keys(fields.members).length > 0 && 
-                                        <MemberInitials members={fields['members']} showall={true} showAssignBtn={false} postId={`edit-${currentProject?._id}`} type = "project" onMemberClick={(memberid, extraparam = false) => removeMember( memberid)} />
+                                        <MemberInitials members={fields['members']} showRemove={true} showall={true} showAssignBtn={false} postId={`edit-${currentProject?._id}`} type = "project" onMemberClick={(memberid, extraparam = false) => removeMember( memberid)} />
 
                                     }
                                 {/* {fields.members && Object.keys(fields.members).length > 0 && (

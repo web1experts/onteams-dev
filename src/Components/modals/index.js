@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateOwnership } from '../../redux/actions/workspace.action';
 import useFilledClass from "../customHooks/useFilledclass";
 import {updateProject} from "../../redux/actions/project.action"
-import { Button, Modal, Form, ListGroup, FloatingLabel, Dropdown } from "react-bootstrap";
+import { Button, Modal, Form, ListGroup, FloatingLabel, Dropdown , Alert} from "react-bootstrap";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { FaCheck, FaPlusCircle, FaTimesCircle, FaUpload, FaRegTrashAlt, FaEllipsisV, FaTrashAlt, FaRegTimesCircle } from "react-icons/fa";
 import fileIcon from './../../images/file-icon-image.jpg'
@@ -18,6 +18,7 @@ import { MdArrowDownward } from "react-icons/md";
 import { GrDrag } from "react-icons/gr";
 import { dataObject } from '../../helpers/objectdata';
 import { useDropzone } from 'react-dropzone'
+import { useToast } from '../../context/ToastContext';
 export function AlertDialog(props) {
   const [open, setOpen] = useState(false);
   const [ loader, setLoader ] = useState(false);
@@ -461,6 +462,7 @@ export function MemberModal( props){
 }
 
 export const  WorkFlowModal =  (props) => {
+  const addToast = useToast();
   const dispatch = useDispatch()
   const modalstate = useSelector(state => state.common.workflowmodal);
   const commonState = useSelector( state => state.common)
@@ -477,7 +479,8 @@ export const  WorkFlowModal =  (props) => {
   const workflowstate = useSelector(state => state.workflow)
   const [search, setSearch] = useState('');
   const [ selectedTab, setSelectedTab] = useState({})
-
+  const [ showAlert, setshowAlert ] = useState( false )
+  const [ AlertMsg, setAlertMsg ] = useState( '' )
   const refreshstates = (formtype) => {
     const stateObject = {}
     switch (formtype) {
@@ -807,6 +810,15 @@ export const  WorkFlowModal =  (props) => {
                         </Form.Group>
                       }
                         <Form.Group className="mb-0 form-group" >
+                            {
+                              showAlert &&
+                              <Alert variant="danger" onClose={() => setshowAlert(false)} dismissible>
+                                <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+                                <p>
+                                  {AlertMsg}
+                                </p>
+                              </Alert>
+                            }
                             <Form.Label><strong>Taskboard setup</strong></Form.Label>
                             <p>Add, remove, reorder and rename the worksteps to reflect the way you work.</p>
                             {
@@ -869,7 +881,24 @@ export const  WorkFlowModal =  (props) => {
                                                       </small>
                                                       {
                                                       index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
-                                                        <span className="delete--workstep ms-2" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
+                                                        <span className="delete--workstep ms-2" onClick={() => {
+                                                          if( commonState?.currentProject?._id && commonState?.currentProject.workflow?.tabs){
+                                                            const tabdata = commonState?.currentProject.workflow?.tabs.find(t => t._id === tab._id);
+
+                                                            // Get the taskCount
+                                                            const taskCount = tabdata ? tabdata.taskCount : 0;
+                                                            if( taskCount > 0){
+                                                              setshowAlert( true)
+                                                              setAlertMsg("This workflow contains task. Move them into another flow and try again.")
+                                                              // addToast("This workflow contains task. Move them into another flow and try again.", 'danger');
+                                                            }else{
+                                                              removetab(index)
+                                                            }
+                                                          }else{
+                                                            removetab(index)
+                                                          }
+                                                          
+                                                        }}><FaRegTimesCircle /></span>
                                                       }
                                                       
                                                     </>

@@ -110,13 +110,15 @@ export const MemberInitials = React.memo(( props ) => {
                                 <Initials title={name} id={`member-${id}-${memberindex}`}>
                                     <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
                                 </Initials>
-                                <span
-                                    className="remove-icon"
-                                    id={`member-${props.postId}-${id}`}
-                                    onClick={() => props.onMemberClick(id, true)}
-                                >
-                                    <MdOutlineClose />
-                                </span>
+                                {props.showRemove && (
+                                    <span
+                                        className="remove-icon"
+                                        id={`member-${props.postId}-${id}`}
+                                        onClick={() => props.onMemberClick(id, true)}
+                                    >
+                                        <MdOutlineClose />
+                                    </span>
+                                )}
                             </ListGroup.Item>
                         ))
                     ) : (
@@ -126,13 +128,15 @@ export const MemberInitials = React.memo(( props ) => {
                                 <Initials title={name} id={`member-${id}-${memberindex}`}>
                                     <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
                                 </Initials>
-                                <span
-                                    className="remove-icon"
-                                    id={`member-${props.postId}-${id}`}
-                                    onClick={() => props.onMemberClick(id, true)}
-                                >
-                                    <MdOutlineClose />
-                                </span>
+                                {props.showRemove && (
+                                    <span
+                                        className="remove-icon"
+                                        id={`member-${props.postId}-${id}`}
+                                        onClick={() => props.onMemberClick(id, true)}
+                                    >
+                                        <MdOutlineClose />
+                                    </span>
+                                )}
                             </ListGroup.Item>
                         ))}
                         {Object.entries(members).length > 6 && (
