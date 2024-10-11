@@ -55,7 +55,7 @@ export const MemberInitials = React.memo(( props ) => {
                         ))
                     ) : (
                         <>
-                            {members.slice(0, members.length > 6 ? 5 : 6).map((member, memberIndex) => (
+                            {members.slice(0, members.length > 5 ? 4 : 5).map((member, memberIndex) => (
                                 <ListGroup.Item action key={`member-${memberIndex}`}>
                                     <Initials title={member.name} id={`member-${member._id}`}>
                                         <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>
@@ -74,10 +74,9 @@ export const MemberInitials = React.memo(( props ) => {
                                 </ListGroup.Item>
                             ))}
                             
-                            {members.length > 6 && (
+                            {members.length > 5 && (
                                 <ListGroup.Item key={`more-member-${props.postId}`} className="more--member">
-                                    <span className="d-none d-xl-block">+{members.slice(5).length}</span>
-                                    <span className="d-block d-xl-none">+{members.slice(3).length}</span>
+                                    <span>+{members.slice(4).length}</span>
                                 </ListGroup.Item>
                             )}
                         </>

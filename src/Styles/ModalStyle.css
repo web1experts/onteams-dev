@@ -207,11 +207,6 @@
     height: calc(100% - 50px);
 }
 
-.file--preview--modal .modal-body {
-    max-height: calc(100vh - 56px);
-    overflow-y: auto;
-}
-
 .file--preview--modal .file--flex {
     display: flex;
     flex-flow: row wrap;
@@ -373,10 +368,11 @@ ul#subtasks-ul li {
     margin-bottom: 0;
 }
 
-ul#subtasks-ul .form-group .form-control:focus, ul#subtasks-ul .form-group .form-control:focus-visible {
+ul#subtasks-ul .form-group .form-control, ul#subtasks-ul .form-group .form-control:focus, ul#subtasks-ul .form-group .form-control:focus-visible {
     border: 0;
     box-shadow: none;
     outline: 0;
+    padding: 0 1rem;
 }
 
 ul#subtasks-ul .form-group input[type="checkbox"] {
