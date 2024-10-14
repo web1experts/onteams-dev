@@ -15,7 +15,7 @@ import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
 import fileIcon from './../../images/file-icon-image.jpg'
-import { selectboxObserver, getMemberdata } from "../../helpers/commonfunctions";
+import { selectboxObserver, getMemberdata, parseDateWithoutTimezone } from "../../helpers/commonfunctions";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import SingleProject from "./singleProject";
@@ -80,13 +80,13 @@ function ProjectsPage() {
     useEffect(() => {
         selectboxObserver()
         dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
-    }, []);
+    }, [dispatch]);
     useEffect(() => {
         if (clientFeed && clientFeed.clientData && clientFeed.clientData.length > 0) {
             setClientList(clientFeed.clientData)
             dispatch(updateStateData(ALL_CLIENTS, clientFeed.clientData))
         }
-    }, [clientFeed])
+    }, [clientFeed, dispatch])
 
     useEffect(() => {
         if (apiClient.createClient) {
@@ -124,10 +124,10 @@ function ProjectsPage() {
 
 
     // Function to remove the last member
-    const removeMember = (member) => {
-        delete fields['members'][member]
-        dispatch(updateStateData(PROJECT_FORM, { members: fields['members'] || {} }))
-    };
+    // const removeMember = (member) => {
+    //     delete fields['members'][member]
+    //     dispatch(updateStateData(PROJECT_FORM, { members: fields['members'] || {} }))
+    // };
 
     const [isdescEditor, setIsDescEditor] = useState(false);
     const [isTaskEditor, setIsTaskEditor] = useState(false);
@@ -215,7 +215,7 @@ function ProjectsPage() {
             setFields({ ...fields, ['status']: selectedStatus });
             handleStatusClose()
         }
-    }, [selectedStatus]);
+    }, [selectedStatus, dispatch]);
 
     const handleListProjects = async () => {
         let selectedfilters = { currentPage: currentPage }
@@ -319,7 +319,7 @@ function ProjectsPage() {
             });
             setAllmembers(memberarray)
         }
-    }, [memberFeed]);
+    }, [memberFeed, dispatch]);
 
     useEffect(() => {
         const check = ['undefined', undefined, 'null', null, '']
@@ -354,38 +354,38 @@ function ProjectsPage() {
     // }
 
 
-    const handleRemoveMember = async (project, memberId, targetelement = null) => {
-        try {
-            const targetElement = document.getElementById(targetelement);
+    // const handleRemoveMember = async (project, memberId, targetelement = null) => {
+    //     try {
+    //         const targetElement = document.getElementById(targetelement);
     
-            if (targetElement) {
-                // Disable the button or make it non-interactive
-                targetElement.classList.add('disabled-pointer');
-            }
+    //         if (targetElement) {
+    //             // Disable the button or make it non-interactive
+    //             targetElement.classList.add('disabled-pointer');
+    //         }
     
-            const currentMembers = project.members;
-            const updatedMembers = currentMembers
-                .filter(member => member._id !== memberId)
-                .map(member => member._id);
+    //         const currentMembers = project.members;
+    //         const updatedMembers = currentMembers
+    //             .filter(member => member._id !== memberId)
+    //             .map(member => member._id);
     
-            // Dispatch the async action to update the project members
-            await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }));
+    //         // Dispatch the async action to update the project members
+    //         await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }));
     
-            if (targetElement) {
-                // Re-enable the button or make it interactive again
-                targetElement.classList.remove('disabled-pointer');
-            }
+    //         if (targetElement) {
+    //             // Re-enable the button or make it interactive again
+    //             targetElement.classList.remove('disabled-pointer');
+    //         }
     
-        } catch (error) {
-            console.error("Error removing member:", error);
+    //     } catch (error) {
+    //         console.error("Error removing member:", error);
     
-            // Ensure target element is re-enabled even if there's an error
-            const targetElement = document.getElementById(targetelement);
-            if (targetElement) {
-                targetElement.classList.remove('disabled-pointer');
-            }
-        }
-    };
+    //         // Ensure target element is re-enabled even if there's an error
+    //         const targetElement = document.getElementById(targetelement);
+    //         if (targetElement) {
+    //             targetElement.classList.remove('disabled-pointer');
+    //         }
+    //     }
+    // };
 
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
@@ -807,7 +807,7 @@ function ProjectsPage() {
                                     </Form.Label>
                                 </Form.Group>
                                 <Form.Group className="mb-0 form-group">
-                                    <Form.Label className="w-100 m-0" key={`description-${fields['description'] || 'desc'}`}>
+                                    <Form.Label className="w-100 m-0">
                                         <small>Description</small>
                                         {
                                             !isdescEditor &&
@@ -839,7 +839,7 @@ function ProjectsPage() {
                                             {/* <Form.Control type="date" name="start_date" onChange={handleChange} value={fields['start_date'] || ''} /> */}
                                             <DatePicker 
                                                 name="start_date"
-                                                value={fields['start_date']} 
+                                                value={fields['start_date'] ? parseDateWithoutTimezone(fields.start_date) : ''} 
                                                 onChange={async (value) => {
                                                         const date = value.toDate();
                                                         // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
@@ -866,7 +866,7 @@ function ProjectsPage() {
                                             {/* <Form.Control type="date" name="due_date" onChange={handleChange} value={fields['due_date'] || ''} /> */}
                                             <DatePicker 
                                                 name="due_date"
-                                                value={fields['due_date']} 
+                                                value={fields['due_date'] ? parseDateWithoutTimezone(fields.due_date) : ''} 
                                                 onChange={async (value) => {
                                                         const date = value.toDate();
                                                         // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC

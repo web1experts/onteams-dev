@@ -154,3 +154,8 @@ export const cleanupCustomDropdown = (select) => {
     }
     select.style.display = ''; // Restore original display style
 };
+
+export function parseDateWithoutTimezone(dateString) {
+    const [year, month, day] = dateString.split('T')[0].split('-');
+    return new Date(year, month - 1, day); // Month is zero-indexed
+  }
