@@ -1287,7 +1287,7 @@ table tr.active td {
   align-items: center;
 }
 
-.projects--grid .task--list ul li .tasks-form-action p  .more--member {
+.projects--grid .task--list ul li .tasks-form-action p .more--member {
   width: 25px;
   height: 25px;
   display: flex;
@@ -1298,8 +1298,10 @@ table tr.active td {
   letter-spacing: -1px;
   color: #ffffff;
   border-radius: 100px;
-  border: 1px solid #ffffff;
+  border: 0;
+  padding: 0;
 }
+
 
 .project--form--actions button.list-group-item, .tasks-form-action button.list-group-item {
   padding: 0;
@@ -1350,7 +1352,7 @@ table tr.active td {
   color: #ffffff;
   overflow: hidden;
   padding: 0;
-  border: 1px solid #ffffff;
+  border: 0;
 }
 
 .tasks-form-action .list-group-item .team--initial {
@@ -3122,6 +3124,11 @@ pre {
   font-size: .9rem;
   color: #ffffff;
   font-weight: 600;
+}
+
+.page--wrapper table td .select--dropdown .btn:focus-visible, .page--wrapper table td .select--dropdown .btn:active {
+  background-color: var(--bs-btn-hover-bg);
+  border-color: var(--bs-btn-hover-border-color);
 }
 
 .page--wrapper table td .select--dropdown .dropdown-menu::before {

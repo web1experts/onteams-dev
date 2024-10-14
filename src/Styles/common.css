@@ -1,3 +1,7 @@
+*:focus-visible {
+  outline: none;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -138,6 +142,10 @@ fieldset:disabled .btn {
   -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
 }
 
+.btn-check:checked+.btn:focus-visible, .btn.active:focus-visible, .btn.show:focus-visible, .btn:first-child:active:focus-visible, :not(.btn-check)+.btn:active:focus-visible {
+  box-shadow: none;
+}
+
 .btn-outline-primary:hover,
 .btn-outline-primary.focus,
 .btn-outline-primary:focus,
@@ -146,8 +154,8 @@ fieldset:disabled .btn {
 .btn.show,
 .btn:first-child:active,
 :not(.btn-check)+.btn:active {
-  color: #5fb39f;
-  background-color: #5ead9a08;
+  color: #ffffff;
+  background-color: #5fb39f;
   border-color: #5fb39f;
   box-shadow: none
 }
@@ -1166,7 +1174,7 @@ span.status--circle.info--color {
   }
 
   .modal-body {
-    max-height: calc(100vh - 100px);
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
   }
 }
@@ -1178,7 +1186,8 @@ span.status--circle.info--color {
   }
 
   .modal-dialog {
-    max-width: calc(100% - 10px);
+    max-width: 100%;
+    padding: 2rem 1rem;
   }
 
   .modal-content {
