@@ -276,11 +276,9 @@ const TasksList = React.memo((props) => {
                                                                 <FloatingLabel label="Task Title *">
                                                                     <Form.Control type="text" name="title" placeholder="Task Title" onChange={handleChange} readOnly={loader} />
                                                                 </FloatingLabel>
-                                                                <Form.Text muted>
-                                                                    Press enter to add
-                                                                </Form.Text>
                                                                 <span className="close-task" onClick={() => { closetask(tab._id) }}><FaRegTimesCircle /></span>
                                                             </Form.Group>
+                                                            <Form.Text muted>Press enter to add</Form.Text>
                                                         </Form>
                                                     </li>
                                                 }
