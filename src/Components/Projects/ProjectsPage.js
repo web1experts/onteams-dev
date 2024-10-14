@@ -815,6 +815,7 @@ function ProjectsPage() {
                                         }
                                        
                                         <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
+                                            
                                             <ReactQuill 
                                                 value={fields['description'] || ''}
                                                 onChange={(value) => {
