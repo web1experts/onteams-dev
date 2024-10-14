@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup, Dropdown, ListGroupItem} from "react-bootstrap";
 import { MdFileDownload, MdOutlineClose } from "react-icons/md";
@@ -19,7 +19,7 @@ import { updateTask, deleteTask } from '../../redux/actions/task.action';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MemberInitials } from '../common/memberInitials';
-
+import DatePicker from "react-multi-date-picker";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
         
@@ -43,6 +43,7 @@ export const TaskForm = () => {
         'list', 'bullet', 'indent'
       ];
       
+
 
       
     const dispatch = useDispatch()
@@ -74,6 +75,8 @@ export const TaskForm = () => {
     const handleNewComment = (event) => {
         setComments(event.target.value);
     }
+
+   
 
     const [search, setSearch] = useState('');
     const handleSearchChange = (e) => {
@@ -128,7 +131,6 @@ export const TaskForm = () => {
             if(currentTask.subtasks && currentTask.subtasks.length > 0 ){
                 for (let index = 0; index < currentTask.subtasks.length; index++) {
                     let subtask = currentTask.subtasks[index];
-                    console.log('TASk:: ', subtask)
                 }
                 setSubtasks(currentTask.subtasks)
             }
@@ -325,14 +327,6 @@ export const TaskForm = () => {
         return null
     }
 
-    // const MemberInitials = ({ id, children, title }) => {
-    //     return (
-    //         <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
-    //             {children}
-    //         </OverlayTrigger>
-    //     )
-    // };
-
     const handleRemovefiles = (id) => {
         let previousfiles = fields['files']
         const updatedFiles = previousfiles.filter(file => file !== id);
@@ -460,7 +454,7 @@ export const TaskForm = () => {
             removeSubtask(index);
         }else{
              dispatch(updateTask(currentTask._id, {subtasks: subtasks}))
-             addSubtask()
+             
         }
     };
 
@@ -869,8 +863,30 @@ export const TaskForm = () => {
                                 </div>
                             </div>
                             <ListGroup.Item>
-                                <label for='due--date'><FaRegCalendarAlt /> Due date</label>
-                                <Form.Control type="date" id='due--date' name="due_date" onChange={async (e) => {await dispatch(updateTask(currentTask._id, {due_date: e.target?.value}))}} value={fields['due_date'] || ''} />
+                                <label for='due--date'><GrAttachment /> Due date</label>
+                                <DatePicker 
+                                    name="due_date"
+                                    value={fields['due_date']} 
+                                    onChange={async (value) => {
+                                        const date = value.toDate();
+                                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                                        const year = date.getFullYear();
+                                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                                        const day = date.getDate().toString().padStart(2, '0');
+                                        const hours = date.getHours().toString().padStart(2, '0');
+                                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                                    
+                                        // Combine into the desired format
+                                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                                        await dispatch(updateTask(currentTask._id, {due_date: formattedDate}))}
+                                    }
+                                    
+                                    className="form-control"
+                                    placeholder="dd/mm/yyyy"
+                                />
+                                
                             </ListGroup.Item>
                             <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
                                 <GrAttachment /> Workflow status

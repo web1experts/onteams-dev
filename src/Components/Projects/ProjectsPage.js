@@ -23,6 +23,9 @@ import { TaskForm } from "../Tasks/taskform";
 import TasksList from "../Tasks/list";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 import { MemberInitials } from "../common/memberInitials";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import DatePicker from "react-multi-date-picker";
 import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE } from "../../redux/actions/types";
 function ProjectsPage() {
     const [isActiveView, setIsActiveView] = useState(2);
@@ -56,7 +59,24 @@ function ProjectsPage() {
     let fieldErrors = {};
     let active = 2;
     const workflowstate = useSelector(state => state.workflow)
-    
+    const modules = {
+        toolbar: [
+          
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          ['blockquote', 'code-block'],
+      
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'align': [] }],
+          ['clean'],                                         // remove formatting button
+          ['link']                                  // link and image buttons
+        ]
+      };
+
+      const formats = [
+         'bold', 'italic', 'underline', 'strike', 'blockquote',
+        'list', 'bullet', 'indent'
+      ];
+      
     useEffect(() => {
         selectboxObserver()
         dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
@@ -787,7 +807,7 @@ function ProjectsPage() {
                                     </Form.Label>
                                 </Form.Group>
                                 <Form.Group className="mb-0 form-group">
-                                    <Form.Label className="w-100 m-0">
+                                    <Form.Label className="w-100 m-0" key={`description-${fields['description'] || 'desc'}`}>
                                         <small>Description</small>
                                         {
                                             !isdescEditor &&
@@ -795,11 +815,18 @@ function ProjectsPage() {
                                         }
                                        
                                         <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
-                                            <textarea className="form-control" placeholder="Add a title" rows="2" name="description" value={fields['description'] || ''} onChange={handleChange}>{fields['description'] || ''}</textarea>
-                                            <ul className="editor--options">
-                                                <li><a href="javascript:;"><FaBold /></a></li>
-                                                <li><a href="javascript:;"><FaItalic /></a></li>
-                                            </ul>
+                                            <ReactQuill 
+                                                value={fields['description'] || ''}
+                                                onChange={(value) => {
+                                                    setFields({...fields, ['description']: value})
+                                                    dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
+                                                    setErrors({ ...errors, ['description']: '' });
+                                                }}
+                                                formats={formats} 
+                                                modules={modules}
+                                                
+                                            />
+                                            
                                         </div>
                                     </Form.Label>
                                 </Form.Group>
@@ -809,10 +836,57 @@ function ProjectsPage() {
                                     </Form.Label>
                                     <Row>
                                         <Col sm={12} lg={6}>
-                                            <Form.Control type="date" name="start_date" onChange={handleChange} value={fields['start_date'] || ''} />
+                                            {/* <Form.Control type="date" name="start_date" onChange={handleChange} value={fields['start_date'] || ''} /> */}
+                                            <DatePicker 
+                                                name="start_date"
+                                                value={fields['start_date']} 
+                                                onChange={async (value) => {
+                                                        const date = value.toDate();
+                                                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                                                        const year = date.getFullYear();
+                                                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                                                        const day = date.getDate().toString().padStart(2, '0');
+                                                        const hours = date.getHours().toString().padStart(2, '0');
+                                                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                                                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                                                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                                                    
+                                                        // Combine into the desired format
+                                                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                                                        handleChange({ target: { name: 'start_date', value: formattedDate } });
+                                                    }
+                                                }
+                                               
+                                                minDate={new Date()}
+                                                className="form-control"
+                                                placeholder="dd/mm/yyyy"
+                                            />
                                         </Col>
                                         <Col sm={12} lg={6} className="mt-3 mt-lg-0">
-                                            <Form.Control type="date" name="due_date" onChange={handleChange} value={fields['due_date'] || ''} />
+                                            {/* <Form.Control type="date" name="due_date" onChange={handleChange} value={fields['due_date'] || ''} /> */}
+                                            <DatePicker 
+                                                name="due_date"
+                                                value={fields['due_date']} 
+                                                onChange={async (value) => {
+                                                        const date = value.toDate();
+                                                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                                                        const year = date.getFullYear();
+                                                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                                                        const day = date.getDate().toString().padStart(2, '0');
+                                                        const hours = date.getHours().toString().padStart(2, '0');
+                                                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                                                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                                                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                                                    
+                                                        // Combine into the desired format
+                                                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                                                        handleChange({ target: { name: 'due_date', value: formattedDate } });
+                                                    }
+                                                }
+                                                minDate={new Date()}
+                                                className="form-control"
+                                                placeholder="dd/mm/yyyy"
+                                            />
                                         </Col>
                                     </Row>
                                 </Form.Group>
