@@ -1166,8 +1166,8 @@ span.status--circle.info--color {
   }
 
   .modal-body {
-    max-height: 100%;
-    overflow-y: scroll;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
   }
 }
 
@@ -1179,5 +1179,9 @@ span.status--circle.info--color {
 
   .modal-dialog {
     max-width: calc(100% - 10px);
+  }
+
+  .modal-content {
+    max-height: 100%;
   }
 }
