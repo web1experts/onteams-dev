@@ -317,7 +317,9 @@ const TasksList = React.memo((props) => {
                                                                     }
                                                                     <p className="m-0 ms-auto">
                                                                         {task?.members && task?.members.length > 0 && (
-                                                                            <MemberInitials members={task?.members} showRemove={false} showAssign={false} postId={task._id} type = "task" onMemberClick={(memberid, extraparam = false) => removeMember( memberid,task)} />
+                                                                            <MemberInitials  directUpdate={true} members={task?.members} showRemove={false} showAssign={false} postId={task._id} type = "task"
+                                                                            //  onMemberClick={(memberid, extraparam = false) => removeMember( memberid,task)} 
+                                                                             />
 
                                                                             // task.members.slice(0, 3).map((member, index) => (
                                                                             //     <ListGroup.Item action key={`key-member-${index}`}>

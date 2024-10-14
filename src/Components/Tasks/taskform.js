@@ -837,7 +837,9 @@ export const TaskForm = () => {
                             <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                             <p className="m-0">
                                 {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                    <MemberInitials members={fields['members']} showRemove={true}  showall={true} showAssign={false} postId={`edit-${currentTask?._id}`} type = "task" onMemberClick={(memberid, extraparam = false) => removeMember( memberid, true)} />
+                                    <MemberInitials directUpdate={true} members={fields['members']} showRemove={true}  showall={true} showAssign={false} postId={`edit-${currentTask?._id}`} type = "task" 
+                                    // onMemberClick={(memberid, extraparam = false) => removeMember( memberid, true)} 
+                                    />
 
                                     // Object.entries(fields['members']).map(([key, value]) => (
                                     //     <ListGroup.Item action key={`key-member-${key}`}>

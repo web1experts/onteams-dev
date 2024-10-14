@@ -334,7 +334,7 @@ function ProjectsPage() {
     // }
 
 
-    const handleRemoveMember = useCallback(async (project, memberId, targetelement = null) => {
+    const handleRemoveMember = async (project, memberId, targetelement = null) => {
         try {
             const targetElement = document.getElementById(targetelement);
     
@@ -365,7 +365,7 @@ function ProjectsPage() {
                 targetElement.classList.remove('disabled-pointer');
             }
         }
-    }, [dispatch]);
+    };
 
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
@@ -668,7 +668,9 @@ function ProjectsPage() {
                                                     <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}</abbr> {project.title}</span></td>
                                                     <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
                                                     <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                        <MemberInitials key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} />
+                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
+                                                        // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
+                                                        />
 
                                                     </td>
                                                     <td key={`status-index-${index}`} data-label="Status" className="onHide">
@@ -720,7 +722,9 @@ function ProjectsPage() {
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
                             (currentProject?.members && currentProject?.members.length > 0) &&
-                            <MemberInitials key={`MemberNames-header-${currentProject?._id}`} showRemove={true} members={currentProject?.members} showAssignBtn={true} postId={currentProject?._id} type = "project" onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `remove-member-${currentProject._id}-${memberid}`)} />
+                            <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={true} members={currentProject?.members} showAssignBtn={true} postId={currentProject?._id} type = "project"
+                            //  onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `remove-member-${currentProject._id}-${memberid}`)}
+                            />
                         }
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
@@ -820,7 +824,9 @@ function ProjectsPage() {
                                 <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                                 <p className="m-0">
                                     {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                        <MemberInitials key={`MemberNames-header-new`}  showall={true} members={fields['members']} showAssignBtn={false} postId="new" showRemove={true} onMemberClick={(memberid, extraparam = false) =>  removeMember(memberid)} />
+                                        <MemberInitials directUpdate={false} key={`MemberNames-header-new`}  showall={true} members={fields['members']} showAssignBtn={false} postId="new" type="project" showRemove={true} 
+                                        // onMemberClick={(memberid, extraparam = false) =>  removeMember(memberid)}
+                                         />
 
                                         // Object.entries(fields['members']).map(([key, value]) => (
                                         //     <ListGroup.Item action key={`key-member-${key}`}>
