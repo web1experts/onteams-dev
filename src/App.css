@@ -1310,6 +1310,7 @@ table tr.active td {
   background: none;
   margin-bottom: 0;
   margin-right: -5px;
+  border: 0;
 }
 
 .project--form--actions .more--member {

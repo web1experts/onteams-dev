@@ -692,10 +692,6 @@ Add Project Modal CSS-=-=-
   margin-bottom: 0;
 }
 
-/* .modal.show {
-  background: rgba(80,84,80,0.4);
-} */
-
 .modal-backdrop.show {
   background: rgba(80, 84, 80, 0.8);
   z-index: 555555;
@@ -703,8 +699,6 @@ Add Project Modal CSS-=-=-
 }
 
 .status--modal .status--list {
-  /* max-height: 300px;
-  overflow-y: auto; */
   margin-top: 1rem;
 }
 
@@ -823,23 +817,6 @@ Add Project Modal CSS-=-=-
   display: flex;
   align-items: center;
 }
-
-/* .add--workflow--modal .workflow--list .list-group-item.border--top--plan {
-  border-top: 3px solid #91C8E4;
-}
-
-.add--workflow--modal .workflow--list .list-group-item.border--top--progress {
-  border-top: 3px solid #FEBBCC;
-}
-
-.add--workflow--modal .workflow--list .list-group-item.border--top--review {
-  border-top: 3px solid #ecc259;
-}
-
-.add--workflow--modal .workflow--list .list-group-item.border--top--complete {
-  border-top: 3px solid #CECE5A;
-} */
-
 
 .add--workflow--modal .workflow--list .list-group-item .flow--circle {
   width: 14px;
@@ -1052,7 +1029,7 @@ span.status--circle.info--color {
 
 .modal-body {
   max-height: 100%;
-  overflow-y: visible;
+  overflow-y: auto;
 }
 
 .edit--task--modal .project--form {

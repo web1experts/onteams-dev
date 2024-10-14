@@ -8,7 +8,7 @@ import { updateStateData, togglePopups } from '../../redux/actions/common.action
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
-import { FaPaperPlane } from "react-icons/fa";
+import { FaPaperPlane, FaRegCalendarAlt } from "react-icons/fa";
 import { BiSolidPencil } from "react-icons/bi";
 import { GrDrag } from "react-icons/gr";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -869,7 +869,7 @@ export const TaskForm = () => {
                                 </div>
                             </div>
                             <ListGroup.Item>
-                                <label for='due--date'><GrAttachment /> Due date</label>
+                                <label for='due--date'><FaRegCalendarAlt /> Due date</label>
                                 <Form.Control type="date" id='due--date' name="due_date" onChange={async (e) => {await dispatch(updateTask(currentTask._id, {due_date: e.target?.value}))}} value={fields['due_date'] || ''} />
                             </ListGroup.Item>
                             <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
