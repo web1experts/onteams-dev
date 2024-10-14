@@ -1751,6 +1751,11 @@ Project Task View CSS=-=-=
   border: 0;
 }
 
+.wrapper--title .members--list .members--list .list-group-item:first-child {
+  margin-right: -5px;
+  border: 1px solid #ffffff
+}
+
 .wrapper--title .members--list .list-group-item {
   background: none;
   margin-left: 0;
@@ -3471,7 +3476,7 @@ Media CSS-=-==
   .holiday--table thead,
   .holiday--table td:first-child,
   .project--table thead,
-  .project--table td:first-child,
+  .project--table td:first-child abbr,
   .activity--table thead,
   .invoice--table thead {
     display: none;

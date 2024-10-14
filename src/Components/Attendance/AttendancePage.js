@@ -67,7 +67,7 @@ function AttendancePage() {
                   <th scope="col">Hitesh Kumar</th>
                   <th scope="col">Gaurav Sharma</th>
                   <th scope="col">Neha Dutt</th>
-                  <th scope="col">Actions</th>
+                  <th scope="col" className="text-end">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -80,7 +80,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -99,7 +99,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -118,7 +118,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -137,7 +137,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -156,7 +156,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -175,7 +175,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -194,7 +194,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -213,7 +213,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -232,7 +232,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -251,7 +251,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -270,7 +270,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -289,7 +289,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -308,7 +308,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -327,7 +327,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -346,7 +346,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -365,7 +365,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -384,7 +384,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -403,7 +403,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -422,7 +422,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -441,7 +441,7 @@ function AttendancePage() {
                   <td>Half day</td>
                   <td>Present</td>
                   <td>Present</td>
-                  <td>
+                  <td className="text-end">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                       <Dropdown.Menu>

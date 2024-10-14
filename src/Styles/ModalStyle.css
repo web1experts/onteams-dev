@@ -149,11 +149,6 @@
     padding-bottom: 1rem;
 }
 
-.add--member--modal form .btn:focus-visible {
-    background: none;
-    /* border: 0; */
-}
-
 .filter--modal .list-group-item {
     border: 0;
     padding: 0;

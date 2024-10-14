@@ -376,14 +376,14 @@ function TimeTrackingPage() {
                 <Table responsive="lg" className="activity--table">
                   <thead>
                     <tr key="tracking-table-header">
-                      <th scope="col" width={20}>#</th>
-                      <th scope="col" width={200}>Member Name</th>
-                      <th scope="col" width={200} className="onHide">Project Name</th>
-                      <th scope="col" width={200} className="onHide">Task Name</th>
-                      <th scope="col" width={200} className="onHide">Project Time</th>
-                      <th scope="col" width={200} className="onHide">Total Time</th>
+                      <th scope="col">#</th>
+                      <th scope="col">Member Name</th>
+                      <th scope="col" className="onHide">Project Name</th>
+                      <th scope="col" className="onHide">Task Name</th>
+                      <th scope="col" className="onHide">Project Time</th>
+                      <th scope="col" className="onHide">Total Time</th>
                       <th scope="col" className="onHide">Status</th>
-                      <th scope="col" width={140} className="onHide">View</th>
+                      <th scope="col" className="onHide text-end">View</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -427,7 +427,7 @@ function TimeTrackingPage() {
                                     <Badge bg="danger">Inactive</Badge>
                                     }
                                 </td>
-                                <td className="onHide"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
+                                <td className="onHide text-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
                               </tr>
                               
                             </>

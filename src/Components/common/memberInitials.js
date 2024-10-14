@@ -1,8 +1,8 @@
 import React, { useState, useEffect,useMemo, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Dropdown } from "react-bootstrap";
-import { FaBold, FaChevronDown, FaItalic, FaPlus, FaRegTrashAlt, FaUpload, FaEllipsisV, FaCheck, FaPlusCircle, FaTimes } from "react-icons/fa";
-import { MdFileDownload, MdOutlineClose } from "react-icons/md";
+import { Row, Col, Button, ListGroup } from "react-bootstrap";
+import { FaPlus} from "react-icons/fa";
+import { MdOutlineClose } from "react-icons/md";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
@@ -117,10 +117,11 @@ export const MemberInitials = React.memo(( props ) => {
 
     return (
         <>
-        
-            { members && members.length > 0 && Array.isArray(members) ?  (
+        <ListGroup horizontal className="members--list">
+            { 
+                members && members.length > 0 && Array.isArray(members) ?  (
                 <>
-                <ListGroup horizontal className="members--list">
+                
                 {
                     (props.showall && props.showall === true) ? (
                         members.map((member, memberIndex) => (
@@ -190,21 +191,8 @@ export const MemberInitials = React.memo(( props ) => {
                             )}
                         </>
                     )
-                }
-
+                } 
                     
-                    {
-                        props.showAssignBtn && props.showAssignBtn === true && 
-
-                        props.type === "project" ?
-
-                            <ListGroup.Item key={`assign-members-${props.postId}`} className="add--member">
-                                <Button variant="primary" onClick={() => { { dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true)) } }}><FaPlus /></Button>
-                            </ListGroup.Item>
-                        :
-                        <></>
-                    }
-                    </ListGroup>
                 </>
             )
 
@@ -266,17 +254,25 @@ export const MemberInitials = React.memo(( props ) => {
                         ))}
                         {Object.entries(members).length > 6 && (
                             <ListGroup.Item key={`more-member-${props.postId}`} className="more--member">
-                                <span className="d-none d-xl-block">+{Object.entries(members).slice(5).length}</span>
-                                <span className="d-block d-xl-none">+{Object.entries(members).slice(3).length}</span>
+                                <span>+{Object.entries(members).slice(5).length}</span>
                             </ListGroup.Item>
                         )}
                         </>
                     )
                 }
                 </>
-        
+             
             }
-       
+            {
+                props.showAssignBtn && props.showAssignBtn === true && 
+                props.type === "project" ?
+                    <ListGroup.Item key={`assign-members-${props.postId}`} className="add--member">
+                        <Button variant="primary" onClick={() => { { dispatch(updateStateData(ASSIGN_MEMBER, true)); dispatch(togglePopups('members', true)) } }}><FaPlus /></Button>
+                    </ListGroup.Item>
+                :
+                <></>
+            }
+        </ListGroup>
         </>
     )
 })

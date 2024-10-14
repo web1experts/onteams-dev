@@ -11,8 +11,7 @@ import { GrAttachment } from "react-icons/gr";
 import { FaPaperPlane, FaRegCalendarAlt } from "react-icons/fa";
 import { BiSolidPencil } from "react-icons/bi";
 import { GrDrag } from "react-icons/gr";
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
+import { LuWorkflow } from "react-icons/lu";
 import { FilesPreviewModal } from '../modals';
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { updateTask, deleteTask } from '../../redux/actions/task.action';
@@ -49,6 +48,7 @@ export const TaskForm = () => {
     const dispatch = useDispatch()
     const memberdata = getMemberdata()
     const [workflowstatus, setWorkflowStatus]  = useState(false)
+    const [datePickerModal, setDatePickerModal]  = useState(false)
     const modalstate = useSelector(state => state.common.taskmodal);
     const taskForm = useSelector( state => state.common.taskForm)
     const apiResult = useSelector(state => state.task);
@@ -69,6 +69,7 @@ export const TaskForm = () => {
     const [ enablesubtaskedit, setEnableSubtakEdit ] = useState({})
     const [ShowCommentModel, setShowCommentModel] = useState(false);
     const handleCloseCommentModel = () => setShowCommentModel(false);
+    const handleDatetModal = () => setDatePickerModal(false);
     const [ editmessage, setEditMessage] = useState({})
     const [comments, setComments] = useState([]);
     const [workflowstatuses, setFlowstatus ] =  useState([])
@@ -862,34 +863,12 @@ export const TaskForm = () => {
                                     ))}
                                 </div>
                             </div>
-                            <ListGroup.Item>
-                                <label for='due--date'><GrAttachment /> Due date</label>
-                                <DatePicker 
-                                    name="due_date"
-                                    value={fields['due_date'] ? parseDateWithoutTimezone(fields.due_date) : ''} 
-                                    onChange={async (value) => {
-                                        const date = value.toDate();
-                                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                                        const year = date.getFullYear();
-                                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                                        const day = date.getDate().toString().padStart(2, '0');
-                                        const hours = date.getHours().toString().padStart(2, '0');
-                                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                                    
-                                        // Combine into the desired format
-                                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                                        await dispatch(updateTask(currentTask._id, {due_date: formattedDate}))}
-                                    }
-                                    
-                                    className="form-control"
-                                    placeholder="dd/mm/yyyy"
-                                />
-                                
+                            <ListGroup.Item onClick={() => { setDatePickerModal ( true )}}>
+                                <label for='date--picker'><FaRegCalendarAlt /> Due date</label>
+                                <label for='date--picker' className='date--new mb-0'>{fields['due_date']}</label>
                             </ListGroup.Item>
                             <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
-                                <GrAttachment /> Workflow status
+                                <LuWorkflow /> Workflow status
                                 <Form.Group className="mb-0 form-group pb-0">
                                     <Form.Label>
                                         {
@@ -918,17 +897,40 @@ export const TaskForm = () => {
                                 }} disabled={loader}><FaRegTrashAlt 
                             /> {loader ? 'Please wait...' : 'Delete'}</ListGroup.Item>
                         </ListGroup>
-                        
-                        {/* <Button variant="danger" onClick={async () => {
-                            setLoader( true)
-                            await dispatch(deleteTask(currentTask._id))
-                            setLoader( false)
-                            dispatch(togglePopups('taskform', false))
-                        }} disabled={loader}>{loader ? 'Please wait...' : 'Delete'}</Button> */}
                     </div>
                 </div>
             </Modal.Body>
         </Modal>
+        <Modal show={datePickerModal} onHide={() => { setDatePickerModal( false )}} centered size="md" className="date--picker--modal">
+                <Modal.Header closeButton>
+                    {/* <Modal.Title>Workflow status</Modal.Title> */}
+                </Modal.Header>
+                <Modal.Body>
+                    <DatePicker 
+                        name="due_date"
+                        id='date--picker'
+                        value={fields['due_date']} 
+                        onChange={async (value) => {
+                            const date = value.toDate();
+                            // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                            const year = date.getFullYear();
+                            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                            const day = date.getDate().toString().padStart(2, '0');
+                            const hours = date.getHours().toString().padStart(2, '0');
+                            const minutes = date.getMinutes().toString().padStart(2, '0');
+                            const seconds = date.getSeconds().toString().padStart(2, '0');
+                            const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                            // Combine into the desired format
+                            const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                            dispatch(updateStateData(TASK_FORM, { ['due_date']: formattedDate }));
+                            setDatePickerModal(false)
+                        }
+                        }                    
+                        className="form-control"
+                        placeholder="dd/mm/yyyy"
+                    />
+                </Modal.Body>
+            </Modal> 
         <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews}  toggle={setPreviewShow} filetoPreview={filetoPreview} />
             <Modal show={workflowstatus} onHide={() => { setWorkflowStatus( false )}} centered size="md" className="status--modal">
                 <Modal.Header closeButton>
