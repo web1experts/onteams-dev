@@ -87,7 +87,14 @@ export const MemberInitials = React.memo(( props ) => {
                     }
                 }
             break;
-    
+            case 'task':
+                if( props.postId !== "new"){
+                   
+                    const updatedSelectedMembers = { ...commonstate.taskForm.members };
+                    delete updatedSelectedMembers[memberId];
+                    dispatch(updateTask(props.postId, {members: Object.keys(updatedSelectedMembers)}))
+                }
+                break;
             default:
                 break;
         }

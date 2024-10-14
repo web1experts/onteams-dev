@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup, Dropdown, ListGroupItem} from "react-bootstrap";
 import { MdFileDownload, MdOutlineClose } from "react-icons/md";
 import { FaBold, FaEllipsisV, FaItalic, FaPlus, FaRegTrashAlt, FaTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
-import { selectboxObserver, getMemberdata } from "../../helpers/commonfunctions";
+import { selectboxObserver, getMemberdata, parseDateWithoutTimezone } from "../../helpers/commonfunctions";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
 import { FiFileText } from "react-icons/fi";
@@ -832,7 +832,20 @@ export const TaskForm = () => {
                             <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                             <p className="m-0">
                                 {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                    <MemberInitials directUpdate={true} members={fields['members']} showRemove={true}  showall={true} showAssign={false} postId={`edit-${currentTask?._id}`} type = "task" />
+                                    <MemberInitials directUpdate={true} members={fields['members']} showRemove={true}  showall={true} showAssign={false} postId={`${currentTask?._id}`} type = "task" 
+                                    // onMemberClick={(memberid, extraparam = false) => removeMember( memberid, true)} 
+                                    />
+
+                                    // Object.entries(fields['members']).map(([key, value]) => (
+                                    //     <ListGroup.Item action key={`key-member-${key}`}>
+                                    //         <MemberInitials title={value} id={`assign_member-${key}`}>
+                                    //             <span className="team--initial nm-k">{value?.charAt(0)}</span>
+                                    //         </MemberInitials>
+                                    //         <span className="remove-icon" onClick={() => removeMember(key)}>
+                                    //             <MdOutlineClose />
+                                    //         </span>
+                                    //     </ListGroup.Item>
+                                    // ))
                                 )}
                             </p>
 

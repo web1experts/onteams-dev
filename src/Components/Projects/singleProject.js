@@ -11,7 +11,7 @@ import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog, MemberModal, StatusModal, WorkFlowModal, FilesModal, FilesPreviewModal } from "../modals";
 import { useDropzone } from 'react-dropzone'
 import fileIcon from './../../images/file-icon-image.jpg'
-import { selectboxObserver } from "../../helpers/commonfunctions";
+import { selectboxObserver, parseDateWithoutTimezone } from "../../helpers/commonfunctions";
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
@@ -89,9 +89,6 @@ function SingleProject(props) {
     }, []);
 
     useEffect(() => {
-    }, [fields]);
-
-    useEffect(() => {
         if (commonState.currentProject) {
             setIsEditor(false);
             setEditorMode( false);
@@ -157,7 +154,7 @@ function SingleProject(props) {
             }, 150)
             dispatch ( updateStateData( EDIT_PROJECT_FORM, fieldsSetup))
         }
-    }, [currentProject]);
+    }, [currentProject, dispatch]);
 
 
     const handleattachfiles = (e) => {
@@ -243,20 +240,18 @@ function SingleProject(props) {
         }
     }, [selectedFiles])
 
-    useEffect(() => {
-    }, [selectedMembers])
 
     // Function to remove the last member
-    const removeMember = (member, directUpdate = false) => {
-        const updatedSelectedMembers = { ...commonState.editProjectForm.members };
-            delete updatedSelectedMembers[member];
-        if( directUpdate === true ){
-            const memberIds = Object.keys(updatedSelectedMembers);
-            dispatch(updateProject(currentProject._id, { members: memberIds }))
-        }else{
-            dispatch( updateStateData( EDIT_PROJECT_FORM, {...commonState.editProjectForm, members: updatedSelectedMembers}))
-        }
-    };
+    // const removeMember = (member, directUpdate = false) => {
+    //     const updatedSelectedMembers = { ...commonState.editProjectForm.members };
+    //         delete updatedSelectedMembers[member];
+    //     if( directUpdate === true ){
+    //         const memberIds = Object.keys(updatedSelectedMembers);
+    //         dispatch(updateProject(currentProject._id, { members: memberIds }))
+    //     }else{
+    //         dispatch( updateStateData( EDIT_PROJECT_FORM, {...commonState.editProjectForm, members: updatedSelectedMembers}))
+    //     }
+    // };
 
 
     const handleEditor = event => {
@@ -317,17 +312,17 @@ function SingleProject(props) {
         setSelectedWorkflow( flow )
     }
 
-    const handleRemoveMember = async (project, memberId, targetelement = null) => {
+    // const handleRemoveMember = async (project, memberId, targetelement = null) => {
 
-        document.getElementById(targetelement).classList.add('disabled-pointer');
-        const currentMembers = project.members;
-        const updatedMembers = currentMembers
-            .filter(member => member._id !== memberId)
-            .map(member => member._id);
-        await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }))
-        document.getElementById(targetelement).classList.remove('disabled-pointer');
-        // removeMember(memberId)
-    }
+    //     document.getElementById(targetelement).classList.add('disabled-pointer');
+    //     const currentMembers = project.members;
+    //     const updatedMembers = currentMembers
+    //         .filter(member => member._id !== memberId)
+    //         .map(member => member._id);
+    //     await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }))
+    //     document.getElementById(targetelement).classList.remove('disabled-pointer');
+    //     // removeMember(memberId)
+    // }
 
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
@@ -603,14 +598,14 @@ function SingleProject(props) {
                                 </Form.Label>
                             </Form.Group>
                             <Form.Group className="mb-0 form-group">
-                                <Form.Label className="w-100 m-0" key={`description-${fields['description'] || 'desc'}`}>
+                                <Form.Label className="w-100 m-0">
                                     <small>Description</small>
                                     {
-                                        !isEditor || fields['description'] === "" ?
+                                        !isEditor  &&
                                         <strong className="add-descrp" onClick={handleEditor}><FiFileText /> Add a description</strong>
-                                    
-                                        :
-                                    <div className={(isEditor || fields['description'] && fields['description'] !== "") ? 'text--editor show--editor' : 'text--editor'}>
+                                    }
+                                        
+                                    <div className={(isEditor ||  fields['description'] && fields['description'] !== "") ? 'text--editor show--editor' : 'text--editor'}>
                                         <ReactQuill 
                                             value={fields['description'] || ''}
                                             onChange={(value) => {
@@ -624,7 +619,7 @@ function SingleProject(props) {
                                         />
                                         
                                     </div>
-                                     }
+                                     
                                 </Form.Label>
                             </Form.Group>
                             <Form.Group className="mb-0 form-group">
@@ -636,7 +631,7 @@ function SingleProject(props) {
                                         {/* <Form.Control type="date" name="start_date" onChange={handleChange} value={fields['start_date'] || ''} /> */}
                                         <DatePicker 
                                                 name="start_date"
-                                                value={fields['start_date']} 
+                                                value={fields['start_date'] ? parseDateWithoutTimezone(fields.start_date) : ''} 
                                                 onChange={async (value) => {
                                                         const date = value.toDate();
                                                         // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
@@ -653,7 +648,6 @@ function SingleProject(props) {
                                                         handleChange({ target: { name: 'start_date', value: formattedDate } });
                                                     }
                                                 }
-                                                format="dd/mm/yyyy"
                                                 minDate={new Date()}
                                                 className="form-control"
                                                 placeholder="dd/mm/yyyy"
@@ -663,7 +657,7 @@ function SingleProject(props) {
                                         {/* <Form.Control type="date" name="due_date" onChange={handleChange} value={fields['due_date'] || ''} /> */}
                                         <DatePicker 
                                             name="due_date"
-                                            value={fields['due_date']} 
+                                            value={fields['due_date'] ? parseDateWithoutTimezone(fields.due_date) : ''} 
                                             onChange={async (value) => {
                                                     const date = value.toDate();
                                                     // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
@@ -680,7 +674,6 @@ function SingleProject(props) {
                                                     handleChange({ target: { name: 'due_date', value: formattedDate } });
                                                 }
                                             }
-                                            format="dd/mm/yyyy"
                                             minDate={new Date()}
                                             className="form-control"
                                             placeholder="dd/mm/yyyy"
