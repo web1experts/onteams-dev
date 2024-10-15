@@ -608,8 +608,8 @@ function SingleProject(props) {
                                         !isEditor  &&
                                         <strong className="add-descrp" onClick={handleEditor}><FiFileText /> Add a description</strong>
                                     }
-                                        
-                                    <div className={(isEditor ||  fields['description'] && fields['description'] !== "") ? 'text--editor show--editor' : 'text--editor'}>
+                                </Form.Label>
+                                <div className={(isEditor ||  fields['description'] && fields['description'] !== "") ? 'text--editor show--editor' : 'text--editor'}>
                                         <ReactQuill 
                                             value={fields['description'] || ''}
                                             onChange={(value) => {
@@ -623,8 +623,6 @@ function SingleProject(props) {
                                         />
                                         
                                     </div>
-                                     
-                                </Form.Label>
                             </Form.Group>
                             <Form.Group className="mb-0 form-group">
                                 <Form.Label>

@@ -816,8 +816,8 @@ function ProjectsPage() {
                                             !isdescEditor &&
                                             <strong className="add-descrp" onClick={setIsDescEditor}><FiFileText /> Add a description</strong>
                                         }
-                                       
-                                        <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
+                                    </Form.Label>
+                                    <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
                                             
                                             <ReactQuill 
                                                 value={fields['description'] || ''}
@@ -832,7 +832,6 @@ function ProjectsPage() {
                                             />
                                             
                                         </div>
-                                    </Form.Label>
                                 </Form.Group>
                                 <Form.Group className="mb-0 form-group">
                                     <Form.Label>
