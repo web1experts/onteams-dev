@@ -61,20 +61,23 @@ function ProjectsPage() {
     const workflowstate = useSelector(state => state.workflow)
     const modules = {
         toolbar: [
-          
-          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-          ['blockquote', 'code-block'],
-      
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          [{ 'align': [] }],
-          ['clean'],                                         // remove formatting button
-          ['link']                                  // link and image buttons
-        ]
+          [{ 'header': '1'}, {'header': '2'}],
+          ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+          [{'list': 'ordered'}, {'list': 'bullet'}, 
+           {'indent': '-1'}, {'indent': '+1'}],
+           ['link'],
+        ],
+        clipboard: {
+          // toggle to add extra line breaks when pasting HTML:
+          matchVisual: false,
+        }
       };
 
       const formats = [
-         'bold', 'italic', 'underline', 'strike', 'blockquote',
-        'list', 'bullet', 'indent'
+        'header',
+        'bold', 'italic', 'underline', 'strike', 'blockquote',
+        'list', 'bullet', 'indent',
+        'link'
       ];
       
     useEffect(() => {
