@@ -162,10 +162,21 @@ export function parseDateWithoutTimezone(dateString) {
 
   export const makeLinksClickable = (text) => {
     const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
-    return text.replace(urlPattern, (url) => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-    });
+    const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi;
+    const phonePattern = /(\+?[0-9]{1,3}?[-.\s]?[(]?[0-9]{1,4}[)]?[-.\s]?[0-9]{1,4}[-.\s]?[0-9]{1,9})/gi;
+
+    return text
+        .replace(urlPattern, (url) => {
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+        })
+        .replace(emailPattern, (email) => {
+            return `<a href="mailto:${email}">${email}</a>`;
+        })
+        .replace(phonePattern, (phone) => {
+            return `<a href="tel:${phone.replace(/\D/g, '')}">${phone}</a>`;
+        });
 };
+
 
 export const sanitizeEmptyQuillValue = (value) => {
     const cleanValue = value.trim();
