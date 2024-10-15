@@ -129,12 +129,12 @@ export const TaskForm = () => {
                 due_date: currentTask.due_date ? new Date(currentTask.due_date).toISOString().split('T')[0] : ''
             };
 
-            if(currentTask.subtasks && currentTask.subtasks.length > 0 ){
-                for (let index = 0; index < currentTask.subtasks.length; index++) {
-                    let subtask = currentTask.subtasks[index];
-                }
-                setSubtasks(currentTask.subtasks)
-            }
+            // if(currentTask.subtasks && currentTask.subtasks.length > 0 ){
+                // for (let index = 0; index < currentTask.subtasks.length; index++) {
+                //     let subtask = currentTask.subtasks[index];
+                // }
+                setSubtasks(currentTask.subtasks ? currentTask.subtasks : [])
+            // }
 
             if (currentTask.description && currentTask.description !== "") {
                 setIsDescEditor(true);
