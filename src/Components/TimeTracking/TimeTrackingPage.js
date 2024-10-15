@@ -401,7 +401,7 @@ function TimeTrackingPage() {
                                         leaveRoom(currentActivity?._id)
                                         setCurrentActivity(activity);
                                       }
-                                  }} ><abbr key={`index-${index}`}>{index + 1}</abbr> {activity.name} 
+                                  }} ><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name} 
                                   {
                                     activity?.latestActivity?.status ? 
                                     <span className="status--circle active--color"></span>

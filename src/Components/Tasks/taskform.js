@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { debounce } from 'lodash';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup, Dropdown, ListGroupItem, Image} from "react-bootstrap";
-import { MdFileDownload, MdOutlineClose } from "react-icons/md";
-import { FaBold, FaEllipsisV, FaItalic, FaPlus, FaRegTrashAlt, FaTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
-import { selectboxObserver, getMemberdata, parseDateWithoutTimezone, makeLinksClickable, sanitizeEmptyQuillValue, formatTimeAgo } from "../../helpers/commonfunctions";
+import { Button, Modal, Form, ListGroup, Row, Col, InputGroup, Dropdown, Image} from "react-bootstrap";
+import { MdFileDownload } from "react-icons/md";
+import { FaEllipsisV, FaPlus, FaRegTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
+import { selectboxObserver, getMemberdata, makeLinksClickable, formatTimeAgo } from "../../helpers/commonfunctions";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
 import { FiFileText } from "react-icons/fi";
@@ -14,6 +14,8 @@ import { BiSolidPencil } from "react-icons/bi";
 import { GrDrag } from "react-icons/gr";
 import { LuWorkflow } from "react-icons/lu";
 import { FilesPreviewModal } from '../modals';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { updateTask, deleteTask } from '../../redux/actions/task.action';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
@@ -692,6 +694,15 @@ export const TaskForm = () => {
     
     },2000)
 
+    const Initials = ({ id, children, title }) => {
+        return (
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
+                {children}
+            </OverlayTrigger>
+
+        )
+    };
+
     return (
         <>
         <Modal show={modalstate} onHide={async () => { 
@@ -885,15 +896,25 @@ export const TaskForm = () => {
                                                         }else{
                                                             return (
                                                                 <p className='d-flex align-items-center task--message' key={`comment-${comment._id}`}>
-                                                                    <span className='msg-member-info'>
+                                                                    <div className='msg-member-info'>
                                                                         {
-                                                                            comment?.author?.avatar &&
+                                                                            comment?.author?.avatar ?
+
                                                                             <Image src={comment?.author?.avatar} roundedCircle />
+                                                                            :
+                                                                            <Initials title={comment?.author?.name}>
+                                                                                <span className={`team--initial nm-${comment?.author?.name?.substring(0, 1).toLowerCase()}`}>
+                                                                                    {comment?.author?.name?.substring(0, 1).toUpperCase()}
+                                                                                </span>
+                                                                            </Initials>
                                                                         }
-                                                                        {comment?.author?.name}
-                                                                        {formatTimeAgo(comment?.createdAt)}
-                                                                    </span>
-                                                                    {comment.text} 
+                                                                        
+                                                                        
+                                                                        <p>
+                                                                            <small>{formatTimeAgo(comment?.createdAt)}</small>
+                                                                            {comment.text} 
+                                                                        </p>
+                                                                    </div>
                                                                     <Dropdown>
                                                                         <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
                                                                             <FaEllipsisV />

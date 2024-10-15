@@ -126,7 +126,7 @@ function Invitation(props) {
                             <tr key={`member-table-row-${index}`} className={invitation._id === selectedInvitation?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(invitation) : () => { return false; }}>
                               {/* <td>{index + 1}</td> */}
                               <td className="onHide">
-                                <abbr>{index + 1}</abbr>
+                                <abbr>{index + 1}.</abbr>
                                 <span className="onHide">
                                   <img variant="top" src="./images/default.jpg" />
                                 </span>

@@ -559,7 +559,7 @@ function TeamMembersPage() {
                         <tr key={`member-table-row-${idx}`} className={member._id === selectedMember?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(member) : () => { return false; }}>
                           {/* <td>{idx + 1}</td> */}
                           <td className="cursor--pointer">
-                            <abbr>{idx + 1}</abbr>
+                            <abbr>{idx + 1}.</abbr>
                             <span className="onHide">
                               <img variant="top" src={member.avatar || "./images/default.jpg"} />
                             </span>
@@ -575,7 +575,7 @@ function TeamMembersPage() {
                         </tr>
                       ))
                     ) : !showloader && memberFeeds && memberFeeds.length === 0 &&
-                    <tr>
+                    <tr className="no--invite">
                       <td colSpan={5}>
                         <h2 className="mt-2 text-center">
                           Members Not Found

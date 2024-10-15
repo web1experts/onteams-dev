@@ -149,6 +149,12 @@
     padding-bottom: 1rem;
 }
 
+.add--member--modal form .btn:focus-visible, .add--member--modal form .btn:active {
+    background: none;
+    color: #de0606;
+    border: 0;
+}
+
 .filter--modal .list-group-item {
     border: 0;
     padding: 0;
@@ -370,7 +376,8 @@ ul#subtasks-ul .form-group .form-control, ul#subtasks-ul .form-group .form-contr
     padding: 0 1rem;
     font-size: 14px;
     line-height: 1.2;
-    max-width: 400px;
+    max-width: calc(100% - 90px);
+    width: 100%;
 }
 
 ul#subtasks-ul .form-group input[type="checkbox"] {
@@ -382,6 +389,7 @@ ul#subtasks-ul .form-group input[type="checkbox"] {
 
 ul#subtasks-ul .form-group svg {
     opacity: 0;
+    min-width: 18px;
 }
 
 ul#subtasks-ul .form-group:hover svg {
@@ -453,6 +461,46 @@ ul#subtasks-ul li textarea.form-control+button {
 
 .task--message {
     margin-bottom: 0;
+    margin-top: .5rem;
+}
+
+.task--message .msg-member-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.task--message .msg-member-info .team--initial {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
+}
+
+.task--message .msg-member-info img {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    object-fit: cover;
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
+}
+
+.task--message .msg-member-info p {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.task--message .msg-member-info small {
+    display: block;
+    font-size: 75%;
+    color: #454545;
 }
 
 .task--message+.task--message {
@@ -535,6 +583,16 @@ ul#subtasks-ul li textarea.form-control+button {
     margin: .5rem 0 .75rem;
 }
 
+@media screen and (max-width:1499px) {
+    ul#subtasks-ul .form-group svg {
+        opacity: 1;
+    }
+
+    ul#subtasks-ul .form-group button {
+        opacity: 1;
+    }
+}
+
 @media screen and (max-width:1199px) {
     .file--preview--modal .file--flex .list-group {
         max-width: 40%;
@@ -562,5 +620,11 @@ ul#subtasks-ul li textarea.form-control+button {
 
     .file--preview--modal .modal-title .dropdown {
         display: none;
+    }
+
+    .add--member--modal form .form-row {
+        align-items: normal;
+        flex-flow: column wrap;
+        gap: 5px;
     }
 }

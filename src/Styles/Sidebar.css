@@ -65,7 +65,7 @@ Sidebar CSS-=-=
 }
 
 .dropdown-menu .menu--scroll {
-  max-height: calc(100vh - 130px);
+  max-height: calc(100vh - 160px);
   overflow-y: auto;
 }
 
@@ -338,25 +338,6 @@ Sidebar CSS-=-=
   .navbar-toggler.collapsed {
     background: #5ead9a;
   }
-  
-  /* .navbar-toggler::before {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-    content: '\276F';
-    font-size: 24px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all .4s ease-in-out;
-    -webkit-transition: all .4s ease-in-out;
-    display: none;
-  }
-   */
 
   .navbar-toggler-icon {
     filter: invert(1) brightness(2);
