@@ -108,7 +108,7 @@ export const MemberInitials = React.memo(( props ) => {
 
     const Initials = ({ id, children, title }) => {
         return (
-            <OverlayTrigger overlay={<Tooltip id={id}>{title}</Tooltip>}>
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
                 {children}
             </OverlayTrigger>
 

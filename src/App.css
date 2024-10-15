@@ -15,9 +15,8 @@ body {
   background: #ffffff;
   color: #454545;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.5;
-  height: 100vh;
 }
 
 .team--page .page--title h2 {
@@ -125,6 +124,10 @@ body {
 .page--title .list-group .view--icon:last-child:not(:first-child) {
   border-top-right-radius: 100px;
   border-bottom-left-radius: 100px;
+}
+
+.page--wrapper {
+  height: calc(100vh - 56px);
 }
 
 .page--wrapper .nav-tabs button {
@@ -267,10 +270,15 @@ body {
   vertical-align: middle;
   line-height: 30px;
   padding: .4rem .5rem;
+  font-weight: 400;
+}
+
+.page--wrapper table td {
   font-weight: 500;
 }
 
-.page--wrapper table th abbr, .page--wrapper table td abbr {
+.page--wrapper table th abbr,
+.page--wrapper table td abbr {
   min-width: 20px;
   display: inline-block;
   text-align: center;
@@ -397,11 +405,11 @@ Collapsible Action CSS-=-=
   left: 0;
 }
 
-.show--details ~ .details--wrapper,
-.show--details ~ .details--projects--grid,
-.view--project ~ .details--projects--view,
-.show--details ~ .details--member--view,
-.view--invitee ~ .details--invitee--view {
+.show--details~.details--wrapper,
+.show--details~.details--projects--grid,
+.view--project~.details--projects--view,
+.show--details~.details--member--view,
+.view--invitee~.details--invitee--view {
   position: relative;
   right: 0;
   display: block;
@@ -458,12 +466,12 @@ button.input-error.dropdown-toggle.btn.btn-success {
   opacity: 1;
 }
 
-.details--projects--view .project--form--actions .btn {
-  width: 100%;
-  max-width: 220px;
+.project--form--actions .btn {
+  min-width: 220px;
+  width: auto;
 }
 
-.details--projects--view .project--form--actions .btn+.btn {
+.project--form--actions .btn+.btn {
   margin-top: 1rem;
 }
 
@@ -472,20 +480,26 @@ button.input-error.dropdown-toggle.btn.btn-success {
   position: relative;
 }
 
-.details--projects--view .project--form--actions .list-group {
+.project--form--actions .list-group {
   padding-bottom: 0;
   display: flex;
   flex: 1 1;
 }
 
-.details--projects--view .project--form--actions .list-group:last-child {
-  width: 100%;
+.project--form--actions .list-group:last-child {
   flex: none;
   background: none
 }
 
+.project--form--actions .list-group:last-child .list-group-item {
+  padding-right: 0;
+  position: sticky;
+  position: -webkit-sticky;
+  bottom: 0;
+}
+
 .details--projects--view .project--form--actions .list-group .output--file-preview .preview--grid {
-  max-height: calc(100vh - 470px);
+  max-height: calc(100vh - 400px);
   overflow-y: auto;
   padding-bottom: 1rem;
 }
@@ -650,7 +664,9 @@ button.input-error.dropdown-toggle.btn.btn-success {
   background: #ffffff;
 }
 
-.wrapper--title .btn--view.active {
+.wrapper--title .btn--view.active,
+.wrapper--title .btn--view:hover,
+.wrapper--title .btn--view:focus-visible {
   background: #7BCCB8;
   color: #ffffff;
   border: 1px solid #7BCCB8;
@@ -733,6 +749,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   margin-left: auto;
   position: relative;
   width: max-content;
+  min-width: fit-content;
   bottom: auto;
 }
 
@@ -769,7 +786,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .rounded--box {
   background: #ffffff;
   padding: 1rem;
-  height: calc(100% - 76px);
+  height: calc(100vh - 100px);
   border-radius: 0.5rem;
   -webkit-border-radius: 0.5rem;
 }
@@ -1172,7 +1189,9 @@ table tr.active td {
   margin-right: -13px;
 }
 
-.projects--page .table .more--member .dropdown-menu, .project--form--actions .more--member .dropdown-menu, .wrapper--title .members--list .dropdown-menu {
+.projects--page .table .more--member .dropdown-menu,
+.project--form--actions .more--member .dropdown-menu,
+.wrapper--title .members--list .dropdown-menu {
   padding: 0;
   border: 0;
   padding-top: 10px;
@@ -1185,11 +1204,14 @@ table tr.active td {
   box-shadow: none;
 }
 
-.project--form--actions .more--member .dropdown-menu, .wrapper--title .members--list .dropdown-menu {
+.project--form--actions .more--member .dropdown-menu,
+.wrapper--title .members--list .dropdown-menu {
   padding-top: 15px;
 }
 
-.projects--page .table .more--member .dropdown-menu::before, .project--form--actions .more--member .dropdown-menu::before, .wrapper--title .members--list .dropdown-menu::before {
+.projects--page .table .more--member .dropdown-menu::before,
+.project--form--actions .more--member .dropdown-menu::before,
+.wrapper--title .members--list .dropdown-menu::before {
   content: "";
   border: 0;
   height: 0;
@@ -1206,12 +1228,15 @@ table tr.active td {
   background: #ffffff;
 }
 
-.project--form--actions .more--member .dropdown-menu::before, .wrapper--title .members--list .dropdown-menu::before {
+.project--form--actions .more--member .dropdown-menu::before,
+.wrapper--title .members--list .dropdown-menu::before {
   right: 7px;
   top: 5px;
 }
 
-.projects--page .table .more--member .dropdown-menu .over--scroll, .project--form--actions .more--member .dropdown-menu .over--scroll, .wrapper--title .members--list .over--scroll {
+.projects--page .table .more--member .dropdown-menu .over--scroll,
+.project--form--actions .more--member .dropdown-menu .over--scroll,
+.wrapper--title .members--list .over--scroll {
   width: -moz-fit-content;
   position: relative;
   width: fit-content;
@@ -1230,7 +1255,9 @@ table tr.active td {
   scrollbar-color: #eeeeee transparent;
 }
 
-.projects--page .table .more--member .dropdown-menu .dropdown-item, .project--form--actions .more--member .dropdown-menu .dropdown-item, .wrapper--title .members--list .dropdown-item {
+.projects--page .table .more--member .dropdown-menu .dropdown-item,
+.project--form--actions .more--member .dropdown-menu .dropdown-item,
+.wrapper--title .members--list .dropdown-item {
   width: fit-content;
   background: none;
   padding: 0;
@@ -1303,7 +1330,8 @@ table tr.active td {
 }
 
 
-.project--form--actions button.list-group-item, .tasks-form-action button.list-group-item {
+.project--form--actions button.list-group-item,
+.tasks-form-action button.list-group-item {
   padding: 0;
   text-decoration: none;
   width: max-content;
@@ -1320,7 +1348,8 @@ table tr.active td {
   margin-left: .5rem;
 }
 
-.project--form--actions .more--member .btn, .tasks-form-action .more--member .btn {
+.project--form--actions .more--member .btn,
+.tasks-form-action .more--member .btn {
   border-radius: 100px;
   -webkit-border-radius: 100px;
   padding: 0;
@@ -1331,7 +1360,8 @@ table tr.active td {
   justify-content: center;
 }
 
-.project--form--actions .more--member svg, .tasks-form-action .more--member svg {
+.project--form--actions .more--member svg,
+.tasks-form-action .more--member svg {
   margin-right: 0;
   font-size: .85rem;
 }
@@ -1358,6 +1388,7 @@ table tr.active td {
 .tasks-form-action .list-group-item .team--initial {
   width: 25px;
   height: 25px;
+  font-size: 14px;
 }
 
 .projects--page .table .project--label {
@@ -1373,7 +1404,8 @@ table tr.active td {
   background: #de0606;
 }
 
-.project--form--actions .list-group-item .remove-icon svg, .tasks-form-action .list-group-item .remove-icon svg{
+.project--form--actions .list-group-item .remove-icon svg,
+.tasks-form-action .list-group-item .remove-icon svg {
   margin-right: 0;
   font-size: .55rem;
 }
@@ -1418,7 +1450,7 @@ Project Task View CSS=-=-=
   scrollbar-width: thin;
   -ms-overflow-style: none;
   gap: 1rem;
-  height: calc(100% - 90px);
+  height: calc(100vh - 90px);
 }
 
 .projects--grid .task--list::-webkit-scrollbar {
@@ -1539,7 +1571,7 @@ Project Task View CSS=-=-=
 }
 
 .workflow--color-4 {
-  background:  darkblue;
+  background: darkblue;
 }
 
 .workflow--color-5 {
@@ -1657,6 +1689,7 @@ Project Task View CSS=-=-=
   -webkit-box-shadow: 0px 4px 5px rgba(99, 99, 99, 0.15);
   border: 1px solid #00000010;
   flex-flow: row wrap;
+  font-weight: 500;
 }
 
 .projects--grid .task--list ul .task--button form {
@@ -1679,6 +1712,7 @@ Project Task View CSS=-=-=
   align-items: center;
   flex: 1 1 100%;
   max-width: 100%;
+  font-weight: 400;
 }
 
 .projects--grid .task--list ul li:last-child {
@@ -1755,7 +1789,7 @@ Project Task View CSS=-=-=
 
 .wrapper--title .members--list .members--list .list-group-item:first-child {
   margin-right: -5px;
-  border: 1px solid #ffffff
+  border: 0
 }
 
 .wrapper--title .members--list .list-group-item {
@@ -1765,7 +1799,8 @@ Project Task View CSS=-=-=
   color: #333333;
   width: auto;
   height: auto;
-  border: 1px solid #ffffff;
+  font-weight: 500;
+  border: 0;
 }
 
 .wrapper--title .members--list .list-group-item .team--initial,
@@ -1783,7 +1818,8 @@ Project Task View CSS=-=-=
   padding: 0;
 }
 
-.wrapper--title .members--list .more--member, .projects--page .table .more--member {
+.wrapper--title .members--list .more--member,
+.projects--page .table .more--member {
   width: 40px;
   height: 40px;
   background: #999999;
@@ -2329,7 +2365,9 @@ pre {
   min-width: 0px;
 }
 
-.show--details .page--wrapper table .project--title--td span, .view--project .page--wrapper table .project--title--td span, .view--invitee .page--wrapper table .project--title--td span {
+.show--details .page--wrapper table .project--title--td span,
+.view--project .page--wrapper table .project--title--td span,
+.view--invitee .page--wrapper table .project--title--td span {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   line-clamp: 1;
@@ -2960,6 +2998,10 @@ pre {
   max-width: calc(25% - 8px);
 }
 
+.project--grid--table tr.no--invite {
+  max-width: 100%;
+}
+
 .project--grid--table td+td {
   border: 0;
   border-bottom: 1px solid #eeeeee;
@@ -3126,7 +3168,8 @@ pre {
   font-weight: 600;
 }
 
-.page--wrapper table td .select--dropdown .btn:focus-visible, .page--wrapper table td .select--dropdown .btn:active {
+.page--wrapper table td .select--dropdown .btn:focus-visible,
+.page--wrapper table td .select--dropdown .btn:active {
   background-color: var(--bs-btn-hover-bg);
   border-color: var(--bs-btn-hover-border-color);
 }
@@ -3189,10 +3232,10 @@ pre {
   flex: none;
 }
 
+
 /*-=-=-=-==-=-
 Media CSS-=-==
 ==-=-=-=-=-*/
-
 
 @media (max-width:1499px) {
   .preview--grid .preview--cell p {
@@ -3232,7 +3275,7 @@ Media CSS-=-==
   }
 
   .projecttitle {
-    max-width: 100%;
+    max-width: 50%;
     flex: 1 1;
   }
 }
@@ -3305,8 +3348,8 @@ Media CSS-=-==
     padding-right: 0;
     margin-right: 0;
     border-bottom: 1px solid #00000014;
-    padding-bottom: 2rem;
-    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
     width: 100%;
   }
 
@@ -3352,7 +3395,8 @@ Media CSS-=-==
     display: none;
   }
 
-  ul#subtasks-ul .form-group button, .task--message .dropdown .btn {
+  ul#subtasks-ul .form-group button,
+  .task--message .dropdown .btn {
     opacity: 1;
   }
 }
@@ -3422,7 +3466,7 @@ Media CSS-=-==
 
   .team--page .page--title h2 {
     font-size: 1.2rem;
-    padding-left: 1rem;
+    padding-left: 1.5rem;
   }
 
   .page--title .list-group--two .list-group-item:first-child:not(:last-child) {
@@ -3598,27 +3642,30 @@ Media CSS-=-==
     display: none;
   }
 
-  .show--details table, 
-  .view--project table, 
+  .show--details table,
+  .view--project table,
   .view--invitee table {
     display: table;
   }
 
-  .show--details table thead, 
-  .view--project table thead, 
+  .show--details table thead,
+  .view--project table thead,
   .view--invitee table thead {
     display: table-header-group;
   }
 
-  .show--details table tbody, 
-  .view--project table tbody, 
+  .show--details table tbody,
+  .view--project table tbody,
   .view--invitee table tbody {
     display: table-row-group;
   }
 
-  .show--details table th, .show--details table td, 
-  .view--project table th, .view--project table td, 
-  .view--invitee table th, .view--invitee table td {
+  .show--details table th,
+  .show--details table td,
+  .view--project table th,
+  .view--project table td,
+  .view--invitee table th,
+  .view--invitee table td {
     display: table-cell;
     border-bottom: 1px solid #eeeeee;
     text-align: left;
@@ -3637,18 +3684,24 @@ Media CSS-=-==
     border-bottom: 1px solid #eeeeee;
   }
 
-  .show--details table tr, .view--project table tr, .view--invitee table tr {
+  .show--details table tr,
+  .view--project table tr,
+  .view--invitee table tr {
     display: table-row;
     border: 0;
     padding: 0;
   }
 
-  .show--details table td:first-child, .view--project table td:first-child, .view--invitee table td:first-child {
+  .show--details table td:first-child,
+  .view--project table td:first-child,
+  .view--invitee table td:first-child {
     display: table-cell;
   }
 
-  .show--details table td::before, .view--project table td::before, 
-  .view--invitee table td::before, .view--invitee table td::before {
+  .show--details table td::before,
+  .view--project table td::before,
+  .view--invitee table td::before,
+  .view--invitee table td::before {
     display: none;
   }
 
@@ -3666,11 +3719,15 @@ Media CSS-=-==
   }
 
   .details--projects--view .project--form--actions .btn {
-    max-width: 160px;
+    min-width: 160px;
     margin: 0 .5rem;
   }
 
-  .details--wrapper, .details--projects--grid, .details--projects--view, .details--member--view, .details--invitee--view {
+  .details--wrapper,
+  .details--projects--grid,
+  .details--projects--view,
+  .details--member--view,
+  .details--invitee--view {
     padding-bottom: 1rem;
   }
 
@@ -3680,7 +3737,10 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:767px) {
-
+  .project--form--actions .list-group:last-child .list-group-item {
+    position: relative;
+    bottom: 0;
+  }
   .wrapper--title h3 span {
     display: none;
   }
@@ -3706,7 +3766,7 @@ Media CSS-=-==
   }
 
   .details--projects--view .project--form--actions .btn {
-    max-width: 120px;
+    min-width: 120px;
   }
 
   .show--details,
@@ -3730,7 +3790,7 @@ Media CSS-=-==
 
   .team--page .page--title h2,
   .wrapper--title h3 {
-    padding-left: 1rem;
+    padding-left: 2rem;
   }
 
   .project--grid--table td::before {

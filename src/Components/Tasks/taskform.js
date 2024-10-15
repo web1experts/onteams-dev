@@ -829,27 +829,14 @@ export const TaskForm = () => {
                     <div className="project--form--actions">
                         <h4>Actions</h4>
                         <ListGroup>
-                            <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
+                            <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus />Assign to</ListGroup.Item>
                             <p className="m-0">
                                 {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                    <MemberInitials directUpdate={true} members={fields['members']} showRemove={true}  showall={true} showAssign={false} postId={`${currentTask?._id}`} type = "task" 
-                                    // onMemberClick={(memberid, extraparam = false) => removeMember( memberid, true)} 
-                                    />
-
-                                    // Object.entries(fields['members']).map(([key, value]) => (
-                                    //     <ListGroup.Item action key={`key-member-${key}`}>
-                                    //         <MemberInitials title={value} id={`assign_member-${key}`}>
-                                    //             <span className="team--initial nm-k">{value?.charAt(0)}</span>
-                                    //         </MemberInitials>
-                                    //         <span className="remove-icon" onClick={() => removeMember(key)}>
-                                    //             <MdOutlineClose />
-                                    //         </span>
-                                    //     </ListGroup.Item>
-                                    // ))
+                                    <MemberInitials directUpdate={true} members={fields['members']} showRemove={true}  showall={true} showAssign={false} postId={`${currentTask?._id}`} type = "task" />
                                 )}
                             </p>
 
-                            <ListGroup.Item onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
+                            <ListGroup.Item onClick={handleUploadShow}><GrAttachment />Attach files</ListGroup.Item>
                             <div className="output--file-preview">
                                 <div className="preview--grid">
                                     {
@@ -868,7 +855,7 @@ export const TaskForm = () => {
                                 <label for='date--picker' className='date--new mb-0'>{fields['due_date']}</label>
                             </ListGroup.Item>
                             <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
-                                <LuWorkflow /> Workflow status
+                                <LuWorkflow />Workflow status
                                 <Form.Group className="mb-0 form-group pb-0">
                                     <Form.Label>
                                         {

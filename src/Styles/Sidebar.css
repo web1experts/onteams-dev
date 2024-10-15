@@ -269,7 +269,7 @@ Sidebar CSS-=-=
   width: 3.75rem;
 }
 
-@-webkit-keyframes pulse {
+/* @-webkit-keyframes pulse {
   0% {
     -webkit-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4);
     box-shadow: 0 0 0 rgba(0, 0, 0, 0.4);
@@ -301,31 +301,45 @@ Sidebar CSS-=-=
     -webkit-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
-}
+} */
 
 @media screen and (max-width:992px) {
   .navbar-toggler {
-    position: absolute;
-    right: -25px;
-    top: 12px;
+    position: fixed;
+    right: -35px;
+    top: 15px;
     border: 0;
-    background: none;
-    border-radius: 0;
+    background: #5ead9a;
+    border-radius: 0 5px 5px 0;
+    -webkit-border-radius: 0 5px 5px 0;
     box-shadow: none;
     outline: none;
-    width: 25px;
-    height: 45px;
-    padding: 0;
+    width: 35px;
+    height: 35px;
+    padding: 0 5px;
     z-index: 222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .navbar-toggler:focus, .navbar-toggler:focus-within {
     box-shadow: none;
     outline: none;
-    background: #eeeeee;
+    background: rgba(249, 249, 249, 1);
+  }
+
+  .open--panel--sidebar .navbar-toggler {
+    box-shadow: none;
+    outline: none;
+    background: rgba(249, 249, 249, 1);
+  }
+
+  .navbar-toggler.collapsed {
+    background: #5ead9a;
   }
   
-  .navbar-toggler::before {
+  /* .navbar-toggler::before {
     position: absolute;
     left: 0;
     top: 0;
@@ -340,16 +354,49 @@ Sidebar CSS-=-=
     justify-content: center;
     transition: all .4s ease-in-out;
     -webkit-transition: all .4s ease-in-out;
-    background: rgba(249, 249, 249, 1);
-  }
-  
-  .open--panel--sidebar .navbar-toggler::before {
-    transform: rotate(180deg);
-    -webkit-transform: rotate(180deg);
-  }
-  
-  .navbar-toggler-icon {
     display: none;
+  }
+   */
+
+  .navbar-toggler-icon {
+    filter: invert(1) brightness(2);
+    -webkit-filter: invert(1) brightness(2);
+    position: relative;
+  }
+
+  .open--panel--sidebar .navbar-toggler-icon:before, .open--panel--sidebar .navbar-toggler-icon::after { 
+    content: '';
+    width: 20px;
+    height: 2px;
+    background: #333333;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+  }
+
+  .open--panel--sidebar .navbar-toggler-icon:before {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+  }
+
+  .open--panel--sidebar .navbar-toggler-icon:after {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+
+  .open--panel--sidebar .navbar-toggler-icon {
+    filter: invert(0) brightness(2);
+    -webkit-filter: invert(0) brightness(2);
+    background-image: none;
+  }
+
+  .open--panel--sidebar .navbar-toggler.collapsed .navbar-toggler-icon {
+    filter: invert(1) brightness(2);
+    -webkit-filter: invert(1) brightness(2);
+    position: relative;
   }
 
   .panel--sidebar {

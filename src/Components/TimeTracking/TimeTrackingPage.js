@@ -376,33 +376,32 @@ function TimeTrackingPage() {
                 <Table responsive="lg" className="activity--table">
                   <thead>
                     <tr key="tracking-table-header">
-                      <th scope="col">#</th>
-                      <th scope="col">Member Name</th>
+                      {/* <th scope="col">#</th> */}
+                      <th scope="col"><abbr>#</abbr> Member Name</th>
                       <th scope="col" className="onHide">Project Name</th>
                       <th scope="col" className="onHide">Task Name</th>
                       <th scope="col" className="onHide">Project Time</th>
                       <th scope="col" className="onHide">Total Time</th>
                       <th scope="col" className="onHide">Status</th>
-                      <th scope="col" className="onHide text-end">View</th>
+                      <th scope="col" className="onHide text-lg-end">View</th>
                     </tr>
                   </thead>
                   <tbody>
                     {
                       liveactivities.length > 0 ?
-
                         liveactivities.map((activity, index) => {
                           totalhours += Number(activity?.totalDuration || 0)
                           totalProjecthours += Number(activity?.latestActivity?.duration || 0)
                           return (
                             <>
                               <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
-                                <td key={`index-${index}`}>{index + 1} </td>
+                                {/* <td key={`index-${index}`}>{index + 1} </td> */}
                                 <td data-label="Member Name" onClick={() => {
                                       if (isActive) {
                                         leaveRoom(currentActivity?._id)
                                         setCurrentActivity(activity);
                                       }
-                                  }} >{activity.name} 
+                                  }} ><abbr key={`index-${index}`}>{index + 1}</abbr> {activity.name} 
                                   {
                                     activity?.latestActivity?.status ? 
                                     <span className="status--circle active--color"></span>
@@ -412,7 +411,7 @@ function TimeTrackingPage() {
                                     :
                                     null
                                   }
-                                  </td>
+                                </td>
                                 <td data-label="Project Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
                                 <td data-label="Task Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.task || '--' }</span></td>
                                 <td data-label="Task Time" className="onHide">{ formattotalTime(activity?.latestActivity?.duration) || '00:00'}</td>
@@ -427,7 +426,7 @@ function TimeTrackingPage() {
                                     <Badge bg="danger">Inactive</Badge>
                                     }
                                 </td>
-                                <td className="onHide text-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
+                                <td className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
                               </tr>
                               
                             </>
@@ -458,18 +457,18 @@ function TimeTrackingPage() {
                 <Table responsive="lg" className="activity--table">
                   <thead>
                     <tr key={'recorded-table-header'}>
-                      <th scope="col" width={20}>#</th>
-                      <th scope="col" width={200}>Member Name</th>
+                      {/* <th scope="col" width={20}>#</th> */}
+                      <th scope="col" width={300}><abbr>#</abbr> Member Name</th>
                       <th scope="col" className="onHide">Total Time</th>
-                      <th scope="col" width={140} className="onHide">View</th>
+                      <th scope="col" className="onHide text-lg-end">View</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr key={'recorded-row'}>
-                      <td>1</td>
-                      <td data-label="Member Name">Hitesh Kumar <span className="status--circle active--color"></span></td>
+                      {/* <td>1</td> */}
+                      <td data-label="Member Name"><abbr>1</abbr> Hitesh Kumar <span className="status--circle active--color"></span></td>
                       <td data-label="Total Time" className="onHide">05 hrs 00 min</td>
-                      <td className="onHide"><Button variant="primary" onClick={handleClick}>View Activity</Button></td>
+                      <td className="onHide text-lg-end"><Button variant="primary" onClick={handleClick}>View Activity</Button></td>
                     </tr>
                   </tbody>
                 </Table>

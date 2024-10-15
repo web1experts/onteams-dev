@@ -67,8 +67,8 @@ function HolidaysPage() {
             <Table responsive="lg" className="holiday--table">
               <thead>
                 <tr>
-                  <th scope="col" width={20}>#</th>
-                  <th scope="col">Date</th>
+                  {/* <th scope="col" width={20}>#</th> */}
+                  <th scope="col"><abbr>#</abbr> Date</th>
                   <th scope="col">Occasion</th>
                   <th scope="col">Type</th>
                   <th scope="col" width={30}>Action</th>
@@ -76,8 +76,8 @@ function HolidaysPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>1</td>
-                  <td data-label="Date">Thursday, Jan 26, 2023</td>
+                  {/* <td>1</td> */}
+                  <td data-label="Date"><abbr>1</abbr> Thursday, Jan 26, 2023</td>
                   <td data-label="Occasion">Republic Day</td>
                   <td data-label="Type">Full Day</td>
                   <td>
@@ -91,8 +91,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>2</td>
-                  <td data-label="Date">Wednessday, Mar 8, 2023</td>
+                  {/* <td>2</td> */}
+                  <td data-label="Date"><abbr>2</abbr> Wednessday, Mar 8, 2023</td>
                   <td data-label="Occasion">Holi</td>
                   <td data-label="Type">Full Day</td>
                   <td>
@@ -106,8 +106,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>3</td>
-                  <td data-label="Date">Tuesday, Aug 15, 2023</td>
+                  {/* <td>3</td> */}
+                  <td data-label="Date"><abbr>3</abbr> Tuesday, Aug 15, 2023</td>
                   <td data-label="Occasion">Independence Day</td>
                   <td data-label="Type">Full Day</td>
                   <td>
@@ -121,8 +121,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>4</td>
-                  <td data-label="Date">Wednessday, Aug 30, 2023</td>
+                  {/* <td>4</td> */}
+                  <td data-label="Date"><abbr>4</abbr> Wednessday, Aug 30, 2023</td>
                   <td data-label="Occasion">Raksha Bandhan</td>
                   <td data-label="Type">Full Day</td>
                   <td>
@@ -136,8 +136,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>5</td>
-                  <td data-label="Date">Monday, Oct 2, 2023</td>
+                  {/* <td>5</td> */}
+                  <td data-label="Date"><abbr>5</abbr> Monday, Oct 2, 2023</td>
                   <td data-label="Occasion">Mahatma Gandhi Jayanti</td>
                   <td data-label="Type">Full Day</td>
                   <td>
@@ -151,8 +151,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>6</td>
-                  <td data-label="Date">Tuesday, Oct 24, 2023</td>
+                  {/* <td>6</td> */}
+                  <td data-label="Date"><abbr>6</abbr> Tuesday, Oct 24, 2023</td>
                   <td data-label="Occasion">Dussehra</td>
                   <td data-label="Type">Half Day</td>
                   <td>
@@ -166,8 +166,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>7</td>
-                  <td data-label="Date">Wednessday, Nov 1, 2023</td>
+                  {/* <td>7</td> */}
+                  <td data-label="Date"><abbr>7</abbr> Wednessday, Nov 1, 2023</td>
                   <td data-label="Occasion">Karva Chauth</td>
                   <td data-label="Type">Half Day</td>
                   <td>
@@ -181,8 +181,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>8</td>
-                  <td data-label="Date">Sunday, Nov 12, 2023</td>
+                  {/* <td>8</td> */}
+                  <td data-label="Date"><abbr>8</abbr> Sunday, Nov 12, 2023</td>
                   <td data-label="Occasion">Diwali/Deepavali</td>
                   <td data-label="Type">Full Day</td>
                   <td>
@@ -196,8 +196,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>9</td>
-                  <td data-label="Date">Wednessday, Nov 15, 2023</td>
+                  {/* <td>9</td> */}
+                  <td data-label="Date"><abbr>9</abbr> Wednessday, Nov 15, 2023</td>
                   <td data-label="Occasion">Bhai Dooj</td>
                   <td data-label="Type">Full Day</td>
                   <td>
@@ -211,8 +211,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>10</td>
-                  <td data-label="Date">Monday, Nov 27, 2023</td>
+                  {/* <td>10</td> */}
+                  <td data-label="Date"><abbr>10</abbr> Monday, Nov 27, 2023</td>
                   <td data-label="Occasion">Guru Nanak Jayanti</td>
                   <td data-label="Type">Full Day</td>
                   <td>
@@ -226,8 +226,8 @@ function HolidaysPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td>11</td>
-                  <td data-label="Date">Monday, Dec 25, 2023</td>
+                  {/* <td>11</td> */}
+                  <td data-label="Date"><abbr>11</abbr> Monday, Dec 25, 2023</td>
                   <td data-label="Occasion">Christmas</td>
                   <td data-label="Type">Full Day</td>
                   <td>
