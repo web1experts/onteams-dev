@@ -65,7 +65,7 @@ Sidebar CSS-=-=
 }
 
 .dropdown-menu .menu--scroll {
-  max-height: calc(100vh - 160px);
+  max-height: calc(100vh - 220px);
   overflow-y: auto;
 }
 
@@ -323,13 +323,7 @@ Sidebar CSS-=-=
     justify-content: center;
   }
   
-  .navbar-toggler:focus, .navbar-toggler:focus-within {
-    box-shadow: none;
-    outline: none;
-    background: rgba(249, 249, 249, 1);
-  }
-
-  .open--panel--sidebar .navbar-toggler {
+  .navbar-toggler:focus, .navbar-toggler:focus-within, .navbar-toggler:focus-visible, .open--panel--sidebar .navbar-toggler {
     box-shadow: none;
     outline: none;
     background: rgba(249, 249, 249, 1);

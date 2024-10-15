@@ -623,8 +623,6 @@ ul#subtasks-ul li textarea.form-control+button {
     }
 
     .add--member--modal form .form-row {
-        align-items: normal;
-        flex-flow: column wrap;
         gap: 5px;
     }
 }
