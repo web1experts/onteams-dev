@@ -445,7 +445,7 @@ function ClientsPage() {
                       return (<>
                         <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={isActive ? () => handleClick(client) : () => { return false; }}>
                           {/* <td>{index + 1}</td> */}
-                          <td className="cursor--pointer"><abbr>{index + 1}</abbr><span className="onHide"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span>{client.name}</td>
+                          <td className="cursor--pointer"><abbr>{index + 1}.</abbr><span className="onHide"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span>{client.name}</td>
                           <td className="onHide"><Button variant="primary" onClick={() => handleClick(client)}>View</Button></td>
                         </tr>
                       </>)
@@ -463,7 +463,6 @@ function ClientsPage() {
             </Table>
             {
                 isActiveView === 1 && !spinner && clientFeeds && clientFeeds.length == 0 &&
-                                    
                 <div className="text-center mt-5">
                     <h2>No Clients Found</h2>
                 </div>

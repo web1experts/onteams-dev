@@ -65,7 +65,7 @@ Sidebar CSS-=-=
 }
 
 .dropdown-menu .menu--scroll {
-  max-height: calc(100vh - 130px);
+  max-height: calc(100vh - 160px);
   overflow-y: auto;
 }
 

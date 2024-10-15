@@ -685,7 +685,7 @@ function ProjectsPage() {
                                             return (<>
                                                 <tr key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
                                                     {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}</abbr> {project.title}</span></td>
+                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
                                                     <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
                                                     <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
                                                         <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
@@ -711,7 +711,7 @@ function ProjectsPage() {
 
                                         !spinner && isActiveView === 2 &&
                                         <>
-                                            <tr key={`noresults-row`}>
+                                            <tr key={`noresults-row`} className="no--invite">
                                                 <td key={`empty-index`} colSpan={9} className="text-center">
                                                     <h2 className="mt-2 text-center">No Projects Found</h2>
                                                 </td>

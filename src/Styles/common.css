@@ -16,11 +16,6 @@
   border-radius: 10px;
 }
 
-#root,
-.App {
-  height: 100vh;
-}
-
 img {
   max-width: 100%;
 }

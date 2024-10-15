@@ -1299,10 +1299,6 @@ table tr.active td {
   opacity: 1;
 }
 
-.tooltip {
-  position: fixed !important;
-}
-
 .tasks-form-action .list-group-item .remove-icon {
   width: 14px;
   height: 14px;
@@ -1328,7 +1324,6 @@ table tr.active td {
   border: 0;
   padding: 0;
 }
-
 
 .project--form--actions button.list-group-item,
 .tasks-form-action button.list-group-item {
@@ -1707,6 +1702,11 @@ Project Task View CSS=-=-=
   flex: 1 1;
 }
 
+.projects--grid .task--list ul .task--button .form-floating>.form-control:focus~label, .projects--grid .task--list ul .task--button .form-floating>.form-control:not(:placeholder-shown)~label {
+  transform: scale(.85) translateY(-.8rem) translateX(1rem);
+  -webkit-transform: scale(.85) translateY(-.8rem) translateX(1rem);
+}
+
 .projects--grid .task--list ul li .tasks-form-action {
   display: flex;
   align-items: center;
@@ -1721,6 +1721,10 @@ Project Task View CSS=-=-=
 
 .projects--grid .task--list ul li:hover {
   background: #7BCCB820;
+}
+
+.projects--grid .task--list ul li.task--button:hover {
+  background: none;
 }
 
 .projects--grid .task--list ul li.active--task {
@@ -3236,6 +3240,12 @@ pre {
 /*-=-=-=-==-=-
 Media CSS-=-==
 ==-=-=-=-=-*/
+
+@media (min-width:1600px) {
+  .tooltip {
+    position: fixed !important;
+  }
+}
 
 @media (max-width:1499px) {
   .preview--grid .preview--cell p {
