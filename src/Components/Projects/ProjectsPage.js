@@ -144,7 +144,12 @@ function ProjectsPage() {
     const [show, setShow] = useState(false);
     const handleClose = () => {
         setFields({ title: '', status: 'in-progress', members: [] })
-        dispatch(updateStateData(ACTIVE_FORM_TYPE, null))
+        if( isActive === 2 || isActive === 1){
+            dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project'))
+        }else{
+            dispatch(updateStateData(ACTIVE_FORM_TYPE, null))
+        }
+        
         dispatch(updateStateData(RESET_FORMS))
         setSelectedFiles([])
         setselectedMembers([])
@@ -158,7 +163,10 @@ function ProjectsPage() {
         setFields({ title: '', status: 'in-progress', members: [] })
         await dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
         if (type === "new") {
-            setCurrentProject({})
+            if( isActive !== 2 && isActive !== 1){
+                setCurrentProject({})
+            }
+            
             setselectedMembers({})
             setImagePreviews([])
 
