@@ -159,3 +159,45 @@ export function parseDateWithoutTimezone(dateString) {
     const [year, month, day] = dateString.split('T')[0].split('-');
     return new Date(year, month - 1, day); // Month is zero-indexed
   }
+
+  export const makeLinksClickable = (text) => {
+    const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+    return text.replace(urlPattern, (url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+};
+
+export const sanitizeEmptyQuillValue = (value) => {
+    const cleanValue = value.trim();
+  
+    // If the value is empty or just contains a single <p> or <strong> tag, return an empty string
+    if (cleanValue === '<p><br></p>' || cleanValue === '<p></p>' || cleanValue === '<strong></strong>' || cleanValue === '<p><strong> </strong></p>' || cleanValue === '<h1><strong> </strong></h1>' || cleanValue === '<h1><br></h1>') {
+      return '';
+    }
+  
+    return cleanValue;
+  };
+
+  export const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const commentDate = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - commentDate) / 1000);
+
+    const intervals = {
+        year: 365 * 24 * 60 * 60,
+        month: 30 * 24 * 60 * 60,
+        day: 24 * 60 * 60,
+        hour: 60 * 60,
+        minute: 60,
+        second: 1,
+    };
+
+    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+        const timeElapsed = Math.floor(diffInSeconds / secondsInUnit);
+        if (timeElapsed >= 1) {
+            return `${timeElapsed} ${unit}${timeElapsed > 1 ? 's' : ''} ago`;
+        }
+    }
+
+    return 'just now';
+};
