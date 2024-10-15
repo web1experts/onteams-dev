@@ -160,22 +160,25 @@ export function parseDateWithoutTimezone(dateString) {
     return new Date(year, month - 1, day); // Month is zero-indexed
   }
 
-  export const makeLinksClickable = (text) => {
-    const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
-    const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi;
-    const phonePattern = /(\+?[0-9]{1,3}?[-.\s]?[(]?[0-9]{1,4}[)]?[-.\s]?[0-9]{1,4}[-.\s]?[0-9]{1,9})/gi;
+  export const makeLinksClickable = (inputText) => {
+    let replacedText;
 
-    return text
-        .replace(urlPattern, (url) => {
-            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-        })
-        .replace(emailPattern, (email) => {
-            return `<a href="mailto:${email}">${email}</a>`;
-        })
-        .replace(phonePattern, (phone) => {
-            return `<a href="tel:${phone.replace(/\D/g, '')}">${phone}</a>`;
-        });
+    // Pattern for URLs starting with http://, https://, or ftp://
+    const replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+    replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
+    // Pattern for URLs starting with "www." (without // before it)
+    const replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gi;
+    replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank" rel="noopener noreferrer">$2</a>');
+
+    // Pattern for email addresses
+    const replacePattern3 = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+    replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+    return replacedText;
 };
+
+
 
 
 export const sanitizeEmptyQuillValue = (value) => {

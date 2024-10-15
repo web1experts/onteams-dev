@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { debounce } from 'lodash';
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, ListGroup, Row, Col, InputGroup, Dropdown, Image} from "react-bootstrap";
 import { MdFileDownload } from "react-icons/md";
@@ -32,7 +33,7 @@ export const TaskForm = () => {
           ['bold', 'italic', 'underline', 'strike', 'blockquote'],
           [{'list': 'ordered'}, {'list': 'bullet'}, 
            {'indent': '-1'}, {'indent': '+1'}],
-          ['clean']
+           ['link'],
         ],
         clipboard: {
           // toggle to add extra line breaks when pasting HTML:
@@ -44,6 +45,7 @@ export const TaskForm = () => {
         'header',
         'bold', 'italic', 'underline', 'strike', 'blockquote',
         'list', 'bullet', 'indent',
+        'link'
       ];
       
 
@@ -251,6 +253,52 @@ export const TaskForm = () => {
             setFields(updatedFields);
         }
     }, [taskForm.images])
+
+    const TaskUpdate = async () => {
+        const formData = new FormData();
+            for (const [key, value] of Object.entries(fields)) {
+                if( key === "subtasks"){
+                    console.log(value)
+                }
+                if (typeof value === 'object' && key === 'images') {
+                    
+                    value.forEach(attach => {
+                        formData.append('images[]', attach);
+                    });
+                } else if (typeof value === 'object' && key === 'members') {
+                    const memberids = Object.keys(fields['members'])
+                    if( memberids.length > 0){
+                        memberids.forEach(item => {
+                            formData.append(`members[]`, item); // Append with the same key for non-empty arrays
+                        });
+                    }else{
+                        formData.append(`members`, '[]');
+                    }
+                } else if (typeof value === 'object' && key === "subtasks") {
+                        value.forEach((obj, index) => {
+                            if( typeof obj === "object"){
+                                formData.append(`${key}[${index}]`, JSON.stringify(obj));
+                            }else{
+                                formData.append(`${key}[${index}]`, obj);
+                            }
+                      });
+                } else if (Array.isArray(value)) { // Check if the value is an array
+                    if (value.length === 0) {
+                        formData.append(`${key}[]`, []); // Append an empty array
+                    } else {
+                        value.forEach(item => {
+                            formData.append(`${key}[]`, item); // Append with the same key for non-empty arrays
+                        });
+                    }
+                } else {
+                    formData.append(key, value)
+                }
+            }
+            let payload = formData;
+
+            
+            await dispatch(updateTask(currentTask._id, payload))
+    }
 
     const handleSubmit = async (e) => {
         
@@ -633,16 +681,18 @@ export const TaskForm = () => {
         },500)
     };
 
-    const handleDescBlur = async() => {
+    const handleDescBlur = debounce(async() => {
         if (pasteOccurred.current) {
             pasteOccurred.current = false; // Reset the flag after handling paste
             return;
         }
-
+       // setTimeout(async function(){
+            await dispatch(updateTask(currentTask._id, { description: fields['description'] }));
+       // },1000)
         // Perform onBlur logic here
-        await dispatch(updateTask(currentTask._id, { description: fields['description'] }));
+        
     
-    }
+    },2000)
 
     const Initials = ({ id, children, title }) => {
         return (
@@ -655,7 +705,11 @@ export const TaskForm = () => {
 
     return (
         <>
-        <Modal show={modalstate} onHide={() => { dispatch(updateStateData(CURRENT_TASK, {}));dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project')); dispatch(togglePopups('taskform', false));}} centered size="lg" className="add--member--modal edit--task--modal modalbox" onShow={() => selectboxObserver()}>
+        <Modal show={modalstate} onHide={async () => { 
+            TaskUpdate()
+            dispatch(updateStateData(CURRENT_TASK, {}));dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project')); dispatch(togglePopups('taskform', false));
+            }
+            } centered size="lg" className="add--member--modal edit--task--modal modalbox" onShow={() => selectboxObserver()}>
             <Modal.Header closeButton>
                 {/* <Modal.Title>{currentTask?._id ? '' : 'Create New Task'}</Modal.Title> */}
             </Modal.Header>
@@ -718,7 +772,7 @@ export const TaskForm = () => {
                                         value={fields['description'] || ''}
                                         onChange={(value) => { 
                                             // dispatch(updateStateData(TASK_FORM, { ['description']: sanitizeEmptyQuillValue(value) }));
-                                        
+                                            
                                                 console.log('Pasted value:', value);
                                                 setFields((prevFields) => ({
                                                 ...prevFields,
@@ -728,7 +782,7 @@ export const TaskForm = () => {
                                             
                                         }}
                                         onKeyDown={handleKeyDown}
-                                        onBlur={handleDescBlur} // Custom blur handler
+                                        //  onBlur={handleDescBlur} // Custom blur handler
                                         ref={(el) => {
                                             if (el) {
                                                 const editor = el.getEditor();
