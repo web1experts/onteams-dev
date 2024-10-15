@@ -284,7 +284,10 @@ const TasksList = React.memo((props) => {
                                                     </li>
                                                 }
 
-                                                {taskslists[tab._id]?.tasks?.map((task, index) => (
+                                                {
+                                                    taskslists[tab._id]?.tasks &&  taskslists[tab._id]?.tasks?.length > 0 && 
+
+                                                    taskslists[tab._id]?.tasks?.map((task, index) => (
                                                     <Draggable
                                                         key={task?._id}
                                                         draggableId={`task-${task?._id}`}

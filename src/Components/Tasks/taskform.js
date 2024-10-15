@@ -614,10 +614,21 @@ export const TaskForm = () => {
         ));
     };
 
+    const handleKeyDown = (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+            pasteOccurred.current = true; // Mark that a paste action is expected
+            console.log('Paste keyboard shortcut detected');
+        }
+    };
+
     const handlePaste = (e) => {
         const pastedData = e.clipboardData.getData('text');
         console.log('Pasted content:', pastedData);
         pasteOccurred.current = true; // Set the paste flag to true
+
+        setTimeout(function(){
+            pasteOccurred.current = false;
+        },500)
     };
 
     const handleDescBlur = async() => {
@@ -705,6 +716,7 @@ export const TaskForm = () => {
                                                 setErrors((prevErrors) => ({ ...prevErrors, description: '' }));
                                             
                                         }}
+                                        onKeyDown={handleKeyDown}
                                         onBlur={handleDescBlur} // Custom blur handler
                                         ref={(el) => {
                                             if (el) {
