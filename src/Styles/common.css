@@ -57,6 +57,14 @@ a:focus {
   color: #fff;
 }
 
+.ql-toolbar.ql-snow .ql-formats {
+  margin-right: 5px;
+}
+
+.ql-snow .ql-color-picker .ql-picker-label svg, .ql-snow .ql-icon-picker .ql-picker-label svg {
+  vertical-align: top;
+}
+
 .btn {
   padding: .45rem 1.5rem;
   border-radius: 50px;
@@ -492,6 +500,10 @@ textarea.form-control {
   background: #803618;
 }
 
+.toast-container {
+  position: fixed;
+}
+
 
 /*-=-=-=-=-=
 Add Project Modal CSS-=-=-
@@ -505,9 +517,10 @@ Add Project Modal CSS-=-=-
 .project--form--inputs {
   flex: 1 1;
   border-right: 1px solid #00000014;
-  padding: 1rem 2rem 1rem 0;
-  margin-right: 2rem;
-  max-height: 100%;
+  padding: 1rem 1rem 0 0;
+  margin-right: 1rem;
+  max-height: calc(100vh - 100px);
+  height: 100%;
   overflow-y: auto;
 }
 
@@ -557,7 +570,7 @@ Add Project Modal CSS-=-=-
 }
 
 .project--form--inputs form label small {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .project--form--inputs form .client--input {
@@ -616,14 +629,10 @@ Add Project Modal CSS-=-=-
 
 .project--form--inputs form .text--editor {
   background-clip: padding-box;
-  /* background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: .5rem; */
   color: #495057;
   font-size: 1rem;
   line-height: 1.5;
   margin-top: .5rem;
-  /* padding: .375rem .75rem; */
   transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
   -webkit-transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
   width: 100%;
@@ -646,10 +655,17 @@ Add Project Modal CSS-=-=-
 
 .text--editor .ql-container.ql-snow {
   border: 0;
+  position: relative;
+}
+
+.ql-snow .ql-tooltip {
+  box-shadow: none;
+  left: 0 !important;;
 }
 
 .text--editor .ql-editor {
   padding: 0 0 15px;
+  font-size: 15px;
 }
 
 .project--form--inputs form .show--editor {
@@ -699,6 +715,7 @@ Add Project Modal CSS-=-=-
   padding-left: 0;
   background: #ffffff;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .project--form--actions .list-group-item .date--new {
@@ -758,13 +775,6 @@ Add Project Modal CSS-=-=-
   max-width: 250px;
 }
 
-.project--form--actions .btn {
-  margin-top: auto;
-  position: sticky;
-  position: -webkit-sticky;
-  bottom: 0;
-}
-
 .workflow--modal {
   margin-top: .25rem;
   cursor: pointer;
@@ -785,8 +795,6 @@ Add Project Modal CSS-=-=-
 }
 
 .modal-backdrop.show {
-  /* background: rgba(80, 84, 80, 0.8);
-  z-index: 555555; */
   opacity: 0
 }
 
@@ -1132,11 +1140,6 @@ span.status--circle.info--color {
   height: 100%;
 }
 
-.project--form--inputs {
-  max-height: calc(100vh - 70px);
-  overflow-y: auto;
-}
-
 .edit--task--modal .project--form--inputs .task--title .form-control {
   border: 0;
   padding: 0;
@@ -1159,10 +1162,6 @@ span.status--circle.info--color {
 }
 
 @media (max-width:1199px) {
-  .project--form--inputs {
-    overflow-y: visible;
-  }
-
   .project--form {
     height: auto;
   }
@@ -1170,7 +1169,6 @@ span.status--circle.info--color {
   .project--form--inputs {
     max-height: 100%;
     overflow-y: visible;
-    padding-top: 0;
   }
 
   .modal-body {
@@ -1180,11 +1178,6 @@ span.status--circle.info--color {
 }
 
 @media screen and (max-width:767px) {
-  .project--form--actions .btn {
-    position: relative;
-    bottom: auto;
-  }
-
   .modal-dialog {
     max-width: 100%;
     padding: 2rem 1rem;

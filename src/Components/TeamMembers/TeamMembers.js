@@ -546,8 +546,8 @@ function TeamMembersPage() {
                 <Table responsive="lg" className={isActiveView === 1 ? 'project--grid--table clients--grid--table' : isActiveView === 2 ? 'project--table clients--table' : 'project--table clients--table'}>
                   <thead>
                     <tr>
-                      <th width={20}>#</th>
-                      <th>Member Name</th>
+                      {/* <th width={20}>#</th> */}
+                      <th><abbr>#</abbr> Member Name</th>
                       <th className="onHide">Role</th>
                       <th className="onHide">Email Address</th>
                       <th className="onHide">Action</th>
@@ -557,8 +557,9 @@ function TeamMembersPage() {
                     {!showloader && memberFeeds && memberFeeds.length > 0 ? (
                       memberFeeds.map((member, idx) => (
                         <tr key={`member-table-row-${idx}`} className={member._id === selectedMember?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(member) : () => { return false; }}>
-                          <td>{idx + 1}</td>
+                          {/* <td>{idx + 1}</td> */}
                           <td className="cursor--pointer">
+                            <abbr>{idx + 1}</abbr>
                             <span className="onHide">
                               <img variant="top" src={member.avatar || "./images/default.jpg"} />
                             </span>
@@ -603,7 +604,9 @@ function TeamMembersPage() {
 
       <div className="details--member--view">
         <div className="wrapper--title">
-          <h3>Member Details</h3>
+          <div className="projecttitle">
+            <h3><strong>Member Details</strong></h3>
+          </div>
           <ListGroup horizontal>
             <ListGroup.Item onClick={() => setIsActive(0)}>
               <MdOutlineClose />
@@ -688,7 +691,7 @@ function TeamMembersPage() {
                   </FloatingLabel>
                   {showError([index], "email")}
                 </Form.Group>
-                <Form.Group className="mb-0 form-group pb-0">
+                <Form.Group className="mb-0 form-group">
                   <Form.Select
                     placeholder="Select role"
                     area-label="Role"

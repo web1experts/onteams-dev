@@ -925,7 +925,11 @@ function ProjectsPage() {
                                     </div>
                                 </div>
                             </ListGroup>
-                            <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
+                            <ListGroup className="mt-auto mb-0">
+                                <ListGroup.Item className="text-center">
+                                    <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
+                                </ListGroup.Item>
+                            </ListGroup>
                         </div>
                     </div>
                 </Modal.Body>
