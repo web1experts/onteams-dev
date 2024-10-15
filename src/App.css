@@ -383,7 +383,7 @@ Collapsible Action CSS-=-=
   background: #e8e8e8;
   flex: 1 1;
   overflow-y: auto;
-  padding: 0 1rem;
+  padding: 0 1rem 1rem;
   position: absolute;
   right: -100%;
   top: 0;
@@ -392,7 +392,7 @@ Collapsible Action CSS-=-=
   -webkit-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   -moz-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   z-index: 2;
-  height: 100%;
+  /* height: 100%; */
 }
 
 .details--wrapper .loading-bar,
@@ -429,7 +429,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .details--projects--view .project--form {
   background: #ffffff;
   padding: 1rem 1.2rem;
-  height: calc(100% - 100px);
+  height: calc(100% - 85px);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
 }
@@ -491,7 +491,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   background: none
 }
 
-.project--form--actions .list-group:last-child .list-group-item {
+.project--form--actions .list-group+.list-group .list-group-item {
   padding-right: 0;
   position: sticky;
   position: -webkit-sticky;
@@ -616,7 +616,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   background: #5ead9a;
 }
 
-.projecttitle {
+.details--projects--view .projecttitle, .details--projects--grid .projecttitle {
   max-width: 33.33%;
   flex: 1 1;
 }
@@ -625,12 +625,18 @@ button.input-error.dropdown-toggle.btn.btn-success {
   font-size: 1.5rem;
   margin: 0;
   font-weight: 600;
+}
+
+.details--projects--view .wrapper--title h3, .details--projects--grid .wrapper--title h3 {
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
   min-height: 50px;
   max-width: 340px;
   width: 100%;
 }
 
-.wrapper--title h3 strong {
+.details--projects--view .wrapper--title h3 strong, .details--projects--grid .wrapper--title h3 strong {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   line-clamp: 1;
@@ -801,8 +807,9 @@ button.input-error.dropdown-toggle.btn.btn-success {
   min-width: 100%;
   object-fit: none;
   background: #eeeeee40;
-  height: 400px;
-  width: 400px;
+  height: auto;
+  width: 100%;
+  max-width: 400px;
   border-radius: 20px;
   -webkit-border-radius: 20px
 }
@@ -1004,7 +1011,7 @@ table tr.active td {
 
 .select--dropdown .drop--scroll {
   min-width: 100%;
-  max-height: 200px;
+  max-height: 170px;
   overflow-y: auto;
   scrollbar-width: auto;
   scrollbar-color: #eeeeee #ffffff;
@@ -1470,7 +1477,7 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list .workflow--color-0 {
-  border-top: 8px solid #91C8E4;
+  border-top: 8px solid #999999;
 }
 
 .projects--grid .task--list .workflow--color-1 {
@@ -1550,7 +1557,7 @@ Project Task View CSS=-=-=
 }
 
 .workflow--color-0 {
-  background: #91C8E4;
+  background: #999999;
 }
 
 .workflow--color-1 {
@@ -3252,7 +3259,11 @@ Media CSS-=-==
     max-width: 110px;
   }
 
-  .projecttitle {
+  .details--projects--view .projecttitle, .details--projects--grid .projecttitle {
+    max-width: 25%;
+  }
+
+  .details--projects--view .project--form--actions {
     max-width: 25%;
   }
 }
@@ -3284,7 +3295,7 @@ Media CSS-=-==
     opacity: 1;
   }
 
-  .projecttitle {
+  .details--projects--view .projecttitle, .details--projects--grid .projecttitle {
     max-width: 50%;
     flex: 1 1;
   }
@@ -3747,7 +3758,7 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:767px) {
-  .project--form--actions .list-group:last-child .list-group-item {
+  .project--form--actions .list-group+.list-group .list-group-item {
     position: relative;
     bottom: 0;
   }

@@ -503,11 +503,11 @@ function SingleProject(props) {
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`project-assign-${currentProject?._id}`} className="me-3">Members</ListGroup.Item>
                         
-                        {fields['members'] && Object.keys(fields.members).length > 0 && (
-                            <MemberInitials showRemove={true} members={currentProject?.members} directUpdate={true} showAssignBtn={true} postId={currentProject?._id} type = "project" 
+                        {/* {fields['members'] && Object.keys(fields.members).length > 0 && ( */}
+                            <MemberInitials showRemove={true} members={currentProject?.members || []} directUpdate={true} showAssignBtn={true} postId={currentProject?._id} type = "project" 
                             // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `member--${currentProject?._id}-${memberid}`)}
                             />
-                        )}
+                        {/* )} */}
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto">
                         <Button variant="outline-primary" className="btn--view d-none d-lg-flex" onClick={() => props.closeview(1)}>Tasks</Button>

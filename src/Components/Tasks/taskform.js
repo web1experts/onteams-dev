@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Modal, Form, ListGroup, FloatingLabel, Row, Col, InputGroup, Dropdown, ListGroupItem} from "react-bootstrap";
-import { MdFileDownload, MdOutlineClose } from "react-icons/md";
-import { FaBold, FaEllipsisV, FaItalic, FaPlus, FaRegTrashAlt, FaTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
-import { selectboxObserver, getMemberdata, parseDateWithoutTimezone } from "../../helpers/commonfunctions";
+import { Button, Modal, Form, ListGroup, Row, Col, InputGroup, Dropdown, Image} from "react-bootstrap";
+import { MdFileDownload } from "react-icons/md";
+import { FaEllipsisV, FaPlus, FaRegTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
+import { selectboxObserver, getMemberdata, makeLinksClickable, formatTimeAgo } from "../../helpers/commonfunctions";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
 import { FiFileText } from "react-icons/fi";
@@ -13,6 +13,8 @@ import { BiSolidPencil } from "react-icons/bi";
 import { GrDrag } from "react-icons/gr";
 import { LuWorkflow } from "react-icons/lu";
 import { FilesPreviewModal } from '../modals';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { updateTask, deleteTask } from '../../redux/actions/task.action';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
@@ -26,26 +28,29 @@ import 'react-quill/dist/quill.snow.css';
 export const TaskForm = () => {
     const modules = {
         toolbar: [
-          
-          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-          ['blockquote', 'code-block'],
-      
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          [{ 'align': [] }],
-          ['clean'],                                         // remove formatting button
-          ['link']                                  // link and image buttons
-        ]
+          [{ 'header': '1'}, {'header': '2'}],
+          ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+          [{'list': 'ordered'}, {'list': 'bullet'}, 
+           {'indent': '-1'}, {'indent': '+1'}],
+          ['clean']
+        ],
+        clipboard: {
+          // toggle to add extra line breaks when pasting HTML:
+          matchVisual: false,
+        }
       };
 
       const formats = [
-         'bold', 'italic', 'underline', 'strike', 'blockquote',
-        'list', 'bullet', 'indent'
+        'header',
+        'bold', 'italic', 'underline', 'strike', 'blockquote',
+        'list', 'bullet', 'indent',
       ];
       
 
-
       
     const dispatch = useDispatch()
+    const quillRef = useRef(null);
+    const pasteOccurred = useRef(false); 
     const memberdata = getMemberdata()
     const [workflowstatus, setWorkflowStatus]  = useState(false)
     const [datePickerModal, setDatePickerModal]  = useState(false)
@@ -57,7 +62,7 @@ export const TaskForm = () => {
     const [currentProject, setCurrentProject] = useState({})
     const [imagePreviews, setImagePreviews] = useState([]);
     const [loader, setLoader] = useState(false);
-    const [fields, setFields] = useState({title: apiResult?.currentTask?.title || '', members: []})
+    const [fields, setFields] = useState({title: apiResult?.currentTask?.title || '', members: [], description: apiResult?.currentTask?.description || ''})
     const [ errors, setErrors ] = useState({})
     const [subtasks, setSubtasks] = useState([]);
     const handleUploadShow = () => dispatch(togglePopups('files', true)) 
@@ -105,7 +110,7 @@ export const TaskForm = () => {
     }, [ modalstate ])
 
     useEffect(() => {
-        if (apiResult.currentTask) {
+        if (apiResult.currentTask) { console.log('hello task')
             setCurrentTask(apiResult.currentTask)
             // setImagePreviews([]);
             // setSubtasks([])
@@ -117,7 +122,7 @@ export const TaskForm = () => {
 
     useEffect(() => {
         if (currentTask && Object.keys(currentTask).length > 0) { 
-            
+            console.log('here at current task')
             setImagePreviews([]);
             let fieldsSetup = {
                 title: currentTask.title,
@@ -138,6 +143,8 @@ export const TaskForm = () => {
 
             if (currentTask.description && currentTask.description !== "") {
                 setIsDescEditor(true);
+            }else{
+                setIsDescEditor(false);
             }
 
             // Set members if present
@@ -547,7 +554,10 @@ export const TaskForm = () => {
                                         className="form-control"
                                         contentEditable={typeof subtask === 'object' && enablesubtaskedit[subtask._id] === true} // Enable editing if clicked
                                         suppressContentEditableWarning={true} // Suppress contentEditable warning
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            if( e.target.tagName === "A"){
+                                                return;
+                                            }
                                             if (typeof subtask === 'object') {
                                                 setEnableSubtakEdit({ [subtask._id]: true }); // Enable editing for clicked subtask
 
@@ -588,8 +598,10 @@ export const TaskForm = () => {
                                         }}
                                         placeholder="Enter subtask"
                                         dangerouslySetInnerHTML={{
-                                            __html: typeof subtask === 'object' ? subtask.title : subtask,
-                                        }} // Set subtask title as HTML content for editable div
+                                            __html: typeof subtask === 'object' 
+                                                ? makeLinksClickable(subtask.title)  // Make links clickable in subtask title
+                                                : makeLinksClickable(subtask),       // Make links clickable in string subtasks
+                                        }}
                                     ></div>
                                 }
                         <button type="button"  variant="primary" onClick={() => removeSubtask(index)}>
@@ -604,6 +616,42 @@ export const TaskForm = () => {
         ));
     };
 
+    const handleKeyDown = (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+            pasteOccurred.current = true; // Mark that a paste action is expected
+            console.log('Paste keyboard shortcut detected');
+        }
+    };
+
+    const handlePaste = (e) => {
+        const pastedData = e.clipboardData.getData('text');
+        console.log('Pasted content:', pastedData);
+        pasteOccurred.current = true; // Set the paste flag to true
+
+        setTimeout(function(){
+            pasteOccurred.current = false;
+        },500)
+    };
+
+    const handleDescBlur = async() => {
+        if (pasteOccurred.current) {
+            pasteOccurred.current = false; // Reset the flag after handling paste
+            return;
+        }
+
+        // Perform onBlur logic here
+        await dispatch(updateTask(currentTask._id, { description: fields['description'] }));
+    
+    }
+
+    const Initials = ({ id, children, title }) => {
+        return (
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
+                {children}
+            </OverlayTrigger>
+
+        )
+    };
 
     return (
         <>
@@ -663,30 +711,42 @@ export const TaskForm = () => {
                                         }}><FiFileText /> Add a description</strong>
                                     }
                                     
-                                    <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
-                                    <ReactQuill 
-                                        value={fields['description'] || ''}
-                                        onChange={(value) => {
-                                            setFields({...fields, ['description']: value})
-                                            dispatch(updateStateData(TASK_FORM, { ['description']: value }));
-                                            setErrors({ ...errors, ['description']: '' });
-                                        }}
-                                        formats={formats} 
-                                        modules={modules}
-                                        onBlur={async (e) => {
-                                            await dispatch(updateTask(currentTask._id, {description: fields['description']}))
-                                        }}
-                                    />
-
-                                        {/* <textarea className="form-control" key={`task-desc-${commonState?.taskForm?.tab}`} placeholder="Add a title" rows="2" name="description" value={fields['description'] || ''} onBlur={async (e) => {
-                                            await dispatch(updateTask(currentTask._id, {description: e.target?.value}))
-                                        }} onChange={handleChange}>{fields['description'] || ''}</textarea>
-                                        <ul className="editor--options">
-                                            <li><a href="javascript:;"><FaBold /></a></li>
-                                            <li><a href="javascript:;"><FaItalic /></a></li>
-                                        </ul> */}
-                                    </div>
+                                    
                                 </Form.Label>
+                                <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
+                                        <ReactQuill 
+                                        value={fields['description'] || ''}
+                                        onChange={(value) => { 
+                                            // dispatch(updateStateData(TASK_FORM, { ['description']: sanitizeEmptyQuillValue(value) }));
+                                        
+                                                console.log('Pasted value:', value);
+                                                setFields((prevFields) => ({
+                                                ...prevFields,
+                                                description: value,
+                                                }));
+                                                setErrors((prevErrors) => ({ ...prevErrors, description: '' }));
+                                            
+                                        }}
+                                        onKeyDown={handleKeyDown}
+                                        onBlur={handleDescBlur} // Custom blur handler
+                                        ref={(el) => {
+                                            if (el) {
+                                                const editor = el.getEditor();
+                                                editor.root.addEventListener('paste', handlePaste); // Listen for paste
+                                            }
+                                        }}
+                                        modules={modules}
+                                        formats={formats}
+                                        // onBlur={async (e) => {
+                                        //     if (!isPaste) {
+                                        //         console.log('no')
+                                        //     }else{
+                                        //         console.log('yes')
+                                        //     }
+                                        //     // await dispatch(updateTask(currentTask._id, {description: fields['description']}))
+                                        // }}
+                                        />
+                                    </div>
                             </Form.Group>
                             {/* <Form.Group className="mb-0 form-group">
                                 <Form.Label>
@@ -781,7 +841,26 @@ export const TaskForm = () => {
                                                             )
                                                         }else{
                                                             return (
-                                                                <p className='d-flex align-items-center task--message' key={`comment-${comment._id}`}>{comment.text} 
+                                                                <p className='d-flex align-items-center task--message' key={`comment-${comment._id}`}>
+                                                                    <div className='msg-member-info'>
+                                                                        {
+                                                                            comment?.author?.avatar ?
+
+                                                                            <Image src={comment?.author?.avatar} roundedCircle />
+                                                                            :
+                                                                            <Initials title={comment?.author?.name}>
+                                                                                <span className={`team--initial nm-${comment?.author?.name?.substring(0, 1).toLowerCase()}`}>
+                                                                                    {comment?.author?.name?.substring(0, 1).toUpperCase()}
+                                                                                </span>
+                                                                            </Initials>
+                                                                        }
+                                                                        
+                                                                        
+                                                                        <p>
+                                                                            <small>{formatTimeAgo(comment?.createdAt)}</small>
+                                                                            {comment.text} 
+                                                                        </p>
+                                                                    </div>
                                                                     <Dropdown>
                                                                         <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
                                                                             <FaEllipsisV />

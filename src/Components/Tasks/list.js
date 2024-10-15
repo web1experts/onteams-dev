@@ -5,6 +5,7 @@ import { FaPlus, FaPlay, FaPause, FaRegTimesCircle, FaEllipsisV } from "react-ic
 import { TASK_FORM, RESET_FORMS, TASK_FORM_TYPE, ACTIVE_FORM_TYPE, CURRENT_TASK } from "../../redux/actions/types";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 import { ListTasks, updateTask, createTask, reorderTasks } from "../../redux/actions/task.action";
+import { MdOutlineAttachFile } from "react-icons/md";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { getFieldRules, validateField } from '../../helpers/rules';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -283,7 +284,10 @@ const TasksList = React.memo((props) => {
                                                     </li>
                                                 }
 
-                                                {taskslists[tab._id]?.tasks?.map((task, index) => (
+                                                {
+                                                    taskslists[tab._id]?.tasks &&  taskslists[tab._id]?.tasks?.length > 0 && 
+
+                                                    taskslists[tab._id]?.tasks?.map((task, index) => (
                                                     <Draggable
                                                         key={task?._id}
                                                         draggableId={`task-${task?._id}`}
@@ -312,6 +316,15 @@ const TasksList = React.memo((props) => {
                                                                                 </span>
                                                                             </>
                                                                         )
+                                                                    }
+                                                                    {
+                                                                        task.files && task.files.length > 0 &&
+                                                                            <>
+                                                                                <span className="files-count" key={`files-count-${task._id}`}>
+                                                                                    <MdOutlineAttachFile />
+                                                                                   {task.files.length}
+                                                                                </span>
+                                                                            </>
                                                                     }
                                                                     <p className="m-0 ms-auto">
                                                                         {task?.members && task?.members.length > 0 && (
