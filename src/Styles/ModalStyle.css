@@ -128,7 +128,7 @@
 
 .add--member--modal form .form-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     flex-flow: row wrap;
     gap: 15px;
 }
@@ -139,7 +139,7 @@
 
 .add--member--modal form .form-group {
     flex: 1 1;
-    position: relative;
+    position: unset;
     padding-bottom: 1rem;
 }
 
@@ -147,6 +147,7 @@
     padding: 0;
     color: #de0606;
     padding-bottom: 1rem;
+    margin: auto;
 }
 
 .add--member--modal form .btn:focus-visible, .add--member--modal form .btn:active {

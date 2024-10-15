@@ -1009,6 +1009,20 @@ table tr.active td {
   -webkit-box-shadow: 0px 0px 10px 2px #001e0026;
 }
 
+.add--member--modal .select--dropdown {
+  position: unset;
+}
+
+.add--member--modal .select--dropdown .dropdown-menu {
+  left: auto !important;
+  right: 0;
+  top: auto !important;
+  z-index: 111111;
+  max-width: 50%;
+  width: 100%;
+  min-width: 0 !important;
+}
+
 .select--dropdown .drop--scroll {
   min-width: 100%;
   max-height: 170px;
@@ -1112,6 +1126,10 @@ table tr.active td {
   width: 100%;
   color: #454545;
   padding: .55rem 2rem .55rem 1.2rem;
+}
+
+.select--dropdown .btn:focus-visible, .select--dropdown .btn:active, .select--dropdown .btn:focus-within {
+  border: 1px solid !important;
 }
 
 .details--projects--view .project--form--inputs form .client--input .custom-dropdown-container {
@@ -2197,7 +2215,7 @@ pre {
 }
 
 .add--team--member--modal .modal-body {
-  min-height: 350px;
+  position: unset;
 }
 
 .timeSheetModal .modal-dialog {
