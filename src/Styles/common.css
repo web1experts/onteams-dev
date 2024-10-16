@@ -1123,7 +1123,7 @@ span.status--circle.info--color {
 }
 
 .modal-content {
-  max-height: max-content;
+  max-height: calc(100% - 20px);
 }
 
 .modal-body {

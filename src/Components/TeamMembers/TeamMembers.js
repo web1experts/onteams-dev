@@ -691,6 +691,11 @@ function TeamMembersPage() {
                   </FloatingLabel>
                   {showError([index], "email")}
                 </Form.Group>
+                {rows.length > 1 && (
+                  <Button variant="link" className="d-md-none" onClick={() => removeRow(index)}>
+                    <FaRegTrashAlt />
+                  </Button>
+                )}
                 <Form.Group className="mb-0 form-group">
                   <Form.Select
                     placeholder="Select role"

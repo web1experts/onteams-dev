@@ -998,29 +998,24 @@ table tr.active td {
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   padding: 12px;
-  margin-top: 15px;
   background: #ffffff;
   min-width: 180px;
-  inset: auto !important;
-  left: 0 !important;
-  transform: none !important;
-  top: 100% !important;
   box-shadow: 0px 0px 10px 2px #001e0026;
   -webkit-box-shadow: 0px 0px 10px 2px #001e0026;
 }
 
-.add--member--modal .select--dropdown {
-  position: unset;
+.dropdown-menu[data-popper-placement="bottom-start"] {
+  margin-bottom: 0;
+  margin-top: 15px;
 }
 
-.add--member--modal .select--dropdown .dropdown-menu {
-  left: auto !important;
-  right: 0;
-  top: auto !important;
-  z-index: 111111;
-  max-width: 50%;
-  width: 100%;
-  min-width: 0 !important;
+.dropdown-menu[data-popper-placement="top-start"] {
+  margin-bottom: 15px;
+  margin-top: 0;
+}
+
+.add--team--member--modal .select--dropdown {
+  position: unset;
 }
 
 .select--dropdown .drop--scroll {
@@ -1034,6 +1029,11 @@ table tr.active td {
 .modal .select--dropdown .dropdown-menu,
 .common--form .select--dropdown .dropdown-menu {
   min-width: 100%;
+}
+
+.add--team--member--modal .select--dropdown .dropdown-menu {
+  min-width: 0;
+  width: 45%;
 }
 
 .modal .select--dropdown .form-group,
@@ -1057,6 +1057,19 @@ table tr.active td {
   top: -20px;
   transform: translateX(-5px);
   width: 0;
+}
+
+.modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"]:before {
+  border-color: transparent transparent #ffffff;
+  top: -20px;
+  transform: translateX(-5px);
+}
+
+.modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"]:before {
+  border-color: #ffffff transparent transparent;
+  top: auto;
+  bottom: -20px;
+  transform: translateX(5px);
 }
 
 .page--wrapper table td .select--dropdown .dropdown-item,
@@ -3970,5 +3983,13 @@ Media CSS-=-==
     min-width: 0;
     flex-basis: 90%;
     flex-shrink: 0;
+  }
+
+  .add--member--modal form .form-group {
+    flex: auto;
+  }
+
+  .add--team--member--modal .select--dropdown .dropdown-menu {
+    width: 90%;
   }
 }
