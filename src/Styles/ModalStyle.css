@@ -590,6 +590,68 @@ ul#subtasks-ul li textarea.form-control+button {
     margin: .5rem 0 .75rem;
 }
 
+.rmdp-ep-arrow {
+    border: 0;
+    padding: 0;
+    min-height: auto;
+    border-radius: 0;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.rmdp-ep-arrow[direction=top] {
+    opacity: 0;
+}
+
+.modal .rmdp-input {
+    opacity: 0;
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+.rmdp-header {
+    margin-top: 0;
+    padding: 0;
+}
+
+.rmdp-ep-arrow+div, .modal .rmdp-input+div {
+    position: relative !important;
+    transform: none !important;
+}
+
+.rmdp-calendar {
+    padding: 0;
+}
+
+.rmdp-calendar, .rmdp-top-class {
+    width: 100%;
+}
+
+.rmdp-day-picker {
+    width: 100%;
+    display: block !important;
+}
+
+.rmdp-wrapper {
+    border-radius: 0;
+    box-shadow: none;
+    margin-top: 10px;
+    border: 0;
+    padding: 0;
+}
+
+.project--form--inputs form .task--date--picker, .project--form--inputs form .task--date--change {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0.25rem;
+    cursor: pointer;
+}
+
 @media screen and (max-width:1499px) {
     ul#subtasks-ul .form-group svg {
         opacity: 1;

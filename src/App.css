@@ -689,6 +689,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   gap: 10px;
   grid-auto-rows: minmax(auto, auto);
   margin-top: 0;
+  margin-bottom: .5rem;
 }
 
 .preview--grid .preview--cell {
@@ -1751,6 +1752,7 @@ Project Task View CSS=-=-=
   flex: 1 1 100%;
   max-width: 100%;
   font-weight: 400;
+  gap: 10px;
 }
 
 .projects--grid .task--list ul li:last-child {

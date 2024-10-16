@@ -112,7 +112,7 @@ function LoginPage() {
                         <div className="common--form">
                             <img className="logo--sm" src="../images/OnTeam-Logo.png" alt="MyTeams" />
                             <Form onSubmit={onSubmit}>
-                                <h2>Sign in to your workspace</h2>
+                                <h2>Login to your account</h2>
                                 <Form.Group className="mb-3 form-group">
                                     <FloatingLabel label="Email address *">
                                         <Form.Control placeholder='Email address' className={error['email'] ? "input-error" : ''} type="text" name="email" onChange={handleChangeInput} readonly={paramsObject['email'] ? true : false}

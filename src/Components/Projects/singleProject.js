@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Dropdown } from "react-bootstrap";
-import { FaBold, FaChevronDown, FaItalic, FaPlus, FaRegTrashAlt, FaUpload, FaEllipsisV, FaCheck, FaPlusCircle, FaTimes } from "react-icons/fa";
-import { MdFileDownload, MdOutlineClose } from "react-icons/md";
+import { Row, Button, Modal, Form, FloatingLabel, ListGroup, Dropdown } from "react-bootstrap";
+import { FaChevronDown, FaPlus, FaRegTrashAlt, FaUpload, FaEllipsisV, FaCheck, FaRegCalendarAlt } from "react-icons/fa";
+import { MdFileDownload, MdOutlineClose, MdOutlineCancel } from "react-icons/md";
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
 import { updateProject, deleteProject } from "../../redux/actions/project.action"
 import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
-import { AlertDialog, MemberModal, StatusModal, WorkFlowModal, FilesModal, FilesPreviewModal } from "../modals";
+import { AlertDialog } from "../modals";
 import { useDropzone } from 'react-dropzone'
 import fileIcon from './../../images/file-icon-image.jpg'
 import { selectboxObserver, parseDateWithoutTimezone } from "../../helpers/commonfunctions";
@@ -20,6 +20,7 @@ import { MemberInitials } from "../common/memberInitials";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import DatePicker from "react-multi-date-picker";
+import ProjectDatePicker from "../Datepickers/projectDatepicker";
 function SingleProject(props) {
     const dispatch = useDispatch();
     const commonState = useSelector( state => state.common)
@@ -64,6 +65,7 @@ function SingleProject(props) {
     const [showPreview, setPreviewShow] = useState(false);
     const handlePreviewClose = () => setPreviewShow(false);
     const [clientsearchTerm, setClientSearchTerm] = useState('');
+    const [ datepickerShow , setDateshow] = useState(false)
     let fieldErrors = {};
 
     const modules = {
@@ -483,14 +485,10 @@ function SingleProject(props) {
     };
 
 
-    // const MemberInitials = ({ id, children, title }) => {
-    //     return (
-    //         <OverlayTrigger overlay={<Tooltip id={id}>{title}</Tooltip>}>
-    //             {children}
-    //         </OverlayTrigger>
+    const handleDateclose = useCallback(() => {
+        setDateshow(false);
+    }, []); // Empty dependency array means this function is memoized and won't change across renders
 
-    //     )
-    // };
 
 
     return (
@@ -629,58 +627,23 @@ function SingleProject(props) {
                                     <small>Start/Due Date</small>
                                 </Form.Label>
                                 <Row>
-                                    <Col sm={12} lg={6}>
-                                        {/* <Form.Control type="date" name="start_date" onChange={handleChange} value={fields['start_date'] || ''} /> */}
-                                        <DatePicker 
-                                                name="start_date"
-                                                value={fields['start_date'] ? parseDateWithoutTimezone(fields.start_date) : ''} 
-                                                onChange={async (value) => {
-                                                        const date = value.toDate();
-                                                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                                                        const year = date.getFullYear();
-                                                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                                                        const day = date.getDate().toString().padStart(2, '0');
-                                                        const hours = date.getHours().toString().padStart(2, '0');
-                                                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                                                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                                                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                                                    
-                                                        // Combine into the desired format
-                                                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                                                        handleChange({ target: { name: 'start_date', value: formattedDate } });
-                                                    }
-                                                }
-                                                minDate={new Date()}
-                                                className="form-control"
-                                                placeholder="dd/mm/yyyy"
-                                            />
-                                    </Col>
-                                    <Col sm={12} lg={6} className="mt-3 mt-lg-0">
-                                        {/* <Form.Control type="date" name="due_date" onChange={handleChange} value={fields['due_date'] || ''} /> */}
-                                        <DatePicker 
-                                            name="due_date"
-                                            value={fields['due_date'] ? parseDateWithoutTimezone(fields.due_date) : ''} 
-                                            onChange={async (value) => {
-                                                    const date = value.toDate();
-                                                    // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                                                    const year = date.getFullYear();
-                                                    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                                                    const day = date.getDate().toString().padStart(2, '0');
-                                                    const hours = date.getHours().toString().padStart(2, '0');
-                                                    const minutes = date.getMinutes().toString().padStart(2, '0');
-                                                    const seconds = date.getSeconds().toString().padStart(2, '0');
-                                                    const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                                                
-                                                    // Combine into the desired format
-                                                    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                                                    handleChange({ target: { name: 'due_date', value: formattedDate } });
-                                                }
-                                            }
-                                            minDate={new Date()}
-                                            className="form-control"
-                                            placeholder="dd/mm/yyyy"
-                                        />
-                                    </Col>
+                                    {
+                                        (!fields.start_date || fields.start_date === "" && !fields.due_date && fields.due_date === "") ?
+                                        <label for='startdate--picker' className="task--date--picker" onClick={() => {setDateshow(true)}}><FaRegCalendarAlt /> Set due date</label>
+                                        :
+                                        <label for='startdate--picker' className="task--date--change" onClick={() => {setDateshow(true)}} >
+                                            {new Date(fields.start_date).toISOString().split('T')[0]} 
+                                            { fields?.due_date && (
+                                                <>
+                                                    <span>/</span> {new Date(fields?.due_date).toISOString().split('T')[0]}
+                                                </>
+                                            ) }
+                                            <MdOutlineCancel onClick={() => {
+                                                dispatch(updateStateData(EDIT_PROJECT_FORM, { ['start_date']: '', ['due_date']: '' }));
+                                            }} />
+                                        </label>
+                                    }
+                                    <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                 </Row>
                             </Form.Group>
                         </Form>

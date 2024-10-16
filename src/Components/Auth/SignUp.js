@@ -137,7 +137,7 @@ function SignUpPage() {
                                 !showOTP ? 
                             
                                 <Form onSubmit={handleSubmit}> 
-                                    <h2>Don't have an account? Sign Up</h2>
+                                    <h2>Create an account.</h2>
                                     <Form.Group className={`mb-3 form-group ${errors['email'] ? 'has-error' : ''}`}>
                                         <FloatingLabel label="Email address *">
                                             <Form.Control type="text" name="email" placeholder="Enter Email address" onChange={handleChange} className={errors['email'] ? "input-error" : ''} />

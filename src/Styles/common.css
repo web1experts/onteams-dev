@@ -713,6 +713,10 @@ Add Project Modal CSS-=-=-
   font-weight: 500;
 }
 
+.project--form--actions .list-group-item .form-label {
+  margin-bottom: 0;
+}
+
 .project--form--actions .list-group-item .date--new {
   color: #777777;
 }
@@ -732,6 +736,10 @@ Add Project Modal CSS-=-=-
 
 .project--form--actions .rmdp-ep-arrow {
   opacity: 0;
+}
+
+.msg-view {
+  white-space: pre-line;
 }
 
 .rmdp-container {

@@ -5,12 +5,9 @@ import { FaPlus, FaPlay, FaPause, FaRegTimesCircle, FaEllipsisV } from "react-ic
 import { TASK_FORM, RESET_FORMS, TASK_FORM_TYPE, ACTIVE_FORM_TYPE, CURRENT_TASK } from "../../redux/actions/types";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 import { ListTasks, updateTask, createTask, reorderTasks } from "../../redux/actions/task.action";
-import { MdOutlineAttachFile } from "react-icons/md";
+import { GrAttachment } from "react-icons/gr";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { getFieldRules, validateField } from '../../helpers/rules';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
-import { MdOutlineClose } from "react-icons/md";
 import { TiInputChecked } from "react-icons/ti";
 import { MemberInitials } from "../common/memberInitials";
 const TasksList = React.memo((props) => {
@@ -321,7 +318,7 @@ const TasksList = React.memo((props) => {
                                                                         task.files && task.files.length > 0 &&
                                                                             <>
                                                                                 <span className="files-count" key={`files-count-${task._id}`}>
-                                                                                    <MdOutlineAttachFile />
+                                                                                    <GrAttachment />
                                                                                    {task.files.length}
                                                                                 </span>
                                                                             </>

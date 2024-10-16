@@ -12,6 +12,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket } from "../../helpers/auth";
 import { getMemberdata } from "../../helpers/commonfunctions";
+import DatePicker from "react-multi-date-picker";
 function TimeTrackingPage() {
   let totalhours = 0;
   let totalProjecthours = 0
@@ -40,7 +41,7 @@ function TimeTrackingPage() {
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
-
+  const [ date, setDate ] = useState('')
   const [showSearch, setSearchShow] = useState(false);
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
@@ -263,7 +264,29 @@ function TimeTrackingPage() {
           <ListGroup.Item key="filter-key-4" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
             <Form>
               <Form.Group className="mb-0 form-group">
-                <Form.Control type="date" name="date" />
+              <DatePicker 
+                    name="date"
+                    id='date--picker'
+                    value={date} 
+                    onChange={async (value) => {
+                        const date = value.toDate();
+                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                        const year = date.getFullYear();
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                        // Combine into the desired format
+                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                        
+                        setDate(formattedDate)
+                      }
+                    }                    
+                    className="form-control"
+                    placeholder="dd/mm/yyyy"
+                />
               </Form.Group>
             </Form>
           </ListGroup.Item>
@@ -307,7 +330,30 @@ function TimeTrackingPage() {
           <ListGroup.Item className="no--style">
             <Form>
               <Form.Group className="mb-0 form-group">
-                <Form.Control type="date" name="date" />
+                <DatePicker 
+                    name="date"
+                    id='date--picker'
+                    value={date} 
+                    onChange={async (value) => {
+                        const date = value.toDate();
+                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                        const year = date.getFullYear();
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                        // Combine into the desired format
+                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                        
+                        setDate(formattedDate)
+                      }
+                    }                    
+                    className="form-control"
+                    placeholder="dd/mm/yyyy"
+                />
+                
               </Form.Group>
             </Form>
           </ListGroup.Item>
@@ -799,7 +845,29 @@ function TimeTrackingPage() {
             <ListGroup.Item key="filter-key-4" className="mt-3">
               <Form>
                 <Form.Group className="mb-0 form-group">
-                  <Form.Control type="date" name="date" />
+                <DatePicker 
+                    name="date"
+                    id='date--picker'
+                    value={date} 
+                    onChange={async (value) => {
+                        const date = value.toDate();
+                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                        const year = date.getFullYear();
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                        // Combine into the desired format
+                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                        
+                        setDate(formattedDate)
+                      }
+                    }                    
+                    className="form-control"
+                    placeholder="dd/mm/yyyy"
+                />
                 </Form.Group>
               </Form>
             </ListGroup.Item>
