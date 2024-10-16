@@ -1013,7 +1013,7 @@ export const TaskForm = () => {
                     <DatePicker 
                         name="due_date"
                         id='date--picker'
-                        value={fields['due_date']} 
+                        value={fields['due_date'] ? parseDateWithoutTimezone(fields['due_date']) : ''} 
                         onChange={async (value) => {
                             const date = value.toDate();
                             // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC

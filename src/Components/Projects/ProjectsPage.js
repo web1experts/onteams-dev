@@ -476,6 +476,11 @@ function ProjectsPage() {
         setFields({ ...fields, ['files']: updatedFiles })
     }
 
+    const handleDateclose = useCallback(() => {
+        setDateshow(false);
+    }, []); // Empty dependency array means this function is memoized and won't change across renders
+
+
     const renderPreview = (type, preview, index) => {
        
         const { src, _id } = preview;
@@ -812,7 +817,7 @@ function ProjectsPage() {
                                                 
                                             </span>
                                         }
-                                        <ProjectDatePicker isShow={datepickerShow} close={setDateshow} ></ProjectDatePicker>
+                                        <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                     </Row>
                                 </Form.Group>
                             </Form>

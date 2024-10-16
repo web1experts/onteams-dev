@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import {  Modal} from "react-bootstrap";
+import {  Button, Modal} from "react-bootstrap";
 
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { EDIT_PROJECT_FORM,  PROJECT_FORM } from '../../redux/actions/types';
 import DatePicker from "react-multi-date-picker";
+import { parseDateWithoutTimezone } from '../../helpers/commonfunctions';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -17,8 +18,9 @@ const ProjectDatePicker = (props) => {
         if( props.isShow === true){
             switch (commonState.active_formtype) {
                 case 'project':
-                    setStartDate(commonState.projectform?.start_date)
-                    setDueDate(commonState.projectform?.due_date)
+                    
+                    setStartDate(commonState.projectForm?.start_date)
+                    setDueDate(commonState.projectForm?.due_date)
                     break;
                 case 'edit_project':
                     setStartDate(commonState.editProjectForm?.start_date)
@@ -38,7 +40,7 @@ const ProjectDatePicker = (props) => {
                     <DatePicker 
                         name="start_date"
                         id='startdate--picker'
-                        value={start_date} 
+                        value={start_date ? parseDateWithoutTimezone( start_date) : ''} 
                         onChange={async (value) => {
                             const date = value.toDate();
                             // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
@@ -71,7 +73,7 @@ const ProjectDatePicker = (props) => {
                     <DatePicker 
                         name="due_date"
                         id='duedate--picker'
-                        value={due_date} 
+                        value={due_date ? parseDateWithoutTimezone( due_date) : ''} 
                         onChange={async (value) => {
                             const date = value.toDate();
                             // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
@@ -101,6 +103,9 @@ const ProjectDatePicker = (props) => {
                         placeholder="dd/mm/yyyy"
                     />
                 </Modal.Body>
+                <Modal.Footer>
+                    <Button variant='primary' onClick={() => { props.close( false )}}>Done</Button>
+                </Modal.Footer>
             </Modal> 
     )
 }

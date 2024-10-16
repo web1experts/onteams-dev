@@ -485,14 +485,10 @@ function SingleProject(props) {
     };
 
 
-    // const MemberInitials = ({ id, children, title }) => {
-    //     return (
-    //         <OverlayTrigger overlay={<Tooltip id={id}>{title}</Tooltip>}>
-    //             {children}
-    //         </OverlayTrigger>
+    const handleDateclose = useCallback(() => {
+        setDateshow(false);
+    }, []); // Empty dependency array means this function is memoized and won't change across renders
 
-    //     )
-    // };
 
 
     return (
@@ -649,7 +645,7 @@ function SingleProject(props) {
                                                 }} />
                                             </span>
                                         }
-                                    <ProjectDatePicker isShow={datepickerShow} close={setDateshow} ></ProjectDatePicker>
+                                    <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                             
                                 </Row>
                             </Form.Group>
