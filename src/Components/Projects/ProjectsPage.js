@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown } from "react-bootstrap";
-import { FaBold, FaChevronDown, FaItalic, FaPlus, FaList, FaRegTrashAlt, FaPlusCircle, FaTimes, FaCog, FaEllipsisV, FaTrashAlt } from "react-icons/fa";
-import { MdFileDownload, MdFilterList, MdOutlineClose, MdSearch } from "react-icons/md";
+import { FaBold, FaChevronDown, FaItalic, FaPlus, FaList, FaRegTrashAlt, FaCalendar, FaTimes, FaCog, FaEllipsisV, FaTrashAlt } from "react-icons/fa";
+import { MdFileDownload, MdFilterList, MdOutlineClose, MdSearch, MdOutlineCancel } from "react-icons/md";
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
 import { BsGrid } from "react-icons/bs";
@@ -26,6 +26,7 @@ import { MemberInitials } from "../common/memberInitials";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import DatePicker from "react-multi-date-picker";
+import ProjectDatePicker from "../Datepickers/projectDatepicker";
 import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE } from "../../redux/actions/types";
 function ProjectsPage() {
     const [isActiveView, setIsActiveView] = useState(2);
@@ -213,6 +214,7 @@ function ProjectsPage() {
     const [filetoPreview, setFiletoPreview] = useState(null);
     const [showPreview, setPreviewShow] = useState(false);
     const handlePreviewClose = () => setPreviewShow(false);
+    const [ datepickerShow , setDateshow] = useState(false)
     const handlePreviewShow = (file) => {
         setFiletoPreview(file)
         setPreviewShow(true)
@@ -337,66 +339,10 @@ function ProjectsPage() {
         if (projectFeed && projectFeed.projectData) {
             setProjects(projectFeed.projectData)
             setTotal(projectFeed.total)
-            // if (currentProject && Object.keys(currentProject).length > 0) {
-            //     let hasopened = false;
-            //     projectFeed.projectData.forEach((p, inx) => {
-            //         if (p._id === currentProject._id) {
-            //             setCurrentProject(p);
-            //             dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project'))
-            //             hasopened = true;
-            //             return;
-            //         }
-            //     })
-            //     if (hasopened === false) {
-            //         setIsActive(0)
-            //     }
-            // }
         }
     }, [projectFeed])
 
-    // const handleRemoveMember = async (project, memberId, targetelement = null) => {
-    //     document.getElementById(targetelement).classList.add('disabled-pointer');
-    //     const currentMembers = project.members;
-    //     const updatedMembers = currentMembers
-    //         .filter(member => member._id !== memberId)
-    //         .map(member => member._id);
-    //     await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }))
-    //     document.getElementById(targetelement).classList.remove('disabled-pointer');
-    // }
-
-
-    // const handleRemoveMember = async (project, memberId, targetelement = null) => {
-    //     try {
-    //         const targetElement = document.getElementById(targetelement);
-    
-    //         if (targetElement) {
-    //             // Disable the button or make it non-interactive
-    //             targetElement.classList.add('disabled-pointer');
-    //         }
-    
-    //         const currentMembers = project.members;
-    //         const updatedMembers = currentMembers
-    //             .filter(member => member._id !== memberId)
-    //             .map(member => member._id);
-    
-    //         // Dispatch the async action to update the project members
-    //         await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }));
-    
-    //         if (targetElement) {
-    //             // Re-enable the button or make it interactive again
-    //             targetElement.classList.remove('disabled-pointer');
-    //         }
-    
-    //     } catch (error) {
-    //         console.error("Error removing member:", error);
-    
-    //         // Ensure target element is re-enabled even if there's an error
-    //         const targetElement = document.getElementById(targetelement);
-    //         if (targetElement) {
-    //             targetElement.classList.remove('disabled-pointer');
-    //         }
-    //     }
-    // };
+  
 
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
@@ -845,60 +791,28 @@ function ProjectsPage() {
                                     <Form.Label>
                                         <small>Start/Due Date</small>
                                     </Form.Label>
+                                    
                                     <Row>
-                                        <Col sm={12} lg={6}>
-                                            {/* <Form.Control type="date" name="start_date" onChange={handleChange} value={fields['start_date'] || ''} /> */}
-                                            <DatePicker 
-                                                name="start_date"
-                                                value={fields['start_date'] ? parseDateWithoutTimezone(fields.start_date) : ''} 
-                                                onChange={async (value) => {
-                                                        const date = value.toDate();
-                                                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                                                        const year = date.getFullYear();
-                                                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                                                        const day = date.getDate().toString().padStart(2, '0');
-                                                        const hours = date.getHours().toString().padStart(2, '0');
-                                                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                                                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                                                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                                                    
-                                                        // Combine into the desired format
-                                                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                                                        handleChange({ target: { name: 'start_date', value: formattedDate } });
-                                                    }
-                                                }
-                                               
-                                                minDate={new Date()}
-                                                className="form-control"
-                                                placeholder="dd/mm/yyyy"
-                                            />
-                                        </Col>
-                                        <Col sm={12} lg={6} className="mt-3 mt-lg-0">
-                                            {/* <Form.Control type="date" name="due_date" onChange={handleChange} value={fields['due_date'] || ''} /> */}
-                                            <DatePicker 
-                                                name="due_date"
-                                                value={fields['due_date'] ? parseDateWithoutTimezone(fields.due_date) : ''} 
-                                                onChange={async (value) => {
-                                                        const date = value.toDate();
-                                                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                                                        const year = date.getFullYear();
-                                                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                                                        const day = date.getDate().toString().padStart(2, '0');
-                                                        const hours = date.getHours().toString().padStart(2, '0');
-                                                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                                                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                                                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                                                    
-                                                        // Combine into the desired format
-                                                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                                                        handleChange({ target: { name: 'due_date', value: formattedDate } });
-                                                    }
-                                                }
-                                                minDate={new Date()}
-                                                className="form-control"
-                                                placeholder="dd/mm/yyyy"
-                                            />
-                                        </Col>
+                                        {
+                                            (!fields.start_date || fields.start_date === "" && !fields.due_date && fields.due_date === "") ?
+                                            <span  onClick={() => {setDateshow(true)}}> <FaCalendar />Set due date</span>
+                                            :
+                                            <span onClick={() => {setDateshow(true)}}>
+                                                {new Date(fields.start_date).toISOString().split('T')[0]} 
+
+                                                { fields?.due_date && (
+                                                    <>
+                                                        <span>/</span> {new Date(fields?.due_date).toISOString().split('T')[0]}
+                                                    </>
+                                                ) }
+
+                                                <MdOutlineCancel onClick={() => {
+                                                    dispatch(updateStateData(PROJECT_FORM, { ['start_date']: '', ['due_date']: '' }));
+                                                }} />
+                                                
+                                            </span>
+                                        }
+                                        <ProjectDatePicker isShow={datepickerShow} close={setDateshow} ></ProjectDatePicker>
                                     </Row>
                                 </Form.Group>
                             </Form>
