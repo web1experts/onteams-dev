@@ -78,7 +78,7 @@ export const TaskForm = () => {
     const handleCloseCommentModel = () => setShowCommentModel(false);
     const handleDatetModal = () => setDatePickerModal(false);
     const [ editmessage, setEditMessage] = useState({})
-    const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState('');
     const [workflowstatuses, setFlowstatus ] =  useState([])
     const handleNewComment = (event) => {
         setComments(event.target.value);
@@ -567,21 +567,30 @@ export const TaskForm = () => {
                         }
                          
                          {typeof subtask !== 'object' ? (
-                            <textarea 
-                                className="form-control" 
-                                rows="2" 
-                                onBlur={() => handleBlur(index)}
-                                name={`subtask-${index}`} 
-                                placeholder="Enter subtask" 
-                                value={subtask} 
-                                onChange={({ target: { value } }) => handlesubtaskChange(index, subtask, value)} 
-                                onKeyDown={(event) => {
-                                    if (event.key === 'Enter' && !event.shiftKey) {
-                                        event.preventDefault(); // Prevent form submission on Enter
-                                        handleBlur(index); // Handle saving on Enter
-                                    }
-                                }}
-                            />
+                            <div className='message--area'>
+                                <div className='textarea--content' id="textContentDiv" dangerouslySetInnerHTML={subtask ? {
+                                        __html: subtask
+                                            .replace(/\n/g, '<br>&nbsp;')  // Replace line breaks with <br> tags
+                                            .replace(/ /g, '&nbsp;') // Replace spaces with non-breaking spaces
+                                    } : null}>
+                                
+                                </div>
+                                <textarea 
+                                    className="form-control" 
+                                    rows="1" 
+                                    // onBlur={() => handleBlur(index)}
+                                    name={`subtask-${index}`} 
+                                    placeholder="Enter subtask" 
+                                    value={subtask} 
+                                    onChange={({ target: { value } }) => handlesubtaskChange(index, subtask, value)} 
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter' && !event.shiftKey) {
+                                            event.preventDefault(); // Prevent form submission on Enter
+                                            handleBlur(index); // Handle saving on Enter
+                                        }
+                                    }}
+                                />
+                            </div>
                         ) : (
                             <div
                                 className="form-control"
@@ -686,7 +695,6 @@ export const TaskForm = () => {
 
         )
     };
-
     return (
         <>
         <Modal show={modalstate} onHide={async () => { 
@@ -711,31 +719,6 @@ export const TaskForm = () => {
                                 {showError('title')}
                                 <span className='pencil--edit'><BiSolidPencil /></span>
                             </Form.Group>
-                            {/* <Form.Group className="mb-0 form-group">
-                                <Form.Label>
-                                    <small>Workflow status</small>
-                                    {
-                                        commonState.currentProject && commonState.currentProject.workflow && commonState.currentProject.workflow.tabs && commonState.currentProject.workflow.tabs.length > 0 &&
-                                        
-                                        <div className="status--modal" onClick={() => {
-                                            setFlowstatus(commonState.currentProject.workflow.tabs);
-                                            setWorkflowStatus( true )
-                                        }}>
-                                             {commonState.currentProject.workflow.tabs.map((status, index) => 
-                                                // Directly compare and return if matched
-                                                status._id === commonState?.taskForm?.tab ? (
-                                                    <div key={`status-${index}`} className="status-item">
-                                                        <span className={`status--circle workflow--color-${index}`}></span>
-                                                        {status.title} <FaChevronDown />
-                                                    </div>
-                                                ) : null // Return null for non-matching items
-                                            )}
-                                            
-                                        </div>
-                                    }
-                                </Form.Label>
-                            </Form.Group> */}
-                            
                            
                             <Form.Group className="mb-0 form-group">
                                 <Form.Label className="w-100 m-0">
@@ -775,29 +758,9 @@ export const TaskForm = () => {
                                         }}
                                         modules={modules}
                                         formats={formats}
-                                        // onBlur={async (e) => {
-                                        //     if (!isPaste) {
-                                        //         console.log('no')
-                                        //     }else{
-                                        //         console.log('yes')
-                                        //     }
-                                        //     // await dispatch(updateTask(currentTask._id, {description: fields['description']}))
-                                        // }}
                                         />
                                     </div>
                             </Form.Group>
-                            {/* <Form.Group className="mb-0 form-group">
-                                <Form.Label>
-                                    <small>Due Date</small>
-                                </Form.Label>
-                                <Row>
-                                    <Col sm={12} lg={6}>
-                                        <Form.Control type="date" name="due_date" onChange={async (e) => {
-                                             await dispatch(updateTask(currentTask._id, {due_date: e.target?.value}))
-                                        }} value={fields['due_date'] || ''} />
-                                    </Col>
-                                </Row>
-                            </Form.Group> */}
 
                             <Form.Group className="mb-0 form-group pb-0">
                                 <Form.Label className="w-100 m-0">
@@ -925,20 +888,34 @@ export const TaskForm = () => {
                                 <Row>
                                     <Col sm={12}>
                                         <InputGroup className="mb-0">
-                                            <textarea
-                                                placeholder="Message"
-                                                name="message"
-                                                rows={1}
-                                                className='form-control'
-                                                onChange={handleNewComment} value={comments || ''}
-                                                onKeyDown={(event) => {
-                                                    if (event.key === 'Enter' && !event.shiftKey) {
-                                                        event.preventDefault(); // Prevent the default behavior (like form submission)
-                                                        handleCommentSubmit()// Call your function to handle the Enter press
-                                                    }
-                                                }}
-                                            />
-                                            <Button variant="outline-secondary" id="send-message" onClick={(() => handleCommentSubmit())}><FaPaperPlane /></Button>
+                                            <div className='message--area'>
+                                                <div className='textarea--content' id="textContentDiv" dangerouslySetInnerHTML={comments ? {
+                                                        __html: comments
+                                                            .replace(/\n/g, '<br>&nbsp;')  // Replace line breaks with <br> tags
+                                                            .replace(/ /g, '&nbsp;') // Replace spaces with non-breaking spaces
+                                                    } : null}>
+                                                   
+                                                </div>
+                                                <textarea
+                                                    placeholder="Message"
+                                                    name="message"
+                                                    className='form-control'
+                                                    onChange={(event) => {
+                                                        handleNewComment(event);
+                                                       // appendToDiv(event.target.value); // Call function to update div content
+                                                    }}
+                                                    value={comments || ''}
+                                                    onKeyDown={(event) => {
+                                                        if (event.key === 'Enter' && !event.shiftKey) {
+                                                            event.preventDefault(); // Prevent the default behavior (like form submission)
+                                                            handleCommentSubmit(); // Call your function to handle the Enter press
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                            <Button variant="outline-secondary" id="send-message" onClick={() => handleCommentSubmit()}>
+                                                <FaPaperPlane />
+                                            </Button>
                                         </InputGroup>
                                     </Col>
                                 </Row>

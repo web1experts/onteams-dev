@@ -30,13 +30,17 @@ body {
 }
 
 .team--page .page--title h2 .btn {
-  margin-left: 0.25rem;
+  margin-left: 0.5rem;
   padding: 0;
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.show--details .page--title h2 .btn {
+  margin-left: 0.25rem;
 }
 
 .page--title .form-control {
@@ -1521,7 +1525,7 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list .workflow--color-3 {
-  border-top: 8px solid #CECE5A;
+  border-top: 8px solid #5ace5d;
 }
 
 .projects--grid .task--list .workflow--color-4 {
@@ -1601,7 +1605,7 @@ Project Task View CSS=-=-=
 }
 
 .workflow--color-3 {
-  background: #CECE5A;
+  background: #5ace5d;
 }
 
 .workflow--color-4 {

@@ -340,8 +340,8 @@
 
 .edit--task--modal form .input-group {
     border: var(--bs-border-width) solid var(--bs-border-color);
-    border-radius: 50px;
-    -webkit-border-radius: 50px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
 }
 
 .edit--task--modal form .input-group #send-message {
@@ -350,7 +350,7 @@
     padding: 0;
     width: 36px;
     height: 36px;
-    margin: auto .15rem auto auto;
+    margin: auto .15rem .15rem;
     border-radius: 100px;
     -webkit-border-radius: 100px;
     color: #777777;
@@ -363,8 +363,47 @@
 
 .edit--task--modal form .input-group .form-control {
     border: 0;
-    resize: vertical;
     background: none;
+    flex: 1 1;
+}
+
+.edit--task--modal form .input-group .message--area, ul#subtasks-ul .form-group .message--area {
+    flex: 1 1;
+    position: relative;
+    min-height: 35px;
+}
+
+ul#subtasks-ul .form-group .message--area+button {
+    display: none;
+}
+
+.edit--task--modal form .input-group textarea, ul#subtasks-ul .form-group textarea {
+    display: block;
+    width: 100%;
+    position: absolute;
+    margin: 0px;
+    top: 0px;
+    left: 0px;
+    background-color: transparent;
+    height: 100%;
+    bottom: 0px;
+    overflow: hidden;
+    resize: none;
+    padding: .5rem 1.2rem;
+    font-size: 15px;
+}
+
+.edit--task--modal form .input-group .textarea--content, ul#subtasks-ul .form-group .textarea--content {
+    position: relative;
+    width: 100%;
+    color: transparent;
+    overflow: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    border: 1px solid transparent;
+    text-align: start;
+    padding: .5rem 1.2rem;
+    font-size: 15px;
 }
 
 ul#subtasks-ul .form-group {
@@ -455,13 +494,13 @@ ul#subtasks-ul .form-group:hover button {
     opacity: 1;
 }
 
-ul#subtasks-ul li textarea.form-control {
+ul#subtasks-ul .form-group textarea.form-control, ul#subtasks-ul .form-group textarea.form-control:focus,
+ul#subtasks-ul .form-group textarea.form-control:focus-visible {
     border: 0;
-    padding: 0;
-    padding-top: .5rem;
-    resize: none;
+    max-width: 100%;
+    padding: .5rem 0;
     box-shadow: none;
-    height: 35px;
+    height: auto;
 }
 
 ul#subtasks-ul li textarea.form-control+button {
@@ -477,6 +516,7 @@ ul#subtasks-ul li textarea.form-control+button {
     display: flex;
     align-items: center;
     gap: 6px;
+    width: 100%;
 }
 
 .task--message .msg-member-info .team--initial {
@@ -504,6 +544,8 @@ ul#subtasks-ul li textarea.form-control+button {
 .task--message .msg-member-info p {
     margin: 0;
     line-height: 1.2;
+    flex: 1 1;
+    max-width: calc(100% - 35px);
 }
 
 .task--message .msg-member-info small {
@@ -547,9 +589,15 @@ ul#subtasks-ul li textarea.form-control+button {
     margin-top: 10px;
     padding: 0;
     box-shadow: none;
-    background: none;
+    background: #7BCCB8;
     padding: 0;
     min-width: max-content;
+    border: 0;
+}
+
+.task--message .dropdown .dropdown-menu[data-popper-placement="top-end"] {
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 .task--message .dropdown .dropdown-menu::before {
@@ -564,8 +612,15 @@ ul#subtasks-ul li textarea.form-control+button {
     width: 0;
 }
 
+.task--message .dropdown .dropdown-menu[data-popper-placement="top-end"]:before {
+    border-color: #7BCCB8 transparent transparent;
+    right: 5px;
+    top: auto;
+    bottom: -16px;
+}
+
 .task--message .dropdown .dropdown-item {
-    color: #454545;
+    color: #ffffff;
     font-weight: 400;
     font-size: 1rem;
     background: none;
@@ -579,10 +634,12 @@ ul#subtasks-ul li textarea.form-control+button {
 
 .task--message .dropdown .dropdown-item button {
     display: block;
+    color: #ffffff;
     width: 100%;
     text-align: left;
     border-radius: 0;
     padding: 0.5rem .75rem;
+    opacity: 1;
 }
 
 .message--edit {
