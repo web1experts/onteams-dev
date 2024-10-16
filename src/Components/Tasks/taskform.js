@@ -567,7 +567,7 @@ export const TaskForm = () => {
                         }
                          
                          {typeof subtask !== 'object' ? (
-                            <input 
+                            <textarea 
                                 className="form-control" 
                                 rows="2" 
                                 onBlur={() => handleBlur(index)}
@@ -894,7 +894,7 @@ export const TaskForm = () => {
                                                                         }
                                                                         
                                                                         
-                                                                        <p>
+                                                                        <p className='msg-view'>
                                                                             <small>{formatTimeAgo(comment?.createdAt)}</small>
                                                                             {comment.text} 
                                                                         </p>
@@ -925,12 +925,14 @@ export const TaskForm = () => {
                                 <Row>
                                     <Col sm={12}>
                                         <InputGroup className="mb-0">
-                                            <Form.Control
+                                            <textarea
                                                 placeholder="Message"
                                                 name="message"
+                                                rows={1}
+                                                className='form-control'
                                                 onChange={handleNewComment} value={comments || ''}
                                                 onKeyDown={(event) => {
-                                                    if (event.key === 'Enter') {
+                                                    if (event.key === 'Enter' && !event.shiftKey) {
                                                         event.preventDefault(); // Prevent the default behavior (like form submission)
                                                         handleCommentSubmit()// Call your function to handle the Enter press
                                                     }
@@ -969,7 +971,7 @@ export const TaskForm = () => {
                             </div>
                             <ListGroup.Item onClick={() => { setDatePickerModal ( true )}}>
                                 <label for='date--picker'><FaRegCalendarAlt /> Due date</label>
-                                <label for='date--picker' className='date--new mb-0'>{fields['due_date']}</label>
+                                <label for='date--picker' className='date--new mb-0'>{fields['due_date'] ? parseDateWithoutTimezone(fields['due_date']): ''}</label>
                             </ListGroup.Item>
                             <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
                                 <LuWorkflow />Workflow status

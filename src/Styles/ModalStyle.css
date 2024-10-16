@@ -363,6 +363,8 @@
 
 .edit--task--modal form .input-group .form-control {
     border: 0;
+    resize: vertical;
+    background: none;
 }
 
 ul#subtasks-ul .form-group {
