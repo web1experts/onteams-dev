@@ -969,7 +969,7 @@ export const TaskForm = () => {
                             </div>
                             <ListGroup.Item onClick={() => { setDatePickerModal ( true )}}>
                                 <label for='date--picker'><FaRegCalendarAlt /> Due date</label>
-                                <label for='date--picker' className='date--new mb-0'>{fields['due_date']}</label>
+                                <label for='date--picker' className='date--new mb-0'>{fields['due_date'] ? parseDateWithoutTimezone(fields['due_date']): ''}</label>
                             </ListGroup.Item>
                             <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
                                 <LuWorkflow />Workflow status
