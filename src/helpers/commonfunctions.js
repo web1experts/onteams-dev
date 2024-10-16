@@ -156,6 +156,9 @@ export const cleanupCustomDropdown = (select) => {
 };
 
 export function parseDateWithoutTimezone(dateString) {
+    if( dateString === "" || dateString === null || typeof dateString === "undefined"){
+        return ''
+    }
     const [year, month, day] = dateString.split('T')[0].split('-');
     return new Date(year, month - 1, day); // Month is zero-indexed
   }

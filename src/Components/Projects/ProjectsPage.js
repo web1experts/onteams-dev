@@ -403,13 +403,10 @@ function ProjectsPage() {
             }
             let payload = formData;
 
-            if (currentProject && currentProject._id) {
-                await dispatch(updateProject(currentProject._id, payload))
-                setLoader(false)
-            } else {
-                await dispatch(createProject(payload))
-                setLoader(false)
-            }
+            
+            await dispatch(createProject(payload))
+            setLoader(false)
+            
         }
     }
 
@@ -725,7 +722,7 @@ function ProjectsPage() {
             <TaskForm />
             <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{currentProject?._id ? 'Edit Project' : 'Create New Project'}</Modal.Title>
+                    <Modal.Title>Create New Project</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="project--form">
@@ -798,25 +795,44 @@ function ProjectsPage() {
                                     </Form.Label>
                                     
                                     <Row>
-                                        {
-                                            (!fields.start_date || fields.start_date === "" && !fields.due_date && fields.due_date === "") ?
-                                            <label for='startdate--picker' className="task--date--picker" onClick={() => {setDateshow(true)}}><FaRegCalendarAlt /> Set due date</label>
-                                            :
-                                            <label for='startdate--picker' className="task--date--change" onClick={() => {setDateshow(true)}}>
-                                                {new Date(fields.start_date).toISOString().split('T')[0]} 
+                                    {(!fields?.start_date && !fields?.due_date) ? (
+                                        <label 
+                                            htmlFor="startdate--picker" 
+                                            className="task--date--picker" 
+                                            onClick={() => { setDateshow(true); }}
+                                        >
+                                            <FaRegCalendarAlt /> Set due date
+                                        </label>
+                                    ) : (
+                                        <label 
+                                            htmlFor="startdate--picker" 
+                                            className="task--date--change" 
+                                            onClick={() => { setDateshow(true); }}
+                                        >
+                                            { fields?.start_date && (
+                                                new Date(fields.start_date).toISOString().split('T')[0]
+                                            )}
 
-                                                { fields?.due_date && (
-                                                    <>
-                                                        <span>/</span> {new Date(fields?.due_date).toISOString().split('T')[0]}
-                                                    </>
-                                                ) }
+                                            { fields?.start_date && fields?.due_date && (
+                                                <span>/</span>
+                                            )}
 
-                                                <MdOutlineCancel onClick={() => {
-                                                    dispatch(updateStateData(PROJECT_FORM, { ['start_date']: '', ['due_date']: '' }));
-                                                }} />
-                                                
-                                            </label>
-                                        }
+                                            { fields?.due_date && (
+                                                <>
+                                                    {new Date(fields.due_date).toISOString().split('T')[0]}
+                                                </>
+                                            )}
+
+                                            {(fields?.start_date || fields?.due_date) && (
+                                                <MdOutlineCancel 
+                                                    onClick={() => {
+                                                        dispatch(updateStateData(PROJECT_FORM, { start_date: '', due_date: '' }));
+                                                    }} 
+                                                />
+                                            )}
+                                        </label>
+                                    )}
+
                                         <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                     </Row>
                                 </Form.Group>
