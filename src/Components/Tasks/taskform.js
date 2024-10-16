@@ -567,7 +567,7 @@ export const TaskForm = () => {
                         }
                          
                          {typeof subtask !== 'object' ? (
-                            <input 
+                            <textarea 
                                 className="form-control" 
                                 rows="2" 
                                 onBlur={() => handleBlur(index)}
@@ -894,7 +894,7 @@ export const TaskForm = () => {
                                                                         }
                                                                         
                                                                         
-                                                                        <p>
+                                                                        <p className='msg-view'>
                                                                             <small>{formatTimeAgo(comment?.createdAt)}</small>
                                                                             {comment.text} 
                                                                         </p>
@@ -925,12 +925,14 @@ export const TaskForm = () => {
                                 <Row>
                                     <Col sm={12}>
                                         <InputGroup className="mb-0">
-                                            <Form.Control
+                                            <textarea
                                                 placeholder="Message"
                                                 name="message"
+                                                rows={2}
+                                                
                                                 onChange={handleNewComment} value={comments || ''}
                                                 onKeyDown={(event) => {
-                                                    if (event.key === 'Enter') {
+                                                    if (event.key === 'Enter' && !event.shiftKey) {
                                                         event.preventDefault(); // Prevent the default behavior (like form submission)
                                                         handleCommentSubmit()// Call your function to handle the Enter press
                                                     }

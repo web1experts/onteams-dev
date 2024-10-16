@@ -39,7 +39,8 @@
     "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "obfuscate": "javascript-obfuscator build/static/js --output build/static/js --config obfuscator-config.json"
   },
   "eslintConfig": {
     "extends": [
@@ -58,5 +59,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^4.1.1"
   }
 }
