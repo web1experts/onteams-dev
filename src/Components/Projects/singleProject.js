@@ -627,22 +627,32 @@ function SingleProject(props) {
                                     <small>Start/Due Date</small>
                                 </Form.Label>
                                 <Row>
-                                    {
-                                        (!fields.start_date || fields.start_date === "" && !fields.due_date && fields.due_date === "") ?
-                                        <label for='startdate--picker' className="task--date--picker" onClick={() => {setDateshow(true)}}><FaRegCalendarAlt /> Set due date</label>
-                                        :
-                                        <label for='startdate--picker' className="task--date--change" onClick={() => {setDateshow(true)}} >
-                                            {new Date(fields.start_date).toISOString().split('T')[0]} 
+                                        <label>
+                                            { fields?.start_date && (
+                                                new Date(fields.start_date).toISOString().split('T')[0]
+                                            )}
+
+                                            { fields?.start_date && fields?.due_date && (
+                                                <span>/</span>
+                                            )}
+
                                             { fields?.due_date && (
                                                 <>
-                                                    <span>/</span> {new Date(fields?.due_date).toISOString().split('T')[0]}
+                                                    {new Date(fields.due_date).toISOString().split('T')[0]}
                                                 </>
-                                            ) }
-                                            <MdOutlineCancel onClick={() => {
-                                                dispatch(updateStateData(EDIT_PROJECT_FORM, { ['start_date']: '', ['due_date']: '' }));
-                                            }} />
+                                            )}
+
+                                            {(fields?.start_date || fields?.due_date) && (
+                                                <MdOutlineCancel 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        dispatch(updateStateData(EDIT_PROJECT_FORM, { ['start_date']: '', ['due_date']: '' }));
+                                                    }} 
+                                                />
+                                            )}
+                                                                
                                         </label>
-                                    }
+                                    
                                     <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                 </Row>
                             </Form.Group>

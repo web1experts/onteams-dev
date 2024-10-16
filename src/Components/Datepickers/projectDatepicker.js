@@ -4,10 +4,6 @@ import { Modal, Form, Row, Button } from "react-bootstrap";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { EDIT_PROJECT_FORM,  PROJECT_FORM } from '../../redux/actions/types';
 import {DatePicker, Calendar,  DateObject } from "react-multi-date-picker";
-import { parseDateWithoutTimezone } from '../../helpers/commonfunctions';
-
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 
 const ProjectDatePicker = (props) => {
     const dispatch = useDispatch()
@@ -23,6 +19,11 @@ const ProjectDatePicker = (props) => {
                     
                     setStartDate(commonState.projectForm?.start_date)
                     setDueDate(commonState.projectForm?.due_date)
+
+                    if(commonState.projectForm?.start_date !== "" && commonState.projectForm?.due_date){
+
+                    }
+
                     break;
                 case 'edit_project':
                     setStartDate(commonState.editProjectForm?.start_date)
@@ -34,9 +35,6 @@ const ProjectDatePicker = (props) => {
         }
     }, [props])
 
-    useEffect(() => {
-        console.log("startpicker:: ", startpicker)
-    },[startpicker])
 
     const handleChange = (e) => {
         setStartPicker(e.target.checked)
@@ -46,50 +44,20 @@ const ProjectDatePicker = (props) => {
         
     }
     const handleDatevalue = () => {
-        if( startpicker === true ){
-            let start_date;
-            let due_date;
-            if( datevalue[0] ){
-                start_date = datevalue[0].format("YYYY-MM-DD")
-            }
-            if( datevalue[1] ){
-                due_date = datevalue[1].format("YYYY-MM-DD")
-            }
-            
-            switch (commonState.active_formtype) {
-                case 'project':
-                    dispatch(updateStateData(PROJECT_FORM, { ['start_date']: start_date, ['due_date']: due_date }));
-                    break;
-                case 'edit_project':
-                    dispatch(updateStateData(EDIT_PROJECT_FORM, { ['start_date']: start_date, ['due_date']: due_date }));
-                    break;
-                default:
-                    break;
-            }
-        }else{
-            const date = datevalue.toDate();
-            // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-            const day = date.getDate().toString().padStart(2, '0');
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
-            const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-            // Combine into the desired format
-            const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-            switch (commonState.active_formtype) {
-                case 'project':
-                    dispatch(updateStateData(PROJECT_FORM, { ['due_date']: formattedDate }));
-                    break;
-                case 'edit_project':
-                    dispatch(updateStateData(EDIT_PROJECT_FORM, { ['due_date']: formattedDate }));
-                    break;
-                default:
-                    break;
-            }
+        let start_date = '';
+        let due_date = '';
+
+        if (startpicker && datevalue.length) {
+            start_date = datevalue[0]?.format("YYYY-MM-DD");
+            due_date = datevalue[1]?.format("YYYY-MM-DD");
+        } else if (!startpicker && datevalue instanceof DateObject) {
+            due_date = datevalue.format("YYYY-MM-DD");
         }
-    }
+
+        const formType = commonState.active_formtype === 'project' ? PROJECT_FORM : EDIT_PROJECT_FORM;
+        dispatch(updateStateData(formType, { start_date, due_date }));
+    };
+
     return (
         <Modal show={props.isShow} onHide={() => { props.close( false )}} centered size="md" className="date--picker--modal">
                 <Modal.Header closeButton>
@@ -100,10 +68,10 @@ const ProjectDatePicker = (props) => {
                         <Form.Group className="mb-3 col-sm-12 col-md-6">
                             
                             <Form.Label>
-                                <Form.Check onChange={handleChange}></Form.Check>
+                                <Form.Check onChange={handleChange} checked={startpicker || commonState.projectForm?.start_date && commonState.projectForm?.start_date !== "" ? true : false}></Form.Check>
                                 Start date
                             </Form.Label>
-                            <Form.Control type="input" placeholder='DD/MM/YYYY' value={ commonState?.projectForm?.start_date ? new Date(commonState?.projectForm?.start_date).toISOString().split('T')[0] :  ''} name="startdate" placeholder='DD/MM/YYYY' onKeyDown={(e) => {e.preventDefault()}} />
+                            <Form.Control type="input" placeholder='DD/MM/YYYY' value={ commonState?.projectForm?.start_date ? new Date(commonState?.projectForm?.start_date).toISOString().split('T')[0] :  ''} name="startdate" onKeyDown={(e) => {e.preventDefault()}} />
                         </Form.Group>
                         <Form.Group className="mb-3 col-sm-12 col-md-6">
                             <Form.Label>Due date</Form.Label>
@@ -138,38 +106,6 @@ const ProjectDatePicker = (props) => {
                         />
 
                     }
-                    
-                    {/* <DatePicker 
-                        name="start_date"
-                        id='startdate--picker'
-                        value={start_date ? parseDateWithoutTimezone( start_date) : ''} 
-                        onChange={async (value) => {
-                            const date = value.toDate();
-                            // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                            const year = date.getFullYear();
-                            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                            const day = date.getDate().toString().padStart(2, '0');
-                            const hours = date.getHours().toString().padStart(2, '0');
-                            const minutes = date.getMinutes().toString().padStart(2, '0');
-                            const seconds = date.getSeconds().toString().padStart(2, '0');
-                            const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                            // Combine into the desired format
-                            const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                            switch (commonState.active_formtype) {
-                                case 'project':
-                                    dispatch(updateStateData(PROJECT_FORM, { ['start_date']: formattedDate }));
-                                    break;
-                                case 'edit_project':
-                                    dispatch(updateStateData(EDIT_PROJECT_FORM, { ['start_date']: formattedDate }));
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                        }                    
-                        className="form-control"
-                        placeholder="dd/mm/yyyy"
-                    /> */}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant='primary' onClick={() => { handleDatevalue(); props.close( false )}}>Done</Button>
