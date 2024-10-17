@@ -742,19 +742,20 @@ function ProjectsPage() {
                                         </div>
                                     </Form.Label>
                                 </Form.Group>
-                                <Form.Group className="mb-0 form-group client--input">
-                                    <Form.Select className="form-control custom-selectbox" placeholder="Select Client" id="client-select" name="client" onChange={handleChange} value={fields['client'] || ''}>
-                                        <option value="none">None</option>
-                                        {
-                                            clientlist && clientlist.length > 0 &&
-                                            clientlist.map((client, index) => {
-                                                return <option key={client._id} value={client._id}>{client.name}</option>
-                                            })
-
-                                        }
-                                    </Form.Select>
-
-                                    <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
+                                <Form.Group className="mb-0 form-group">
+                                    <Form.Label><small>Client</small></Form.Label>
+                                    <div className="client--input">
+                                        <Form.Select className="form-control custom-selectbox" placeholder="Select Client" id="client-select" name="client" onChange={handleChange} value={fields['client'] || ''}>
+                                            <option value="none">None</option>
+                                            {
+                                                clientlist && clientlist.length > 0 &&
+                                                clientlist.map((client, index) => {
+                                                    return <option key={client._id} value={client._id}>{client.name}</option>
+                                                })
+                                            }
+                                        </Form.Select>
+                                        <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
+                                    </div>
                                     <AddClient show={showClient} toggleshow={handleClientClose} />
                                 </Form.Group>
                                 <Form.Group className="mb-0 form-group">
@@ -847,17 +848,6 @@ function ProjectsPage() {
                                         <MemberInitials directUpdate={false} key={`MemberNames-header-new`}  showall={true} members={fields['members']} showAssignBtn={false} postId="new" type="project" showRemove={true} 
                                         // onMemberClick={(memberid, extraparam = false) =>  removeMember(memberid)}
                                          />
-
-                                        // Object.entries(fields['members']).map(([key, value]) => (
-                                        //     <ListGroup.Item action key={`key-member-${key}`}>
-                                        //         <MemberInitials title={value} id={`assign_member-${key}`}>
-                                        //             <span className={`team--initial nm-${value?.charAt(0).toLowerCase()}`}>{value?.charAt(0).toUpperCase()}</span>
-                                        //         </MemberInitials>
-                                        //         <span className="remove-icon" onClick={() => removeMember(key)}>
-                                        //             <MdOutlineClose />
-                                        //         </span>
-                                        //     </ListGroup.Item>
-                                        // ))
                                     )}
                                 </p>
 

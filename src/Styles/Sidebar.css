@@ -185,7 +185,7 @@ Sidebar CSS-=-=
 }
 
 .panel--sidebar .navbar-expand-lg .navbar-collapse::-webkit-scrollbar-thumb {
-  background-color: #44444420;
+  background-color: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 

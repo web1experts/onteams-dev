@@ -776,7 +776,6 @@ export const TaskForm = () => {
                                             <ul
                                                 id={`subtasks-ul`}
                                                 className="subtasks--list"
-                                                style={{ overflowY: 'auto', height: '100%' }}
                                             >
                                                 {renderSubtasks()}
                                                 {provided.placeholder} {/* Important for spacing during drag */}
@@ -921,6 +920,41 @@ export const TaskForm = () => {
                                     </Col>
                                 </Row>
                             </Form.Group>
+                            <Form.Group className="mb-0 mt-3 form-group">
+                                <Form.Label className="w-100 m-0">
+                                    <small>Timeline</small>
+                                </Form.Label>
+                                <div className='timeline--container'>
+                                    <div className='timeline--blip'>
+                                        <div className='timeline--blip--line'></div>
+                                        <div className='timeline--blip--status workflow--color-2'></div>
+                                        <div className='blip--container'>
+                                            <small>Wed, 11. Oct | 08:33 pm</small>
+                                            <p>Status changed to <strong>in review</strong> by <strong>Php Web1 Experts</strong></p>
+                                        </div>
+                                    </div>
+                                    <div className='timeline--blip'>
+                                        <div className='timeline--blip--line'></div>
+                                        <div className='timeline--blip--status workflow--color-1'></div>
+                                        <div className='blip--container'>
+                                            <small>Wed, 11. Oct | 08:33 pm</small>
+                                            <p>Status changed to <strong>in progress</strong> by <strong>Php Web1 Experts</strong></p>
+                                        </div>
+                                    </div>
+                                    <div className='timeline--blip'>
+                                        <div className='timeline--blip--line'></div>
+                                        <div className='timeline--blip--status workflow--color-0'></div>
+                                        <div className='blip--container'>
+                                            <small>Wed, 10. Oct | 08:33 pm</small>
+                                            <p>Task created in <strong>Planned</strong> by <strong>Php Web1 Experts</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Form.Group>
+                            <div className='task--cr--status'>
+                                <p className='mb-0'>Created on: <strong>16th October 2024 by Php Web1 Experts</strong></p>
+                                <p className='mb-0'>Last update: <strong>7 minutes ago by Php Web1 Experts</strong></p>
+                            </div>
                         </Form>
                     </div>
                     <div className="project--form--actions">
@@ -947,11 +981,10 @@ export const TaskForm = () => {
                                     ))}
                                 </div>
                             </div>
-                            <ListGroup.Item onClick={() => { setDatePickerModal ( true )}}>
-                                <label><FaRegCalendarAlt /> Due date</label>
-                                
+                            <ListGroup.Item>
+                                <label onClick={() => { setDatePickerModal ( true )}}><FaRegCalendarAlt /> Due date</label>
+                                <label onClick={() => { setDatePickerModal ( true )}} className='date--new w-100 mb-0'>{fields['due_date'] ? fields['due_date']: ''}</label>
                             </ListGroup.Item>
-                            <ListGroup.Item onClick={() => { setDatePickerModal ( true )}}><label  className='date--new mb-0'>{fields['due_date'] ? fields['due_date']: ''}</label></ListGroup.Item>
                             <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
                                 <LuWorkflow />Workflow status
                                 <Form.Group className="mb-0 form-group pb-0">
