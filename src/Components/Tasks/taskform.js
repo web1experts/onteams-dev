@@ -21,7 +21,7 @@ import { updateTask, deleteTask } from '../../redux/actions/task.action';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MemberInitials } from '../common/memberInitials';
-import DatePicker from "react-multi-date-picker";
+import {DatePicker, Calendar} from "react-multi-date-picker";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
         
@@ -378,6 +378,7 @@ export const TaskForm = () => {
         setFields({ ...fields, ['files']: updatedFiles })
         const previewfiles = currentTask.files.filter(file => file._id !== id);
         dispatch(updateStateData(CURRENT_TASK, { ...currentTask, ['files']: previewfiles }));
+        dispatch(updateTask(currentTask._id, {files: previewfiles}))
     }
 
     const handleRemove = (indexToRemove) => {
@@ -947,9 +948,10 @@ export const TaskForm = () => {
                                 </div>
                             </div>
                             <ListGroup.Item onClick={() => { setDatePickerModal ( true )}}>
-                                <label for='date--picker'><FaRegCalendarAlt /> Due date</label>
-                                <label for='date--picker' className='date--new mb-0'>{fields['due_date'] ? parseDateWithoutTimezone(fields['due_date']): ''}</label>
+                                <label><FaRegCalendarAlt /> Due date</label>
+                                
                             </ListGroup.Item>
+                            <ListGroup.Item onClick={() => { setDatePickerModal ( true )}}><label  className='date--new mb-0'>{fields['due_date'] ? fields['due_date']: ''}</label></ListGroup.Item>
                             <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus( true )}}>
                                 <LuWorkflow />Workflow status
                                 <Form.Group className="mb-0 form-group pb-0">
@@ -989,52 +991,29 @@ export const TaskForm = () => {
                     {/* <Modal.Title>Workflow status</Modal.Title> */}
                 </Modal.Header>
                 <Modal.Body>
-                <DatePicker 
-                    name="due_date"
-                    id="date--picker"
-                    value={fields['due_date'] && fields.due_date !== "" ? parseDateWithoutTimezone(fields['due_date']).toISOString().substring(0, 10) : ''}
-                    onChange={(value) => {
-                        console.log("Selected value:", value); // Debugging: Log the value to check its type
-
-                        // Ensure value is a valid Date object
-                        let date;
-                        if (value instanceof Date) {
-                            date = value; // If value is a Date object, use it directly
-                        } else if (typeof value === 'string' || value instanceof String) {
-                            // Try parsing the value if it's a string
-                            date = new Date(value);
-                        } else {
-                            console.error("Invalid value type: ", value);
-                            return;
+                    <Calendar 
+                        name="due_date"
+                        id='date--picker'
+                        value={fields['due_date'] ? parseDateWithoutTimezone(fields['due_date']) : null} 
+                        onChange={async (value) => {
+                            // const date = value.toDate();
+                            // // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                            // const year = date.getFullYear();
+                            // const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                            // const day = date.getDate().toString().padStart(2, '0');
+                            // const hours = date.getHours().toString().padStart(2, '0');
+                            // const minutes = date.getMinutes().toString().padStart(2, '0');
+                            // const seconds = date.getSeconds().toString().padStart(2, '0');
+                            // const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                            // Combine into the desired format
+                            const formattedDate = value.format("YYYY-MM-DD")//`${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                             dispatch(updateStateData(TASK_FORM, { ['due_date']: formattedDate }));
+                            setDatePickerModal(false)
                         }
-
-                        if (isNaN(date.getTime())) {
-                            console.error("Invalid date:", value);
-                            return; // Exit if date is invalid
-                        }
-
-                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00
-                        const year = date.getFullYear();
-                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                        const day = date.getDate().toString().padStart(2, '0');
-                        const hours = date.getHours().toString().padStart(2, '0');
-                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-
-                        // Combine into the desired format
-                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-
-                        // Dispatch the updated date
-                        dispatch(updateStateData(TASK_FORM, { due_date: formattedDate }));
-
-                        // Close the date picker modal
-                        setDatePickerModal(false);
-                    }}
-                    className="form-control"
-                    placeholder="dd/mm/yyyy"
-                />
-
+                        }                    
+                        className="form-control"
+                        placeholder="dd/mm/yyyy"
+                    />
                 </Modal.Body>
             </Modal> 
         <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews}  toggle={setPreviewShow} filetoPreview={filetoPreview} />
