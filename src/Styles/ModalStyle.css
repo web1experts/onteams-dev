@@ -701,6 +701,15 @@ ul#subtasks-ul li textarea.form-control+button {
     margin-top: 10px;
     border: 0;
     padding: 0;
+    width: 100%;
+}
+
+.rmdp-range {
+    border-radius: 50%;
+}
+
+.rmdp-week, .rmdp-ym {
+    margin-bottom: .25rem;
 }
 
 .project--form--inputs form .task--date--picker, .project--form--inputs form .task--date--change {

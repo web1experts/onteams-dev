@@ -84,9 +84,8 @@ const ProjectDatePicker = (props) => {
                 <Modal.Body>
                     <Row>
                         <Form.Group className="mb-3 col-sm-12 col-md-6">
-                            
-                            <Form.Label>
-                                <Form.Check onChange={handleChange} checked={startpicker || start_date && start_date !== "" ? true : false}></Form.Check>
+                            <Form.Label className='d-flex align-items-center'>
+                                <Form.Check className='form-check' onChange={handleChange} checked={startpicker || start_date && start_date !== "" ? true : false}></Form.Check>
                                 Start date
                             </Form.Label>
                             <Form.Control type="input" placeholder='DD/MM/YYYY' value={ start_date ? new Date(start_date).toISOString().split('T')[0] :  ''} name="startdate" onKeyDown={(e) => {e.preventDefault()}} />
