@@ -889,10 +889,12 @@ export const TaskForm = () => {
                                                                         }
                                                                         
                                                                         
-                                                                        <p className='msg-view'>
-                                                                            <small>{formatTimeAgo(comment?.createdAt)}</small>
-                                                                            {comment.text} 
-                                                                        </p>
+                                                                        <div className='msg-view'>
+                                                                        <small>{formatTimeAgo(comment?.createdAt)}</small>
+                                                                            {/* Render sanitized HTML content */}
+                                                                            <p dangerouslySetInnerHTML={{ __html: makeLinksClickable(comment.text) }} />
+                                                                            
+                                                                        </div>
                                                                     </div>
                                                                     <Dropdown>
                                                                         <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
