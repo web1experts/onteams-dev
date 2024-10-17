@@ -450,16 +450,6 @@ export const TaskForm = () => {
         return null;
     };
 
-    // Function to remove the last member
-    const removeMember = (member) => {
-        const updatedSelectedMembers = { ...commonState.taskForm.members };
-        delete updatedSelectedMembers[member];
-        delete fields['members'][member]
-        // dispatch(updateStateData(TASK_FORM, { members: updatedSelectedMembers }))
-       
-         dispatch(updateTask(currentTask._id, {members: Object.keys(updatedSelectedMembers)}))
-    };
-    
     const [taskModalState, setTaskModalState] = useState(refreshstates(commonState.active_formtype || false))
 
     const handlesubtaskChange = (index, oldval, newval, directupdate = false ) => {
@@ -611,6 +601,11 @@ export const TaskForm = () => {
                                         e.stopPropagation();  
                                         return;
                                     } 
+                                    const selection = window.getSelection();
+                                    if (selection && selection.type === 'Range') {
+                                        // User is selecting text, so don't move the caret
+                                        return;
+                                    }
                                     if (typeof subtask === 'object') {
                                         setEnableSubtakEdit({ [subtask._id]: true });
 
@@ -641,7 +636,7 @@ export const TaskForm = () => {
 
                                         console.log('content is:: ', content)
                                         // const content = e.target.textContent.trim();
-                                        handlesubtaskChange(index, subtask, content.replace(/\n\s*\n/g, '\n'), true);
+                                        handlesubtaskChange(index, subtask, content, true);
                                         // dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
                                     }
                                 }}
@@ -718,6 +713,18 @@ export const TaskForm = () => {
 
         )
     };
+    const formatDate = (dateString) => {
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+        const date = new Date(dateString);
+    
+        // Format the time part
+        const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+        const formattedDate = date.toLocaleDateString('en-US', options).replace(',', '');
+        const formattedTime = date.toLocaleTimeString('en-US', timeOptions).toLowerCase();
+    
+        return `${formattedDate} | ${formattedTime}`;
+    };
+
     return (
         <>
         <Modal show={modalstate} onHide={async () => { 
@@ -950,30 +957,25 @@ export const TaskForm = () => {
                                     <small>Timeline</small>
                                 </Form.Label>
                                 <div className='timeline--container'>
-                                    <div className='timeline--blip'>
-                                        <div className='timeline--blip--line'></div>
-                                        <div className='timeline--blip--status workflow--color-2'></div>
-                                        <div className='blip--container'>
-                                            <small>Wed, 11. Oct | 08:33 pm</small>
-                                            <p>Status changed to <strong>in review</strong> by <strong>Php Web1 Experts</strong></p>
-                                        </div>
-                                    </div>
-                                    <div className='timeline--blip'>
-                                        <div className='timeline--blip--line'></div>
-                                        <div className='timeline--blip--status workflow--color-1'></div>
-                                        <div className='blip--container'>
-                                            <small>Wed, 11. Oct | 08:33 pm</small>
-                                            <p>Status changed to <strong>in progress</strong> by <strong>Php Web1 Experts</strong></p>
-                                        </div>
-                                    </div>
-                                    <div className='timeline--blip'>
-                                        <div className='timeline--blip--line'></div>
-                                        <div className='timeline--blip--status workflow--color-0'></div>
-                                        <div className='blip--container'>
-                                            <small>Wed, 10. Oct | 08:33 pm</small>
-                                            <p>Task created in <strong>Planned</strong> by <strong>Php Web1 Experts</strong></p>
-                                        </div>
-                                    </div>
+                                    {
+                                        currentTask?.taskmeta?.length > 0 && currentTask?.taskmeta[0]?.meta_key === "timeline" && currentTask?.taskmeta[0]?.meta_value?.length > 0 &&
+                                        currentTask?.taskmeta[0]?.meta_value.map((timeline, index) => {
+                                                return (
+                                                    <div className='timeline--blip'>
+                                                        <div className='timeline--blip--line'></div>
+                                                        <div className='timeline--blip--status workflow--color-2'></div>
+                                                        <div className='blip--container'>
+                                                            <small>{formatDate(timeline?.createdAt)}</small>
+                                                            <p dangerouslySetInnerHTML={{ __html: timeline.message }}></p>
+                                                            {/* <p>Status changed to <strong>in review</strong> by <strong>Php Web1 Experts</strong></p> */}
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                            
+                                    }
+                                    
+                                    
                                 </div>
                             </Form.Group>
                             <div className='task--cr--status'>
