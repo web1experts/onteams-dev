@@ -378,6 +378,7 @@ export const TaskForm = () => {
         setFields({ ...fields, ['files']: updatedFiles })
         const previewfiles = currentTask.files.filter(file => file._id !== id);
         dispatch(updateStateData(CURRENT_TASK, { ...currentTask, ['files']: previewfiles }));
+        dispatch(updateTask(currentTask._id, {files: previewfiles}))
     }
 
     const handleRemove = (indexToRemove) => {
