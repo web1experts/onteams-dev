@@ -12,7 +12,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #44444420;
+  background-color: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
@@ -942,6 +942,14 @@ Add Project Modal CSS-=-=-
   margin-right: .5rem;
   font-size: 18px;
   cursor: grab;
+}
+
+.add--workflow--modal .workflow--list .list-group-item:first-child .drag--icon, .add--workflow--modal .workflow--list .list-group-item:last-child .drag--icon {
+  display: none;
+}
+
+.add--workflow--modal .workflow--list .list-group-item:first-child, .add--workflow--modal .workflow--list .list-group-item:last-child {
+  min-height: 45px;
 }
 
 .add--workflow--modal .workflow--list .list-group-item small {

@@ -39,7 +39,8 @@ body {
   justify-content: center;
 }
 
-.show--details .page--title h2 .btn {
+.show--details .page--title h2 .btn, .view--project .page--title h2 .btn,
+.view--invitee .page--title h2 .btn {
   margin-left: 0.25rem;
 }
 
@@ -131,7 +132,7 @@ body {
 }
 
 .page--wrapper {
-  height: calc(100vh - 56px);
+  height: calc(100vh - 57px);
 }
 
 .page--wrapper .nav-tabs button {
@@ -371,12 +372,15 @@ Collapsible Action CSS-=-=
 
 .show--details .table-responsive-xl,
 .view--project .table-responsive-xl,
-.view--invitee .table-responsive-xl {
+.view--invitee .table-responsive-xl,
+.show--details .table-responsive-lg,
+.view--project .table-responsive-lg,
+.view--invitee .table-responsive-lg {
   overflow-y: auto;
   scrollbar-width: thin;
   overflow-x: hidden;
   height: 100%;
-  max-height: calc(100vh - 110px);
+  max-height: calc(100vh - 88px);
 }
 
 .details--wrapper,
@@ -798,6 +802,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   background: #ffffff;
   padding: 1rem;
   height: calc(100vh - 100px);
+  overflow-y: auto;
   border-radius: 0.5rem;
   -webkit-border-radius: 0.5rem;
 }
@@ -993,11 +998,8 @@ table tr.active td {
   margin: auto;
 }
 
-.page--wrapper table td .select--dropdown .dropdown-menu,
-.team--page .page--title .select--dropdown .dropdown-menu,
-.modal .select--dropdown .dropdown-menu,
-.rounded--box .select--dropdown .dropdown-menu,
-.common--form .select--dropdown .dropdown-menu {
+.page--wrapper table td .select--dropdown .dropdown-menu, .team--page .page--title .select--dropdown .dropdown-menu, 
+.modal .select--dropdown .dropdown-menu, .rounded--box .select--dropdown .dropdown-menu, .common--form .select--dropdown .dropdown-menu {
   padding: 0;
   border: 1px solid #eeeeee;
   border-radius: .5rem;
@@ -1007,20 +1009,26 @@ table tr.active td {
   min-width: 180px;
   box-shadow: 0px 0px 10px 2px #001e0026;
   -webkit-box-shadow: 0px 0px 10px 2px #001e0026;
+  transform: none !important;
+  inset: 0 !important;
+  height: fit-content;
+  top: 100% !important;
 }
 
-.dropdown-menu[data-popper-placement="bottom-start"] {
+.modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"], .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"] {
   margin-bottom: 0;
   margin-top: 15px;
 }
 
-.dropdown-menu[data-popper-placement="top-start"] {
+.modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"], .select--dropdown .dropdown-menu[data-popper-placement="top-start"] {
   margin-bottom: 15px;
   margin-top: 0;
+  top: auto !important;
+  bottom: 100% !important;
 }
 
 .add--team--member--modal .select--dropdown {
-  position: unset;
+  position: relative;
 }
 
 .select--dropdown .drop--scroll {
@@ -1028,7 +1036,7 @@ table tr.active td {
   max-height: 170px;
   overflow-y: auto;
   scrollbar-width: auto;
-  scrollbar-color: #eeeeee #ffffff;
+  scrollbar-color: rgba(0, 0, 0, 0.1) #ffffff;
 }
 
 .modal .select--dropdown .dropdown-menu,
@@ -1038,7 +1046,7 @@ table tr.active td {
 
 .add--team--member--modal .select--dropdown .dropdown-menu {
   min-width: 0;
-  width: 45%;
+  width: 100%;
 }
 
 .modal .select--dropdown .form-group,
@@ -1295,7 +1303,7 @@ table tr.active td {
   box-shadow: 0px 0px 10px 2px #001e0026;
   -webkit-box-shadow: 0px 0px 10px 2px #001e0026;
   scrollbar-width: auto;
-  scrollbar-color: #eeeeee transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
 }
 
 .projects--page .table .more--member .dropdown-menu .dropdown-item,
@@ -1482,13 +1490,13 @@ Project Task View CSS=-=-=
   display: flex;
   flex-flow: row nowrap;
   margin-left: 0;
-  padding-bottom: 1rem;
+  padding-bottom: 0;
   overflow-x: scroll;
-  scrollbar-color: rgba(0, 0, 0, 0.5) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
   scrollbar-width: thin;
   -ms-overflow-style: none;
   gap: 1rem;
-  height: calc(100vh - 90px);
+  height: calc(100vh - 100px);
 }
 
 .projects--grid .task--list::-webkit-scrollbar {
@@ -1498,7 +1506,7 @@ Project Task View CSS=-=-=
 
 .projects--grid .task--list::-webkit-scrollbar-thumb {
   height: 3px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .projects--grid .task--list .task--grid {
@@ -1709,7 +1717,7 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list ul:hover::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .projects--grid .task--list ul li {
@@ -3167,6 +3175,7 @@ pre {
 
 .clients--grid--table td {
   text-align: center;
+  border: 0;
 }
 
 .clients--grid--table td:last-child {
@@ -3274,10 +3283,6 @@ pre {
 
 .rounded--box .card .custom-dropdown-container {
   max-width: 400px;
-}
-
-.project--form--inputs form .client--input .select--dropdown {
-  flex: none;
 }
 
 
@@ -3406,7 +3411,7 @@ Media CSS-=-==
     padding-right: 0;
     margin-right: 0;
     border-bottom: 1px solid #00000014;
-    padding-bottom: 1rem;
+    padding-bottom: 0;
     margin-bottom: 1rem;
     width: 100%;
   }
@@ -3790,7 +3795,7 @@ Media CSS-=-==
   }
 
   .projects--grid .task--list {
-    height: calc(100% - 70px);
+    height: calc(100% - 82px);
   }
 }
 
@@ -3989,13 +3994,5 @@ Media CSS-=-==
     min-width: 0;
     flex-basis: 90%;
     flex-shrink: 0;
-  }
-
-  .add--member--modal form .form-group {
-    flex: auto;
-  }
-
-  .add--team--member--modal .select--dropdown .dropdown-menu {
-    width: 90%;
   }
 }
