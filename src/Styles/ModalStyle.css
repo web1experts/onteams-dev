@@ -126,37 +126,40 @@
     bottom: -2px;
 }
 
-.add--team--member--modal form .form-row {
+.add--team--member--modal form .form-row, .add--member--modal form .form-row {
     display: flex;
     align-items: flex-start;
     flex-flow: row wrap;
     gap: 15px;
 }
 
-.add--team--member--modal .error {
+.add--team--member--modal .error, .add--member--modal .error {
     position: relative;
     bottom: 3px;
 }
 
-.add--team--member--modal form .form-row+.form-row {
-    margin-top: .5rem;
+.add--team--member--modal form .form-row+.form-row, .add--member--modal form .form-row+.form-row {
+    margin-top: .85rem;
 }
 
-.add--team--member--modal form .form-group {
+.add--team--member--modal form .form-group, .add--member--modal form .form-group {
     flex: 1 1;
     position: unset;
     padding-bottom: 0;
 }
 
-.add--team--member--modal form .btn {
+.add--team--member--modal form .btn, .add--member--modal form .btn {
     padding: 0;
     color: #de0606;
     padding-bottom: 0;
     margin: 0;
     padding-top: 6px;
+    border: 0;
+    outline: none;
 }
 
-.add--team--member--modal form .btn:focus-visible, .add--team--member--modal form .btn:active {
+.add--team--member--modal form .btn:focus-visible, .add--team--member--modal form .btn:active, 
+.add--member--modal form .btn:focus-visible, .add--member--modal form .btn:active {
     background: none;
     color: #de0606;
     border: 0;
@@ -720,6 +723,16 @@ ul#subtasks-ul li textarea.form-control+button {
     cursor: pointer;
 }
 
+@media (min-width:426px) {
+    .add--team--member--modal form .d-md-none {
+        display: none;
+    }
+
+    .add--member--modal form .form-group {
+        flex: 1 1;
+    }
+}
+
 @media screen and (max-width:1499px) {
     ul#subtasks-ul .form-group svg {
         opacity: 1;
@@ -759,7 +772,17 @@ ul#subtasks-ul li textarea.form-control+button {
         display: none;
     }
 
-    .add--team--member--modal form .form-row {
+    .add--team--member--modal form .form-row, .add--team--member--modal form .form-row {
         gap: 5px;
+    }
+    
+    .add--team--member--modal .select--dropdown .dropdown-menu {
+        width: 90%;
+    }
+}
+
+@media screen and (max-width:425px) {
+    .add--member--modal form .form-group {
+        flex: auto;
     }
 }

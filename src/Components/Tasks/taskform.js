@@ -571,7 +571,7 @@ export const TaskForm = () => {
                                 <div className='textarea--content' id="textContentDiv" dangerouslySetInnerHTML={subtask ? {
                                         __html: subtask
                                             .replace(/\n/g, '<br>&nbsp;')  // Replace line breaks with <br> tags
-                                            .replace(/ /g, '&nbsp;') // Replace spaces with non-breaking spaces
+                                            // .replace(/ /g, '&nbsp;') // Replace spaces with non-breaking spaces
                                     } : null}>
                                 
                                 </div>
@@ -801,7 +801,7 @@ export const TaskForm = () => {
                                 </Form.Label>
                                 {
                                     currentTask && currentTask.comments && currentTask.comments.length > 0 &&
-                                    <Row>
+                                    <Row key={`task-comments-${currentTask?._idß}`}>
                                         <Col sm={12}>
                                             
                                                 {
@@ -892,7 +892,7 @@ export const TaskForm = () => {
                                                 <div className='textarea--content' id="textContentDiv" dangerouslySetInnerHTML={comments ? {
                                                         __html: comments
                                                             .replace(/\n/g, '<br>&nbsp;')  // Replace line breaks with <br> tags
-                                                            .replace(/ /g, '&nbsp;') // Replace spaces with non-breaking spaces
+                                                            // .replace(/ /g, '&nbsp;') // Replace spaces with non-breaking spaces
                                                     } : null}>
                                                    
                                                 </div>
@@ -984,34 +984,57 @@ export const TaskForm = () => {
                 </div>
             </Modal.Body>
         </Modal>
-        <Modal show={datePickerModal} onHide={() => { setDatePickerModal( false )}} centered size="md" className="date--picker--modal">
+        <Modal show={datePickerModal} centered size="md" className="date--picker--modal">
                 <Modal.Header closeButton>
                     {/* <Modal.Title>Workflow status</Modal.Title> */}
                 </Modal.Header>
                 <Modal.Body>
-                    <DatePicker 
-                        name="due_date"
-                        id='date--picker'
-                        value={fields['due_date'] ? parseDateWithoutTimezone(fields['due_date']) : ''} 
-                        onChange={async (value) => {
-                            const date = value.toDate();
-                            // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                            const year = date.getFullYear();
-                            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                            const day = date.getDate().toString().padStart(2, '0');
-                            const hours = date.getHours().toString().padStart(2, '0');
-                            const minutes = date.getMinutes().toString().padStart(2, '0');
-                            const seconds = date.getSeconds().toString().padStart(2, '0');
-                            const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                            // Combine into the desired format
-                            const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                            dispatch(updateStateData(TASK_FORM, { ['due_date']: formattedDate }));
-                            setDatePickerModal(false)
+                <DatePicker 
+                    name="due_date"
+                    id="date--picker"
+                    value={fields['due_date'] && fields.due_date !== "" ? parseDateWithoutTimezone(fields['due_date']).toISOString().substring(0, 10) : ''}
+                    onChange={(value) => {
+                        console.log("Selected value:", value); // Debugging: Log the value to check its type
+
+                        // Ensure value is a valid Date object
+                        let date;
+                        if (value instanceof Date) {
+                            date = value; // If value is a Date object, use it directly
+                        } else if (typeof value === 'string' || value instanceof String) {
+                            // Try parsing the value if it's a string
+                            date = new Date(value);
+                        } else {
+                            console.error("Invalid value type: ", value);
+                            return;
                         }
-                        }                    
-                        className="form-control"
-                        placeholder="dd/mm/yyyy"
-                    />
+
+                        if (isNaN(date.getTime())) {
+                            console.error("Invalid date:", value);
+                            return; // Exit if date is invalid
+                        }
+
+                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00
+                        const year = date.getFullYear();
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+
+                        // Combine into the desired format
+                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+
+                        // Dispatch the updated date
+                        dispatch(updateStateData(TASK_FORM, { due_date: formattedDate }));
+
+                        // Close the date picker modal
+                        setDatePickerModal(false);
+                    }}
+                    className="form-control"
+                    placeholder="dd/mm/yyyy"
+                />
+
                 </Modal.Body>
             </Modal> 
         <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews}  toggle={setPreviewShow} filetoPreview={filetoPreview} />
