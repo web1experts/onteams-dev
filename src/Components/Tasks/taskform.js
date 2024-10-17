@@ -462,7 +462,7 @@ export const TaskForm = () => {
     
     const [taskModalState, setTaskModalState] = useState(refreshstates(commonState.active_formtype || false))
 
-    const handlesubtaskChange = (index, oldval, newval ) => {
+    const handlesubtaskChange = (index, oldval, newval, directupdate = false ) => {
        
         const newSubtasks = [...subtasks];
         newSubtasks[index] = (typeof oldval === "object" && oldval._id ) ? {...oldval, ['title']: newval } : newval ; // Update the specific subtask
@@ -470,7 +470,10 @@ export const TaskForm = () => {
         setFields({...fields, ['subtasks']: newSubtasks})
         // Dispatch the updated subtasks to global state
         dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks }));
-       
+        if(directupdate === true){
+            dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
+        }
+        // 
         
     }
 
@@ -597,8 +600,17 @@ export const TaskForm = () => {
                                 className="form-control"
                                 contentEditable={typeof subtask === 'object' && enablesubtaskedit[subtask._id] === true}
                                 suppressContentEditableWarning={true}
+                                onMouseDown={(e) => {
+                                    if (e.target.tagName === 'A') {
+                                        e.stopPropagation();
+                                    }
+                                }}
+                                
                                 onClick={(e) => {
-                                    if (e.target.tagName === 'A') return;
+                                    if (e.target.tagName === 'A'){ 
+                                        e.stopPropagation();  
+                                        return;
+                                    } 
                                     if (typeof subtask === 'object') {
                                         setEnableSubtakEdit({ [subtask._id]: true });
 
@@ -615,12 +627,22 @@ export const TaskForm = () => {
                                         }, 0);
                                     }
                                 }}
+                                
                                 onBlur={(e) => {
-                                    if (typeof subtask === 'object') {
+                                    if (typeof subtask === 'object') { console.log('On blur')
                                         setEnableSubtakEdit({ [subtask._id]: false });
                                         // Save content, converting <br> to \n
-                                        const content = e.target.innerHTML.replace(/<br\s*\/?>/gm, '\n');
-                                        handlesubtaskChange(index, subtask, content);
+                                        let content = e.target.innerHTML
+                                            .replace(/<a\s+href="[^"]*"[^>]*>(.*?)<\/a>/g, '$1')  // Convert <a> tags to plain text
+                                            .replace(/<\/?div>/g, '')                             // Remove wrapping <div> tags if present
+                                            .replace(/<br\s*\/?>/g, '\n')                         // Convert <br> back to newlines
+                                            .replace(/&nbsp;/g, ' ')                              // Convert non-breaking spaces to regular spaces
+                                            .replace(/(?:\r\n|\r|\n)/g, '\n');                    // Normalize newlines
+
+                                        console.log('content is:: ', content)
+                                        // const content = e.target.textContent.trim();
+                                        handlesubtaskChange(index, subtask, content.replace(/\n\s*\n/g, '\n'), true);
+                                        // dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
                                     }
                                 }}
                                 onKeyDown={(e) => {
@@ -778,7 +800,10 @@ export const TaskForm = () => {
                                                 className="subtasks--list"
                                                 style={{ overflowY: 'auto', height: '100%' }}
                                             >
-                                                {renderSubtasks()}
+                                                {
+                                                    subtasks && subtasks.length > 0 &&
+                                                    renderSubtasks() 
+                                                }
                                                 {provided.placeholder} {/* Important for spacing during drag */}
                                             </ul>
                                         </div>
