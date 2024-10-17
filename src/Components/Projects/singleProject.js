@@ -627,7 +627,11 @@ function SingleProject(props) {
                                     <small>Start/Due Date</small>
                                 </Form.Label>
                                 <Row>
-                                        <label>
+                                        <label 
+                                            htmlFor="startdate--picker" 
+                                            className="task--date--change" 
+                                            onClick={() => { setDateshow(true); }}
+                                        >
                                             { fields?.start_date && (
                                                 new Date(fields.start_date).toISOString().split('T')[0]
                                             )}
