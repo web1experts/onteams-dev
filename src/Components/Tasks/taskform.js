@@ -1093,8 +1093,9 @@ export const TaskForm = () => {
                     {
                       filteredStatuses.map((status, index) => (
                         <ListGroup.Item key={`status-${status._id}`} className={commonState?.taskForm?.tab == status._id ? "status--active": ""} onClick={async () => {
-                            await dispatch(updateTask(currentTask._id, {tab: status._id}))
                             setWorkflowStatus( false )
+                            await dispatch(updateTask(currentTask._id, {tab: status._id}))
+                            
                           }}>
                             <p><span class={`workflow--color-${index} status--circle`}></span> {status.title} {commonState?.taskForm?.tab === status._id && <FaCheck />}</p>
                         </ListGroup.Item>
