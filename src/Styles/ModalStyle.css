@@ -148,6 +148,10 @@
     padding-bottom: 1rem;
 }
 
+.add--member--modal form .form-group {
+    position: relative;
+}
+
 .add--team--member--modal form .btn, .add--member--modal form .btn {
     padding: 0;
     color: #de0606;
@@ -193,14 +197,10 @@
 .search--modal.show .modal-dialog {
     -webkit-transform: translate(0, 0);
     transform: translate(0, 0);
-    background-color: var(--bs-modal-bg);
-    background-clip: padding-box;
-    border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
 }
 
 .search--modal .modal-content {
     border-radius: 0;
-    background-color: transparent;
     border: 0;
     max-width: 700px;
     margin: auto;
@@ -395,6 +395,8 @@ ul#subtasks-ul .form-group .message--area+button {
     resize: none;
     padding: .25rem .5rem;
     font-size: 15px;
+    line-break: anywhere;
+    white-space: pre-wrap;
 }
 
 .edit--task--modal form .input-group .textarea--content, ul#subtasks-ul .form-group .textarea--content {
@@ -403,6 +405,7 @@ ul#subtasks-ul .form-group .message--area+button {
     color: transparent;
     overflow: hidden;
     white-space: pre-wrap;
+    line-break: anywhere;
     overflow-wrap: break-word;
     border: 1px solid transparent;
     text-align: start;
@@ -521,17 +524,25 @@ ul#subtasks-ul li textarea.form-control+button {
 .task--message {
     margin-bottom: 0;
     margin-top: .5rem;
+    padding: .5rem .3rem;
+    border-radius: .25rem;
+    -webkit-border-radius: .25rem;
+}
+
+.task--message:hover {
+    background: #eeeeee60;
 }
 
 .task--message .msg-member-info {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     width: 100%;
 }
 
 .task--message .msg-member-info .team--initial {
     width: 28px;
+    min-width: 28px;
     height: 28px;
     display: flex;
     align-items: center;
@@ -555,9 +566,14 @@ ul#subtasks-ul li textarea.form-control+button {
 .task--message .msg-member-info p {
     margin: 0;
     line-height: 1.2;
-    flex: 1 1;
-    max-width: calc(100% - 35px);
 }
+
+.task--message .msg-view {
+    flex: 1 1;
+    max-width: calc(100% - 45px);
+    white-space: pre-line;
+    line-break: anywhere;
+  }
 
 .task--message .msg-member-info small {
     display: block;
@@ -566,10 +582,8 @@ ul#subtasks-ul li textarea.form-control+button {
 }
 
 .task--message+.task--message {
-    border-top: 1px solid #dddddd50;
+    border-top: 1px solid #dddddd70;
     margin: 0;
-    margin-top: .5rem;
-    padding-top: .5rem;
 }
 
 .task--message:last-child {
