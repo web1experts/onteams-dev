@@ -297,8 +297,8 @@ const TasksList = React.memo((props) => {
                                                                 {...provided.dragHandleProps}
                                                                 className="task--button"
                                                                 onClick={async () => {
-                                                                    await dispatch(updateStateData(CURRENT_TASK, task))
                                                                     await dispatch(updateStateData(ACTIVE_FORM_TYPE, 'task_edit'));
+                                                                    await dispatch(updateStateData(CURRENT_TASK, task))
                                                                     handleTaskShow();
                                                                 }}
                                                             >

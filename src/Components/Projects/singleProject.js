@@ -627,6 +627,15 @@ function SingleProject(props) {
                                     <small>Start/Due Date</small>
                                 </Form.Label>
                                 <Row>
+                                {(!fields?.start_date && !fields?.due_date) ? (
+                                        <label 
+                                            htmlFor="startdate--picker" 
+                                            className="task--date--picker" 
+                                            onClick={() => { setDateshow(true); }}
+                                        >
+                                            <FaRegCalendarAlt /> Set due date
+                                        </label>
+                                    ) : (
                                         <label 
                                             htmlFor="startdate--picker" 
                                             className="task--date--change" 
@@ -656,7 +665,7 @@ function SingleProject(props) {
                                             )}
                                                                 
                                         </label>
-                                    
+                                    )}
                                     <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                 </Row>
                             </Form.Group>

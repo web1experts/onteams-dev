@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, ListGroup, Row, Col, InputGroup, Dropdown, Image} from "react-bootstrap";
 import { MdFileDownload } from "react-icons/md";
 import { FaEllipsisV, FaPlus, FaRegTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
-import { selectboxObserver, getMemberdata, makeLinksClickable, formatTimeAgo, parseDateWithoutTimezone } from "../../helpers/commonfunctions";
+import { selectboxObserver, getMemberdata, makeLinksClickable, formatTimeAgo, parseDateWithoutTimezone, timeAgo } from "../../helpers/commonfunctions";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
 import { FiFileText } from "react-icons/fi";
@@ -244,49 +244,50 @@ export const TaskForm = () => {
         if( currentTask?.description === fields?.description){
             return false;
         }
-        const formData = new FormData();
-            for (const [key, value] of Object.entries(fields)) {
-                if( key === "subtasks"){
-                    console.log(value)
-                }
-                if (typeof value === 'object' && key === 'images') {
+        await dispatch(updateTask(currentTask._id, {description: fields?.description}))
+        // const formData = new FormData();
+        //     for (const [key, value] of Object.entries(fields)) {
+        //         if( key === "subtasks"){
+        //             console.log(value)
+        //         }
+        //         if (typeof value === 'object' && key === 'images') {
                     
-                    value.forEach(attach => {
-                        formData.append('images[]', attach);
-                    });
-                } else if (typeof value === 'object' && key === 'members') {
-                    const memberids = Object.keys(fields['members'])
-                    if( memberids.length > 0){
-                        memberids.forEach(item => {
-                            formData.append(`members[]`, item); // Append with the same key for non-empty arrays
-                        });
-                    }else{
-                        formData.append(`members`, '[]');
-                    }
-                } else if (typeof value === 'object' && key === "subtasks") {
-                        value.forEach((obj, index) => {
-                            if( typeof obj === "object"){
-                                formData.append(`${key}[${index}]`, JSON.stringify(obj));
-                            }else{
-                                formData.append(`${key}[${index}]`, obj);
-                            }
-                      });
-                } else if (Array.isArray(value)) { // Check if the value is an array
-                    if (value.length === 0) {
-                        formData.append(`${key}[]`, []); // Append an empty array
-                    } else {
-                        value.forEach(item => {
-                            formData.append(`${key}[]`, item); // Append with the same key for non-empty arrays
-                        });
-                    }
-                } else {
-                    formData.append(key, value)
-                }
-            }
-            let payload = formData;
+        //             value.forEach(attach => {
+        //                 formData.append('images[]', attach);
+        //             });
+        //         } else if (typeof value === 'object' && key === 'members') {
+        //             const memberids = Object.keys(fields['members'])
+        //             if( memberids.length > 0){
+        //                 memberids.forEach(item => {
+        //                     formData.append(`members[]`, item); // Append with the same key for non-empty arrays
+        //                 });
+        //             }else{
+        //                 formData.append(`members`, '[]');
+        //             }
+        //         } else if (typeof value === 'object' && key === "subtasks") {
+        //                 value.forEach((obj, index) => {
+        //                     if( typeof obj === "object"){
+        //                         formData.append(`${key}[${index}]`, JSON.stringify(obj));
+        //                     }else{
+        //                         formData.append(`${key}[${index}]`, obj);
+        //                     }
+        //               });
+        //         } else if (Array.isArray(value)) { // Check if the value is an array
+        //             if (value.length === 0) {
+        //                 formData.append(`${key}[]`, []); // Append an empty array
+        //             } else {
+        //                 value.forEach(item => {
+        //                     formData.append(`${key}[]`, item); // Append with the same key for non-empty arrays
+        //                 });
+        //             }
+        //         } else {
+        //             formData.append(key, value)
+        //         }
+        //     }
+        //     let payload = formData;
 
             
-            await dispatch(updateTask(currentTask._id, payload))
+        //     await dispatch(updateTask(currentTask._id, payload))
     }
 
     const handleSubmit = async (e) => {
@@ -572,7 +573,7 @@ export const TaskForm = () => {
                                 <textarea 
                                     className="form-control" 
                                     rows="1" 
-                                    // onBlur={() => handleBlur(index)}
+                                    onBlur={() => handleBlur(index)}
                                     name={`subtask-${index}`} 
                                     placeholder="Enter subtask" 
                                     value={subtask} 
@@ -583,6 +584,7 @@ export const TaskForm = () => {
                                             handleBlur(index); // Handle saving on Enter
                                         }
                                     }}
+                                    
                                 />
                             </div>
                         ) : (
@@ -954,36 +956,51 @@ export const TaskForm = () => {
                                     </Col>
                                 </Row>
                             </Form.Group>
-                            <Form.Group className="mb-0 mt-3 form-group">
-                                <Form.Label className="w-100 m-0">
-                                    <small>Timeline</small>
-                                </Form.Label>
-                                <div className='timeline--container'>
-                                    {
-                                        currentTask?.taskmeta?.length > 0 && currentTask?.taskmeta[0]?.meta_key === "timeline" && currentTask?.taskmeta[0]?.meta_value?.length > 0 &&
-                                        currentTask?.taskmeta[0]?.meta_value.map((timeline, index) => {
-                                                return (
-                                                    <div className='timeline--blip'>
-                                                        <div className='timeline--blip--line'></div>
-                                                        <div className='timeline--blip--status workflow--color-2'></div>
-                                                        <div className='blip--container'>
-                                                            <small>{formatDate(timeline?.createdAt)}</small>
-                                                            <p dangerouslySetInnerHTML={{ __html: timeline.message }}></p>
-                                                            {/* <p>Status changed to <strong>in review</strong> by <strong>Php Web1 Experts</strong></p> */}
-                                                        </div>
-                                                    </div>
-                                                )
-                                            })
-                                            
+
+                            {currentTask?.taskmeta?.length > 0 &&
+                                currentTask.taskmeta.map((meta, index) => {
+                                    // Conditionally render based on the meta_key value
+                                    if (meta.meta_key === 'timeline') {
+                                    return (
+                                        <Form.Group className="mb-0 mt-3 form-group">
+                                            <Form.Label className="w-100 m-0">
+                                                <small>Timeline</small>
+                                            </Form.Label>
+                                            <div className='timeline--container' key={`timeline-area-${currentTask?._id}`}>
+                                                {
+                                                    meta?.meta_value?.length > 0 &&
+                                                    meta.meta_value.map((timeline, index) => {
+                                                            return (
+                                                                <div className='timeline--blip'>
+                                                                    <div className='timeline--blip--line'></div>
+                                                                    <div className='timeline--blip--status workflow--color-2'></div>
+                                                                    <div className='blip--container'>
+                                                                        <small>{formatDate(timeline?.createdAt)}</small>
+                                                                        <p dangerouslySetInnerHTML={{ __html: timeline.message }}></p>
+                                                                        {/* <p>Status changed to <strong>in review</strong> by <strong>Php Web1 Experts</strong></p> */}
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                        
+                                                }
+                                                
+                                            </div>
+                                        </Form.Group>
+                                    );
+                                    } else if (meta.meta_key === 'task_created_updated') {
+                                        return (
+                                            <div className='task--cr--status'>
+                                                <p className='mb-0'>Created on: <strong>{timeAgo(currentTask?.createdAt)} by {currentTask?.member?.name}</strong></p>
+                                                <p className='mb-0'>Last update: <strong>{timeAgo(meta?.updatedAt)} by {meta.meta_value}</strong></p>
+                                            </div>
+                                        );
                                     }
-                                    
-                                    
-                                </div>
-                            </Form.Group>
-                            <div className='task--cr--status'>
-                                <p className='mb-0'>Created on: <strong>16th October 2024 by Php Web1 Experts</strong></p>
-                                <p className='mb-0'>Last update: <strong>7 minutes ago by Php Web1 Experts</strong></p>
-                            </div>
+                                })
+                                }
+
+                               
+                           
                         </Form>
                     </div>
                     <div className="project--form--actions">

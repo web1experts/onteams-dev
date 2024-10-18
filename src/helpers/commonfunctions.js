@@ -3,6 +3,7 @@ import { decryptJsonData } from "./auth";
 import CustomDropdown from "../Components/dropdowns/customdropdown";
 import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
+
 const secretKey = process.env.REACT_APP_SECRET_KEY
 const roots = new Map();
 export function transformString(input) {
@@ -218,3 +219,68 @@ export const sanitizeEmptyQuillValue = (value) => {
 
     return 'just now';
 };
+
+// Helper function to add suffix to the day (1st, 2nd, 3rd, etc.)
+const getDayWithSuffix = (day) => {
+    const j = day % 10,
+          k = day % 100;
+    if (j == 1 && k != 11) {
+      return day + 'st';
+    }
+    if (j == 2 && k != 12) {
+      return day + 'nd';
+    }
+    if (j == 3 && k != 13) {
+      return day + 'rd';
+    }
+    return day + 'th';
+  };
+  
+  // Helper function to format date like "16th October 2024"
+  const formatDate = (date) => {
+    const day = getDayWithSuffix(date.getDate());
+    const month = date.toLocaleString('default', { month: 'long' });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+  
+  // Helper function to format the time ago
+  export const timeAgo = (dateString) => {
+    const date = new Date(dateString);
+  const now = new Date();
+  
+  // Calculate the difference in milliseconds
+  const diff = now - date;
+  
+  // Calculate time differences
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  
+  if (seconds < 60) {
+    return `${seconds} seconds ago`;
+  } else if (minutes < 60) {
+    return `${minutes} minutes ago`;
+  } else if (hours < 24) {
+    return `${hours} hours ago`;
+  } else {
+    // If it's more than 24 hours, return the date in 'ddth Month YYYY' format
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'long' });
+    const year = date.getFullYear();
+    
+    // Format the day with a suffix like 1st, 2nd, 3rd, etc.
+    const suffix = (day) => {
+      if (day > 3 && day < 21) return 'th'; // Suffix for 4-20
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    };
+    
+    return `${day}${suffix(day)} ${month} ${year}`;
+  }
+  };
