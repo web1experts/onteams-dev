@@ -400,7 +400,7 @@ Collapsible Action CSS-=-=
   -webkit-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   -moz-transition: opacity 0.5s cubic-bezier(.4, 0, .2, 1);
   z-index: 2;
-  /* height: 100%; */
+  height: 100vh;
 }
 
 .details--wrapper .loading-bar,
@@ -496,14 +496,14 @@ button.input-error.dropdown-toggle.btn.btn-success {
 
 .project--form--actions .list-group:last-child {
   flex: none;
-  background: none
+  background: none;
+  position: sticky;
+  position: -webkit-sticky;
+  bottom: 0;
 }
 
 .project--form--actions .list-group+.list-group .list-group-item {
   padding-right: 0;
-  position: sticky;
-  position: -webkit-sticky;
-  bottom: 0;
 }
 
 .details--projects--view .project--form--actions .list-group .output--file-preview .preview--grid {
@@ -722,10 +722,14 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .preview--grid .preview--cell p {
   margin: 0;
   display: block;
-  max-width: 170px;
+  max-width: 150px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.upload--status .preview--grid .preview--cell p {
+  max-width: 400px;
 }
 
 .preview--cell embed,
@@ -781,9 +785,18 @@ button.input-error.dropdown-toggle.btn.btn-success {
   box-shadow: none;
 }
 
-.preview--grid .preview--cell .btn-secondary:hover {
+.preview--grid .preview--cell .btn-secondary:hover, .preview--grid .preview--cell .btn-secondary:active, .preview--grid .preview--cell .btn-secondary:focus {
   color: #1e7e34;
-  box-shadow: none
+  box-shadow: none;
+  border: 0;
+}
+
+.preview--grid .preview--cell .btn-primary.focus, .preview--grid .preview--cell .btn-primary:focus, 
+.preview--grid .preview--cell .btn-primary:not(:disabled):not(.disabled).active, 
+.preview--grid .preview--cell .btn-primary:not(:disabled):not(.disabled):active {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .preview--grid .preview--cell img {
@@ -940,6 +953,10 @@ table tr.active td {
   min-width: 220px;
 }
 
+.page--title .select--dropdown .form-control {
+  min-width: 100%;
+}
+
 .select2-container--default .select2-selection--single {
   border-radius: 50px;
   -webkit-border-radius: 50px;
@@ -1006,7 +1023,7 @@ table tr.active td {
   -webkit-border-radius: .5rem;
   padding: 12px;
   background: #ffffff;
-  min-width: 180px;
+  min-width: 210px;
   box-shadow: 0px 0px 10px 2px #001e0026;
   -webkit-box-shadow: 0px 0px 10px 2px #001e0026;
   transform: none !important;
@@ -1035,7 +1052,7 @@ table tr.active td {
   min-width: 100%;
   max-height: 170px;
   overflow-y: auto;
-  scrollbar-width: auto;
+  scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.1) #ffffff;
 }
 
@@ -2411,7 +2428,7 @@ pre {
 .view--project table td,
 .view--invitee .table td {
   position: relative;
-  line-height: 35px;
+  line-height: 34.3px;
   min-width: 210px;
 }
 
@@ -2644,7 +2661,7 @@ pre {
   flex-flow: row wrap;
   position: relative;
   background: #E8E8E860;
-  height: 100%;
+  height: 100vh
 }
 
 .setting--page .setting--tabs {
@@ -2652,7 +2669,7 @@ pre {
 }
 
 .setting--page .setting--tabs .list-group {
-  flex-flow: column wrap;
+  flex-flow: row wrap;
   margin: 0;
   position: sticky;
   position: -webkit-sticky;
@@ -2661,6 +2678,9 @@ pre {
   padding: 0;
   background: #ffffff;
   border-right: 1px solid #89ccb830;
+  max-height: calc(100% - 53px);
+  overflow-y: auto;
+  max-width: 250px;
 }
 
 .setting--page .setting--tabs h2 {
@@ -2679,6 +2699,14 @@ pre {
   color: #89ccb8;
   font-weight: 500;
   text-transform: capitalize;
+  border-radius: 0;
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+.setting--tabs .list-group-horizontal>.list-group-item:first-child:not(:last-child) {
+  border-radius: 0;
+  -webkit-border-radius: 0;
 }
 
 .setting--tabs .list-group .list-group-item:last-child {
@@ -3777,7 +3805,7 @@ Media CSS-=-==
     margin-top: 0;
   }
 
-  .details--projects--view .project--form--actions .list-group:last-child {
+  .project--form--actions .list-group:last-child {
     position: relative;
   }
 
@@ -3979,7 +4007,7 @@ Media CSS-=-==
     margin: 0;
   }
 
-  .details--projects--view .project--form--actions .list-group:last-child {
+  .project--form--actions .list-group:last-child {
     position: relative;
   }
 
@@ -3994,5 +4022,9 @@ Media CSS-=-==
     min-width: 0;
     flex-basis: 90%;
     flex-shrink: 0;
+  }
+
+  .upload--status .preview--grid .preview--cell p {
+    max-width: 280px;
   }
 }

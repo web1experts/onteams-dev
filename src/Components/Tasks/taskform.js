@@ -876,7 +876,7 @@ export const TaskForm = () => {
                                                             )
                                                         }else{
                                                             return (
-                                                                <p className='d-flex align-items-center task--message' key={`comment-${comment._id}`}>
+                                                                <p className='d-flex task--message' key={`comment-${comment._id}`}>
                                                                     <div className='msg-member-info'>
                                                                         {
                                                                             comment?.author?.avatar && comment?.author?.avatar !== null ?
