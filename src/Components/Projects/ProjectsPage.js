@@ -534,18 +534,51 @@ function ProjectsPage() {
         setCurrentProject(project)
     }
 
+    // const handleDragEnd = (result) => {
+    //     const { source, destination, draggableId } = result;
+    //     // If there's no destination (i.e., the item was dropped outside), do nothing
+    //     if (!destination) return;
+
+    //     const projectId = draggableId.split('-')[1]; // Extract task ID from draggableId
+    //     const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
+    //     const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
+
+    //     // Clone the projects array to avoid mutating the state directly
+    //     let reorderedProjects = [...projects];
+
+    //     if (sourceTabId === destinationTabId) {
+    //         // If the task was moved within the same tab, reorder the tasks
+    //         const [removed] = reorderedProjects.splice(source.index, 1); // Remove task from the source position
+    //         reorderedProjects.splice(destination.index, 0, removed); // Insert task to the destination position
+    //     } else {
+    //         // Task was moved to a different tab (if needed, handle cross-tab logic here)
+    //         const [removed] = reorderedProjects.splice(source.index, 1); // Remove from source tab
+    //         reorderedProjects.splice(destination.index, 0, removed); // Add to destination tab
+    //     }
+    //     // Finally, update the state with reordered projects
+    //     const projectToUpdate =
+    //     {
+    //         project_id: projectId,
+    //         order: destination.index,
+
+    //     }
+    //     dispatch(reorderedProject({ project: projectToUpdate, filters: filters }));
+    //     setProjects(reorderedProjects);
+    // };
+
     const handleDragEnd = (result) => {
         const { source, destination, draggableId } = result;
+    
         // If there's no destination (i.e., the item was dropped outside), do nothing
         if (!destination) return;
-
+    
         const projectId = draggableId.split('-')[1]; // Extract task ID from draggableId
         const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
         const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
-
+    
         // Clone the projects array to avoid mutating the state directly
         let reorderedProjects = [...projects];
-
+    
         if (sourceTabId === destinationTabId) {
             // If the task was moved within the same tab, reorder the tasks
             const [removed] = reorderedProjects.splice(source.index, 1); // Remove task from the source position
@@ -555,16 +588,20 @@ function ProjectsPage() {
             const [removed] = reorderedProjects.splice(source.index, 1); // Remove from source tab
             reorderedProjects.splice(destination.index, 0, removed); // Add to destination tab
         }
-        // Finally, update the state with reordered projects
-        const projectToUpdate =
-        {
-            project_id: projectId,
-            order: destination.index,
-
-        }
-        dispatch(reorderedProject({ project: projectToUpdate, filters: filters }));
+    
+        // Generate a list of newly ordered projects
+        const newOrder = reorderedProjects.map((project, index) => ({
+            project_id: project._id, // Adjust this if your project ID key is different
+            order: index
+        }));
+        
+        // Dispatch the action with the new order
+        dispatch(reorderedProject({ projects: newOrder, filters: filters }));
+    
+        // Update the state with reordered projects
         setProjects(reorderedProjects);
     };
+    
 
     const handleKeyDown = (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
