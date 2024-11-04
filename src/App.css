@@ -278,6 +278,24 @@ body {
   font-weight: 400;
 }
 
+.page--wrapper .draggable--table tr {
+  display: flex;
+}
+
+.page--wrapper .draggable--table th, .page--wrapper .draggable--table td {
+  width: auto;
+  flex: 1 1;
+  line-height: 33px;
+}
+
+.show--details .draggable--table td, .view--project .draggable--table td, .view--invitee .draggable--table td {
+  line-height: 34.3px;
+}
+
+.page--wrapper .draggable--table td.member--circles {
+  min-height: 0;
+}
+
 .page--wrapper table td {
   font-weight: 500;
 }
@@ -3490,6 +3508,10 @@ Media CSS-=-==
   .task--message .dropdown .btn {
     opacity: 1;
   }
+
+  .page--wrapper table td.project--title--td span {
+    max-width: 150px;
+  }
 }
 
 @media screen and (max-width:992px) {
@@ -3533,6 +3555,10 @@ Media CSS-=-==
   .setting--page .rounded--box .table tr,
   .setting--page .rounded--box .table tr td,
   .setting--page .rounded--box .table tr th {
+    display: block;
+  }
+
+  .page--wrapper .draggable--table tr {
     display: block;
   }
 

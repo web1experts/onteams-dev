@@ -698,7 +698,7 @@ function ProjectsPage() {
                     }
                     <Container fluid>
                     <DragDropContext onDragEnd={handleDragEnd}>
-                        <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table' : 'project--table'}>
+                        <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table draggable--table' : 'project--table'}>
                             <thead>
                                 <tr key="project-table-header">
                                     {/* <th scope="col" width={20} key="project-hash-header">#</th> */}
