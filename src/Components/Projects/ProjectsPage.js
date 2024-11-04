@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown } from "react-bootstrap";
 import { FaChevronDown, FaPlus, FaList, FaRegTrashAlt, FaRegCalendarAlt, FaCog } from "react-icons/fa";
@@ -6,7 +6,7 @@ import { MdFileDownload, MdFilterList, MdOutlineClose, MdSearch, MdOutlineCancel
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
 import { BsGrid } from "react-icons/bs";
-import { ListProjects, createProject, updateProject, deleteProject } from "../../redux/actions/project.action"
+import { ListProjects, createProject, updateProject, deleteProject, reorderedProject } from "../../redux/actions/project.action"
 import { Listmembers } from "../../redux/actions/members.action";
 import { formatStatus } from "../../utils/common";
 import { StatusModal, MemberModal, WorkFlowModal, FilesModal, FilesPreviewModal } from "../modals";
@@ -14,20 +14,21 @@ import { ListClients } from "../../redux/actions/client.action";
 import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
-import fileIcon from './../../images/file-icon-image.jpg'
-import { selectboxObserver, getMemberdata, parseDateWithoutTimezone } from "../../helpers/commonfunctions";
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
+import { selectboxObserver, getMemberdata } from "../../helpers/commonfunctions";
 import SingleProject from "./singleProject";
 import { TaskForm } from "../Tasks/taskform";
 import TasksList from "../Tasks/list";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 import { MemberInitials } from "../common/memberInitials";
-import ReactQuill from 'react-quill';
+import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import DatePicker from "react-multi-date-picker";
+import 'react-quill/dist/quill.snow.css';
+import AutoLinks from "quill-auto-links";
+
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE } from "../../redux/actions/types";
+Quill.register("modules/autoLinks", AutoLinks);
 function ProjectsPage() {
     const [isActiveView, setIsActiveView] = useState(2);
     const dispatch = useDispatch();
@@ -58,6 +59,8 @@ function ProjectsPage() {
     const [allMembers, setAllmembers] = useState([{ value: 'all', label: 'All Members' }])
     const [spinner, setSpinner] = useState(false)
     let fieldErrors = {};
+    const quillRef = useRef(null);
+    const pasteOccurred = useRef(false);
     let active = 2;
     const workflowstate = useSelector(state => state.workflow)
     const modules = {
@@ -71,7 +74,8 @@ function ProjectsPage() {
         clipboard: {
           // toggle to add extra line breaks when pasting HTML:
           matchVisual: false,
-        }
+        },
+        autoLinks: true
       };
 
       const formats = [
@@ -182,21 +186,8 @@ function ProjectsPage() {
     const [showClient, setClientShow] = useState(false);
     const handleClientClose = () => setClientShow(false);
     const handleClientShow = () => setClientShow(true);
-    const [showWorkflow, setWorkflowShow] = useState(false);
     const handleWorkflowClose = () => dispatch(togglePopups('workflow', false));
     const handleWorkflowShow = () => dispatch(togglePopups('workflow', true));
-    const [showSetting, setSettingShow] = useState(false);
-    const handleSettingClose = () => setSettingShow(false);
-    const handleSettingShow = () => setSettingShow(true);
-    const [showEdit, setEditShow] = useState(false);
-    const handleEditClose = () => setEditShow(false);
-    const handleEditShow = () => setEditShow(true);
-    const [showAdd, setAddShow] = useState(false);
-    const handleAddClose = () => setAddShow(false);
-    const handleAddShow = () => setAddShow(true);
-    const [showAssign, setAssignShow] = useState(false);
-    const handleAssignClose = () => setAssignShow(false);
-    const handleAssignShow = () => setAssignShow(true);
     const [showUpload, setUploadShow] = useState(false);
     const handleUploadClose = () => {
         setUploadShow(false);
@@ -243,7 +234,6 @@ function ProjectsPage() {
         dispatch(Listmembers(0, '', false));
         dispatch(ListClients());
     }, [])
-
 
 
     useEffect(() => { 
@@ -443,10 +433,6 @@ function ProjectsPage() {
         }
     }, [projects]);
 
-    const handleattachfiles = (e) => {
-        handleUploadClose()
-    }
-
     useEffect(() => {
         if (apiResult.deletedProject) {
             setIsActive(0)
@@ -455,8 +441,6 @@ function ProjectsPage() {
 
         if (apiResult.success) {
             setIsDescEditor( false )
-            // dispatch(updateStateData(DIRECT_UPDATE, false));
-            // dispatch(updateStateData(RESET_FORMS))
             setFields({ title: '', status: 'in-progress', members: [] })
             handleClose()
             setSelectedFiles([]);
@@ -545,19 +529,75 @@ function ProjectsPage() {
         }
     }, [currentProject]);
 
-
-    // const MemberInitials = ({ id, children, title }) => {
-    //     return (
-    //         <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
-    //             {children}
-    //         </OverlayTrigger>
-    //     )
-    // };
-
     const handleProjectChange = (project) => {
         dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project'))
         setCurrentProject(project)
     }
+
+    const handleDragEnd = (result) => {
+        const { source, destination, draggableId } = result;
+        // If there's no destination (i.e., the item was dropped outside), do nothing
+        if (!destination) return;
+
+        const projectId = draggableId.split('-')[1]; // Extract task ID from draggableId
+        const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
+        const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
+
+        // Clone the projects array to avoid mutating the state directly
+        let reorderedProjects = [...projects];
+
+        if (sourceTabId === destinationTabId) {
+            // If the task was moved within the same tab, reorder the tasks
+            const [removed] = reorderedProjects.splice(source.index, 1); // Remove task from the source position
+            reorderedProjects.splice(destination.index, 0, removed); // Insert task to the destination position
+        } else {
+            // Task was moved to a different tab (if needed, handle cross-tab logic here)
+            const [removed] = reorderedProjects.splice(source.index, 1); // Remove from source tab
+            reorderedProjects.splice(destination.index, 0, removed); // Add to destination tab
+        }
+        // Finally, update the state with reordered projects
+        const projectToUpdate =
+        {
+            project_id: projectId,
+            order: destination.index,
+
+        }
+        dispatch(reorderedProject({ project: projectToUpdate, filters: filters }));
+        setProjects(reorderedProjects);
+    };
+
+    const handleKeyDown = (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+            pasteOccurred.current = true; // Mark that a paste action is expected
+            console.log('Paste keyboard shortcut detected');
+        }
+    };
+
+    const handlePaste = (e) => {
+        const pastedData = e.clipboardData.getData('text');
+        console.log('Pasted content:', pastedData);
+        pasteOccurred.current = true; // Set the paste flag to true
+
+        setTimeout(function(){
+            pasteOccurred.current = false;
+        },500)
+    };
+
+    useEffect(() => {
+        // Add the paste listener to the editor
+        if (quillRef.current) {
+          const editor = quillRef.current.getEditor();
+          editor.root.addEventListener('paste', handlePaste);
+        }
+    
+        // Cleanup the event listener on unmount
+        return () => {
+          if (quillRef.current) {
+            const editor = quillRef.current.getEditor();
+            editor.root.removeEventListener('paste', handlePaste);
+          }
+        };
+      }, []);
 
 
     return (
@@ -572,15 +612,10 @@ function ProjectsPage() {
                                     <Button variant="primary" className={isActive !== 0 ? 'd-flex' : 'd-lg-none'} onClick={handleFilterShow}><MdFilterList /></Button>
                                     <Button variant="primary" onClick={() => handleShow('new')}><FaPlus /></Button>
                                     <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
-                                        {/* <ListGroup.Item key="showfor-filter-list">
-                                            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('show_for', event.target.value)} value={filters['show_for'] || 'all'}>
-                                                <option value="all">All Projects</option>
-                                                <option value="my">My Projects</option>
-                                            </Form.Select>
-                                        </ListGroup.Item> */}
+                                     
                                         <ListGroup.Item key="member-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
-                                                <option value="my">My Projects</option>
+                                                <option value={memberdata?._id}>My Projects</option>
                                                 {
                                                     allMembers.map((member, index) => {
                                                         return <option key={`member-projects-${index}`} value={member.value}>{member.label}</option>
@@ -625,6 +660,7 @@ function ProjectsPage() {
                         </div>
                     }
                     <Container fluid>
+                    <DragDropContext onDragEnd={handleDragEnd}>
                         <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table' : 'project--table'}>
                             <thead>
                                 <tr key="project-table-header">
@@ -636,50 +672,79 @@ function ProjectsPage() {
                                     <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {
-                                    (!spinner && projects && projects.length > 0)
-                                        ? projects.map((project, index) => {
+                            <Droppable droppableId={`droppable-project-table`} type="PROJECTS">
+                                        {(provided) => (
+                                    <tbody 
+                                        id={`projectable-body`}
+                                        className="projects--list"
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                        style={{ overflowY: 'auto', height: '100%' }}>
+                                        {
+                                            (!spinner && projects && projects.length > 0)
+                                                ? projects.map((project, index) => {
 
-                                            return (<>
-                                                <tr key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
-                                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
-                                                    <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
-                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
-                                                        // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
-                                                        />
+                                                    return (<>
+                                                        <Draggable
+                                                            key={project?._id}
+                                                            draggableId={`project-${project?._id}`}
+                                                            index={index}
+                                                        >
+                                                            {(provided) => (
+                                                                // <div
+                                                                //         ref={provided.innerRef}
+                                                                //         {...provided.draggableProps}
+                                                                //         {...provided.dragHandleProps}
+                                                                //     >
+                                
+                                                                <tr ref={provided.innerRef}
+                                                                         {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps} 
+                                                                key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
+                                                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
+                                                                    <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
+                                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
+                                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
+                                                                        // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
+                                                                        />
 
-                                                    </td>
-                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide">
+                                                                    </td>
+                                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide">
 
-                                                        <Dropdown className="select--dropdown" key='status-key'>
-                                                            <Dropdown.Toggle onClick={() => {dispatch(updateStateData(DIRECT_UPDATE, true));handleStatusShow()}} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                        <Dropdown className="select--dropdown" key='status-key'>
+                                                                            <Dropdown.Toggle onClick={() => {dispatch(updateStateData(DIRECT_UPDATE, true));handleStatusShow()}} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
 
-                                                        </Dropdown>
-                                                    </td>
-                                                    <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                        <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
-                                                        <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
-                                                    </td>
-                                                </tr>
-                                            </>)
-                                        })
-                                        :
+                                                                        </Dropdown>
+                                                                    </td>
+                                                                    <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
+                                                                        <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
+                                                                        <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
+                                                                    </td>
+                                                                </tr>
+                                                                // </div>
+                                                                )}
+                                                                </Draggable>
+                                                            
+                                                    </>)
+                                                })
+                                                :
 
-                                        !spinner && isActiveView === 2 &&
-                                        <>
-                                            <tr key={`noresults-row`} className="no--invite">
-                                                <td key={`empty-index`} colSpan={9} className="text-center">
-                                                    <h2 className="mt-2 text-center">No Projects Found</h2>
-                                                </td>
-                                            </tr>
-                                        </>
+                                                !spinner && isActiveView === 2 &&
+                                                <>
+                                                    <tr key={`noresults-row`} className="no--invite">
+                                                        <td key={`empty-index`} colSpan={9} className="text-center">
+                                                            <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                        </td>
+                                                    </tr>
+                                                </>
 
-                                }
-                            </tbody>
+                                        }
+                                    </tbody>
+                                )}
+                                </Droppable>
                         </Table>
+                        </DragDropContext>
                         {
                             isActiveView === 1 && !spinner && projects && projects.length == 0 &&
                             <div className="text-center mt-5">
@@ -780,12 +845,16 @@ function ProjectsPage() {
                                                 value={fields['description'] || ''}
                                                 onChange={(value) => {
                                                     setFields({...fields, ['description']: value})
-                                                    dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
                                                     setErrors({ ...errors, ['description']: '' });
+
+                                                    setTimeout(() => {
+                                                        dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
+                                                    },800)
                                                 }}
                                                 formats={formats} 
                                                 modules={modules}
-                                                
+                                                onKeyDown={handleKeyDown}
+                                                ref={quillRef}
                                             />
                                             
                                         </div>

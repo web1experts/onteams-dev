@@ -22,9 +22,10 @@ import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MemberInitials } from '../common/memberInitials';
 import {DatePicker, Calendar} from "react-multi-date-picker";
-import ReactQuill from 'react-quill';
+import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-        
+import AutoLinks from "quill-auto-links";
+Quill.register("modules/autoLinks", AutoLinks);
 
 export const TaskForm = () => {
     const modules = {
@@ -38,7 +39,8 @@ export const TaskForm = () => {
         clipboard: {
           // toggle to add extra line breaks when pasting HTML:
           matchVisual: false,
-        }
+        },
+        autoLinks: true
       };
 
       const formats = [
@@ -684,10 +686,34 @@ export const TaskForm = () => {
         }
     };
 
+    useEffect(() => {
+        // Add the paste listener to the editor
+        if (quillRef.current) {
+          const editor = quillRef.current.getEditor();
+          editor.root.addEventListener('paste', handlePaste);
+        }
+    
+        // Cleanup the event listener on unmount
+        return () => {
+          if (quillRef.current) {
+            const editor = quillRef.current.getEditor();
+            editor.root.removeEventListener('paste', handlePaste);
+          }
+        };
+      }, []);
+
     const handlePaste = (e) => {
         const pastedData = e.clipboardData.getData('text');
         console.log('Pasted content:', pastedData);
         pasteOccurred.current = true; // Set the paste flag to true
+
+        // const urlRegex = /(https?:\/\/[^\s]+)/g;
+        // if (urlRegex.test(pastedData)) {
+        //     e.preventDefault(); // Prevent the default paste behavior
+        //     const quill = quillRef.current.getEditor();
+        //     const range = quill.getSelection(); // Get current cursor position
+        //     quill.insertText(range.index, pastedData, 'link', pastedData);
+        // }
 
         setTimeout(function(){
             pasteOccurred.current = false;
@@ -782,12 +808,13 @@ export const TaskForm = () => {
                                         }}
                                         onKeyDown={handleKeyDown}
                                         //  onBlur={handleDescBlur} // Custom blur handler
-                                        ref={(el) => {
-                                            if (el) {
-                                                const editor = el.getEditor();
-                                                editor.root.addEventListener('paste', handlePaste); // Listen for paste
-                                            }
-                                        }}
+                                        // ref={(el) => {
+                                        //     if (el) {
+                                        //         const editor = el.getEditor();
+                                        //         editor.root.addEventListener('paste', handlePaste); // Listen for paste
+                                        //     }
+                                        // }}
+                                        ref={quillRef}
                                         modules={modules}
                                         formats={formats}
                                         />
@@ -958,7 +985,12 @@ export const TaskForm = () => {
                             </Form.Group>
 
                             {currentTask?.taskmeta?.length > 0 &&
-                                currentTask.taskmeta.map((meta, index) => {
+                            
+                                currentTask.taskmeta.sort((a, b) => {
+                                    // Sort such that 'timeline' comes before 'task_created_updated'
+                                    const order = ['timeline', 'task_created_updated'];
+                                    return order.indexOf(a.meta_key) - order.indexOf(b.meta_key);
+                                }).map((meta, index) => {
                                     // Conditionally render based on the meta_key value
                                     if (meta.meta_key === 'timeline') {
                                     return (
@@ -973,7 +1005,7 @@ export const TaskForm = () => {
                                                             return (
                                                                 <div className='timeline--blip'>
                                                                     <div className='timeline--blip--line'></div>
-                                                                    <div className='timeline--blip--status workflow--color-2'></div>
+                                                                    <div className={`timeline--blip--status workflow--color-${index}`}></div>
                                                                     <div className='blip--container'>
                                                                         <small>{formatDate(timeline?.createdAt)}</small>
                                                                         <p dangerouslySetInnerHTML={{ __html: timeline.message }}></p>
@@ -991,8 +1023,12 @@ export const TaskForm = () => {
                                     } else if (meta.meta_key === 'task_created_updated') {
                                         return (
                                             <div className='task--cr--status'>
-                                                <p className='mb-0'>Created on: <strong>{timeAgo(currentTask?.createdAt)} by {currentTask?.member?.name}</strong></p>
-                                                <p className='mb-0'>Last update: <strong>{timeAgo(meta?.updatedAt)} by {meta.meta_value}</strong></p>
+                                                <p className='mb-0'>Created on: <strong>{timeAgo(meta?.createdAt)} by {meta.meta_value?.created_by}</strong></p>
+                                                {
+                                                    meta.meta_value?.updated_by && meta.meta_value?.updated_by !== "" && 
+                                                    <p className='mb-0'>Last update: <strong>{timeAgo(meta?.updatedAt)} by {meta.meta_value?.updated_by}</strong></p>
+                                                }
+                                                
                                             </div>
                                         );
                                     }

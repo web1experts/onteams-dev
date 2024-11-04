@@ -17,12 +17,16 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
 import {  EDIT_PROJECT_FORM, ASSIGN_MEMBER, RESET_FORMS, CURRENT_PROJECT, DIRECT_UPDATE } from "../../redux/actions/types";
 import { MemberInitials } from "../common/memberInitials";
-import ReactQuill from 'react-quill';
+import ReactQuill, { Quill }  from 'react-quill';
+import AutoLinks from "quill-auto-links";
 import 'react-quill/dist/quill.snow.css';
 import DatePicker from "react-multi-date-picker";
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
+Quill.register("modules/autoLinks", AutoLinks);
 function SingleProject(props) {
     const dispatch = useDispatch();
+    const quillRef = useRef(null);
+    const pasteOccurred = useRef(false);
     const commonState = useSelector( state => state.common)
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [], client: '' });
     const [errors, setErrors] = useState({ title: '' });
@@ -79,7 +83,8 @@ function SingleProject(props) {
         clipboard: {
           // toggle to add extra line breaks when pasting HTML:
           matchVisual: false,
-        }
+        },
+        autoLinks: true
       };
 
       const formats = [
@@ -334,6 +339,39 @@ function SingleProject(props) {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
         return null
     }
+
+    const handleKeyDown = (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+            pasteOccurred.current = true; // Mark that a paste action is expected
+            console.log('Paste keyboard shortcut detected');
+        }
+    };
+
+    const handlePaste = (e) => {
+        const pastedData = e.clipboardData.getData('text');
+        console.log('Pasted content:', pastedData);
+        pasteOccurred.current = true; // Set the paste flag to true
+
+        setTimeout(function(){
+            pasteOccurred.current = false;
+        },500)
+    };
+
+    useEffect(() => {
+        // Add the paste listener to the editor
+        if (quillRef.current) {
+          const editor = quillRef.current.getEditor();
+          editor.root.addEventListener('paste', handlePaste);
+        }
+    
+        // Cleanup the event listener on unmount
+        return () => {
+          if (quillRef.current) {
+            const editor = quillRef.current.getEditor();
+            editor.root.removeEventListener('paste', handlePaste);
+          }
+        };
+      }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -612,12 +650,15 @@ function SingleProject(props) {
                                             value={fields['description'] || ''}
                                             onChange={(value) => {
                                                 setFields({...fields, ['description']: value})
-                                                dispatch( updateStateData( EDIT_PROJECT_FORM,  {['description']: value }))
                                                 setErrors({ ...errors, ['description']: '' });
+                                                setTimeout(() => {
+                                                    dispatch( updateStateData( EDIT_PROJECT_FORM,  {['description']: value }))
+                                                },800)
                                             }}
                                             formats={formats} 
                                             modules={modules}
-                                            
+                                            onKeyDown={handleKeyDown}
+                                            ref={quillRef}
                                         />
                                         
                                     </div>

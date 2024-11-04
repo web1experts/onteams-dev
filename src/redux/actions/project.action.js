@@ -120,3 +120,18 @@ export const getSingleProject = (projectId) =>{
         }
     }
 }
+
+export const reorderedProject = (payload) => {
+    return async (dispatch)=>{
+        try{
+            const response = await API.apiPutUrl('project', `/reorder`, payload);
+            if(response.data && response.data.success){
+                console.log('Reorder Successfull')
+            }else{
+                console.log('Reorder failed')
+            }
+        }catch (err){
+            errorRequest(err, dispatch);
+        }
+    }
+}

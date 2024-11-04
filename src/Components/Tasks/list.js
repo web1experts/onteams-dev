@@ -211,15 +211,6 @@ const TasksList = React.memo((props) => {
         setShowtaskform({ [tabid]: false })
     }
 
-    // const MemberInitials = ({ id, children, title }) => {
-    //     return (
-    //         <OverlayTrigger placement="bottom" overlay={<Tooltip id={id}>{title}</Tooltip>}>
-    //             {children}
-    //         </OverlayTrigger>
-    //     )
-    // };
-
-
     return (
         <>
             {
@@ -240,10 +231,7 @@ const TasksList = React.memo((props) => {
                                             variant="primary"
                                             onClick={() => {
                                                 setFields({ title: '', tab: tab._id, project_id: currentProject?._id, order: 0 })
-                                                // dispatch(updateStateData(ACTIVE_FORM_TYPE, 'task_create'));
-                                                // dispatch(updateStateData(TASK_FORM, { tab: tab._id, project_id: currentProject?._id }));
                                                 setShowtaskform({ [tab._id]: true })
-                                                // handleTaskShow();
                                             }}
                                         >
                                             <FaPlus />
@@ -326,26 +314,8 @@ const TasksList = React.memo((props) => {
                                                                     <p className="m-0 ms-auto">
                                                                         {task?.members && task?.members.length > 0 && (
                                                                             <MemberInitials  directUpdate={true} members={task?.members} showRemove={false} showAssign={false} postId={task._id} type = "task"
-                                                                            //  onMemberClick={(memberid, extraparam = false) => removeMember( memberid,task)} 
-                                                                             />
-
-                                                                            // task.members.slice(0, 3).map((member, index) => (
-                                                                            //     <ListGroup.Item action key={`key-member-${index}`}>
-                                                                            //         {/* Assuming `member` is an object with a `name` or `title` */}
-                                                                            //         <MemberInitials title={member.name || member} id={`assign_member-${index}`}>
-                                                                            //             <span className={`team--initial nm-${member.name.charAt(0).toLowerCase()}`}>{(member.name || member)?.charAt(0).toUpperCase()}</span>
-                                                                            //         </MemberInitials>
-                                                                            //         <span className="remove-icon" onClick={(e) => { e.stopPropagation(); removeMember(member._id, task) }}>
-                                                                            //             <MdOutlineClose />
-                                                                            //         </span>
-                                                                            //     </ListGroup.Item>
-                                                                            // ))
+                                                                           />
                                                                         )}
-                                                                        {/* {task?.members.length > 3 && (
-                                                                            <ListGroup.Item key={`more-member-${task._id}`} className="more--member">
-                                                                                <span>+{task.members.slice(3).length}</span>
-                                                                            </ListGroup.Item>
-                                                                        )} */}
                                                                     </p>
                                                                 </div>
                                                             </li>
