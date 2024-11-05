@@ -3674,6 +3674,7 @@ Media CSS-=-==
     margin-bottom: 0;
     position: relative;
     padding: 1rem;
+    outline: none;
   }
 
   table tr:focus, table tr:focus-within, table tr:focus-visible, table tr:active, table tr:visited {
