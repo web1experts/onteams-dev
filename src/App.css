@@ -3537,9 +3537,14 @@ Media CSS-=-==
   .page--wrapper table td.project--title--td span {
     max-width: 150px;
   }
+
+  .page--wrapper .draggable--table th:nth-child(2), .page--wrapper .draggable--table td:nth-child(2) {
+    flex: none;
+    min-width: 150px;
+  }
 }
 
-@media screen and (max-width:1099px) {
+@media screen and (max-width:1023px) {
   .common--form {
     padding: 2rem;
   }
