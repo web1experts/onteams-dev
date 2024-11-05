@@ -6,8 +6,9 @@
   box-sizing: border-box;
 }
 
-*:focus {
+*:focus, *:focus-visible, *:focus-within {
   box-shadow: none;
+  outline: none;
 }
 
 body {
@@ -290,6 +291,11 @@ body {
 
 .show--details .draggable--table td, .view--project .draggable--table td, .view--invitee .draggable--table td {
   line-height: 34.3px;
+}
+
+.page--wrapper .draggable--table th:nth-child(4), .page--wrapper .draggable--table td:nth-child(4) {
+  flex: none;
+  min-width: 250px;
 }
 
 .page--wrapper .draggable--table td.member--circles {
@@ -3100,7 +3106,7 @@ pre {
   max-width: calc(25% - 8px);
 }
 
-.project--grid--table tr.no--invite {
+.project--table tr.no--invite {
   max-width: 100%;
 }
 
@@ -3331,6 +3337,10 @@ pre {
   max-width: 400px;
 }
 
+.draggable--table>:not(caption)>*>* {
+  border-top-width: var(--bs-border-width);
+  margin-top: -1px;
+}
 
 /*-=-=-=-==-=-
 Media CSS-=-==
@@ -3387,9 +3397,24 @@ Media CSS-=-==
     max-width: 50%;
     flex: 1 1;
   }
+
+  .page--wrapper .draggable--table th:nth-child(4), .page--wrapper .draggable--table td:nth-child(4) {
+    flex: none;
+    min-width: 170px;
+  }
 }
 
 @media screen and (max-width:1199px) {
+  .page--wrapper .draggable--table th:nth-child(4), .page--wrapper .draggable--table td:nth-child(4), .page--wrapper .draggable--table th:last-child, .page--wrapper .draggable--table td:last-child {
+    flex: none;
+    min-width: 145px;
+  }
+
+  .page--wrapper .draggable--table td button {
+    padding: 0.15rem .65rem;
+    font-size: 14px;
+  }
+
   .wrapper--title .btn--view {
     padding: .35rem 1rem;
   }
@@ -3475,9 +3500,9 @@ Media CSS-=-==
     max-width: 100%;
   }
 
-  .details--projects--view .project--form {
+  /* .details--projects--view .project--form {
     height: auto;
-  }
+  } */
 
   .details--projects--view .project--form--actions>.btn {
     align-self: flex-start;
@@ -3514,7 +3539,7 @@ Media CSS-=-==
   }
 }
 
-@media screen and (max-width:992px) {
+@media screen and (max-width:1099px) {
   .common--form {
     padding: 2rem;
   }
@@ -3566,6 +3591,11 @@ Media CSS-=-==
     display: none;
   }
 
+  .draggable--table>:not(caption)>*>* {
+    border-top-width: 0;
+    margin-top: 0;
+}
+
   .setting--page .rounded--box .table td:last-child,
   .setting--page .rounded--box .table th:last-child {
     text-align: left;
@@ -3591,12 +3621,12 @@ Media CSS-=-==
     border-top-right-radius: 50px;
   }
 
-  .project--form,
+  /* .project--form,
   .details--projects--view .project--form {
     display: flex;
     flex-flow: column wrap;
     height: auto;
-  }
+  } */
 
   .output--file-preview {
     margin-bottom: 0;
@@ -3803,7 +3833,10 @@ Media CSS-=-==
 
   .show--details table tr,
   .view--project table tr,
-  .view--invitee table tr {
+  .view--invitee table tr,
+  .show--details .draggable--table tr,
+  .view--project .draggable--table tr,
+  .view--invitee .draggable--table tr {
     display: table-row;
     border: 0;
     padding: 0;

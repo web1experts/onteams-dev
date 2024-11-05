@@ -687,7 +687,7 @@ function ProjectsPage() {
                         </Row>
                     </Container>
                 </div>
-                <div className='page--wrapper px-md-2 py-3'>
+                <div className='page--wrapper px-md-2 py-3 h-auto'>
                     {
                         spinner &&
                         <div className="loading-bar">
@@ -695,76 +695,76 @@ function ProjectsPage() {
                         </div>
                     }
                     <Container fluid>
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                        <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table draggable--table' : 'project--table'}>
-                            <thead>
-                                <tr key="project-table-header">
-                                    {/* <th scope="col" width={20} key="project-hash-header">#</th> */}
-                                    <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Project Name</th>
-                                    <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
-                                    <th scope="col" width='30%' key="project-member-header" className="onHide">Assigned Members</th>
-                                    <th scope="col" key="project-status-header" className="onHide">Status</th>
-                                    <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <Droppable droppableId={`droppable-project-table`} type="PROJECTS">
-                                        {(provided) => (
-                                    <tbody 
-                                        id={`projectable-body`}
-                                        className="projects--list"
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
-                                        style={{ overflowY: 'auto', height: '100%' }}>
-                                        {
-                                            (!spinner && projects && projects.length > 0)
-                                            ? projects.map((project, index) => {
-                                                return (<>
-                                                    <Draggable
-                                                        key={project?._id}
-                                                        draggableId={`project-${project?._id}`}
-                                                        index={index}
-                                                    >
-                                                        {(provided) => (
-                                                            <tr ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps} 
-                                                                key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
-                                                                <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
-                                                                <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
-                                                                <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                                    <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
-                                                                    // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
-                                                                    />
-                                                                </td>
-                                                                <td key={`status-index-${index}`} data-label="Status" className="onHide">
-                                                                    <Dropdown className="select--dropdown" key='status-key'>
-                                                                        <Dropdown.Toggle onClick={() => {dispatch(updateStateData(DIRECT_UPDATE, true));handleStatusShow()}} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                                    </Dropdown>
-                                                                </td>
-                                                                <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                                    <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
-                                                                    <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
-                                                                </td>
-                                                            </tr>
-                                                        )}
-                                                    </Draggable>
-                                                </>)
-                                            })
-                                            :
+                        <DragDropContext onDragEnd={handleDragEnd}>
+                            <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table draggable--table' : 'project--table'}>
+                                <thead>
+                                    <tr key="project-table-header">
+                                        {/* <th scope="col" width={20} key="project-hash-header">#</th> */}
+                                        <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Project Name</th>
+                                        <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
+                                        <th scope="col" width='30%' key="project-member-header" className="onHide">Assigned Members</th>
+                                        <th scope="col" key="project-status-header" className="onHide">Status</th>
+                                        <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <Droppable droppableId={`droppable-project-table`} type="PROJECTS">
+                                            {(provided) => (
+                                        <tbody 
+                                            id={`projectable-body`}
+                                            className="projects--list"
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                            style={{ overflowY: 'auto', height: '100%' }}>
+                                            {
+                                                (!spinner && projects && projects.length > 0)
+                                                ? projects.map((project, index) => {
+                                                    return (<>
+                                                        <Draggable
+                                                            key={project?._id}
+                                                            draggableId={`project-${project?._id}`}
+                                                            index={index}
+                                                        >
+                                                            {(provided) => (
+                                                                <tr ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps} 
+                                                                    key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
+                                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
+                                                                    <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
+                                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
+                                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
+                                                                        // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
+                                                                        />
+                                                                    </td>
+                                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide">
+                                                                        <Dropdown className="select--dropdown" key='status-key'>
+                                                                            <Dropdown.Toggle onClick={() => {dispatch(updateStateData(DIRECT_UPDATE, true));handleStatusShow()}} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                        </Dropdown>
+                                                                    </td>
+                                                                    <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
+                                                                        <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
+                                                                        <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </Draggable>
+                                                    </>)
+                                                })
+                                                :
 
-                                            !spinner && isActiveView === 2 &&
-                                            <>
-                                                <tr key={`noresults-row`} className="no--invite">
-                                                    <td key={`empty-index`} colSpan={9} className="text-center">
-                                                        <h2 className="mt-2 text-center">No Projects Found</h2>
-                                                    </td>
-                                                </tr>
-                                            </>
-                                        }
-                                    </tbody>
-                                )}
-                                </Droppable>
-                        </Table>
+                                                !spinner && isActiveView === 2 &&
+                                                <>
+                                                    <tr key={`noresults-row`} className="no--invite">
+                                                        <td key={`empty-index`} colSpan={9} className="text-center">
+                                                            <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                        </td>
+                                                    </tr>
+                                                </>
+                                            }
+                                        </tbody>
+                                    )}
+                                    </Droppable>
+                            </Table>
                         </DragDropContext>
                         {
                             isActiveView === 1 && !spinner && projects && projects.length == 0 &&

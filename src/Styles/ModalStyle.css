@@ -812,16 +812,6 @@ ul#subtasks-ul li textarea.form-control+button {
     }
 }
 
-@media screen and (max-width:1499px) {
-    ul#subtasks-ul .form-group svg {
-        opacity: 1;
-    }
-
-    ul#subtasks-ul .form-group button {
-        opacity: 1;
-    }
-}
-
 @media screen and (max-width:1199px) {
     .file--preview--modal .file--flex .list-group {
         max-width: 40%;
@@ -829,6 +819,14 @@ ul#subtasks-ul li textarea.form-control+button {
 
     .file--preview--modal .file--preview {
         max-width: 60%;
+    }
+
+    ul#subtasks-ul .form-group svg {
+        opacity: 1;
+    }
+
+    ul#subtasks-ul .form-group button {
+        opacity: 1;
     }
 }
 

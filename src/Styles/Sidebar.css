@@ -326,7 +326,6 @@ Sidebar CSS-=-=
   .navbar-toggler:focus, .navbar-toggler:focus-within, .navbar-toggler:focus-visible, .open--panel--sidebar .navbar-toggler {
     box-shadow: none;
     outline: none;
-    background: rgba(249, 249, 249, 1);
   }
 
   .navbar-toggler.collapsed {
@@ -363,8 +362,6 @@ Sidebar CSS-=-=
   }
 
   .open--panel--sidebar .navbar-toggler-icon {
-    filter: invert(0) brightness(2);
-    -webkit-filter: invert(0) brightness(2);
     background-image: none;
   }
 

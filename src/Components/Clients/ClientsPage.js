@@ -453,7 +453,7 @@ function ClientsPage() {
                     :
                      
                     !spinner && isActiveView === 2 &&
-                      <tr>
+                      <tr className="no--invite">
                         <td colSpan={3}>
                           <h2 className="mt-2 text-center">Clients Not Found</h2>
                         </td>
@@ -466,8 +466,6 @@ function ClientsPage() {
                 <div className="text-center mt-5">
                     <h2>No Clients Found</h2>
                 </div>
-                
-            
             }
           </Container>
         </div>
