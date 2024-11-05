@@ -649,7 +649,6 @@ function ProjectsPage() {
                                     <Button variant="primary" className={isActive !== 0 ? 'd-flex' : 'd-lg-none'} onClick={handleFilterShow}><MdFilterList /></Button>
                                     <Button variant="primary" onClick={() => handleShow('new')}><FaPlus /></Button>
                                     <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
-                                     
                                         <ListGroup.Item key="member-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
                                                 <option value={memberdata?._id}>My Projects</option>
@@ -658,7 +657,6 @@ function ProjectsPage() {
                                                         return <option key={`member-projects-${index}`} value={member.value}>{member.label}</option>
                                                     })
                                                 }
-                                                
                                                 <option value="unassigned">Unassigned</option>
                                             </Form.Select>
                                         </ListGroup.Item>
@@ -719,63 +717,49 @@ function ProjectsPage() {
                                         style={{ overflowY: 'auto', height: '100%' }}>
                                         {
                                             (!spinner && projects && projects.length > 0)
-                                                ? projects.map((project, index) => {
-
-                                                    return (<>
-                                                        <Draggable
-                                                            key={project?._id}
-                                                            draggableId={`project-${project?._id}`}
-                                                            index={index}
-                                                        >
-                                                            {(provided) => (
-                                                                // <div
-                                                                //         ref={provided.innerRef}
-                                                                //         {...provided.draggableProps}
-                                                                //         {...provided.dragHandleProps}
-                                                                //     >
-                                
-                                                                <tr ref={provided.innerRef}
-                                                                         {...provided.draggableProps}
-                                                                        {...provided.dragHandleProps} 
+                                            ? projects.map((project, index) => {
+                                                return (<>
+                                                    <Draggable
+                                                        key={project?._id}
+                                                        draggableId={`project-${project?._id}`}
+                                                        index={index}
+                                                    >
+                                                        {(provided) => (
+                                                            <tr ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps} 
                                                                 key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
-                                                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
-                                                                    <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
-                                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
-                                                                        // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
-                                                                        />
+                                                                <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
+                                                                <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
+                                                                <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
+                                                                    <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
+                                                                    // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
+                                                                    />
+                                                                </td>
+                                                                <td key={`status-index-${index}`} data-label="Status" className="onHide">
+                                                                    <Dropdown className="select--dropdown" key='status-key'>
+                                                                        <Dropdown.Toggle onClick={() => {dispatch(updateStateData(DIRECT_UPDATE, true));handleStatusShow()}} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                    </Dropdown>
+                                                                </td>
+                                                                <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
+                                                                    <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
+                                                                    <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </Draggable>
+                                                </>)
+                                            })
+                                            :
 
-                                                                    </td>
-                                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide">
-
-                                                                        <Dropdown className="select--dropdown" key='status-key'>
-                                                                            <Dropdown.Toggle onClick={() => {dispatch(updateStateData(DIRECT_UPDATE, true));handleStatusShow()}} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-
-                                                                        </Dropdown>
-                                                                    </td>
-                                                                    <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                                        <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
-                                                                        <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
-                                                                    </td>
-                                                                </tr>
-                                                                // </div>
-                                                                )}
-                                                                </Draggable>
-                                                            
-                                                    </>)
-                                                })
-                                                :
-
-                                                !spinner && isActiveView === 2 &&
-                                                <>
-                                                    <tr key={`noresults-row`} className="no--invite">
-                                                        <td key={`empty-index`} colSpan={9} className="text-center">
-                                                            <h2 className="mt-2 text-center">No Projects Found</h2>
-                                                        </td>
-                                                    </tr>
-                                                </>
-
+                                            !spinner && isActiveView === 2 &&
+                                            <>
+                                                <tr key={`noresults-row`} className="no--invite">
+                                                    <td key={`empty-index`} colSpan={9} className="text-center">
+                                                        <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                    </td>
+                                                </tr>
+                                            </>
                                         }
                                     </tbody>
                                 )}
@@ -802,7 +786,6 @@ function ProjectsPage() {
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
-                           
                             <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={true} members={currentProject?.members || []} showAssignBtn={true} postId={currentProject?._id} type = "project"
                             //  onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `remove-member-${currentProject._id}-${memberid}`)}
                             />
