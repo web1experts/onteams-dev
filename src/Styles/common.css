@@ -121,7 +121,7 @@ fieldset:disabled .btn {
 .btn-primary:not(:disabled):not(.disabled).active:focus,
 .btn-primary:not(:disabled):not(.disabled):active:focus,
 .show>.btn-primary.dropdown-toggle:focus {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .btn-primary:not(:disabled):not(.disabled).active,
@@ -141,12 +141,12 @@ fieldset:disabled .btn {
   color: #ffffff;
   background-color: #5ead9a;
   border-color: #5ead9a;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px !important;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px !important;
 }
 
 .btn-check:checked+.btn:focus-visible, .btn.active:focus-visible, .btn.show:focus-visible, .btn:first-child:active:focus-visible, :not(.btn-check)+.btn:active:focus-visible {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .btn-outline-primary:hover,
@@ -1184,8 +1184,9 @@ span.status--circle.info--color {
   }
 
   .project--form--inputs {
-    max-height: 100%;
+    max-height: max-content;
     overflow-y: visible;
+    height: auto;
   }
 
   .modal-body {

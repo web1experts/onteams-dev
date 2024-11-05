@@ -461,7 +461,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .details--projects--view .project--form {
   background: #ffffff;
   padding: 1rem 1.2rem;
-  height: calc(100% - 85px);
+  height: calc(100% - 100px);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
 }
@@ -820,7 +820,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .preview--grid .preview--cell .btn-primary:not(:disabled):not(.disabled):active {
   background-color: transparent;
   border-color: transparent;
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .preview--grid .preview--cell img {
@@ -3676,6 +3676,11 @@ Media CSS-=-==
     padding: 1rem;
   }
 
+  table tr:focus, table tr:focus-within, table tr:focus-visible, table tr:active, table tr:visited {
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
   .holiday--table thead,
   .holiday--table td:first-child,
   .project--table thead,
@@ -3884,10 +3889,6 @@ Media CSS-=-==
   .details--member--view,
   .details--invitee--view {
     padding-bottom: 1rem;
-  }
-
-  .projects--grid .task--list {
-    height: calc(100% - 82px);
   }
 }
 
