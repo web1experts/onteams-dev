@@ -155,7 +155,7 @@ export const setAuthorization = () => {
     if(mt_featureSwitches && mt_featureSwitches !== "" && mt_featureSwitches !== null ){
       const memberData = parseIfValidJSON(mt_featureSwitches)
       if( memberData !== false) {
-        axios.defaults.headers.common.member_key =  memberData._id || ''
+        axios.defaults.headers.common.memberkey =  memberData._id || ''
       }
       
     }

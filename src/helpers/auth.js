@@ -151,17 +151,17 @@ export function setupDashboards( companies ){
         localStorage.setItem('current_dashboard', JSON.stringify({ name: companies[0].company.name, id: companies[0].company._id }));
         axios.defaults.headers.common.companyId =  companies[0].company._id || ''
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
-        axios.defaults.headers.common.member_key =  companies[0]?.memberData?._id || ''
+        axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
       }else{
         localStorage.setItem('current_dashboard', JSON.stringify({ name: companyExists.company.name, id: companyExists.company._id }));
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companyExists?.memberData || null))
-        axios.defaults.headers.common.member_key =  companyExists?.memberData?._id || ''
+        axios.defaults.headers.common.memberkey =  companyExists?.memberData?._id || ''
       }
     }else{
       localStorage.setItem('current_dashboard', JSON.stringify({name: companies[0].company.name, id: companies[0].company._id}));
       axios.defaults.headers.common.companyId =  companies[0].company._id || ''
       localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
-      axios.defaults.headers.common.member_key =  companies[0]?.memberData?._id || ''
+      axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
     }
     
     
