@@ -687,7 +687,7 @@ function ProjectsPage() {
                         </Row>
                     </Container>
                 </div>
-                <div className='page--wrapper px-md-2 py-3 h-auto'>
+                <div className='page--wrapper px-md-2 py-3'>
                     {
                         spinner &&
                         <div className="loading-bar">
@@ -879,7 +879,7 @@ function ProjectsPage() {
                                             
                                         </div>
                                 </Form.Group>
-                                <Form.Group className="mb-0 form-group">
+                                <Form.Group className="mb-0 form-group pb-0">
                                     <Form.Label>
                                         <small>Start/Due Date</small>
                                     </Form.Label>

@@ -65,7 +65,7 @@ Sidebar CSS-=-=
 }
 
 .dropdown-menu .menu--scroll {
-  max-height: calc(100vh - 220px);
+  max-height: calc(100dvh - 120px);
   overflow-y: auto;
 }
 
@@ -167,7 +167,7 @@ Sidebar CSS-=-=
 .panel--sidebar .navbar-expand-lg .navbar-collapse {
   display: block !important;
   background: none;
-  height: 100vh;
+  height: 100dvh;
 }
 
 .panel--sidebar .navbar-expand-lg .navbar-collapse {

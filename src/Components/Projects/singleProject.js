@@ -663,7 +663,7 @@ function SingleProject(props) {
                                         
                                     </div>
                             </Form.Group>
-                            <Form.Group className="mb-0 form-group">
+                            <Form.Group className="mb-0 form-group pb-0">
                                 <Form.Label>
                                     <small>Start/Due Date</small>
                                 </Form.Label>
