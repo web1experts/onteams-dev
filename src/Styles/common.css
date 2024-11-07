@@ -1144,6 +1144,7 @@ span.status--circle.info--color {
   margin: auto;
   height: 100dvh;
   max-height: 100dvh;
+  width: calc(100% - 40px);
 }
 
 .modal-content {
@@ -1207,9 +1208,9 @@ span.status--circle.info--color {
   }
 }
 
-@media screen and (max-width:767px) {
+@media screen and (max-width:992px) {
   .modal-dialog {
-    max-width: 100%;
     padding: 2rem 1rem;
+    max-width: 800px;
   }
 }
