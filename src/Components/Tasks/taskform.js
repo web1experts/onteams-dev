@@ -114,11 +114,8 @@ export const TaskForm = () => {
     }, [ modalstate ])
 
     useEffect(() => {
-        if (apiResult.currentTask) { console.log('hello task')
-            setCurrentTask(apiResult.currentTask)
-            // setImagePreviews([]);
-            // setSubtasks([])
-            
+        if (apiResult.currentTask) {
+            setCurrentTask(apiResult.currentTask)  
         }
 
     }, [apiResult.currentTask])

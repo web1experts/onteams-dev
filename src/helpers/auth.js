@@ -223,9 +223,12 @@ export function logout() {
 }
 
 export const SendComment = (text, postId, userId,parentCommentId) => {
-  // console.log('text, postId, userId',text, postId, userId,parentCommentId)
   socket.emit('comment', { text, postId, userId,parentCommentId });
 };
+
+export const createTask = (payload) => { 
+  socket.emit('addtask', payload);
+}
 
 export const UpdateComment = (postId, text ) => {
   // console.log('text, postId, userId',text, postId, userId,parentCommentId)

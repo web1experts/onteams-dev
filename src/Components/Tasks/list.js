@@ -200,7 +200,7 @@ const TasksList = React.memo((props) => {
             let payload = formData;
 
 
-            await dispatch(createTask(payload))
+            await dispatch(createTask(fields))
             setLoader(false)
             closetask(fields['tab'])
 
