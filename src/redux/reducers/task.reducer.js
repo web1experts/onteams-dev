@@ -35,10 +35,11 @@ import {
         case CREATE_TASK_SUCCESS :
             return {
                 ...state,
-                success: true,
-                message: action.payload.message,
+                 success: false,
+                // message: action.payload.message,
                 error: null,
-                message_variant: 'success',
+                // message_variant: 'success',
+                newTask: action.payload.task
             };
         case CREATE_TASK_FAILED :
             return {
@@ -89,11 +90,11 @@ import {
             }
         case TASK_REORDER:
             return {
-                success: 'success'
+                successfull: true
             }
         case TASK_REORDER_ERROR:
             return{
-                success: 'success'
+                successfull: false
             }
         case TASK_COMMON_ERROR: 
             return {

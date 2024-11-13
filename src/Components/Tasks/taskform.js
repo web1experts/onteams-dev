@@ -120,6 +120,18 @@ export const TaskForm = () => {
 
     }, [apiResult.currentTask])
 
+    useEffect(() => {
+        if (apiResult.tasks?.taskData && Object.keys(apiResult.tasks.taskData).length > 0) {
+            console.log("apiResult.currentTask:: ", currentTask)
+            if (currentTask && currentTask._id && apiResult.tasks?.taskData?.[currentTask?.tab] && apiResult.tasks?.taskData?.[currentTask?.tab].tasks) {
+                const taskToUpdate = apiResult.tasks.taskData[currentTask.tab].tasks.find(task => task._id === currentTask?._id);
+
+                if (taskToUpdate) { console.log('tasks to update::', taskToUpdate)
+                    dispatch(updateStateData(CURRENT_TASK, taskToUpdate));
+                }
+            }
+        }
+    }, [apiResult.tasks, dispatch])
 
     useEffect(() => {
         if (currentTask && Object.keys(currentTask).length > 0) { 
@@ -135,12 +147,7 @@ export const TaskForm = () => {
                 due_date: currentTask.due_date ? new Date(currentTask.due_date).toISOString().split('T')[0] : ''
             };
 
-            // if(currentTask.subtasks && currentTask.subtasks.length > 0 ){
-                // for (let index = 0; index < currentTask.subtasks.length; index++) {
-                //     let subtask = currentTask.subtasks[index];
-                // }
-                setSubtasks(currentTask.subtasks ? currentTask.subtasks : [])
-            // }
+            setSubtasks(currentTask.subtasks ? currentTask.subtasks : [])
 
             if (currentTask.description && currentTask.description !== "") {
                 setIsDescEditor(true);
@@ -244,123 +251,7 @@ export const TaskForm = () => {
             return false;
         }
         await dispatch(updateTask(currentTask._id, {description: fields?.description}))
-        // const formData = new FormData();
-        //     for (const [key, value] of Object.entries(fields)) {
-        //         if( key === "subtasks"){
-        //             console.log(value)
-        //         }
-        //         if (typeof value === 'object' && key === 'images') {
-                    
-        //             value.forEach(attach => {
-        //                 formData.append('images[]', attach);
-        //             });
-        //         } else if (typeof value === 'object' && key === 'members') {
-        //             const memberids = Object.keys(fields['members'])
-        //             if( memberids.length > 0){
-        //                 memberids.forEach(item => {
-        //                     formData.append(`members[]`, item); // Append with the same key for non-empty arrays
-        //                 });
-        //             }else{
-        //                 formData.append(`members`, '[]');
-        //             }
-        //         } else if (typeof value === 'object' && key === "subtasks") {
-        //                 value.forEach((obj, index) => {
-        //                     if( typeof obj === "object"){
-        //                         formData.append(`${key}[${index}]`, JSON.stringify(obj));
-        //                     }else{
-        //                         formData.append(`${key}[${index}]`, obj);
-        //                     }
-        //               });
-        //         } else if (Array.isArray(value)) { // Check if the value is an array
-        //             if (value.length === 0) {
-        //                 formData.append(`${key}[]`, []); // Append an empty array
-        //             } else {
-        //                 value.forEach(item => {
-        //                     formData.append(`${key}[]`, item); // Append with the same key for non-empty arrays
-        //                 });
-        //             }
-        //         } else {
-        //             formData.append(key, value)
-        //         }
-        //     }
-        //     let payload = formData;
-
-            
-        //     await dispatch(updateTask(currentTask._id, payload))
-    }
-
-    const handleSubmit = async (e) => {
-        
-        e.preventDefault();
-        setLoader(true)
        
-        const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
-            // Get rules for the current field
-            const rules = getFieldRules('task', fieldName);
-            // Validate the field
-            const error = await validateField('task', fieldName, value, rules);
-            // If error exists, return it as part of the resolved promise
-            return { fieldName, error };
-        });
-        const updatedErrorsArray = await Promise.all(updatedErrorsPromises);
-        updatedErrorsArray.forEach(({ fieldName, error }) => {
-            if (error) {
-                fieldErrors[fieldName] = error;
-            }
-        });
-        // Check if there are any errors
-        const hasError = Object.keys(fieldErrors).length > 0;
-        // If there are errors, update the errors state
-        if (hasError) {
-            setLoader(false)
-            setErrors(fieldErrors);
-        } else {
-            const formData = new FormData();
-            for (const [key, value] of Object.entries(fields)) {
-                if( key === "subtasks"){
-                    console.log(value)
-                }
-                if (typeof value === 'object' && key === 'images') {
-                    
-                    value.forEach(attach => {
-                        formData.append('images[]', attach);
-                    });
-                } else if (typeof value === 'object' && key === 'members') {
-                    const memberids = Object.keys(fields['members'])
-                    if( memberids.length > 0){
-                        memberids.forEach(item => {
-                            formData.append(`members[]`, item); // Append with the same key for non-empty arrays
-                        });
-                    }else{
-                        formData.append(`members`, '[]');
-                    }
-                } else if (typeof value === 'object' && key === "subtasks") {
-                        value.forEach((obj, index) => {
-                            if( typeof obj === "object"){
-                                formData.append(`${key}[${index}]`, JSON.stringify(obj));
-                            }else{
-                                formData.append(`${key}[${index}]`, obj);
-                            }
-                      });
-                } else if (Array.isArray(value)) { // Check if the value is an array
-                    if (value.length === 0) {
-                        formData.append(`${key}[]`, []); // Append an empty array
-                    } else {
-                        value.forEach(item => {
-                            formData.append(`${key}[]`, item); // Append with the same key for non-empty arrays
-                        });
-                    }
-                } else {
-                    formData.append(key, value)
-                }
-            }
-            let payload = formData;
-
-            
-            await dispatch(updateTask(currentTask._id, payload))
-            setLoader(false)
-            
-        }
     }
 
     const handleDelteComment = async (commentId, feedId) => {
@@ -492,14 +383,22 @@ export const TaskForm = () => {
         if (subtaskValue === '') {
             removeSubtask(index);
         }else{
+            const updatedSubtask = {
+                title: subtaskValue,
+                _id: 0, // Replace with your method to generate a unique ID
+                order: 0, // Use index as the order, or modify as needed
+                status: false // Default status, update as necessary
+            };
+    
+            // Update `subtasks` with the new object at the specified index
+            const updatedSubtasks = [...subtasks];
+            updatedSubtasks[index] = updatedSubtask;
+            setSubtasks( updatedSubtasks)
+
              dispatch(updateTask(currentTask._id, {subtasks: subtasks}))
              
         }
     };
-
-    useEffect(() => {
-        console.log("enablesubtaskedit:: ", enablesubtaskedit)
-    }, [enablesubtaskedit])
 
     const updateSubtask = (ischecked, index) => {
         const newSubtasks = [...subtasks];
@@ -636,9 +535,7 @@ export const TaskForm = () => {
                                             .replace(/(?:\r\n|\r|\n)/g, '\n');                    // Normalize newlines
 
                                         console.log('content is:: ', content)
-                                        // const content = e.target.textContent.trim();
                                         handlesubtaskChange(index, subtask, content, true);
-                                        // dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
                                     }
                                 }}
                                 onKeyDown={(e) => {
@@ -703,15 +600,6 @@ export const TaskForm = () => {
         const pastedData = e.clipboardData.getData('text');
         console.log('Pasted content:', pastedData);
         pasteOccurred.current = true; // Set the paste flag to true
-
-        // const urlRegex = /(https?:\/\/[^\s]+)/g;
-        // if (urlRegex.test(pastedData)) {
-        //     e.preventDefault(); // Prevent the default paste behavior
-        //     const quill = quillRef.current.getEditor();
-        //     const range = quill.getSelection(); // Get current cursor position
-        //     quill.insertText(range.index, pastedData, 'link', pastedData);
-        // }
-
         setTimeout(function(){
             pasteOccurred.current = false;
         },500)
@@ -722,11 +610,7 @@ export const TaskForm = () => {
             pasteOccurred.current = false; // Reset the flag after handling paste
             return;
         }
-       // setTimeout(async function(){
             await dispatch(updateTask(currentTask._id, { description: fields['description'] }));
-       // },1000)
-        // Perform onBlur logic here
-        
     
     },2000)
 
@@ -758,7 +642,6 @@ export const TaskForm = () => {
             }
             } centered size="lg" className="add--member--modal edit--task--modal modalbox" onShow={() => selectboxObserver()}>
             <Modal.Header closeButton>
-                {/* <Modal.Title>{currentTask?._id ? '' : 'Create New Task'}</Modal.Title> */}
             </Modal.Header>
             <Modal.Body>
                 <div className="project--form">
@@ -793,24 +676,13 @@ export const TaskForm = () => {
                                         <ReactQuill 
                                         value={fields['description'] || ''}
                                         onChange={(value) => { 
-                                            // dispatch(updateStateData(TASK_FORM, { ['description']: sanitizeEmptyQuillValue(value) }));
-                                            
-                                                console.log('Pasted value:', value);
-                                                setFields((prevFields) => ({
-                                                ...prevFields,
-                                                description: value,
-                                                }));
-                                                setErrors((prevErrors) => ({ ...prevErrors, description: '' }));
-                                            
+                                            setFields((prevFields) => ({
+                                            ...prevFields,
+                                            description: value,
+                                            }));
+                                            setErrors((prevErrors) => ({ ...prevErrors, description: '' }));   
                                         }}
                                         onKeyDown={handleKeyDown}
-                                        //  onBlur={handleDescBlur} // Custom blur handler
-                                        // ref={(el) => {
-                                        //     if (el) {
-                                        //         const editor = el.getEditor();
-                                        //         editor.root.addEventListener('paste', handlePaste); // Listen for paste
-                                        //     }
-                                        // }}
                                         ref={quillRef}
                                         modules={modules}
                                         formats={formats}
@@ -836,7 +708,7 @@ export const TaskForm = () => {
                                                     subtasks && subtasks.length > 0 &&
                                                     renderSubtasks() 
                                                 }
-                                                {provided.placeholder} {/* Important for spacing during drag */}
+                                                {provided.placeholder}
                                             </ul>
                                         </div>
                                     )}
@@ -852,7 +724,6 @@ export const TaskForm = () => {
                                 <FaPlus /> Add subtasks
                             </small>
 
-                            
                             <Form.Group className="mb-0 mt-3 form-group">
                                 <Form.Label className="w-100 m-0">
                                     <small>Task chat</small>
@@ -861,7 +732,6 @@ export const TaskForm = () => {
                                     currentTask && currentTask.comments && currentTask.comments.length > 0 &&
                                     <Row key={`task-comments-${currentTask?._idß}`}>
                                         <Col sm={12}>
-                                            
                                                 {
                                                     currentTask.comments.map((comment, index) => {
                                                         if( editmessage[comment._id] && editmessage[comment._id]['show'] === true ){
@@ -1108,17 +978,7 @@ export const TaskForm = () => {
                         id='date--picker'
                         value={fields['due_date'] ? parseDateWithoutTimezone(fields['due_date']) : null} 
                         onChange={async (value) => {
-                            // const date = value.toDate();
-                            // // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                            // const year = date.getFullYear();
-                            // const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                            // const day = date.getDate().toString().padStart(2, '0');
-                            // const hours = date.getHours().toString().padStart(2, '0');
-                            // const minutes = date.getMinutes().toString().padStart(2, '0');
-                            // const seconds = date.getSeconds().toString().padStart(2, '0');
-                            // const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                            // Combine into the desired format
-                            const formattedDate = value.format("YYYY-MM-DD")//`${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                            const formattedDate = value.format("YYYY-MM-DD")
                              dispatch(updateStateData(TASK_FORM, { ['due_date']: formattedDate }));
                             setDatePickerModal(false)
                         }

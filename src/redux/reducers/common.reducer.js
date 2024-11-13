@@ -136,7 +136,7 @@ export default (state = initialState, action) => {
             taskmodal: action.payload
         }
     case RESET_FORMS: 
-    if(action.payload === "edit_project"){
+    if(action.payload === "edit_project"){ console.log('reset project')
         return {
             ...state,
             currentProject: false,

@@ -10,6 +10,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { TiInputChecked } from "react-icons/ti";
 import { MemberInitials } from "../common/memberInitials";
+import { socket } from "../../helpers/auth";
 const TasksList = React.memo((props) => {
     const dispatch = useDispatch()
     const [fields, setFields] = useState({ title: '' })
@@ -43,6 +44,12 @@ const TasksList = React.memo((props) => {
         if (commonState.currentProject) {
             setCurrentProject(commonState.currentProject)
         }
+
+        socket.on('refreshTasks', function(msg){ 
+            if (commonState.currentProject) {
+                dispatch(ListTasks(commonState?.currentProject?._id));
+            }
+       });
     }, [commonState.currentProject])
 
     useEffect(() => {
@@ -56,17 +63,27 @@ const TasksList = React.memo((props) => {
     useEffect(() => {
         if (taskFeed?.taskData && Object.keys(taskFeed.taskData).length > 0) {
             setTasksLists(taskFeed.taskData)
-            if (apiResult.currentTask && apiResult.currentTask._id && taskFeed?.taskData?.[apiResult.currentTask.tab] && taskFeed?.taskData?.[apiResult.currentTask.tab].tasks) {
-                const taskToUpdate = taskFeed.taskData[apiResult.currentTask.tab].tasks.find(task => task._id === apiResult.currentTask._id);
+            // console.log("apiResult.currentTask:: ", apiResult.currentTask)
+            // if (apiResult.currentTask && apiResult.currentTask._id && taskFeed?.taskData?.[apiResult.currentTask.tab] && taskFeed?.taskData?.[apiResult.currentTask.tab].tasks) {
+            //     const taskToUpdate = taskFeed.taskData[apiResult.currentTask.tab].tasks.find(task => task._id === apiResult.currentTask._id);
 
-                if (taskToUpdate) {
-                    dispatch(updateStateData(CURRENT_TASK, taskToUpdate));
-                }
-            }
+            //     if (taskToUpdate) { console.log('tasks to update::', taskToUpdate)
+            //         dispatch(updateStateData(CURRENT_TASK, taskToUpdate));
+            //     }
+            // }
         }
     }, [taskFeed, dispatch])
 
     useEffect(() => {
+        if( apiResult.newTask){
+            setTasksLists({
+                ...taskslists,
+                [apiResult.newTask?.tab]: {
+                    ...taskslists[apiResult.newTask],
+                    tasks: [apiResult.newTask, ...taskslists[apiResult.newTask?.tab].tasks] // Add new task at the beginning
+                }
+            });
+        }
 
         if (apiResult.success) {
             handleListTasks()
@@ -76,7 +93,8 @@ const TasksList = React.memo((props) => {
 
     }, [apiResult])
 
-
+  
+    
 
     const handleDragEnd = (result) => {
         const { source, destination, draggableId } = result;
@@ -155,19 +173,6 @@ const TasksList = React.memo((props) => {
 
     };
 
-    const removeMember = (id, task) => {
-        let taskMembers = [];
-
-        task.members.forEach(member => {
-
-            if (member._id !== id) {
-                taskMembers.push(member._id)
-            }
-        });
-
-        dispatch(updateTask(task._id, { members: taskMembers }))
-    };
-
     const handleTasksubmit = async (e) => {
 
         e.preventDefault();
@@ -204,8 +209,29 @@ const TasksList = React.memo((props) => {
             setLoader(false)
             closetask(fields['tab'])
 
+            // const newTask = {
+            //     _id: 0,
+            //     title: fields?.title,
+            //     subtasks: [],
+            //     members: [],
+            //     description: '',
+            //     comments: [],
+            //     order: 0
+            // };
+
+            // setTasksLists({
+            //     ...taskslists,
+            //     [fields['tab']]: {
+            //         ...taskslists[fields['tab']],
+            //         tasks: [newTask, ...taskslists[fields['tab']].tasks] // Add new task at the beginning
+            //     }
+            // });
         }
     }
+
+    useEffect(() => {
+        console.log("Updated taskslists:", taskslists);
+    }, [taskslists]);
 
     const closetask = (tabid) => {
         setShowtaskform({ [tabid]: false })

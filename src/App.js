@@ -64,15 +64,8 @@ function App(props) {
       setCurrentLoggedInUser(props.userdata);
       setLoggedIn(true);
     }
-
-    // socket.on("userStatusUpdate", (data) => {
-    //   props.trackingStatus(data);
-    // });
   }, [props.userdata]);
 
-  // useEffect(() => {
-  //   checkIfSidebarShouldBeVisible();
-  // }, []);
 
   useEffect(() => {
     if (apiResultAuth.profile) {
@@ -104,8 +97,6 @@ function App(props) {
     const handleCommentReceived = (data) => {
       if (data.success) {
         props.createComment(data);
-      } else {
-        // toast.error(data.error);
       }
     };
 
@@ -123,8 +114,6 @@ function App(props) {
     const handleCommentDeleted = (data) => {
       if (data.success) {
         props.deleteComment(data); // You can dispatch or use props function
-      } else {
-        
       }
     };
 
@@ -137,8 +126,7 @@ function App(props) {
     };
   }, [dispatch, props.deleteComment]);
 
-  
-
+ 
   /************************   helping functions  ***********************************/
   // Function to determine if the header should be shown
   const showHeader = () => {

@@ -61,7 +61,6 @@ export const ListTasks = (projectId) => {
 
 
 export const createTask = (payload) =>{
-    console.log('Payload: ', payload)
     return async (dispatch)=>{
         try{
             const response = await API.apiPost('task', payload);
