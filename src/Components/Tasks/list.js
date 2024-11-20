@@ -32,10 +32,6 @@ const TasksList = React.memo((props) => {
 
     let fieldErrors = {};
     const handleListTasks = async () => {
-        // let selectedfilters = { currentPage: currentPage }
-        // if (Object.keys(filters).length > 0) {
-        //     selectedfilters = { ...selectedfilters, ...filters }
-        // }
         await dispatch(ListTasks(commonState?.currentProject?._id));
         setSpinner(false)
     }
@@ -63,14 +59,6 @@ const TasksList = React.memo((props) => {
     useEffect(() => {
         if (taskFeed?.taskData && Object.keys(taskFeed.taskData).length > 0) {
             setTasksLists(taskFeed.taskData)
-            // console.log("apiResult.currentTask:: ", apiResult.currentTask)
-            // if (apiResult.currentTask && apiResult.currentTask._id && taskFeed?.taskData?.[apiResult.currentTask.tab] && taskFeed?.taskData?.[apiResult.currentTask.tab].tasks) {
-            //     const taskToUpdate = taskFeed.taskData[apiResult.currentTask.tab].tasks.find(task => task._id === apiResult.currentTask._id);
-
-            //     if (taskToUpdate) { console.log('tasks to update::', taskToUpdate)
-            //         dispatch(updateStateData(CURRENT_TASK, taskToUpdate));
-            //     }
-            // }
         }
     }, [taskFeed, dispatch])
 
@@ -159,11 +147,6 @@ const TasksList = React.memo((props) => {
             }
             dispatch(reorderTasks({ tasks: tasksToUpdate }));
 
-            console.log(`Task ${taskId} moved from tab ${sourceTabId} to tab ${destinationTabId} from position ${source.index} to ${destination.index}`);
-            if (replacedTaskId) {
-                console.log(`Task ${replacedTaskId} was replaced at position ${destination.index} in tab ${destinationTabId}`);
-            }
-
         }
     };
 
@@ -176,6 +159,12 @@ const TasksList = React.memo((props) => {
     const handleTasksubmit = async (e) => {
 
         e.preventDefault();
+        const formElements = e.target.elements;
+        for (let element of formElements) {
+            if (element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.tagName === "SELECT") {
+                element.disabled = true;
+            }
+        }
         setLoader(true)
         const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
             // Get rules for the current field
@@ -203,35 +192,11 @@ const TasksList = React.memo((props) => {
                 formData.append(key, value)
             }
             let payload = formData;
-
-
             await dispatch(createTask(fields))
             setLoader(false)
             closetask(fields['tab'])
-
-            // const newTask = {
-            //     _id: 0,
-            //     title: fields?.title,
-            //     subtasks: [],
-            //     members: [],
-            //     description: '',
-            //     comments: [],
-            //     order: 0
-            // };
-
-            // setTasksLists({
-            //     ...taskslists,
-            //     [fields['tab']]: {
-            //         ...taskslists[fields['tab']],
-            //         tasks: [newTask, ...taskslists[fields['tab']].tasks] // Add new task at the beginning
-            //     }
-            // });
         }
     }
-
-    useEffect(() => {
-        console.log("Updated taskslists:", taskslists);
-    }, [taskslists]);
 
     const closetask = (tabid) => {
         setShowtaskform({ [tabid]: false })

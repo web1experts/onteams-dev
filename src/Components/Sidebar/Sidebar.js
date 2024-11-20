@@ -34,7 +34,8 @@ function SidebarPanel() {
     const currentLoggedUser = getloggedInUser();
     const memberProfile = currentMemberProfile()
     const location = useLocation();
-    let companyname = ''
+    let companyname = '';
+    let selectedCompId;
     const [companies, setCompanies ] = useState([])
 
     const [showDropdown, setShowDropdown] = useState(false);
@@ -52,6 +53,7 @@ function SidebarPanel() {
     if (encryptedCompany && encryptedCompany !== "") {
         const decryptedCompany = parseIfValidJSON(encryptedCompany);
         companyname = (decryptedCompany) ? decryptedCompany.name : ''
+        selectedCompId = (decryptedCompany) ? decryptedCompany.id : ''
     }
 
     function refreshWorskspacelist(){
@@ -138,7 +140,7 @@ function SidebarPanel() {
                                             {companies.map((companyobj, index) => {
                                                 if (companyobj.company && companyobj.company.name) {
                                                     return (
-                                                        <Dropdown.Item key={`copmany-${companyobj.company._id}-${companyobj.company?.name}`} onClick={() => handleClick(companyobj.company._id)}><span className="initial--name">{companyobj.company.name !== "" ? transformString(companyobj.company.name) : transformString(currentLoggedUser?.name)}</span> {companyobj.company?.name}</Dropdown.Item>
+                                                        <Dropdown.Item className={selectedCompId === companyobj.company._id ? 'active-workspace': ''} key={`copmany-${companyobj.company._id}-${companyobj.company?.name}`} onClick={() => handleClick(companyobj.company._id)}><span className="initial--name">{companyobj.company.name !== "" ? transformString(companyobj.company.name) : transformString(currentLoggedUser?.name)}</span> {companyobj.company?.name}</Dropdown.Item>
                                                     )
                                                 }
                                             })}

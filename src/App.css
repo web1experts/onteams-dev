@@ -946,10 +946,18 @@ button.input-error.dropdown-toggle.btn.btn-success {
   margin-top: 1rem;
 }
 
-.table tr.project--active td,
-.team--Cards.active,
-table tr.active td {
-  background: #7bccb820;
+
+.team--Cards.active, table tr.active td, table tr.marked-project td {
+  background: rgba(123, 204, 184, .12549019607843137);
+}
+
+.show--details.team--page .table tr.project--active td, .view--project.team--page .table tr.project--active td {
+  border-bottom-color: #6FCCB8 !important;
+  border-top-color: #6FCCB8 !important;
+  margin-bottom: 1px !important;
+}
+.show--details.team--page .table tr.project--active+tr td, .view--project.team--page .table tr.project--active+tr td {
+ border-top-width: 0px !important;
 }
 
 .show--details .g-4,

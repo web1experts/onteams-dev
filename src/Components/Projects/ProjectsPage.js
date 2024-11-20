@@ -24,7 +24,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.snow.css';
 import AutoLinks from "quill-auto-links";
-
+import { socket } from "../../helpers/auth";
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE } from "../../redux/actions/types";
@@ -449,6 +449,12 @@ function ProjectsPage() {
             handleListProjects()
         }
 
+        socket.on('refreshProjects', function(msg){ 
+            if (apiResult.success || apiResult.deletedProject || apiResult.successfull) {
+                handleListProjects()
+            }
+       });
+
     }, [apiResult])
 
     const handleRemovefiles = (id) => {
@@ -534,37 +540,6 @@ function ProjectsPage() {
         setCurrentProject(project)
     }
 
-    // const handleDragEnd = (result) => {
-    //     const { source, destination, draggableId } = result;
-    //     // If there's no destination (i.e., the item was dropped outside), do nothing
-    //     if (!destination) return;
-
-    //     const projectId = draggableId.split('-')[1]; // Extract task ID from draggableId
-    //     const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
-    //     const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
-
-    //     // Clone the projects array to avoid mutating the state directly
-    //     let reorderedProjects = [...projects];
-
-    //     if (sourceTabId === destinationTabId) {
-    //         // If the task was moved within the same tab, reorder the tasks
-    //         const [removed] = reorderedProjects.splice(source.index, 1); // Remove task from the source position
-    //         reorderedProjects.splice(destination.index, 0, removed); // Insert task to the destination position
-    //     } else {
-    //         // Task was moved to a different tab (if needed, handle cross-tab logic here)
-    //         const [removed] = reorderedProjects.splice(source.index, 1); // Remove from source tab
-    //         reorderedProjects.splice(destination.index, 0, removed); // Add to destination tab
-    //     }
-    //     // Finally, update the state with reordered projects
-    //     const projectToUpdate =
-    //     {
-    //         project_id: projectId,
-    //         order: destination.index,
-
-    //     }
-    //     dispatch(reorderedProject({ project: projectToUpdate, filters: filters }));
-    //     setProjects(reorderedProjects);
-    // };
 
     const handleDragEnd = (result) => {
         const { source, destination, draggableId } = result;
@@ -609,6 +584,40 @@ function ProjectsPage() {
             console.log('Paste keyboard shortcut detected');
         }
     };
+
+    const handleRowDoubleClick = ( project, index ) => { console.log('index is: ', index)
+        
+        if( project.marked_by && project.marked_by.includes(memberdata._id)){
+            setProjects((prevProjects) => {
+                // Create a new array from the previous projects
+                const updatedProjects = [...prevProjects];
+              
+                // Access the project at index 1
+                const projectToUpdate = updatedProjects[index];
+              
+                if (projectToUpdate) {
+                  // Remove the memberId from the marked_by array
+                  const updatedMarkedBy = projectToUpdate.marked_by.filter(id => id !== memberdata._id);
+              
+                  // Update the project's marked_by column
+                  updatedProjects[index] = {
+                    ...projectToUpdate,
+                    marked_by: updatedMarkedBy,
+                  };
+                  console.log('project to update:: ', {
+                    ...projectToUpdate,
+                    marked_by: updatedMarkedBy,
+                  })
+                }
+              
+                return updatedProjects; // Return the updated projects array
+              });
+            dispatch(updateProject(project._id, { marked: false }))
+        }else{
+            dispatch(updateProject(project._id, { marked: true }))
+        }
+        
+    }
 
     const handlePaste = (e) => {
         const pastedData = e.clipboardData.getData('text');
@@ -728,7 +737,19 @@ function ProjectsPage() {
                                                                 <tr ref={provided.innerRef}
                                                                     {...provided.draggableProps}
                                                                     {...provided.dragHandleProps} 
-                                                                    key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={project._id === currentProject?._id ? 'project--active' : ''}>
+                                                                    onDoubleClick={(event) => {
+                                                                        if( event.target.classList.contains('marked-project')){
+                                                                            event.currentTarget.classList.remove('marked-project')
+                                                                             
+                                                                        }else{
+                                                                            event.currentTarget.classList.add('marked-project')
+                                                                        }
+                                                                        
+                                                                         handleRowDoubleClick(project, index)
+                                                                    }}
+                                                                    key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${
+                                                                        project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
+                                                                      }`}>
                                                                     <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
                                                                     <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
                                                                     <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">

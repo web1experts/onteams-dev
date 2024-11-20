@@ -10,7 +10,8 @@ import {
     GET_SINGLE_PROJECT_SUCCESS,
     GET_SINGLE_PROJECT_FAILED,
     PROJECT_COMMON_ERROR,
-    CLEAR_MESSAGES
+    CLEAR_MESSAGES,
+    PROJECT_REORDER
 
 } from "../actions/types";
     
@@ -103,6 +104,10 @@ import {
                 singleProject: '',
                 message: null,
                 message_variant: null,
+            }
+        case PROJECT_REORDER:
+            return {
+                successfull: true
             }
         default: return state;
       }

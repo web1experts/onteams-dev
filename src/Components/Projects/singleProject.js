@@ -125,7 +125,7 @@ function SingleProject(props) {
 
 
     useEffect(() => {
-        if (currentProject && Object.keys(currentProject).length > 0) { console.log('here at project:: ', currentProject)
+        if (currentProject && Object.keys(currentProject).length > 0) {
             setSelectedFiles([]);
             setImagePreviews([]);
             let fieldsSetup = {

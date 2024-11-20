@@ -69,6 +69,7 @@ export const TaskForm = () => {
     const [fields, setFields] = useState({title: apiResult?.currentTask?.title || '', members: [], description: apiResult?.currentTask?.description || ''})
     const [ errors, setErrors ] = useState({})
     const [subtasks, setSubtasks] = useState([]);
+    const [issubopen , setissubopen] = useState( false )
     const handleUploadShow = () => dispatch(togglePopups('files', true)) 
     const [isdescEditor, setIsDescEditor] = useState(false);
     const [filetoPreview, setFiletoPreview] = useState(null);
@@ -122,11 +123,10 @@ export const TaskForm = () => {
 
     useEffect(() => {
         if (apiResult.tasks?.taskData && Object.keys(apiResult.tasks.taskData).length > 0) {
-            console.log("apiResult.currentTask:: ", currentTask)
             if (currentTask && currentTask._id && apiResult.tasks?.taskData?.[currentTask?.tab] && apiResult.tasks?.taskData?.[currentTask?.tab].tasks) {
                 const taskToUpdate = apiResult.tasks.taskData[currentTask.tab].tasks.find(task => task._id === currentTask?._id);
 
-                if (taskToUpdate) { console.log('tasks to update::', taskToUpdate)
+                if (taskToUpdate) {
                     dispatch(updateStateData(CURRENT_TASK, taskToUpdate));
                 }
             }
@@ -135,7 +135,6 @@ export const TaskForm = () => {
 
     useEffect(() => {
         if (currentTask && Object.keys(currentTask).length > 0) { 
-            console.log('here at current task:: ', currentTask)
             setImagePreviews([]);
             let fieldsSetup = {
                 title: currentTask.title,
@@ -147,7 +146,15 @@ export const TaskForm = () => {
                 due_date: currentTask.due_date ? new Date(currentTask.due_date).toISOString().split('T')[0] : ''
             };
 
-            setSubtasks(currentTask.subtasks ? currentTask.subtasks : [])
+            setSubtasks(() => {
+                const subtasks = currentTask.subtasks ? currentTask.subtasks : [];
+                if (issubopen) {
+                  return [...subtasks, ""];
+                }
+                return subtasks;
+            });
+              
+              
 
             if (currentTask.description && currentTask.description !== "") {
                 setIsDescEditor(true);
@@ -367,10 +374,11 @@ export const TaskForm = () => {
         // }
     };
     const addSubtask = () => {
+        setissubopen( true )
         setSubtasks([...subtasks, '']);
     }
 
-    const removeSubtask = (index) => {
+    const removeSubtask = (index) => { console.log('index:: ', index)
         const newSubtasks = subtasks.filter((_, i) => i !== index); // Remove the subtask at the given index
         setSubtasks(newSubtasks); // Update local state
         dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks })); // Dispatch the updated subtasks
@@ -382,6 +390,7 @@ export const TaskForm = () => {
         const subtaskValue = subtasks[index];
         if (subtaskValue === '') {
             removeSubtask(index);
+            setissubopen( false)
         }else{
             const updatedSubtask = {
                 title: subtaskValue,
@@ -395,7 +404,7 @@ export const TaskForm = () => {
             updatedSubtasks[index] = updatedSubtask;
             setSubtasks( updatedSubtasks)
 
-             dispatch(updateTask(currentTask._id, {subtasks: subtasks}))
+            dispatch(updateTask(currentTask._id, {subtasks: updatedSubtasks}))
              
         }
     };
@@ -554,10 +563,11 @@ export const TaskForm = () => {
                                 }}
                                 placeholder="Enter subtask"
                                 dangerouslySetInnerHTML={{
-                                    __html: typeof subtask === 'object' 
-                                        ? makeLinksClickable(subtask.title.replace(/\n/g, '<br/>')) // Convert line breaks to <br> for display
-                                        : makeLinksClickable(subtask.replace(/\n/g, '<br/>')),       // Handle string subtasks as well
-                                }}
+                                    __html: typeof subtask === 'object'
+                                      ? makeLinksClickable(String(subtask.title).replace(/\n/g, '<br/>')) // Ensure title is a string
+                                      : makeLinksClickable(String(subtask).replace(/\n/g, '<br/>')),      // Ensure subtask is a string
+                                  }}
+                                  
                             ></div>
                         )}
 

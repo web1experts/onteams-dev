@@ -13,6 +13,7 @@ import {
     GET_SINGLE_PROJECT_SUCCESS,
     GET_SINGLE_PROJECT_FAILED,
     PROJECT_COMMON_ERROR,
+    PROJECT_REORDER
 } from "./types";
 
 const config = {
@@ -126,7 +127,7 @@ export const reorderedProject = (payload) => {
         try{
             const response = await API.apiPutUrl('project', `/reorder`, payload);
             if(response.data && response.data.success){
-                console.log('Reorder Successfull')
+                await dispatch({ type: PROJECT_REORDER, payload: response.data});
             }else{
                 console.log('Reorder failed')
             }

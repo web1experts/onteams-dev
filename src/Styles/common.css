@@ -170,7 +170,9 @@ fieldset:disabled .btn {
   background-color: #5fb39f;
   border-color: #5fb39f;
 }
-
+a.active-workspace.dropdown-item {
+  background: #7bccb840 !important;
+}
 .form-control:focus {
   box-shadow: none;
 }

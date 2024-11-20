@@ -101,7 +101,7 @@ export const MemberInitials = React.memo(( props ) => {
     };
 
     useEffect(() => {
-        if( props.members ){ console.log('members list:: 0', props.members)
+        if( props.members ){
             setMembers( props.members)
         }
     }, [props ])
