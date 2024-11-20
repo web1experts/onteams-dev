@@ -6,7 +6,9 @@
   box-sizing: border-box;
 }
 
-*:focus, *:focus-visible, *:focus-within {
+*:focus,
+*:focus-visible,
+*:focus-within {
   box-shadow: none;
   outline: none;
 }
@@ -40,7 +42,8 @@ body {
   justify-content: center;
 }
 
-.show--details .page--title h2 .btn, .view--project .page--title h2 .btn,
+.show--details .page--title h2 .btn,
+.view--project .page--title h2 .btn,
 .view--invitee .page--title h2 .btn {
   margin-left: 0.25rem;
 }
@@ -283,19 +286,23 @@ body {
   display: flex;
 }
 
-.page--wrapper .draggable--table th, .page--wrapper .draggable--table td {
+.page--wrapper .draggable--table th,
+.page--wrapper .draggable--table td {
   width: auto;
   flex: 1 1;
   line-height: 33px;
 }
 
-.show--details .draggable--table td, .view--project .draggable--table td, .view--invitee .draggable--table td {
+.show--details .draggable--table td,
+.view--project .draggable--table td,
+.view--invitee .draggable--table td {
   line-height: 34.3px;
 }
 
-.page--wrapper .draggable--table th:nth-child(4), .page--wrapper .draggable--table td:nth-child(4) {
+.page--wrapper .draggable--table th:nth-child(4), .page--wrapper .draggable--table td:nth-child(4), 
+.page--wrapper .draggable--table th:last-child, .page--wrapper .draggable--table td:last-child {
   flex: none;
-  min-width: 250px;
+  min-width: 170px;
 }
 
 .page--wrapper .draggable--table td.member--circles {
@@ -323,7 +330,6 @@ body {
   -webkit-line-clamp: 1;
   line-clamp: 1;
   -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
   overflow: hidden;
 }
 
@@ -648,7 +654,8 @@ button.input-error.dropdown-toggle.btn.btn-success {
   background: #5ead9a;
 }
 
-.details--projects--view .projecttitle, .details--projects--grid .projecttitle {
+.details--projects--view .projecttitle,
+.details--projects--grid .projecttitle {
   max-width: 33.33%;
   flex: 1 1;
 }
@@ -659,7 +666,8 @@ button.input-error.dropdown-toggle.btn.btn-success {
   font-weight: 600;
 }
 
-.details--projects--view .wrapper--title h3, .details--projects--grid .wrapper--title h3 {
+.details--projects--view .wrapper--title h3,
+.details--projects--grid .wrapper--title h3 {
   font-size: 1.5rem;
   margin: 0;
   font-weight: 600;
@@ -668,7 +676,8 @@ button.input-error.dropdown-toggle.btn.btn-success {
   width: 100%;
 }
 
-.details--projects--view .wrapper--title h3 strong, .details--projects--grid .wrapper--title h3 strong {
+.details--projects--view .wrapper--title h3 strong,
+.details--projects--grid .wrapper--title h3 strong {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   line-clamp: 1;
@@ -809,14 +818,17 @@ button.input-error.dropdown-toggle.btn.btn-success {
   box-shadow: none;
 }
 
-.preview--grid .preview--cell .btn-secondary:hover, .preview--grid .preview--cell .btn-secondary:active, .preview--grid .preview--cell .btn-secondary:focus {
+.preview--grid .preview--cell .btn-secondary:hover,
+.preview--grid .preview--cell .btn-secondary:active,
+.preview--grid .preview--cell .btn-secondary:focus {
   color: #1e7e34;
   box-shadow: none;
   border: 0;
 }
 
-.preview--grid .preview--cell .btn-primary.focus, .preview--grid .preview--cell .btn-primary:focus, 
-.preview--grid .preview--cell .btn-primary:not(:disabled):not(.disabled).active, 
+.preview--grid .preview--cell .btn-primary.focus,
+.preview--grid .preview--cell .btn-primary:focus,
+.preview--grid .preview--cell .btn-primary:not(:disabled):not(.disabled).active,
 .preview--grid .preview--cell .btn-primary:not(:disabled):not(.disabled):active {
   background-color: transparent;
   border-color: transparent;
@@ -947,17 +959,22 @@ button.input-error.dropdown-toggle.btn.btn-success {
 }
 
 
-.team--Cards.active, table tr.active td, table tr.marked-project td {
-  background: rgba(123, 204, 184, .12549019607843137);
+.team--Cards.active,
+table tr.active td,
+table tr.marked-project td {
+  background: rgba(123, 204, 184, .125);
 }
 
-.show--details.team--page .table tr.project--active td, .view--project.team--page .table tr.project--active td {
+.show--details .table tr.project--active td,
+.view--project .table tr.project--active td {
   border-bottom-color: #6FCCB8 !important;
   border-top-color: #6FCCB8 !important;
-  margin-bottom: 1px !important;
+  margin-bottom: 0 !important;
 }
-.show--details.team--page .table tr.project--active+tr td, .view--project.team--page .table tr.project--active+tr td {
- border-top-width: 0px !important;
+
+.show--details .table tr.project--active+tr td,
+.view--project .table tr.project--active+tr td {
+  border-top-width: 1px !important;
 }
 
 .show--details .g-4,
@@ -1047,8 +1064,11 @@ button.input-error.dropdown-toggle.btn.btn-success {
   margin: auto;
 }
 
-.page--wrapper table td .select--dropdown .dropdown-menu, .team--page .page--title .select--dropdown .dropdown-menu, 
-.modal .select--dropdown .dropdown-menu, .rounded--box .select--dropdown .dropdown-menu, .common--form .select--dropdown .dropdown-menu {
+.page--wrapper table td .select--dropdown .dropdown-menu,
+.team--page .page--title .select--dropdown .dropdown-menu,
+.modal .select--dropdown .dropdown-menu,
+.rounded--box .select--dropdown .dropdown-menu,
+.common--form .select--dropdown .dropdown-menu {
   padding: 0;
   border: 1px solid #eeeeee;
   border-radius: .5rem;
@@ -1064,12 +1084,14 @@ button.input-error.dropdown-toggle.btn.btn-success {
   top: 100% !important;
 }
 
-.modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"], .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"] {
+.modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"],
+.select--dropdown .dropdown-menu[data-popper-placement="bottom-start"] {
   margin-bottom: 0;
   margin-top: 15px;
 }
 
-.modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"], .select--dropdown .dropdown-menu[data-popper-placement="top-start"] {
+.modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"],
+.select--dropdown .dropdown-menu[data-popper-placement="top-start"] {
   margin-bottom: 15px;
   margin-top: 0;
   top: auto !important;
@@ -1204,7 +1226,9 @@ button.input-error.dropdown-toggle.btn.btn-success {
   padding: .55rem 2rem .55rem 1.2rem;
 }
 
-.select--dropdown .btn:focus-visible, .select--dropdown .btn:active, .select--dropdown .btn:focus-within {
+.select--dropdown .btn:focus-visible,
+.select--dropdown .btn:active,
+.select--dropdown .btn:focus-within {
   border: 1px solid !important;
 }
 
@@ -1803,7 +1827,8 @@ Project Task View CSS=-=-=
   flex: 1 1;
 }
 
-.projects--grid .task--list ul .task--button .form-floating>.form-control:focus~label, .projects--grid .task--list ul .task--button .form-floating>.form-control:not(:placeholder-shown)~label {
+.projects--grid .task--list ul .task--button .form-floating>.form-control:focus~label,
+.projects--grid .task--list ul .task--button .form-floating>.form-control:not(:placeholder-shown)~label {
   transform: scale(.85) translateY(-.8rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.8rem) translateX(1rem);
 }
@@ -2478,7 +2503,6 @@ pre {
   -webkit-line-clamp: 1;
   line-clamp: 1;
   -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
   overflow: hidden;
 }
 
@@ -3115,6 +3139,14 @@ pre {
   max-width: calc(25% - 8px);
 }
 
+.project--grid--table tr.marked-project {
+  background: rgba(123, 204, 184, .125);
+}
+
+.project--grid--table tr.marked-project td {
+  background: none;
+}
+
 .project--table tr.no--invite {
   max-width: 100%;
 }
@@ -3155,10 +3187,6 @@ pre {
 
 .project--grid--table thead,
 .project--grid--table th {
-  display: none;
-}
-
-.page--wrapper .project--grid--table td abbr {
   display: none;
 }
 
@@ -3207,8 +3235,8 @@ pre {
   display: table-cell;
   border-bottom: 1px solid #eeeeee;
   text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* text-overflow: ellipsis; */
+  /* white-space: nowrap; */
   overflow: hidden;
   max-width: 190px;
   padding: .4rem .5rem;
@@ -3346,9 +3374,20 @@ pre {
   max-width: 400px;
 }
 
-.draggable--table>:not(caption)>*>* {
+.table>:not(caption)>*>* {
   border-top-width: var(--bs-border-width);
-  margin-top: -1px;
+  margin-bottom: -1px;
+}
+
+.project--grid--table>:not(caption)>*>* {
+  border-top-width: 0;
+  margin-bottom: 0;
+}
+
+.show--details .table>:not(caption)>*>*, .view--project .table>:not(caption)>*>*, .view--invitee .table>:not(caption)>*>* {
+  border-top-width: var(--bs-border-width);
+  margin-bottom: -1px;
+  border-top-color: #eeeeee;
 }
 
 /*-=-=-=-==-=-
@@ -3366,7 +3405,8 @@ Media CSS-=-==
     max-width: 110px;
   }
 
-  .details--projects--view .projecttitle, .details--projects--grid .projecttitle {
+  .details--projects--view .projecttitle,
+  .details--projects--grid .projecttitle {
     max-width: 25%;
   }
 
@@ -3402,21 +3442,42 @@ Media CSS-=-==
     opacity: 1;
   }
 
-  .details--projects--view .projecttitle, .details--projects--grid .projecttitle {
+  .details--projects--view .projecttitle,
+  .details--projects--grid .projecttitle {
     max-width: 50%;
     flex: 1 1;
   }
 
-  .page--wrapper .draggable--table th:nth-child(4), .page--wrapper .draggable--table td:nth-child(4) {
+  .page--wrapper .draggable--table th:nth-child(4),
+  .page--wrapper .draggable--table td:nth-child(4),
+  .page--wrapper .draggable--table th:last-child,
+  .page--wrapper .draggable--table td:last-child {
     flex: none;
     min-width: 170px;
   }
 }
 
 @media screen and (max-width:1199px) {
-  .page--wrapper .draggable--table th:nth-child(4), .page--wrapper .draggable--table td:nth-child(4), .page--wrapper .draggable--table th:last-child, .page--wrapper .draggable--table td:last-child {
+  .page--wrapper .draggable--table tr {
+    display: table-row;
+  }
+
+  .page--wrapper .draggable--table th:nth-child(4),
+  .page--wrapper .draggable--table td:nth-child(4),
+  .page--wrapper .draggable--table th:last-child,
+  .page--wrapper .draggable--table td:last-child {
     flex: none;
-    min-width: 145px;
+    min-width: 100px;
+  }
+
+  .projects--page .table .list-group-item .team--initial, .projects--page .table .list-group-item .team--image, .projects--page .table .list-group-item .btn, .project--form--actions .list-group-item .team--initial, .tasks-form-action .list-group-item .team--initial {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .projects--page .table .more--member {
+    width: 30px;
+    height: 30px;
   }
 
   .page--wrapper .draggable--table td button {
@@ -3543,7 +3604,8 @@ Media CSS-=-==
     max-width: 150px;
   }
 
-  .page--wrapper .draggable--table th:nth-child(2), .page--wrapper .draggable--table td:nth-child(2) {
+  .page--wrapper .draggable--table th:nth-child(2),
+  .page--wrapper .draggable--table td:nth-child(2) {
     flex: none;
     min-width: 150px;
   }
@@ -3601,10 +3663,10 @@ Media CSS-=-==
     display: none;
   }
 
-  .draggable--table>:not(caption)>*>* {
+  .table>:not(caption)>*>* {
     border-top-width: 0;
-    margin-top: 0;
-}
+    margin-bottom: 0;
+  }
 
   .setting--page .rounded--box .table td:last-child,
   .setting--page .rounded--box .table th:last-child {
@@ -3675,7 +3737,11 @@ Media CSS-=-==
     outline: none;
   }
 
-  table tr:focus, table tr:focus-within, table tr:focus-visible, table tr:active, table tr:visited {
+  table tr:focus,
+  table tr:focus-within,
+  table tr:focus-visible,
+  table tr:active,
+  table tr:visited {
     box-shadow: none !important;
     outline: none !important;
   }
@@ -3896,6 +3962,7 @@ Media CSS-=-==
     position: relative;
     bottom: 0;
   }
+
   .wrapper--title h3 span {
     display: none;
   }

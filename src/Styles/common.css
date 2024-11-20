@@ -1174,7 +1174,8 @@ span.status--circle.info--color {
   line-clamp: 1;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
-  overflow: hidden;
+  /* overflow: hidden; */
+  border-radius: 0;
 }
 
 .edit--task--modal .project--form--inputs .task--title .pencil--edit {

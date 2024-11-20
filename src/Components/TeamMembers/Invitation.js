@@ -113,8 +113,8 @@ function Invitation(props) {
                   <thead>
                     <tr>
                       {/* <th width={20}>#</th> */}
-                      <th className="onHide"><abbr>#</abbr> Role</th>
-                      <th>Email Address</th>
+                      <th><abbr>#</abbr> Email Address</th>
+                      <th className="onHide">Role</th>
                       <th className="onHide">Action</th>
                     </tr>
                   </thead>
@@ -125,8 +125,8 @@ function Invitation(props) {
                           <>
                             <tr key={`member-table-row-${index}`} className={invitation._id === selectedInvitation?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(invitation) : () => { return false; }}>
                               {/* <td>{index + 1}</td> */}
+                              <td><abbr>{index + 1}.</abbr> {invitation.email}</td>
                               <td className="onHide">
-                                <abbr>{index + 1}.</abbr>
                                 <span className="onHide">
                                   <img variant="top" src="./images/default.jpg" />
                                 </span>
@@ -137,7 +137,6 @@ function Invitation(props) {
                                   }
                                 )}
                               </td>
-                              <td>{invitation.email}</td>
                               <td className="onHide">
                                 <Button variant="primary" onClick={() => { handleTableToggle(invitation); setIsActive(true) }}>View</Button>
                               </td>

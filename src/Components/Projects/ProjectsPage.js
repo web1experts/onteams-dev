@@ -717,13 +717,14 @@ function ProjectsPage() {
                                     </tr>
                                 </thead>
                                 <Droppable droppableId={`droppable-project-table`} type="PROJECTS">
-                                            {(provided) => (
+                                    {(provided) => (
                                         <tbody 
                                             id={`projectable-body`}
                                             className="projects--list"
                                             ref={provided.innerRef}
                                             {...provided.droppableProps}
-                                            style={{ overflowY: 'auto', height: '100%' }}>
+                                            // style={{ overflowY: 'auto', height: '100%' }}
+                                            >
                                             {
                                                 (!spinner && projects && projects.length > 0)
                                                 ? projects.map((project, index) => {
