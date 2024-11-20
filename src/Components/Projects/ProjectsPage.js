@@ -34,7 +34,7 @@ function ProjectsPage() {
     const dispatch = useDispatch();
     const memberdata = getMemberdata()
     const [projects, setProjects] = useState([]);
-    const [filters, setFilters] = useState({})
+    const [filters, setFilters] = useState({member: memberdata?._id, status: 'in-progress'})
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [] });
     const [errors, setErrors] = useState({ title: '' });
     const [loader, setLoader] = useState(false);
