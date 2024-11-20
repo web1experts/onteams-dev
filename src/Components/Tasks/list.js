@@ -158,13 +158,16 @@ const TasksList = React.memo((props) => {
 
     const handleTasksubmit = async (e) => {
 
-        e.preventDefault();
-        const formElements = e.target.elements;
-        for (let element of formElements) {
-            if (element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.tagName === "SELECT") {
-                element.disabled = true;
+        e.preventDefault(); 
+        if( e.type === "submit"){
+            const formElements = e.target.elements;
+            for (let element of formElements) {
+                if (element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.tagName === "SELECT") {
+                    element.disabled = true;
+                }
             }
         }
+        
         setLoader(true)
         const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
             // Get rules for the current field
@@ -241,10 +244,7 @@ const TasksList = React.memo((props) => {
                                                     showtaskform[tab._id] && showtaskform[tab._id] === true &&
                                                     <li class="task--button">
                                                         <Form onSubmit={(e) => {
-                                                            handleTasksubmit(e)
-                                                            //closetask(tab._id)
-
-                                                        }} onBlur={(e) => {
+                                                            e.stopPropagation()
                                                             handleTasksubmit(e)
                                                             //closetask(tab._id)
 
