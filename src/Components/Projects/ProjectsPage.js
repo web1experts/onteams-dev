@@ -34,7 +34,7 @@ function ProjectsPage() {
     const dispatch = useDispatch();
     const memberdata = getMemberdata()
     const [projects, setProjects] = useState([]);
-    const [filters, setFilters] = useState({member: memberdata?._id, status: 'in-progress'})
+    const [filters, setFilters] = useState({ member: memberdata?._id, status: 'in-progress' })
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [] });
     const [errors, setErrors] = useState({ title: '' });
     const [loader, setLoader] = useState(false);
@@ -47,7 +47,7 @@ function ProjectsPage() {
     const apiClient = useSelector(state => state.client)
     const memberFeed = useSelector((state) => state.member.members);
     const commonState = useSelector(state => state.common)
-    const projectform = useSelector( state => state.common.projectForm)
+    const projectform = useSelector(state => state.common.projectForm)
     const [clientlist, setClientList] = useState([])
     const [members, setMembers] = useState([])
     const [currentPage, setCurrentPage] = useState(0);
@@ -65,26 +65,26 @@ function ProjectsPage() {
     const workflowstate = useSelector(state => state.workflow)
     const modules = {
         toolbar: [
-          [{ 'header': '1'}, {'header': '2'}],
-          ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-          [{'list': 'ordered'}, {'list': 'bullet'}, 
-           {'indent': '-1'}, {'indent': '+1'}],
-           ['link'],
+            [{ 'header': '1' }, { 'header': '2' }],
+            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' },
+            { 'indent': '-1' }, { 'indent': '+1' }],
+            ['link'],
         ],
         clipboard: {
-          // toggle to add extra line breaks when pasting HTML:
-          matchVisual: false,
+            // toggle to add extra line breaks when pasting HTML:
+            matchVisual: false,
         },
         autoLinks: true
-      };
+    };
 
-      const formats = [
+    const formats = [
         'header',
         'bold', 'italic', 'underline', 'strike', 'blockquote',
         'list', 'bullet', 'indent',
         'link'
-      ];
-      
+    ];
+
     useEffect(() => {
         selectboxObserver()
         dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
@@ -112,23 +112,23 @@ function ProjectsPage() {
         }
     }, [commonState.selectedMembers])
 
-    useEffect(() => { 
+    useEffect(() => {
         if (commonState.projectForm) {
             setFields(prevFields => {
                 const updatedFields = {
                     ...prevFields, // Retain the existing properties of fields
                     ...commonState.projectForm // Merge properties from commonState.projectForm
                 };
-            
+
                 // Log updated fields for debugging
                 // console.log("Updated Fields:", updatedFields);
-            
+
                 return updatedFields; // Return the new state
             });
-            
+
         }
     }, [projectform]);
-    
+
 
 
     // Function to remove the last member
@@ -149,12 +149,12 @@ function ProjectsPage() {
     const [show, setShow] = useState(false);
     const handleClose = () => {
         setFields({ title: '', status: 'in-progress', members: [] })
-        if( isActive === 2 || isActive === 1){
+        if (isActive === 2 || isActive === 1) {
             dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project'))
-        }else{
+        } else {
             dispatch(updateStateData(ACTIVE_FORM_TYPE, null))
         }
-        
+
         dispatch(updateStateData(RESET_FORMS))
         setSelectedFiles([])
         setselectedMembers([])
@@ -162,16 +162,16 @@ function ProjectsPage() {
         setShow(false);
     }
     const handleShow = async (type) => {
-       
+
         await dispatch(updateStateData(ACTIVE_FORM_TYPE, 'project'))
         await dispatch(updateStateData(RESET_FORMS, 'project'))
         setFields({ title: '', status: 'in-progress', members: [] })
         await dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
         if (type === "new") {
-            if( isActive !== 2 && isActive !== 1){
+            if (isActive !== 2 && isActive !== 1) {
                 setCurrentProject({})
             }
-            
+
             setselectedMembers({})
             setImagePreviews([])
 
@@ -205,7 +205,7 @@ function ProjectsPage() {
     const [filetoPreview, setFiletoPreview] = useState(null);
     const [showPreview, setPreviewShow] = useState(false);
     const handlePreviewClose = () => setPreviewShow(false);
-    const [ datepickerShow , setDateshow] = useState(false)
+    const [datepickerShow, setDateshow] = useState(false)
     const handlePreviewShow = (file) => {
         setFiletoPreview(file)
         setPreviewShow(true)
@@ -236,7 +236,7 @@ function ProjectsPage() {
     }, [])
 
 
-    useEffect(() => { 
+    useEffect(() => {
         if (commonState.projectForm.images?.length > 0) {
             const selectedFiles = commonState.projectForm.images
             const previews = [];
@@ -301,7 +301,7 @@ function ProjectsPage() {
     }
 
     const handleChange = ({ target: { name, value, type, files } }) => {
-        setFields({...fields, [name]: value})
+        setFields({ ...fields, [name]: value })
         dispatch(updateStateData(PROJECT_FORM, { [name]: value }))
         setErrors({ ...errors, [name]: '' })
     };
@@ -332,14 +332,14 @@ function ProjectsPage() {
         }
     }, [projectFeed])
 
-  
+
 
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
         return null
     }
 
-    const handleSubmit = async (e) => { 
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true)
         const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
@@ -369,7 +369,7 @@ function ProjectsPage() {
             for (const [key, value] of Object.entries(fields)) {
                 if (typeof value === 'object' && key === 'images') {
                     value.forEach(attach => {
-                       
+
                         formData.append('images[]', attach);
                     });
                 } else if (typeof value === 'object' && key === 'members') {
@@ -393,10 +393,10 @@ function ProjectsPage() {
             }
             let payload = formData;
 
-            
+
             await dispatch(createProject(payload))
             setLoader(false)
-            
+
         }
     }
 
@@ -427,7 +427,7 @@ function ProjectsPage() {
             if (hasopened === false) {
                 setIsActive(0)
             }
-            if( found === false ){
+            if (found === false) {
                 setCurrentProject({})
             }
         }
@@ -440,7 +440,7 @@ function ProjectsPage() {
         }
 
         if (apiResult.success) {
-            setIsDescEditor( false )
+            setIsDescEditor(false)
             setFields({ title: '', status: 'in-progress', members: [] })
             handleClose()
             setSelectedFiles([]);
@@ -449,11 +449,11 @@ function ProjectsPage() {
             handleListProjects()
         }
 
-        socket.on('refreshProjects', function(msg){ 
+        socket.on('refreshProjects', function (msg) {
             if (apiResult.success || apiResult.deletedProject || apiResult.successfull) {
                 handleListProjects()
             }
-       });
+        });
 
     }, [apiResult])
 
@@ -469,7 +469,7 @@ function ProjectsPage() {
 
 
     const renderPreview = (type, preview, index) => {
-       
+
         const { src, _id } = preview;
         const mimetype = (preview.mimetype) ? preview.mimetype : src.split('.').pop().toLowerCase();
         const previewComponents = {
@@ -543,17 +543,17 @@ function ProjectsPage() {
 
     const handleDragEnd = (result) => {
         const { source, destination, draggableId } = result;
-    
+
         // If there's no destination (i.e., the item was dropped outside), do nothing
         if (!destination) return;
-    
+
         const projectId = draggableId.split('-')[1]; // Extract task ID from draggableId
         const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
         const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
-    
+
         // Clone the projects array to avoid mutating the state directly
         let reorderedProjects = [...projects];
-    
+
         if (sourceTabId === destinationTabId) {
             // If the task was moved within the same tab, reorder the tasks
             const [removed] = reorderedProjects.splice(source.index, 1); // Remove task from the source position
@@ -563,20 +563,20 @@ function ProjectsPage() {
             const [removed] = reorderedProjects.splice(source.index, 1); // Remove from source tab
             reorderedProjects.splice(destination.index, 0, removed); // Add to destination tab
         }
-    
+
         // Generate a list of newly ordered projects
         const newOrder = reorderedProjects.map((project, index) => ({
             project_id: project._id, // Adjust this if your project ID key is different
             order: index
         }));
-        
+
         // Dispatch the action with the new order
         dispatch(reorderedProject({ projects: newOrder, filters: filters }));
-    
+
         // Update the state with reordered projects
         setProjects(reorderedProjects);
     };
-    
+
 
     const handleKeyDown = (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
@@ -585,38 +585,39 @@ function ProjectsPage() {
         }
     };
 
-    const handleRowDoubleClick = ( project, index ) => { console.log('index is: ', index)
-        
-        if( project.marked_by && project.marked_by.includes(memberdata._id)){
+    const handleRowDoubleClick = (project, index) => {
+        console.log('index is: ', index)
+
+        if (project.marked_by && project.marked_by.includes(memberdata._id)) {
             setProjects((prevProjects) => {
                 // Create a new array from the previous projects
                 const updatedProjects = [...prevProjects];
-              
+
                 // Access the project at index 1
                 const projectToUpdate = updatedProjects[index];
-              
+
                 if (projectToUpdate) {
-                  // Remove the memberId from the marked_by array
-                  const updatedMarkedBy = projectToUpdate.marked_by.filter(id => id !== memberdata._id);
-              
-                  // Update the project's marked_by column
-                  updatedProjects[index] = {
-                    ...projectToUpdate,
-                    marked_by: updatedMarkedBy,
-                  };
-                  console.log('project to update:: ', {
-                    ...projectToUpdate,
-                    marked_by: updatedMarkedBy,
-                  })
+                    // Remove the memberId from the marked_by array
+                    const updatedMarkedBy = projectToUpdate.marked_by.filter(id => id !== memberdata._id);
+
+                    // Update the project's marked_by column
+                    updatedProjects[index] = {
+                        ...projectToUpdate,
+                        marked_by: updatedMarkedBy,
+                    };
+                    console.log('project to update:: ', {
+                        ...projectToUpdate,
+                        marked_by: updatedMarkedBy,
+                    })
                 }
-              
+
                 return updatedProjects; // Return the updated projects array
-              });
+            });
             dispatch(updateProject(project._id, { marked: false }))
-        }else{
+        } else {
             dispatch(updateProject(project._id, { marked: true }))
         }
-        
+
     }
 
     const handlePaste = (e) => {
@@ -624,26 +625,26 @@ function ProjectsPage() {
         console.log('Pasted content:', pastedData);
         pasteOccurred.current = true; // Set the paste flag to true
 
-        setTimeout(function(){
+        setTimeout(function () {
             pasteOccurred.current = false;
-        },500)
+        }, 500)
     };
 
     useEffect(() => {
         // Add the paste listener to the editor
         if (quillRef.current) {
-          const editor = quillRef.current.getEditor();
-          editor.root.addEventListener('paste', handlePaste);
+            const editor = quillRef.current.getEditor();
+            editor.root.addEventListener('paste', handlePaste);
         }
-    
+
         // Cleanup the event listener on unmount
         return () => {
-          if (quillRef.current) {
-            const editor = quillRef.current.getEditor();
-            editor.root.removeEventListener('paste', handlePaste);
-          }
+            if (quillRef.current) {
+                const editor = quillRef.current.getEditor();
+                editor.root.removeEventListener('paste', handlePaste);
+            }
         };
-      }, []);
+    }, []);
 
 
     return (
@@ -718,74 +719,73 @@ function ProjectsPage() {
                                 </thead>
                                 <Droppable droppableId={`droppable-project-table`} type="PROJECTS">
                                     {(provided) => (
-                                        <tbody 
+                                        <tbody
                                             id={`projectable-body`}
                                             className="projects--list"
                                             ref={provided.innerRef}
                                             {...provided.droppableProps}
-                                            // style={{ overflowY: 'auto', height: '100%' }}
-                                            >
+                                        // style={{ overflowY: 'auto', height: '100%' }}
+                                        >
                                             {
                                                 (!spinner && projects && projects.length > 0)
-                                                ? projects.map((project, index) => {
-                                                    return (<>
-                                                        <Draggable
-                                                            key={project?._id}
-                                                            draggableId={`project-${project?._id}`}
-                                                            index={index}
-                                                        >
-                                                            {(provided) => (
-                                                                <tr ref={provided.innerRef}
-                                                                    {...provided.draggableProps}
-                                                                    {...provided.dragHandleProps} 
-                                                                    onDoubleClick={(event) => {
-                                                                        if( event.target.classList.contains('marked-project')){
-                                                                            event.currentTarget.classList.remove('marked-project')
-                                                                             
-                                                                        }else{
-                                                                            event.currentTarget.classList.add('marked-project')
-                                                                        }
-                                                                        
-                                                                         handleRowDoubleClick(project, index)
-                                                                    }}
-                                                                    key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${
-                                                                        project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
-                                                                      }`}>
-                                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
-                                                                    <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
-                                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type = "project" 
-                                                                        // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
-                                                                        />
-                                                                    </td>
-                                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide">
-                                                                        <Dropdown className="select--dropdown" key='status-key'>
-                                                                            <Dropdown.Toggle onClick={() => {dispatch(updateStateData(DIRECT_UPDATE, true));handleStatusShow()}} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                                        </Dropdown>
-                                                                    </td>
-                                                                    <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                                        <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
-                                                                        <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
-                                                                    </td>
-                                                                </tr>
-                                                            )}
-                                                        </Draggable>
-                                                    </>)
-                                                })
-                                                :
+                                                    ? projects.map((project, index) => {
+                                                        return (<>
+                                                            <Draggable
+                                                                key={project?._id}
+                                                                draggableId={`project-${project?._id}`}
+                                                                index={index}
+                                                            >
+                                                                {(provided) => (
+                                                                    <tr ref={provided.innerRef}
+                                                                        {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps}
+                                                                        onDoubleClick={(event) => {
+                                                                            if (event.target.classList.contains('marked-project')) {
+                                                                                event.currentTarget.classList.remove('marked-project')
 
-                                                !spinner && isActiveView === 2 &&
-                                                <>
-                                                    <tr key={`noresults-row`} className="no--invite">
-                                                        <td key={`empty-index`} colSpan={9} className="text-center">
-                                                            <h2 className="mt-2 text-center">No Projects Found</h2>
-                                                        </td>
-                                                    </tr>
-                                                </>
+                                                                            } else {
+                                                                                event.currentTarget.classList.add('marked-project')
+                                                                            }
+
+                                                                            handleRowDoubleClick(project, index)
+                                                                        }}
+                                                                        key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
+                                                                            }`}>
+                                                                        <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
+                                                                        <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
+                                                                        <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
+                                                                            <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type="project"
+                                                                            // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
+                                                                            />
+                                                                        </td>
+                                                                        <td key={`status-index-${index}`} data-label="Status" className="onHide">
+                                                                            <Dropdown className="select--dropdown" key='status-key'>
+                                                                                <Dropdown.Toggle onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); handleStatusShow() }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                            </Dropdown>
+                                                                        </td>
+                                                                        <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
+                                                                            <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
+                                                                            <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
+                                                                        </td>
+                                                                    </tr>
+                                                                )}
+                                                            </Draggable>
+                                                        </>)
+                                                    })
+                                                    :
+
+                                                    !spinner && isActiveView === 2 &&
+                                                    <>
+                                                        <tr key={`noresults-row`} className="no--invite">
+                                                            <td key={`empty-index`} colSpan={9} className="text-center">
+                                                                <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                            </td>
+                                                        </tr>
+                                                    </>
                                             }
                                         </tbody>
                                     )}
-                                    </Droppable>
+                                </Droppable>
                             </Table>
                         </DragDropContext>
                         {
@@ -808,7 +808,7 @@ function ProjectsPage() {
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
-                            <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={true} members={currentProject?.members || []} showAssignBtn={true} postId={currentProject?._id} type = "project"
+                            <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={true} members={currentProject?.members || []} showAssignBtn={true} postId={currentProject?._id} type="project"
                             //  onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `remove-member-${currentProject._id}-${memberid}`)}
                             />
                         }
@@ -816,7 +816,7 @@ function ProjectsPage() {
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
                         <Button variant="outline-primary" className="active btn--view d-none d-lg-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
                         <Button variant="outline-primary" className="btn--view d-none d-lg-flex" onClick={() => setIsActive(2)}>View</Button>
-                        <ListGroup.Item className="d-none d-lg-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true));dispatch( togglePopups('workflow', true))}}><FaCog /></ListGroup.Item>
+                        <ListGroup.Item className="d-none d-lg-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
                         <ListGroup.Item key={`gridview`} className="gridView ms-1" action active={activeTab === 'GridView'} onClick={() => setActiveTab('GridView')}><BsGrid /></ListGroup.Item>
                         <ListGroup.Item key={`listview`} className="ListView ms-1" action active={activeTab === 'ListView'} onClick={() => setActiveTab('ListView')}><FaList /></ListGroup.Item>
                         <ListGroup.Item key={`closekey`} onClick={() => setIsActive(0)}><MdOutlineClose /></ListGroup.Item>
@@ -869,7 +869,7 @@ function ProjectsPage() {
                                     <Form.Label>
                                         <small>Workflow</small>
                                         <div className="workflow--modal" onClick={(handleWorkflowShow)}>
-                                            <span className="workflow--selected">{fields['workflow']?.title ? fields['workflow']?.title  : workflowstate?.workflows?.[0]?.title || 'Select' } <FaChevronDown /></span>
+                                            <span className="workflow--selected">{fields['workflow']?.title ? fields['workflow']?.title : workflowstate?.workflows?.[0]?.title || 'Select'} <FaChevronDown /></span>
                                         </div>
                                     </Form.Label>
                                 </Form.Group>
@@ -882,68 +882,68 @@ function ProjectsPage() {
                                         }
                                     </Form.Label>
                                     <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
-                                            
-                                            <ReactQuill 
-                                                value={fields['description'] || ''}
-                                                onChange={(value) => {
-                                                    setFields({...fields, ['description']: value})
-                                                    setErrors({ ...errors, ['description']: '' });
 
-                                                    setTimeout(() => {
-                                                        dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
-                                                    },800)
-                                                }}
-                                                formats={formats} 
-                                                modules={modules}
-                                                onKeyDown={handleKeyDown}
-                                                ref={quillRef}
-                                            />
-                                            
-                                        </div>
+                                        <ReactQuill
+                                            value={fields['description'] || ''}
+                                            onChange={(value) => {
+                                                setFields({ ...fields, ['description']: value })
+                                                setErrors({ ...errors, ['description']: '' });
+
+                                                setTimeout(() => {
+                                                    dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
+                                                }, 800)
+                                            }}
+                                            formats={formats}
+                                            modules={modules}
+                                            onKeyDown={handleKeyDown}
+                                            ref={quillRef}
+                                        />
+
+                                    </div>
                                 </Form.Group>
                                 <Form.Group className="mb-0 form-group pb-0">
                                     <Form.Label>
                                         <small>Start/Due Date</small>
                                     </Form.Label>
-                                    
+
                                     <Row>
-                                    {(!fields?.start_date && !fields?.due_date) ? (
-                                        <label 
-                                            htmlFor="startdate--picker" 
-                                            className="task--date--picker" 
-                                            onClick={() => { setDateshow(true); }}
-                                        >
-                                            <FaRegCalendarAlt /> Set due date
-                                        </label>
-                                    ) : (
-                                        <label 
-                                            htmlFor="startdate--picker" 
-                                            className="task--date--change" 
-                                            onClick={() => { setDateshow(true); }}
-                                        >
-                                            { fields?.start_date && (
-                                                new Date(fields.start_date).toISOString().split('T')[0]
-                                            )}
+                                        {(!fields?.start_date && !fields?.due_date) ? (
+                                            <label
+                                                htmlFor="startdate--picker"
+                                                className="task--date--picker"
+                                                onClick={() => { setDateshow(true); }}
+                                            >
+                                                <FaRegCalendarAlt /> Set due date
+                                            </label>
+                                        ) : (
+                                            <label
+                                                htmlFor="startdate--picker"
+                                                className="task--date--change"
+                                                onClick={() => { setDateshow(true); }}
+                                            >
+                                                {fields?.start_date && (
+                                                    new Date(fields.start_date).toISOString().split('T')[0]
+                                                )}
 
-                                            { fields?.start_date && fields?.due_date && (
-                                                <span>/</span>
-                                            )}
+                                                {fields?.start_date && fields?.due_date && (
+                                                    <span>/</span>
+                                                )}
 
-                                            { fields?.due_date && (
-                                                <>
-                                                    {new Date(fields.due_date).toISOString().split('T')[0]}
-                                                </>
-                                            )}
+                                                {fields?.due_date && (
+                                                    <>
+                                                        {new Date(fields.due_date).toISOString().split('T')[0]}
+                                                    </>
+                                                )}
 
-                                            {(fields?.start_date || fields?.due_date) && (
-                                                <MdOutlineCancel 
-                                                    onClick={() => {
-                                                        dispatch(updateStateData(PROJECT_FORM, { start_date: '', due_date: '' }));
-                                                    }} 
-                                                />
-                                            )}
-                                        </label>
-                                    )}
+                                                {(fields?.start_date || fields?.due_date) && (
+                                                    <MdOutlineCancel
+                                                        onClick={() => {
+                                                            dispatch(updateStateData(PROJECT_FORM, { start_date: '', due_date: '' }));
+                                                        }}
+                                                    />
+                                                )}
+                                            </label>
+                                        )}
 
                                         <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                     </Row>
@@ -956,9 +956,9 @@ function ProjectsPage() {
                                 <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                                 <p className="m-0">
                                     {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                        <MemberInitials directUpdate={false} key={`MemberNames-header-new`}  showall={true} members={fields['members']} showAssignBtn={false} postId="new" type="project" showRemove={true} 
+                                        <MemberInitials directUpdate={false} key={`MemberNames-header-new`} showall={true} members={fields['members']} showAssignBtn={false} postId="new" type="project" showRemove={true}
                                         // onMemberClick={(memberid, extraparam = false) =>  removeMember(memberid)}
-                                         />
+                                        />
                                     )}
                                 </p>
 
@@ -1000,7 +1000,7 @@ function ProjectsPage() {
                     <Button variant="danger">Delete</Button>
                 </Modal.Footer>
             </Modal>
-            
+
             {/*--=-=Filter Modal**/}
             <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>

@@ -795,16 +795,7 @@ function TimeTrackingPage() {
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
-              {/* <Select2
-                defaultValue={1}
-                data={[
-                  { text: 'Team Projects', id: 1 },
-                  { text: 'My Projects', id: 2 },
-                ]}
-                options={{
-                  placeholder: 'Team Projects',
-                }}
-              /> */}
+              
             </ListGroup.Item>
             <ListGroup.Item key="filter-key-2" className="mt-3">
               <Dropdown className="select--dropdown">
