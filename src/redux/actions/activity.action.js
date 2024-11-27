@@ -50,12 +50,12 @@ export const getliveActivity = (payload) => {
   };
 }
 
-export const getRecoredActivity = (id) => {
+export const getRecoredActivity = (id, status) => {
 
   return async (dispatch) => {
     try {
 
-      const response = await API.apiGet('activity', { id: id, status: 'recorded' })
+      const response = await API.apiGet('activity', { id: id, status: status })
     
       if (response.data && response.data.success) {
          await dispatch({ type: RECORDED_ACTIVITY_SUCCESS, payload: response.data });

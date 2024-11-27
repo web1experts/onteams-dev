@@ -1,17 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Select2 from 'react-select2-wrapper';
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown } from "react-bootstrap";
 import { Fullscreen } from "yet-another-react-lightbox/dist/plugins/Fullscreen";
-import { FaPlay, FaCheck } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
-import Spinner from 'react-bootstrap/Spinner';
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket } from "../../helpers/auth";
-import { getMemberdata } from "../../helpers/commonfunctions";
+import { getMemberdata, showAmPmtime } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 function TimeTrackingPage() {
   let totalhours = 0;
@@ -48,7 +46,6 @@ function TimeTrackingPage() {
 
   const videoRef = useRef(null);
     const peerConnections = {}
-
     function startsharing(userID, status){
       socket.emit('joinRoom', userID)
      if( status === true ){
@@ -56,7 +53,6 @@ function TimeTrackingPage() {
         socket.emit('watcher', socket.id, userID, userID, currentMember.role?.slug)
      },800)
      }
-     
    }
 
    function leaveRoom(room){
@@ -74,7 +70,7 @@ function TimeTrackingPage() {
 
   const handleRecordedActivity = async () => {
     setSpinner(true)
-    await dispatch(getRecoredActivity(currentActivity._id))
+    await dispatch(getRecoredActivity(currentActivity._id, screenshotTab.toLocaleLowerCase()))
       setSpinner(false)
   }
 
@@ -89,41 +85,25 @@ function TimeTrackingPage() {
     if (minutes > 0 || hours > 0) {
         formattedTime += `${minutes}m`;
     }
-    
     return formattedTime.trim();
-}
+  }
 
   useEffect(() => { 
-      
-         
-    //});
-        if(currentActivity !== false ){ 
-           startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
-        }
-   
-
-   },[currentActivity])
+    if(currentActivity !== false ){ 
+        startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
+    }
+  },[currentActivity])
 
    useEffect(() => {
-
     if (Object.keys(filters).length > 0 && !showFilter) {
         handleLiveActivityList()
     }
-
   }, [filters])
-
-
-
 
   useEffect(() => {
     refreshSocket()
     selectboxObserver()
     handleLiveActivityList()
-
-    // socket.on('userStatusUpdate', ({ userId, status, projectTitle, total_time }) => { 
-      
-    //   // handleLiveActivityList()
-    // });
 
     socket.on('trackerstateUpdate', (memberId) => {
       handleLiveActivityList()
@@ -136,50 +116,42 @@ function TimeTrackingPage() {
       }
       
       if( !peerConnections[id] ){
-          peerConnections[id] = new RTCPeerConnection({ // User stun server for connection with different networks
-              iceServers: [
-                  // { 'urls': 'stun:stun.services.mozilla.com' },
-                  // { 'urls': 'stun:stun.l.google.com:19302' },
-                  {
-                    urls: 'turn:64.227.189.65:3478',
-                    username: 'web1experts',  // Optional if using 'lt-cred-mech'
-                    credential: 'PtJJc0FUvuKP3jkn' // Optional if using 'lt-cred-mech'
-                  },
-              ]
-          });
-          
+        peerConnections[id] = new RTCPeerConnection({ // User stun server for connection with different networks
+          iceServers: [
+              {
+                urls: 'turn:64.227.189.65:3478',
+                username: 'web1experts',  // Optional if using 'lt-cred-mech'
+                credential: 'PtJJc0FUvuKP3jkn' // Optional if using 'lt-cred-mech'
+              },
+          ]
+        });  
       }
 
-          
-
-          peerConnections[id].setRemoteDescription(new RTCSessionDescription(description))
-              .then(() => peerConnections[id].createAnswer())
-              .then(sdp => peerConnections[id].setLocalDescription(sdp))
-              .then(function () {
-                  socket.emit('answer', id, peerConnections[id].localDescription, roomId);
-              });
-          peerConnections[id].onaddstream = function (event) {
-            if(event.stream){
-              videoRef.current.srcObject = event.stream;
-              videoRef.current.onloadedmetadata = () => videoRef.current.play();
+        peerConnections[id].setRemoteDescription(new RTCSessionDescription(description))
+            .then(() => peerConnections[id].createAnswer())
+            .then(sdp => peerConnections[id].setLocalDescription(sdp))
+            .then(function () {
+                socket.emit('answer', id, peerConnections[id].localDescription, roomId);
+            });
+        peerConnections[id].onaddstream = function (event) {
+          if(event.stream){
+            videoRef.current.srcObject = event.stream;
+            videoRef.current.onloadedmetadata = () => videoRef.current.play();
+          }
+        };
+        peerConnections[id].onicecandidate = function (event) {
+            if (event.candidate) {
+                socket.emit('candidate', id, event.candidate, roomId,'viwers');
             }
-          };
-          peerConnections[id].onicecandidate = function (event) {
-              if (event.candidate) {
-                  socket.emit('candidate', id, event.candidate, roomId,'viwers');
-              }
-          };
+        };
 
-          peerConnections[id].addEventListener('iceconnectionstatechange', () => {console.log('ICE Connection State:', peerConnections[id].iceConnectionState);
-            if (peerConnections[id].iceConnectionState === 'connected' || peerConnections[id].iceConnectionState === 'completed' || peerConnections[id].iceConnectionState === 'disconnected' || peerConnections[id].iceConnectionState === 'failed') {
-                console.log('WebRTC connection is complete!');
-                
-            }
+        peerConnections[id].addEventListener('iceconnectionstatechange', () => {console.log('ICE Connection State:', peerConnections[id].iceConnectionState);
+          if (peerConnections[id].iceConnectionState === 'connected' || peerConnections[id].iceConnectionState === 'completed' || peerConnections[id].iceConnectionState === 'disconnected' || peerConnections[id].iceConnectionState === 'failed') {
+              console.log('WebRTC connection is complete!');
+              
+          }
         });
-      
   });
-
-
 
   socket.on('candidate', function (id, candidate, roomId) {
     if(peerConnections[id]){
@@ -187,13 +159,10 @@ function TimeTrackingPage() {
       peerConnections[id].addIceCandidate(new RTCIceCandidate(candidate))
           .catch(e => console.error(e));
     }
-      
   });
 
   setSpinner(true)
   }, [])
-
-
 
   useEffect(() => {
     if (activitystate?.liveactivities?.memberData) { 
@@ -205,21 +174,19 @@ function TimeTrackingPage() {
                 return;
             }
         })
-
       }
     }
 
     if( activitystate?.recordedActivity ){
       setRecordedActivities(activitystate?.recordedActivity)
     }
-
   }, [activitystate])
 
   const handlefilterchange = (name, value) => {
     if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
         setFilters({ ...filters, [name]: value })
     }
-}
+  }
 
   const handleLightBox = (media) => {
     const data = [{ src: media }];
@@ -229,7 +196,6 @@ function TimeTrackingPage() {
   
   useEffect(() => {
     selectboxObserver();
-
   }, [activeTab])
 
   useEffect(() => {
@@ -237,8 +203,11 @@ function TimeTrackingPage() {
     if( activeInnerTab === "InnerRecorded"){
       handleRecordedActivity()
     }
-
   }, [activeInnerTab])
+
+  useEffect(() => {
+    handleRecordedActivity();
+  }, [screenshotTab])
 
   const showTabs = () => {
     if (activeTab === 'Recorded') {
@@ -258,9 +227,7 @@ function TimeTrackingPage() {
               <option value="pause">Paused</option>
               <option value="inactive">Inactive</option>
           </Form.Select>
-            
           </ListGroup.Item>
-          
           <ListGroup.Item key="filter-key-4" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
             <Form>
               <Form.Group className="mb-0 form-group">
@@ -353,7 +320,6 @@ function TimeTrackingPage() {
                     className="form-control"
                     placeholder="dd/mm/yyyy"
                 />
-                
               </Form.Group>
             </Form>
           </ListGroup.Item>
@@ -362,7 +328,6 @@ function TimeTrackingPage() {
     } else {
       return (
         <>
-
         </>
       )
     }
@@ -381,7 +346,6 @@ function TimeTrackingPage() {
         }}
       />
 
-
       <div className={isActive ? "show--details team--page" : "team--page"}>
         <div className='page--title px-md-2 pt-3'>
           <Container fluid>
@@ -397,8 +361,6 @@ function TimeTrackingPage() {
                         leaveRoom(currentActivity?._id)
                         setCurrentActivity(cact);
                       }
-                        
-                      
                       setActiveTab("Live")}}>Live</ListGroup.Item>
                     <ListGroup.Item action active={activeTab === "Recorded"} onClick={() => {setActiveTab("Recorded")}}>Recorded</ListGroup.Item>
                     {showTabs()}
@@ -422,7 +384,6 @@ function TimeTrackingPage() {
                 <Table responsive="lg" className="activity--table">
                   <thead>
                     <tr key="tracking-table-header">
-                      {/* <th scope="col">#</th> */}
                       <th scope="col"><abbr>#</abbr> Member Name</th>
                       <th scope="col" className="onHide">Project Name</th>
                       <th scope="col" className="onHide">Task Name</th>
@@ -583,133 +544,54 @@ function TimeTrackingPage() {
             <>
               {screenshotTab === "Screenshots" && (
                 <>
-                  <div className="wrapper--title screens--tabs">
-                    <p><span>Project: Wp Dynamic Gallery</span><strong>04 September 2023</strong><small>9:00 AM - 10:45 AM</small></p>
-                    <ListGroup horizontal>
-                      <ListGroup.Item key={'screenshots-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
-                        Screenshots
-                      </ListGroup.Item>
-                      <ListGroup.Item key={'videos-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
-                        Videos
-                      </ListGroup.Item>
-                    </ListGroup>
-                  </div>
-                  <div className="shots--list">
-                    <CardGroup>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                    </CardGroup>
-                  </div>
-                  <hr />
-                  <div className="wrapper--title screens--tabs">
-                    <p><span>Project: Wp Dynamic Gallery</span><strong>04 September 2023</strong><small>9:00 AM - 10:45 AM</small></p>
-                    <ListGroup horizontal>
-                      <ListGroup.Item key={'screenshots-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
-                        Screenshots
-                      </ListGroup.Item>
-                      <ListGroup.Item key={'videos-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
-                        Videos
-                      </ListGroup.Item>
-                    </ListGroup>
-                  </div>
-                  <div className="shots--list">
-                    <CardGroup>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                      <Card>
-                        <Card.Body>
-                          <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                          <p><strong>Task Name:</strong> Create dynamic gallery <br /><strong>Time:</strong> 09:30 AM</p>
-                        </Card.Body>
-                      </Card>
-                    </CardGroup>
-                  </div>
+                  {
+                  recordedactivities && recordedactivities.length > 0 ? 
+                    recordedactivities.map((recording, index) => {
+                      return (
+                      <>
+                        <div className="wrapper--title screens--tabs">
+                          <p><span>Project: {recording?.project?.title}</span><strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong></p>
+                          <ListGroup horizontal>
+                            <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
+                              Screenshots
+                            </ListGroup.Item>
+                            <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
+                              Videos
+                            </ListGroup.Item>
+                          </ListGroup>
+                        </div>
+
+                        <div className="shots--list pt-3">
+                          <CardGroup>
+                          {
+                            recording?.activityMeta && recording?.activityMeta.length > 0 &&
+                            recording.activityMeta.map((meta, i) => {
+                              // Check if meta_key is 'videos'
+                              if (meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
+                                return meta.meta_value.map((screenshotData, j) => (
+
+                                  <Card key={`card-${i}-${j}`}>
+                                    <Card.Body>
+                                        <img className="card-img-top" src={ screenshotData?.url } alt="Card image cap" onClick={() => handleLightBox(`${screenshotData?.url}`)} />
+                                        <p><strong>Task Name:</strong> {recording.task?.title} <br /><strong>Time:</strong> {showAmPmtime(`${screenshotData?.taken_time}`)}</p>
+                                      </Card.Body>
+                                  </Card>
+                                ));
+                              }
+                              return null; // Return null if meta_key is not 'videos'
+                            })
+                          }
+                          </CardGroup>
+                        </div>
+                      </>
+                      )
+                    })
+                    
+
+                  :
+                  null
+                }
+                  
                 </>
               )}
               {screenshotTab === "Videos" && (
@@ -742,7 +624,6 @@ function TimeTrackingPage() {
 
                                   <Card key={`card-${i}-${j}`}>
                                     <Card.Body>
-                                      {/* <span className="video--icon"><FaPlay /></span> */}
                                       <video controls height={'175px'}>
                                         <source src={videoData?.url} type="video/webm" />
                                         Your browser does not support the video tag.

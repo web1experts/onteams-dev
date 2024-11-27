@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, ListGroup, Accordion, Form, FloatingLabel, Dropdown } from "react-bootstrap";
-import { FaPlus, FaPlay, FaPause, FaRegTimesCircle, FaEllipsisV } from "react-icons/fa";
-import { TASK_FORM, RESET_FORMS, TASK_FORM_TYPE, ACTIVE_FORM_TYPE, CURRENT_TASK } from "../../redux/actions/types";
+import { Button, ListGroup, Accordion, Form, FloatingLabel } from "react-bootstrap";
+import { FaPlus, FaPlay, FaPause, FaRegTimesCircle } from "react-icons/fa";
+import { ACTIVE_FORM_TYPE, CURRENT_TASK } from "../../redux/actions/types";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
-import { ListTasks, updateTask, createTask, reorderTasks } from "../../redux/actions/task.action";
+import { ListTasks, createTask, reorderTasks } from "../../redux/actions/task.action";
 import { GrAttachment } from "react-icons/gr";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { getFieldRules, validateField } from '../../helpers/rules';
@@ -20,11 +20,6 @@ const TasksList = React.memo((props) => {
     const [showtaskform, setShowtaskform] = useState({})
     const taskFeed = useSelector(state => state.task.tasks);
     const [taskslists, setTasksLists] = useState([])
-    const [showProject, setProjectShow] = useState(false);
-    const handleProjectClose = () => setProjectShow(false);
-    const handleProjectShow = () => setProjectShow(true);
-    const [showTask, setTaskShow] = useState(false);
-    const handleTaskClose = () => setTaskShow(false);
     const handleTaskShow = () => dispatch(togglePopups('taskform', true))
     const [currentProject, setCurrentProject] = useState({})
     const [spinner, setSpinner] = useState(false)
@@ -75,18 +70,12 @@ const TasksList = React.memo((props) => {
 
         if (apiResult.success) {
             handleListTasks()
-            // setSpinner(true)
             setShowtaskform(false)
         }
-
     }, [apiResult])
-
-  
-    
 
     const handleDragEnd = (result) => {
         const { source, destination, draggableId } = result;
-
         // If there's no destination (i.e., the item was dropped outside), do nothing
         if (!destination) return;
         const taskId = draggableId.split('-')[1];
@@ -102,16 +91,12 @@ const TasksList = React.memo((props) => {
 
             const [removed] = reorderedTasks.splice(source.index, 1); // Remove task from the source position
             reorderedTasks.splice(destination.index, 0, removed); // Add task to the destination position
-
-
-
             // Update the state with the reordered tasks
             setTasksLists({
                 ...taskslists,
                 [sourceTabId]: { ...taskslists[sourceTabId], tasks: reorderedTasks }
             });
             
-           
             const tasksToUpdate =
             {
                 task_id: taskId,
@@ -124,12 +109,9 @@ const TasksList = React.memo((props) => {
             // Handle moving between different tabs
             const sourceTasks = Array.from(taskslists[sourceTabId].tasks);
             const destinationTasks = Array.from(taskslists[destinationTabId].tasks);
-
             replacedTaskId = destinationTasks[destination.index]?._id;
-
             const [movedTask] = sourceTasks.splice(source.index, 1); // Remove task from the source tab
             destinationTasks.splice(destination.index, 0, movedTask); // Add task to the destination tab
-
             // Update the state for both source and destination tabs
             setTasksLists({
                 ...taskslists,
@@ -146,7 +128,6 @@ const TasksList = React.memo((props) => {
 
             }
             dispatch(reorderTasks({ tasks: tasksToUpdate }));
-
         }
     };
 
@@ -157,7 +138,6 @@ const TasksList = React.memo((props) => {
     };
 
     const handleTasksubmit = async (e) => {
-
         e.preventDefault(); 
         if( e.type === "submit"){
             const formElements = e.target.elements;
@@ -247,7 +227,6 @@ const TasksList = React.memo((props) => {
                                                             e.stopPropagation()
                                                             handleTasksubmit(e)
                                                             //closetask(tab._id)
-
                                                         }}>
                                                             <Form.Group className="mb-0 form-group">
                                                                 <FloatingLabel label="Task Title *">

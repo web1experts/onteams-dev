@@ -119,23 +119,11 @@ function ProjectsPage() {
                     ...prevFields, // Retain the existing properties of fields
                     ...commonState.projectForm // Merge properties from commonState.projectForm
                 };
-
-                // Log updated fields for debugging
-                // console.log("Updated Fields:", updatedFields);
-
                 return updatedFields; // Return the new state
             });
 
         }
     }, [projectform]);
-
-
-
-    // Function to remove the last member
-    // const removeMember = (member) => {
-    //     delete fields['members'][member]
-    //     dispatch(updateStateData(PROJECT_FORM, { members: fields['members'] || {} }))
-    // };
 
     const [isdescEditor, setIsDescEditor] = useState(false);
     const [isTaskEditor, setIsTaskEditor] = useState(false);
@@ -171,10 +159,8 @@ function ProjectsPage() {
             if (isActive !== 2 && isActive !== 1) {
                 setCurrentProject({})
             }
-
             setselectedMembers({})
             setImagePreviews([])
-
         }
         setShow(true);
     }
@@ -198,7 +184,6 @@ function ProjectsPage() {
     const [showFilter, setFilterShow] = useState(false);
     const handleFilterClose = () => setFilterShow(false);
     const handleFilterShow = () => setFilterShow(true);
-
     const [showSearch, setSearchShow] = useState(false);
     const handleSearchClose = () => setSearchShow(false);
     const handleSearchShow = () => setSearchShow(true);
@@ -210,7 +195,6 @@ function ProjectsPage() {
         setFiletoPreview(file)
         setPreviewShow(true)
     };
-
     useEffect(() => {
         if (currentProject && Object.keys(currentProject).length > 0 && isActive !== 2) {
             handleStatusClose()
@@ -268,7 +252,6 @@ function ProjectsPage() {
         const selectedFiles = commonState.projectForm.images
         const updatedSelectedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
         const updatedImagePreviews = imagePreviews.filter((_, index) => index !== indexToRemove);
-        // setSelectedFiles(updatedSelectedFiles);
         dispatch(updateStateData(PROJECT_FORM, { images: updatedSelectedFiles }))
         setImagePreviews(updatedImagePreviews);
     };
@@ -277,7 +260,6 @@ function ProjectsPage() {
         setProjects([])
         handleListProjects()
         setSpinner(true)
-
     }, [])
 
     useEffect(() => {
@@ -331,8 +313,6 @@ function ProjectsPage() {
             setTotal(projectFeed.total)
         }
     }, [projectFeed])
-
-
 
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
@@ -392,11 +372,8 @@ function ProjectsPage() {
                 }
             }
             let payload = formData;
-
-
             await dispatch(createProject(payload))
             setLoader(false)
-
         }
     }
 
@@ -469,7 +446,6 @@ function ProjectsPage() {
 
 
     const renderPreview = (type, preview, index) => {
-
         const { src, _id } = preview;
         const mimetype = (preview.mimetype) ? preview.mimetype : src.split('.').pop().toLowerCase();
         const previewComponents = {
@@ -540,10 +516,8 @@ function ProjectsPage() {
         setCurrentProject(project)
     }
 
-
     const handleDragEnd = (result) => {
         const { source, destination, draggableId } = result;
-
         // If there's no destination (i.e., the item was dropped outside), do nothing
         if (!destination) return;
 
@@ -553,7 +527,6 @@ function ProjectsPage() {
 
         // Clone the projects array to avoid mutating the state directly
         let reorderedProjects = [...projects];
-
         if (sourceTabId === destinationTabId) {
             // If the task was moved within the same tab, reorder the tasks
             const [removed] = reorderedProjects.splice(source.index, 1); // Remove task from the source position
@@ -563,7 +536,6 @@ function ProjectsPage() {
             const [removed] = reorderedProjects.splice(source.index, 1); // Remove from source tab
             reorderedProjects.splice(destination.index, 0, removed); // Add to destination tab
         }
-
         // Generate a list of newly ordered projects
         const newOrder = reorderedProjects.map((project, index) => ({
             project_id: project._id, // Adjust this if your project ID key is different
@@ -572,7 +544,6 @@ function ProjectsPage() {
 
         // Dispatch the action with the new order
         dispatch(reorderedProject({ projects: newOrder, filters: filters }));
-
         // Update the state with reordered projects
         setProjects(reorderedProjects);
     };
@@ -592,14 +563,12 @@ function ProjectsPage() {
             setProjects((prevProjects) => {
                 // Create a new array from the previous projects
                 const updatedProjects = [...prevProjects];
-
                 // Access the project at index 1
                 const projectToUpdate = updatedProjects[index];
 
                 if (projectToUpdate) {
                     // Remove the memberId from the marked_by array
                     const updatedMarkedBy = projectToUpdate.marked_by.filter(id => id !== memberdata._id);
-
                     // Update the project's marked_by column
                     updatedProjects[index] = {
                         ...projectToUpdate,
@@ -617,14 +586,12 @@ function ProjectsPage() {
         } else {
             dispatch(updateProject(project._id, { marked: true }))
         }
-
     }
 
     const handlePaste = (e) => {
         const pastedData = e.clipboardData.getData('text');
         console.log('Pasted content:', pastedData);
         pasteOccurred.current = true; // Set the paste flag to true
-
         setTimeout(function () {
             pasteOccurred.current = false;
         }, 500)
@@ -636,7 +603,6 @@ function ProjectsPage() {
             const editor = quillRef.current.getEditor();
             editor.root.addEventListener('paste', handlePaste);
         }
-
         // Cleanup the event listener on unmount
         return () => {
             if (quillRef.current) {
@@ -808,9 +774,7 @@ function ProjectsPage() {
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
-                            <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={true} members={currentProject?.members || []} showAssignBtn={true} postId={currentProject?._id} type="project"
-                            //  onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `remove-member-${currentProject._id}-${memberid}`)}
-                            />
+                            <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={true} members={currentProject?.members || []} showAssignBtn={true} postId={currentProject?._id} type="project"/>
                         }
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
@@ -898,14 +862,12 @@ function ProjectsPage() {
                                             onKeyDown={handleKeyDown}
                                             ref={quillRef}
                                         />
-
                                     </div>
                                 </Form.Group>
                                 <Form.Group className="mb-0 form-group pb-0">
                                     <Form.Label>
                                         <small>Start/Due Date</small>
                                     </Form.Label>
-
                                     <Row>
                                         {(!fields?.start_date && !fields?.due_date) ? (
                                             <label
@@ -944,7 +906,6 @@ function ProjectsPage() {
                                                 )}
                                             </label>
                                         )}
-
                                         <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                     </Row>
                                 </Form.Group>
@@ -956,12 +917,9 @@ function ProjectsPage() {
                                 <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
                                 <p className="m-0">
                                     {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                        <MemberInitials directUpdate={false} key={`MemberNames-header-new`} showall={true} members={fields['members']} showAssignBtn={false} postId="new" type="project" showRemove={true}
-                                        // onMemberClick={(memberid, extraparam = false) =>  removeMember(memberid)}
-                                        />
+                                        <MemberInitials directUpdate={false} key={`MemberNames-header-new`} showall={true} members={fields['members']} showAssignBtn={false} postId="new" type="project" showRemove={true} />
                                     )}
                                 </p>
-
                                 <ListGroup.Item onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
                                 <div className="output--file-preview">
                                     <div className="preview--grid">
@@ -1014,7 +972,6 @@ function ProjectsPage() {
                                 <option value="my">My Projects</option>
                             </Form.Select>
                         </ListGroup.Item>
-
                         <ListGroup.Item key="member-filter-list">
                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'} >
                                 {
@@ -1056,7 +1013,6 @@ function ProjectsPage() {
                     </ListGroup>
                 </Modal.Body>
             </Modal>
-            {/*--=-=File Preview Modal**/}
             <>
                 <AlertDialog
                     showdialog={showdialog}
@@ -1068,5 +1024,4 @@ function ProjectsPage() {
         </>
     );
 }
-
 export default ProjectsPage;

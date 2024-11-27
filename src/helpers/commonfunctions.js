@@ -284,3 +284,28 @@ const getDayWithSuffix = (day) => {
     return `${day}${suffix(day)} ${month} ${year}`;
   }
   };
+
+  export const showAmPmtime = (timestamp) => {
+    // Create a new Date object
+    const date = new Date(timestamp);
+
+    // Use Intl.DateTimeFormat to format the time
+    const timeFormat = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+    });
+
+    // Format the date object to the desired format
+    const formattedTime = timeFormat.format(date);
+
+    // Round the time to the nearest 30-minute interval
+    const [hours, minutes] = formattedTime.split(':').map(Number);
+
+    // Round the minutes to the nearest 30-minute mark
+    const roundedMinutes = minutes < 30 ? 0 : 30;
+
+    // Format the new time with rounded minutes
+    const roundedTime = `${hours.toString().padStart(2, '0')}:${roundedMinutes.toString().padStart(2, '0')} ${formattedTime.includes('AM') ? 'AM' : 'PM'}`;
+    return roundedTime;
+  }
