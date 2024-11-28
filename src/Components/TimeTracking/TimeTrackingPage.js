@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown } from "react-bootstrap";
-import { Fullscreen } from "yet-another-react-lightbox/dist/plugins/Fullscreen";
+import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck } from "react-icons/fa";
 import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
@@ -29,7 +29,8 @@ function TimeTrackingPage() {
   const [screenshotTab, setScreenshotTab] = useState({});
   const [activeInnerTab, setActiveInnerTab] = useState("InnerLive");
   const [open, setOpen] = useState(false);
-  const [postMedia, setPostMedia] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [postMedia, setPostMedia] = useState([]);
   const activitystate = useSelector((state) => state.activity)
   const [liveactivities, setLiveactivities] = useState([])
   const [ recordedactivities, setRecordedActivities] = useState([])
@@ -101,6 +102,7 @@ function TimeTrackingPage() {
         handleLiveActivityList()
     }
   }, [filters])
+
 
   useEffect(() => {
     refreshSocket()
@@ -190,9 +192,29 @@ function TimeTrackingPage() {
     }
   }
 
-  const handleLightBox = (media) => {
-    const data = [{ src: media }];
-    setPostMedia(data)
+  const handleLightBox = (type, mediaItems, index) => {
+    setCurrentIndex(index);
+    const slides =
+    Array.isArray(mediaItems) && mediaItems.length > 0
+      ? mediaItems.map((item) => {
+          if (type === "video") {
+            return {
+              type: "video",
+              src: item.url,
+              poster: null, // Optional, for a thumbnail or video preview
+              videoProps: {
+                controls: true,
+                autoPlay: false, // Set to true if you want videos to start automatically
+                style: { maxHeight: "90vh", maxWidth: "100%" },
+              },
+            };
+          }
+          return { type: "image", src: item.url }; // Default case for images
+        })
+      : [];
+
+    // const data = slides;
+    setPostMedia(slides)
     setOpen(true)
   }
   
@@ -201,7 +223,7 @@ function TimeTrackingPage() {
   }, [activeTab])
 
   useEffect(() => {
-    console.log('activeInnerTab: ', activeInnerTab)
+  
     if( activeInnerTab === "InnerRecorded"){
       handleRecordedActivity()
     }
@@ -346,8 +368,28 @@ function TimeTrackingPage() {
         slides={postMedia}
         plugins={[Fullscreen]}
         fullscreen={{ ref: fullscreenRef }}
+        index={currentIndex}
         on={{
           click: () => fullscreenRef.current?.enter(),
+        }}
+        render={{
+          slide: ({slide}) => {
+            if (slide?.type === "video") {
+              return (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <video
+                    controls
+                    autoPlay={false}
+                    style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                  >
+                    <source src={slide.src} type="video/webm" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              );
+            }
+            return null; // Default render for images will be used
+          },
         }}
       />
 
@@ -611,7 +653,7 @@ function TimeTrackingPage() {
                                         className="card-img-top"
                                         src={screenshotData?.url}
                                         alt="Card image cap"
-                                        onClick={() => handleLightBox(screenshotData?.url)}
+                                        onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
                                       />
                                       <p>
                                         <strong>Task Name:</strong> {recording.task?.title} <br />
@@ -629,7 +671,7 @@ function TimeTrackingPage() {
                               ) {
                                 return meta.meta_value.map((videoData, j) => (
                                   <Card key={`video-card-${i}-${j}`}>
-                                    <Card.Body>
+                                    <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
                                       <video controls height="175px">
                                         <source src={videoData?.url} type="video/webm" />
                                         Your browser does not support the video tag.

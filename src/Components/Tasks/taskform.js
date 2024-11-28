@@ -233,7 +233,7 @@ export const TaskForm = () => {
             for (let i = 0; i < selectedFiles.length; i++) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const fileExtension = selectedFiles[i].name.split('.').pop().toLowerCase();
+                    const fileExtension = selectedFiles[i].name?.split('.').pop().toLowerCase();
                     previews.push({
                         src: e.target.result,
                         file: selectedFiles[i],
@@ -291,7 +291,7 @@ export const TaskForm = () => {
     const renderPreview = (type, preview, index) => {
 
         const { src, _id } = preview;
-        const mimetype = (preview.mimetype) ? preview.mimetype : src.split('.').pop().toLowerCase();
+        const mimetype = (preview.mimetype) ? preview.mimetype : src?.split('.').pop().toLowerCase();
         const previewComponents = {
             image: (
                 <div className="preview--cell">

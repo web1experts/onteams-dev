@@ -988,6 +988,8 @@ table tr.marked-project td {
 .table>:not(caption)>*>* {
   border-top-width: var(--bs-border-width);
   margin-bottom: -1px;
+  border-bottom-width: var(--bs-border-width);
+  box-shadow: none;
 }
 
 .project--grid--table>:not(caption)>*>* {
@@ -997,15 +999,10 @@ table tr.marked-project td {
 
 .show--details .table>:not(caption)>*>*, .view--project .table>:not(caption)>*>*, .view--invitee .table>:not(caption)>*>* {
   border-top-width: var(--bs-border-width);
-  margin-bottom: -1px;
+  margin-bottom: 0;
   border-top-color: #eeeeee;
+  border-bottom-width: 0;
 }
-
-/* .show--details .table tr.project--active+tr td,
-.view--project .table tr.project--active+tr td {
-  border-top-width: 1px !important;
-  border-bottom-width: 1px !important;
-} */
 
 .show--details .g-4,
 .view--project .g-4 {

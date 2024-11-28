@@ -3,7 +3,7 @@ import Select2 from 'react-select2-wrapper';
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Badge, Dropdown, CardGroup } from "react-bootstrap";
-import { Fullscreen } from "yet-another-react-lightbox/dist/plugins/Fullscreen";
+import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaAngleRight, FaPlay, FaCheck } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
 import { selectboxObserver } from "../../helpers/commonfunctions";
