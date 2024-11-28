@@ -558,12 +558,11 @@ function TeamMembersPage() {
                       memberFeeds.map((member, idx) => (
                         <tr key={`member-table-row-${idx}`} className={member._id === selectedMember?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(member) : () => { return false; }}>
                           {/* <td>{idx + 1}</td> */}
-                          <td className="cursor--pointer">
-                            <abbr>{idx + 1}.</abbr>
+                          <td className="cursor--pointer project--title--td">
                             <span className="onHide">
                               <img variant="top" src={member.avatar || "./images/default.jpg"} />
                             </span>
-                            {member.name}
+                            <span><abbr>{idx + 1}.</abbr> {member.name}</span>
                           </td>
                           <td className="onHide">
                             {member.role?.name}

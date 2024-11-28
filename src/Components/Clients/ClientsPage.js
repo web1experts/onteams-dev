@@ -445,7 +445,7 @@ function ClientsPage() {
                       return (<>
                         <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={isActive ? () => handleClick(client) : () => { return false; }}>
                           {/* <td>{index + 1}</td> */}
-                          <td className="cursor--pointer"><abbr>{index + 1}.</abbr><span className="onHide"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span>{client.name}</td>
+                          <td className="cursor--pointer project--title--td"><span className="onHide"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span><span><abbr>{index + 1}.</abbr> {client.name}</span></td>
                           <td className="onHide"><Button variant="primary" onClick={() => handleClick(client)}>View</Button></td>
                         </tr>
                       </>)

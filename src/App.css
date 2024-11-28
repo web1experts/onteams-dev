@@ -331,6 +331,7 @@ body {
   line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  position: relative
 }
 
 .page--wrapper .clients--grid--table td.project--title--td span {
@@ -522,6 +523,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   padding-bottom: 0;
   display: flex;
   flex: 1 1;
+  max-width: 100%;
 }
 
 .project--form--actions .list-group:last-child {
@@ -530,6 +532,15 @@ button.input-error.dropdown-toggle.btn.btn-success {
   position: sticky;
   position: -webkit-sticky;
   bottom: 0;
+}
+
+.project--form--actions .members--list, .project--form--actions .members--list:last-child {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  scrollbar-width: auto;
+  flex: 1 1;
+  flex-flow: row wrap;
 }
 
 .project--form--actions .list-group+.list-group .list-group-item {
@@ -970,12 +981,31 @@ table tr.marked-project td {
   border-bottom-color: #6FCCB8 !important;
   border-top-color: #6FCCB8 !important;
   margin-bottom: 0 !important;
+  border-top-width: 1px !important;
+  border-bottom-width: 1px !important;
 }
 
-.show--details .table tr.project--active+tr td,
+.table>:not(caption)>*>* {
+  border-top-width: var(--bs-border-width);
+  margin-bottom: -1px;
+}
+
+.project--grid--table>:not(caption)>*>* {
+  border-top-width: 0;
+  margin-bottom: 0;
+}
+
+.show--details .table>:not(caption)>*>*, .view--project .table>:not(caption)>*>*, .view--invitee .table>:not(caption)>*>* {
+  border-top-width: var(--bs-border-width);
+  margin-bottom: -1px;
+  border-top-color: #eeeeee;
+}
+
+/* .show--details .table tr.project--active+tr td,
 .view--project .table tr.project--active+tr td {
   border-top-width: 1px !important;
-}
+  border-bottom-width: 1px !important;
+} */
 
 .show--details .g-4,
 .view--project .g-4 {
@@ -993,7 +1023,7 @@ table tr.marked-project td {
 
 .show--details .table .onHide,
 .view--project .table .onHide,
-.view--invitee .table .onHide {
+.view--invitee .table .onHide, .clients--table tr td img {
   display: none;
 }
 
@@ -1458,7 +1488,7 @@ table tr.marked-project td {
   flex: none;
   display: inline-block;
   background: none;
-  margin-bottom: 0;
+  margin-bottom: 5px;
   margin-right: -5px;
   border: 0;
 }
@@ -1810,6 +1840,8 @@ Project Task View CSS=-=-=
   border: 1px solid #00000010;
   flex-flow: row wrap;
   font-weight: 500;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .projects--grid .task--list ul .task--button form {
@@ -1825,6 +1857,11 @@ Project Task View CSS=-=-=
 
 .projects--grid .task--list ul .task--button .form-group .form-floating {
   flex: 1 1;
+}
+
+.projects--grid .task--list ul .task--button .form-control:disabled {
+  background-color: transparent;
+  opacity: 1;
 }
 
 .projects--grid .task--list ul .task--button .form-floating>.form-control:focus~label,
@@ -2459,15 +2496,19 @@ pre {
   border-top-right-radius: 50px;
 }
 
-.activity--table table .status--circle {
+.page--wrapper.activity--table table .status--circle, .show--details .page--wrapper .activity--table .project--title--td .status--circle, 
+.view--project .page--wrapper .activity--table .project--title--td .status--circle, .view--invitee .page--wrapper .activity--table .project--title--td .status--circle {
   width: 8px;
   height: 8px;
+  margin: auto;
   margin-left: 0.25rem;
   border-radius: 100px;
   -webkit-border-radius: 100px;
   display: inline-block;
   vertical-align: middle;
-  margin-top: 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
 }
 
 .activity--table table .active--color {
@@ -2506,13 +2547,15 @@ pre {
   overflow: hidden;
 }
 
-.show--details table td .status--circle,
-.view--project table td .status--circle {
+.show--details .page--wrapper table td.project--title--td .status--circle,
+.view--project .page--wrapper table td.project--title--td .status--circle {
   position: absolute;
-  right: 0;
+  right: 10px;
   top: 0;
   bottom: 0;
   margin: auto;
+  width: 8px;
+  height: 8px;
 }
 
 .activity--tabs .select2-container {
@@ -2649,6 +2692,10 @@ pre {
   display: inline-block;
 }
 
+.screens--tabs p {
+  flex: 1 1;
+}
+
 .screens--tabs p,
 .screens--tabs p small {
   font-size: 0.85rem;
@@ -2664,7 +2711,7 @@ pre {
 
 .screens--tabs p strong {
   display: block;
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
 .activity--box .card-group {
@@ -2685,7 +2732,7 @@ pre {
   margin-bottom: 0;
   padding: 0;
   flex: 1 1 100%;
-  max-width: calc(20% - 10px);
+  max-width: calc(16.6666% - 10px);
 }
 
 .activity--box .card img.card-img-top {
@@ -2697,12 +2744,18 @@ pre {
 }
 
 .activity--box .card .card-body {
-  padding: 0.25rem;
-  border: 1px solid rgba(0, 0, 0, .125);
+  padding: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, .15);
   border-radius: 0.25rem;
   -webkit-border-radius: 0.25rem;
   cursor: pointer;
   position: relative;
+  max-width: 100%;
+}
+
+.activity--box .card .card-body video, .activity--box .card .card-body iframe, .activity--box .card .card-body img {
+  max-width: 100%;
+  object-fit: cover;
 }
 
 .activity--box .card .card-body p {
@@ -2890,6 +2943,10 @@ pre {
 
 .dashboard--page h2 {
   font-size: 3rem;
+}
+
+.dashboard--page img {
+  max-width: 700px;
 }
 
 .dashboard--page .btn--group {
@@ -3118,6 +3175,10 @@ pre {
   display: block;
 }
 
+.page--wrapper .project--grid--table th abbr, .page--wrapper .project--grid--table td abbr {
+  display: none;
+}
+
 .project--grid--table tbody {
   display: flex;
   flex-flow: row wrap;
@@ -3149,6 +3210,13 @@ pre {
 
 .project--table tr.no--invite {
   max-width: 100%;
+}
+
+.project--table tr.no--invite td, .project--table tr.no--invite td:last-child {
+  min-width: 100%;
+  width: 100%;
+  max-width: 100%;
+  flex: 1 1;
 }
 
 .project--grid--table td+td {
@@ -3235,8 +3303,6 @@ pre {
   display: table-cell;
   border-bottom: 1px solid #eeeeee;
   text-align: left;
-  /* text-overflow: ellipsis; */
-  /* white-space: nowrap; */
   overflow: hidden;
   max-width: 190px;
   padding: .4rem .5rem;
@@ -3248,7 +3314,7 @@ pre {
   display: table;
 }
 
-.clients--table td span {
+.clients--table td.project--title--td span.onHide {
   display: none;
 }
 
@@ -3271,7 +3337,7 @@ pre {
   text-align: center !important;
 }
 
-.clients--grid--table td span {
+.page--wrapper .clients--grid--table td span img, .page--wrapper .clients--grid--table td.project--title--td span img {
   border-radius: 100px;
   -webkit-border-radius: 100px;
   height: 130px;
@@ -3374,22 +3440,6 @@ pre {
   max-width: 400px;
 }
 
-.table>:not(caption)>*>* {
-  border-top-width: var(--bs-border-width);
-  margin-bottom: -1px;
-}
-
-.project--grid--table>:not(caption)>*>* {
-  border-top-width: 0;
-  margin-bottom: 0;
-}
-
-.show--details .table>:not(caption)>*>*, .view--project .table>:not(caption)>*>*, .view--invitee .table>:not(caption)>*>* {
-  border-top-width: var(--bs-border-width);
-  margin-bottom: -1px;
-  border-top-color: #eeeeee;
-}
-
 /*-=-=-=-==-=-
 Media CSS-=-==
 ==-=-=-=-=-*/
@@ -3412,6 +3462,10 @@ Media CSS-=-==
 
   .details--projects--view .project--form--actions {
     max-width: 25%;
+  }
+
+  .project--grid--table tr, .activity--box .card-group .card {
+    max-width: calc(20% - 8px);
   }
 }
 
@@ -3455,6 +3509,10 @@ Media CSS-=-==
     flex: none;
     min-width: 170px;
   }
+
+  .project--grid--table tr, .activity--box .card-group .card {
+    max-width: calc(25% - 8px);
+  }
 }
 
 @media screen and (max-width:1199px) {
@@ -3470,7 +3528,9 @@ Media CSS-=-==
     min-width: 100px;
   }
 
-  .projects--page .table .list-group-item .team--initial, .projects--page .table .list-group-item .team--image, .projects--page .table .list-group-item .btn, .project--form--actions .list-group-item .team--initial, .tasks-form-action .list-group-item .team--initial {
+  .projects--page .table .list-group-item .team--initial, .projects--page .table .list-group-item .team--image, 
+  .projects--page .table .list-group-item .btn, .project--form--actions .list-group-item .team--initial, 
+  .tasks-form-action .list-group-item .team--initial {
     width: 30px;
     height: 30px;
   }
@@ -3530,8 +3590,8 @@ Media CSS-=-==
   }
 
   .activity--box .card .card-body {
-    padding: 0.25rem;
-    border: 1px solid rgba(0, 0, 0, .125);
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, .15);
     border-radius: 0.25rem;
     -webkit-border-radius: 0.25rem;
   }
@@ -3601,7 +3661,7 @@ Media CSS-=-==
   }
 
   .page--wrapper table td.project--title--td span {
-    max-width: 150px;
+    max-width: 100%;
   }
 
   .page--wrapper .draggable--table th:nth-child(2),
@@ -3825,7 +3885,7 @@ Media CSS-=-==
     top: .5rem;
   }
 
-  .clients--table td span {
+  .clients--table td span img {
     border-radius: 100px;
     -webkit-border-radius: 100px;
     height: 130px;
@@ -3858,6 +3918,7 @@ Media CSS-=-==
 
   .page--wrapper table td.project--title--td span {
     max-width: 100%;
+    /* width: auto; */
   }
 
   .activity--table tr.mobile--hide {
@@ -3868,6 +3929,12 @@ Media CSS-=-==
   .view--project table,
   .view--invitee table {
     display: table;
+  }
+
+  .show--details .project--table td:first-child abbr,
+  .view--project .project--table td:first-child abbr,
+  .view--invitee .project--table td:first-child abbr {
+    display: inline-block;
   }
 
   .show--details table thead,
@@ -3954,6 +4021,14 @@ Media CSS-=-==
   .details--member--view,
   .details--invitee--view {
     padding-bottom: 1rem;
+  }
+
+  .clients--table td.project--title--td span.onHide {
+    display: block;
+  }
+
+  .show--details .clients--table td.project--title--td span.onHide {
+    display: none;
   }
 }
 

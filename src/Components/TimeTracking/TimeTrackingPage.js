@@ -408,21 +408,23 @@ function TimeTrackingPage() {
                             <>
                               <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
                                 {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                <td data-label="Member Name" onClick={() => {
+                                <td data-label="Member Name" className="project--title--td" onClick={() => {
                                       if (isActive) {
                                         leaveRoom(currentActivity?._id)
                                         setCurrentActivity(activity);
                                       }
-                                  }} ><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name} 
-                                  {
-                                    activity?.latestActivity?.status ? 
-                                    <span className="status--circle active--color"></span>
-                                    :
-                                    activity?.latestActivity?.status === false  ?
-                                    <span className="status--circle info--color"></span>
-                                    :
-                                    null
-                                  }
+                                  }} >
+                                    <span><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name}
+                                      {
+                                        activity?.latestActivity?.status ? 
+                                        <small className="status--circle active--color"></small>
+                                        :
+                                        activity?.latestActivity?.status === false  ?
+                                        <small className="status--circle info--color"></small>
+                                        :
+                                        null
+                                      }
+                                    </span>
                                 </td>
                                 <td data-label="Project Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
                                 <td data-label="Task Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title || '--' }</span></td>

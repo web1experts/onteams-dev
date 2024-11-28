@@ -702,9 +702,9 @@ ul#subtasks-ul li textarea.form-control+button {
     padding: 0;
 }
 
-.rmdp-ep-arrow+div, .modal .rmdp-input+div {
-    position: relative !important;
-    transform: none !important;
+.rmdp-container {
+    position: relative;
+    z-index: 111111;
 }
 
 .rmdp-calendar {
@@ -726,6 +726,15 @@ ul#subtasks-ul li textarea.form-control+button {
     margin-top: 10px;
     border: 0;
     padding: 0;
+    width: 100%;
+}
+
+.page--title .rmdp-wrapper, .page--title .rmdp-wrapper.form-control {
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    margin-top: 10px;
+    border: 0;
+    padding: 10px;
     width: 100%;
 }
 
