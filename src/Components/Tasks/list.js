@@ -204,8 +204,11 @@ const TasksList = React.memo((props) => {
                                         <Button
                                             variant="primary"
                                             onClick={() => {
-                                                setFields({ title: '', tab: tab._id, project_id: currentProject?._id, order: 0 })
-                                                setShowtaskform({ [tab._id]: true })
+                                                if( !showtaskform[tab._id] || showtaskform[tab._id] === false ){
+                                                    setFields({ title: '', tab: tab._id, project_id: currentProject?._id, order: 0 })
+                                                    setShowtaskform({ [tab._id]: true })
+                                                }
+                                               
                                             }}
                                         >
                                             <FaPlus />
