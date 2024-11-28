@@ -287,15 +287,14 @@ const getDayWithSuffix = (day) => {
 
   export const showAmPmtime = (timestamp) => {
     // Create a new Date object
-    const date = new Date(timestamp);
-
+    const date = typeof timestamp === "undefined" ? new Date() : new Date(timestamp);
+console.log('DAte:: ', date)
     // Use Intl.DateTimeFormat to format the time
     const timeFormat = new Intl.DateTimeFormat('en-US', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true
     });
-
     // Format the date object to the desired format
     const formattedTime = timeFormat.format(date);
 

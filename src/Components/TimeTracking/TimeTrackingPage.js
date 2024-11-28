@@ -26,7 +26,7 @@ function TimeTrackingPage() {
   const dispatch = useDispatch()
   const fullscreenRef = React.useRef(null);
   const [activeTab, setActiveTab] = useState("Live");
-  const [screenshotTab, setScreenshotTab] = useState("Screenshots");
+  const [screenshotTab, setScreenshotTab] = useState({});
   const [activeInnerTab, setActiveInnerTab] = useState("InnerLive");
   const [open, setOpen] = useState(false);
   const [postMedia, setPostMedia] = useState('');
@@ -70,7 +70,7 @@ function TimeTrackingPage() {
 
   const handleRecordedActivity = async () => {
     setSpinner(true)
-    await dispatch(getRecoredActivity(currentActivity._id, screenshotTab.toLocaleLowerCase()))
+    await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
       setSpinner(false)
   }
 
@@ -89,8 +89,10 @@ function TimeTrackingPage() {
   }
 
   useEffect(() => { 
-    if(currentActivity !== false ){ 
+    if(currentActivity !== false && activeTab === "Live"){ 
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
+    }else if(currentActivity !== false && activeTab === "Recorded"){
+      setActiveInnerTab("InnerRecorded")
     }
   },[currentActivity])
 
@@ -205,9 +207,9 @@ function TimeTrackingPage() {
     }
   }, [activeInnerTab])
 
-  useEffect(() => {
-    handleRecordedActivity();
-  }, [screenshotTab])
+  // useEffect(() => {
+  //   handleRecordedActivity();
+  // }, [screenshotTab])
 
   const showTabs = () => {
     if (activeTab === 'Recorded') {
@@ -333,6 +335,9 @@ function TimeTrackingPage() {
     }
   }
 
+  const getActiveTab = (recordingId) => screenshotTab[recordingId] || "Screenshots";
+
+
   return (
     <>
       <Lightbox
@@ -420,7 +425,7 @@ function TimeTrackingPage() {
                                   }
                                 </td>
                                 <td data-label="Project Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
-                                <td data-label="Task Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.task || '--' }</span></td>
+                                <td data-label="Task Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title || '--' }</span></td>
                                 <td data-label="Task Time" className="onHide">{ formattotalTime(activity?.latestActivity?.duration) || '00:00'}</td>
                                 <td data-label="Total Time" className="onHide">{ formattotalTime(activity?.totalDuration) || '00:00'}</td>
                                 <td data-label="Status" className="onHide">
@@ -471,12 +476,38 @@ function TimeTrackingPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr key={'recorded-row'}>
-                      {/* <td>1</td> */}
-                      <td data-label="Member Name"><abbr>1</abbr> Hitesh Kumar <span className="status--circle active--color"></span></td>
-                      <td data-label="Total Time" className="onHide">05 hrs 00 min</td>
-                      <td className="onHide text-lg-end"><Button variant="primary" onClick={handleClick}>View Activity</Button></td>
-                    </tr>
+                  {
+                      liveactivities.length > 0 ?
+                        liveactivities.map((activity, index) => {
+                          totalhours += Number(activity?.totalDuration || 0)
+                          totalProjecthours += Number(activity?.latestActivity?.duration || 0)
+                          return (
+                            <>
+                              <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
+                                {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                <td data-label="Member Name" onClick={() => {
+                                      if (isActive) {
+                                        setCurrentActivity(activity);
+                                      }
+                                  }} ><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name} 
+                                  
+                                </td>
+                                
+                                <td data-label="Total Time" className="onHide">{ formattotalTime(activity?.totalDuration) || '00:00'}</td>
+                                
+                                <td className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
+                              </tr>
+                              
+                            </>
+                          )
+                        })
+                        :
+                        !spinner && liveactivities.length === 0  &&
+                          <tr key={`noresults-row`}>
+                            <td colSpan={8} className="text-center"><h3>No Results</h3> </td>
+                          </tr>
+                    }
+                    
                   </tbody>
                 </Table>
               </>
@@ -516,7 +547,7 @@ function TimeTrackingPage() {
             <>
               <div className="current--player p-2" key={`activity-${currentActivity?._id}`}>
                 <div className="timer--task">
-                  <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task || '--' }</small></h5>
+                  <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
                   <span className="ml-3 p-2">{ currentActivity?.latestActivity?.app_version}</span>
                   <p className="task--timer">
                     <span><strong>{ formattotalTime(currentActivity?.totalDuration) || '00:00'}</strong></span>
@@ -542,114 +573,87 @@ function TimeTrackingPage() {
           )}
           {activeInnerTab === "InnerRecorded" && (
             <>
-              {screenshotTab === "Screenshots" && (
-                <>
-                  {
-                  recordedactivities && recordedactivities.length > 0 ? 
-                    recordedactivities.map((recording, index) => {
-                      return (
-                      <>
-                        <div className="wrapper--title screens--tabs">
-                          <p><span>Project: {recording?.project?.title}</span><strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong></p>
-                          <ListGroup horizontal>
-                            <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
-                              Screenshots
-                            </ListGroup.Item>
-                            <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
-                              Videos
-                            </ListGroup.Item>
-                          </ListGroup>
-                        </div>
+              {
+                recordedactivities && recordedactivities.length > 0 ? 
+                  recordedactivities.map((recording, index) => {
+                    return (
+                    <>
+                      <div className="wrapper--title screens--tabs">
+                        <p><span>Project: {recording?.project?.title}</span><strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong></p>
+                        <ListGroup horizontal>
+                          <ListGroup.Item key={'screenshots1-tab-key'} action active={!screenshotTab[recording._id] || screenshotTab[recording._id] && screenshotTab[recording._id] === "Screenshots"} onClick={() => setScreenshotTab({...screenshotTab, [recording._id]: "Screenshots"})}>
+                            Screenshots
+                          </ListGroup.Item>
+                          <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab[recording._id] && screenshotTab[recording._id] === "Videos"} onClick={() => setScreenshotTab({...screenshotTab, [recording._id]: "Videos"})}>
+                            Videos
+                          </ListGroup.Item>
+                        </ListGroup>
+                      </div>
 
-                        <div className="shots--list pt-3">
-                          <CardGroup>
+                      <div className="shots--list pt-3">
+                      <CardGroup>
                           {
-                            recording?.activityMeta && recording?.activityMeta.length > 0 &&
+                            recording?.activityMeta &&
+                            recording.activityMeta.length > 0 &&
                             recording.activityMeta.map((meta, i) => {
-                              // Check if meta_key is 'videos'
-                              if (meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
+                              // Handle screenshots tab
+                              if (
+                                getActiveTab(recording._id) === "Screenshots" &&
+                                meta.meta_key === 'screenshots' &&
+                                meta.meta_value.length > 0
+                              ) {
                                 return meta.meta_value.map((screenshotData, j) => (
-
-                                  <Card key={`card-${i}-${j}`}>
+                                  <Card key={`screenshot-card-${i}-${j}`}>
                                     <Card.Body>
-                                        <img className="card-img-top" src={ screenshotData?.url } alt="Card image cap" onClick={() => handleLightBox(`${screenshotData?.url}`)} />
-                                        <p><strong>Task Name:</strong> {recording.task?.title} <br /><strong>Time:</strong> {showAmPmtime(`${screenshotData?.taken_time}`)}</p>
-                                      </Card.Body>
-                                  </Card>
-                                ));
-                              }
-                              return null; // Return null if meta_key is not 'videos'
-                            })
-                          }
-                          </CardGroup>
-                        </div>
-                      </>
-                      )
-                    })
-                    
-
-                  :
-                  null
-                }
-                  
-                </>
-              )}
-              {screenshotTab === "Videos" && (
-                <>
-                {
-                  recordedactivities && recordedactivities.length > 0 ? 
-                    recordedactivities.map((recording, index) => {
-                      return (
-                      <>
-                        <div className="wrapper--title screens--tabs">
-                          <p><span>Project: {recording?.project?.title}</span><strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong><small>{ formattotalTime(recording?.duration) || '00:00'}</small></p>
-                          <ListGroup horizontal>
-                            <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
-                              Screenshots
-                            </ListGroup.Item>
-                            <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
-                              Videos
-                            </ListGroup.Item>
-                          </ListGroup>
-                        </div>
-
-                        <div className="shots--list pt-3">
-                          <CardGroup>
-                          {
-                            recording?.activityMeta && recording?.activityMeta.length > 0 &&
-                            recording.activityMeta.map((meta, i) => {
-                              // Check if meta_key is 'videos'
-                              if (meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                                return meta.meta_value.map((videoData, j) => (
-
-                                  <Card key={`card-${i}-${j}`}>
-                                    <Card.Body>
-                                      <video controls height={'175px'}>
-                                        <source src={videoData?.url} type="video/webm" />
-                                        Your browser does not support the video tag.
-                                      </video>
-                                      <p><strong>Task Name:</strong> {recording.task} <br />  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}</p>
+                                      <img
+                                        className="card-img-top"
+                                        src={screenshotData?.url}
+                                        alt="Card image cap"
+                                        onClick={() => handleLightBox(screenshotData?.url)}
+                                      />
+                                      <p>
+                                        <strong>Task Name:</strong> {recording.task?.title} <br />
+                                        <strong>Time:</strong>
+                                      </p>
                                     </Card.Body>
                                   </Card>
                                 ));
                               }
-                              return null; // Return null if meta_key is not 'videos'
+                              // Handle videos tab
+                              if (
+                                getActiveTab(recording._id) === "Videos" &&
+                                meta.meta_key === 'videos' &&
+                                meta.meta_value.length > 0
+                              ) {
+                                return meta.meta_value.map((videoData, j) => (
+                                  <Card key={`video-card-${i}-${j}`}>
+                                    <Card.Body>
+                                      <video controls height="175px">
+                                        <source src={videoData?.url} type="video/webm" />
+                                        Your browser does not support the video tag.
+                                      </video>
+                                      <p>
+                                        <strong>Task Name:</strong> {recording.task?.title} <br />
+                                        <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                      </p>
+                                    </Card.Body>
+                                  </Card>
+                                ));
+                              }
+                              return null; // Return null if no condition is met
                             })
                           }
-                          </CardGroup>
-                        </div>
-                      </>
-                      )
-                    })
-                    
+                        </CardGroup>
 
-                  :
-                  null
-                }
+                      </div>
+                    </>
+                    )
+                  })
                   
-                  
-                </>
-              )}
+
+                :
+                null
+              }
             </>
           )}
         </div>

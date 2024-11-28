@@ -15,7 +15,7 @@ const initializeSocket = () => {
   }
 
   socket = io(process.env.REACT_APP_API_HOST, {
-    transports: ['polling'], maxHttpBufferSize: 1e8 });
+    transports: ['websocket'], maxHttpBufferSize: 1e8 });
 
   
 };
