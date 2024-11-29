@@ -620,12 +620,12 @@ button.input-error.dropdown-toggle.btn.btn-success {
   color: #ffffff;
   cursor: pointer;
   margin-left: 0.25rem;
-  border: 2px solid #7BCCB8;
+  border: 1px solid #7BCCB8;
 }
 
 .wrapper--title .list-group-item:hover {
   background: #5ead9a;
-  border: 2px solid #5ead9a;
+  border: 1px solid #5ead9a;
   color: #ffffff;
 }
 
@@ -2593,18 +2593,28 @@ pre {
 }
 
 .wrapper--title .live--tabs .list-group-item,
-.screens--tabs .list-group .list-group-item {
+.screens--tabs .list-group .list-group-item, .screens--shots .list-group-item {
   border-radius: 25px;
   -webkit-border-radius: 25px;
   width: auto;
   height: auto;
   padding: 0;
   color: #7BCCB8;
-  border: 1px solid transparent;
+  border: 1px solid #ffffff;
   background: #ffffff;
   padding: .45rem .75rem;
   margin-right: .5rem;
   margin-left: 0;
+}
+
+.wrapper--title .screens--shots .list-group-item:first-child:not(:last-child) {
+  border-bottom-left-radius: 25px;
+  border-top-right-radius: 25px;
+}
+
+.wrapper--title .screens--shots .list-group-item:last-child:not(:first-child) {
+  border-top-right-radius: 25px;
+  border-bottom-left-radius: 25px;
 }
 
 .screens--tabs .list-group .list-group-item {
@@ -2625,7 +2635,8 @@ pre {
 }
 
 .wrapper--title .live--tabs .active,
-.screens--tabs .list-group .active {
+.screens--tabs .list-group .active,
+.screens--shots .active {
   color: #ffffff;
   background-color: #7BCCB8;
   border-color: #7BCCB8;
@@ -2634,7 +2645,8 @@ pre {
 }
 
 .wrapper--title .live--tabs .list-group-item+.list-group-item.active,
-.screens--tabs .list-group .list-group-item+.list-group-item-action.active {
+.screens--tabs .list-group .list-group-item+.list-group-item-action.active,
+.screens--shots .list-group-item+.list-group-item-action.active {
   border: 1px solid #7BCCB8;
 }
 
@@ -2687,8 +2699,6 @@ pre {
   max-height: calc(100dvh - 100px);
   overflow-y: auto;
   padding-top: 0;
-  transition: all .1s ease-in-out;
-  -webkit-transition: all .1s ease-in-out;
 }
 
 .activity--box .expand--button button {
@@ -2701,12 +2711,24 @@ pre {
   margin-left: 1rem;
 }
 
-.activity--box .expand--button button .close--fullscreen, .activity--box .exit--fullscreen button .open--fullscreen {
+.activity--box .expand--button button .close--fullscreen, .activity--box .exit--fullscreen button .open--fullscreen,
+.activity--box .expand--button .enter--screen, .activity--box .expand--button .exit--screen {
   display: none;
 }
 
-.activity--box .exit--fullscreen button .close--fullscreen {
+.activity--box .exit--fullscreen button .close--fullscreen, .fullscreen--box .expand--button .enter--screen, .fullscreen--box .expand--button .exit--screen {
   display: block;
+}
+
+.fullscreen--box .expand--button button {
+  background: none;
+}
+
+.fullscreen--box .expand--button .btn.active, .fullscreen--box .expand--button .btn.show, .fullscreen--box .expand--button .btn:first-child:active, .fullscreen--box .expand--button :not(.btn-check)+.btn:active {
+  color: #ffffff;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .exit--fullscreen {
@@ -2729,13 +2751,11 @@ pre {
   right: 0;
   top: 0;
   bottom: 0;
-  transition: all .1s ease-in-out;
-  -webkit-transition: all .1s ease-in-out;
   width: 100%;
   height: 100%;
   max-height: 100%;
-  background: rgba(80, 84, 80, 0.9);
-  padding: 1rem;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 0;
   border-radius: 0;
   z-index: 555;
   display: flex;
@@ -2744,14 +2764,26 @@ pre {
 }
 
 .fullscreen--box .current--player {
-  background: #ffffff;
-  max-width: 800px;
+  background: none;
   width: 100%;
-  border-radius: .5rem;
-  -webkit-border-radius: .5rem;
+  border-radius: 0;
+  -webkit-border-radius: 0;
   margin: auto;
-  max-height: 100dvh;
-  padding: 1rem;
+  padding: 0 !important;
+  max-width: calc(100% - 120px);
+  max-height: calc(100% - 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullscreen--box .current--player video {
+  max-width: calc(100dvw - 50px);
+  max-height: calc(100dvh - 50px);
+}
+
+.fullscreen--box .current--player .timer--task h5, .fullscreen--box .current--player .timer--task p, .fullscreen--box .current--player .timer--task span {
+  display: none;
 }
 
 .activity--box .card .card-body strong {

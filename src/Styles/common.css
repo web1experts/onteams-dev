@@ -819,7 +819,7 @@ Add Project Modal CSS-=-=-
 }
 
 .yarl__container {
-  background-color: rgba(80, 84, 80, 0.9);
+  background: rgba(0, 0, 0, 0.9);
 }
 
 .status--modal .status--list {

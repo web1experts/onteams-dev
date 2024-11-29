@@ -239,6 +239,38 @@ function TimeTrackingPage() {
     }
   }, [activeInnerTab])
 
+  const enterFullscreen = () => {
+    const activityBox = document.querySelector(".fullscreen--box");
+    if (activityBox) {
+      if (activityBox.requestFullscreen) {
+        activityBox.requestFullscreen();
+      } else if (activityBox.webkitRequestFullscreen) {
+        // Safari
+        activityBox.webkitRequestFullscreen();
+      } else if (activityBox.mozRequestFullScreen) {
+        // Firefox
+        activityBox.mozRequestFullScreen();
+      } else if (activityBox.msRequestFullscreen) {
+        // IE/Edge
+        activityBox.msRequestFullscreen();
+      }
+    }
+  };
+
+  const exitFullscreen = () => {
+    if (document.fullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+  };
+
   // useEffect(() => {
   //   handleRecordedActivity();
   // }, [screenshotTab])
@@ -371,8 +403,7 @@ function TimeTrackingPage() {
     if (activeInnerTab === 'InnerRecorded') {
       return (
         <>
-          <div className="screens--tabs">
-            <ListGroup horizontal>
+            <ListGroup horizontal className="screens--shots">
               <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
                 Screenshots
               </ListGroup.Item>
@@ -380,7 +411,6 @@ function TimeTrackingPage() {
                 Videos
               </ListGroup.Item>
             </ListGroup>
-          </div>
         </>
       )
     } else {
@@ -617,7 +647,7 @@ function TimeTrackingPage() {
             
           </ListGroup>
           <ListGroup horizontal>
-          {showRecordedTabs()}
+            {showRecordedTabs()}
             <ListGroup.Item key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false)}}>
               <MdOutlineClose />
             </ListGroup.Item>
@@ -635,6 +665,8 @@ function TimeTrackingPage() {
                   </p>
                   <div className={isScreenActive ? 'expand--button exit--fullscreen' : 'expand--button'}>
                     <Button variant="secondary" onClick={handleToggler}><BsArrowsFullscreen className="open--fullscreen" /><MdClose className="close--fullscreen" /></Button>
+                    {/* <button variant="primary" className="enter--screen" onClick={enterFullscreen}><BsArrowsFullscreen /></button>
+                    <button variant="secondary" className="exit--screen" onClick={exitFullscreen}><MdClose/></button> */}
                   </div>
                 </div>
                 {
@@ -662,10 +694,14 @@ function TimeTrackingPage() {
                   recordedactivities.map((recording, index) => {
                     return (
                     <>
-                     <div className="wrapper--title">
-                      <p><span>Project: {recording?.project?.title}</span><strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong><small>{ formattotalTime(recording?.duration) || '00:00'}</small></p>
+                      <div className="wrapper--title screens--tabs">
+                        <p>
+                          <span>Project: {recording?.project?.title}</span>
+                          <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
+                        </p>
+                        <h3>{ formattotalTime(recording?.duration) || '00:00'}</h3>
                       </div>
-                     <div className="shots--list pt-3">
+                      <div className="shots--list pt-3">
                       <CardGroup>
                           {
                             recording?.activityMeta &&
