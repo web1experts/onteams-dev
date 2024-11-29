@@ -656,8 +656,8 @@ function TimeTrackingPage() {
                                         onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
                                       />
                                       <p>
-                                        <strong>Task Name:</strong> {recording.task?.title} <br />
-                                        <strong>Time:</strong>
+                                        <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
+                                        <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
                                       </p>
                                     </Card.Body>
                                   </Card>
