@@ -978,11 +978,11 @@ table tr.marked-project td {
 
 .show--details .table tr.project--active td,
 .view--project .table tr.project--active td {
-  border-bottom-color: #6FCCB8 !important;
-  border-top-color: #6FCCB8 !important;
-  margin-bottom: 0 !important;
-  border-top-width: 1px !important;
-  border-bottom-width: 1px !important;
+  border-bottom-color: #6FCCB8;
+  border-top-color: #6FCCB8;
+  margin-bottom: 0;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
 }
 
 .table>:not(caption)>*>* {
@@ -1002,6 +1002,11 @@ table tr.marked-project td {
   margin-bottom: 0;
   border-top-color: #eeeeee;
   border-bottom-width: 0;
+}
+
+.show--details .table tr.project--active + tr td,
+.view--project .table tr.project--active + tr td {
+  border-top-width: 0;
 }
 
 .show--details .g-4,
@@ -2448,7 +2453,6 @@ pre {
 
 .modal-open .timeSheetModal {
   z-index: 999999;
-  background: rgba(0, 0, 0, 0.85);
 }
 
 .yarl__portal {
@@ -2456,7 +2460,7 @@ pre {
 }
 
 .yarl__slide {
-  padding: 3rem 0
+  padding: 3rem 1rem
 }
 
 .yarl__slide_image {
@@ -2493,8 +2497,7 @@ pre {
   border-top-right-radius: 50px;
 }
 
-.page--wrapper.activity--table table .status--circle, .show--details .page--wrapper .activity--table .project--title--td .status--circle, 
-.view--project .page--wrapper .activity--table .project--title--td .status--circle, .view--invitee .page--wrapper .activity--table .project--title--td .status--circle {
+.page--wrapper.activity--table table .status--circle {
   width: 8px;
   height: 8px;
   margin: auto;
@@ -2503,9 +2506,18 @@ pre {
   -webkit-border-radius: 100px;
   display: inline-block;
   vertical-align: middle;
+  position: relative;
+}
+
+.show--details .page--wrapper table td.project--title--td .status--circle,
+.view--project .page--wrapper table td.project--title--td .status--circle {
   position: absolute;
+  right: 10px;
   top: 0;
   bottom: 0;
+  margin: auto;
+  width: 8px;
+  height: 8px;
 }
 
 .activity--table table .active--color {
@@ -2544,17 +2556,6 @@ pre {
   overflow: hidden;
 }
 
-.show--details .page--wrapper table td.project--title--td .status--circle,
-.view--project .page--wrapper table td.project--title--td .status--circle {
-  position: absolute;
-  right: 10px;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  width: 8px;
-  height: 8px;
-}
-
 .activity--tabs .select2-container {
   min-width: 160px;
 }
@@ -2568,12 +2569,15 @@ pre {
 
 .current--player .timer--task h5 {
   margin: 0;
+  font-size: 1rem;
 }
 
 .current--player .timer--task .task--timer {
   margin-top: 0;
   margin-left: auto;
   margin-bottom: 0;
+  min-width: 110px;
+  text-align: right;
 }
 
 .current--player .timer--task h5 small {
@@ -2683,6 +2687,71 @@ pre {
   max-height: calc(100dvh - 100px);
   overflow-y: auto;
   padding-top: 0;
+  transition: all .1s ease-in-out;
+  -webkit-transition: all .1s ease-in-out;
+}
+
+.activity--box .expand--button button {
+  padding: 0;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+}
+
+.activity--box .expand--button button .close--fullscreen, .activity--box .exit--fullscreen button .open--fullscreen {
+  display: none;
+}
+
+.activity--box .exit--fullscreen button .close--fullscreen {
+  display: block;
+}
+
+.exit--fullscreen {
+  position: absolute;
+  right: 20px;
+  top: 18px;
+}
+
+.exit--fullscreen button {
+  width: auto;
+  height: auto;
+  background: none;
+  font-size: 30px;
+  border: 0;
+}
+
+.fullscreen--box {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  transition: all .1s ease-in-out;
+  -webkit-transition: all .1s ease-in-out;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  background: rgba(80, 84, 80, 0.9);
+  padding: 1rem;
+  border-radius: 0;
+  z-index: 555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullscreen--box .current--player {
+  background: #ffffff;
+  max-width: 800px;
+  width: 100%;
+  border-radius: .5rem;
+  -webkit-border-radius: .5rem;
+  margin: auto;
+  max-height: 100dvh;
+  padding: 1rem;
 }
 
 .activity--box .card .card-body strong {
@@ -2753,6 +2822,7 @@ pre {
 .activity--box .card .card-body video, .activity--box .card .card-body iframe, .activity--box .card .card-body img {
   max-width: 100%;
   object-fit: cover;
+  height: 180px;
 }
 
 .activity--box .card .card-body p {
@@ -3495,7 +3565,7 @@ Media CSS-=-==
 
   .details--projects--view .projecttitle,
   .details--projects--grid .projecttitle {
-    max-width: 50%;
+    max-width: 45%;
     flex: 1 1;
   }
 
@@ -3510,6 +3580,18 @@ Media CSS-=-==
   .project--grid--table tr, .activity--box .card-group .card {
     max-width: calc(25% - 8px);
   }
+
+  .activity--table tr th:last-child {
+    min-width: 148px;
+  }
+
+  .activity--table tr th:first-child {
+    min-width: 160px;
+  }
+
+  .activity--table tr th {
+    min-width: 110px;
+  }
 }
 
 @media screen and (max-width:1199px) {
@@ -3518,11 +3600,20 @@ Media CSS-=-==
   }
 
   .page--wrapper .draggable--table th:nth-child(4),
-  .page--wrapper .draggable--table td:nth-child(4),
+  .page--wrapper .draggable--table td:nth-child(4) {
+    flex: none;
+    min-width: 120px;
+  }
+
   .page--wrapper .draggable--table th:last-child,
   .page--wrapper .draggable--table td:last-child {
     flex: none;
-    min-width: 100px;
+    min-width: 150px;
+  }
+
+  .page--wrapper table td .select--dropdown button.dropdown-toggle {
+    font-size: .8rem;
+    margin-left: .25rem;
   }
 
   .projects--page .table .list-group-item .team--initial, .projects--page .table .list-group-item .team--image, 
@@ -3574,6 +3665,18 @@ Media CSS-=-==
   .page--wrapper table th:first-child,
   .page--wrapper table td:first-child {
     min-width: fit-content
+  }
+
+  .activity--table tr th:last-child {
+    min-width: 148px;
+  }
+
+  .activity--table tr th:first-child {
+    min-width: 160px;
+  }
+
+  .activity--table tr th {
+    min-width: 110px;
   }
 
   .select2-container--default .select2-selection--single {
@@ -3668,7 +3771,7 @@ Media CSS-=-==
   }
 }
 
-@media screen and (max-width:1023px) {
+@media screen and (max-width:992px) {
   .common--form {
     padding: 2rem;
   }
@@ -4046,10 +4149,6 @@ Media CSS-=-==
     max-width: calc(50% - 8px);
   }
 
-  .rounded--box {
-    height: auto;
-  }
-
   .wrapper--title .btn--view {
     padding: .15rem .75rem;
     font-size: 13px;
@@ -4083,12 +4182,25 @@ Media CSS-=-==
   }
 
   .team--page .page--title h2,
-  .wrapper--title h3 {
+  .wrapper--title h3,
+  .wrapper--title .live--tabs {
     padding-left: 2rem;
   }
 
   .project--grid--table td::before {
     margin-bottom: 2px;
+  }
+
+  .wrapper--title .live--tabs {
+    flex: 1 1;
+  }
+
+  .screens--tabs {
+    gap: 0;
+  }
+
+  .screens--tabs p {
+    flex: auto;
   }
 }
 
@@ -4198,14 +4310,14 @@ Media CSS-=-==
     padding: .55rem 1rem;
   }
 
-  .page--title .list-group-item-action {
+  /* .page--title .list-group-item-action {
     padding: .35rem 1rem;
     font-size: 15px;
-  }
+  } */
 
   .wrapper--title .live--tabs .list-group-item:last-child .form-control {
     width: max-content;
-    max-width: 160px;
+    max-width: max-content;
     margin: 0;
   }
 
@@ -4228,5 +4340,29 @@ Media CSS-=-==
 
   .upload--status .preview--grid .preview--cell p {
     max-width: 280px;
+  }
+
+  .current--player .timer--task {
+    flex-flow: row wrap;
+  }
+
+  .wrapper--title {
+    gap: 0;
+  }
+
+  .details--projects--view .projecttitle, .details--projects--grid .projecttitle {
+    max-width: calc(100% - 60px);
+  }
+}
+
+@media screen and (max-width:414px) {
+  .team--page .page--title h2 {
+    flex-flow: row wrap;
+  }
+
+  .page--title .activity--tabs {
+    justify-content: flex-end;
+    margin-top: 20px;
+    flex: 1 1 100%;
   }
 }

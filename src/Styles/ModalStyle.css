@@ -253,11 +253,6 @@
     flex-flow: column wrap;
 }
 
-.file--preview--modal .modal-dialog {
-    width: 100%;
-    max-width: 90%;
-}
-
 .file--preview--modal .modal-title {
     display: flex;
     flex: 1 1;

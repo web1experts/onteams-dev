@@ -718,7 +718,7 @@ function ProjectsPage() {
                                                                         key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                                             }`}>
                                                                         <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
-                                                                        <td key={`cname-index-${index}`} data-label="Client Name" className="onHide">{project.client?.name || <span className='text-muted'>__</span>}</td>
+                                                                        <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td>
                                                                         <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
                                                                             <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type="project"
                                                                             // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
@@ -778,8 +778,8 @@ function ProjectsPage() {
                         }
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
-                        <Button variant="outline-primary" className="active btn--view d-none d-lg-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
-                        <Button variant="outline-primary" className="btn--view d-none d-lg-flex" onClick={() => setIsActive(2)}>View</Button>
+                        <Button variant="outline-primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
+                        <Button variant="outline-primary" className="btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>View</Button>
                         <ListGroup.Item className="d-none d-lg-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
                         {/* <ListGroup.Item key={`gridview`} className="gridView ms-1" action active={activeTab === 'GridView'} onClick={() => setActiveTab('GridView')}><BsGrid /></ListGroup.Item>
                         <ListGroup.Item key={`listview`} className="ListView ms-1" action active={activeTab === 'ListView'} onClick={() => setActiveTab('ListView')}><FaList /></ListGroup.Item> */}

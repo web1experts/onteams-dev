@@ -375,7 +375,7 @@ Sidebar CSS-=-=
     transform: translateX(-100%);
     -webkit-transform: translateX(-100%);
     background: rgba(249, 249, 249, 1);
-    z-index: 222222;
+    z-index: 2;
   }
 
   .team--page {

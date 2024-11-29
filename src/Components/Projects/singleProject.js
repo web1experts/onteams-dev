@@ -550,8 +550,8 @@ function SingleProject(props) {
                         {/* )} */}
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto">
-                        <Button variant="outline-primary" className="btn--view d-none d-lg-flex" onClick={() => props.closeview(1)}>Tasks</Button>
-                        <Button variant="outline-primary" className="active btn--view d-none d-lg-flex" onClick={() => setIsActive(2)}>View</Button>
+                        <Button variant="outline-primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}>Tasks</Button>
+                        <Button variant="outline-primary" className="active btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>View</Button>
                         <ListGroup.Item key={`closekey`} onClick={() => props.closeview(0)}><MdOutlineClose /></ListGroup.Item>
                     </ListGroup>
                 </div>

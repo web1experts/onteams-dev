@@ -5,6 +5,8 @@ import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown } from "react-bootstrap";
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck } from "react-icons/fa";
+import { MdClose } from "react-icons/md";
+import { BsArrowsFullscreen } from "react-icons/bs";
 import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
@@ -17,6 +19,7 @@ function TimeTrackingPage() {
   const currentMember = getMemberdata();
   const [spinner, setSpinner] = useState(false)
   const [isActive, setIsActive] = useState(false);
+  const [isScreenActive, setIsScreenActive] = useState(false);
   const handleClick = (activity) => {
     setIsActive(current => !current);
     setCurrentActivity( activity)
@@ -74,6 +77,11 @@ function TimeTrackingPage() {
     await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
       setSpinner(false)
   }
+
+  
+  const handleToggler = event => {
+    setIsScreenActive(current => !current);
+  };
 
   function formattotalTime(time){
     const hours = Math.floor(time / (1000 * 60 * 60));
@@ -343,6 +351,7 @@ function TimeTrackingPage() {
                     }                    
                     className="form-control"
                     placeholder="dd/mm/yyyy"
+                    popperPlacement="auto" // Automatically position based on viewport
                 />
               </Form.Group>
             </Form>
@@ -586,16 +595,19 @@ function TimeTrackingPage() {
             </ListGroup.Item>
           </ListGroup>
         </div>
-        <div className="rounded--box activity--box">
+        <div className={isScreenActive ? 'rounded--box activity--box fullscreen--box' : 'rounded--box activity--box'}>
           {activeInnerTab === "InnerLive" && (
             <>
-              <div className="current--player p-2" key={`activity-${currentActivity?._id}`}>
+              <div className="current--player pt-3" key={`activity-${currentActivity?._id}`}>
                 <div className="timer--task">
                   <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
-                  <span className="ml-3 p-2">{ currentActivity?.latestActivity?.app_version}</span>
+                  <span className="ms-md-3">{ currentActivity?.latestActivity?.app_version}</span>
                   <p className="task--timer">
                     <span><strong>{ formattotalTime(currentActivity?.totalDuration) || '00:00'}</strong></span>
                   </p>
+                  <div className={isScreenActive ? 'expand--button exit--fullscreen' : 'expand--button'}>
+                    <Button variant="secondary" onClick={handleToggler}><BsArrowsFullscreen className="open--fullscreen" /><MdClose className="close--fullscreen" /></Button>
+                  </div>
                 </div>
                 {
                   currentActivity?.latestActivity?.status ? 

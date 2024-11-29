@@ -818,6 +818,10 @@ Add Project Modal CSS-=-=-
   background: rgba(80, 84, 80, 0.8);
 }
 
+.yarl__container {
+  background-color: rgba(80, 84, 80, 0.9);
+}
+
 .status--modal .status--list {
   margin-top: 1rem;
 }
@@ -1150,8 +1154,8 @@ span.status--circle.info--color {
   margin: auto;
   height: 100dvh;
   max-height: 100dvh;
-  width: calc(100% - 60px);
-  padding: 2rem 0rem;
+  width: calc(100% - 2rem);
+  padding: 1rem 0;
 }
 
 .modal-content {
