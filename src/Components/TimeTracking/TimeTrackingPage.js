@@ -391,12 +391,7 @@ function TimeTrackingPage() {
     }
   }
 
-
-
-
-
   const getActiveTab = (recordingId) => screenshotTab[recordingId] || "Screenshots";
-
 
   return (
     <>
@@ -486,7 +481,7 @@ function TimeTrackingPage() {
                           totalProjecthours += Number(activity?.latestActivity?.duration || 0)
                           return (
                             <>
-                              <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active project--active marked-project': '' } >
+                              <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'project--active': '' } >
                                 {/* <td key={`index-${index}`}>{index + 1} </td> */}
                                 <td data-label="Member Name" className="project--title--td" onClick={() => {
                                       if (isActive && activeInnerTab !== "InnerRecorded") {
