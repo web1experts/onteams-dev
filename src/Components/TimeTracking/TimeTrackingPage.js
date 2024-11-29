@@ -92,8 +92,9 @@ function TimeTrackingPage() {
   useEffect(() => { 
     if(currentActivity !== false && activeTab === "Live"){ 
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
-    }else if(currentActivity !== false && activeTab === "Recorded"){ console.log('here')
-      setActiveInnerTab("InnerRecorded")
+    }
+    if(currentActivity !== false && activeInnerTab === "InnerRecorded"){
+      // setActiveInnerTab("InnerRecorded")
       handleRecordedActivity()
     }
   },[currentActivity])
@@ -480,12 +481,10 @@ function TimeTrackingPage() {
                               <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active project--active marked-project': '' } >
                                 {/* <td key={`index-${index}`}>{index + 1} </td> */}
                                 <td data-label="Member Name" className="project--title--td" onClick={() => {
-                                      if (isActive) {
+                                      if (isActive && activeInnerTab !== "InnerRecorded") {
                                         leaveRoom(currentActivity?._id)
                                         setCurrentActivity(activity);
-                                      }
-                                      console.log('act',activeInnerTab)
-                                      if(activeInnerTab === "InnerRecorded"){ 
+                                      }else if(activeInnerTab === "InnerRecorded"){
                                         setCurrentActivity(activity)
                                         // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
                                       }
@@ -502,11 +501,11 @@ function TimeTrackingPage() {
                                       }
                                     </span>
                                 </td>
-                                <td data-label="Project Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
-                                <td data-label="Task Name" className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title || '--' }</span></td>
-                                <td data-label="Task Time" className="onHide">{ formattotalTime(activity?.latestActivity?.duration) || '00:00'}</td>
-                                <td data-label="Total Time" className="onHide">{ formattotalTime(activity?.totalDuration) || '00:00'}</td>
-                                <td data-label="Status" className="onHide">
+                                <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
+                                <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title || '--' }</span></td>
+                                <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ formattotalTime(activity?.latestActivity?.duration) || '00:00'}</td>
+                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formattotalTime(activity?.totalDuration) || '00:00'}</td>
+                                <td data-label="Status" key={`status-title-${activity?._id}`} className="onHide">
                                   { 
                                     (activity?.latestActivity?.status) ? 
                                     <Badge bg="success">Active</Badge> : 
@@ -516,7 +515,7 @@ function TimeTrackingPage() {
                                     <Badge bg="danger">Inactive</Badge>
                                     }
                                 </td>
-                                <td className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
+                                <td  key={`view-act-${activity?._id}`} className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
                               </tr>
                               
                             </>
@@ -719,10 +718,8 @@ function TimeTrackingPage() {
                     </>
                     )
                   })
-                  
-
                 :
-                null
+                <p class="text-center mt-5">No activity available.</p>
               }
             </>
           )}
