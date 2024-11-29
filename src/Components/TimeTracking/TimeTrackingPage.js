@@ -26,7 +26,7 @@ function TimeTrackingPage() {
   const dispatch = useDispatch()
   const fullscreenRef = React.useRef(null);
   const [activeTab, setActiveTab] = useState("Live");
-  const [screenshotTab, setScreenshotTab] = useState({});
+  const [screenshotTab, setScreenshotTab] = useState('Screenshots');
   const [activeInnerTab, setActiveInnerTab] = useState("InnerLive");
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -92,8 +92,9 @@ function TimeTrackingPage() {
   useEffect(() => { 
     if(currentActivity !== false && activeTab === "Live"){ 
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
-    }else if(currentActivity !== false && activeTab === "Recorded"){
+    }else if(currentActivity !== false && activeTab === "Recorded"){ console.log('here')
       setActiveInnerTab("InnerRecorded")
+      handleRecordedActivity()
     }
   },[currentActivity])
 
@@ -314,39 +315,63 @@ function TimeTrackingPage() {
     }
   }
 
-  const showDate = () => {
+  // const showDate = () => {
+  //   if (activeInnerTab === 'InnerRecorded') {
+  //     return (
+  //       <>
+  //         <ListGroup.Item className="no--style">
+  //           <Form>
+  //             <Form.Group className="mb-0 form-group">
+  //               <DatePicker 
+  //                   name="date"
+  //                   id='date--picker'
+  //                   value={date} 
+  //                   onChange={async (value) => {
+  //                       const date = value.toDate();
+  //                       // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+  //                       const year = date.getFullYear();
+  //                       const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+  //                       const day = date.getDate().toString().padStart(2, '0');
+  //                       const hours = date.getHours().toString().padStart(2, '0');
+  //                       const minutes = date.getMinutes().toString().padStart(2, '0');
+  //                       const seconds = date.getSeconds().toString().padStart(2, '0');
+  //                       const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+  //                       // Combine into the desired format
+  //                       const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                        
+  //                       setDate(formattedDate)
+  //                     }
+  //                   }                    
+  //                   className="form-control"
+  //                   placeholder="dd/mm/yyyy"
+  //               />
+  //             </Form.Group>
+  //           </Form>
+  //         </ListGroup.Item>
+  //       </>
+  //     )
+  //   } else {
+  //     return (
+  //       <>
+  //       </>
+  //     )
+  //   }
+  // }
+
+  const showRecordedTabs = () => {
     if (activeInnerTab === 'InnerRecorded') {
       return (
         <>
-          <ListGroup.Item className="no--style">
-            <Form>
-              <Form.Group className="mb-0 form-group">
-                <DatePicker 
-                    name="date"
-                    id='date--picker'
-                    value={date} 
-                    onChange={async (value) => {
-                        const date = value.toDate();
-                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                        const year = date.getFullYear();
-                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                        const day = date.getDate().toString().padStart(2, '0');
-                        const hours = date.getHours().toString().padStart(2, '0');
-                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                        // Combine into the desired format
-                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                        
-                        setDate(formattedDate)
-                      }
-                    }                    
-                    className="form-control"
-                    placeholder="dd/mm/yyyy"
-                />
-              </Form.Group>
-            </Form>
-          </ListGroup.Item>
+          <div className="screens--tabs">
+            <ListGroup horizontal>
+              <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
+                Screenshots
+              </ListGroup.Item>
+              <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
+                Videos
+              </ListGroup.Item>
+            </ListGroup>
+          </div>
         </>
       )
     } else {
@@ -356,6 +381,10 @@ function TimeTrackingPage() {
       )
     }
   }
+
+
+
+
 
   const getActiveTab = (recordingId) => screenshotTab[recordingId] || "Screenshots";
 
@@ -448,12 +477,17 @@ function TimeTrackingPage() {
                           totalProjecthours += Number(activity?.latestActivity?.duration || 0)
                           return (
                             <>
-                              <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
+                              <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active project--active marked-project': '' } >
                                 {/* <td key={`index-${index}`}>{index + 1} </td> */}
                                 <td data-label="Member Name" className="project--title--td" onClick={() => {
                                       if (isActive) {
                                         leaveRoom(currentActivity?._id)
                                         setCurrentActivity(activity);
+                                      }
+                                      console.log('act',activeInnerTab)
+                                      if(activeInnerTab === "InnerRecorded"){ 
+                                        setCurrentActivity(activity)
+                                        // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
                                       }
                                   }} >
                                     <span><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name}
@@ -578,9 +612,10 @@ function TimeTrackingPage() {
             }}>
               Recorded
             </ListGroup.Item>
-            {showDate()}
+            
           </ListGroup>
           <ListGroup horizontal>
+          {showRecordedTabs()}
             <ListGroup.Item key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false)}}>
               <MdOutlineClose />
             </ListGroup.Item>
@@ -622,19 +657,10 @@ function TimeTrackingPage() {
                   recordedactivities.map((recording, index) => {
                     return (
                     <>
-                      <div className="wrapper--title screens--tabs">
-                        <p><span>Project: {recording?.project?.title}</span><strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong></p>
-                        <ListGroup horizontal>
-                          <ListGroup.Item key={'screenshots1-tab-key'} action active={!screenshotTab[recording._id] || screenshotTab[recording._id] && screenshotTab[recording._id] === "Screenshots"} onClick={() => setScreenshotTab({...screenshotTab, [recording._id]: "Screenshots"})}>
-                            Screenshots
-                          </ListGroup.Item>
-                          <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab[recording._id] && screenshotTab[recording._id] === "Videos"} onClick={() => setScreenshotTab({...screenshotTab, [recording._id]: "Videos"})}>
-                            Videos
-                          </ListGroup.Item>
-                        </ListGroup>
+                     <div className="wrapper--title">
+                      <p><span>Project: {recording?.project?.title}</span><strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong><small>{ formattotalTime(recording?.duration) || '00:00'}</small></p>
                       </div>
-
-                      <div className="shots--list pt-3">
+                     <div className="shots--list pt-3">
                       <CardGroup>
                           {
                             recording?.activityMeta &&
@@ -642,7 +668,7 @@ function TimeTrackingPage() {
                             recording.activityMeta.map((meta, i) => {
                               // Handle screenshots tab
                               if (
-                                getActiveTab(recording._id) === "Screenshots" &&
+                                screenshotTab === "Screenshots" &&
                                 meta.meta_key === 'screenshots' &&
                                 meta.meta_value.length > 0
                               ) {
@@ -665,7 +691,7 @@ function TimeTrackingPage() {
                               }
                               // Handle videos tab
                               if (
-                                getActiveTab(recording._id) === "Videos" &&
+                                screenshotTab === "Videos" &&
                                 meta.meta_key === 'videos' &&
                                 meta.meta_value.length > 0
                               ) {
