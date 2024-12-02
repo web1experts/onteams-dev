@@ -87,7 +87,8 @@ function TimeTrackingPage() {
     const hours = Math.floor(time / (1000 * 60 * 60));
     const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
 
-    let formattedTime = '';
+    let formattedTime = ''; console.log("hours:: ", hours)
+    console.log("minutes:: ", minutes)
     if (hours > 0) {
         formattedTime += `${hours}h `;
     }
@@ -95,6 +96,20 @@ function TimeTrackingPage() {
         formattedTime += `${minutes}m`;
     }
     return formattedTime.trim();
+  }
+
+  function formatTime(seconds) {
+
+    // Validate input: check if seconds is a valid non-negative number
+    if (typeof seconds !== "number" || seconds < 0 || isNaN(seconds)) {
+      return "00:00:00";
+    }
+  
+    // Calculate hours, minutes, and seconds
+    const hours = Math.floor(seconds / 3600).toString().padStart(2, "0");
+    const minutes = Math.floor((seconds % 3600) / 60).toString().padStart(2, "0");
+  
+    return `${hours}:${minutes}`;
   }
 
   useEffect(() => { 
@@ -699,7 +714,7 @@ function TimeTrackingPage() {
                           <span>Project: {recording?.project?.title}</span>
                           <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
                         </p>
-                        <h3>{ formattotalTime(recording?.duration) || '00:00'}</h3>
+                        <h3>{ formatTime(recording?.duration) || '00:00'}</h3>
                       </div>
                       <div className="shots--list pt-3">
                       <CardGroup>
