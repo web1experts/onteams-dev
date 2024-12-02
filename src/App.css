@@ -2712,16 +2712,22 @@ pre {
 }
 
 .activity--box .expand--button button .close--fullscreen, .activity--box .exit--fullscreen button .open--fullscreen,
-.activity--box .expand--button .enter--screen, .activity--box .expand--button .exit--screen {
+.activity--box .expand--button .enter--screen {
   display: none;
 }
 
-.activity--box .exit--fullscreen button .close--fullscreen, .fullscreen--box .expand--button .enter--screen, .fullscreen--box .expand--button .exit--screen {
-  display: block;
+.activity--box .exit--fullscreen button .close--fullscreen, .fullscreen--box .expand--button .enter--screen {
+  display: flex;
 }
 
 .fullscreen--box .expand--button button {
   background: none;
+}
+
+.activity--box .enter--screen svg {
+  width: auto;
+  height: auto;
+  font-size: 22px;
 }
 
 .fullscreen--box .expand--button .btn.active, .fullscreen--box .expand--button .btn.show, .fullscreen--box .expand--button .btn:first-child:active, .fullscreen--box .expand--button :not(.btn-check)+.btn:active {
@@ -2735,6 +2741,8 @@ pre {
   position: absolute;
   right: 20px;
   top: 18px;
+  display: flex;
+  align-items: center;
 }
 
 .exit--fullscreen button {
