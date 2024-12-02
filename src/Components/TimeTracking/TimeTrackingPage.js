@@ -6,7 +6,7 @@ import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, 
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { BsArrowsFullscreen } from "react-icons/bs";
+import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit } from "react-icons/bs";
 import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
@@ -239,35 +239,35 @@ function TimeTrackingPage() {
     }
   }, [activeInnerTab])
 
-  const enterFullscreen = () => {
-    const activityBox = document.querySelector(".fullscreen--box");
-    if (activityBox) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    const activityBox = document.querySelector(".activity--box");
+
+    if (!document.fullscreenElement) {
+      // Enter fullscreen
       if (activityBox.requestFullscreen) {
         activityBox.requestFullscreen();
       } else if (activityBox.webkitRequestFullscreen) {
-        // Safari
-        activityBox.webkitRequestFullscreen();
+        activityBox.webkitRequestFullscreen(); // Safari
       } else if (activityBox.mozRequestFullScreen) {
-        // Firefox
-        activityBox.mozRequestFullScreen();
+        activityBox.mozRequestFullScreen(); // Firefox
       } else if (activityBox.msRequestFullscreen) {
-        // IE/Edge
-        activityBox.msRequestFullscreen();
+        activityBox.msRequestFullscreen(); // IE/Edge
       }
-    }
-  };
-
-  const exitFullscreen = () => {
-    if (document.fullscreenElement) {
+      setIsFullscreen(true);
+    } else {
+      // Exit fullscreen
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
+        document.webkitExitFullscreen(); // Safari
       } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
+        document.mozCancelFullScreen(); // Firefox
       } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
+        document.msExitFullscreen(); // IE/Edge
       }
+      setIsFullscreen(false);
     }
   };
 
@@ -617,7 +617,6 @@ function TimeTrackingPage() {
                             <td colSpan={8} className="text-center"><h3>No Results</h3> </td>
                           </tr>
                     }
-                    
                   </tbody>
                 </Table>
               </>
@@ -664,9 +663,18 @@ function TimeTrackingPage() {
                     <span><strong>{ formattotalTime(currentActivity?.totalDuration) || '00:00'}</strong></span>
                   </p>
                   <div className={isScreenActive ? 'expand--button exit--fullscreen' : 'expand--button'}>
-                    <Button variant="secondary" onClick={handleToggler}><BsArrowsFullscreen className="open--fullscreen" /><MdClose className="close--fullscreen" /></Button>
-                    {/* <button variant="primary" className="enter--screen" onClick={enterFullscreen}><BsArrowsFullscreen /></button>
-                    <button variant="secondary" className="exit--screen" onClick={exitFullscreen}><MdClose/></button> */}
+                  <Button variant="secondary" className="enter--screen" onClick={toggleFullscreen}>
+                    {isFullscreen ? (
+                      <>
+                        <BsFullscreenExit />
+                      </>
+                    ) : (
+                      <>
+                        <BsFullscreen />
+                      </>
+                    )}
+                  </Button>
+                  <Button variant="secondary" onClick={handleToggler}><BsArrowsFullscreen className="open--fullscreen" /><MdClose className="close--fullscreen" /></Button>
                   </div>
                 </div>
                 {
