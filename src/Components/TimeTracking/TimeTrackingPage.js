@@ -44,6 +44,7 @@ function TimeTrackingPage() {
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
   const [ date, setDate ] = useState('')
+  const [ filtereddate, setFilteredDate ] = useState('')
   const [showSearch, setSearchShow] = useState(false);
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
@@ -371,48 +372,48 @@ function TimeTrackingPage() {
     }
   }
 
-  // const showDate = () => {
-  //   if (activeInnerTab === 'InnerRecorded') {
-  //     return (
-  //       <>
-  //         <ListGroup.Item className="no--style">
-  //           <Form>
-  //             <Form.Group className="mb-0 form-group">
-  //               <DatePicker 
-  //                   name="date"
-  //                   id='date--picker'
-  //                   value={date} 
-  //                   onChange={async (value) => {
-  //                       const date = value.toDate();
-  //                       // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-  //                       const year = date.getFullYear();
-  //                       const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-  //                       const day = date.getDate().toString().padStart(2, '0');
-  //                       const hours = date.getHours().toString().padStart(2, '0');
-  //                       const minutes = date.getMinutes().toString().padStart(2, '0');
-  //                       const seconds = date.getSeconds().toString().padStart(2, '0');
-  //                       const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-  //                       // Combine into the desired format
-  //                       const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+  const showDate = () => {
+    if (activeInnerTab === 'InnerRecorded') {
+      return (
+        <>
+          <ListGroup.Item className="no--style">
+            <Form>
+              <Form.Group className="mb-0 form-group">
+                <DatePicker 
+                    name="date"
+                    id='date--picker'
+                    value={filtereddate} 
+                    onChange={async (value) => {
+                        const date = value.toDate();
+                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                        const year = date.getFullYear();
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        const seconds = date.getSeconds().toString().padStart(2, '0');
+                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                        // Combine into the desired format
+                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
                         
-  //                       setDate(formattedDate)
-  //                     }
-  //                   }                    
-  //                   className="form-control"
-  //                   placeholder="dd/mm/yyyy"
-  //               />
-  //             </Form.Group>
-  //           </Form>
-  //         </ListGroup.Item>
-  //       </>
-  //     )
-  //   } else {
-  //     return (
-  //       <>
-  //       </>
-  //     )
-  //   }
-  // }
+                        setFilteredDate(formattedDate)
+                      }
+                    }                    
+                    className="form-control"
+                    placeholder="dd/mm/yyyy"
+                />
+              </Form.Group>
+            </Form>
+          </ListGroup.Item>
+        </>
+      )
+    } else {
+      return (
+        <>
+        </>
+      )
+    }
+  }
 
   const showRecordedTabs = () => {
     if (activeInnerTab === 'InnerRecorded') {
@@ -551,8 +552,8 @@ function TimeTrackingPage() {
                                 </td>
                                 <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
                                 <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title || '--' }</span></td>
-                                <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ formattotalTime(activity?.latestActivity?.duration) || '00:00'}</td>
-                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formattotalTime(activity?.totalDuration) || '00:00'}</td>
+                                <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ formatTime(activity?.latestActivity?.duration) || '00:00'}</td>
+                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formatTime(activity?.totalDuration) || '00:00'}</td>
                                 <td data-label="Status" key={`status-title-${activity?._id}`} className="onHide">
                                   { 
                                     (activity?.latestActivity?.status) ? 
@@ -658,7 +659,7 @@ function TimeTrackingPage() {
             }}>
               Recorded
             </ListGroup.Item>
-            
+            {showDate()}
           </ListGroup>
           <ListGroup horizontal>
             {showRecordedTabs()}
