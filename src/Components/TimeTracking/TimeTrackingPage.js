@@ -75,7 +75,7 @@ function TimeTrackingPage() {
 
   const handleRecordedActivity = async () => {
     setSpinner(true)
-    await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
+    await dispatch(getRecoredActivity(currentActivity._id, 'recorded', filtereddate))
       setSpinner(false)
   }
 
@@ -84,32 +84,28 @@ function TimeTrackingPage() {
     setIsScreenActive(current => !current);
   };
 
-  function formattotalTime(time){
-    const hours = Math.floor(time / (1000 * 60 * 60));
-    const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
+  // function formattotalTime(time){
+  //   const hours = Math.floor(time / (1000 * 60 * 60));
+  //   const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
 
-    let formattedTime = ''; console.log("hours:: ", hours)
-    console.log("minutes:: ", minutes)
-    if (hours > 0) {
-        formattedTime += `${hours}h `;
-    }
-    if (minutes > 0 || hours > 0) {
-        formattedTime += `${minutes}m`;
-    }
-    return formattedTime.trim();
-  }
+  //   let formattedTime = ''; 
+  //   if (hours > 0) {
+  //       formattedTime += `${hours}h `;
+  //   }
+  //   if (minutes > 0 || hours > 0) {
+  //       formattedTime += `${minutes}m`;
+  //   }
+  //   return formattedTime.trim();
+  // }
 
   function formatTime(seconds) {
-
     // Validate input: check if seconds is a valid non-negative number
     if (typeof seconds !== "number" || seconds < 0 || isNaN(seconds)) {
-      return "00:00:00";
+      return "00:00";
     }
-  
     // Calculate hours, minutes, and seconds
     const hours = Math.floor(seconds / 3600).toString().padStart(2, "0");
     const minutes = Math.floor((seconds % 3600) / 60).toString().padStart(2, "0");
-  
     return `${hours}:${minutes}`;
   }
 
@@ -128,6 +124,10 @@ function TimeTrackingPage() {
         handleLiveActivityList()
     }
   }, [filters])
+
+  useEffect(() => {
+    console.log("filtereddate :: ", filtereddate)
+  }, [ filtereddate ])
 
 
   useEffect(() => {
@@ -383,22 +383,29 @@ function TimeTrackingPage() {
                     name="date"
                     id='date--picker'
                     value={filtereddate} 
+                    format="YYYY-MM-DD"
+                    range
+                    dateSeparator=" - " 
                     onChange={async (value) => {
-                        const date = value.toDate();
-                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                        const year = date.getFullYear();
-                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                        const day = date.getDate().toString().padStart(2, '0');
-                        const hours = date.getHours().toString().padStart(2, '0');
-                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                        // Combine into the desired format
-                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+                        // const date = value.toDate();
+                        // // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
+                        // const year = date.getFullYear();
+                        // const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+                        // const day = date.getDate().toString().padStart(2, '0');
+                        // const hours = date.getHours().toString().padStart(2, '0');
+                        // const minutes = date.getMinutes().toString().padStart(2, '0');
+                        // const seconds = date.getSeconds().toString().padStart(2, '0');
+                        // const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+                        // // Combine into the desired format
+                        // const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
                         
-                        setFilteredDate(formattedDate)
+                        setFilteredDate(value)
                       }
-                    }                    
+                    }  
+                    onClose={() => {
+                      console.log('Date picker lost focus. Triggering filter.'); 
+                      handleRecordedActivity()
+                    }}                  
                     className="form-control"
                     placeholder="dd/mm/yyyy"
                 />
@@ -580,8 +587,8 @@ function TimeTrackingPage() {
                       <td></td>
                       <td></td>
                       <td><strong>Total Hours</strong></td>
-                      <td><strong>{ formattotalTime(totalProjecthours) || '00:00'}</strong></td>
-                      <td><strong>{ formattotalTime(totalhours) || '00:00'}</strong></td>
+                      <td><strong>{ formatTime(totalProjecthours) || '00:00'}</strong></td>
+                      <td><strong>{ formatTime(totalhours) || '00:00'}</strong></td>
                       <td></td>
                       <td></td>
                     </tr>
@@ -619,7 +626,7 @@ function TimeTrackingPage() {
                                   
                                 </td>
                                 
-                                <td data-label="Total Time" className="onHide">{ formattotalTime(activity?.totalDuration) || '00:00'}</td>
+                                <td data-label="Total Time" className="onHide">{ formatTime(activity?.totalDuration) || '00:00'}</td>
                                 
                                 <td className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
                               </tr>
@@ -676,7 +683,7 @@ function TimeTrackingPage() {
                   <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
                   <span className="ms-md-3">{ currentActivity?.latestActivity?.app_version}</span>
                   <p className="task--timer">
-                    <span><strong>{ formattotalTime(currentActivity?.totalDuration) || '00:00'}</strong></span>
+                    <span><strong>{ formatTime(currentActivity?.totalDuration) || '00:00'}</strong></span>
                   </p>
                   <div className={isScreenActive ? 'expand--button exit--fullscreen' : 'expand--button'}>
                   <Button variant="secondary" className="enter--screen" onClick={toggleFullscreen}>

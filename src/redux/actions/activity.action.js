@@ -50,12 +50,12 @@ export const getliveActivity = (payload) => {
   };
 }
 
-export const getRecoredActivity = (id, status) => {
+export const getRecoredActivity = (id, status, filtereddate) => {
 
   return async (dispatch) => {
     try {
 
-      const response = await API.apiGet('activity', { id: id, status: status })
+      const response = await API.apiGet('activity', { id: id, status: status, date_range: filtereddate })
     
       if (response.data && response.data.success) {
          await dispatch({ type: RECORDED_ACTIVITY_SUCCESS, payload: response.data });
