@@ -552,13 +552,10 @@ function ProjectsPage() {
     const handleKeyDown = (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
             pasteOccurred.current = true; // Mark that a paste action is expected
-            console.log('Paste keyboard shortcut detected');
         }
     };
 
     const handleRowDoubleClick = (project, index) => {
-        console.log('index is: ', index)
-
         if (project.marked_by && project.marked_by.includes(memberdata._id)) {
             setProjects((prevProjects) => {
                 // Create a new array from the previous projects
@@ -574,10 +571,7 @@ function ProjectsPage() {
                         ...projectToUpdate,
                         marked_by: updatedMarkedBy,
                     };
-                    console.log('project to update:: ', {
-                        ...projectToUpdate,
-                        marked_by: updatedMarkedBy,
-                    })
+                    
                 }
 
                 return updatedProjects; // Return the updated projects array
@@ -590,7 +584,6 @@ function ProjectsPage() {
 
     const handlePaste = (e) => {
         const pastedData = e.clipboardData.getData('text');
-        console.log('Pasted content:', pastedData);
         pasteOccurred.current = true; // Set the paste flag to true
         setTimeout(function () {
             pasteOccurred.current = false;

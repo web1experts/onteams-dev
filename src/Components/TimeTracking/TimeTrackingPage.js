@@ -20,14 +20,17 @@ function TimeTrackingPage() {
   const [spinner, setSpinner] = useState(false)
   const [isActive, setIsActive] = useState(false);
   const [isScreenActive, setIsScreenActive] = useState(false);
+  const [ recordedRefresh, setRecordedRefresh ] = useState(true)
   const handleClick = (activity) => {
     setIsActive(current => !current);
+    setRecordedRefresh( true )
     setCurrentActivity( activity)
   };
   const options = { day: '2-digit', month: 'long', year: 'numeric' };
   const [currentActivity, setCurrentActivity] = useState(false);
   const dispatch = useDispatch()
   const fullscreenRef = React.useRef(null);
+  const datePickerRef = useRef(null)
   const [activeTab, setActiveTab] = useState("Live");
   const [screenshotTab, setScreenshotTab] = useState('Screenshots');
   const [activeInnerTab, setActiveInnerTab] = useState("InnerLive");
@@ -44,7 +47,10 @@ function TimeTrackingPage() {
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
   const [ date, setDate ] = useState('')
-  const [ filtereddate, setFilteredDate ] = useState('')
+  const [ filtereddate, setFilteredDate ] = useState([new Date().toISOString().split('T')[0]])
+  
+  const [selectedFilter, setSelectedFilter ] = useState('today')
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [showSearch, setSearchShow] = useState(false);
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
@@ -54,6 +60,7 @@ function TimeTrackingPage() {
     function startsharing(userID, status){
       socket.emit('joinRoom', userID)
      if( status === true ){
+      setSpinner(true)
       setTimeout(function(){        
         socket.emit('watcher', socket.id, userID, userID, currentMember.role?.slug)
      },800)
@@ -64,7 +71,7 @@ function TimeTrackingPage() {
      socket.emit('leaveRoom', socket.id, room )
    }
   const handleLiveActivityList = async () => {
-    let selectedfilters = { currentPage: currentPage, status: 'live' }
+    let selectedfilters = { currentPage: currentPage, status: activeTab.toLowerCase(), date_range: filtereddate }
     if (Object.keys(filters).length > 0) {
         selectedfilters = { ...selectedfilters, ...filters }
     }
@@ -84,19 +91,6 @@ function TimeTrackingPage() {
     setIsScreenActive(current => !current);
   };
 
-  // function formattotalTime(time){
-  //   const hours = Math.floor(time / (1000 * 60 * 60));
-  //   const minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
-
-  //   let formattedTime = ''; 
-  //   if (hours > 0) {
-  //       formattedTime += `${hours}h `;
-  //   }
-  //   if (minutes > 0 || hours > 0) {
-  //       formattedTime += `${minutes}m`;
-  //   }
-  //   return formattedTime.trim();
-  // }
 
   function formatTime(seconds) {
     // Validate input: check if seconds is a valid non-negative number
@@ -111,9 +105,10 @@ function TimeTrackingPage() {
 
   useEffect(() => { 
     if(currentActivity !== false && activeTab === "Live"){ 
+      
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
     }
-    if(currentActivity !== false && activeInnerTab === "InnerRecorded"){
+    if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true){
       // setActiveInnerTab("InnerRecorded")
       handleRecordedActivity()
     }
@@ -125,10 +120,6 @@ function TimeTrackingPage() {
     }
   }, [filters])
 
-  useEffect(() => {
-    console.log("filtereddate :: ", filtereddate)
-  }, [ filtereddate ])
-
 
   useEffect(() => {
     refreshSocket()
@@ -136,6 +127,7 @@ function TimeTrackingPage() {
     handleLiveActivityList()
 
     socket.on('trackerstateUpdate', (memberId) => {
+      setRecordedRefresh(false)
       handleLiveActivityList()
     })
 
@@ -167,6 +159,7 @@ function TimeTrackingPage() {
           if(event.stream){
             videoRef.current.srcObject = event.stream;
             videoRef.current.onloadedmetadata = () => videoRef.current.play();
+            setSpinner(false)
           }
         };
         peerConnections[id].onicecandidate = function (event) {
@@ -178,7 +171,9 @@ function TimeTrackingPage() {
         peerConnections[id].addEventListener('iceconnectionstatechange', () => {console.log('ICE Connection State:', peerConnections[id].iceConnectionState);
           if (peerConnections[id].iceConnectionState === 'connected' || peerConnections[id].iceConnectionState === 'completed' || peerConnections[id].iceConnectionState === 'disconnected' || peerConnections[id].iceConnectionState === 'failed') {
               console.log('WebRTC connection is complete!');
-              
+              if(peerConnections[id].iceConnectionState === 'disconnected' || peerConnections[id].iceConnectionState === 'failed'){
+                setSpinner(false)
+              }
           }
         });
   });
@@ -193,6 +188,34 @@ function TimeTrackingPage() {
 
   setSpinner(true)
   }, [])
+
+  function generateTimeRange(createdAt, tasks) {
+    // Create a new Date object from the createdAt date (UTC)
+    const startTime = new Date(createdAt);
+    
+    // If tasks array is empty, the total duration will be 0
+    const totalDurationInSeconds = tasks.length > 0
+        ? tasks.reduce((sum, task) => sum + task.duration, 0)
+        : 0;
+    
+    // Add the total duration in seconds to the start time
+    const endTime = new Date(startTime.getTime() + totalDurationInSeconds * 1000);
+    
+    // Format the start and end times using local time zone
+    const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+    });
+    const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+    });
+    
+    // Return the formatted time range
+    return `${startTimeFormatted} - ${endTimeFormatted}`;
+}
 
   useEffect(() => {
     if (activitystate?.liveactivities?.memberData) { 
@@ -246,6 +269,9 @@ function TimeTrackingPage() {
   
   useEffect(() => {
     selectboxObserver();
+    if( activeTab !== "Recordings"){
+      handleLiveActivityList()
+    }
   }, [activeTab])
 
   useEffect(() => {
@@ -292,53 +318,10 @@ function TimeTrackingPage() {
   // }, [screenshotTab])
 
   const showTabs = () => {
-    if (activeTab === 'Recorded') {
+    if (activeTab === 'Recordings') {
       return (
         <>
-          <ListGroup.Item key="filter-key-1" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('show_for', event.target.value)} value={filters['show_for'] || 'all'}>
-                <option value="all">Team Projects</option>
-                <option value="my">My Projects</option>
-            </Form.Select>
-            
-          </ListGroup.Item>
-          <ListGroup.Item key="filter-key-2" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-          <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
-              <option value="all">View All</option>
-              <option value="active">Active</option>
-              <option value="pause">Paused</option>
-              <option value="inactive">Inactive</option>
-          </Form.Select>
-          </ListGroup.Item>
-          <ListGroup.Item key="filter-key-4" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-            <Form>
-              <Form.Group className="mb-0 form-group">
-              <DatePicker 
-                    name="date"
-                    id='date--picker'
-                    value={date} 
-                    onChange={async (value) => {
-                        const date = value.toDate();
-                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                        const year = date.getFullYear();
-                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                        const day = date.getDate().toString().padStart(2, '0');
-                        const hours = date.getHours().toString().padStart(2, '0');
-                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                        // Combine into the desired format
-                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                        
-                        setDate(formattedDate)
-                      }
-                    }                    
-                    className="form-control"
-                    placeholder="dd/mm/yyyy"
-                />
-              </Form.Group>
-            </Form>
-          </ListGroup.Item>
+          {showDate()}
           <ListGroup.Item key="filter-key-5" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
             <Form>
               <Form.Group className="mb-0 form-group">
@@ -372,54 +355,134 @@ function TimeTrackingPage() {
     }
   }
 
+  const FilterButton = ({ position }) => {
+    return (
+      <>
+        <div className="filter-box">
+          <Button variant="primary" onClick={() => {
+            if( isActive ){
+              handleRecordedActivity()
+            }else{  
+              setIsPickerOpen(false)
+              handleLiveActivityList()
+            }
+            
+          }} className="date-filter-btn">Apply</Button>
+          <Button variant="primary" onClick={() => setIsPickerOpen(false)} className="date-filter-btn">Cancel</Button>
+        </div>
+      </>
+    )
+  }
+
+  const FiltersDate = ({ position, setFilteredDate, setSelectedFilter, setIsPickerOpen }) => {
+    
+    // Helper function to format dates as "YYYY-MM-DD"
+    const formatDate = (date) => {
+        return date.toISOString().split("T")[0];
+    };
+
+    // Helper function to calculate date ranges
+    const handleDateFilter = (event, start, end = null) => {
+        event.stopPropagation();
+        if (end !== null) {
+            setFilteredDate([formatDate(start), formatDate(end)]);
+        } else {
+            setFilteredDate([formatDate(start)]);
+        }
+        datePickerRef.current.closeCalendar()
+        datePickerRef.current.openCalendar()
+    };
+
+    const today = new Date();
+
+    // Yesterday
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // Last 7 days
+    const last7Days = new Date(today);
+    last7Days.setDate(last7Days.getDate() - 6); // Subtract 6 to get exactly 7 days including today
+
+    // Last week (Monday to Sunday)
+    const lastWeekEnd = new Date(today);
+    lastWeekEnd.setDate(today.getDate() - today.getDay()); // Last Sunday
+    const lastWeekStart = new Date(lastWeekEnd);
+    lastWeekStart.setDate(lastWeekStart.getDate() - 6); // Last Monday
+
+    // Last 2 weeks (from Monday of the week before last week)
+    const last2WeeksStart = new Date(lastWeekStart);
+    last2WeeksStart.setDate(last2WeeksStart.getDate() - 7);
+
+    // This month (start to end of the current month)
+    // This month (start to end of the current month)
+    const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 2);
+    const thisMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Correctly gets the last day of the current month
+    thisMonthEnd.setHours(23, 59, 59, 999); // Optional: Ensure full inclusion of the last day
+
+
+    // Last month (start to end of the previous month)
+    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 2);
+    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of the last month
+    lastMonthEnd.setHours(23, 59, 59, 999); // Ensure full-day inclusion for the last day
+
+
+    return (
+        <>
+            <ListGroup vertical="true" className="date-filters">
+                <ListGroup.Item className={ selectedFilter === 'today'? 'active': ''} key={'date-today'} onClick={(e) => {handleDateFilter(e, today); setSelectedFilter('today')}}>Today</ListGroup.Item>
+                <ListGroup.Item className={ selectedFilter === 'yesterday'? 'active': ''} key={'date-yesterday'} onClick={(e) =>{ handleDateFilter(e, yesterday); setSelectedFilter('yesterday')}}>Yesterday</ListGroup.Item>
+                <ListGroup.Item className={ selectedFilter === '7days'? 'active': ''} key={'date-7days'} onClick={(e) => {handleDateFilter(e, last7Days, today); setSelectedFilter('7days')}}>Last 7 days</ListGroup.Item>
+                <ListGroup.Item className={ selectedFilter === 'last-week'? 'active': ''} key={'date-last-week'} onClick={(e) => {handleDateFilter(e, lastWeekStart, lastWeekEnd); setSelectedFilter('last-week')}}>Last week</ListGroup.Item>
+                <ListGroup.Item className={ selectedFilter === 'last2-weeks'? 'active': ''} key={'date-last2-weeks'} onClick={(e) => {handleDateFilter(e, last2WeeksStart, lastWeekEnd); setSelectedFilter('last2-weeks')}}>Last 2 weeks</ListGroup.Item>
+                <ListGroup.Item className={ selectedFilter === 'this-month'? 'active': ''} key={'date-this-month'} onClick={(e) => {handleDateFilter(e, thisMonthStart, thisMonthEnd); setSelectedFilter('this-month')}}>This month</ListGroup.Item>
+                <ListGroup.Item className={ selectedFilter === 'last-month'? 'active': ''} key={'date-last-month'} onClick={(e) => {handleDateFilter(e, lastMonthStart, lastMonthEnd); setSelectedFilter('last-month')}}>Last month</ListGroup.Item>
+            </ListGroup>
+        </>
+    );
+};
+
   const showDate = () => {
-    if (activeInnerTab === 'InnerRecorded') {
+    // if (activeInnerTab === 'InnerRecorded') {
       return (
         <>
           <ListGroup.Item className="no--style">
             <Form>
               <Form.Group className="mb-0 form-group">
                 <DatePicker 
+                    key={'date-filter'}
+                    ref={datePickerRef}
                     name="date"
-                    id='date--picker'
+                    weekStartDayIndex={1}
+                    id='datepicker-filter'
                     value={filtereddate} 
                     format="YYYY-MM-DD"
                     range
+                    numberOfMonths={2}
                     dateSeparator=" - " 
                     onChange={async (value) => {
-                        // const date = value.toDate();
-                        // // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                        // const year = date.getFullYear();
-                        // const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                        // const day = date.getDate().toString().padStart(2, '0');
-                        // const hours = date.getHours().toString().padStart(2, '0');
-                        // const minutes = date.getMinutes().toString().padStart(2, '0');
-                        // const seconds = date.getSeconds().toString().padStart(2, '0');
-                        // const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                        // // Combine into the desired format
-                        // const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                        
                         setFilteredDate(value)
                       }
-                    }  
-                    onClose={() => {
-                      console.log('Date picker lost focus. Triggering filter.'); 
-                      handleRecordedActivity()
-                    }}                  
+                    }          
                     className="form-control"
                     placeholder="dd/mm/yyyy"
+                    open={isPickerOpen} // Control visibility with state
+                    onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                    onClose={() => setIsPickerOpen(false)} // Update state when closed
+                    plugins={
+                      [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
+                    } 
                 />
               </Form.Group>
             </Form>
           </ListGroup.Item>
         </>
       )
-    } else {
-      return (
-        <>
-        </>
-      )
-    }
+    // } else {
+    //   return (
+    //     <>
+    //     </>
+    //   )
+    // }
   }
 
   const showRecordedTabs = () => {
@@ -443,6 +506,7 @@ function TimeTrackingPage() {
       )
     }
   }
+  
 
   const getActiveTab = (recordingId) => screenshotTab[recordingId] || "Screenshots";
 
@@ -495,7 +559,7 @@ function TimeTrackingPage() {
                         setCurrentActivity(cact);
                       }
                       setActiveTab("Live")}}>Live</ListGroup.Item>
-                    <ListGroup.Item action active={activeTab === "Recorded"} onClick={() => {setActiveTab("Recorded")}}>Recorded</ListGroup.Item>
+                    <ListGroup.Item action active={activeTab === "Recordings"} onClick={() => {setActiveTab("Recordings")}}>Recorded</ListGroup.Item>
                     {showTabs()}
                   </ListGroup>
                 </h2>
@@ -530,7 +594,7 @@ function TimeTrackingPage() {
                     {
                       liveactivities.length > 0 ?
                         liveactivities.map((activity, index) => {
-                          totalhours += Number(activity?.totalDuration || 0)
+                          totalhours += Number(activity?.totalTaskDuration || 0)
                           totalProjecthours += Number(activity?.latestActivity?.duration || 0)
                           return (
                             <>
@@ -551,16 +615,16 @@ function TimeTrackingPage() {
                                         <small className="status--circle active--color"></small>
                                         :
                                         activity?.latestActivity?.status === false  ?
-                                        <small className="status--circle info--color"></small>
+                                        <small className="status--circle idle--color"></small>
                                         :
-                                        null
+                                        <small className="status--circle inactive--color"></small>
                                       }
                                     </span>
                                 </td>
                                 <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
                                 <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title || '--' }</span></td>
                                 <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ formatTime(activity?.latestActivity?.duration) || '00:00'}</td>
-                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formatTime(activity?.totalDuration) || '00:00'}</td>
+                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formatTime(activity?.totalTaskDuration) || '00:00'}</td>
                                 <td data-label="Status" key={`status-title-${activity?._id}`} className="onHide">
                                   { 
                                     (activity?.latestActivity?.status) ? 
@@ -596,7 +660,7 @@ function TimeTrackingPage() {
                 </Table>
               </>
             )}
-            {activeTab === "Recorded" && (
+            {activeTab === "Recordings" && (
               <>
                 <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
                 <Table responsive="lg" className="activity--table">
@@ -612,8 +676,8 @@ function TimeTrackingPage() {
                   {
                       liveactivities.length > 0 ?
                         liveactivities.map((activity, index) => {
-                          totalhours += Number(activity?.totalDuration || 0)
-                          totalProjecthours += Number(activity?.latestActivity?.duration || 0)
+                          totalhours += Number(activity?.totalTaskDuration || 0)
+                         
                           return (
                             <>
                               <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
@@ -626,7 +690,7 @@ function TimeTrackingPage() {
                                   
                                 </td>
                                 
-                                <td data-label="Total Time" className="onHide">{ formatTime(activity?.totalDuration) || '00:00'}</td>
+                                <td data-label="Total Time" className="onHide">{ formatTime(activity?.totalTaskDuration) || '00:00'}</td>
                                 
                                 <td className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
                               </tr>
@@ -683,7 +747,7 @@ function TimeTrackingPage() {
                   <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
                   <span className="ms-md-3">{ currentActivity?.latestActivity?.app_version}</span>
                   <p className="task--timer">
-                    <span><strong>{ formatTime(currentActivity?.totalDuration) || '00:00'}</strong></span>
+                    <span><strong>{ formatTime(currentActivity?.totalTaskDuration) || '00:00'}</strong></span>
                   </p>
                   <div className={isScreenActive ? 'expand--button exit--fullscreen' : 'expand--button'}>
                   <Button variant="secondary" className="enter--screen" onClick={toggleFullscreen}>
@@ -729,8 +793,8 @@ function TimeTrackingPage() {
                         <p>
                           <span>Project: {recording?.project?.title}</span>
                           <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
+                          <strong>{ generateTimeRange(recording?.createdAt, recording?.tasks)}</strong>
                         </p>
-                        <h3>{ formatTime(recording?.duration) || '00:00'}</h3>
                       </div>
                       <div className="shots--list pt-3">
                       <CardGroup>
@@ -775,7 +839,7 @@ function TimeTrackingPage() {
                                         Your browser does not support the video tag.
                                       </video>
                                       <p>
-                                        <strong>Task Name:</strong> {recording.task?.title} <br />
+                                        <strong>Task Name:</strong> {videoData.task_data?.title} <br />
                                         <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
                                       </p>
                                     </Card.Body>
