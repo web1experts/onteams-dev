@@ -5,7 +5,6 @@ import {jwtDecode} from 'jwt-decode';
 import axios from './api/instance'
 import { parseIfValidJSON } from './commonfunctions';
 const secretKey = process.env.REACT_APP_SECRET_KEY
-
 let socket;
 
 // Function to initialize or refresh the socket connection
@@ -16,8 +15,6 @@ const initializeSocket = () => {
 
   socket = io(process.env.REACT_APP_API_HOST, {
     transports: ['websocket'], maxHttpBufferSize: 1e8 });
-
-  
 };
 
 // Initialize the socket connection
@@ -31,11 +28,6 @@ export const refreshSocket = () => {
 // Export the socket instance
 export { socket };
 
-
-
-
-
-
 export function encryptJsonData(data, key) {
   return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
 }
@@ -44,7 +36,6 @@ export function decryptJsonData(data, key) {
   const bytes = CryptoJS.AES.decrypt(data, key); 
   return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 }
-
 
 // export const socket = io(process.env.REACT_APP_API_HOST, {
 //   transports: ['polling'], maxHttpBufferSize: 1e8 });
@@ -121,12 +112,8 @@ export function isAuth() {
 
 export async function login(token,  current_loggedin_user = false, companies = []) {
   localStorage.setItem('accessToken', token);
-
   localStorage.setItem('current_loggedin_user', JSON.stringify(current_loggedin_user, secretKey));
   setupDashboards( companies)
-
-  // localStorage.setItem('current_loggedin_user', JSON.stringify(current_loggedin_user));
-  // localStorage.setItem('company', JSON.stringify(current_loggedin_user?.company));
   setAuthorization();
   return true;
 }
@@ -162,9 +149,7 @@ export function setupDashboards( companies ){
       axios.defaults.headers.common.companyId =  companies[0].company._id || ''
       localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
       axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
-    }
-    
-    
+    } 
   }else{ 
     localStorage.removeItem('current_dashboard');
     localStorage.removeItem('mt_dashboards');

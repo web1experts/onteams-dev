@@ -87,10 +87,10 @@ function DashboardPage() {
             <h2>Welcome to OnTeams</h2>
             <div className="btn--group">
               <Button type="button" variant="primary">
-                <a href='/downloads/On-teams-win32-ia32.zip' download>Onteams Desktop App For Windows</a>
+                <a href='/downloads/onteams-win32-ia32.zip' download>Onteams Desktop App For Windows</a>
               </Button>
               <Button type="button" variant="outline-primary">
-                <a href='/downloads/On-teams-darwin-x64.zip' download>Onteams Desktop App For Mac OS</a>
+                <a href='/downloads/onteams-darwin-x64.zip' download>Onteams Desktop App For Mac OS</a>
               </Button>
             </div>
           </Container>

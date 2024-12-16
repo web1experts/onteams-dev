@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown, Accordion } from "react-bootstrap";
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
@@ -18,6 +18,7 @@ function TimeTrackingPage() {
   let totalProjecthours = 0
   const currentMember = getMemberdata();
   const [spinner, setSpinner] = useState(false)
+  const [activityspinner, setActSpinner] = useState(false)
   const [isActive, setIsActive] = useState(false);
   const [isScreenActive, setIsScreenActive] = useState(false);
   const [ recordedRefresh, setRecordedRefresh ] = useState(true)
@@ -25,6 +26,11 @@ function TimeTrackingPage() {
     setIsActive(current => !current);
     setRecordedRefresh( true )
     setCurrentActivity( activity)
+    if(activeTab === "Recordings"){
+      setActiveInnerTab("InnerRecorded")
+    }else{
+      setActiveInnerTab("InnerLive")
+    }
   };
   const options = { day: '2-digit', month: 'long', year: 'numeric' };
   const [currentActivity, setCurrentActivity] = useState(false);
@@ -60,7 +66,7 @@ function TimeTrackingPage() {
     function startsharing(userID, status){
       socket.emit('joinRoom', userID)
      if( status === true ){
-      setSpinner(true)
+      setActSpinner(true)
       setTimeout(function(){        
         socket.emit('watcher', socket.id, userID, userID, currentMember.role?.slug)
      },800)
@@ -81,9 +87,9 @@ function TimeTrackingPage() {
   
 
   const handleRecordedActivity = async () => {
-    setSpinner(true)
+    setActSpinner(true)
     await dispatch(getRecoredActivity(currentActivity._id, 'recorded', filtereddate))
-      setSpinner(false)
+    setActSpinner(false)
   }
 
   
@@ -105,7 +111,7 @@ function TimeTrackingPage() {
 
   useEffect(() => { 
     if(currentActivity !== false && activeTab === "Live"){ 
-      
+        setSpinner( false )
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
     }
     if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true){
@@ -126,10 +132,29 @@ function TimeTrackingPage() {
     selectboxObserver()
     handleLiveActivityList()
 
-    socket.on('trackerstateUpdate', (memberId) => {
-      setRecordedRefresh(false)
-      handleLiveActivityList()
-    })
+    socket.on('trackerstateUpdate', (memberData) => {
+      setRecordedRefresh(false);
+      console.log('run activity refresh');
+      console.log('Member to update:: ', memberData._id);
+  
+      setLiveactivities((prevActivities) => {
+          console.log('liveactivities.length:: ', prevActivities.length);
+  
+          if (memberData && memberData._id && prevActivities && prevActivities.length > 0) {
+              const updatedActivities = prevActivities.map(activity =>
+                  activity._id === memberData._id ? { ...activity, ...memberData } : activity
+              );
+              console.log('updatedActivities:: ', updatedActivities);
+              return updatedActivities;
+          }
+  
+          // If no update is needed, return the previous state
+          return prevActivities;
+      });
+  
+      // handleLiveActivityList() if required
+  });
+  
 
     socket.on('offer', function (id, description, roomId) {
       if(peerConnections[id]){ 
@@ -159,7 +184,8 @@ function TimeTrackingPage() {
           if(event.stream){
             videoRef.current.srcObject = event.stream;
             videoRef.current.onloadedmetadata = () => videoRef.current.play();
-            setSpinner(false)
+            
+            
           }
         };
         peerConnections[id].onicecandidate = function (event) {
@@ -172,7 +198,7 @@ function TimeTrackingPage() {
           if (peerConnections[id].iceConnectionState === 'connected' || peerConnections[id].iceConnectionState === 'completed' || peerConnections[id].iceConnectionState === 'disconnected' || peerConnections[id].iceConnectionState === 'failed') {
               console.log('WebRTC connection is complete!');
               if(peerConnections[id].iceConnectionState === 'disconnected' || peerConnections[id].iceConnectionState === 'failed'){
-                setSpinner(false)
+                setActSpinner(false)
               }
           }
         });
@@ -187,6 +213,11 @@ function TimeTrackingPage() {
   });
 
   setSpinner(true)
+
+  setInterval(function(){
+    handleLiveActivityList()
+  }, 60000)
+
   }, [])
 
   function generateTimeRange(createdAt, tasks) {
@@ -220,14 +251,14 @@ function TimeTrackingPage() {
   useEffect(() => {
     if (activitystate?.liveactivities?.memberData) { 
       setLiveactivities(activitystate.liveactivities.memberData)
-      if (currentActivity && Object.keys(currentActivity).length > 0) {
-        activitystate.liveactivities.memberData.forEach((a, inx) => {
-            if (a._id === currentActivity._id) {
-                setCurrentActivity(a);
-                return;
-            }
-        })
-      }
+      // if (currentActivity && Object.keys(currentActivity).length > 0) {
+      //   activitystate.liveactivities.memberData.forEach((a, inx) => {
+      //       if (a._id === currentActivity._id) {
+      //           setCurrentActivity(a);
+      //           return;
+      //       }
+      //   })
+      // }
     }
 
     if( activitystate?.recordedActivity ){
@@ -276,7 +307,7 @@ function TimeTrackingPage() {
 
   useEffect(() => {
   
-    if( activeInnerTab === "InnerRecorded"){
+    if( activeInnerTab === "InnerRecorded" && currentActivity){
       handleRecordedActivity()
     }
   }, [activeInnerTab])
@@ -712,6 +743,12 @@ function TimeTrackingPage() {
         </div>
       </div>
       <div className="details--wrapper">
+        {
+              activityspinner &&
+              <div class="loading-bar">
+                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+              </div>
+          }
         <div className="wrapper--title">
           <ListGroup horizontal className="live--tabs">
             <ListGroup.Item key={'live-key'} action active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
@@ -734,7 +771,7 @@ function TimeTrackingPage() {
           </ListGroup>
           <ListGroup horizontal>
             {showRecordedTabs()}
-            <ListGroup.Item key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false)}}>
+            <ListGroup.Item key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false);}}>
               <MdOutlineClose />
             </ListGroup.Item>
           </ListGroup>
@@ -766,7 +803,7 @@ function TimeTrackingPage() {
                 </div>
                 {
                   currentActivity?.latestActivity?.status ? 
-                  <video ref={videoRef} id='remoteVideo' width="100%"  className="video" 
+                  <video ref={videoRef} id='remoteVideo' width="100%"  className="video" onLoadedData={() => {setActSpinner( false )}}
                   preload="auto"
                         autoPlay
                         muted>video not available</video>
@@ -784,82 +821,91 @@ function TimeTrackingPage() {
           )}
           {activeInnerTab === "InnerRecorded" && (
             <>
+            <Accordion defaultActiveKey="0">
               {
                 recordedactivities && recordedactivities.length > 0 ? 
                   recordedactivities.map((recording, index) => {
                     return (
                     <>
-                      <div className="wrapper--title screens--tabs">
-                        <p>
-                          <span>Project: {recording?.project?.title}</span>
-                          <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
-                          <strong>{ generateTimeRange(recording?.createdAt, recording?.tasks)}</strong>
-                        </p>
+                    
+                    <Accordion.Item eventKey={index}>
+                      <div className="screens--tabs">
+                      
+                        <Accordion.Header>
+                          <p>
+                            <span>Project: {recording?.project?.title}</span>
+                            <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
+                            <strong>{ generateTimeRange(recording?.createdAt, recording?.tasks)}</strong>
+                          </p>
+                        </Accordion.Header>
                       </div>
+                      <Accordion.Body>
                       <div className="shots--list pt-3">
                       <CardGroup>
                           {
-                            recording?.activityMeta &&
-                            recording.activityMeta.length > 0 &&
-                            recording.activityMeta.map((meta, i) => {
-                              // Handle screenshots tab
-                              if (
-                                screenshotTab === "Screenshots" &&
-                                meta.meta_key === 'screenshots' &&
-                                meta.meta_value.length > 0
-                              ) {
-                                return meta.meta_value.map((screenshotData, j) => (
-                                  <Card key={`screenshot-card-${i}-${j}`}>
-                                    <Card.Body>
-                                      <img
-                                        className="card-img-top"
-                                        src={screenshotData?.url}
-                                        alt="Card image cap"
-                                        onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
-                                      />
-                                      <p>
-                                        <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
-                                        <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
-                                      </p>
-                                    </Card.Body>
-                                  </Card>
-                                ));
-                              }
-                              // Handle videos tab
-                              if (
-                                screenshotTab === "Videos" &&
-                                meta.meta_key === 'videos' &&
-                                meta.meta_value.length > 0
-                              ) {
-                                return meta.meta_value.map((videoData, j) => (
-                                  <Card key={`video-card-${i}-${j}`}>
-                                    <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                      <video controls height="175px">
-                                        <source src={videoData?.url} type="video/webm" />
-                                        Your browser does not support the video tag.
-                                      </video>
-                                      <p>
-                                        <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                        <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                      </p>
-                                    </Card.Body>
-                                  </Card>
-                                ));
-                              }
-                              return null; // Return null if no condition is met
-                            })
+                            recording?.activityMeta && recording.activityMeta.length > 0 ? (
+                              recording.activityMeta.map((meta, i) => {
+                                // Handle screenshots tab
+                                if (screenshotTab === "Screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
+                                  return meta.meta_value.map((screenshotData, j) => (
+                                    <Card key={`screenshot-card-${i}-${j}`}>
+                                      <Card.Body>
+                                        <img
+                                          className="card-img-top"
+                                          src={screenshotData?.url}
+                                          alt="screenshot"
+                                          onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
+                                        />
+                                        <p>
+                                          <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
+                                          <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
+                                        </p>
+                                      </Card.Body>
+                                    </Card>
+                                  ));
+                                }
+
+                                // Handle videos tab
+                                if (screenshotTab === "Videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
+                                  return meta.meta_value.map((videoData, j) => (
+                                    <Card key={`video-card-${i}-${j}`}>
+                                      <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
+                                        <video controls height="175px">
+                                          <source src={videoData?.url} type="video/webm" />
+                                          Your browser does not support the video tag.
+                                        </video>
+                                        <p>
+                                          <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                                          <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                        </p>
+                                      </Card.Body>
+                                    </Card>
+                                  ));
+                                }
+
+                                return null; // Return null if no condition is met
+                              })
+                            ) : (
+                              <div>No data available</div> // Display if no data is available
+                            )
                           }
                         </CardGroup>
 
+
                       </div>
+                      </Accordion.Body>
+                      </Accordion.Item>
+                  
                     </>
                     )
                   })
                 :
                 <p class="text-center mt-5">No activity available.</p>
               }
+            </Accordion>  
             </>
           )}
+          
         </div>
       </div>
       {/*--=-=Filter Modal**/}
