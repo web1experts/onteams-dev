@@ -6,7 +6,7 @@ import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, 
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit } from "react-icons/bs";
+import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise } from "react-icons/bs";
 import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
@@ -139,10 +139,7 @@ function TimeTrackingPage() {
     handleLiveActivityList()
 
     socket.on('trackerstateUpdate', (memberData, status = false) => {
-      setRecordedRefresh(false); console.log('status is: ', status)
-      console.log('run activity refresh');
-      console.log('Member to update:: ', memberData._id);
-  
+      setRecordedRefresh(false); 
       setLiveactivities((prevActivities) => {
   
           if (memberData && memberData._id && prevActivities && prevActivities.length > 0) {
@@ -254,73 +251,73 @@ function TimeTrackingPage() {
 
   }, [])
 
-//   function generateTimeRange(createdAt, tasks) {
-//     // Create a new Date object from the createdAt date (UTC)
-//     const startTime = new Date(createdAt);
+  function generateTimeRange(createdAt, tasks) {
+    // Create a new Date object from the createdAt date (UTC)
+    const startTime = new Date(createdAt);
     
-//     // If tasks array is empty, the total duration will be 0
-//     const totalDurationInSeconds = tasks.length > 0
-//         ? tasks.reduce((sum, task) => sum + task.duration, 0)
-//         : 0;
+    // If tasks array is empty, the total duration will be 0
+    const totalDurationInSeconds = tasks.length > 0
+        ? tasks.reduce((sum, task) => sum + task.duration, 0)
+        : 0;
     
-//     // Add the total duration in seconds to the start time
-//     const endTime = new Date(startTime.getTime() + totalDurationInSeconds * 1000);
+    // Add the total duration in seconds to the start time
+    const endTime = new Date(startTime.getTime() + totalDurationInSeconds * 1000);
     
-//     // Calculate hours and minutes for the duration
-//     const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
-//     const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
+    // Calculate hours and minutes for the duration
+    const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
+    const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
     
-//     // Format hours and minutes into a string (e.g., 1:30 hrs)
-//     const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
+    // Format hours and minutes into a string (e.g., 1:30 hrs)
+    const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
     
-//     // Format the start and end times using local time zone
-//     const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
-//       hour: '2-digit',
-//       minute: '2-digit',
-//       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-//     });
-//     const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
-//       hour: '2-digit',
-//       minute: '2-digit',
-//       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-//     });
-    
-//     // Return the formatted time range with duration in brackets
-//     return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
-// }
-
-
-function generateTimeRange(createdAt, updatedAt) {
-  // Create Date objects from createdAt and updatedAt (UTC)
-  const startTime = new Date(createdAt);
-  const endTime = new Date(updatedAt);
-
-  // Calculate the difference in seconds between updatedAt and createdAt
-  const totalDurationInSeconds = (endTime - startTime) / 1000; // Convert milliseconds to seconds
-
-  // Calculate hours and minutes for the total duration
-  const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
-  const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
-  
-  // Format hours and minutes into a string (e.g., 1:30 hrs)
-  const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
-  
-  // Format the start and end times using local time zone
-  const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
+    // Format the start and end times using local time zone
+    const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-  });
-  
-  const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
+    });
+    const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-  });
-  
-  // Return the formatted time range with duration in brackets
-  return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
+    });
+    
+    // Return the formatted time range with duration in brackets
+    return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
 }
+
+
+// function generateTimeRange(createdAt, updatedAt) {
+//   // Create Date objects from createdAt and updatedAt (UTC)
+//   const startTime = new Date(createdAt);
+//   const endTime = new Date(updatedAt);
+
+//   // Calculate the difference in seconds between updatedAt and createdAt
+//   const totalDurationInSeconds = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+
+//   // Calculate hours and minutes for the total duration
+//   const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
+//   const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
+  
+//   // Format hours and minutes into a string (e.g., 1:30 hrs)
+//   const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
+  
+//   // Format the start and end times using local time zone
+//   const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
+//       hour: '2-digit',
+//       minute: '2-digit',
+//       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+//   });
+  
+//   const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
+//       hour: '2-digit',
+//       minute: '2-digit',
+//       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+//   });
+  
+//   // Return the formatted time range with duration in brackets
+//   return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
+// }
 
 
 
@@ -659,6 +656,9 @@ function generateTimeRange(createdAt, updatedAt) {
                   <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
                   <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button>
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
+                    <ListGroup.Item>
+                      <BsArrowClockwise onClick={handleLiveActivityList}/>
+                    </ListGroup.Item>
                     <ListGroup.Item action active={activeTab === "Live"} onClick={() => {
                       if( currentActivity && Object.keys(currentActivity)){
                         const cact = currentActivity
@@ -846,6 +846,9 @@ function generateTimeRange(createdAt, updatedAt) {
               Recorded
             </ListGroup.Item>
             {showDate()}
+            <ListGroup.Item>
+              <BsArrowClockwise onClick={handleRecordedActivity}/>
+            </ListGroup.Item>
           </ListGroup>
           <ListGroup horizontal>
             {showRecordedTabs()}
@@ -913,8 +916,8 @@ function generateTimeRange(createdAt, updatedAt) {
                           <p>
                             <span>Project: {recording?.project?.title}</span>
                             <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
-                            <strong>{ generateTimeRange(recording?.createdAt, recording?.updatedAt)}</strong>
-                          </p>
+                            <strong>{ generateTimeRange(recording?.createdAt, recording?.tasks)}</strong>
+                          </p>ß
                         </Accordion.Header>
                       </div>
                       <Accordion.Body>
