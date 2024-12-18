@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSingleMemberByUserAndCompanyId, Listmembers } from '../../redux/actions/members.action';
 import { useToast } from '../../context/ToastContext';
 import { setAuthorization } from '../../helpers/api';
-import { setupDashboards } from '../../helpers/auth';
 import { REFRESH_DASHBOARDS } from '../../redux/actions/types';
 export default function ToastAlerts() {
     const addToast = useToast();
@@ -14,6 +13,7 @@ export default function ToastAlerts() {
     const apiResultClient = useSelector(state => state.client);
     const workspace = useSelector(state => state.workspace)
     const apiResultTask = useSelector(state => state.task);
+    const apiResultHoliday = useSelector( state => state.holiday);
     const dispatch = useDispatch();
     const { currentMember } = useSelector(state => state.member);
     const [loggedIn, setLoggedIn] = useState(false);
@@ -24,11 +24,6 @@ export default function ToastAlerts() {
   
 
     useEffect(() => {
-
-      const handleMessages = async () => {
-
-      }
-
       if(
          apiResultAuth.token_msg && apiResultAuth.token_msg !== "" ){ 
           addToast(apiResultAuth.token_msg, 'danger');
@@ -76,8 +71,12 @@ export default function ToastAlerts() {
           addToast(apiResultTask.message, apiResultTask.message_variant);
           handleClearMessages()
         }
+        if(apiResultHoliday.message){
+          addToast(apiResultHoliday.message, apiResultHoliday.message_variant);
+          handleClearMessages()
+        }
     
-      },[apiResultMember, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask, dispatch]);
+      },[apiResultMember, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask,apiResultHoliday, dispatch]);
 
       const clearMessages = () => ({
         type: CLEAR_MESSAGES,

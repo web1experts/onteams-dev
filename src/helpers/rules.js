@@ -251,6 +251,32 @@ export const formRules = {
                 minLength: 'Name should be atleast 2 characters long',
             },
         }
+    },
+    holiday: {
+        rules: {
+            date: {
+                required: true,
+            },
+            occasion: {
+                required: true,
+                minLength: 2,
+            },
+            type: {
+                required: true,
+            },
+        },
+        msg: {
+            date: {
+                required: 'Date is required',
+            },
+            type: {
+                required: 'Type is required',
+            },
+            occasion: {
+                required: 'Occasion is required',
+                minLength: 'Occasion should be atleast 2 characters long',
+            },
+        }
     }
 }
 

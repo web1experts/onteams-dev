@@ -1,38 +1,136 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Select2 from 'react-select2-wrapper';
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Dropdown, ListGroup, Table } from "react-bootstrap";
 import { FaEllipsisV, FaPlus, FaCheck } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
+import { getFieldRules, validateField } from "../../helpers/rules";
+import DatePicker from "react-multi-date-picker";
+import { createHoliday, ListHolidays, deleteHoliday, updateHoliday } from "../../redux/actions/holiday.action";
 
 function HolidaysPage() {
-
-  const inputs = document.querySelectorAll('.form-floating .form-control');
-
-  inputs.forEach(input => {
-    input.addEventListener('input', function () {
-      if (this.value) {
-        this.classList.add('filled');
-      } else {
-        this.classList.remove('filled');
-      }
-    });
-
-    // Initial check in case the input is pre-filled
-    if (input.value) {
-      input.classList.add('filled');
-    }
-  });
-
+  const dispatch = useDispatch()
+  const [ date, setDate] = useState('')
+  const holidaysFeed = useSelector(state => state.holiday.holidays)
+  const apiResult = useSelector(state => state.holiday)
+  const [ holidays, setHolidays] = useState([])
+  const [editItem, setEditItem ] = useState(false)
+  let fieldErrors = {};
   const [isActive, setIsActive] = useState(false);
-
+  const [fields, setFields] = useState({ date: "", occasion: '', type: ''});
+  const [errors, setErrors] = useState({})
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
-
+  const [ loader, setLoader ] = useState( false )
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoader(true)
+    const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
+        // Get rules for the current field
+        const rules = getFieldRules('holiday', fieldName);
+        // Validate the field
+        const error = await validateField('holiday', fieldName, value, rules);
+        // If error exists, return it as part of the resolved promise
+        return { fieldName, error };
+    });
+
+    // Wait for all promises to resolve
+    const updatedErrorsArray = await Promise.all(updatedErrorsPromises);
+    updatedErrorsArray.forEach(({ fieldName, error }) => {
+        if (error) {
+            fieldErrors[fieldName] = error;
+        }
+    });
+    // Check if there are any errors
+    const hasError = Object.keys(fieldErrors).length > 0;
+    // If there are errors, update the errors state
+    if (hasError) {
+        setLoader(false)
+        setErrors(fieldErrors);
+    } else {
+        const formData = new FormData();
+        for (const [key, value] of Object.entries(fields)) {
+          formData.append(key, value)
+        }
+        // let payload = formData;
+        if(editItem !== false ){
+          await dispatch(updateHoliday(editItem._id, fields))
+        }else{
+          await dispatch(createHoliday(formData))
+        }
+        setLoader(false)
+    }
+}
+
+const handleListHolidays = async () => {
+  await dispatch(ListHolidays());
+  setLoader(false)
+}
+
+useEffect(() => {
+  if (holidaysFeed && holidaysFeed.length > 0) {
+      setHolidays(holidaysFeed)
+  }
+}, [holidaysFeed])
+
+useEffect(() => {
+ 
+  if (apiResult.success) {
+      setFields({ date: '', occasion: '', type: '' })
+      handleClose()
+      setEditItem(false )
+      setLoader(false)
+      handleListHolidays()
+  }
+
+}, [apiResult])
+
+useEffect(() => {
+  handleListHolidays()
+  setLoader(true)
+}, [])
+
+useEffect(() => {
+  if( editItem !== false ){
+    setFields({date: editItem.date, occasion: editItem.occasion, type: editItem.type})
+  }
+}, [editItem])
+
+const handleChange = ({ target: { name, value, type} }) => {
+  setFields({ ...fields, [name]: value })
+  setErrors({ ...errors, [name]: '' })
+};
+
+const showError = (name) => {
+  if (errors[name]) return (<span className="error">{errors[name]}</span>)
+  return null
+}
+function formatDate(dateString) {
+  // Parse the input date string into a Date object
+  const date = new Date(dateString);
+
+  // Define arrays for day and month names
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  // Extract day name, month name, day, and year
+  const dayName = days[date.getDay()];
+  const monthName = months[date.getMonth()];
+  const day = date.getDate();
+  const year = date.getFullYear();
+
+  // Return the formatted string
+  return `${dayName}, ${monthName} ${day}, ${year}`;
+}
+
+const handleDelete = (id) => {
+  dispatch(deleteHoliday(id))
+}
   return (
     <>
 
@@ -47,13 +145,27 @@ function HolidaysPage() {
               </Col>
               <Col xs={6} md={7}>
                 <ListGroup horizontal>
-                    <ListGroup.Item className='d-none d-lg-block'>
+                    {/* <ListGroup.Item className='d-none d-lg-block'>
                       <Form>
                         <Form.Group className="mb-0 form-group">
-                          <Form.Control type="date" name="holidaydate" />
+                        <DatePicker 
+                          key={'date-filter'}
+                          name="date"
+                          weekStartDayIndex={1}
+                          id='datepicker'
+                          value={date} 
+                          format="YYYY-MM-DD"
+                          dateSeparator=" - " 
+                          onChange={async (value) => {
+                              setDate(value)
+                            }
+                          }          
+                          className="form-control"
+                          placeholder="YYYY-MM-DD"
+                      />
                         </Form.Group>
                       </Form>
-                    </ListGroup.Item>
+                    </ListGroup.Item> */}
                     <ListGroup.Item>
                       <Button variant="primary" className="" onClick={handleShow}><FaPlus /> Add Holidays</Button>
                     </ListGroup.Item>
@@ -66,182 +178,51 @@ function HolidaysPage() {
           <Container fluid>
             <Table responsive="lg" className="holiday--table">
               <thead>
-                <tr>
-                  {/* <th scope="col" width={20}>#</th> */}
-                  <th scope="col"><abbr>#</abbr> Date</th>
+                <tr key={`holiday-table-head`}>
+                  <th scope="col"><abbr title="Number">#</abbr> Date</th>
                   <th scope="col">Occasion</th>
                   <th scope="col">Type</th>
                   <th scope="col" width={30}>Action</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  {/* <td>1</td> */}
-                  <td data-label="Date"><abbr>1.</abbr> Thursday, Jan 26, 2023</td>
-                  <td data-label="Occasion">Republic Day</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>2</td> */}
-                  <td data-label="Date"><abbr>2.</abbr> Wednessday, Mar 8, 2023</td>
-                  <td data-label="Occasion">Holi</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>3</td> */}
-                  <td data-label="Date"><abbr>3.</abbr> Tuesday, Aug 15, 2023</td>
-                  <td data-label="Occasion">Independence Day</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>4</td> */}
-                  <td data-label="Date"><abbr>4.</abbr> Wednessday, Aug 30, 2023</td>
-                  <td data-label="Occasion">Raksha Bandhan</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>5</td> */}
-                  <td data-label="Date"><abbr>5.</abbr> Monday, Oct 2, 2023</td>
-                  <td data-label="Occasion">Mahatma Gandhi Jayanti</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>6</td> */}
-                  <td data-label="Date"><abbr>6.</abbr> Tuesday, Oct 24, 2023</td>
-                  <td data-label="Occasion">Dussehra</td>
-                  <td data-label="Type">Half Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>7</td> */}
-                  <td data-label="Date"><abbr>7.</abbr> Wednessday, Nov 1, 2023</td>
-                  <td data-label="Occasion">Karva Chauth</td>
-                  <td data-label="Type">Half Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>8</td> */}
-                  <td data-label="Date"><abbr>8.</abbr> Sunday, Nov 12, 2023</td>
-                  <td data-label="Occasion">Diwali/Deepavali</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>9</td> */}
-                  <td data-label="Date"><abbr>9.</abbr> Wednessday, Nov 15, 2023</td>
-                  <td data-label="Occasion">Bhai Dooj</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>10</td> */}
-                  <td data-label="Date"><abbr>10.</abbr> Monday, Nov 27, 2023</td>
-                  <td data-label="Occasion">Guru Nanak Jayanti</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-                <tr>
-                  {/* <td>11</td> */}
-                  <td data-label="Date"><abbr>11.</abbr> Monday, Dec 25, 2023</td>
-                  <td data-label="Occasion">Christmas</td>
-                  <td data-label="Type">Full Day</td>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
+              {
+                (holidays && holidays.length > 0)
+                    ? holidays.map((holiday, index) => {
+                      return (<>
+                        <tr key={`holiday-row-${index}`}>
+                          <td key={`date-td-${index}`} data-label="Date"><abbr>{index + 1 }.</abbr> {formatDate(holiday.date)}</td>
+                          <td key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion}</td>
+                          <td key={`type-td-${index}`} data-label="Type">{holiday.type.split(' ') // Split the sentence into words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter and make the rest lowercase
+    .join(' ')}</td>
+                          <td key={`action-td-${index}`}>
+                            <Dropdown>
+                              <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
+                              <Dropdown.Menu>
+                                <Dropdown.Item key={`edit-item-${index}`} onClick={() => {
+                                  setEditItem(holiday);
+                                  handleShow()
+                                }}>Edit</Dropdown.Item>
+                                <Dropdown.Item key={`delete-item-${index}`}onClick={() => handleDelete(holiday._id)}>Delete</Dropdown.Item>
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          </td>
+                        </tr>
+                      </>)
+                    })
+                    :
+                    <></>
+              }
+                
               </tbody>
             </Table>
+            {
+               holidays && holidays.length == 0 &&
+                <div className="text-center mt-5">
+                    <h2>No Holidays Found</h2>
+                </div>
+            }
           </Container>
         </div>
       </div>
@@ -251,20 +232,50 @@ function HolidaysPage() {
           <Modal.Title>Add Holiday</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form onSubmit={handleSubmit}> 
             <Form.Group className="mb-3 form-group">
-              <FloatingLabel label="Holiday Date">
-                <Form.Control type="date" name="holidaydate" placeholder="dd/mm/yyyy" />
-              </FloatingLabel>
+              
+                <DatePicker 
+                  key={'date-filter'}
+                  name="date"
+                  weekStartDayIndex={1}
+                  id='datepicker'
+                  value={fields['date']} 
+                  format="YYYY-MM-DD"
+                  dateSeparator=" - " 
+                  open={true}
+                  onChange={async (value) => {
+                      setDate(value);
+                      const formattedDate = new Date(value).toISOString().split('T')[0];
+                      handleChange({ target: { name: 'date', value: formattedDate } });
+                      // setFields({ ...fields, ['date']: date })
+                    }
+                  }    
+                  editable={false}      
+                  className="form-control"
+                  placeholder="YYYY-MM-DD"
+                />
+                {showError('date')}
             </Form.Group>
             <Form.Group className="mb-3 form-group">
               <FloatingLabel label="Occasion">
-                <Form.Control type="text" name="occasion" placeholder="Occasion" />
+                <Form.Control type="text" name="occasion" value={fields['occasion']} placeholder="Occasion" onChange={handleChange} />
               </FloatingLabel>
+              {showError('occasion')}
             </Form.Group>
             <Form.Group className="mb-0 form-group">
               <Dropdown className="select--dropdown">
-                <Dropdown.Toggle variant="success">Type</Dropdown.Toggle>
+                <Dropdown.Toggle variant="success" key="typekey">
+                  {
+                    fields['type'] === "full day" ? 
+                     'Full Day'
+                     :
+                     fields['type'] === 'half day' ?
+                     'Half Day'
+                     :
+                     'Type'
+                  }
+                </Dropdown.Toggle>
                 <Dropdown.Menu>
                 <div className="drop--scroll">
                   <Form>
@@ -272,28 +283,23 @@ function HolidaysPage() {
                       <Form.Control type="text" placeholder="Search here.." />
                     </Form.Group>
                   </Form>
-                  <Dropdown.Item className="selected--option" href="#/action-1">Type <FaCheck /></Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Full Day</Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Half Day</Dropdown.Item>
+                  <Dropdown.Item className="selected--option">Type { (!fields['type'] || fields['type'] === '') ? <FaCheck /> : null}</Dropdown.Item>
+                  <Dropdown.Item onClick={() => {
+                    handleChange({ target: { name: 'type', value: 'full day' } });
+                  }}>Full Day  { fields['type'] === 'full day' ? <FaCheck /> : null}</Dropdown.Item>
+                  <Dropdown.Item onClick={() => {
+                    handleChange({ target: { name: 'type', value: 'half day' } });
+                  }}>Half Day{ fields['type'] === 'half day' ? <FaCheck /> : null}</Dropdown.Item>
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
-              {/* <Select2
-                defaultValue={1}
-                data={[
-                  { text: 'Full Day', id: 1 },
-                  { text: 'Half Day', id: 2 },
-                ]}
-                options={{
-                  placeholder: 'Type',
-                }}
-              /> */}
+              {showError('type')}
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary">Cancel</Button>
-          <Button variant="primary">Add</Button>
+          <Button variant="secondary" onClick={() => {setShow( false)}}>Cancel</Button>
+          <Button variant="primary" type="submit" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Add'}</Button>
         </Modal.Footer>
       </Modal>
       {/*--=-=Filter Modal**/}

@@ -25,7 +25,8 @@ const apiKeys = {
     ownership: '/workspace/transfer',
     workflow: '/workflows',
     activity: '/activity',
-    profile: 'auth/profile'
+    profile: 'auth/profile',
+    holidays: '/holidays'
 };
   
 export default apiKeys;

@@ -682,7 +682,7 @@ ul#subtasks-ul li textarea.form-control+button {
 .rmdp-ep-arrow[direction=top] {
     opacity: 0;
 }
-
+/* 
 .modal .rmdp-input {
     opacity: 0;
     height: 0;
@@ -690,7 +690,7 @@ ul#subtasks-ul li textarea.form-control+button {
     padding: 0;
     margin: 0;
     border: 0;
-}
+} */
 
 .rmdp-header {
     margin-top: 0;

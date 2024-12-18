@@ -25,6 +25,8 @@ function TimeTrackingPage() {
   const handleClick = (activity) => {
     setIsActive(current => !current);
     setRecordedRefresh( true )
+
+    socket.emit('get-tracker-status-update', {userID: activity._id})
     setCurrentActivity( activity)
     if(activeTab === "Recordings"){
       setActiveInnerTab("InnerRecorded")
@@ -109,7 +111,8 @@ function TimeTrackingPage() {
     return `${hours}:${minutes}`;
   }
 
-  useEffect(() => { 
+  useEffect(() => {
+    setActSpinner( false )
     if(currentActivity !== false && activeTab === "Live"){ 
         setSpinner( false )
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
@@ -118,6 +121,9 @@ function TimeTrackingPage() {
       // setActiveInnerTab("InnerRecorded")
       handleRecordedActivity()
     }
+    // if(currentActivity?.latestActivity?.status === false){
+    //   setActSpinner( false )
+    // }
   },[currentActivity])
 
    useEffect(() => {
@@ -132,18 +138,46 @@ function TimeTrackingPage() {
     selectboxObserver()
     handleLiveActivityList()
 
-    socket.on('trackerstateUpdate', (memberData) => {
-      setRecordedRefresh(false);
+    socket.on('trackerstateUpdate', (memberData, status = false) => {
+      setRecordedRefresh(false); console.log('status is: ', status)
       console.log('run activity refresh');
       console.log('Member to update:: ', memberData._id);
   
       setLiveactivities((prevActivities) => {
-          console.log('liveactivities.length:: ', prevActivities.length);
   
           if (memberData && memberData._id && prevActivities && prevActivities.length > 0) {
-              const updatedActivities = prevActivities.map(activity =>
-                  activity._id === memberData._id ? { ...activity, ...memberData } : activity
-              );
+              const updatedActivities = prevActivities.map(activity => {
+                
+                if (activity._id === memberData._id) {
+                  const updatedMemberData = {
+                    ...memberData,
+                    latestActivity: {
+                      ...memberData.latestActivity,
+                      status: status // Update the status here
+                    }
+                  };
+              
+                  // Merge updatedMemberData with the activity
+                  return { ...activity, ...updatedMemberData };
+                }
+                
+                setCurrentActivity((prev) => {
+                  if (prev && prev._id === memberData._id) { 
+                    return {
+                      ...prev,
+                      ...memberData,
+                      latestActivity: {
+                        ...prev.latestActivity,
+                        status: status,
+                      },
+                    };
+                  }
+                  return prev; // Return unchanged `currentActivity` if `_id` doesn't match
+                });
+
+                return activity; // Return unchanged activity if no match
+              });
+
               console.log('updatedActivities:: ', updatedActivities);
               return updatedActivities;
           }
@@ -220,33 +254,75 @@ function TimeTrackingPage() {
 
   }, [])
 
-  function generateTimeRange(createdAt, tasks) {
-    // Create a new Date object from the createdAt date (UTC)
-    const startTime = new Date(createdAt);
+//   function generateTimeRange(createdAt, tasks) {
+//     // Create a new Date object from the createdAt date (UTC)
+//     const startTime = new Date(createdAt);
     
-    // If tasks array is empty, the total duration will be 0
-    const totalDurationInSeconds = tasks.length > 0
-        ? tasks.reduce((sum, task) => sum + task.duration, 0)
-        : 0;
+//     // If tasks array is empty, the total duration will be 0
+//     const totalDurationInSeconds = tasks.length > 0
+//         ? tasks.reduce((sum, task) => sum + task.duration, 0)
+//         : 0;
     
-    // Add the total duration in seconds to the start time
-    const endTime = new Date(startTime.getTime() + totalDurationInSeconds * 1000);
+//     // Add the total duration in seconds to the start time
+//     const endTime = new Date(startTime.getTime() + totalDurationInSeconds * 1000);
     
-    // Format the start and end times using local time zone
-    const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
+//     // Calculate hours and minutes for the duration
+//     const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
+//     const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
+    
+//     // Format hours and minutes into a string (e.g., 1:30 hrs)
+//     const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
+    
+//     // Format the start and end times using local time zone
+//     const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
+//       hour: '2-digit',
+//       minute: '2-digit',
+//       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+//     });
+//     const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
+//       hour: '2-digit',
+//       minute: '2-digit',
+//       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+//     });
+    
+//     // Return the formatted time range with duration in brackets
+//     return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
+// }
+
+
+function generateTimeRange(createdAt, updatedAt) {
+  // Create Date objects from createdAt and updatedAt (UTC)
+  const startTime = new Date(createdAt);
+  const endTime = new Date(updatedAt);
+
+  // Calculate the difference in seconds between updatedAt and createdAt
+  const totalDurationInSeconds = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+
+  // Calculate hours and minutes for the total duration
+  const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
+  const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
+  
+  // Format hours and minutes into a string (e.g., 1:30 hrs)
+  const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
+  
+  // Format the start and end times using local time zone
+  const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-    });
-    const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
+  });
+  
+  const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-    });
-    
-    // Return the formatted time range
-    return `${startTimeFormatted} - ${endTimeFormatted}`;
+  });
+  
+  // Return the formatted time range with duration in brackets
+  return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
 }
+
+
 
   useEffect(() => {
     if (activitystate?.liveactivities?.memberData) { 
@@ -634,8 +710,10 @@ function TimeTrackingPage() {
                                 <td data-label="Member Name" className="project--title--td" onClick={() => {
                                       if (isActive && activeInnerTab !== "InnerRecorded") {
                                         leaveRoom(currentActivity?._id)
+                                        socket.emit('get-tracker-status-update', {userID: activity._id})
                                         setCurrentActivity(activity);
                                       }else if(activeInnerTab === "InnerRecorded"){
+                                        setRecordedRefresh( true )
                                         setCurrentActivity(activity)
                                         // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
                                       }
@@ -835,7 +913,7 @@ function TimeTrackingPage() {
                           <p>
                             <span>Project: {recording?.project?.title}</span>
                             <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
-                            <strong>{ generateTimeRange(recording?.createdAt, recording?.tasks)}</strong>
+                            <strong>{ generateTimeRange(recording?.createdAt, recording?.updatedAt)}</strong>
                           </p>
                         </Accordion.Header>
                       </div>
