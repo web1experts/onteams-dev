@@ -303,3 +303,21 @@ const getDayWithSuffix = (day) => {
     return formattedTime;
   };
   
+
+  export function formatDateinString(dateString) {
+    // Parse the input date string into a Date object
+    const date = new Date(dateString);
+  
+    // Define arrays for day and month names
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+    // Extract day name, month name, day, and year
+    const dayName = days[date.getDay()];
+    const monthName = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+  
+    // Return the formatted string
+    return `${dayName}, ${monthName} ${day}, ${year}`;
+  }

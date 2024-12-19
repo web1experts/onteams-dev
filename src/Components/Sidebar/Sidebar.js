@@ -61,7 +61,6 @@ function SidebarPanel() {
         
         if (encryptedCompanies !== null) {
             const decryptcompanies = parseIfValidJSON(encryptedCompanies)
-            console.log('decryptcompanies: ', decryptcompanies)
             setCompanies(decryptcompanies ? decryptcompanies : [] )
         }
     }
@@ -179,14 +178,14 @@ function SidebarPanel() {
                             {/* <Link  key="docs-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><CgFileDocument /></span> Docs</Link> */}
                             {/* <Link  key="chats-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><BiChat /></span> Chats</Link> */}
                             {/* <Link  key="notes-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><CgNotes /></span> Notes</Link> */}
-                            <Link  key="invoice-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/invoice' ? 'active' : ''}`} to="/invoice"><span className="nav--item--icon"><TbFileInvoice /></span> Invoice</Link>
+                            {/* <Link  key="invoice-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/invoice' ? 'active' : ''}`} to="/invoice"><span className="nav--item--icon"><TbFileInvoice /></span> Invoice</Link> */}
                             {/* <Link  key="password-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><RiLockPasswordLine /></span> Password Manager</Link> */}
                             {/* <Nav.Link href="#"><span className="nav--item--icon"><RiSettingsLine /></span> Setting</Nav.Link>
                             <Nav.Link href="#"><span className="nav--item--icon"><FiLogOut /></span> Logout</Nav.Link> */}
                         </Nav>
                     </Navbar.Collapse>
                 </Navbar>
-                <Button variant="primary" className="screen--record" onClick={captureShow}>REC</Button>
+                {/* <Button variant="primary" className="screen--record" onClick={ captureShow}>REC</Button> */}
             </div>
 
             <Modal show={show} onHide={captureClose} className="captureModal" centered>

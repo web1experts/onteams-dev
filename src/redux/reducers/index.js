@@ -12,6 +12,7 @@ import workflowReducer from "./workflow.reducer";
 import activityReducer from "./activity.reducer";
 import commonReducer from "./common.reducer";
 import holidayReducer from "./holiday.reducer";
+import attendanceReducer from "./attendance.reducer";
 export default combineReducers({
   auth: authReducer,
   project: projectReducer,
@@ -24,5 +25,6 @@ export default combineReducers({
   workflow: workflowReducer ,
   activity: activityReducer,
   common: commonReducer,
-  holiday: holidayReducer   
+  holiday: holidayReducer,
+  attendance: attendanceReducer   
 });

@@ -26,7 +26,8 @@ const apiKeys = {
     workflow: '/workflows',
     activity: '/activity',
     profile: 'auth/profile',
-    holidays: '/holidays'
+    holidays: '/holidays',
+    attendance: 'attendance',
 };
   
 export default apiKeys;

@@ -6,6 +6,7 @@ import { FaEllipsisV, FaPlus, FaCheck } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import DatePicker from "react-multi-date-picker";
+import { formatDateinString } from "../../helpers/commonfunctions";
 import { createHoliday, ListHolidays, deleteHoliday, updateHoliday } from "../../redux/actions/holiday.action";
 
 function HolidaysPage() {
@@ -110,23 +111,7 @@ const showError = (name) => {
   if (errors[name]) return (<span className="error">{errors[name]}</span>)
   return null
 }
-function formatDate(dateString) {
-  // Parse the input date string into a Date object
-  const date = new Date(dateString);
 
-  // Define arrays for day and month names
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-  // Extract day name, month name, day, and year
-  const dayName = days[date.getDay()];
-  const monthName = months[date.getMonth()];
-  const day = date.getDate();
-  const year = date.getFullYear();
-
-  // Return the formatted string
-  return `${dayName}, ${monthName} ${day}, ${year}`;
-}
 
 const handleDelete = (id) => {
   dispatch(deleteHoliday(id))
@@ -191,7 +176,7 @@ const handleDelete = (id) => {
                     ? holidays.map((holiday, index) => {
                       return (<>
                         <tr key={`holiday-row-${index}`}>
-                          <td key={`date-td-${index}`} data-label="Date"><abbr>{index + 1 }.</abbr> {formatDate(holiday.date)}</td>
+                          <td key={`date-td-${index}`} data-label="Date"><abbr>{index + 1 }.</abbr> {formatDateinString(holiday.date)}</td>
                           <td key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion}</td>
                           <td key={`type-td-${index}`} data-label="Type">{holiday.type.split(' ') // Split the sentence into words
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter and make the rest lowercase

@@ -656,7 +656,7 @@ function TimeTrackingPage() {
                   <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
                   <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button>
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
-                    <ListGroup.Item>
+                    <ListGroup.Item className="active list-group-item-action">
                       <BsArrowClockwise onClick={handleLiveActivityList}/>
                     </ListGroup.Item>
                     <ListGroup.Item action active={activeTab === "Live"} onClick={() => {
@@ -731,7 +731,7 @@ function TimeTrackingPage() {
                                     </span>
                                 </td>
                                 <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
-                                <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title || '--' }</span></td>
+                                <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title.substring(0, 25) || '--' }</span></td>
                                 <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ formatTime(activity?.latestActivity?.duration) || '00:00'}</td>
                                 <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formatTime(activity?.totalTaskDuration) || '00:00'}</td>
                                 <td data-label="Status" key={`status-title-${activity?._id}`} className="onHide">
@@ -846,7 +846,7 @@ function TimeTrackingPage() {
               Recorded
             </ListGroup.Item>
             {showDate()}
-            <ListGroup.Item>
+            <ListGroup.Item className="list-group-item active list-group-item-action">
               <BsArrowClockwise onClick={handleRecordedActivity}/>
             </ListGroup.Item>
           </ListGroup>
@@ -917,7 +917,7 @@ function TimeTrackingPage() {
                             <span>Project: {recording?.project?.title}</span>
                             <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
                             <strong>{ generateTimeRange(recording?.createdAt, recording?.tasks)}</strong>
-                          </p>ß
+                          </p>
                         </Accordion.Header>
                       </div>
                       <Accordion.Body>
