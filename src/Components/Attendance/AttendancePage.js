@@ -19,6 +19,7 @@ function AttendancePage() {
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
+  const [spinner, setSpinner] = useState(false)
   const handlefilterchange = (name, value) => {
     // if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
         setFilters({ ...filters, [name]: value })
@@ -26,7 +27,9 @@ function AttendancePage() {
   }
 
   const handleAttendanceList = async () => {
+    setSpinner(true)
    await dispatch(ListAttendance(filters))
+   setSpinner(false)
   }
 
   useEffect(() => {
@@ -69,7 +72,7 @@ function AttendancePage() {
                     <ListGroup.Item>
                       <Form className="d-flex align-items-center">
                         <Form.Group className="mb-0 form-group me-3">
-                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('members', event.target.value)} value={filters['members'] || 'all'}>
+                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['members'] || 'all'}>
                           <option value="all">Members</option>
                           {
                               members.map((member, index) => {
@@ -105,49 +108,113 @@ function AttendancePage() {
           </Container>
         </div>
         <div className='page--wrapper px-md-2 py-3'>
+        {
+            spinner &&
+            <div className="loading-bar">
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+            </div>
+        }
           <Container fluid>
             {/* <div class="perf--badge">
               <h5 class="ms-auto">Attendance: <strong>28.57%</strong></h5>
             </div> */}
-            <Table responsive="lg">
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  {
-                    members && members.length > 0 &&
-                    members.map((member, index) => {
-                      return (
-                        <th scope="col">{member.name}</th>
-                      )
-                    })
-                  }
+            {
+              !filters['member'] || filters['member'] === 'all' ?
+            
+              <Table responsive="lg">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    {
+                      members && members.length > 0 &&
+                      members.map((member, index) => {
+                        return (
+                          <th scope="col">{member.name}</th>
+                        )
+                      })
+                    }
+                    
+                    {/* <th scope="col" className="text-end">Actions</th> */}
+                  </tr>
+                </thead>
+                <tbody>
+                {attendances && attendances.map((attendanceDate, dateIndex) => (
+                  <tr key={dateIndex}>
+                    <td>{formatDateinString(attendanceDate.date)}</td>
+                    {attendanceDate.dailyAttendance.length === 0 ? (
+                        members.map((member, i) => (
+                          <td key={`${member._id}-${i}`}>--</td>
+                      ))
+                      ) : (
+                        attendanceDate.dailyAttendance.map((attendance, attendanceIndex) => (
+                            <td key={`${attendance.memberId}-${attendanceIndex}`}>{attendance.status}</td>
+                        ))
+                      )}  
+                    {/* {attendanceDate.dailyAttendance.map((attendance, idx) => (
+                      <td key={attendance.memberId}>
+                        {attendance.status}
+                      </td>
+                    ))} */}
+                    {/* <td className="text-end">
+                      <Dropdown>
+                        <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
+                          <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </td> */}
+                  </tr>
+                ))}
                   
-                  <th scope="col" className="text-end">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-              {attendances && attendances.map((attendanceDate, dateIndex) => (
-                <tr key={dateIndex}>
-                  <td>{formatDateinString(attendanceDate.date)}</td>
-                  {attendanceDate.dailyAttendance.map((attendance, idx) => (
-                    <td key={attendance.memberId}>
-                      {attendance.status}
-                    </td>
-                  ))}
-                  <td className="text-end">
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-              ))}
-                
-              </tbody>
-            </Table>
+                </tbody>
+              </Table>
+              :
+                <Table responsive="lg">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time In</th>
+                    <th scope="col">Time Out</th>
+                    <th scope="col">Logged Time</th>
+                    <th scope="col">Manual Time</th>
+                    <th scope="col">Total Time</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {attendances &&
+                  attendances.map((attendanceDate, dateIndex) => (
+                    attendanceDate.dailyAttendance.length === 0 ? (
+                      <tr key={dateIndex}>
+                        <td>{formatDateinString(attendanceDate.date)}</td>
+                        <td>--</td>
+                        <td>--</td>
+                        <td>--</td>
+                        <td>--</td>
+                        <td>--</td>
+                        <td>--</td>
+                      </tr>
+                    ) : (
+                      attendanceDate.dailyAttendance.map((attendance, attendanceIndex) => (
+                        <tr key={`${dateIndex}-${attendanceIndex}`}>
+                          <td>{attendanceIndex === 0 ? formatDateinString(attendanceDate.date) : ''}</td>
+                          <td>{attendance.time_in}</td>
+                          <td>{attendance.time_out}</td>
+                          <td>{attendance.logged_time}</td>
+                          <td>--</td>
+                          <td>{attendance.logged_time}</td>
+                          <td>{attendance.status}</td>
+                        </tr>
+                      ))
+                    )
+                  ))
+                }
+
+                </tbody>
+              </Table>
+            
+          }
           </Container>
         </div>
       </div>
@@ -171,26 +238,31 @@ function AttendancePage() {
                         </Form.Group>
                       </Form>
                       <Dropdown.Item className="selected--option" href="#/action-1">Members <FaCheck /></Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">Hitesh Kumar</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">Tarun Giri</Dropdown.Item>
+                        {
+                          members.map((member, index) => {
+                              return <Dropdown.Item key={`member-projects-${index}`} onClick={() => handlefilterchange('member', member._id)}>{member.name}</Dropdown.Item>
+                          })
+                        }
                       </div>
                     </Dropdown.Menu>
                   </Dropdown>
-                  {/* <Select2
-                    defaultValue={1}
-                    data={[
-                      { text: 'All Members', id: 1 },
-                      { text: 'Hitesh Kumar', id: 2 },
-                      { text: 'Tarun Giri', id: 3 },
-                      { text: 'Gaurav Sharma', id: 4 },
-                    ]}
-                    options={{
-                      placeholder: 'Members',
-                    }}
-                  /> */}
+                 
                 </Form.Group>
                 <Form.Group className="mb-0 form-group">
-                  <Form.Control type="date" name="holidaydate" />
+                  <DatePicker 
+                    key={'month-filter'}
+                    name="month"
+                    onlyMonthPicker={true}
+                    value=""
+                    open={true}
+                    onChange={async (value) => {
+                        handlefilterchange('month', value)
+                      }
+                    }    
+                    editable={false}      
+                    className="form-control"
+                    placeholder="Select month"
+                  />
                 </Form.Group>
               </Form>
             </ListGroup.Item>

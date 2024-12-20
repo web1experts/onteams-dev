@@ -27,7 +27,7 @@ function HolidaysPage() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
+  const [spinner, setSpinner] = useState(false)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true)
@@ -69,8 +69,10 @@ function HolidaysPage() {
 }
 
 const handleListHolidays = async () => {
+  setSpinner(true)
   await dispatch(ListHolidays());
   setLoader(false)
+  setSpinner(false)
 }
 
 useEffect(() => {
@@ -160,6 +162,12 @@ const handleDelete = (id) => {
           </Container>
         </div>
         <div className='page--wrapper px-md-2 py-3'>
+        {
+            spinner &&
+            <div className="loading-bar">
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+            </div>
+        }
           <Container fluid>
             <Table responsive="lg" className="holiday--table">
               <thead>
