@@ -92,9 +92,15 @@ body {
   border-left-width: 1px;
 }
 
-.page--title .list-group-item-action.active {
+.page--title .list-group-item-action.active, .page--title .refresh--btn {
   color: #ffffff;
   background: #7BCCB8;
+}
+
+.page--title .refresh--btn {
+  padding: 0;
+  width: 40px;
+  height: 40px;
 }
 
 .page--title .list-group-item .form-group {
@@ -2012,12 +2018,12 @@ Project Task View CSS=-=-=
   border-radius: 0.5rem;
   -webkit-border-radius: 0.5rem;
   border: 0;
+  position: relative;
 }
 
 .accordion-item {
   background-color: transparent;
   border: 0;
-  position: relative;
 }
 
 .accordion-item+.accordion-item {
@@ -2032,15 +2038,17 @@ Project Task View CSS=-=-=
   font-weight: 500;
   background: #7BCCB810;
   text-decoration: none;
-  padding: 0.75rem 1rem;
+  padding: 0;
   position: relative;
   border: 0;
+  box-shadow: none;
 }
 
 .accordion-button::after {
   display: inline-block;
   position: absolute;
-  right: 15px;
+  right: 0;
+  top: 15px;
 }
 
 .accordion span.btn-primary {
@@ -2068,8 +2076,8 @@ Project Task View CSS=-=-=
 }
 
 .accordion .accordion-body {
-  max-height: calc(100dvh - 320px);
-  overflow-y: auto;
+  /* max-height: calc(100dvh - 320px);
+  overflow-y: auto; */
   margin-top: 0;
   padding-bottom: .5rem;
 }
@@ -2607,6 +2615,16 @@ pre {
   margin-left: 0;
 }
 
+.wrapper--title .live--tabs .refresh--btn {
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  margin: 0;
+  background: #7BCCB8;
+  color: #ffffff;
+}
+
 .wrapper--title .screens--shots .list-group-item:first-child:not(:last-child) {
   border-bottom-left-radius: 25px;
   border-top-right-radius: 25px;
@@ -2657,6 +2675,7 @@ pre {
 .wrapper--title .live--tabs .no--style {
   padding: 0;
   background: none;
+  border: 1px solid transparent;
 }
 
 .wrapper--title .live--tabs .list-group-item:last-child .form-control {
@@ -2679,16 +2698,37 @@ pre {
   border-bottom-left-radius: 25px;
 }
 
+.wrapper--title .live--tabs .no--style .rmdp-calendar {
+  padding: 1rem;
+}
+
+.wrapper--title .live--tabs .no--style .date-filters {
+  padding: 1rem;
+  min-width: 170px;
+}
+
+.wrapper--title .live--tabs .no--style .rmdp-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, .125);
+  -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, .125);
+  max-height: calc(100dvh - 100px);
+  overflow-y: auto;
+}
+
+.filter-box {
+  padding: 1rem 0;
+}
+
 .screens--tabs .list-group .list-group-item:last-child:not(:first-child) {
   border-top-right-radius: 5px;
   border-bottom-left-radius: 5px;
 }
 
 .screens--tabs {
-  padding: .75rem 0 .5rem 0;
+  padding: .5rem 0 .5rem 0;
   border-bottom: 1px solid #eeeeee;
-  position: sticky;
-  position: -webkit-sticky;
+  /* position: sticky;
+  position: -webkit-sticky; */
   z-index: 111;
   top: 0;
   background: #ffffff;
@@ -3708,15 +3748,25 @@ Media CSS-=-==
   }
 
   .activity--table tr th:last-child {
-    min-width: 148px;
+    min-width: 135px;
   }
 
   .activity--table tr th:first-child {
-    min-width: 160px;
+    min-width: 155px;
   }
 
   .activity--table tr th {
-    min-width: 110px;
+    min-width: 118px;
+  }
+
+  .page--wrapper.activity--table table .status--circle {
+    position: absolute;
+    right: 0;
+    top: 12px;
+  }
+
+  .wrapper--title {
+    gap: 10px;
   }
 
   .select2-container--default .select2-selection--single {
@@ -3802,12 +3852,17 @@ Media CSS-=-==
 
   .page--wrapper table td.project--title--td span {
     max-width: 100%;
+    padding-right: 10px;
   }
 
   .page--wrapper .draggable--table th:nth-child(2),
   .page--wrapper .draggable--table td:nth-child(2) {
     flex: none;
     min-width: 150px;
+  }
+
+  .page--wrapper table td button {
+    font-size: .85rem;
   }
 }
 
@@ -3826,6 +3881,12 @@ Media CSS-=-==
     min-width: 118px;
     font-size: 14px;
     max-width: 122px;
+  }
+
+  .page--title .rmdp-input {
+    width: max-content;
+    max-width: 140px;
+    margin: 0;
   }
 
   .select2-container--default .select2-selection--single {
@@ -4235,12 +4296,30 @@ Media CSS-=-==
     flex: 1 1;
   }
 
+  .wrapper--title .screens--shots, .wrapper--title .screens--shots+.list-group-item {
+    margin-top: .5rem;
+  }
+
   .screens--tabs {
     gap: 0;
   }
 
   .screens--tabs p {
     flex: auto;
+  }
+
+  .team--page .page--title h2 .btn, .page--title .refresh--btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+  }
+
+  .time-tracking--page .team--page .page--title .activity--tabs {
+    margin-top: 1rem;
+  }
+
+  .page--title .rmdp-input {
+    min-height: 36px;
   }
 }
 
@@ -4253,6 +4332,15 @@ Media CSS-=-==
   .project--grid--table tr,
   .activity--box .card-group .card {
     max-width: calc(100% - 0px);
+  }
+
+  .time-tracking--page .team--page .page--title h2 {
+    flex-flow: row wrap;
+  }
+
+  .page--title .rmdp-input {
+    font-size: .85rem;
+    max-width: 120px;
   }
 
   .module__wrapper {

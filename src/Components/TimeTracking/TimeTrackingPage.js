@@ -471,8 +471,8 @@ function TimeTrackingPage() {
               handleLiveActivityList()
             }
             
-          }} className="date-filter-btn">Apply</Button>
-          <Button variant="primary" onClick={() => setIsPickerOpen(false)} className="date-filter-btn">Cancel</Button>
+          }} className="date-filter-btn me-1">Apply</Button>
+          <Button variant="primary" onClick={() => setIsPickerOpen(false)} className="date-filter-btn ms-1">Cancel</Button>
         </div>
       </>
     )
@@ -656,7 +656,7 @@ function TimeTrackingPage() {
                   <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
                   <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button>
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
-                    <ListGroup.Item className="active list-group-item-action">
+                    <ListGroup.Item className="refresh--btn list-group-item-action d-none d-md-flex">
                       <BsArrowClockwise onClick={handleLiveActivityList}/>
                     </ListGroup.Item>
                     <ListGroup.Item action active={activeTab === "Live"} onClick={() => {
@@ -846,7 +846,7 @@ function TimeTrackingPage() {
               Recorded
             </ListGroup.Item>
             {showDate()}
-            <ListGroup.Item className="list-group-item active list-group-item-action">
+            <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
               <BsArrowClockwise onClick={handleRecordedActivity}/>
             </ListGroup.Item>
           </ListGroup>
