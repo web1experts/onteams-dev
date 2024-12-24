@@ -408,7 +408,7 @@ function ClientsPage() {
                   <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
                     <ListGroup.Item className='d-none d-lg-block'>
-                      <Form>
+                      <Form onSubmit={(e) => {e.preventDefault()}}>
                         <Form.Group className="mb-0 form-group">
                           <Form.Control type="text" placeholder="Search Client.." onChange={(e) => setSearch(e.target.value)} />
                         </Form.Group>

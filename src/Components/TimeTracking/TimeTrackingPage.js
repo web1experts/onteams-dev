@@ -251,74 +251,63 @@ function TimeTrackingPage() {
 
   }, [])
 
-  function generateTimeRange(createdAt, tasks) {
-    // Create a new Date object from the createdAt date (UTC)
-    const startTime = new Date(createdAt);
+//   function generateTimeRange(createdAt, tasks) {
+//     // Create a new Date object from the createdAt date (UTC)
+//     const startTime = new Date(createdAt);
     
-    // If tasks array is empty, the total duration will be 0
-    const totalDurationInSeconds = tasks.length > 0
-        ? tasks.reduce((sum, task) => sum + task.duration, 0)
-        : 0;
+//     // If tasks array is empty, the total duration will be 0
+//     const totalDurationInSeconds = tasks.length > 0
+//         ? tasks.reduce((sum, task) => sum + task.duration, 0)
+//         : 0;
     
-    // Add the total duration in seconds to the start time
-    const endTime = new Date(startTime.getTime() + totalDurationInSeconds * 1000);
+//     // Add the total duration in seconds to the start time
+//     const endTime = new Date(startTime.getTime() + totalDurationInSeconds * 1000);
     
-    // Calculate hours and minutes for the duration
-    const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
-    const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
+//     // Calculate hours and minutes for the duration
+//     const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
+//     const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
     
-    // Format hours and minutes into a string (e.g., 1:30 hrs)
-    const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
+//     // Format hours and minutes into a string (e.g., 1:30 hrs)
+//     const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
     
-    // Format the start and end times using local time zone
-    const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-    });
-    const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-    });
-    
-    // Return the formatted time range with duration in brackets
-    return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
-}
-
-
-// function generateTimeRange(createdAt, updatedAt) {
-//   // Create Date objects from createdAt and updatedAt (UTC)
-//   const startTime = new Date(createdAt);
-//   const endTime = new Date(updatedAt);
-
-//   // Calculate the difference in seconds between updatedAt and createdAt
-//   const totalDurationInSeconds = (endTime - startTime) / 1000; // Convert milliseconds to seconds
-
-//   // Calculate hours and minutes for the total duration
-//   const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
-//   const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
-  
-//   // Format hours and minutes into a string (e.g., 1:30 hrs)
-//   const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
-  
-//   // Format the start and end times using local time zone
-//   const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
+//     // Format the start and end times using local time zone
+//     const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
 //       hour: '2-digit',
 //       minute: '2-digit',
 //       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-//   });
-  
-//   const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
+//     });
+//     const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
 //       hour: '2-digit',
 //       minute: '2-digit',
 //       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-//   });
-  
-//   // Return the formatted time range with duration in brackets
-//   return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
+//     });
+    
+//     // Return the formatted time range with duration in brackets
+//     return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
 // }
 
+
+function generateTimeRange(createdAt, duration) {
+  // Create Date objects from createdAt and duration
+  const startTime = new Date(createdAt);
+  const endTime = new Date(duration);
+
+  // Format the start and end times using local time zone
+  const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+  });
+
+  const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+  });
+
+  // Return the formatted time range in the desired format
+  return `${startTimeFormatted} - ${endTimeFormatted}`;
+}
 
 
   useEffect(() => {
@@ -545,6 +534,29 @@ function TimeTrackingPage() {
     );
 };
 
+function extractTimeFromISO(createdAt, duration) {
+  if (createdAt && duration) {
+    // Parse the ISO strings to Date objects
+    const startDate = new Date(createdAt);
+    const endDate = new Date(duration);
+
+    // Calculate the difference in milliseconds
+    const diffInMilliseconds = endDate - startDate;
+
+    // Convert milliseconds to seconds
+    const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+
+    // Calculate hours and minutes
+    const hours = Math.floor(diffInSeconds / 3600); // Total hours
+    const minutes = Math.floor((diffInSeconds % 3600) / 60); // Remaining minutes
+
+    // Format and return as hh:mm
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+  return '00:00';
+}
+
+
   const showDate = () => {
     // if (activeInnerTab === 'InnerRecorded') {
       return (
@@ -701,8 +713,8 @@ function TimeTrackingPage() {
                     {
                       liveactivities.length > 0 ?
                         liveactivities.map((activity, index) => {
-                          totalhours += Number(activity?.totalTaskDuration || 0)
-                          totalProjecthours += Number(activity?.latestActivity?.duration || 0)
+                          // totalhours += Number(activity?.totalTaskDuration || 0)
+                          // totalProjecthours += Number(activity?.latestActivity?.duration || 0)
                           return (
                             <>
                               <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'project--active': '' } >
@@ -732,8 +744,8 @@ function TimeTrackingPage() {
                                 </td>
                                 <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
                                 <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></td>
-                                <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ formatTime(activity?.latestActivity?.duration) || '00:00'}</td>
-                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formatTime(activity?.totalTaskDuration) || '00:00'}</td>
+                                <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ extractTimeFromISO(activity?.latestActivity?.createdAt, activity?.latestActivity?.duration) || '00:00'}</td>
+                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formatTime(activity?.totalDuration) || '00:00'}</td>
                                 <td data-label="Status" key={`status-title-${activity?._id}`} className="onHide">
                                   { 
                                     (activity?.latestActivity?.status) ? 
@@ -760,8 +772,12 @@ function TimeTrackingPage() {
                       <td></td>
                       <td></td>
                       <td><strong>Total Hours</strong></td>
-                      <td><strong>{ formatTime(totalProjecthours) || '00:00'}</strong></td>
-                      <td><strong>{ formatTime(totalhours) || '00:00'}</strong></td>
+                      <td><strong>
+                        {/* { formatTime(totalProjecthours) || '00:00'} */}
+                        </strong></td>
+                      <td><strong>
+                        {/* { formatTime(totalhours) || '00:00'} */}
+                        </strong></td>
                       <td></td>
                       <td></td>
                     </tr>
@@ -916,7 +932,7 @@ function TimeTrackingPage() {
                           <p>
                             <span>Project: {recording?.project?.title}</span>
                             <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
-                            <strong>{ generateTimeRange(recording?.createdAt, recording?.tasks)}</strong>
+                            <strong>{ generateTimeRange(recording?.createdAt, recording?.duration)}</strong>
                           </p>
                         </Accordion.Header>
                       </div>

@@ -638,7 +638,7 @@ function ProjectsPage() {
                                             </Form.Select>
                                         </ListGroup.Item>
                                         <ListGroup.Item key="search-filter-list">
-                                            <Form>
+                                            <Form onSubmit={(e) => {e.preventDefault()}}>
                                                 <Form.Group className="mb-0 form-group">
                                                     <Form.Control type="text" placeholder="Search by Project or Client" onChange={(event) => handlefilterchange('search', event.target.value)} />
                                                 </Form.Group>

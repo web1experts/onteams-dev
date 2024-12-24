@@ -505,7 +505,7 @@ function TeamMembersPage() {
                   <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Members"} onClick={() => { setsearchTerm(''); setActiveTab("Members") }}>Members</ListGroup.Item>
                   <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Invitees"} onClick={() => { setsearchTerm(''); setActiveTab("Invitees") }}>Invitations</ListGroup.Item>
                   <ListGroup.Item className='d-none d-lg-block'>
-                    <Form>
+                    <Form onSubmit={(e) => {e.preventDefault()}}>
                       <Form.Group className="mb-0 form-group">
                         <Form.Control type="text" placeholder={activeTab === "Members" ? "Search Member.." : "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)} />
                       </Form.Group>
