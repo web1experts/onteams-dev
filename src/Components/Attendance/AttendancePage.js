@@ -72,11 +72,11 @@ function AttendancePage() {
                     <ListGroup.Item>
                       <Form className="d-flex align-items-center">
                         <Form.Group className="mb-0 form-group me-3">
-                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['members'] || 'all'}>
+                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
                           <option value="all">Members</option>
                           {
                               members.map((member, index) => {
-                                  return <option key={`member-projects-${index}`} value={member._id}>{member.name}</option>
+                                  return <option selected={filters['member'] && filters['member'] === member._id ? true : false} key={`member-projects-${index}`} value={member._id}>{member.name}</option>
                               })
                           }
                         </Form.Select>

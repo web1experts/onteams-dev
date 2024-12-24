@@ -239,7 +239,8 @@ const handleDelete = (id) => {
                   open={true}
                   onChange={async (value) => {
                       setDate(value);
-                      const formattedDate = new Date(value).toISOString().split('T')[0];
+                      const selectedDate = new Date(value);
+                      const formattedDate = selectedDate.toLocaleDateString('en-CA'); // 'en-CA' gives "YYYY-MM-DD" format
                       handleChange({ target: { name: 'date', value: formattedDate } });
                       // setFields({ ...fields, ['date']: date })
                     }

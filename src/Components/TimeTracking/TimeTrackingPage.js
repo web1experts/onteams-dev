@@ -731,7 +731,7 @@ function TimeTrackingPage() {
                                     </span>
                                 </td>
                                 <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
-                                <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title.substring(0, 25) || '--' }</span></td>
+                                <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></td>
                                 <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ formatTime(activity?.latestActivity?.duration) || '00:00'}</td>
                                 <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formatTime(activity?.totalTaskDuration) || '00:00'}</td>
                                 <td data-label="Status" key={`status-title-${activity?._id}`} className="onHide">
