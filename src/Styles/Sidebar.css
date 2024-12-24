@@ -171,7 +171,7 @@ Sidebar CSS-=-=
 }
 
 .panel--sidebar .navbar-expand-lg .navbar-collapse {
-  max-height: calc(100% - 220px);
+  max-height: calc(100% - 110px);
   overflow-y: auto;
 }
 

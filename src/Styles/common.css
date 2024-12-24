@@ -229,7 +229,6 @@ textarea.form-control {
 .common--form {
   height: 100dvh;
   display: flex;
-  /* align-items: center; */
   justify-content: center;
   flex-flow: row wrap;
   padding: 2rem 5rem;
