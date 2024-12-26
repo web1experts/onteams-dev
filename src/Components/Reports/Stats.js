@@ -1,42 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import Select2 from 'react-select2-wrapper';
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Badge, Dropdown, CardGroup } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaPlay, FaCheck } from "react-icons/fa";
-import { generateTimeRange, showAmPmtime, getMemberdata } from "../../helpers/commonfunctions";
+import { FaAngleRight, FaPlay, FaCheck } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
-import { getReportsByMember, gerReportsByProject } from "../../redux/actions/report.action";
-import { Listmembers } from "../../redux/actions/members.action";
-import { ListProjects } from "../../redux/actions/project.action";
-import DatePicker from "react-multi-date-picker";
-function ReportsPage() {
-  const dispatch = useDispatch()
-  const datePickerRef = useRef(null)
-  const memberdata = getMemberdata()
+import { selectboxObserver } from "../../helpers/commonfunctions";
+function Stats() {
+
   const fullscreenRef = React.useRef(null);
+  const [isActive, setIsActive] = useState(false);
   const [activeTab, setActiveTab] = useState("Screenshots");
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const memberFeed = useSelector((state) => state.member.members)
-  const projectFeed = useSelector(state => state.project.projects);
-  const [ projects, setProjects ] = useState([])
-  const [members, setMembers] = useState([])
-  const reportState = useSelector((state) => state.reports)
-  const [memberReports, setMemberReports] = useState([])
-  const[ projectReports, setProjectReports] = useState([])
-  const options = { day: '2-digit', month: 'long', year: 'numeric' };
-  const [screenshotTab, setScreenshotTab] = useState('Screenshots');
+
   const [ViewReport, setViewReport] = useState(false);
   const handleReportClose = () => setViewReport(false);
   const handleViewReport = () => setViewReport(true);
-  const [ filtereddate, setFilteredDate ] = useState([new Date().toISOString().split('T')[0]])
-  const [selectedFilter, setSelectedFilter ] = useState('today')
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
+
   const [open, setOpen] = useState(false);
-  const [ filters, setFilters] = useState({member: memberdata?._id, sort_by: 'members'});
+  const [ filters, setFilters] = useState({});
   const [postMedia, setPostMedia] = useState('');
 
   const handleLightBox = (media) => {
@@ -50,153 +35,14 @@ function ReportsPage() {
   const handleFilterShow = () => setFilterShow(true);
 
   const handlefilterchange = (name, value) => {
-    setFilters({ ...filters, [name]: value })
-  }
-
-  const handleListProjects = async () => {
-      await dispatch(ListProjects({}));
-  }
-
-  const handleReports = () => {
-    if( filters['sort_by'] === "members"){
-      dispatch(getReportsByMember(filters))
-    }else{
-      dispatch(gerReportsByProject(filters))
+    if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
+        setFilters({ ...filters, [name]: value })
     }
   }
 
   useEffect(() => {
-    dispatch(Listmembers(0, '', false));
-    handleListProjects()
-  }, [dispatch])
-
-  useEffect(() => {
-    setActiveTab("Screenshots")
-    handleReports()
-  }, [filters])
-
-  useEffect(() => {
-      if (memberFeed && memberFeed.memberData) {
-          setMembers(memberFeed.memberData);
-      }
-  }, [memberFeed, dispatch]);
-
-  useEffect(() => {
-      const check = ['undefined', undefined, 'null', null, '']
-      if (projectFeed && projectFeed.projectData) {
-          setProjects(projectFeed.projectData)
-      }
-  }, [projectFeed])
-
-  useEffect(() => {
-    handlefilterchange('date_range', filtereddate)
-  }, [filtereddate])
-
-  useEffect(() => {
-      if (reportState?.memberReports) { 
-        setMemberReports(reportState?.memberReports)
-      }
-      if(reportState.projectReports){
-        setProjectReports(reportState.projectReports)
-      }
-    }, [reportState])
-
-    const showRecordedTabs = () => {
-        
-          return (
-            <>
-                <ListGroup horizontal className="screens--shots">
-                  <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
-                    Screenshots
-                  </ListGroup.Item>
-                  <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
-                    Videos
-                  </ListGroup.Item>
-                </ListGroup>
-            </>
-          )
-      }
-
-  const FilterButton = ({ position }) => {
-      return (
-        <>
-          <div className="filter-box">
-            <Button variant="primary" onClick={() => {
-              handleReports()
-            }} className="date-filter-btn me-1">Apply</Button>
-            <Button variant="primary" onClick={() => setIsPickerOpen(false)} className="date-filter-btn ms-1">Cancel</Button>
-          </div>
-        </>
-      )
-    }
-  
-    const FiltersDate = ({ position, setFilteredDate, setSelectedFilter, setIsPickerOpen }) => {
-      
-      // Helper function to format dates as "YYYY-MM-DD"
-      const formatDate = (date) => {
-          return date.toISOString().split("T")[0];
-      };
-  
-      // Helper function to calculate date ranges
-      const handleDateFilter = (event, start, end = null) => {
-          event.stopPropagation();
-          if (end !== null) {
-              setFilteredDate([formatDate(start), formatDate(end)]);
-          } else {
-              setFilteredDate([formatDate(start)]);
-          }
-          datePickerRef.current.closeCalendar()
-          datePickerRef.current.openCalendar()
-      };
-  
-      const today = new Date();
-  
-      // Yesterday
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-  
-      // Last 7 days
-      const last7Days = new Date(today);
-      last7Days.setDate(last7Days.getDate() - 6); // Subtract 6 to get exactly 7 days including today
-  
-      // Last week (Monday to Sunday)
-      const lastWeekEnd = new Date(today);
-      lastWeekEnd.setDate(today.getDate() - today.getDay()); // Last Sunday
-      const lastWeekStart = new Date(lastWeekEnd);
-      lastWeekStart.setDate(lastWeekStart.getDate() - 6); // Last Monday
-  
-      // Last 2 weeks (from Monday of the week before last week)
-      const last2WeeksStart = new Date(lastWeekStart);
-      last2WeeksStart.setDate(last2WeeksStart.getDate() - 7);
-  
-      // This month (start to end of the current month)
-      // This month (start to end of the current month)
-      const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 2);
-      const thisMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Correctly gets the last day of the current month
-      thisMonthEnd.setHours(23, 59, 59, 999); // Optional: Ensure full inclusion of the last day
-  
-  
-      // Last month (start to end of the previous month)
-      const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 2);
-      const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of the last month
-      lastMonthEnd.setHours(23, 59, 59, 999); // Ensure full-day inclusion for the last day
-  
-  
-      return (
-          <>
-              <ListGroup vertical="true" className="date-filters">
-                  <ListGroup.Item className={ selectedFilter === 'today'? 'active': ''} key={'date-today'} onClick={(e) => {handleDateFilter(e, today); setSelectedFilter('today')}}>Today</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'yesterday'? 'active': ''} key={'date-yesterday'} onClick={(e) =>{ handleDateFilter(e, yesterday); setSelectedFilter('yesterday')}}>Yesterday</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === '7days'? 'active': ''} key={'date-7days'} onClick={(e) => {handleDateFilter(e, last7Days, today); setSelectedFilter('7days')}}>Last 7 days</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'last-week'? 'active': ''} key={'date-last-week'} onClick={(e) => {handleDateFilter(e, lastWeekStart, lastWeekEnd); setSelectedFilter('last-week')}}>Last week</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'last2-weeks'? 'active': ''} key={'date-last2-weeks'} onClick={(e) => {handleDateFilter(e, last2WeeksStart, lastWeekEnd); setSelectedFilter('last2-weeks')}}>Last 2 weeks</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'this-month'? 'active': ''} key={'date-this-month'} onClick={(e) => {handleDateFilter(e, thisMonthStart, thisMonthEnd); setSelectedFilter('this-month')}}>This month</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'last-month'? 'active': ''} key={'date-last-month'} onClick={(e) => {handleDateFilter(e, lastMonthStart, lastMonthEnd); setSelectedFilter('last-month')}}>Last month</ListGroup.Item>
-              </ListGroup>
-          </>
-      );
-  };
-
+    selectboxObserver()
+  },[])
   return (
     <>
       <Lightbox
@@ -220,65 +66,25 @@ function ReportsPage() {
               <Col>
                 <ListGroup horizontal>
                   <ListGroup.Item className="d-none d-xl-block">
-                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('sort_by', event.target.value)} value={filters['sort_by'] || 'members'}>
+                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('show_for', event.target.value)} value={filters['show_for'] || 'all'}>
                       <option value="">Sort by</option>
-                      <option value="members">Members</option>
+                      <option value="screenshots">Screenshots</option>
                       <option value="projects">Projects</option>
                   </Form.Select>
                     
                   </ListGroup.Item>
-                  {
-                    filters['sort_by'] === 'members' ?
-                  
-                      <ListGroup.Item className="d-none d-xl-block">
-                      <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || memberdata?._id}>
-                        <option value={memberdata?._id}>My Reports</option>
-                        {
-                            members.map((member, index) => {
-                                return <option key={`member-${index}`} value={member._id}>{member.name}</option>
-                            })
-                        }
-                      </Form.Select>
-                        
-                      </ListGroup.Item>
-                    :
-                      <ListGroup.Item className="d-none d-xl-block">
-                      <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project', event.target.value)} value={filters['project'] || ''}>
-                        {
-                            projects.map((project, index) => {
-                                return <option key={`project-${index}`} value={project._id}>{project.title}</option>
-                            })
-                        }
-                      </Form.Select>
-                        
-                      </ListGroup.Item>
-                    }
+                  <ListGroup.Item className="d-none d-xl-block">
+                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('reports', event.target.value)} value={filters['reports'] || 'all'}>
+                      <option value="my">My Reports</option>
+                      <option value="hitesh">Hitesh Kumar</option>
+                      <option value="tarun">Tarun Giri</option>
+                  </Form.Select>
+                    
+                  </ListGroup.Item>
                   <ListGroup.Item className="d-none d-xl-block">
                     <Form>
                       <Form.Group className="mb-0 form-group">
-                      <DatePicker 
-                        key={'date-filter'}
-                        name="date"
-                        weekStartDayIndex={1}
-                        id='datepicker-filter'
-                        value={filtereddate} 
-                        format="YYYY-MM-DD"
-                        range
-                        numberOfMonths={2}
-                        dateSeparator=" - " 
-                        onChange={async (value) => {
-                            setFilteredDate(value)
-                          }
-                        }          
-                        className="form-control"
-                        placeholder="dd/mm/yyyy"
-                        open={isPickerOpen} // Control visibility with state
-                        onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                        onClose={() => setIsPickerOpen(false)} // Update state when closed
-                        plugins={
-                          [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
-                        } 
-                    />
+                        <Form.Control type="date" name="date" />
                       </Form.Group>
                     </Form>
                   </ListGroup.Item>
@@ -292,176 +98,211 @@ function ReportsPage() {
         </div>
         <div className='page--wrapper daily--reports px-md-2 py-3'>
           <Container fluid>
-          <div className="reports-section">
-          <div className="rounded--box activity--box">
             <Accordion defaultActiveKey="0">
-              {
-                filters['sort_by'] === 'members' ?
-                  memberReports && memberReports.length > 0 ? 
-                    memberReports.map((report, index) => {
-                      return (
-                      <>
-                      
-                      <Accordion.Item eventKey={index}>
-                        <div className="screens--tabs">
-                        
-                          <Accordion.Header>
-                            <p>
-                              <span>Project: {report?.project?.title}</span>
-                              <strong>{new Date(report?.createdAt).toLocaleDateString('en-GB', options)}</strong>
-                              <strong>{ generateTimeRange(report?.createdAt, report?.duration)}</strong>
-                            </p>
-                          </Accordion.Header>
-                        </div>
-                        <Accordion.Body>
-                          <div className="shots--list pt-3">
-                            <ListGroup horizontal>
-                              {showRecordedTabs()}
-                            </ListGroup>
-                            <CardGroup>
-                                {
-                                  report?.activityMeta && report.activityMeta.length > 0 ? (
-                                    report.activityMeta.map((meta, i) => {
-                                      // Handle screenshots tab
-                                      if (screenshotTab === "Screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((screenshotData, j) => (
-                                          <Card key={`screenshot-card-${i}-${j}`}>
-                                            <Card.Body>
-                                              <img
-                                                className="card-img-top"
-                                                src={screenshotData?.url}
-                                                alt="screenshot"
-                                                onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
-                                              />
-                                              <p>
-                                                <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
-                                                <strong>Date: {screenshotData?.taken_time.split('T')[0]}</strong><br />
-                                                <strong>Time: {showAmPmtime(screenshotData?.taken_time)}</strong>
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ));
-                                      }
+              <Accordion.Item eventKey="0">
+                <Accordion.Header>The Galaxy <small>Hitesh Kumar</small></Accordion.Header>
+                <Accordion.Body>
+                  <Row>
+                    <Col sm={12}>
+                      <div className="report--info">
+                        <p className="p--card">
+                          <label>Project Name</label>
+                          <p>The Galaxy</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Member Name</label>
+                          <p>Gagandeep Singh</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Report Time</label>
+                          <p>06:10 PM</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Client Name</label>
+                          <p>Daniel</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Time Spent</label>
+                          <p>2 hrs 30 Min</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Client Updated</label>
+                          <p>Yes I Did</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Time Tested</label>
+                          <p>4</p>
+                        </p>
+                      </div>
+                    </Col>
+                    <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
+                      <label>Remarks</label>
+                      <pre>
+                        Created below pages
 
-                                      // Handle videos tab
-                                      if (screenshotTab === "Videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((videoData, j) => (
-                                          <Card key={`video-card-${i}-${j}`}>
-                                            <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                              <video controls height="175px">
-                                                <source src={videoData?.url} type="video/webm" />
-                                                Your browser does not support the video tag.
-                                              </video>
-                                              <p>
-                                                <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                                <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
-                                                <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ));
-                                      }
-
-                                      return null; // Return null if no condition is met
-                                    })
-                                  ) : (
-                                    <div>No data available</div> // Display if no data is available
-                                  )
-                                }
-                              </CardGroup>
-                            </div>
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      </>
-                      )
-                    })
-                  :
-                  <p class="text-center mt-5">No activity available.</p>
-                  :
-
-                  projectReports && projectReports.length > 0 ? 
-                    projectReports.map((report, index) => {
-                      return (
-                      <>
-                      
-                      <Accordion.Item eventKey={index}>
-                        <div className="screens--tabs">
-                        
-                          <Accordion.Header>
-                            <p>
-                              <span>Project: {report?.project?.title}</span>
-                              
-                            </p>
-                          </Accordion.Header>
-                        </div>
-                        <Accordion.Body>
-                          <div className="shots--list pt-3">
-                            <ListGroup horizontal>
-                              {showRecordedTabs()}
-                            </ListGroup>
-                            <CardGroup>
-                                {
-                                  report?.activityMetas && report.activityMetas.length > 0 ? (
-                                    report.activityMetas.map((meta, i) => {
-                                      // Handle screenshots tab
-                                      if (screenshotTab === "Screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((screenshotData, j) => (
-                                          <Card key={`screenshot-card-${i}-${j}`}>
-                                            <Card.Body>
-                                              <img
-                                                className="card-img-top"
-                                                src={screenshotData?.url}
-                                                alt="screenshot"
-                                                onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
-                                              />
-                                              <p>
-                                                <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
-                                                <strong>Date:{screenshotData?.taken_time.split('T')[0]}</strong><br />
-                                                <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ));
-                                      }
-
-                                      // Handle videos tab
-                                      if (screenshotTab === "Videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((videoData, j) => (
-                                          <Card key={`video-card-${i}-${j}`}>
-                                            <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                              <video controls height="175px">
-                                                <source src={videoData?.url} type="video/webm" />
-                                                Your browser does not support the video tag.
-                                              </video>
-                                              <p>
-                                                <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                                <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
-                                                <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ));
-                                      }
-
-                                      return null; // Return null if no condition is met
-                                    })
-                                  ) : (
-                                    <div>No data available</div> // Display if no data is available
-                                  )
-                                }
-                              </CardGroup>
-                            </div>
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      </>
-                      )
-                    })
-                  :
-                  <p class="text-center mt-5">No activity available.</p>
-              }
-            </Accordion> 
-            </div>
-            </div>
+                        https://tempiecomau.wpcomstaging.com
+                        https://tempiecomau.wpcomstaging.com/about/
+                        https://tempiecomau.wpcomstaging.com/find-a-tempie/
+                        https://tempiecomau.wpcomstaging.com/be-a-tempie/
+                        https://tempiecomau.wpcomstaging.com/contact-us/
+                      </pre>
+                    </Col>
+                    <Col sm={12}>
+                      <label>Tasks</label>
+                      <ul>
+                        <li>
+                          <p className="mb-0"><FaAngleRight /> Search page design changes</p> <strong>00:15 min</strong>
+                          <Badge bg="success">Completed</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                        <li>
+                          <p className="mb-0"><FaAngleRight /> Remove extra spacing and a slide</p> <strong>00:45 min</strong>
+                          <Badge bg="success">Completed</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                        <li>
+                          <p className="mb-0"><FaAngleRight /> Search page design changes</p> <strong>00:30 min</strong>
+                          <Badge bg="warning">In Progress</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                      </ul>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+              <Accordion.Item eventKey="1">
+                <Accordion.Header>My Teams <small>Tarun Giri</small></Accordion.Header>
+                <Accordion.Body>
+                  <Row>
+                    <Col sm={12}>
+                      <div className="report--info">
+                        <p className="p--card">
+                          <label>Project Name</label>
+                          <p>The Galaxy</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Member Name</label>
+                          <p>Gagandeep Singh</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Report Time</label>
+                          <p>06:10 PM</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Client Name</label>
+                          <p>Daniel</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Time Spent</label>
+                          <p>2 hrs 30 Min</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Client Updated</label>
+                          <p>Yes I Did</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Time Tested</label>
+                          <p>4</p>
+                        </p>
+                      </div>
+                    </Col>
+                    <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
+                      <label>Remarks</label>
+                      <pre>Created below pages
+                        https://tempiecomau.wpcomstaging.com
+                        https://tempiecomau.wpcomstaging.com/about/
+                        https://tempiecomau.wpcomstaging.com/find-a-tempie/
+                        https://tempiecomau.wpcomstaging.com/be-a-tempie/
+                        https://tempiecomau.wpcomstaging.com/contact-us/
+                      </pre>
+                    </Col>
+                    <Col sm={12}>
+                      <label>Tasks</label>
+                      <ul>
+                        <li><p className="mb-0"><FaAngleRight /> Search page design changes</p> <strong>00:15 min</strong>
+                          <Badge bg="success">Completed</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                        <li><p className="mb-0"><FaAngleRight /> Remove extra spacing and a slide</p> <strong>00:45 min</strong>
+                          <Badge bg="success">Completed</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                        <li><p className="mb-0"><FaAngleRight /> Search page design changes</p> <strong>00:30 min</strong>
+                          <Badge bg="warning">In Progress</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                      </ul>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+              <Accordion.Item eventKey="2">
+                <Accordion.Header>TheJugg <small>Gagandeep Singh</small></Accordion.Header>
+                <Accordion.Body>
+                  <Row>
+                    <Col sm={12}>
+                      <div className="report--info">
+                        <p className="p--card">
+                          <label>Project Name</label>
+                          <p>The Galaxy</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Member Name</label>
+                          <p>Gagandeep Singh</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Report Time</label>
+                          <p>06:10 PM</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Client Name</label>
+                          <p>Daniel</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Time Spent</label>
+                          <p>2 hrs 30 Min</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Client Updated</label>
+                          <p>Yes I Did</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Time Tested</label>
+                          <p>4</p>
+                        </p>
+                      </div>
+                    </Col>
+                    <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
+                      <label>Remarks</label>
+                      <pre>Created below pages
+                        https://tempiecomau.wpcomstaging.com
+                        https://tempiecomau.wpcomstaging.com/about/
+                        https://tempiecomau.wpcomstaging.com/find-a-tempie/
+                        https://tempiecomau.wpcomstaging.com/be-a-tempie/
+                        https://tempiecomau.wpcomstaging.com/contact-us/
+                      </pre>
+                    </Col>
+                    <Col sm={12}>
+                      <label>Tasks</label>
+                      <ul>
+                        <li><p className="mb-0"><FaAngleRight /> Search page design changes</p> <strong>00:15 min</strong>
+                          <Badge bg="success">Completed</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                        <li><p className="mb-0"><FaAngleRight /> Remove extra spacing and a slide</p> <strong>00:45 min</strong>
+                          <Badge bg="success">Completed</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                        <li><p className="mb-0"><FaAngleRight /> Search page design changes</p> <strong>00:30 min</strong>
+                          <Badge bg="warning">In Progress</Badge>
+                          <Button variant="primary" onClick={handleViewReport}>View Report</Button>
+                        </li>
+                      </ul>
+                    </Col>
+                  </Row>
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
           </Container>
         </div>
       </div>
@@ -1012,4 +853,4 @@ function ReportsPage() {
   );
 }
 
-export default ReportsPage;
+export default Stats;

@@ -28,6 +28,7 @@ const apiKeys = {
     profile: 'auth/profile',
     holidays: '/holidays',
     attendance: 'attendance',
+    reports: 'reports'
 };
   
 export default apiKeys;

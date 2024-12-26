@@ -11,7 +11,7 @@ import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket } from "../../helpers/auth";
-import { getMemberdata, showAmPmtime } from "../../helpers/commonfunctions";
+import { getMemberdata, showAmPmtime, generateTimeRange } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 function TimeTrackingPage() {
   let totalhours = 0;
@@ -287,27 +287,7 @@ function TimeTrackingPage() {
 // }
 
 
-function generateTimeRange(createdAt, duration) {
-  // Create Date objects from createdAt and duration
-  const startTime = new Date(createdAt);
-  const endTime = new Date(duration);
 
-  // Format the start and end times using local time zone
-  const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-  });
-
-  const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-  });
-
-  // Return the formatted time range in the desired format
-  return `${startTimeFormatted} - ${endTimeFormatted}`;
-}
 
 
   useEffect(() => {
