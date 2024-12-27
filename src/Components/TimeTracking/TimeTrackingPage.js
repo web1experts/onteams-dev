@@ -175,7 +175,6 @@ function TimeTrackingPage() {
                 return activity; // Return unchanged activity if no match
               });
 
-              console.log('updatedActivities:: ', updatedActivities);
               return updatedActivities;
           }
   

@@ -36,14 +36,9 @@ function ReportsPage() {
   const [selectedFilter, setSelectedFilter ] = useState('today')
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [postMedia, setPostMedia] = useState([]);
   const [ filters, setFilters] = useState({member: memberdata?._id, sort_by: 'members','project_status': 'all'});
-  const [postMedia, setPostMedia] = useState('');
-
-  const handleLightBox = (media) => {
-    const data = [{ src: media }];
-    setPostMedia(data)
-    setOpen(true)
-  }
 
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
@@ -197,6 +192,33 @@ function ReportsPage() {
       );
   };
 
+  const handleLightBox = (type, mediaItems, index) => {
+    setCurrentIndex(index);
+    const slides =
+    Array.isArray(mediaItems) && mediaItems.length > 0
+      ? mediaItems.map((item) => {
+          if (type === "video") {
+            return {
+              type: "video",
+              src: item.url,
+              poster: null, // Optional, for a thumbnail or video preview
+              videoProps: {
+                controls: true,
+                autoPlay: false, // Set to true if you want videos to start automatically
+                style: { maxHeight: "90vh", maxWidth: "100%" },
+              },
+            };
+          }
+          return { type: "image", src: item.url }; // Default case for images
+        })
+      : [];
+
+    // const data = slides;
+    setPostMedia(slides)
+    setOpen(true)
+  }
+  
+
   return (
     <>
       <Lightbox
@@ -205,8 +227,28 @@ function ReportsPage() {
         slides={postMedia}
         plugins={[Fullscreen]}
         fullscreen={{ ref: fullscreenRef }}
+        index={currentIndex}
         on={{
           click: () => fullscreenRef.current?.enter(),
+        }}
+        render={{
+          slide: ({slide}) => {
+            if (slide?.type === "video") {
+              return (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <video
+                    controls
+                    autoPlay={false}
+                    style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                  >
+                    <source src={slide.src} type="video/webm" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              );
+            }
+            return null; // Default render for images will be used
+          },
         }}
       />
 
@@ -308,7 +350,7 @@ function ReportsPage() {
         <div className='page--wrapper daily--reports px-md-2 py-3'>
           <Container fluid>
           <div className="reports-section">
-          <div className="rounded--box activity--box">
+          <div className="rounded--box activity--box" key='activity-box'>
             <Accordion defaultActiveKey="0">
               {
                 filters['sort_by'] === 'members' ?
@@ -317,7 +359,7 @@ function ReportsPage() {
                       return (
                       <>
                       
-                      <Accordion.Item eventKey={index}>
+                      <Accordion.Item eventKey={index} key={`accord-item-${index}`}>
                         <div className="screens--tabs">
                         
                           <Accordion.Header>
