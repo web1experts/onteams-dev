@@ -197,7 +197,7 @@ function TimeTrackingPage() {
         peerConnections[id] = new RTCPeerConnection({ // User stun server for connection with different networks
           iceServers: [
               {
-                urls: 'turn:app.onteams.ai:3478',
+                urls: 'turn:64.227.189.65:3478',
                 username: 'web1experts',  // Optional if using 'lt-cred-mech'
                 credential: 'PtJJc0FUvuKP3jkn' // Optional if using 'lt-cred-mech'
               },
