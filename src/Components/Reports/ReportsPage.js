@@ -117,6 +117,7 @@ function ReportsPage() {
         <>
           <div className="filter-box">
             <Button variant="primary" onClick={() => {
+              setIsPickerOpen(false)
               handleReports()
             }} className="date-filter-btn me-1">Apply</Button>
             <Button variant="primary" onClick={() => setIsPickerOpen(false)} className="date-filter-btn ms-1">Cancel</Button>
