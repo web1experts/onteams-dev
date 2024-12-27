@@ -197,7 +197,7 @@ function TimeTrackingPage() {
         peerConnections[id] = new RTCPeerConnection({ // User stun server for connection with different networks
           iceServers: [
               {
-                urls: 'turn:64.227.189.65:3478',
+                urls: 'turn:app.onteams.ai:3478',
                 username: 'web1experts',  // Optional if using 'lt-cred-mech'
                 credential: 'PtJJc0FUvuKP3jkn' // Optional if using 'lt-cred-mech'
               },
@@ -669,7 +669,7 @@ function extractTimeFromISO(createdAt, duration) {
         <div className='page--wrapper daily--reports activity--table px-md-2 py-3'>
           {
               spinner &&
-              <div class="loading-bar">
+              <div className="loading-bar">
                   <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
           }
@@ -819,7 +819,7 @@ function extractTimeFromISO(createdAt, duration) {
       <div className="details--wrapper">
         {
               activityspinner &&
-              <div class="loading-bar">
+              <div className="loading-bar">
                   <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
           }
@@ -977,7 +977,7 @@ function extractTimeFromISO(createdAt, duration) {
                     )
                   })
                 :
-                <p class="text-center mt-5">No activity available.</p>
+                <p className="text-center mt-5">No activity available.</p>
               }
             </Accordion>  
             </>
