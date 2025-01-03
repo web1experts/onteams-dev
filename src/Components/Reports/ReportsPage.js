@@ -4,34 +4,47 @@ import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Dropdown, CardGroup } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaPlay, FaCheck } from "react-icons/fa";
-import { generateTimeRange, showAmPmtime, getMemberdata } from "../../helpers/commonfunctions";
+import { FaPlay, FaCheck, FaAngleRight, FaPlusCircle, FaTrash } from "react-icons/fa";
+import { secondstoMinutes, showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { MdFilterList } from "react-icons/md";
-import { getReportsByMember, gerReportsByProject } from "../../redux/actions/report.action";
+import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import { ListProjects } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
+import { ListTasks } from "../../redux/actions/task.action";
 function ReportsPage() {
   const dispatch = useDispatch()
   const datePickerRef = useRef(null)
   const memberdata = getMemberdata()
   const fullscreenRef = React.useRef(null);
+  const [fields, setFields] = useState({})
   const [activeTab, setActiveTab] = useState("Screenshots");
+  const [ loader, setLoader] = useState(false)
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setShow(false);
+    setFields({})
+    setEntries([])
+  }
   const handleShow = () => setShow(true);
   const memberFeed = useSelector((state) => state.member.members)
   const projectFeed = useSelector(state => state.project.projects);
   const [ projects, setProjects ] = useState([])
+  const taskFeed = useSelector(state => state.task.tasks);
+  const [taskslists, setTasksLists] = useState([])
   const [members, setMembers] = useState([])
   const reportState = useSelector((state) => state.reports)
   const [memberReports, setMemberReports] = useState([])
   const[ projectReports, setProjectReports] = useState([])
+  const [ singleprojectReport , setsingleProjectReport] = useState({})
   const options = { day: '2-digit', month: 'long', year: 'numeric' };
   const [screenshotTab, setScreenshotTab] = useState('Screenshots');
   const [ViewReport, setViewReport] = useState(false);
   const handleReportClose = () => setViewReport(false);
   const handleViewReport = () => setViewReport(true);
+  const [view, setView] = useState('group')
+  const [occupiedRanges, setOccupiedRanges] = useState([])
+  const [timeSlots, setTimeslots] = useState([])
   const [ filtereddate, setFilteredDate ] = useState([new Date().toISOString().split('T')[0]])
   const [selectedFilter, setSelectedFilter ] = useState('today')
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -39,10 +52,23 @@ function ReportsPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
   const [ filters, setFilters] = useState({member: memberdata?._id, sort_by: 'members','project_status': 'all'});
-
+  const [ selectedproject, setSelectedProject] = useState('')
+  const [ selectedTask, setSelectedTask] = useState('');
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
+  const [entries, setEntries] = useState([]);
+  const [ errors, setErrors] = useState([])
+  const handleProjectSelect = async ({ target: { name, value } }) => {
+    setSelectedProject(value)
+    await dispatch(ListTasks(value));
+    await dispatch(getSingleProjectReport(value))
+  }
+
+  const handleTaskSelect = async ({ target: { name, value } }) => {
+    setSelectedTask(value)
+  }
+  
 
   const handlefilterchange = (name, value) => {
     setFilters({ ...filters, [name]: value })
@@ -66,6 +92,33 @@ function ReportsPage() {
   }, [dispatch])
 
   useEffect(() => {
+      setEntries([]);
+      if (taskFeed?.taskData && Object.keys(taskFeed.taskData).length > 0) {
+          setTasksLists(taskFeed.taskData)
+          const firstTask = Object.values(taskFeed.taskData).find(tab => tab.tasks && tab.tasks.length > 0)?.tasks[0];
+          if (firstTask) {
+            setEntries([...entries, { task: firstTask._id, start_time: "", end_time: "" }]);
+          }   
+      }
+  }, [taskFeed, dispatch])
+
+  useEffect(() => {
+    if(occupiedRanges){ console.log("occupiedRanges:: ", occupiedRanges)
+      setTimeslots(generateTimeSlots(10))
+    }
+    
+  },[occupiedRanges])
+
+  // Helper function to calculate time ranges
+  const calculateOccupiedRanges = (data) => {
+    return data.map((item) => {
+      const start = new Date(item.createdAt); // Convert createdAt to a Date object
+      const end = new Date(item.duration); // Convert duration to a Date object (end time)
+      
+      return { start, end };
+    });
+  };
+  useEffect(() => {
     setActiveTab("Screenshots")
     handleReports()
   }, [filters])
@@ -77,14 +130,22 @@ function ReportsPage() {
   }, [memberFeed, dispatch]);
 
   useEffect(() => {
+    if(view === 'single'){
+      setFilteredDate(new Date().toISOString().split('T')[0])
+    }else{
+      setFilteredDate([new Date().toISOString().split('T')[0]])
+    }
+  }, [view])
+
+  useEffect(() => {
       const check = ['undefined', undefined, 'null', null, '']
       if (projectFeed && projectFeed.projectData) {
           setProjects(projectFeed.projectData)
       }
   }, [projectFeed])
 
-  useEffect(() => {
-    handlefilterchange('date_range', filtereddate)
+  useEffect(() => { console.log('filtereddate', filtereddate)
+    // handlefilterchange('date_range', filtereddate)
   }, [filtereddate])
 
   useEffect(() => {
@@ -93,6 +154,12 @@ function ReportsPage() {
       }
       if(reportState.projectReports){
         setProjectReports(reportState.projectReports)
+      }
+
+      if( reportState.singleProjectReport){
+        setsingleProjectReport(reportState.singleProjectReport)
+        console.log(calculateOccupiedRanges(reportState.singleProjectReport))
+        setOccupiedRanges(calculateOccupiedRanges(reportState.singleProjectReport))
       }
     }, [reportState])
 
@@ -112,12 +179,65 @@ function ReportsPage() {
           )
       }
 
+      // Generate time slots for the day
+      const generateTimeSlots = (intervalMinutes = 15) => {
+        const slots = [];
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0); // Set to start of the day
+        const endOfDay = new Date(startOfDay);
+        endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
+      
+        let current = new Date(startOfDay);
+        while (current <= endOfDay) {
+          const hours = current.getHours().toString().padStart(2, '0'); // Format hours
+          const minutes = current.getMinutes().toString().padStart(2, '0'); // Format minutes
+          slots.push(`${hours}:${minutes}`); // Add formatted time
+          current.setMinutes(current.getMinutes() + intervalMinutes); // Increment by interval
+        }
+        return slots;
+      };
+
+    // Check if a time slot is occupied
+    const isTimeSlotOccupied = (time, ranges) => {
+      console.log('Ranges:: ', ranges);
+    
+      if (!ranges || ranges.length === 0) {
+        // If ranges is null, undefined, or empty, return false (time slot is not occupied)
+        return false;
+      }
+    
+      // Convert time string (HH:mm) to a Date object on the same day
+      const timeDate = new Date();
+      const [hours, minutes] = time.split(':');
+      timeDate.setHours(hours, minutes, 0, 0); // Set time based on HH:mm
+    
+      return ranges.some(({ start, end }) => {
+        // Convert start time from ISO string to Date object
+        const startDate = new Date(start);
+        
+        // If end time exists, convert it to Date; otherwise, set endDate to null
+        const endDate = end ? new Date(end) : null; 
+        
+        // Check if the time falls within the range
+        if (endDate) {
+          // If there is an end time, check if time is between start and end
+          return timeDate >= startDate && timeDate < endDate;
+        }
+        
+        // If there's no end time, check if the time is after the start time
+        return timeDate >= startDate;
+      });
+    };
+    
+    
+
   const FilterButton = ({ position }) => {
       return (
         <>
           <div className="filter-box">
             <Button variant="primary" onClick={() => {
               setIsPickerOpen(false)
+              handlefilterchange('date_range', filtereddate)
               handleReports()
             }} className="date-filter-btn me-1">Apply</Button>
             <Button variant="primary" onClick={() => setIsPickerOpen(false)} className="date-filter-btn ms-1">Cancel</Button>
@@ -193,6 +313,28 @@ function ReportsPage() {
       );
   };
 
+  function calculateTotalTime(activities) {
+    let totalMilliseconds = 0;
+
+    for (const activity of activities) {
+        const { createdAt, duration } = activity;
+
+        // Convert createdAt and duration to Date objects
+        const startTime = new Date(createdAt).getTime();
+        const stopTime = new Date(duration).getTime();
+
+        // Calculate the time spent in milliseconds
+        totalMilliseconds += stopTime - startTime;
+    }
+
+    // Convert total milliseconds to hours, minutes, and seconds
+    const totalSeconds = Math.floor(totalMilliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    return `${hours} hrs ${minutes} mins`;
+}
+
   const handleLightBox = (type, mediaItems, index) => {
     setCurrentIndex(index);
     const slides =
@@ -219,6 +361,102 @@ function ReportsPage() {
     setOpen(true)
   }
   
+
+  const handleAddEntry = () => {
+    setEntries([...entries, { task: "", start_time: "", end_time: "" }]);
+};
+
+const handleReportSubmit = async (e) => {
+  e.preventDefault();
+  const errors = entries.map((entry) => {
+    const entryErrors = {};
+    if (!entry.task) entryErrors.task = "Task is required";
+    if (!entry.start_time) entryErrors.hours = "Hours are required";
+    if (!entry.end_time) entryErrors.minutes = "Minutes are required";
+    return entryErrors;
+  });
+
+  const hasErrors = errors.some((entryErrors) => Object.keys(entryErrors).length > 0);
+
+  if (hasErrors) {
+    setErrors(errors); // Update the errors state to show errors below each field
+    return false; // Prevent form submission
+  }
+  setErrors([]);
+  setLoader( true )
+  const payload = { project_id: selectedproject, entries }
+  dispatch(addManualTime({...payload,...fields}))
+
+}
+
+useEffect(() => {
+  setLoader(false)
+  if (reportState.success) {
+      // setFields({})
+      // setEntries([])
+      handleClose()
+  }
+}, [reportState])
+
+const handleRemoveEntry = (index) => {
+    setEntries(entries.filter((_, i) => i !== index));
+    setErrors(errors.filter((_, i) => i !== index));
+};
+
+const handleEntryChange = (index, field, value) => {
+    const updatedEntries = [...entries];
+    updatedEntries[index][field] = value;
+    setEntries(updatedEntries);
+};
+
+const handlechange = ({ target: { name, value } }) => {
+  setFields({...fields, [name]: value})
+};
+
+
+const groupTasksById = (activities) => {
+  const groupedTasks = activities.reduce((acc, activity) => {
+      activity.tasks.forEach((t) => {
+          const taskId = t.task._id;
+
+          if (!acc[taskId]) {
+              acc[taskId] = {
+                  taskId: t.task._id,
+                  title: t.task.title,
+                  duration: 0,
+                  statuses: [],
+              };
+          }
+
+          acc[taskId].duration += t.duration; // Accumulate durations
+          acc[taskId].statuses.push(...t.task.subtasks.map((subtask) => subtask.status));
+      });
+
+      return acc;
+  }, {});
+
+  return Object.values(groupedTasks); // Convert object to array
+};
+
+
+const TaskList = ({ report }) => {
+  // Group tasks by title and calculate total durations
+  const groupedTasks = groupTasksById(report?.activities);
+
+  return (
+    <ul>
+      {groupedTasks.map((task, index) => (
+        <li key={`grouped-task-${index}`}>
+          <p className="mb-0">
+            <FaAngleRight /> {task.title}
+          </p>
+          <strong>{secondstoMinutes(task.duration)}</strong>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 
   return (
     <>
@@ -308,9 +546,18 @@ function ReportsPage() {
                           ))}
                         </Form.Select>
                       </ListGroup.Item>
+                      
                       </>
                     }
-                  <ListGroup.Item className="d-none d-xl-block">
+                  <ListGroup.Item onClick={(e) => {setView('group')}}>
+                    Group View
+                  </ListGroup.Item>
+                  <ListGroup.Item onClick={(e) => {setView('single')}}>
+                    Single View
+                  </ListGroup.Item>
+                  {
+                    view === 'group' ? 
+                    <ListGroup.Item className="d-none d-xl-block">
                     <Form>
                       <Form.Group className="mb-0 form-group">
                       <DatePicker 
@@ -340,8 +587,40 @@ function ReportsPage() {
                       </Form.Group>
                     </Form>
                   </ListGroup.Item>
+                  :
+                  <ListGroup.Item className="d-none d-xl-block">
+                    <Form>
+                      <Form.Group className="mb-0 form-group">
+                      <DatePicker 
+                        ref={datePickerRef}
+                        key={'date-filter'}
+                        name="date"
+                        weekStartDayIndex={1}
+                        id='datepicker-filter'
+                        value={filtereddate} 
+                        format="YYYY-MM-DD"
+                        dateSeparator=" - " 
+                        onChange={async (value) => {
+                            setFilteredDate(value)
+                          }
+                        }          
+                        className="form-control"
+                        placeholder="dd/mm/yyyy"
+                        open={isPickerOpen} // Control visibility with state
+                        onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                        onClose={() => setIsPickerOpen(false)} // Update state when closed
+                        plugins={
+                          [<FilterButton position="bottom" />]
+                        } 
+                        range={false}
+                        multiple={false}
+                    />
+                      </Form.Group>
+                    </Form>
+                  </ListGroup.Item>
+                  }
                   <ListGroup.Item>
-                    <Button variant="primary" onClick={handleShow}>Submit Report</Button>
+                    <Button variant="primary" onClick={handleShow}>Manual Time</Button>
                   </ListGroup.Item>
                 </ListGroup>
               </Col>
@@ -356,18 +635,19 @@ function ReportsPage() {
               {
                 filters['sort_by'] === 'members' ?
                   memberReports && memberReports.length > 0 ? 
+                  view === 'group' ?
                     memberReports.map((report, index) => {
                       return (
                       <>
                       
-                      <Accordion.Item eventKey={index} key={`accord-item-${index}`}>
+                      <Accordion.Item eventKey={index} key={`accord-item-${report?.project?._id}`}>
                         <div className="screens--tabs">
                         
                           <Accordion.Header>
                             <p>
                               <span>Project: {report?.project?.title}</span>
-                              <strong>{new Date(report?.createdAt).toLocaleDateString('en-GB', options)}</strong>
-                              <strong>{ generateTimeRange(report?.createdAt, report?.duration)}</strong>
+                              {/* <strong>{new Date(report?.createdAt).toLocaleDateString('en-GB', options)}</strong> */}
+                              {/* <strong>{ generateTimeRange(report?.createdAt, report?.duration)}</strong> */}
                             </p>
                           </Accordion.Header>
                         </div>
@@ -378,8 +658,8 @@ function ReportsPage() {
                             </ListGroup>
                             <CardGroup>
                                 {
-                                  report?.activityMeta && report.activityMeta.length > 0 ? (
-                                    report.activityMeta.map((meta, i) => {
+                                  report?.activityMetas && report.activityMetas.length > 0 ? (
+                                    report.activityMetas.map((meta, i) => {
                                       // Handle screenshots tab
                                       if (screenshotTab === "Screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
                                         return meta.meta_value.map((screenshotData, j) => (
@@ -433,11 +713,58 @@ function ReportsPage() {
                       </>
                       )
                     })
+                    :
+                    memberReports.map((report, index) => {
+                      return (
+                      <>
+                      
+                      <Accordion.Item eventKey={index}>
+                        <div className="screens--tabs">
+                        
+                          <Accordion.Header>{report?.project?.title} </Accordion.Header>
+                        </div>
+                        <Accordion.Body>
+                          <Row>
+                            <Col sm={12}>
+                              <div className="report--info">
+                                
+                                <p className="p--card">
+                                  <label>Time Spent</label>
+                                  <p>{calculateTotalTime(report?.activities)}</p>
+                                </p>
+                              </div>
+                            </Col>
+                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
+                              <label>Remarks</label>
+                              {
+                                report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                report?.project?.projectmeta.map((meta) => {
+                                  if(meta.meta_key === 'remarks'){
+                                    return <pre>{meta.meta_value}</pre>
+                                  }else{
+                                    return null
+                                  }
+                                })
+                              }
+                            </Col>
+                            <Col sm={12}>
+                              <label>Tasks</label>
+                              <TaskList report={report} />
+                              
+                            </Col>
+                          </Row>
+                          
+                          </Accordion.Body>
+                        </Accordion.Item>
+                      </>
+                      )
+                    })
                   :
                   <p className="text-center mt-5">No activity available.</p>
                   :
 
                   projectReports && projectReports.length > 0 ? 
+                    view === 'group' ?
                     projectReports.map((report, index) => {
                       return (
                       <>
@@ -514,6 +841,69 @@ function ReportsPage() {
                       </>
                       )
                     })
+                    :
+                    projectReports.map((report, index) => {
+                      return (
+                      <>
+                      
+                      <Accordion.Item eventKey={index}>
+                        <div className="screens--tabs">
+                        
+                          <Accordion.Header>{report?.member?.name} </Accordion.Header>
+                        </div>
+                        <Accordion.Body>
+                          <Row>
+                            <Col sm={12}>
+                              <div className="report--info">
+                                
+                                <p className="p--card">
+                                  <label>Time Spent</label>
+                                  <p>{calculateTotalTime(report?.activities)}</p>
+                                </p>
+                              </div>
+                            </Col>
+                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
+                              <label>Remarks</label>
+                              {
+                                report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                report?.project?.projectmeta.map((meta) => {
+                                  if(meta.meta_key === 'remarks'){
+                                    return <pre>{meta.meta_value}</pre>
+                                  }else{
+                                    return null
+                                  }
+                                })
+                              }
+                              
+                            </Col>
+                            <Col sm={12}>
+                              <label>Tasks</label>
+                              {/* <ul>
+                                {
+                                  report?.activities?.length > 0 &&
+                                  report?.activities.map((act, actindex) => {
+                                    console.log('Act tasks:: ', act.tasks)
+                                    return (act.tasks || []).map((taskdata, tskindex) => (
+                                      
+                                        <li key={`${report._id}-taskkey-${tskindex}`}>
+                                          <p className="mb-0"><FaAngleRight /> {taskdata?.task?.title}</p> <strong>{secondstoMinutes(taskdata?.duration)}</strong>
+                                          
+                                        </li>
+                                      )
+                                    )
+                                  })
+                                }
+                              </ul> */}
+                               <TaskList report={report} />
+                            </Col>
+                          </Row>
+                          
+                          </Accordion.Body>
+                        </Accordion.Item>
+                      </>
+                      )
+                    })
+
                   :
                   <p className="text-center mt-5">No activity available.</p>
               }
@@ -523,282 +913,178 @@ function ReportsPage() {
           </Container>
         </div>
       </div>
-      <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal">
+      <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal" onShow={() => {selectboxObserver();}}>
         <Modal.Header closeButton>
           <Modal.Title>Submit Report</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form onSubmit={handleReportSubmit}>
             <Row>
               <Col sm={12} lg={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Select your Project</Form.Label>
-                  <Dropdown className="select--dropdown">
-                    <Dropdown.Toggle variant="success">Select</Dropdown.Toggle>
-                    <Dropdown.Menu>
+                  
                     <div className="drop--scroll">
-                      <Form>
-                        <Form.Group className="form-group mb-3">
-                          <Form.Control type="text" placeholder="Search here.." />
-                        </Form.Group>
-                      </Form>
-                      <Dropdown.Item className="selected--option" href="#/action-1">Select <FaCheck /></Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">The Galaxy</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">TheJugg</Dropdown.Item>
+                      <Form.Select className="form-control custom-selectbox" id="projects"
+                        value={selectedproject} onChange={handleProjectSelect} name="project">
+                          <option value={''}>Select Project</option>
+                        {
+                          projects.map(project => (
+                            <option value={project._id}>{project.title}</option>
+                          ))
+                        }
+                      </Form.Select>
+                      
                       </div>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                  {/* <Select2
-                    defaultValue={1}
-                    data={[
-                      { text: 'Select', id: 1 },
-                      { text: 'The Galaxy', id: 2 },
-                      { text: 'My Teams', id: 3 },
-                      { text: 'TheJugg', id: 4 },
-                    ]}
-                    options={{
-                      placeholder: 'Project',
-                    }}
-                  /> */}
+                      {
+                        // selectedproject !== '' && taskslists && Object.keys(taskslists).length > 0 &&
+                        // <div className="drop--scroll">
+                        //   <Form.Select className="form-control custom-selectbox" id="tasks"
+                        //     value={selectedTask} onChange={handleTaskSelect} name="task">
+                        //       <option value={''}>Select Task</option>
+                            // {
+                            //   Object.values(taskslists).map((tab, index) =>
+                            //     tab.tasks && tab.tasks.length > 0 ? (
+                            //         tab.tasks.map((task) => (
+                            //           <option value={task._id}>{task.title}</option>
+                            //         ))
+                            //     ) : (
+                            //       null
+                            //     )
+                            //   )
+                            // }
+                        //   </Form.Select>
+                        // </div>
+                      }
                 </Form.Group>
               </Col>
-              <Col sm={12} lg={6}>
+              {/* <Col sm={12} lg={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Time Spent</Form.Label>
                   <p className="mb-0"><strong>4 hours 30 minutes</strong></p>
                 </Form.Group>
-              </Col>
-              <Col sm={12} lg={12}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Add Manual Time</Form.Label>
-                  <Row>
-                    <Col xs={6} lg={6}>
-                      <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="success">Hours</Dropdown.Toggle>
-                        <Dropdown.Menu>
-                        <div className="drop--scroll">
-                          <Form>
-                            <Form.Group className="form-group mb-3">
-                              <Form.Control type="text" placeholder="Search here.." />
-                            </Form.Group>
-                          </Form>
-                          <Dropdown.Item className="selected--option" href="#/action-1">Hours <FaCheck /></Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">01</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">02</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">03</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">04</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">05</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">06</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">07</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">08</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">09</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">10</Dropdown.Item>
-                          </div>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                      {/* <Select2
-                        defaultValue={1}
-                        data={[
-                          { text: 'Hours', id: 1 },
-                          { text: '01', id: 2 },
-                          { text: '02', id: 3 },
-                          { text: '03', id: 4 },
-                          { text: '04', id: 5 },
-                          { text: '05', id: 6 },
-                          { text: '06', id: 7 },
-                          { text: '07', id: 8 },
-                          { text: '08', id: 9 },
-                          { text: '09', id: 10 },
-                          { text: '10', id: 11 },
-                        ]}
-                        options={{
-                          placeholder: 'Hours',
-                        }}
-                      /> */}
-                    </Col>
-                    <Col xs={6} lg={6}>
-                      <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="success">Minutes</Dropdown.Toggle>
-                        <Dropdown.Menu>
-                        <div className="drop--scroll">
-                          <Form>
-                            <Form.Group className="form-group mb-3">
-                              <Form.Control type="text" placeholder="Search here.." />
-                            </Form.Group>
-                          </Form>
-                          <Dropdown.Item className="selected--option" href="#/action-1">Minutes <FaCheck /></Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">00</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">15</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">20</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">25</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">30</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">35</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">40</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">45</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">50</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">55</Dropdown.Item>
-                          </div>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                      {/* <Select2
-                        defaultValue={1}
-                        data={[
-                          { text: 'Minutes', id: 1 },
-                          { text: '00', id: 2 },
-                          { text: '15', id: 3 },
-                          { text: '20', id: 4 },
-                          { text: '25', id: 5 },
-                          { text: '30', id: 6 },
-                          { text: '35', id: 7 },
-                          { text: '40', id: 8 },
-                          { text: '45', id: 9 },
-                          { text: '50', id: 10 },
-                          { text: '55', id: 11 },
-                        ]}
-                        options={{
-                          placeholder: 'Minutes',
-                        }}
-                      /> */}
-                    </Col>
-                  </Row>
-                </Form.Group>
-              </Col>
-              <Col sm={12} lg={12}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Task List</Form.Label>
-                  <ul>
-                    <li>Design project page
-                      <Dropdown>
-                        <Dropdown.Toggle variant="success">Completed</Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item className="in--progress" href="javacript:;">In progress</Dropdown.Item>
-                          <Dropdown.Item className="in--review" href="javacript:;">In Review</Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </li>
-                    <li>Change color scheme
-                      <Dropdown>
-                        <Dropdown.Toggle variant="info">In Review</Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item className="in--progress" href="javacript:;">In progress</Dropdown.Item>
-                          <Dropdown.Item className="completed" href="javacript:;">Completed</Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </li>
-                    <li>change font style
-                      <Dropdown>
-                        <Dropdown.Toggle variant="warning">In Progress</Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item className="in--review" href="javacript:;">In Review</Dropdown.Item>
-                          <Dropdown.Item className="completed" href="javacript:;">Completed</Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </li>
-                    <li>Design project page
-                      <Dropdown>
-                        <Dropdown.Toggle variant="success">Completed</Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item className="in--progress" href="javacript:;">In progress</Dropdown.Item>
-                          <Dropdown.Item className="in--review" href="javacript:;">In Review</Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </li>
-                  </ul>
-                </Form.Group>
-              </Col>
-              <Col sm={12} lg={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>How Many Times You Tested Your Work?</Form.Label>
-                  <Dropdown className="select--dropdown">
-                    <Dropdown.Toggle variant="success">Select</Dropdown.Toggle>
-                    <Dropdown.Menu>
-                    <div className="drop--scroll">
-                      <Form>
-                        <Form.Group className="form-group mb-3">
-                          <Form.Control type="text" placeholder="Search here.." />
-                        </Form.Group>
-                      </Form>
-                      <Dropdown.Item className="selected--option" href="#/action-1">Select <FaCheck /></Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">0 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">1 time</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">2 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">3 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">4 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">5 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">6 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">7 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">8 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">9 times</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">10 times</Dropdown.Item>
-                      </div>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                  {/* <Select2
-                    defaultValue={1}
-                    data={[
-                      { text: 'Select', id: 1 },
-                      { text: '0 Times', id: 2 },
-                      { text: '1 Times', id: 3 },
-                      { text: '2 Times', id: 4 },
-                      { text: '3 Times', id: 5 },
-                      { text: '4 Times', id: 6 },
-                      { text: '5 Times', id: 7 },
-                      { text: '6 Times', id: 8 },
-                      { text: '7 Times', id: 9 },
-                      { text: '8 Times', id: 10 },
-                      { text: '9 Times', id: 11 },
-                      { text: '10 Times', id: 12 },
-                    ]}
-                    options={{
-                      placeholder: 'Times',
-                    }}
-                  /> */}
-                </Form.Group>
-              </Col>
-              <Col sm={12} lg={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Did you shared updates with client?</Form.Label>
-                  <Dropdown className="select--dropdown">
-                    <Dropdown.Toggle variant="success">Select</Dropdown.Toggle>
-                    <Dropdown.Menu>
-                    <div className="drop--scroll">
-                      <Form>
-                        <Form.Group className="form-group mb-3">
-                          <Form.Control type="text" placeholder="Search here.." />
-                        </Form.Group>
-                      </Form>
-                      <Dropdown.Item className="selected--option" href="#/action-1">Select <FaCheck /></Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">Yes I did</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">No I didn't</Dropdown.Item>
-                      <Dropdown.Item href="#/action-2">Not required</Dropdown.Item>
-                      </div>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                  {/* <Select2
-                    defaultValue={1}
-                    data={[
-                      { text: 'Select', id: 1 },
-                      { text: 'Yes I did', id: 2 },
-                      { text: 'No I didn`t', id: 3 },
-                      { text: 'Not required', id: 4 },
-                    ]}
-                    options={{
-                      placeholder: 'Hours',
-                    }}
-                  /> */}
-                </Form.Group>
-              </Col>
+              </Col> */}
+              </Row>
+              <Row>
+                {
+                  entries.length > 0 &&
+                  <Col sm={12} lg={12}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Task List</Form.Label>
+                    </Form.Group>
+                  </Col>
+                }
+                {
+                  entries.map((entry, index) => (
+                    <>
+                      <Col md={4}>
+                          <Form.Select
+                              value={entry.task}
+                              onChange={(e) =>
+                                  handleEntryChange(index, "task", e.target.value)
+                              }
+                          >
+                              <option value="">Select Task</option>
+                              {
+                                Object.values(taskslists).map((tab, index) =>
+                                  tab.tasks && tab.tasks.length > 0 ? (
+                                      tab.tasks.map((task) => (
+                                        <option value={task._id}>{task.title}</option>
+                                      ))
+                                  ) : (
+                                    null
+                                  )
+                                )
+                              }
+                          </Form.Select>
+                          {errors[index]?.task && <span className="form-error">{errors[index].task}</span>}
+                      </Col>
+                      <Col md={2}>
+                      <Form.Select
+                        value={entry.start_time}
+                        onChange={(e) =>
+                            handleEntryChange(index, "start_time", e.target.value)
+                        }
+                      >
+                        {timeSlots.map((slot) => {
+                          const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                          return (
+                            <option key={slot} value={slot} disabled={isOccupied}>
+                              {slot}
+                            </option>
+                          );
+                        })}
+                      </Form.Select>
+                          {/* <Form.Control
+                              type="text"
+                              placeholder="Start time"
+                              value={entry.hours}
+                              onChange={(e) =>
+                                  handleEntryChange(index, "start_time", e.target.value)
+                              }
+                          /> */}
+                          {errors[index]?.start_time && <span className="form-error">{errors[index].start_time}</span>}
+                      </Col>
+                      <Col md={2}>
+                          {/* <Form.Control
+                              type="text"
+                              placeholder="End time"
+                              value={entry.minutes}
+                              onChange={(e) =>
+                                  handleEntryChange(index, "end_time", e.target.value)
+                              }
+                          /> */}
+                          <Form.Select
+                          value={entry.end_time}
+                          onChange={(e) =>
+                              handleEntryChange(index, "end_time", e.target.value)
+                          }>
+                            {timeSlots.map((slot) => {
+                              const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                              return (
+                                <option key={slot} value={slot} disabled={isOccupied}>
+                                  {slot}
+                                </option>
+                              );
+                            })}
+                          </Form.Select>
+                          {errors[index]?.end_time && <span className="form-error">{errors[index].end_time}</span>}
+                      </Col>
+                      {
+                        index > 0 &&
+                        <Col md={1}>
+                          <Button
+                              variant="danger"
+                              onClick={() => handleRemoveEntry(index)}
+                          >
+                              <FaTrash />
+                          </Button>
+                        </Col>
+                      }
+                      
+                      {index === entries.length - 1 && (
+                          <Col md={1}>
+                              <Button variant="success" onClick={handleAddEntry}>
+                                  <FaPlusCircle />
+                              </Button>
+                          </Col>
+                      )}
+                  </>
+              ))}
+              </Row>
+              <Row>
+              
               <Col sm={12} lg={12}>
                 <Form.Group className="mb-3">
                   <Form.Label>Remarks</Form.Label>
-                  <Form.Control as="textarea" placeholder="Please mention the complete details of the project with the Project URL, Screenshots, credentials, or whatever you think is important for the testing of the completed tasks." rows={3} />
+                  <Form.Control as="textarea" placeholder="Please mention the complete details of the project with the Project URL, Screenshots, credentials, or whatever you think is important for the testing of the completed tasks." name="remarks" onChange={handlechange} rows={3} />
                 </Form.Group>
               </Col>
             </Row>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" disabled>Submit</Button>
+          <Button variant="primary" onClick={handleReportSubmit} disabled={loader}>{loader === true ? 'Please wait...': 'Submit'}</Button>
         </Modal.Footer>
       </Modal>
 

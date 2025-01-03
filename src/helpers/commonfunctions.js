@@ -343,3 +343,16 @@ const getDayWithSuffix = (day) => {
     // Return the formatted time range in the desired format
     return `${startTimeFormatted} - ${endTimeFormatted}`;
   }
+
+  export function secondstoMinutes(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (hours > 0) {
+        // Format for hours and minutes (e.g., "1:20 hrs")
+        return `${hours}:${String(minutes).padStart(2, '0')} hrs`;
+    } else {
+        // Format for minutes only (e.g., "00:15 mins")
+        return `${String(minutes).padStart(2, '0')} mins`;
+    }
+}

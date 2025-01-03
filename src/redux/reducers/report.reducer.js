@@ -1,10 +1,11 @@
-import { REPORTS_ERROR, MEMBER_REPORTS_LIST_SUCCESS,PROJECT_REPORTS_LIST_SUCCESS, REPORTS_SUCCESS } from "../actions/types";
+import { REPORTS_ERROR,SINGLE_PROJECT_REPORT,MANUAL_TIME_SUCCESS, MEMBER_REPORTS_LIST_SUCCESS,PROJECT_REPORTS_LIST_SUCCESS, CLEAR_MESSAGES } from "../actions/types";
 
 const initialState = {
     memberReports: [],
     projectReports: [],
     message: null,
-    message_variant: null
+    message_variant: null,
+    singleProjectReport: null
 };
 
 export default (state = initialState, action) => {
@@ -18,6 +19,28 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 projectReports: action.payload.projectReports
+            }
+        case MANUAL_TIME_SUCCESS: 
+            return {
+                ...state,
+                success: true,
+                message: action.payload.message,
+                message_variant: 'success',
+                error: null
+            }
+        case CLEAR_MESSAGES:
+            return {
+                ...state,
+                message: null,
+                message_variant: null,
+                success: null,
+                error: null,
+                singleProjectReport: null
+            };
+        case SINGLE_PROJECT_REPORT: 
+            return {
+                ...state,
+                singleProjectReport: action.payload.projectReport
             }
         default: return state;
     }

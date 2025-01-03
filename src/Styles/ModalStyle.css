@@ -682,6 +682,10 @@ ul#subtasks-ul li textarea.form-control+button {
 .rmdp-ep-arrow[direction=top] {
     opacity: 0;
 }
+input.form-error, select.form-error {
+    color: red;
+    border: 1px solid red;
+}
 /* 
 .modal .rmdp-input {
     opacity: 0;

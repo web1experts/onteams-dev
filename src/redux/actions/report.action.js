@@ -6,7 +6,9 @@ import {
     REPORTS_ERROR,
     PROJECT_REPORTS_LIST_SUCCESS,
     MEMBER_REPORTS_LIST_SUCCESS,
-    REPORTS_SUCCESS
+    REPORTS_SUCCESS,
+    MANUAL_TIME_SUCCESS,
+    SINGLE_PROJECT_REPORT
 } from "./types";
 // console.log('Environment : ', process.env.NODE_ENV)
 const config = {
@@ -56,6 +58,36 @@ export const gerReportsByProject = (filters) => {
       const response = await API.apiGet('reports', filters)
       if (response.data && response.data.success) {
          await dispatch({ type: PROJECT_REPORTS_LIST_SUCCESS, payload: response.data });
+      } else {
+         await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
+export const addManualTime = (payload) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('reports','/add_manual_time', payload)
+      if (response.data && response.data.success) {
+         await dispatch({ type: MANUAL_TIME_SUCCESS, payload: response.data });
+      } else {
+         await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
+export const getSingleProjectReport = (projectId) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGetByKey('reports',`/singleProject/${projectId}`)
+      if (response.data && response.data.success) {
+         await dispatch({ type: SINGLE_PROJECT_REPORT, payload: response.data });
       } else {
          await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
       }

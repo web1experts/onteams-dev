@@ -117,10 +117,10 @@ function TimeTrackingPage() {
         setSpinner( false )
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
     }
-    if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true){
-      // setActiveInnerTab("InnerRecorded")
-      handleRecordedActivity()
-    }
+    // if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true){
+    //   // setActiveInnerTab("InnerRecorded")
+    //   handleRecordedActivity()
+    // }
     // if(currentActivity?.latestActivity?.status === false){
     //   setActSpinner( false )
     // }
