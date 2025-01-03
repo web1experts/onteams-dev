@@ -74,6 +74,16 @@ a:focus {
   font-size: 1rem;
 }
 
+.AddTimeModal .btn {
+  padding: 0;
+  font-size: 1rem;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .modal-footer .btn svg {
   margin-right: 0.5rem;
   margin-top: -.2rem;
@@ -743,7 +753,6 @@ Add Project Modal CSS-=-=-
 
 .project--form--actions .rmdp-day-picker {
   padding: 5px;
-  display: block !important;
 }
 
 .project--form--actions .rmdp-input {

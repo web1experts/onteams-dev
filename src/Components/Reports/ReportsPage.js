@@ -4,7 +4,7 @@ import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Dropdown, CardGroup } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaPlay, FaCheck, FaAngleRight, FaPlusCircle, FaTrash } from "react-icons/fa";
+import { FaPlay, FaCheck, FaAngleRight, FaPlus, FaTrash } from "react-icons/fa";
 import { secondstoMinutes, showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { MdFilterList } from "react-icons/md";
 import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport } from "../../redux/actions/report.action";
@@ -564,10 +564,10 @@ const TaskList = ({ report }) => {
                       
                       </>
                     }
-                  <ListGroup.Item onClick={(e) => {setView('group')}}>
+                  <ListGroup.Item action className="change--view" active={view === 'group' ? true : false} onClick={(e) => {setView('group')}}>
                     Group View
                   </ListGroup.Item>
-                  <ListGroup.Item onClick={(e) => {setView('single')}}>
+                  <ListGroup.Item action className="change--view" active={view === 'single' ? true : false} onClick={(e) => {setView('single')}}>
                     Single View
                   </ListGroup.Item>
                   {
@@ -657,20 +657,15 @@ const TaskList = ({ report }) => {
                       
                       <Accordion.Item eventKey={index} key={`accord-item-${report?.project?._id}`}>
                         <div className="screens--tabs">
-                        
                           <Accordion.Header>
-                            <p>
-                              <span>Project: {report?.project?.title}</span>
+                            Project: {report?.project?.title}
                               {/* <strong>{new Date(report?.createdAt).toLocaleDateString('en-GB', options)}</strong> */}
                               {/* <strong>{ generateTimeRange(report?.createdAt, report?.duration)}</strong> */}
-                            </p>
                           </Accordion.Header>
                         </div>
                         <Accordion.Body>
                           <div className="shots--list pt-3">
-                            <ListGroup horizontal>
-                              {showRecordedTabs()}
-                            </ListGroup>
+                            {showRecordedTabs()}
                             <CardGroup>
                                 {
                                   report?.activityMetas && report.activityMetas.length > 0 ? (
@@ -735,21 +730,19 @@ const TaskList = ({ report }) => {
                       
                       <Accordion.Item eventKey={index}>
                         <div className="screens--tabs">
-                        
                           <Accordion.Header>{report?.project?.title} </Accordion.Header>
                         </div>
                         <Accordion.Body>
                           <Row>
                             <Col sm={12}>
                               <div className="report--info">
-                                
                                 <p className="p--card">
                                   <label>Time Spent</label>
                                   <p>{calculateTotalTime(report?.activities)}</p>
                                 </p>
                               </div>
                             </Col>
-                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
+                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
                               <label>Remarks</label>
                               {
                                 report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
@@ -786,19 +779,11 @@ const TaskList = ({ report }) => {
                       
                       <Accordion.Item eventKey={index}>
                         <div className="screens--tabs">
-                        
-                          <Accordion.Header>
-                            <p>
-                              <span>Member: {report?.member?.name}</span>
-                              
-                            </p>
-                          </Accordion.Header>
+                          <Accordion.Header>Member: {report?.member?.name}</Accordion.Header>
                         </div>
                         <Accordion.Body>
                           <div className="shots--list pt-3">
-                            <ListGroup horizontal>
-                              {showRecordedTabs()}
-                            </ListGroup>
+                            {showRecordedTabs()}
                             <CardGroup>
                                 {
                                   report?.activityMetas && report.activityMetas.length > 0 ? (
@@ -860,10 +845,8 @@ const TaskList = ({ report }) => {
                     projectReports.map((report, index) => {
                       return (
                       <>
-                      
                       <Accordion.Item eventKey={index}>
                         <div className="screens--tabs">
-                        
                           <Accordion.Header>{report?.member?.name} </Accordion.Header>
                         </div>
                         <Accordion.Body>
@@ -928,7 +911,7 @@ const TaskList = ({ report }) => {
           </Container>
         </div>
       </div>
-      <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal" onShow={() => {selectboxObserver();}}>
+      <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal" onShow={() => {selectboxObserver();}}>
         <Modal.Header closeButton>
           <Modal.Title>Submit Report</Modal.Title>
         </Modal.Header>
@@ -938,7 +921,6 @@ const TaskList = ({ report }) => {
               <Col sm={12} lg={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Select your Project</Form.Label>
-                  
                     <div className="drop--scroll">
                       <Form.Select className="form-control custom-selectbox" id="projects"
                         value={selectedproject._id} onChange={handleProjectSelect} name="project">
@@ -949,13 +931,12 @@ const TaskList = ({ report }) => {
                           ))
                         }
                       </Form.Select>
-                      
-                      </div>
-                      
+                    </div>
                 </Form.Group>
               </Col>
               <Col sm={12} lg={6}>
                 <Form.Group className="mb-3">
+                  <Form.Label>Select Workflow</Form.Label>
                   <Form.Select className="form-control" id="projects-tab"
                     value={selectedWorkflow} onChange={(e) => {setWorkflow(e.target.value)}}>
                       <option value={''}>Select Workflow Tab</option>
@@ -967,19 +948,20 @@ const TaskList = ({ report }) => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-              </Row>
-              <Row>
+            </Row>
+            <Row>
                 {
                   entries.length > 0 &&
                   <Col sm={12} lg={12}>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-0">
                       <Form.Label>Task List</Form.Label>
                     </Form.Group>
                   </Col>
                 }
+              </Row>
                 {
                   entries.map((entry, index) => (
-                    <>
+                    <Row className="mb-3">
                       <Col md={4}>
                           <Form.Select
                               value={entry.task}
@@ -1003,22 +985,22 @@ const TaskList = ({ report }) => {
                           </Form.Select>
                           {errors[index]?.task && <span className="form-error">{errors[index].task}</span>}
                       </Col>
-                      <Col md={2}>
-                      <Form.Select
-                        value={entry.start_time}
-                        onChange={(e) =>
-                            handleEntryChange(index, "start_time", e.target.value)
-                        }
-                      >
-                        {timeSlots.map((slot) => {
-                          const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                          return (
-                            <option key={slot} value={slot} disabled={isOccupied}>
-                              {slot}
-                            </option>
-                          );
-                        })}
-                      </Form.Select>
+                      <Col md={3}>
+                        <Form.Select
+                          value={entry.start_time}
+                          onChange={(e) =>
+                              handleEntryChange(index, "start_time", e.target.value)
+                          }
+                        >
+                          {timeSlots.map((slot) => {
+                            const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                            return (
+                              <option key={slot} value={slot} disabled={isOccupied}>
+                                {slot}
+                              </option>
+                            );
+                          })}
+                        </Form.Select>
                           {/* <Form.Control
                               type="text"
                               placeholder="Start time"
@@ -1029,7 +1011,7 @@ const TaskList = ({ report }) => {
                           /> */}
                           {errors[index]?.start_time && <span className="form-error">{errors[index].start_time}</span>}
                       </Col>
-                      <Col md={2}>
+                      <Col md={3}>
                           {/* <Form.Control
                               type="text"
                               placeholder="End time"
@@ -1054,37 +1036,34 @@ const TaskList = ({ report }) => {
                           </Form.Select>
                           {errors[index]?.end_time && <span className="form-error">{errors[index].end_time}</span>}
                       </Col>
-                      {
-                        index > 0 &&
-                        <Col md={1}>
-                          <Button
-                              variant="danger"
-                              onClick={() => handleRemoveEntry(index)}
-                          >
+                      <Col md={2} className="text-right">
+                        {
+                          index > 0 &&
+                            <Button
+                                variant="danger"
+                                onClick={() => handleRemoveEntry(index)}
+                            >
                               <FaTrash />
-                          </Button>
-                        </Col>
-                      }
-                      
-                      {index === entries.length - 1 && (
-                          <Col md={1}>
-                              <Button variant="success" onClick={handleAddEntry}>
-                                  <FaPlusCircle />
-                              </Button>
-                          </Col>
-                      )}
-                  </>
-              ))}
-              </Row>
-              <Row>
+                            </Button>
+                        }
+                        {index === entries.length - 1 && (
+                            <Button variant="success" className="ms-2" onClick={handleAddEntry}>
+                                <FaPlus />
+                            </Button>
+                        )}
+                      </Col>
+                    </Row>
+                  ))
+                }
               
-              <Col sm={12} lg={12}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Remarks</Form.Label>
-                  <Form.Control as="textarea" placeholder="Please mention the complete details of the project with the Project URL, Screenshots, credentials, or whatever you think is important for the testing of the completed tasks." name="remarks" onChange={handlechange} rows={3} />
-                </Form.Group>
-              </Col>
-            </Row>
+              <Row>
+                <Col sm={12} lg={12}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Remarks</Form.Label>
+                    <Form.Control as="textarea" placeholder="Please mention the complete details of the project with the Project URL, Screenshots, credentials, or whatever you think is important for the testing of the completed tasks." name="remarks" onChange={handlechange} rows={3} />
+                  </Form.Group>
+                </Col>
+              </Row>
           </Form>
         </Modal.Body>
         <Modal.Footer>

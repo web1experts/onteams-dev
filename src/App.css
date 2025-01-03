@@ -668,7 +668,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .wrapper--title .ListView:hover,
 .wrapper--title .gridView:hover,
 .wrapper--title .active:hover {
-  border: 0 solid #5ead9a;
+  border: 1px solid transparent;
   background: #5ead9a;
 }
 
@@ -2039,7 +2039,7 @@ Project Task View CSS=-=-=
   font-weight: 500;
   background: #7BCCB810;
   text-decoration: none;
-  padding: 0;
+  padding: 0.5rem 1rem;
   position: relative;
   border: 0;
   box-shadow: none;
@@ -2048,7 +2048,7 @@ Project Task View CSS=-=-=
 .accordion-button::after {
   display: inline-block;
   position: absolute;
-  right: 0;
+  right: 15px;
   top: 15px;
 }
 
@@ -2077,10 +2077,9 @@ Project Task View CSS=-=-=
 }
 
 .accordion .accordion-body {
-  /* max-height: calc(100dvh - 320px);
-  overflow-y: auto; */
   margin-top: 0;
-  padding-bottom: .5rem;
+  padding: 1rem;
+  padding-top: 0;
 }
 
 .accordion-button:focus {
@@ -2239,10 +2238,6 @@ Project Task View CSS=-=-=
   overflow-y: visible;
   margin-top: 0;
   padding: 1rem 1rem .5rem 1rem;
-}
-
-.daily--reports .accordion-button::after {
-  top: 20px;
 }
 
 .daily--reports .accordion-button:not(.collapsed) {
@@ -2521,7 +2516,7 @@ pre {
 .show--details .page--wrapper table td.project--title--td .status--circle,
 .view--project .page--wrapper table td.project--title--td .status--circle {
   position: absolute;
-  right: 10px;
+  right: 0;
   top: 0;
   bottom: 0;
   margin: auto;
@@ -2601,19 +2596,35 @@ pre {
   font-weight: 500;
 }
 
-.wrapper--title .live--tabs .list-group-item,
-.screens--tabs .list-group .list-group-item, .screens--shots .list-group-item {
+.accordion .screens--shots {
+  justify-content: flex-end;
+}
+
+.wrapper--title .live--tabs .list-group-item, .screens--tabs .list-group .list-group-item, .screens--shots .list-group-item, .accordion .screens--shots .list-group-item {
   border-radius: 25px;
   -webkit-border-radius: 25px;
   width: auto;
   height: auto;
   padding: 0;
   color: #7BCCB8;
-  border: 1px solid #ffffff;
+  border: 1px solid transparent;
   background: #ffffff;
   padding: .45rem .75rem;
   margin-right: .5rem;
   margin-left: 0;
+}
+
+.accordion .screens--shots .list-group-item {
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  margin-right: 0;
+  margin-left: 0.5rem;
+  border: 1px solid #7BCCB8;
+}
+
+.accordion .screens--shots .list-group-item:last-child:not(:first-child) {
+  border-top-right-radius: 50px;
+  border-bottom-left-radius: 50px;
 }
 
 .wrapper--title .live--tabs .refresh--btn {
@@ -2655,7 +2666,7 @@ pre {
 
 .wrapper--title .live--tabs .active,
 .screens--tabs .list-group .active,
-.screens--shots .active {
+.screens--shots .active, .accordion .screens--shots .active {
   color: #ffffff;
   background-color: #7BCCB8;
   border-color: #7BCCB8;
@@ -2665,7 +2676,7 @@ pre {
 
 .wrapper--title .live--tabs .list-group-item+.list-group-item.active,
 .screens--tabs .list-group .list-group-item+.list-group-item-action.active,
-.screens--shots .list-group-item+.list-group-item-action.active {
+.screens--shots .list-group-item+.list-group-item-action.active, .accordion .screens--shots .list-group-item+.list-group-item-action.active {
   border: 1px solid #7BCCB8;
 }
 
@@ -2706,6 +2717,40 @@ pre {
 .date-filters {
   padding: 1rem;
   min-width: 170px;
+  border-right: 1px solid #cfd8e2;
+  border-radius: 0;
+}
+
+.rmdp-border-left {
+  border-left: 0;
+}
+
+.page--title .date-filters {
+  justify-content: center;
+  grid-gap: 0;
+  gap: 0;
+}
+
+.page--title .date-filters .list-group-item {
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  width: auto;
+  height: auto;
+  padding: 0;
+  color: #7BCCB8;
+  border: 1px solid transparent;
+  background: #ffffff;
+  padding: .45rem .75rem;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.page--title .date-filters .active {
+  color: #ffffff;
+  background-color: #7BCCB8;
+  border-color: #7BCCB8;
+  box-shadow: none;
+  outline: none;
 }
 
 .rmdp-wrapper {
@@ -2718,6 +2763,21 @@ pre {
 
 .filter-box {
   padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team--page .page--title .filter-box .btn {
+  margin-left: 0.5rem;
+  width: auto;
+  height: auto;
+  padding: .45rem 1.5rem;
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  box-shadow: none;
+  font-size: 1rem;
+  text-transform: capitalize;
 }
 
 .screens--tabs .list-group .list-group-item:last-child:not(:first-child) {
@@ -2726,18 +2786,18 @@ pre {
 }
 
 .screens--tabs {
-  padding: .5rem 0 .5rem 0;
-  border-bottom: 1px solid #eeeeee;
+  /* padding: .5rem 0 .5rem 0;
+  border-bottom: 1px solid #eeeeee; */
   z-index: 111;
   top: 0;
-  background: #ffffff;
+  /* background: #ffffff; */
 }
 
 .activity--box {
   position: relative;
   max-height: calc(100dvh - 100px);
   overflow-y: auto;
-  padding-top: 0;
+  padding: 0;
 }
 
 .activity--box .expand--button button {
@@ -3875,11 +3935,15 @@ Media CSS-=-==
     margin-top: 0;
   }
 
+  .rmdp-day-picker {
+    flex-flow: row wrap;
+  }
+
   .page--title .form-control,
   .page--title .select2-container {
     min-width: 118px;
     font-size: 14px;
-    max-width: 122px;
+    /* max-width: 122px; */
   }
 
   .page--title .rmdp-input {
@@ -4231,6 +4295,10 @@ Media CSS-=-==
 
   .show--details .clients--table td.project--title--td span.onHide {
     display: none;
+  }
+
+  .rmdp-input {
+    max-width: 180px;
   }
 }
 

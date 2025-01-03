@@ -703,7 +703,7 @@ input.form-error, select.form-error {
 
 .rmdp-container {
     position: relative;
-    z-index: 111111;
+    z-index: 111;
 }
 
 .rmdp-calendar {
@@ -716,7 +716,6 @@ input.form-error, select.form-error {
 
 .rmdp-day-picker {
     width: 100%;
-    display: block !important;
 }
 
 .rmdp-wrapper {
@@ -729,17 +728,19 @@ input.form-error, select.form-error {
 }
 
 .page--title .rmdp-wrapper, .page--title .rmdp-wrapper.form-control {
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
     margin-top: 10px;
     border: 0;
-    padding: 10px;
+    padding: 0;
     width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, .125);
+    -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, .125);
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
 }
 
 .rmdp-range {
-    border-radius: 50%;
-    background-color: #2484c8;
+    background-color: #6fbeef;
 }
 
 .rmdp-day.rmdp-today span {

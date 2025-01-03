@@ -816,12 +816,6 @@ function extractTimeFromISO(createdAt, duration) {
         </div>
       </div>
       <div className="details--wrapper">
-        {
-              activityspinner &&
-              <div className="loading-bar">
-                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
-              </div>
-          }
         <div className="wrapper--title">
           <ListGroup horizontal className="live--tabs">
             <ListGroup.Item key={'live-key'} action active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
@@ -853,9 +847,15 @@ function extractTimeFromISO(createdAt, duration) {
           </ListGroup>
         </div>
         <div className={isScreenActive ? 'rounded--box activity--box fullscreen--box' : 'rounded--box activity--box'}>
+          {
+              activityspinner &&
+              <div className="loading-bar">
+                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+              </div>
+          }
           {activeInnerTab === "InnerLive" && (
             <>
-              <div className="current--player pt-3" key={`activity-${currentActivity?._id}`}>
+              <div className="current--player p-3" key={`activity-${currentActivity?._id}`}>
                 <div className="timer--task">
                   <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
                   <span className="ms-md-3">{ currentActivity?.latestActivity?.app_version}</span>
