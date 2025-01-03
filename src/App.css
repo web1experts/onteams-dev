@@ -337,6 +337,7 @@ body {
   line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  max-width: 300px;
   position: relative
 }
 
@@ -2698,16 +2699,16 @@ pre {
   border-bottom-left-radius: 25px;
 }
 
-.wrapper--title .live--tabs .no--style .rmdp-calendar {
+.rmdp-calendar {
   padding: 1rem;
 }
 
-.wrapper--title .live--tabs .no--style .date-filters {
+.date-filters {
   padding: 1rem;
   min-width: 170px;
 }
 
-.wrapper--title .live--tabs .no--style .rmdp-wrapper {
+.rmdp-wrapper {
   border-radius: 12px;
   box-shadow: 0 5px 30px rgba(0, 0, 0, .125);
   -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, .125);
@@ -2727,8 +2728,6 @@ pre {
 .screens--tabs {
   padding: .5rem 0 .5rem 0;
   border-bottom: 1px solid #eeeeee;
-  /* position: sticky;
-  position: -webkit-sticky; */
   z-index: 111;
   top: 0;
   background: #ffffff;
@@ -3851,7 +3850,7 @@ Media CSS-=-==
   }
 
   .page--wrapper table td.project--title--td span {
-    max-width: 100%;
+    max-width: fit-content;
     padding-right: 10px;
   }
 
@@ -4086,6 +4085,13 @@ Media CSS-=-==
     top: .5rem;
   }
 
+  .page--wrapper.activity--table table .status--circle {
+    position: absolute;
+    right: 0;
+    top: 8px;
+    margin-left: .5rem;
+  }
+
   .clients--table td span img {
     border-radius: 100px;
     -webkit-border-radius: 100px;
@@ -4115,11 +4121,6 @@ Media CSS-=-==
   .loading-bar {
     width: calc(100% - 0px);
     background: #ffffff90;
-  }
-
-  .page--wrapper table td.project--title--td span {
-    max-width: 100%;
-    /* width: auto; */
   }
 
   .activity--table tr.mobile--hide {
