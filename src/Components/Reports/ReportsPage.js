@@ -59,8 +59,17 @@ function ReportsPage() {
   const handleFilterShow = () => setFilterShow(true);
   const [entries, setEntries] = useState([]);
   const [ errors, setErrors] = useState([])
-  const handleProjectSelect = async ({ target: { name, value } }) => {
-    setSelectedProject(value)
+  const [ selectedWorkflow, setWorkflow] = useState('')
+  const [filteredTasks, setFilteredTasks] = useState([])
+  const handleProjectSelect = async ({ target: { name, value, selectedOptions } }) => {
+    const selectedOption = selectedOptions[0];
+  
+  // Retrieve the data-project attribute value
+  const projectData = JSON.parse(selectedOption.getAttribute("data-project"));
+    setSelectedProject(projectData)
+    if(projectData?.workflow?.tabs && projectData.workflow.tabs.length > 0){
+      setWorkflow(projectData.workflow.tabs[0]?._id)
+    }
     await dispatch(ListTasks(value));
     await dispatch(getSingleProjectReport(value))
   }
@@ -95,15 +104,23 @@ function ReportsPage() {
       setEntries([]);
       if (taskFeed?.taskData && Object.keys(taskFeed.taskData).length > 0) {
           setTasksLists(taskFeed.taskData)
-          const firstTask = Object.values(taskFeed.taskData).find(tab => tab.tasks && tab.tasks.length > 0)?.tasks[0];
-          if (firstTask) {
-            setEntries([...entries, { task: firstTask._id, start_time: "", end_time: "" }]);
-          }   
+          setFilteredTasks(taskFeed.taskData[selectedWorkflow].tasks)
+          
       }
   }, [taskFeed, dispatch])
+  
+  useEffect(() => {
+    if (filteredTasks?.length > 0 && entries.length === 0) {
+      setEntries([...entries, { task: filteredTasks[0]._id, start_time: "", end_time: "" }]);
+    }  
+  }, [filteredTasks])
 
   useEffect(() => {
-    if(occupiedRanges){ console.log("occupiedRanges:: ", occupiedRanges)
+    setFilteredTasks(taskslists[selectedWorkflow]?.tasks)
+  }, [selectedWorkflow])
+
+  useEffect(() => {
+    if(occupiedRanges){
       setTimeslots(generateTimeSlots(10))
     }
     
@@ -199,8 +216,6 @@ function ReportsPage() {
 
     // Check if a time slot is occupied
     const isTimeSlotOccupied = (time, ranges) => {
-      console.log('Ranges:: ', ranges);
-    
       if (!ranges || ranges.length === 0) {
         // If ranges is null, undefined, or empty, return false (time slot is not occupied)
         return false;
@@ -926,44 +941,32 @@ const TaskList = ({ report }) => {
                   
                     <div className="drop--scroll">
                       <Form.Select className="form-control custom-selectbox" id="projects"
-                        value={selectedproject} onChange={handleProjectSelect} name="project">
+                        value={selectedproject._id} onChange={handleProjectSelect} name="project">
                           <option value={''}>Select Project</option>
                         {
                           projects.map(project => (
-                            <option value={project._id}>{project.title}</option>
+                            <option data-project={JSON.stringify(project)} value={project._id}>{project.title}</option>
                           ))
                         }
                       </Form.Select>
                       
                       </div>
-                      {
-                        // selectedproject !== '' && taskslists && Object.keys(taskslists).length > 0 &&
-                        // <div className="drop--scroll">
-                        //   <Form.Select className="form-control custom-selectbox" id="tasks"
-                        //     value={selectedTask} onChange={handleTaskSelect} name="task">
-                        //       <option value={''}>Select Task</option>
-                            // {
-                            //   Object.values(taskslists).map((tab, index) =>
-                            //     tab.tasks && tab.tasks.length > 0 ? (
-                            //         tab.tasks.map((task) => (
-                            //           <option value={task._id}>{task.title}</option>
-                            //         ))
-                            //     ) : (
-                            //       null
-                            //     )
-                            //   )
-                            // }
-                        //   </Form.Select>
-                        // </div>
-                      }
+                      
                 </Form.Group>
               </Col>
-              {/* <Col sm={12} lg={6}>
+              <Col sm={12} lg={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Time Spent</Form.Label>
-                  <p className="mb-0"><strong>4 hours 30 minutes</strong></p>
+                  <Form.Select className="form-control" id="projects-tab"
+                    value={selectedWorkflow} onChange={(e) => {setWorkflow(e.target.value)}}>
+                      <option value={''}>Select Workflow Tab</option>
+                    { selectedproject && Object.keys(selectedproject).length > 0 &&
+                      selectedproject?.workflow?.tabs.map(tab => (
+                        <option value={tab._id}>{tab.title}</option>
+                      ))
+                    }
+                  </Form.Select>
                 </Form.Group>
-              </Col> */}
+              </Col>
               </Row>
               <Row>
                 {
@@ -983,18 +986,19 @@ const TaskList = ({ report }) => {
                               onChange={(e) =>
                                   handleEntryChange(index, "task", e.target.value)
                               }
+                              key={`taskin-${selectedWorkflow}`}
                           >
                               <option value="">Select Task</option>
                               {
-                                Object.values(taskslists).map((tab, index) =>
-                                  tab.tasks && tab.tasks.length > 0 ? (
-                                      tab.tasks.map((task) => (
+                                // Object.values(taskslists).map((tab, index) =>
+                                  filteredTasks &&  filteredTasks.length > 0 ? (
+                                    filteredTasks.map((task) => (
                                         <option value={task._id}>{task.title}</option>
                                       ))
                                   ) : (
                                     null
                                   )
-                                )
+                                // )
                               }
                           </Form.Select>
                           {errors[index]?.task && <span className="form-error">{errors[index].task}</span>}
