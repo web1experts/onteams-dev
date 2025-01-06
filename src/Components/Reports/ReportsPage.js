@@ -399,7 +399,7 @@ const handleReportSubmit = async (e) => {
   }
   setErrors([]);
   setLoader( true )
-  const payload = { project_id: selectedproject, entries }
+  const payload = { project_id: selectedproject, entries, date: filtereddate }
   dispatch(addManualTime({...payload,...fields}))
 
 }
