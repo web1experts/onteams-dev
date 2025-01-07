@@ -175,9 +175,9 @@ function ReportsPage() {
       }
   }, [projectFeed])
 
-  useEffect(() => { console.log('filtereddate', filtereddate)
-    // handlefilterchange('date_range', filtereddate)
-  }, [filtereddate])
+  // useEffect(() => { 
+  //   // handlefilterchange('date_range', filtereddate)
+  // }, [filtereddate])
 
   useEffect(() => {
       if (reportState?.memberReports) { 
@@ -189,7 +189,7 @@ function ReportsPage() {
 
       if( reportState.singleProjectReport){
         setsingleProjectReport(reportState.singleProjectReport)
-        console.log(calculateOccupiedRanges(reportState.singleProjectReport))
+        // console.log(calculateOccupiedRanges(reportState.singleProjectReport))
         setOccupiedRanges(calculateOccupiedRanges(reportState.singleProjectReport))
       }
     }, [reportState])
@@ -647,15 +647,77 @@ const TaskList = ({ report }) => {
   const groupedTasks = groupTasksById(report?.activities);
   const [ViewReport, setViewReport] = useState(false);
   const handleReportClose = () => setViewReport(false);
+  const fullscreenrefrence = React.useRef(null);
   const [taskId, setTaskId] = useState('')
   const handleViewReport = (taskId) => {
     setTaskId( taskId)
     setViewReport(true);
   }
   const [activeTab, setActiveTab] = useState("screenshots");
+  const [open, setOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [postMedia, setPostMedia] = useState([]);
+
+  const triggerLightBox = (type, mediaItems, index) => {
+    setCurrentIndex(index);
+    const slides =
+    Array.isArray(mediaItems) && mediaItems.length > 0
+      ? mediaItems.map((item) => {
+          if (type === "video" && item.task === taskId) {
+            return {
+              type: "video",
+              src: item.url,
+              poster: null, // Optional, for a thumbnail or video preview
+              videoProps: {
+                controls: true,
+                autoPlay: false, // Set to true if you want videos to start automatically
+                style: { maxHeight: "90vh", maxWidth: "100%" },
+              },
+            };
+          }else if(type === "screenshot" && item.task === taskId){
+            return { type: "image", src: item.url }; // Default case for images
+          }
+          return null;
+        }).filter(Boolean)
+      : [];
+
+    // const data = slides;
+    setPostMedia(slides)
+    setOpen(true)
+  }
 
   return (
     <>
+    <Lightbox
+      open={open}
+      close={() => setOpen(false)}
+      slides={postMedia}
+      plugins={[Fullscreen]}
+      fullscreen={{ ref: fullscreenrefrence }}
+      index={currentIndex}
+      on={{
+        click: () => fullscreenrefrence.current?.enter(),
+      }}
+      render={{
+        slide: ({slide}) => {
+          if (slide?.type === "video") {
+            return (
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <video
+                  controls
+                  autoPlay={false}
+                  style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                >
+                  <source src={slide.src} type="video/webm" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            );
+          }
+          return null; // Default render for images will be used
+        },
+      }}
+    />
     <ul>
       {groupedTasks.map((task, index) => (
         <li key={`grouped-task-${index}`}>
@@ -663,7 +725,7 @@ const TaskList = ({ report }) => {
             <FaAngleRight /> {task.title}
           </p>
           <strong>{task.duration}</strong>
-          <Button variant="primary" onClick={() => {handleViewReport(task._id)}}>View Report</Button>
+          <Button variant="primary" onClick={() => {handleViewReport(task.taskId)}}>View Report</Button>
         </li>
       ))}
     </ul>
@@ -687,7 +749,7 @@ const TaskList = ({ report }) => {
               // Handle screenshots tab
               if (activeTab === "screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
                 return meta.meta_value.map((screenshotData, j) => {
-                  if(screenshotData.task !== taskId){return null}
+                  if(screenshotData?.task !== taskId){ return null}
                   return (
                     <>
                       <Card>
@@ -696,7 +758,7 @@ const TaskList = ({ report }) => {
                                 className="card-img-top"
                                 src={screenshotData?.url}
                                 alt="screenshot"
-                                // onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
+                                onClick={() => triggerLightBox('screenshot', meta.meta_value, j)}
                               />
                               <p>
                                 <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
@@ -715,7 +777,7 @@ const TaskList = ({ report }) => {
                   return (
                     <Card key={`video-card-${i}-${j}`}>
                       <Card.Body 
-                      // onClick={() => handleLightBox('video', meta.meta_value, j)}
+                      onClick={() => triggerLightBox('video', meta.meta_value, j)}
                       >
                         <video controls height="175px">
                           <source src={videoData?.url} type="video/webm" />
