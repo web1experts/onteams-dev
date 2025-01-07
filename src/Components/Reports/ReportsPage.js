@@ -654,12 +654,12 @@ const TaskList = ({ report }) => {
     setViewReport(true);
   }
   const [activeTab, setActiveTab] = useState("screenshots");
-  const [open, setOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [postMedia, setPostMedia] = useState([]);
+  const [reportopen, setReportOpen] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [lightboxMedia, setLightboxMedia] = useState([]);
 
   const triggerLightBox = (type, mediaItems, index) => {
-    setCurrentIndex(index);
+    setSlideIndex(index);
     const slides =
     Array.isArray(mediaItems) && mediaItems.length > 0
       ? mediaItems.map((item) => {
@@ -682,19 +682,19 @@ const TaskList = ({ report }) => {
       : [];
 
     // const data = slides;
-    setPostMedia(slides)
-    setOpen(true)
+    setLightboxMedia(slides)
+    setReportOpen(true)
   }
 
   return (
     <>
     <Lightbox
-      open={open}
-      close={() => setOpen(false)}
-      slides={postMedia}
+      open={reportopen}
+      close={() => setReportOpen(false)}
+      slides={lightboxMedia}
       plugins={[Fullscreen]}
       fullscreen={{ ref: fullscreenrefrence }}
-      index={currentIndex}
+      index={slideIndex}
       on={{
         click: () => fullscreenrefrence.current?.enter(),
       }}
@@ -729,7 +729,7 @@ const TaskList = ({ report }) => {
         </li>
       ))}
     </ul>
-    <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" className="timeSheetModal">
+    <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" key={`reports-${taskId}`} className="timeSheetModal">
         <Modal.Header closeButton>
           <ListGroup horizontal>
             <ListGroup.Item action active={activeTab === "screenshots"} onClick={() => setActiveTab("screenshots")}>
@@ -742,23 +742,26 @@ const TaskList = ({ report }) => {
         </Modal.Header>
         <Modal.Body>
           <div className="shots--list">
-            <CardGroup>
+            <CardGroup key={`card-group-${taskId}`}>
           {
             report?.activityMetas && report.activityMetas.length > 0 ? (
             report.activityMetas.map((meta, i) => {
               // Handle screenshots tab
               if (activeTab === "screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
+                let idx = 0
                 return meta.meta_value.map((screenshotData, j) => {
-                  if(screenshotData?.task !== taskId){ return null}
+                  if(screenshotData?.task !== taskId){ return <></>}else{
+                    const currentIdx = idx;
+                    idx++;
                   return (
                     <>
-                      <Card>
+                      <Card key={`task-card-${taskId}-${j}`}>
                             <Card.Body>
                               <img
                                 className="card-img-top"
                                 src={screenshotData?.url}
                                 alt="screenshot"
-                                onClick={() => triggerLightBox('screenshot', meta.meta_value, j)}
+                                onClick={() => triggerLightBox('screenshot', meta.meta_value, currentIdx)}
                               />
                               <p>
                                 <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
@@ -768,29 +771,34 @@ const TaskList = ({ report }) => {
                           </Card>
                           
                     </>
-                  )
+                  )}
                 });
               }
               if (activeTab === "videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
+                let idx = 0
                 return meta.meta_value.map((videoData, j) => {
-                  if(videoData.task !== taskId){return null}
-                  return (
-                    <Card key={`video-card-${i}-${j}`}>
-                      <Card.Body 
-                      onClick={() => triggerLightBox('video', meta.meta_value, j)}
-                      >
-                        <video controls height="175px">
-                          <source src={videoData?.url} type="video/webm" />
-                          Your browser does not support the video tag.
-                        </video>
-                        <p>
-                          <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                          <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                        </p>
-                      </Card.Body>
-                    </Card>
-                  )
-                });
+                  if(videoData.task !== taskId){return null}else{
+                    const currentIdx = idx;
+                    idx++;
+                      return (
+                        <Card key={`video-card-${i}-${j}`}>
+                          <Card.Body 
+                          onClick={() => triggerLightBox('video', meta.meta_value, currentIdx)}
+                          >
+                            <video controls height="175px">
+                              <source src={videoData?.url} type="video/webm" />
+                              Your browser does not support the video tag.
+                            </video>
+                            <p>
+                              <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                              <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                            </p>
+                          </Card.Body>
+                        </Card>
+                      )
+                    }
+                  });
+                
               }
               return null; // Return null if no condition is met
             })
