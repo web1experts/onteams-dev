@@ -15,12 +15,14 @@ import { ListTasks } from "../../redux/actions/task.action";
 function ReportsPage() {
   const dispatch = useDispatch()
   const datePickerRef = useRef(null)
+  const manuldatePickerRef = useRef(null)
   const memberdata = getMemberdata()
   const fullscreenRef = React.useRef(null);
-  const [fields, setFields] = useState({})
-  const [activeTab, setActiveTab] = useState("Screenshots");
+  const [fields, setFields] = useState({date: new Date()})
+  
   const [ loader, setLoader] = useState(false)
   const [show, setShow] = useState(false);
+  const [spinner, setSpinner] = useState(false)
   const handleClose = () => {
     setShow(false);
     setFields({})
@@ -39,9 +41,7 @@ function ReportsPage() {
   const [ singleprojectReport , setsingleProjectReport] = useState({})
   const options = { day: '2-digit', month: 'long', year: 'numeric' };
   const [screenshotTab, setScreenshotTab] = useState('Screenshots');
-  const [ViewReport, setViewReport] = useState(false);
-  const handleReportClose = () => setViewReport(false);
-  const handleViewReport = () => setViewReport(true);
+
   const [view, setView] = useState('group')
   const [occupiedRanges, setOccupiedRanges] = useState([])
   const [timeSlots, setTimeslots] = useState([])
@@ -49,9 +49,10 @@ function ReportsPage() {
   const [selectedFilter, setSelectedFilter ] = useState('today')
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [ searchEntries, setSearchEntries] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
-  const [ filters, setFilters] = useState({member: memberdata?._id, sort_by: 'members','project_status': 'all'});
+  const [ filters, setFilters] = useState({member: memberdata?._id, sort_by: 'members','project_status': 'in-progress'});
   const [ selectedproject, setSelectedProject] = useState('')
   const [ selectedTask, setSelectedTask] = useState('');
   const [showFilter, setFilterShow] = useState(false);
@@ -81,23 +82,31 @@ function ReportsPage() {
 
   const handlefilterchange = (name, value) => {
     setFilters({ ...filters, [name]: value })
+    if( name === 'sort_by' && value === "projects"){
+      setTimeout(function(){
+        selectboxObserver()
+      },10)
+    }
   }
 
   const handleListProjects = async () => {
       await dispatch(ListProjects({}));
   }
 
-  const handleReports = () => {
+  const handleReports = async () => {
+    setSpinner(true)
     if( filters['sort_by'] === "members"){
-      dispatch(getReportsByMember(filters))
+      await dispatch(getReportsByMember(filters))
     }else{
-      dispatch(gerReportsByProject(filters))
+     await dispatch(gerReportsByProject(filters))
     }
+    setSpinner(false)
   }
 
   useEffect(() => {
     dispatch(Listmembers(0, '', false));
     handleListProjects()
+    selectboxObserver()
   }, [dispatch])
 
   useEffect(() => {
@@ -136,7 +145,7 @@ function ReportsPage() {
     });
   };
   useEffect(() => {
-    setActiveTab("Screenshots")
+    
     handleReports()
   }, [filters])
 
@@ -149,9 +158,14 @@ function ReportsPage() {
   useEffect(() => {
     if(view === 'single'){
       setFilteredDate(new Date().toISOString().split('T')[0])
+      handlefilterchange('date_range', new Date().toISOString().split('T')[0])
     }else{
       setFilteredDate([new Date().toISOString().split('T')[0]])
+      handlefilterchange('date_range', [new Date().toISOString().split('T')[0]])
     }
+    // setTimeout(() => {
+      // handleReports()
+    // },100)
   }, [view])
 
   useEffect(() => {
@@ -253,7 +267,7 @@ function ReportsPage() {
             <Button variant="primary" onClick={() => {
               setIsPickerOpen(false)
               handlefilterchange('date_range', filtereddate)
-              handleReports()
+              // handleReports()
             }} className="date-filter-btn me-1">Apply</Button>
             <Button variant="primary" onClick={() => setIsPickerOpen(false)} className="date-filter-btn ms-1">Cancel</Button>
           </div>
@@ -328,27 +342,86 @@ function ReportsPage() {
       );
   };
 
-  function calculateTotalTime(activities) {
+
+
+  function calculateTotalTime(activities, type= 'all') {
     let totalMilliseconds = 0;
+    let invalidDurations = [];
 
     for (const activity of activities) {
         const { createdAt, duration } = activity;
 
-        // Convert createdAt and duration to Date objects
+        // Convert timestamps to milliseconds
         const startTime = new Date(createdAt).getTime();
         const stopTime = new Date(duration).getTime();
 
-        // Calculate the time spent in milliseconds
-        totalMilliseconds += stopTime - startTime;
+        if(type !== 'all' && activity?.type !== type){
+          continue;
+        }
+
+        // Check for invalid timestamps
+        if (isNaN(startTime) || isNaN(stopTime)) {
+            invalidDurations.push({ createdAt, duration });
+            continue;
+        }
+
+        // Calculate time spent in milliseconds
+        const timeDifference = stopTime - startTime;
+
+        // Only add positive durations to total time
+        if (timeDifference >= 0) {
+            totalMilliseconds += timeDifference;
+            
+        } else {
+            console.warn("Negative duration detected:", { createdAt, duration });
+        }
+    }
+
+    // Log invalid durations for debugging
+    if (invalidDurations.length) {
+        console.warn("Invalid timestamps detected:", invalidDurations);
     }
 
     // Convert total milliseconds to hours, minutes, and seconds
     const totalSeconds = Math.floor(totalMilliseconds / 1000);
+
+     // If the total time is less than 60 seconds, return the number of seconds
+     if (totalSeconds < 60) {
+      return `${totalSeconds} seconds`;
+  }
+
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
 
     return `${hours} hrs ${minutes} mins`;
 }
+
+
+const handleSearchChange = (name, index, searchvalue) => {
+  setSearchEntries((prevEntries) => {
+    const updatedEntries = [...prevEntries]; // Create a shallow copy of the array
+
+    // If the index is within the bounds of the current array, update the entry
+    if (index < updatedEntries.length) {
+      updatedEntries[index] = {
+        ...updatedEntries[index], // Spread the current entry
+        [name]: searchvalue // Update the specific key with the new value
+      };
+    } else {
+      // If the index is out of bounds, create a new entry
+      const newEntry = {
+        tasksearch: name === "tasksearch" ? searchvalue : "",
+        start_time: name === "start_time" ? searchvalue : "",
+        end_time: name === "end_time" ? searchvalue : ""
+      };
+      updatedEntries.push(newEntry); // Add the new entry to the array
+    }
+
+    return updatedEntries; // Return the updated array
+  });
+}
+
 
   const handleLightBox = (type, mediaItems, index) => {
     setCurrentIndex(index);
@@ -378,16 +451,45 @@ function ReportsPage() {
   
 
   const handleAddEntry = () => {
-    setEntries([...entries, { task: "", start_time: "", end_time: "" }]);
+    setEntries([...entries, { task: "", task_title: "", start_time: "", end_time: "" }]);
 };
 
 const handleReportSubmit = async (e) => {
   e.preventDefault();
-  const errors = entries.map((entry) => {
+  const errors = entries.map((entry, index) => {
     const entryErrors = {};
     if (!entry.task) entryErrors.task = "Task is required";
-    if (!entry.start_time) entryErrors.hours = "Hours are required";
-    if (!entry.end_time) entryErrors.minutes = "Minutes are required";
+    // Validation 2: Start and End Time are required
+    if (!entry.start_time) {
+      entryErrors.start_time = "Start time is required.";
+    }
+    if (!entry.end_time) {
+      entryErrors.end_time = "End time is required.";
+    }
+
+    // Validation 3: End time must be greater than start time
+    if (entry.start_time && entry.end_time && entry.start_time >= entry.end_time) {
+      entryErrors.end_time = "End time must be greater than start time.";
+    }
+    // Validation 4: Unique start and end times for each row
+    entries.forEach((otherEntry, otherIndex) => {
+      if (index !== otherIndex) {
+        if (entry.start_time === otherEntry.start_time) {
+          entryErrors.start_time = "Start time must be unique.";
+        }
+        if (entry.end_time === otherEntry.end_time) {
+          entryErrors.end_time = "End time must be unique.";
+        }
+      }
+    });
+
+    // Validation 5: Start time should not match previous row's start or end time
+    if (index > 0) {
+      const prevEntry = entries[index - 1];
+      if (entry.start_time === prevEntry.start_time || entry.start_time === prevEntry.end_time) {
+        entryErrors.start_time = "Start time cannot match the previous row's start or end time.";
+      }
+    }
     return entryErrors;
   });
 
@@ -396,10 +498,10 @@ const handleReportSubmit = async (e) => {
   if (hasErrors) {
     setErrors(errors); // Update the errors state to show errors below each field
     return false; // Prevent form submission
-  }
+  }//return false;
   setErrors([]);
   setLoader( true )
-  const payload = { project_id: selectedproject, entries, date: filtereddate }
+  const payload = { project_id: selectedproject, entries }
   dispatch(addManualTime({...payload,...fields}))
 
 }
@@ -420,14 +522,19 @@ const handleRemoveEntry = (index) => {
 
 const handleEntryChange = (index, field, value) => {
     const updatedEntries = [...entries];
-    updatedEntries[index][field] = value;
+    if( field === 'task'){
+      updatedEntries[index][field] = value._id;
+      updatedEntries[index]['task_title'] = value.title;
+    }else{
+      updatedEntries[index][field] = value;
+    }
+    
     setEntries(updatedEntries);
 };
 
 const handlechange = ({ target: { name, value } }) => {
   setFields({...fields, [name]: value})
 };
-
 
 const groupTasksById = (activities) => {
   const groupedTasks = activities.reduce((acc, activity) => {
@@ -438,12 +545,93 @@ const groupTasksById = (activities) => {
               acc[taskId] = {
                   taskId: t.task._id,
                   title: t.task.title,
-                  duration: 0,
+                  duration: 0, // Store duration in milliseconds
                   statuses: [],
               };
           }
 
-          acc[taskId].duration += t.duration; // Accumulate durations
+          // Calculate duration using `createdAt` and `duration`
+          if (t.createdAt && t.duration) {
+              const createdAtTime = new Date(t.createdAt).getTime();
+              const durationTime = new Date(t.duration).getTime();
+
+              if (!isNaN(createdAtTime) && !isNaN(durationTime)) {
+                  const timeDifferenceInMs = durationTime - createdAtTime;
+                  if (timeDifferenceInMs > 0) {
+                      acc[taskId].duration += timeDifferenceInMs;
+                  }
+              }
+          }
+
+          // Combine statuses from subtasks
+          acc[taskId].statuses.push(...t.task.subtasks.map((subtask) => subtask.status));
+      });
+
+      return acc;
+  }, {});
+
+  // Format durations into "hh:mm:ss"
+  return Object.values(groupedTasks).map((task) => {
+      const totalSeconds = Math.round(task.duration / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      task.duration =
+          totalSeconds < 60
+              ? `${totalSeconds} secs`
+              : `${hours}:${minutes.toString().padStart(2, "0")}`;
+      return task;
+  });
+};
+
+
+const groupTasksByIdold = (activities) => {
+  const groupedTasks = activities.reduce((acc, activity) => {
+      activity.tasks.forEach((t) => {
+          const taskId = t.task._id;
+
+          if (!acc[taskId]) {
+              acc[taskId] = {
+                  taskId: t.task._id,
+                  title: t.task.title,
+                  duration: "00:00", // Initialize duration in hh:mm format
+                  statuses: [],
+              };
+          }
+
+          // Calculate duration using `createdAt` and `duration`
+          if (t.createdAt && t.duration) {
+              const createdAtTime = new Date(t.createdAt).getTime();
+              const durationTime = new Date(t.duration).getTime();
+
+              // Ensure valid timestamps
+              if (!isNaN(createdAtTime) && !isNaN(durationTime)) {
+                  const timeDifferenceInSeconds = Math.floor((durationTime - createdAtTime) / 1000); // Convert to seconds
+
+                  // Convert accumulated seconds into hh:mm format or seconds
+                  // const [existingHours, existingMinutes] = acc[taskId].duration.split(":").map(Number);
+                  // const existingDurationInSeconds = existingHours * 3600 + existingMinutes * 60;
+
+                  // const totalDurationInSeconds = existingDurationInSeconds + timeDifferenceInSeconds;
+
+                  
+                
+                  const hours = Math.floor(timeDifferenceInSeconds / 3600);
+                  const minutes = Math.floor((timeDifferenceInSeconds % 3600) / 60);
+                  
+                  
+                  if (timeDifferenceInSeconds < 60) {
+                      acc[taskId].duration = `${timeDifferenceInSeconds} secs`; // Store seconds
+                  } else {
+                      // const totalHours = Math.floor(totalDurationInSeconds / 3600);
+                      // const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60);
+                      acc[taskId].duration = `${hours}:${minutes}`; // Store in hh:mm format
+                  }
+              }
+          }
+
+          // Combine statuses from subtasks
           acc[taskId].statuses.push(...t.task.subtasks.map((subtask) => subtask.status));
       });
 
@@ -457,18 +645,102 @@ const groupTasksById = (activities) => {
 const TaskList = ({ report }) => {
   // Group tasks by title and calculate total durations
   const groupedTasks = groupTasksById(report?.activities);
+  const [ViewReport, setViewReport] = useState(false);
+  const handleReportClose = () => setViewReport(false);
+  const [taskId, setTaskId] = useState('')
+  const handleViewReport = (taskId) => {
+    setTaskId( taskId)
+    setViewReport(true);
+  }
+  const [activeTab, setActiveTab] = useState("screenshots");
 
   return (
+    <>
     <ul>
       {groupedTasks.map((task, index) => (
         <li key={`grouped-task-${index}`}>
           <p className="mb-0">
             <FaAngleRight /> {task.title}
           </p>
-          <strong>{secondstoMinutes(task.duration)}</strong>
+          <strong>{task.duration}</strong>
+          <Button variant="primary" onClick={() => {handleViewReport(task._id)}}>View Report</Button>
         </li>
       ))}
     </ul>
+    <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" className="timeSheetModal">
+        <Modal.Header closeButton>
+          <ListGroup horizontal>
+            <ListGroup.Item action active={activeTab === "screenshots"} onClick={() => setActiveTab("screenshots")}>
+              Screenshots
+            </ListGroup.Item>
+            <ListGroup.Item action active={activeTab === "videos"} onClick={() => setActiveTab("videos")}>
+              Videos
+            </ListGroup.Item>
+          </ListGroup>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="shots--list">
+            <CardGroup>
+          {
+            report?.activityMetas && report.activityMetas.length > 0 ? (
+            report.activityMetas.map((meta, i) => {
+              // Handle screenshots tab
+              if (activeTab === "screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
+                return meta.meta_value.map((screenshotData, j) => {
+                  if(screenshotData.task !== taskId){return null}
+                  return (
+                    <>
+                      <Card>
+                            <Card.Body>
+                              <img
+                                className="card-img-top"
+                                src={screenshotData?.url}
+                                alt="screenshot"
+                                // onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
+                              />
+                              <p>
+                                <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
+                                <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
+                              </p>
+                            </Card.Body>
+                          </Card>
+                          
+                    </>
+                  )
+                });
+              }
+              if (activeTab === "videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
+                return meta.meta_value.map((videoData, j) => {
+                  if(videoData.task !== taskId){return null}
+                  return (
+                    <Card key={`video-card-${i}-${j}`}>
+                      <Card.Body 
+                      // onClick={() => handleLightBox('video', meta.meta_value, j)}
+                      >
+                        <video controls height="175px">
+                          <source src={videoData?.url} type="video/webm" />
+                          Your browser does not support the video tag.
+                        </video>
+                        <p>
+                          <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                          <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                        </p>
+                      </Card.Body>
+                    </Card>
+                  )
+                });
+              }
+              return null; // Return null if no condition is met
+            })
+          ) : (
+            <div>No data available</div> // Display if no data is available
+          )
+        }
+        </CardGroup>
+        </div>
+        </Modal.Body>
+      </Modal>
+      </>
   );
 };
 
@@ -540,7 +812,7 @@ const TaskList = ({ report }) => {
                     :
                     <>
                       <ListGroup.Item key="status-filter-list">
-                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project_status', event.target.value)} value={filters['project_status'] || 'all'}>
+                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project_status', event.target.value)} value={filters['project_status'] || 'in-progress'}>
                             <option value="all">View All</option>
                             <option value="in-progress">In Progress</option>
                             <option value="on-hold">On Hold</option>
@@ -567,7 +839,7 @@ const TaskList = ({ report }) => {
                   <ListGroup.Item action className="change--view" active={view === 'group' ? true : false} onClick={(e) => {setView('group')}}>
                     Group View
                   </ListGroup.Item>
-                  <ListGroup.Item action className="change--view" active={view === 'single' ? true : false} onClick={(e) => {setView('single')}}>
+                  <ListGroup.Item action className="change--view" active={view === 'single' ? true : false} onClick={(e) => {setView('single');}}>
                     Single View
                   </ListGroup.Item>
                   {
@@ -589,7 +861,8 @@ const TaskList = ({ report }) => {
                         onChange={async (value) => {
                             setFilteredDate(value)
                           }
-                        }          
+                        } 
+                        editable={false}         
                         className="form-control"
                         placeholder="dd/mm/yyyy"
                         open={isPickerOpen} // Control visibility with state
@@ -612,11 +885,14 @@ const TaskList = ({ report }) => {
                         name="date"
                         weekStartDayIndex={1}
                         id='datepicker-filter'
+                        editable={false}
                         value={filtereddate} 
                         format="YYYY-MM-DD"
                         dateSeparator=" - " 
                         onChange={async (value) => {
                             setFilteredDate(value)
+                            datePickerRef.current.closeCalendar()
+                            datePickerRef.current.openCalendar()
                           }
                         }          
                         className="form-control"
@@ -643,6 +919,12 @@ const TaskList = ({ report }) => {
           </Container>
         </div>
         <div className='page--wrapper daily--reports px-md-2 py-3'>
+          {
+            spinner &&
+              <div className="loading-bar">
+                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+              </div>
+          }
           <Container fluid>
           <div className="reports-section">
           <div className="rounded--box activity--box" key='activity-box'>
@@ -658,13 +940,33 @@ const TaskList = ({ report }) => {
                       <Accordion.Item eventKey={index} key={`accord-item-${report?.project?._id}`}>
                         <div className="screens--tabs">
                           <Accordion.Header>
-                            Project: {report?.project?.title}
-                              {/* <strong>{new Date(report?.createdAt).toLocaleDateString('en-GB', options)}</strong> */}
-                              {/* <strong>{ generateTimeRange(report?.createdAt, report?.duration)}</strong> */}
+                            Project: {report?.project?.title} <br />
                           </Accordion.Header>
                         </div>
                         <Accordion.Body>
                           <div className="shots--list pt-3">
+                          <Row>
+                            <Col sm={12}>
+                              <div className="report--info">
+                                <p className="p--card">
+                                  <label>Client Name</label>
+                                  <p>{report?.project?.client?.name}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Track Time</label>
+                                  <p>{calculateTotalTime(report?.activities, 'tracker')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Manual Time</label>
+                                  <p>{calculateTotalTime(report?.activities, 'manual')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Total Time Spent</label>
+                                  <p>{calculateTotalTime(report?.activities, 'all')}</p>
+                                </p>
+                              </div>
+                            </Col>
+                            </Row>
                             {showRecordedTabs()}
                             <CardGroup>
                                 {
@@ -730,15 +1032,30 @@ const TaskList = ({ report }) => {
                       
                       <Accordion.Item eventKey={index}>
                         <div className="screens--tabs">
-                          <Accordion.Header>{report?.project?.title} </Accordion.Header>
+                          <Accordion.Header>{report?.project?.title} <br />
+                          {/* Client: {report?.project?.client?.name} <br />
+                          Time spent:  {calculateTotalTime(report?.activities)} */}
+                          </Accordion.Header>
                         </div>
                         <Accordion.Body>
                           <Row>
                             <Col sm={12}>
                               <div className="report--info">
                                 <p className="p--card">
-                                  <label>Time Spent</label>
-                                  <p>{calculateTotalTime(report?.activities)}</p>
+                                  <label>Client name</label>
+                                  <p>{report?.project?.client?.name}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Track Time</label>
+                                  <p>{calculateTotalTime(report?.activities, 'tracker')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Manual Time</label>
+                                  <p>{calculateTotalTime(report?.activities, 'manual')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Total Time Spent</label>
+                                  <p>{calculateTotalTime(report?.activities, 'all')}</p>
                                 </p>
                               </div>
                             </Col>
@@ -783,6 +1100,28 @@ const TaskList = ({ report }) => {
                         </div>
                         <Accordion.Body>
                           <div className="shots--list pt-3">
+                          <Row>
+                            <Col sm={12}>
+                              <div className="report--info">
+                                <p className="p--card">
+                                  <label>Client Name</label>
+                                  <p>{report?.member?.client?.name}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Track Time</label>
+                                  <p>{calculateTotalTime(report?.activities,'tracker')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Manual Time</label>
+                                  <p>{calculateTotalTime(report?.activities, 'manual')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Total Time Spent</label>
+                                  <p>{calculateTotalTime(report?.activities, 'all')}</p>
+                                </p>
+                              </div>
+                            </Col>
+                            </Row>
                             {showRecordedTabs()}
                             <CardGroup>
                                 {
@@ -853,10 +1192,21 @@ const TaskList = ({ report }) => {
                           <Row>
                             <Col sm={12}>
                               <div className="report--info">
-                                
                                 <p className="p--card">
-                                  <label>Time Spent</label>
-                                  <p>{calculateTotalTime(report?.activities)}</p>
+                                  <label>Client name</label>
+                                  <p>{report?.member?.client?.name}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Track Time</label>
+                                  <p>{calculateTotalTime(report?.activities,'tracker')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Manual Time</label>
+                                  <p>{calculateTotalTime(report?.activities, 'manual')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Total Time Spent</label>
+                                  <p>{calculateTotalTime(report?.activities, 'all')}</p>
                                 </p>
                               </div>
                             </Col>
@@ -876,22 +1226,7 @@ const TaskList = ({ report }) => {
                             </Col>
                             <Col sm={12}>
                               <label>Tasks</label>
-                              {/* <ul>
-                                {
-                                  report?.activities?.length > 0 &&
-                                  report?.activities.map((act, actindex) => {
-                                    console.log('Act tasks:: ', act.tasks)
-                                    return (act.tasks || []).map((taskdata, tskindex) => (
-                                      
-                                        <li key={`${report._id}-taskkey-${tskindex}`}>
-                                          <p className="mb-0"><FaAngleRight /> {taskdata?.task?.title}</p> <strong>{secondstoMinutes(taskdata?.duration)}</strong>
-                                          
-                                        </li>
-                                      )
-                                    )
-                                  })
-                                }
-                              </ul> */}
+                              
                                <TaskList report={report} />
                             </Col>
                           </Row>
@@ -913,11 +1248,35 @@ const TaskList = ({ report }) => {
       </div>
       <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal" onShow={() => {selectboxObserver();}}>
         <Modal.Header closeButton>
-          <Modal.Title>Submit Report</Modal.Title>
+          <Modal.Title>Manual Time</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleReportSubmit}>
             <Row>
+              <Col sm={12} lg={6}>
+                <Form.Group className="mb-0 form-group">
+                  <Form.Label>Select date</Form.Label>
+                  <DatePicker 
+                    ref={manuldatePickerRef}
+                    key={'manual-date-filter'}
+                    name="date"
+                    weekStartDayIndex={1}
+                    id='manual-datepicker'
+                    editable={false}
+                    value={fields['date']} 
+                    format="YYYY-MM-DD"
+                    dateSeparator=" - " 
+                    onChange={async (value) => {
+                      setFields({...fields, ['date']: value})
+                      }
+                    }          
+                    className="form-control"
+                    placeholder="dd/mm/yyyy"
+                    range={false}
+                    multiple={false}
+                  />
+                </Form.Group>
+              </Col>
               <Col sm={12} lg={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Select your Project</Form.Label>
@@ -937,7 +1296,7 @@ const TaskList = ({ report }) => {
               <Col sm={12} lg={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Select Workflow</Form.Label>
-                  <Form.Select className="form-control" id="projects-tab"
+                  <Form.Select className="form-control custom-selectbox" id="projects-tab"
                     value={selectedWorkflow} onChange={(e) => {setWorkflow(e.target.value)}}>
                       <option value={''}>Select Workflow Tab</option>
                     { selectedproject && Object.keys(selectedproject).length > 0 &&
@@ -963,12 +1322,54 @@ const TaskList = ({ report }) => {
                   entries.map((entry, index) => (
                     <Row className="mb-3">
                       <Col md={4}>
-                          <Form.Select
+                        <Dropdown className="select--dropdown">
+                          <Dropdown.Toggle variant="success">
+                            { 
+                              
+                              entry.task_title ?
+                                <>
+                                {entry.task_title}
+                                </>
+                              :
+                              'Select'
+                            }
+
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                              <div className="drop--scroll">
+                                  <Form>
+                                      <Form.Group className="form-group mb-3">
+                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.tasksearch} onChange={(e) => {handleSearchChange('tasksearch', index, e.target.value)}} />
+                                      </Form.Group>
+                                  </Form>
+                                  {
+                                    filteredTasks &&  filteredTasks.length > 0  &&
+                                    filteredTasks.map((task) => {
+                                      if( searchEntries[index]?.tasksearch && searchEntries[index]?.tasksearch !== ""){
+                                        if (task?.title?.toLowerCase().includes(searchEntries[index]?.tasksearch?.toLowerCase())) {
+                                          return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
+                                        }else{
+                                          return null;
+                                        }
+                                        
+                                      }else{
+                                        return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
+                                      }
+                                      
+                                    })
+                                  }
+                              </div>
+                          </Dropdown.Menu>
+                      </Dropdown>
+
+
+                          {/* <Form.Select
                               value={entry.task}
                               onChange={(e) =>
                                   handleEntryChange(index, "task", e.target.value)
                               }
                               key={`taskin-${selectedWorkflow}`}
+                              className="custom-selectbox"
                           >
                               <option value="">Select Task</option>
                               {
@@ -982,11 +1383,12 @@ const TaskList = ({ report }) => {
                                   )
                                 // )
                               }
-                          </Form.Select>
+                          </Form.Select> */}
                           {errors[index]?.task && <span className="form-error">{errors[index].task}</span>}
                       </Col>
                       <Col md={3}>
-                        <Form.Select
+                        {/* <Form.Select
+                          className="custom-selectbox"
                           value={entry.start_time}
                           onChange={(e) =>
                               handleEntryChange(index, "start_time", e.target.value)
@@ -1000,28 +1402,55 @@ const TaskList = ({ report }) => {
                               </option>
                             );
                           })}
-                        </Form.Select>
-                          {/* <Form.Control
-                              type="text"
-                              placeholder="Start time"
-                              value={entry.hours}
-                              onChange={(e) =>
-                                  handleEntryChange(index, "start_time", e.target.value)
-                              }
-                          /> */}
+                        </Form.Select> */}
+
+                      <Dropdown className="select--dropdown">
+                        <Dropdown.Toggle variant="success">
+                          { 
+                            
+                            entry.start_time ?
+                              <>
+                              {entry.start_time}
+                              </>
+                            :
+                            'Select'
+                          }
+                        </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                              <div className="drop--scroll">
+                                  <Form>
+                                      <Form.Group className="form-group mb-3">
+                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.start_time} onChange={(e) => {handleSearchChange('start_time', index, e.target.value)}} />
+                                      </Form.Group>
+                                  </Form>
+                                  {
+                                    
+                                    timeSlots.map((slot) => {
+                                      const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                                      if( searchEntries[index]?.start_time && searchEntries[index]?.start_time !== ""){
+                                        if (slot?.toLowerCase().includes(searchEntries[index]?.start_time?.toLowerCase())) {
+                                          return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
+                                        }else{
+                                          return null;
+                                        }
+                                        
+                                      }else{
+                                        return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
+                                      }
+                                      
+                                    })
+                                  }
+                              </div>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                          
                           {errors[index]?.start_time && <span className="form-error">{errors[index].start_time}</span>}
                       </Col>
                       <Col md={3}>
-                          {/* <Form.Control
-                              type="text"
-                              placeholder="End time"
-                              value={entry.minutes}
-                              onChange={(e) =>
-                                  handleEntryChange(index, "end_time", e.target.value)
-                              }
-                          /> */}
-                          <Form.Select
+                          
+                          {/* <Form.Select
                           value={entry.end_time}
+                          className="custom-selectbox"
                           onChange={(e) =>
                               handleEntryChange(index, "end_time", e.target.value)
                           }>
@@ -1033,7 +1462,46 @@ const TaskList = ({ report }) => {
                                 </option>
                               );
                             })}
-                          </Form.Select>
+                          </Form.Select> */}
+                          <Dropdown className="select--dropdown">
+                        <Dropdown.Toggle variant="success">
+                          { 
+                            
+                            entry.end_time ?
+                              <>
+                              {entry.end_time}
+                              </>
+                            :
+                            'Select'
+                          }
+                        </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                              <div className="drop--scroll">
+                                  <Form>
+                                      <Form.Group className="form-group mb-3">
+                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.end_time} onChange={(e) => {handleSearchChange('end_time', index, e.target.value)}} />
+                                      </Form.Group>
+                                  </Form>
+                                  {
+                                    
+                                    timeSlots.map((slot) => {
+                                      const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                                      if( searchEntries[index]?.end_time && searchEntries[index]?.end_time !== ""){
+                                        if (slot?.toLowerCase().includes(searchEntries[index]?.end_time?.toLowerCase())) {
+                                          return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
+                                        }else{
+                                          return null;
+                                        }
+                                        
+                                      }else{
+                                        return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
+                                      }
+                                      
+                                    })
+                                  }
+                              </div>
+                          </Dropdown.Menu>
+                        </Dropdown>
                           {errors[index]?.end_time && <span className="form-error">{errors[index].end_time}</span>}
                       </Col>
                       <Col md={2} className="text-right">
@@ -1071,193 +1539,7 @@ const TaskList = ({ report }) => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" className="timeSheetModal">
-        <Modal.Header closeButton>
-          <ListGroup horizontal>
-            <ListGroup.Item action active={activeTab === "Screenshots"} onClick={() => setActiveTab("Screenshots")}>
-              Screenshots
-            </ListGroup.Item>
-            <ListGroup.Item action active={activeTab === "Videos"} onClick={() => setActiveTab("Videos")}>
-              Videos
-            </ListGroup.Item>
-          </ListGroup>
-        </Modal.Header>
-        <Modal.Body>
-          {activeTab === "Screenshots" && (
-            <>
-              <h6 className="mb-2">09:00 AM - 10:00 AM</h6>
-              <div className="shots--list">
-                <CardGroup>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                </CardGroup>
-              </div>
-              <hr />
-              <h6 className="mb-2">10:01 AM - 11:00 AM</h6>
-              <div className="shots--list">
-                <CardGroup>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                  <Card>
-                    <Card.Body>
-                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                      <p>create dynamic gallery, 09:30 AM</p>
-                    </Card.Body>
-                  </Card>
-                </CardGroup>
-              </div>
-            </>
-          )}
-          {activeTab === "Videos" && (
-            <div className="shots--list">
-              <CardGroup>
-                <Card>
-                  <Card.Body>
-                    <span className="video--icon"><FaPlay /></span>
-                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                    <p>create dynamic gallery, 09:30 AM</p>
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <span className="video--icon"><FaPlay /></span>
-                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                    <p>create dynamic gallery, 09:30 AM</p>
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <span className="video--icon"><FaPlay /></span>
-                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                    <p>create dynamic gallery, 09:30 AM</p>
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <span className="video--icon"><FaPlay /></span>
-                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                    <p>create dynamic gallery, 09:30 AM</p>
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <span className="video--icon"><FaPlay /></span>
-                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                    <p>create dynamic gallery, 09:30 AM</p>
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <span className="video--icon"><FaPlay /></span>
-                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                    <p>create dynamic gallery, 09:30 AM</p>
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <span className="video--icon"><FaPlay /></span>
-                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
-                    <p>create dynamic gallery, 09:30 AM</p>
-                  </Card.Body>
-                </Card>
-                <Card>
-                  <Card.Body>
-                    <span className="video--icon"><FaPlay /></span>
-                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
-                    <p>create dynamic gallery, 09:30 AM</p>
-                  </Card.Body>
-                </Card>
-              </CardGroup>
-            </div>
-          )}
-        </Modal.Body>
-      </Modal>
+      
       {/*--=-=Filter Modal**/}
       <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal">
         <Modal.Header closeButton>

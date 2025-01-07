@@ -117,13 +117,13 @@ function TimeTrackingPage() {
         setSpinner( false )
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
     }
-    // if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true){
-    //   // setActiveInnerTab("InnerRecorded")
-    //   handleRecordedActivity()
-    // }
-    // if(currentActivity?.latestActivity?.status === false){
-    //   setActSpinner( false )
-    // }
+    if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true){
+      // setActiveInnerTab("InnerRecorded")
+      handleRecordedActivity()
+    }
+    if(currentActivity?.latestActivity?.status === false){
+      setActSpinner( false )
+    }
   },[currentActivity])
 
    useEffect(() => {
@@ -196,7 +196,7 @@ function TimeTrackingPage() {
         peerConnections[id] = new RTCPeerConnection({ // User stun server for connection with different networks
           iceServers: [
               {
-                urls: 'turn:64.227.189.65:3478',
+                urls: 'turn:13.60.162.218:3478',
                 username: 'web1experts',  // Optional if using 'lt-cred-mech'
                 credential: 'PtJJc0FUvuKP3jkn' // Optional if using 'lt-cred-mech'
               },
@@ -249,45 +249,6 @@ function TimeTrackingPage() {
   }, 60000)
 
   }, [])
-
-//   function generateTimeRange(createdAt, tasks) {
-//     // Create a new Date object from the createdAt date (UTC)
-//     const startTime = new Date(createdAt);
-    
-//     // If tasks array is empty, the total duration will be 0
-//     const totalDurationInSeconds = tasks.length > 0
-//         ? tasks.reduce((sum, task) => sum + task.duration, 0)
-//         : 0;
-    
-//     // Add the total duration in seconds to the start time
-//     const endTime = new Date(startTime.getTime() + totalDurationInSeconds * 1000);
-    
-//     // Calculate hours and minutes for the duration
-//     const totalHours = Math.floor(totalDurationInSeconds / 3600); // Total hours
-//     const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60); // Remaining minutes
-    
-//     // Format hours and minutes into a string (e.g., 1:30 hrs)
-//     const formattedDuration = `${totalHours}:${totalMinutes.toString().padStart(2, '0')} hrs`;
-    
-//     // Format the start and end times using local time zone
-//     const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
-//       hour: '2-digit',
-//       minute: '2-digit',
-//       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-//     });
-//     const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
-//       hour: '2-digit',
-//       minute: '2-digit',
-//       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-//     });
-    
-//     // Return the formatted time range with duration in brackets
-//     return `${startTimeFormatted} - ${endTimeFormatted} (${formattedDuration})`;
-// }
-
-
-
-
 
   useEffect(() => {
     if (activitystate?.liveactivities?.memberData) { 
@@ -521,10 +482,15 @@ function extractTimeFromISO(createdAt, duration) {
 
     // Calculate the difference in milliseconds
     const diffInMilliseconds = endDate - startDate;
-
+    if (diffInMilliseconds < 0) {
+      return '00:00';
+    }
     // Convert milliseconds to seconds
     const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
-
+     // Check if the difference is less than 60 seconds
+     if (diffInSeconds < 60) {
+      return `${diffInSeconds} secs`;
+    }
     // Calculate hours and minutes
     const hours = Math.floor(diffInSeconds / 3600); // Total hours
     const minutes = Math.floor((diffInSeconds % 3600) / 60); // Remaining minutes
@@ -791,7 +757,15 @@ function extractTimeFromISO(createdAt, duration) {
                                         setCurrentActivity(activity);
                                       }
                                   }} ><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name} 
-                                  
+                                  {
+                                    activity?.latestActivity?.status ? 
+                                    <small className="status--circle active--color"></small>
+                                    :
+                                    activity?.latestActivity?.status === false  ?
+                                    <small className="status--circle idle--color"></small>
+                                    :
+                                    <small className="status--circle inactive--color"></small>
+                                  }
                                 </td>
                                 
                                 <td data-label="Total Time" className="onHide">{ formatTime(activity?.totalTaskDuration) || '00:00'}</td>

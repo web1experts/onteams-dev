@@ -344,15 +344,34 @@ const getDayWithSuffix = (day) => {
     return `${startTimeFormatted} - ${endTimeFormatted}`;
   }
 
-  export function secondstoMinutes(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+//   export function secondstoMinutes(seconds) {
+//     const hours = Math.floor(seconds / 3600);
+//     const minutes = Math.floor((seconds % 3600) / 60);
 
-    if (hours > 0) {
-        // Format for hours and minutes (e.g., "1:20 hrs")
-        return `${hours}:${String(minutes).padStart(2, '0')} hrs`;
-    } else {
-        // Format for minutes only (e.g., "00:15 mins")
-        return `${String(minutes).padStart(2, '0')} mins`;
+//     if (hours > 0) {
+//         // Format for hours and minutes (e.g., "1:20 hrs")
+//         return `${hours}:${String(minutes).padStart(2, '0')} hrs`;
+//     } else {
+//         // Format for minutes only (e.g., "00:15 mins")
+//         return `${String(minutes).padStart(2, '0')} mins`;
+//     }
+// }
+
+export function secondstoMinutes(seconds) {
+    if( seconds < 60 ){
+        return `${seconds} secs`;
     }
-}
+    const totalMinutes = Math.round(seconds / 60); // Round total seconds to the nearest minute
+    const hours = Math.floor(totalMinutes / 60); // Get whole hours
+    const minutes = totalMinutes % 60; // Get remaining minutes
+  
+    if (hours > 0) {
+      // Format for hours and minutes (e.g., "1:03 hrs")
+      return `${hours}:${String(minutes).padStart(2, '0')} hrs`;
+    } else {
+      // Format for minutes only (e.g., "15 mins")
+      return `${String(minutes).padStart(2, '0')} mins`;
+    }
+  }
+  
+
