@@ -11,7 +11,7 @@ import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket } from "../../helpers/auth";
-import { getMemberdata, showAmPmtime, generateTimeRange } from "../../helpers/commonfunctions";
+import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 function TimeTrackingPage() {
   let totalhours = 0;
@@ -113,11 +113,11 @@ function TimeTrackingPage() {
 
   useEffect(() => {
     setActSpinner( false )
-    if(currentActivity !== false && activeTab === "Live"){ 
+    if(currentActivity !== false && activeTab === "Live" || currentActivity !== false && activeInnerTab === "InnerLive"){ 
         setSpinner( false )
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
     }
-    if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true){
+    if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true || currentActivity !== false && activeTab === "Recordings" && recordedRefresh === true){
       // setActiveInnerTab("InnerRecorded")
       handleRecordedActivity()
     }
@@ -211,7 +211,7 @@ function TimeTrackingPage() {
                 socket.emit('answer', id, peerConnections[id].localDescription, roomId);
             });
         peerConnections[id].onaddstream = function (event) {
-          if(event.stream){
+          if(event.stream && videoRef.current){
             videoRef.current.srcObject = event.stream;
             videoRef.current.onloadedmetadata = () => videoRef.current.play();
             
@@ -672,6 +672,7 @@ function extractTimeFromISO(createdAt, duration) {
                                       }else if(activeInnerTab === "InnerRecorded"){
                                         setRecordedRefresh( true )
                                         setCurrentActivity(activity)
+                                        
                                         // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
                                       }
                                   }} >
@@ -689,8 +690,8 @@ function extractTimeFromISO(createdAt, duration) {
                                 </td>
                                 <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
                                 <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></td>
-                                <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ extractTimeFromISO(activity?.latestActivity?.createdAt, activity?.latestActivity?.duration) || '00:00'}</td>
-                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ formatTime(activity?.totalDuration) || '00:00'}</td>
+                                <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</td>
+                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</td>
                                 <td data-label="Status" key={`status-title-${activity?._id}`} className="onHide">
                                   { 
                                     (activity?.latestActivity?.status) ? 
@@ -753,8 +754,16 @@ function extractTimeFromISO(createdAt, duration) {
                               <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
                                 {/* <td key={`index-${index}`}>{index + 1} </td> */}
                                 <td data-label="Member Name" onClick={() => {
-                                      if (isActive) {
+                                      // if (isActive) {
+                                      //   setCurrentActivity(activity);
+                                      // }
+                                      if (isActive && activeInnerTab !== "InnerRecorded" || isActive && activeTab !== "Recordings") {
+                                        leaveRoom(currentActivity?._id)
+                                        socket.emit('get-tracker-status-update', {userID: activity._id})
                                         setCurrentActivity(activity);
+                                      }else if(activeInnerTab === "InnerRecorded" ||  activeTab === "Recordings"){
+                                        setRecordedRefresh( true )
+                                        setCurrentActivity(activity)
                                       }
                                   }} ><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name} 
                                   {
@@ -768,7 +777,7 @@ function extractTimeFromISO(createdAt, duration) {
                                   }
                                 </td>
                                 
-                                <td data-label="Total Time" className="onHide">{ formatTime(activity?.totalTaskDuration) || '00:00'}</td>
+                                <td data-label="Total Time" className="onHide">{ convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</td>
                                 
                                 <td className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
                               </tr>
@@ -834,7 +843,7 @@ function extractTimeFromISO(createdAt, duration) {
                   <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
                   <span className="ms-md-3">{ currentActivity?.latestActivity?.app_version}</span>
                   <p className="task--timer">
-                    <span><strong>{ formatTime(currentActivity?.totalTaskDuration) || '00:00'}</strong></span>
+                    <span><strong>{ convertSecondstoTime(currentActivity?.totalTaskDuration) || '00:00'}</strong></span>
                   </p>
                   <div className={isScreenActive ? 'expand--button exit--fullscreen' : 'expand--button'}>
                   <Button variant="secondary" className="enter--screen" onClick={toggleFullscreen}>

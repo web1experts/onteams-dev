@@ -13,7 +13,8 @@ import {
     GET_SINGLE_PROJECT_SUCCESS,
     GET_SINGLE_PROJECT_FAILED,
     PROJECT_COMMON_ERROR,
-    PROJECT_REORDER
+    PROJECT_REORDER,
+    MEMBER_PROJECTS
 } from "./types";
 
 const config = {
@@ -49,6 +50,21 @@ export const ListProjects = (payload) => {
             const response = await API.apiGet('project', payload);
             if(response.data && response.data.success){
             await dispatch({ type: LIST_PROJECT_SUCCESS, payload: response.data })
+            }else{
+            await dispatch({ type: LIST_PROJECT_FAILED, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+}
+
+export const ListMemberProjects = (memberId) => {
+    return async (dispatch) => {
+        try{
+            const response = await API.apiGetByKey('project',`/by_member/${memberId}`,);
+            if(response.data && response.data.success){
+            await dispatch({ type: MEMBER_PROJECTS, payload: response.data })
             }else{
             await dispatch({ type: LIST_PROJECT_FAILED, payload: response.data.message });
             }

@@ -11,7 +11,8 @@ import {
     GET_SINGLE_PROJECT_FAILED,
     PROJECT_COMMON_ERROR,
     CLEAR_MESSAGES,
-    PROJECT_REORDER
+    PROJECT_REORDER,
+    MEMBER_PROJECTS
 
 } from "../actions/types";
     
@@ -47,6 +48,10 @@ import {
         case LIST_PROJECT_SUCCESS:
             return {
                 projects: action.payload.projectsData
+            }
+        case MEMBER_PROJECTS: 
+            return {
+                memberProjects: action.payload.projectsData
             }
         case LIST_PROJECT_FAILED:
             return {

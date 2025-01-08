@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Dropdown, CardGroup } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Dropdown, CardGroup, Badge } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaPlay, FaCheck, FaAngleRight, FaPlus, FaTrash } from "react-icons/fa";
 import { secondstoMinutes, showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { MdFilterList } from "react-icons/md";
 import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
-import { ListProjects } from "../../redux/actions/project.action";
+import { ListProjects, ListMemberProjects } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
 import { ListTasks } from "../../redux/actions/task.action";
 function ReportsPage() {
@@ -32,6 +32,8 @@ function ReportsPage() {
   const memberFeed = useSelector((state) => state.member.members)
   const projectFeed = useSelector(state => state.project.projects);
   const [ projects, setProjects ] = useState([])
+  const MemberprojectFeed = useSelector(state => state.project.memberProjects);
+  const [ memberprojects, setMemberProjects ] = useState([])
   const taskFeed = useSelector(state => state.task.tasks);
   const [taskslists, setTasksLists] = useState([])
   const [members, setMembers] = useState([])
@@ -91,6 +93,7 @@ function ReportsPage() {
 
   const handleListProjects = async () => {
       await dispatch(ListProjects({}));
+      await dispatch(ListMemberProjects(memberdata?._id));
   }
 
   const handleReports = async () => {
@@ -174,6 +177,13 @@ function ReportsPage() {
           setProjects(projectFeed.projectData)
       }
   }, [projectFeed])
+
+  useEffect(() => {
+    const check = ['undefined', undefined, 'null', null, '']
+    if (MemberprojectFeed && MemberprojectFeed.projectData) {
+        setMemberProjects(MemberprojectFeed.projectData)
+    }
+}, [MemberprojectFeed])
 
   // useEffect(() => { 
   //   // handlefilterchange('date_range', filtereddate)
@@ -345,54 +355,24 @@ function ReportsPage() {
 
 
   function calculateTotalTime(activities, type= 'all') {
-    let totalMilliseconds = 0;
-    let invalidDurations = [];
-
+    let totalSeconds = 0;
     for (const activity of activities) {
-        const { createdAt, duration } = activity;
-
-        // Convert timestamps to milliseconds
-        const startTime = new Date(createdAt).getTime();
-        const stopTime = new Date(duration).getTime();
-
+        const { duration } = activity;
         if(type !== 'all' && activity?.type !== type){
           continue;
         }
-
-        // Check for invalid timestamps
-        if (isNaN(startTime) || isNaN(stopTime)) {
-            invalidDurations.push({ createdAt, duration });
-            continue;
-        }
-
-        // Calculate time spent in milliseconds
-        const timeDifference = stopTime - startTime;
-
-        // Only add positive durations to total time
-        if (timeDifference >= 0) {
-            totalMilliseconds += timeDifference;
-            
-        } else {
-            console.warn("Negative duration detected:", { createdAt, duration });
-        }
+        totalSeconds += duration 
     }
-
-    // Log invalid durations for debugging
-    if (invalidDurations.length) {
-        console.warn("Invalid timestamps detected:", invalidDurations);
-    }
-
-    // Convert total milliseconds to hours, minutes, and seconds
-    const totalSeconds = Math.floor(totalMilliseconds / 1000);
-
      // If the total time is less than 60 seconds, return the number of seconds
-     if (totalSeconds < 60) {
+    if (totalSeconds === 0) {
+      return `00:00`;
+    }
+    else if (totalSeconds < 60) {
       return `${totalSeconds} seconds`;
-  }
+    }
 
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
 
     return `${hours} hrs ${minutes} mins`;
 }
@@ -458,40 +438,54 @@ const handleReportSubmit = async (e) => {
   e.preventDefault();
   const errors = entries.map((entry, index) => {
     const entryErrors = {};
+
+    // Validation 1: Task is required
     if (!entry.task) entryErrors.task = "Task is required";
+
     // Validation 2: Start and End Time are required
     if (!entry.start_time) {
-      entryErrors.start_time = "Start time is required.";
+        entryErrors.start_time = "Start time is required.";
     }
     if (!entry.end_time) {
-      entryErrors.end_time = "End time is required.";
+        entryErrors.end_time = "End time is required.";
     }
 
-    // Validation 3: End time must be greater than start time
-    if (entry.start_time && entry.end_time && entry.start_time >= entry.end_time) {
-      entryErrors.end_time = "End time must be greater than start time.";
-    }
-    // Validation 4: Unique start and end times for each row
-    entries.forEach((otherEntry, otherIndex) => {
-      if (index !== otherIndex) {
-        if (entry.start_time === otherEntry.start_time) {
-          entryErrors.start_time = "Start time must be unique.";
-        }
-        if (entry.end_time === otherEntry.end_time) {
-          entryErrors.end_time = "End time must be unique.";
-        }
-      }
-    });
+    // Helper function to convert HH:mm to Date object
+    const parseTime = (time) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date;
+    };
 
-    // Validation 5: Start time should not match previous row's start or end time
-    if (index > 0) {
-      const prevEntry = entries[index - 1];
-      if (entry.start_time === prevEntry.start_time || entry.start_time === prevEntry.end_time) {
-        entryErrors.start_time = "Start time cannot match the previous row's start or end time.";
-      }
+    if (entry.start_time && entry.end_time) {
+        const currentStart = parseTime(entry.start_time);
+        const currentEnd = parseTime(entry.end_time);
+
+        // Validation 3: End time must be greater than start time
+        if (currentStart >= currentEnd) {
+            entryErrors.end_time = "End time must be greater than start time.";
+        }
+
+        // Validation 4: Start and End times should not overlap with other entries
+        entries.forEach((otherEntry, otherIndex) => {
+            if (index !== otherIndex && otherEntry.start_time && otherEntry.end_time) {
+                const otherStart = parseTime(otherEntry.start_time);
+                const otherEnd = parseTime(otherEntry.end_time);
+
+                if (
+                    currentStart < otherEnd && currentEnd > otherStart // Overlap condition
+                ) {
+                    entryErrors.start_time = "Time range overlaps with another entry.";
+                    entryErrors.end_time = "Time range overlaps with another entry.";
+                }
+            }
+        });
     }
+
     return entryErrors;
-  });
+});
+
 
   const hasErrors = errors.some((entryErrors) => Object.keys(entryErrors).length > 0);
 
@@ -546,25 +540,26 @@ const groupTasksById = (activities) => {
                   taskId: t.task._id,
                   title: t.task.title,
                   duration: 0, // Store duration in milliseconds
-                  statuses: [],
+                  tab: t.task.tab
+                  // statuses: [],
               };
           }
 
           // Calculate duration using `createdAt` and `duration`
-          if (t.createdAt && t.duration) {
-              const createdAtTime = new Date(t.createdAt).getTime();
-              const durationTime = new Date(t.duration).getTime();
+          if ( t.duration) {
+              // const createdAtTime = new Date(t.createdAt).getTime();
+              // const durationTime = new Date(t.duration).getTime();
 
-              if (!isNaN(createdAtTime) && !isNaN(durationTime)) {
-                  const timeDifferenceInMs = durationTime - createdAtTime;
-                  if (timeDifferenceInMs > 0) {
-                      acc[taskId].duration += timeDifferenceInMs;
-                  }
-              }
+              // if (!isNaN(createdAtTime) && !isNaN(durationTime)) {
+              //     const timeDifferenceInMs = durationTime - createdAtTime;
+              //     if (timeDifferenceInMs > 0) {
+                      acc[taskId].duration += t.duration;
+              //     }
+              // }
           }
 
           // Combine statuses from subtasks
-          acc[taskId].statuses.push(...t.task.subtasks.map((subtask) => subtask.status));
+          // acc[taskId].statuses.push(...t.task.subtasks.map((subtask) => subtask.status));
       });
 
       return acc;
@@ -572,7 +567,7 @@ const groupTasksById = (activities) => {
 
   // Format durations into "hh:mm:ss"
   return Object.values(groupedTasks).map((task) => {
-      const totalSeconds = Math.round(task.duration / 1000);
+      const totalSeconds = task.duration //Math.round(task.duration / 1000);
       const hours = Math.floor(totalSeconds / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
@@ -584,63 +579,6 @@ const groupTasksById = (activities) => {
       return task;
   });
 };
-
-
-const groupTasksByIdold = (activities) => {
-  const groupedTasks = activities.reduce((acc, activity) => {
-      activity.tasks.forEach((t) => {
-          const taskId = t.task._id;
-
-          if (!acc[taskId]) {
-              acc[taskId] = {
-                  taskId: t.task._id,
-                  title: t.task.title,
-                  duration: "00:00", // Initialize duration in hh:mm format
-                  statuses: [],
-              };
-          }
-
-          // Calculate duration using `createdAt` and `duration`
-          if (t.createdAt && t.duration) {
-              const createdAtTime = new Date(t.createdAt).getTime();
-              const durationTime = new Date(t.duration).getTime();
-
-              // Ensure valid timestamps
-              if (!isNaN(createdAtTime) && !isNaN(durationTime)) {
-                  const timeDifferenceInSeconds = Math.floor((durationTime - createdAtTime) / 1000); // Convert to seconds
-
-                  // Convert accumulated seconds into hh:mm format or seconds
-                  // const [existingHours, existingMinutes] = acc[taskId].duration.split(":").map(Number);
-                  // const existingDurationInSeconds = existingHours * 3600 + existingMinutes * 60;
-
-                  // const totalDurationInSeconds = existingDurationInSeconds + timeDifferenceInSeconds;
-
-                  
-                
-                  const hours = Math.floor(timeDifferenceInSeconds / 3600);
-                  const minutes = Math.floor((timeDifferenceInSeconds % 3600) / 60);
-                  
-                  
-                  if (timeDifferenceInSeconds < 60) {
-                      acc[taskId].duration = `${timeDifferenceInSeconds} secs`; // Store seconds
-                  } else {
-                      // const totalHours = Math.floor(totalDurationInSeconds / 3600);
-                      // const totalMinutes = Math.floor((totalDurationInSeconds % 3600) / 60);
-                      acc[taskId].duration = `${hours}:${minutes}`; // Store in hh:mm format
-                  }
-              }
-          }
-
-          // Combine statuses from subtasks
-          acc[taskId].statuses.push(...t.task.subtasks.map((subtask) => subtask.status));
-      });
-
-      return acc;
-  }, {});
-
-  return Object.values(groupedTasks); // Convert object to array
-};
-
 
 const TaskList = ({ report }) => {
   // Group tasks by title and calculate total durations
@@ -686,6 +624,16 @@ const TaskList = ({ report }) => {
     setReportOpen(true)
   }
 
+  const gettaskTab = (tabid) => { console.log(report?.project?.workflow?.tabs);
+    console.log('tab to find:: ', tabid)
+    if( report?.project?.workflow?.tabs?.length > 0){
+      const matchedTabTitle = report.project.workflow.tabs.find(tab => tab._id === tabid)?.title;
+      console.log("matchedTabTitle", matchedTabTitle)
+      return <Badge bg="info">{matchedTabTitle}</Badge>
+    }
+    return null;
+  }
+
   return (
     <>
     <Lightbox
@@ -725,6 +673,9 @@ const TaskList = ({ report }) => {
             <FaAngleRight /> {task.title}
           </p>
           <strong>{task.duration}</strong>
+          {
+            gettaskTab(task.tab)
+          }
           <Button variant="primary" onClick={() => {handleViewReport(task.taskId)}}>View Report</Button>
         </li>
       ))}
@@ -1355,7 +1306,7 @@ const TaskList = ({ report }) => {
                         value={selectedproject._id} onChange={handleProjectSelect} name="project">
                           <option value={''}>Select Project</option>
                         {
-                          projects.map(project => (
+                          memberprojects.map(project => (
                             <option data-project={JSON.stringify(project)} value={project._id}>{project.title}</option>
                           ))
                         }

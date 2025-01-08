@@ -322,40 +322,52 @@ const getDayWithSuffix = (day) => {
     return `${dayName}, ${monthName} ${day}, ${year}`;
   }
 
-  export function generateTimeRange(createdAt, duration) {
-    // Create Date objects from createdAt and duration
-    const startTime = new Date(createdAt);
-    const endTime = new Date(duration);
+  // export function generateTimeRange(createdAt, duration) {
+  //   // Create Date objects from createdAt and duration
+  //   const startTime = new Date(createdAt);
+  //   const endTime = new Date(duration);
   
+  //   // Format the start and end times using local time zone
+  //   const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
+  //       hour: '2-digit',
+  //       minute: '2-digit',
+  //       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+  //   });
+  
+  //   const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
+  //       hour: '2-digit',
+  //       minute: '2-digit',
+  //       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
+  //   });
+  
+  //   // Return the formatted time range in the desired format
+  //   return `${startTimeFormatted} - ${endTimeFormatted}`;
+  // }
+
+  export function generateTimeRange(createdAt, duration) {
+    // Create a Date object from createdAt
+    const startTime = new Date(createdAt);
+
+    // Calculate the endTime by adding duration (in seconds) to the startTime
+    const endTime = new Date(startTime.getTime() + duration * 1000); // Convert seconds to milliseconds
+
     // Format the start and end times using local time zone
     const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true // Ensures 12-hour format (e.g., 3:00pm)
     });
-  
+
     const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true // Ensures 12-hour format (e.g., 3:00pm)
     });
-  
+
     // Return the formatted time range in the desired format
     return `${startTimeFormatted} - ${endTimeFormatted}`;
-  }
+}
 
-//   export function secondstoMinutes(seconds) {
-//     const hours = Math.floor(seconds / 3600);
-//     const minutes = Math.floor((seconds % 3600) / 60);
-
-//     if (hours > 0) {
-//         // Format for hours and minutes (e.g., "1:20 hrs")
-//         return `${hours}:${String(minutes).padStart(2, '0')} hrs`;
-//     } else {
-//         // Format for minutes only (e.g., "00:15 mins")
-//         return `${String(minutes).padStart(2, '0')} mins`;
-//     }
-// }
 
 export function secondstoMinutes(seconds) {
     if( seconds < 60 ){
@@ -374,4 +386,23 @@ export function secondstoMinutes(seconds) {
     }
   }
   
+  export function convertSecondstoTime(totalSeconds) { console.log("totalSeconds:: ", totalSeconds)
+    if (totalSeconds === 0 || totalSeconds == null) {
+        return `00:00`;
+    } else if (totalSeconds < 60) {
+        return `${totalSeconds} seconds`;
+    }
 
+    const hours = Math.floor(totalSeconds / 3600);
+    const remainingSecondsAfterHours = totalSeconds % 3600;
+    const minutes = Math.floor(remainingSecondsAfterHours / 60);
+    const seconds = remainingSecondsAfterHours % 60;
+
+    console.log(`Hours: ${hours}, Minutes: ${minutes}, Seconds: ${seconds}`); // Debugging step
+
+    // Pad hours and minutes to ensure two-digit format
+    const paddedHours = hours.toString().padStart(2, '0');
+    const paddedMinutes = minutes.toString().padStart(2, '0');
+
+    return `${paddedHours}:${paddedMinutes}`;
+}
