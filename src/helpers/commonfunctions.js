@@ -363,9 +363,9 @@ const getDayWithSuffix = (day) => {
         minute: '2-digit',
         hour12: true // Ensures 12-hour format (e.g., 3:00pm)
     });
-
+    const totaltime = convertSecondstoTime(duration)
     // Return the formatted time range in the desired format
-    return `${startTimeFormatted} - ${endTimeFormatted}`;
+    return `${startTimeFormatted} - ${endTimeFormatted} (${totaltime})`;
 }
 
 
@@ -386,7 +386,7 @@ export function secondstoMinutes(seconds) {
     }
   }
   
-  export function convertSecondstoTime(totalSeconds) { console.log("totalSeconds:: ", totalSeconds)
+  export function convertSecondstoTime(totalSeconds) { 
     if (totalSeconds === 0 || totalSeconds == null) {
         return `00:00`;
     } else if (totalSeconds < 60) {
@@ -397,9 +397,6 @@ export function secondstoMinutes(seconds) {
     const remainingSecondsAfterHours = totalSeconds % 3600;
     const minutes = Math.floor(remainingSecondsAfterHours / 60);
     const seconds = remainingSecondsAfterHours % 60;
-
-    console.log(`Hours: ${hours}, Minutes: ${minutes}, Seconds: ${seconds}`); // Debugging step
-
     // Pad hours and minutes to ensure two-digit format
     const paddedHours = hours.toString().padStart(2, '0');
     const paddedMinutes = minutes.toString().padStart(2, '0');

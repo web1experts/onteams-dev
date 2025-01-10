@@ -82,6 +82,21 @@ export const addManualTime = (payload) => {
   };
 }
 
+export const addRemarkstoProject = (payload) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('reports','/add_remarks', payload)
+      if (response.data && response.data.success) {
+         await dispatch({ type: REPORTS_SUCCESS, payload: response.data });
+      } else {
+         await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
 export const getSingleProjectReport = (projectId) => {
   return async (dispatch) => {
     try {

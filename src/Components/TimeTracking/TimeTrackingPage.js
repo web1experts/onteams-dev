@@ -840,7 +840,8 @@ function extractTimeFromISO(createdAt, duration) {
             <>
               <div className="current--player p-3" key={`activity-${currentActivity?._id}`}>
                 <div className="timer--task">
-                  <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
+                  
+                  <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } [{currentActivity?.latestActivity?.project?.client?.name}] - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
                   <span className="ms-md-3">{ currentActivity?.latestActivity?.app_version}</span>
                   <p className="task--timer">
                     <span><strong>{ convertSecondstoTime(currentActivity?.totalTaskDuration) || '00:00'}</strong></span>
@@ -892,7 +893,7 @@ function extractTimeFromISO(createdAt, duration) {
                       
                         <Accordion.Header>
                           <p>
-                            <span>Project: {recording?.project?.title}</span>
+                            <span>{recording?.project?.title}</span>
                             <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
                             <strong>{ generateTimeRange(recording?.createdAt, recording?.duration)}</strong>
                           </p>

@@ -4,10 +4,10 @@ import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Dropdown, CardGroup, Badge } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaPlay, FaCheck, FaAngleRight, FaPlus, FaTrash } from "react-icons/fa";
+import { FaRegEdit, FaCheck, FaAngleRight, FaPlus, FaTrash } from "react-icons/fa";
 import { secondstoMinutes, showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { MdFilterList } from "react-icons/md";
-import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport } from "../../redux/actions/report.action";
+import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import { ListProjects, ListMemberProjects } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
@@ -19,7 +19,8 @@ function ReportsPage() {
   const memberdata = getMemberdata()
   const fullscreenRef = React.useRef(null);
   const [fields, setFields] = useState({date: new Date()})
-  
+  const [ remarksActive ,setremarksActive] = useState(false)
+  const [remarks, setRemarks] = useState('')
   const [ loader, setLoader] = useState(false)
   const [show, setShow] = useState(false);
   const [spinner, setSpinner] = useState(false)
@@ -27,6 +28,19 @@ function ReportsPage() {
     setShow(false);
     setFields({})
     setEntries([])
+  }
+  const handleRemarks = () => {
+    setremarksActive(current => !current)
+    if (selectedReport?.projectmeta && selectedReport.projectmeta.length > 0) {
+      const remarksMeta = selectedReport.projectmeta.find(meta => meta.meta_key === "remarks");
+    
+      if (remarksMeta) {
+        setRemarks(remarksMeta.meta_value);
+      }
+    }
+  }
+  const handleRemarksChange = (e) => {
+    setRemarks(e.target.value)
   }
   const handleShow = () => setShow(true);
   const memberFeed = useSelector((state) => state.member.members)
@@ -43,7 +57,7 @@ function ReportsPage() {
   const [ singleprojectReport , setsingleProjectReport] = useState({})
   const options = { day: '2-digit', month: 'long', year: 'numeric' };
   const [screenshotTab, setScreenshotTab] = useState('Screenshots');
-
+  const [ selectedReport, setSelectedReport] = useState({})
   const [view, setView] = useState('group')
   const [occupiedRanges, setOccupiedRanges] = useState([])
   const [timeSlots, setTimeslots] = useState([])
@@ -81,10 +95,15 @@ function ReportsPage() {
     setSelectedTask(value)
   }
   
+  const saveRemarks = (project_id) => {
+    setLoader( true )
+    const payload = { project_id: project_id, remarks: remarks, date: filtereddate }
+    dispatch(addRemarkstoProject(payload))
+  }
 
   const handlefilterchange = (name, value) => {
     setFilters({ ...filters, [name]: value })
-    if( name === 'sort_by' && value === "projects"){
+    if( name === 'sort_by'){
       setTimeout(function(){
         selectboxObserver()
       },10)
@@ -503,9 +522,10 @@ const handleReportSubmit = async (e) => {
 useEffect(() => {
   setLoader(false)
   if (reportState.success) {
-      // setFields({})
-      // setEntries([])
+      setFields({date: new Date()})
+      handleReports()
       handleClose()
+      setremarksActive( false )
   }
 }, [reportState])
 
@@ -624,11 +644,9 @@ const TaskList = ({ report }) => {
     setReportOpen(true)
   }
 
-  const gettaskTab = (tabid) => { console.log(report?.project?.workflow?.tabs);
-    console.log('tab to find:: ', tabid)
+  const gettaskTab = (tabid) => { 
     if( report?.project?.workflow?.tabs?.length > 0){
       const matchedTabTitle = report.project.workflow.tabs.find(tab => tab._id === tabid)?.title;
-      console.log("matchedTabTitle", matchedTabTitle)
       return <Badge bg="info">{matchedTabTitle}</Badge>
     }
     return null;
@@ -961,7 +979,7 @@ const TaskList = ({ report }) => {
                       <Accordion.Item eventKey={index} key={`accord-item-${report?.project?._id}`}>
                         <div className="screens--tabs">
                           <Accordion.Header>
-                            Project: {report?.project?.title} <br />
+                            {report?.project?.title} <br />
                           </Accordion.Header>
                         </div>
                         <Accordion.Body>
@@ -1051,11 +1069,9 @@ const TaskList = ({ report }) => {
                       return (
                       <>
                       
-                      <Accordion.Item eventKey={index}>
+                      <Accordion.Item eventKey={index} onClick={() => {setSelectedReport(report?.project)}}>
                         <div className="screens--tabs">
-                          <Accordion.Header>{report?.project?.title} <br />
-                          {/* Client: {report?.project?.client?.name} <br />
-                          Time spent:  {calculateTotalTime(report?.activities)} */}
+                          <Accordion.Header>{report?.project?.title}
                           </Accordion.Header>
                         </div>
                         <Accordion.Body>
@@ -1080,23 +1096,44 @@ const TaskList = ({ report }) => {
                                 </p>
                               </div>
                             </Col>
-                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
-                              <label>Remarks</label>
-                              {
-                                report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                report?.project?.projectmeta.map((meta) => {
-                                  if(meta.meta_key === 'remarks'){
-                                    return <pre>{meta.meta_value}</pre>
-                                  }else{
-                                    return null
-                                  }
-                                })
-                              }
-                            </Col>
+                            
                             <Col sm={12}>
                               <label>Tasks</label>
                               <TaskList report={report} />
                               
+                            </Col>
+                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                              <label>Remarks</label>
+                              
+                              {
+                                remarksActive === true ? 
+                                <>
+                                  <Form.Group className="mb-0 form-group">
+                                    
+                                    <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
+                                      
+                                    </textarea>
+                                  </Form.Group>
+                                  <Button variant="primary" onClick={() => {
+                                    saveRemarks(report?.project?._id)
+                                  }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
+                                  <Button variant="danger" onClick={handleRemarks}>Cancel</Button>
+                                </>
+                                :
+                                <>
+                                  <FaRegEdit onClick={handleRemarks} />
+                                  {
+                                  report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                  report?.project?.projectmeta.map((meta) => {
+                                    if(meta.meta_key === 'remarks'){
+                                      return <pre>{meta.meta_value}</pre>
+                                    }else{
+                                      return null
+                                    }
+                                  })
+                                }
+                                </>
+                              }
                             </Col>
                           </Row>
                           
@@ -1205,7 +1242,7 @@ const TaskList = ({ report }) => {
                     projectReports.map((report, index) => {
                       return (
                       <>
-                      <Accordion.Item eventKey={index}>
+                      <Accordion.Item eventKey={index} onClick={() => {setSelectedReport(report?.project)}}>
                         <div className="screens--tabs">
                           <Accordion.Header>{report?.member?.name} </Accordion.Header>
                         </div>
@@ -1231,24 +1268,45 @@ const TaskList = ({ report }) => {
                                 </p>
                               </div>
                             </Col>
-                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
-                              <label>Remarks</label>
-                              {
-                                report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                report?.project?.projectmeta.map((meta) => {
-                                  if(meta.meta_key === 'remarks'){
-                                    return <pre>{meta.meta_value}</pre>
-                                  }else{
-                                    return null
-                                  }
-                                })
-                              }
-                              
-                            </Col>
+                            
                             <Col sm={12}>
                               <label>Tasks</label>
                               
                                <TaskList report={report} />
+                            </Col>
+                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
+                              <label>Remarks</label>
+                              
+                              {
+                                remarksActive === true ? 
+                                <>
+                                  <Form.Group className="mb-0 form-group">
+                                    
+                                    <textarea class="form-control mt-4" rows={7} data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
+                                      
+                                    </textarea>
+                                  </Form.Group>
+                                  <Button variant="primary" onClick={() => {
+                                    saveRemarks(report?.project?._id)
+                                  }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
+                                  <Button variant="danger" onClick={handleRemarks}>Cancel</Button>
+                                </>
+                              :
+                              <>
+                                <FaRegEdit onClick={handleRemarks} />
+                                {
+                                  report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                  report?.project?.projectmeta.map((meta) => {
+                                    if(meta.meta_key === 'remarks'){
+                                      return <pre>{meta.meta_value}</pre>
+                                    }else{
+                                      return null
+                                    }
+                                  })
+                                }
+                                </>
+                              }
+                              
                             </Col>
                           </Row>
                           
@@ -1544,15 +1602,6 @@ const TaskList = ({ report }) => {
                     </Row>
                   ))
                 }
-              
-              <Row>
-                <Col sm={12} lg={12}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Remarks</Form.Label>
-                    <Form.Control as="textarea" placeholder="Please mention the complete details of the project with the Project URL, Screenshots, credentials, or whatever you think is important for the testing of the completed tasks." name="remarks" onChange={handlechange} rows={3} />
-                  </Form.Group>
-                </Col>
-              </Row>
           </Form>
         </Modal.Body>
         <Modal.Footer>

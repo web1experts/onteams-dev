@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Form, Dropdown, ListGroup, Table, Modal, Button } from "react-bootstrap";
 import { FaEllipsisV, FaCheck } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
-import { formatDateinString } from "../../helpers/commonfunctions";
+import { formatDateinString, selectboxObserver } from "../../helpers/commonfunctions";
 import { ListAttendance } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import DatePicker from "react-multi-date-picker";
@@ -36,6 +36,7 @@ function AttendancePage() {
     // selectboxObserver()
     dispatch(Listmembers(0, '', false));
     handleAttendanceList()
+    selectboxObserver()
   },[])
 
   useEffect(() => {
@@ -53,10 +54,6 @@ function AttendancePage() {
       setAttendances(attendanceFeed)
     }
   }, [attendanceFeed])
-
-  useEffect(() => {
-   console.log("attendances:: ", attendances)
-  }, [attendances])
 
   return (
     <>
@@ -150,20 +147,7 @@ function AttendancePage() {
                             <td key={`${attendance.memberId}-${attendanceIndex}`}>{attendance.status}</td>
                         ))
                       )}  
-                    {/* {attendanceDate.dailyAttendance.map((attendance, idx) => (
-                      <td key={attendance.memberId}>
-                        {attendance.status}
-                      </td>
-                    ))} */}
-                    {/* <td className="text-end">
-                      <Dropdown>
-                        <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item href="#/action-1">Edit</Dropdown.Item>
-                          <Dropdown.Item href="#/action-2">Delete</Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </td> */}
+                    
                   </tr>
                 ))}
                   
@@ -201,9 +185,9 @@ function AttendancePage() {
                           <td>{attendanceIndex === 0 ? formatDateinString(attendanceDate.date) : ''}</td>
                           <td>{attendance.time_in}</td>
                           <td>{attendance.time_out}</td>
-                          <td>{attendance.logged_time}</td>
-                          <td>--</td>
-                          <td>{attendance.logged_time}</td>
+                          <td>{attendance.tracked_time}</td>
+                          <td>{attendance.manual_time}</td>
+                          <td>{attendance.total_time}</td>
                           <td>{attendance.status}</td>
                         </tr>
                       ))
