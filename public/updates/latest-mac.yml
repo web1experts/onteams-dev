@@ -1,0 +1,8 @@
+version: 1.0.0
+files:
+  - url: https://app.onteams.ai/downloads/onteams-darwin-x64.zip
+    sha512: 9kjdU...
+    size: 98765432
+path: https://app.onteams.ai/downloads/onteams-darwin-x64.zip
+sha512: 9kjdU...
+releaseDate: '2024-02-21T12:34:56.789Z'

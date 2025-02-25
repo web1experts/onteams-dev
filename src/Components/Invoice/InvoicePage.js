@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Select2 from 'react-select2-wrapper';
 import { Container, Row, Col, Button, Form, ListGroup, Table, Modal, Card, Dropdown } from "react-bootstrap";
 import { FaPlus, FaCheck } from "react-icons/fa";
 import { MdOutlineClose } from "react-icons/md";

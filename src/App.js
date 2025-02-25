@@ -11,7 +11,6 @@ import { isAuth } from "./helpers/auth";
 import { refreshUserWorkspace } from "./redux/actions/auth.actions";
 import { checkifUserhasworkspace } from "./helpers/commonfunctions";
 import ToastAlerts from "./Components/toasts";
-import 'react-select2-wrapper/css/select2.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Styles/common.css';
 import './Styles/Sidebar.css';

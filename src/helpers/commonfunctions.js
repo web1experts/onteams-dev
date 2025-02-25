@@ -70,8 +70,6 @@ export function getMemberdata(){
     return memberData
 }
 
-
-
 export const roles =[
     { value: 'software-engineer', label: 'Software Engineer' },
     { value: 'web-designer', label: 'Web Designer' },
@@ -181,9 +179,6 @@ export function parseDateWithoutTimezone(dateString) {
 
     return replacedText;
 };
-
-
-
 
 export const sanitizeEmptyQuillValue = (value) => {
     const cleanValue = value.trim();
@@ -321,28 +316,6 @@ const getDayWithSuffix = (day) => {
     // Return the formatted string
     return `${dayName}, ${monthName} ${day}, ${year}`;
   }
-
-  // export function generateTimeRange(createdAt, duration) {
-  //   // Create Date objects from createdAt and duration
-  //   const startTime = new Date(createdAt);
-  //   const endTime = new Date(duration);
-  
-  //   // Format the start and end times using local time zone
-  //   const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
-  //       hour: '2-digit',
-  //       minute: '2-digit',
-  //       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-  //   });
-  
-  //   const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
-  //       hour: '2-digit',
-  //       minute: '2-digit',
-  //       hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-  //   });
-  
-  //   // Return the formatted time range in the desired format
-  //   return `${startTimeFormatted} - ${endTimeFormatted}`;
-  // }
 
   export function generateTimeRange(createdAt, duration) {
     // Create a Date object from createdAt

@@ -161,6 +161,9 @@ fieldset:disabled .btn {
   box-shadow: none !important;
   outline: none;
 }
+strong.activity-type-text {
+  text-transform: capitalize;
+}
 
 .btn-outline-primary:hover,
 .btn-outline-primary.focus,

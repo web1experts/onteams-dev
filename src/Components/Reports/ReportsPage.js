@@ -5,7 +5,8 @@ import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Dropdown, CardGroup, Badge } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaRegEdit, FaCheck, FaAngleRight, FaPlus, FaTrash } from "react-icons/fa";
-import { secondstoMinutes, showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
+import { BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
+import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { MdFilterList } from "react-icons/md";
 import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
@@ -24,6 +25,8 @@ function ReportsPage() {
   const [ loader, setLoader] = useState(false)
   const [show, setShow] = useState(false);
   const [spinner, setSpinner] = useState(false)
+  const [currentVideoPage, setCurrentVideoPage] = useState({});
+  const videosPerPage = 12; // Adjust as needed
   const handleClose = () => {
     setShow(false);
     setFields({})
@@ -135,7 +138,7 @@ function ReportsPage() {
       setEntries([]);
       if (taskFeed?.taskData && Object.keys(taskFeed.taskData).length > 0) {
           setTasksLists(taskFeed.taskData)
-          setFilteredTasks(taskFeed.taskData[selectedWorkflow].tasks)
+          setFilteredTasks(taskFeed?.taskData[selectedWorkflow]?.tasks)
           
       }
   }, [taskFeed, dispatch])
@@ -669,14 +672,30 @@ const TaskList = ({ report }) => {
           if (slide?.type === "video") {
             return (
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <video
+                <media-controller>
+                    <video
+                      slot="media"
+                      src={slide.src}
+                      crossorigin
+                      style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                    >
+                      
+                    </video>
+                    <media-control-bar>
+                       <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
+                      <media-play-button></media-play-button>
+                      <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
+                      <media-time-range></media-time-range>
+                    </media-control-bar>
+                  </media-controller>
+                {/* <video
                   controls
                   autoPlay={false}
                   style={{ maxHeight: "90vh", maxWidth: "100%" }}
                 >
                   <source src={slide.src} type="video/webm" />
                   Your browser does not support the video tag.
-                </video>
+                </video> */}
               </div>
             );
           }
@@ -745,28 +764,95 @@ const TaskList = ({ report }) => {
               }
               if (activeTab === "videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
                 let idx = 0
-                return meta.meta_value.map((videoData, j) => {
-                  if(videoData.task !== taskId){return null}else{
-                    const currentIdx = idx;
-                    idx++;
-                      return (
-                        <Card key={`video-card-${i}-${j}`}>
-                          <Card.Body 
-                          onClick={() => triggerLightBox('video', meta.meta_value, currentIdx)}
-                          >
-                            <video controls height="175px">
-                              <source src={videoData?.url} type="video/webm" />
-                              Your browser does not support the video tag.
-                            </video>
-                            <p>
-                              <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                              <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                            </p>
-                          </Card.Body>
-                        </Card>
+                // return meta.meta_value.map((videoData, j) => {
+                //   if(videoData.task !== taskId){return null}else{
+                //     const currentIdx = idx;
+                //     idx++;
+                //       return (
+                //         <Card key={`video-card-${i}-${j}`}>
+                //           <Card.Body 
+                //           onClick={() => triggerLightBox('video', meta.meta_value, currentIdx)}
+                //           >
+                //             <video controls height="175px">
+                //               <source src={videoData?.url} type="video/webm" />
+                //               Your browser does not support the video tag.
+                //             </video>
+                //             <p>
+                //               <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                //               <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                //             </p>
+                //           </Card.Body>
+                //         </Card>
+                //       )
+                //     }
+                //   });
+                
+                return (
+                  <>
+                    {meta.meta_value
+                      .slice(
+                        ((currentVideoPage[`single-${report?.project?._id}`] || 1) - 1) * videosPerPage,
+                        (currentVideoPage[`single-${report?.project?._id}`] || 1) * videosPerPage
                       )
-                    }
-                  });
+                      .map((videoData, j) => {
+                        if(videoData.task !== taskId){return null}else{
+                              const currentIdx = idx;
+                              idx++;
+                              return (
+                            <Card key={`video-card-${report?.project?._id}-${currentVideoPage[`single-${report?.project?._id}`] || 1}-${j}`}>
+                              <Card.Body onClick={() => triggerLightBox("video", meta.meta_value, currentIdx)}>
+                                <video
+                                  height="175px"
+                                  preload="metadata"
+                                  muted
+                                  onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
+                                  controls={false}
+                                >
+                                  <source src={videoData?.url} type="video/webm" />
+                                  Your browser does not support the video tag.
+                                </video>
+                                <p>
+                                  <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                </p>
+                              </Card.Body>
+                            </Card>
+                          )
+                        }
+                    })}
+              
+                    {/* Pagination Controls */}
+                    <div style={{ marginTop: "10px", textAlign: "center" }}>
+                      <Button variant="outline-primary"
+                        disabled={(currentVideoPage[`single-${report?.project?._id}`] || 1) === 1}
+                        onClick={() =>
+                          setCurrentVideoPage((prev) => ({
+                            ...prev,
+                            [`single-${report?.project?._id}`]: (prev[`single-${report?.project?._id}`] || 1) - 1,
+                          }))
+                        }
+                      >
+                        <BsArrowLeftCircleFill />
+                      </Button>
+              
+                      <span style={{ margin: "0 10px" }}>
+                        Page {currentVideoPage[`single-${report?.project?._id}`] || 1} of {Math.ceil(meta.meta_value.length / videosPerPage)}
+                      </span>
+              
+                      <Button variant="outline-primary"
+                        disabled={(currentVideoPage[`single-${report?.project?._id}`] || 1) >= Math.ceil(meta.meta_value.length / videosPerPage)}
+                        onClick={() =>
+                          setCurrentVideoPage((prev) => ({
+                            ...prev,
+                            [`single-${report?.project?._id}`]: (prev[`single-${report?.project?._id}`] || 1) + 1,
+                          }))
+                        }
+                      >
+                        <BsArrowRightCircleFill />
+                      </Button>
+                    </div>
+                  </>
+                );
                 
               }
               return null; // Return null if no condition is met
@@ -967,16 +1053,17 @@ const TaskList = ({ report }) => {
           <Container fluid>
           <div className="reports-section">
           <div className="rounded--box activity--box" key='activity-box'>
-            <Accordion defaultActiveKey="0">
+            
               {
                 filters['sort_by'] === 'members' ?
                   memberReports && memberReports.length > 0 ? 
                   view === 'group' ?
-                    memberReports.map((report, index) => {
+                    <Accordion>
+                    {memberReports.map((report, index) => {
                       return (
                       <>
                       
-                      <Accordion.Item eventKey={index} key={`accord-item-${report?.project?._id}`}>
+                      <Accordion.Item eventKey={`group-accord-item-${report?.project?._id}`} key={`group-accord-item-${report?.project?._id}`}>
                         <div className="screens--tabs">
                           <Accordion.Header>
                             {report?.project?.title} <br />
@@ -1034,21 +1121,81 @@ const TaskList = ({ report }) => {
 
                                       // Handle videos tab
                                       if (screenshotTab === "Videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((videoData, j) => (
-                                          <Card key={`video-card-${i}-${j}`}>
-                                            <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                              <video controls height="175px">
-                                                <source src={videoData?.url} type="video/webm" />
-                                                Your browser does not support the video tag.
-                                              </video>
-                                              <p>
-                                                <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                                <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
-                                                <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ));
+                                        return (
+                                          <>
+                                            {meta.meta_value
+                                              .slice(
+                                                ((currentVideoPage[report?.project?._id] || 1) - 1) * videosPerPage,
+                                                (currentVideoPage[report?.project?._id] || 1) * videosPerPage
+                                              )
+                                              .map((videoData, j) => (
+                                                <Card key={`video-card-${report?.project?._id}-${currentVideoPage[report?.project?._id] || 1}-${i}-${j}`}>
+                                                  <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
+                                                    <video
+                                                      height="175px"
+                                                      preload="metadata"
+                                                      muted
+                                                      onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
+                                                    >
+                                                      <source src={videoData?.url} type="video/webm" />
+                                                      Your browser does not support the video tag.
+                                                    </video>
+                                                    <p>
+                                                    <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                                                    <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
+                                                    <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                    </p>
+                                                  </Card.Body>
+                                                </Card>
+                                              ))}
+                                      
+                                            {/* Pagination Controls */}
+                                            <div style={{ marginTop: "10px", textAlign: "center" }}>
+                                              <Button variant="outline-primary"
+                                                disabled={(currentVideoPage[report?.project?._id] || 1) === 1}
+                                                onClick={() =>
+                                                  setCurrentVideoPage((prev) => ({
+                                                    ...prev,
+                                                    [report?.project?._id]: (prev[report?.project?._id] || 1) - 1,
+                                                  }))
+                                                }
+                                              >
+                                                <BsArrowLeftCircleFill />
+                                              </Button>
+                                      
+                                              <span style={{ margin: "0 10px" }}>
+                                                Page {currentVideoPage[report?.project?._id] || 1} of {Math.ceil(meta.meta_value.length / videosPerPage)}
+                                              </span>
+                                      
+                                              <Button variant="outline-primary"
+                                                disabled={(currentVideoPage[report?.project?._id] || 1) >= Math.ceil(meta.meta_value.length / videosPerPage)}
+                                                onClick={() =>
+                                                  setCurrentVideoPage((prev) => ({
+                                                    ...prev,
+                                                    [report?.project?._id]: (prev[report?.project?._id] || 1) + 1,
+                                                  }))
+                                                }
+                                              >
+                                                <BsArrowRightCircleFill />
+                                              </Button>
+                                            </div>
+                                          </>
+                                        );
+                                        // return meta.meta_value.map((videoData, j) => (
+                                        //   <Card key={`video-card-${i}-${j}`}>
+                                        //     <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
+                                        //       <video controls height="175px">
+                                        //         <source src={videoData?.url} type="video/webm" />
+                                        //         Your browser does not support the video tag.
+                                        //       </video>
+                                        //       <p>
+                                        //         <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                                        //         <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
+                                        //         <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                        //       </p>
+                                        //     </Card.Body>
+                                        //   </Card>
+                                        // ));
                                       }
 
                                       return null; // Return null if no condition is met
@@ -1064,12 +1211,16 @@ const TaskList = ({ report }) => {
                       </>
                       )
                     })
+                    }
+                    </Accordion>
+                    
                     :
-                    memberReports.map((report, index) => {
+                    <Accordion>
+                    {memberReports.map((report, index) => {
                       return (
                       <>
                       
-                      <Accordion.Item eventKey={index} onClick={() => {setSelectedReport(report?.project)}}>
+                      <Accordion.Item key={`single-accord-item-${report?.project?._id}`} eventKey={`single-accord-item-${report?.project?._id}`} onClick={() => {setSelectedReport(report?.project)}}>
                         <div className="screens--tabs">
                           <Accordion.Header>{report?.project?.title}
                           </Accordion.Header>
@@ -1102,57 +1253,61 @@ const TaskList = ({ report }) => {
                               <TaskList report={report} />
                               
                             </Col>
-                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
-                              <label>Remarks</label>
-                              
-                              {
-                                remarksActive === true ? 
-                                <>
-                                  <Form.Group className="mb-0 form-group">
-                                    
-                                    <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
+                            { memberdata?._id === filters?.member &&
+                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                                <label>Remarks</label>
+                                
+                                {
+                                  remarksActive === true ? 
+                                  <>
+                                    <Form.Group className="mb-0 form-group">
                                       
-                                    </textarea>
-                                  </Form.Group>
-                                  <Button variant="primary" onClick={() => {
-                                    saveRemarks(report?.project?._id)
-                                  }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
-                                  <Button variant="danger" onClick={handleRemarks}>Cancel</Button>
-                                </>
-                                :
-                                <>
-                                  <FaRegEdit onClick={handleRemarks} />
-                                  {
-                                  report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                  report?.project?.projectmeta.map((meta) => {
-                                    if(meta.meta_key === 'remarks'){
-                                      return <pre>{meta.meta_value}</pre>
-                                    }else{
-                                      return null
-                                    }
-                                  })
+                                      <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
+                                        
+                                      </textarea>
+                                    </Form.Group>
+                                    <Button variant="primary" onClick={() => {
+                                      saveRemarks(report?.project?._id)
+                                    }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
+                                    <Button variant="danger" onClick={handleRemarks}>Cancel</Button>
+                                  </>
+                                  :
+                                  <>
+                                    <FaRegEdit onClick={handleRemarks} />
+                                    {
+                                    report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                    report?.project?.projectmeta.map((meta) => {
+                                      if(meta.meta_key === 'remarks'){
+                                        return <pre>{meta.meta_value}</pre>
+                                      }else{
+                                        return null
+                                      }
+                                    })
+                                  }
+                                  </>
                                 }
-                                </>
-                              }
-                            </Col>
+                              </Col>
+                            }
                           </Row>
                           
                           </Accordion.Body>
                         </Accordion.Item>
                       </>
                       )
-                    })
+                    })}
+                    </Accordion>
                   :
                   <p className="text-center mt-5">No activity available.</p>
                   :
 
                   projectReports && projectReports.length > 0 ? 
                     view === 'group' ?
-                    projectReports.map((report, index) => {
+                    <Accordion>
+                    {projectReports.map((report, index) => {
                       return (
                       <>
                       
-                      <Accordion.Item eventKey={index}>
+                      <Accordion.Item eventKey={`member-group-accord-item-${report?.member?._id}`} key={`member-group-accord-item-${report?.member?._id}`}>
                         <div className="screens--tabs">
                           <Accordion.Header>Member: {report?.member?.name}</Accordion.Header>
                         </div>
@@ -1237,12 +1392,14 @@ const TaskList = ({ report }) => {
                         </Accordion.Item>
                       </>
                       )
-                    })
+                    })}
+                    </Accordion>
                     :
-                    projectReports.map((report, index) => {
+                    <Accordion>
+                    {projectReports.map((report, index) => {
                       return (
                       <>
-                      <Accordion.Item eventKey={index} onClick={() => {setSelectedReport(report?.project)}}>
+                      <Accordion.Item eventKey={`single-member-accord-item-${report?.member?._id}`} key={`single-member-accord-item-${report?.member?._id}`} onClick={() => {setSelectedReport(report?.project)}}>
                         <div className="screens--tabs">
                           <Accordion.Header>{report?.member?.name} </Accordion.Header>
                         </div>
@@ -1314,12 +1471,12 @@ const TaskList = ({ report }) => {
                         </Accordion.Item>
                       </>
                       )
-                    })
-
+                    })}
+                    </Accordion>
                   :
                   <p className="text-center mt-5">No activity available.</p>
               }
-            </Accordion> 
+             
             </div>
             </div>
           </Container>

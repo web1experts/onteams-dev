@@ -6,13 +6,14 @@ import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, 
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise } from "react-icons/bs";
+import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
 import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket } from "../../helpers/auth";
 import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
+
 function TimeTrackingPage() {
   let totalhours = 0;
   let totalProjecthours = 0
@@ -56,6 +57,8 @@ function TimeTrackingPage() {
   const handleFilterShow = () => setFilterShow(true);
   const [ date, setDate ] = useState('')
   const [ filtereddate, setFilteredDate ] = useState([new Date().toISOString().split('T')[0]])
+  const [currentVideoPage, setCurrentVideoPage] = useState({});
+  const videosPerPage = 12; // Adjust as needed
   
   const [selectedFilter, setSelectedFilter ] = useState('today')
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -64,6 +67,7 @@ function TimeTrackingPage() {
   const handleSearchShow = () => setSearchShow(true);
 
   const videoRef = useRef(null);
+  const videoPlyrRef = useRef(null)
     const peerConnections = {}
     function startsharing(userID, status){
       socket.emit('joinRoom', userID)
@@ -131,6 +135,29 @@ function TimeTrackingPage() {
         handleLiveActivityList()
     }
   }, [filters])
+
+  /*useEffect(() => {
+    if (open) {
+      const player = new Plyr(videoPlyrRef.current, {
+        controls: [
+          "play",
+          "rewind",
+          "fast-forward",
+          "progress",
+          "current-time",
+          "mute",
+          "volume",
+          "settings",
+          "fullscreen",
+        ],
+        settings: ["speed", "quality"],
+      });
+
+      return () => {
+        player.destroy();
+      };
+    }
+  }, [open]);*/
 
 
   useEffect(() => {
@@ -571,6 +598,8 @@ function extractTimeFromISO(createdAt, duration) {
 
   const getActiveTab = (recordingId) => screenshotTab[recordingId] || "Screenshots";
 
+  
+
   return (
     <>
       <Lightbox
@@ -588,14 +617,31 @@ function extractTimeFromISO(createdAt, duration) {
             if (slide?.type === "video") {
               return (
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                  <video
+                  <media-controller>
+                    <video
+                      slot="media"
+                      src={slide.src}
+                      crossorigin
+                      style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                    >
+                      
+                    </video>
+                    <media-control-bar>
+                       <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
+                      <media-play-button></media-play-button>
+                      <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
+                      <media-time-range></media-time-range>
+                    </media-control-bar>
+                  </media-controller>
+                  {/* <video
                     controls
                     autoPlay={false}
                     style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                    ref={videoPlyrRef} className="plyr"
                   >
                     <source src={slide.src} type="video/webm" />
                     Your browser does not support the video tag.
-                  </video>
+                  </video> */}
                 </div>
               );
             }
@@ -881,21 +927,22 @@ function extractTimeFromISO(createdAt, duration) {
           )}
           {activeInnerTab === "InnerRecorded" && (
             <>
-            <Accordion defaultActiveKey="0">
+            <Accordion>
               {
                 recordedactivities && recordedactivities.length > 0 ? 
                   recordedactivities.map((recording, index) => {
                     return (
                     <>
                     
-                    <Accordion.Item eventKey={index}>
+                    <Accordion.Item eventKey={`screenshot-${recording?._id}-${index}`}>
                       <div className="screens--tabs">
                       
                         <Accordion.Header>
                           <p>
-                            <span>{recording?.project?.title}</span>
+                            <span>{recording?.project?.title} [{recording?.project?.client?.name}]</span>
                             <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
                             <strong>{ generateTimeRange(recording?.createdAt, recording?.duration)}</strong>
+                            <strong className="activity-type-text">Activity Type: {recording?.type }</strong>
                           </p>
                         </Accordion.Header>
                       </div>
@@ -926,21 +973,67 @@ function extractTimeFromISO(createdAt, duration) {
                                 }
 
                                 // Handle videos tab
-                                if (screenshotTab === "Videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                                  return meta.meta_value.map((videoData, j) => (
-                                    <Card key={`video-card-${i}-${j}`}>
-                                      <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                        <video controls height="175px">
-                                          <source src={videoData?.url} type="video/webm" />
-                                          Your browser does not support the video tag.
-                                        </video>
-                                        <p>
-                                          <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                          <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                        </p>
-                                      </Card.Body>
-                                    </Card>
-                                  ));
+                                if (screenshotTab === "Videos" && meta.meta_key === "videos" && meta.meta_value.length > 0) {
+                                  return (
+                                    <>
+                                      {meta.meta_value
+                                        .slice(
+                                          ((currentVideoPage[recording?._id] || 1) - 1) * videosPerPage,
+                                          (currentVideoPage[recording?._id] || 1) * videosPerPage
+                                        )
+                                        .map((videoData, j) => (
+                                          <Card key={`video-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
+                                            <Card.Body onClick={() => handleLightBox("video", meta.meta_value, j)}>
+                                              <video
+                                                height="175px"
+                                                preload="metadata"
+                                                muted
+                                                onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
+                                                controls={false}
+                                              >
+                                                <source src={videoData?.url} type="video/webm" />
+                                                Your browser does not support the video tag.
+                                              </video>
+                                              <p>
+                                                <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                                                <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                              </p>
+                                            </Card.Body>
+                                          </Card>
+                                        ))}
+                                
+                                      {/* Pagination Controls */}
+                                      <div style={{ marginTop: "10px", textAlign: "center" }}>
+                                        <Button variant="outline-primary"
+                                          disabled={(currentVideoPage[recording?._id] || 1) === 1}
+                                          onClick={() =>
+                                            setCurrentVideoPage((prev) => ({
+                                              ...prev,
+                                              [recording?._id]: (prev[recording?._id] || 1) - 1,
+                                            }))
+                                          }
+                                        >
+                                          <BsArrowLeftCircleFill />
+                                        </Button>
+                                
+                                        <span style={{ margin: "0 10px" }}>
+                                          Page {currentVideoPage[recording?._id] || 1} of {Math.ceil(meta.meta_value.length / videosPerPage)}
+                                        </span>
+                                
+                                        <Button variant="outline-primary"
+                                          disabled={(currentVideoPage[recording?._id] || 1) >= Math.ceil(meta.meta_value.length / videosPerPage)}
+                                          onClick={() =>
+                                            setCurrentVideoPage((prev) => ({
+                                              ...prev,
+                                              [recording?._id]: (prev[recording?._id] || 1) + 1,
+                                            }))
+                                          }
+                                        >
+                                          <BsArrowRightCircleFill />
+                                        </Button>
+                                      </div>
+                                    </>
+                                  );
                                 }
 
                                 return null; // Return null if no condition is met

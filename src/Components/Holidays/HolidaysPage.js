@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Select2 from 'react-select2-wrapper';
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Dropdown, ListGroup, Table } from "react-bootstrap";
 import { FaEllipsisV, FaPlus, FaCheck } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
