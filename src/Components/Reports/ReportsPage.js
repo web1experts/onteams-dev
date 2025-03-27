@@ -13,6 +13,8 @@ import { Listmembers } from "../../redux/actions/members.action";
 import { ListProjects, ListMemberProjects } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
 import { ListTasks } from "../../redux/actions/task.action";
+import "media-chrome";
+import "media-chrome/dist/menu"
 function ReportsPage() {
   const dispatch = useDispatch()
   const datePickerRef = useRef(null)
@@ -663,6 +665,7 @@ const TaskList = ({ report }) => {
       slides={lightboxMedia}
       plugins={[Fullscreen]}
       fullscreen={{ ref: fullscreenrefrence }}
+      carousel={{ finite: lightboxMedia.length === 1 }}
       index={slideIndex}
       on={{
         click: () => fullscreenrefrence.current?.enter(),
@@ -676,16 +679,35 @@ const TaskList = ({ report }) => {
                     <video
                       slot="media"
                       src={slide.src}
-                      crossorigin
                       style={{ maxHeight: "90vh", maxWidth: "100%" }}
                     >
                       
                     </video>
+                    <media-settings-menu hidden anchor="auto">
+                      <media-settings-menu-item>
+                        Speed
+                        <media-playback-rate-menu slot="submenu" hidden rates="1 1.25 1.5 1.75 2 2.50 3 3.50 4 4.50 5 6 7 8 9 10">
+                          <div slot="title">Speed</div>
+                        </media-playback-rate-menu>
+                      </media-settings-menu-item>
+                      <media-settings-menu-item>
+                        Quality
+                        <media-rendition-menu slot="submenu" hidden>
+                          <div slot="title">Quality</div>
+                        </media-rendition-menu>
+                      </media-settings-menu-item>
+                      
+                    </media-settings-menu>
                     <media-control-bar>
+                    <media-play-button></media-play-button>
                        <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
-                      <media-play-button></media-play-button>
+                      
                       <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
-                      <media-time-range></media-time-range>
+                      <media-time-display></media-time-display>
+                      <media-time-range slot="center-controls"></media-time-range>
+                      <media-duration-display></media-duration-display><media-pip-button></media-pip-button>
+                      <media-fullscreen-button></media-fullscreen-button>
+                      <media-settings-menu-button></media-settings-menu-button>
                     </media-control-bar>
                   </media-controller>
                 {/* <video
@@ -1253,7 +1275,7 @@ const TaskList = ({ report }) => {
                               <TaskList report={report} />
                               
                             </Col>
-                            { memberdata?._id === filters?.member &&
+                            { memberdata?._id === filters?.member ?
                               <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
                                 <label>Remarks</label>
                                 
@@ -1286,6 +1308,20 @@ const TaskList = ({ report }) => {
                                   }
                                   </>
                                 }
+                              </Col>
+                              :
+                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                                <label>Remarks</label>
+                                    {
+                                    report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                    report?.project?.projectmeta.map((meta) => {
+                                      if(meta.meta_key === 'remarks'){
+                                        return <pre>{meta.meta_value}</pre>
+                                      }else{
+                                        return null
+                                      }
+                                    })
+                                  }
                               </Col>
                             }
                           </Row>

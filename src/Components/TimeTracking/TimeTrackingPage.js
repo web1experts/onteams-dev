@@ -13,6 +13,8 @@ import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket } from "../../helpers/auth";
 import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
+import "media-chrome";
+import "media-chrome/dist/menu";
 
 function TimeTrackingPage() {
   let totalhours = 0;
@@ -609,6 +611,7 @@ function extractTimeFromISO(createdAt, duration) {
         plugins={[Fullscreen]}
         fullscreen={{ ref: fullscreenRef }}
         index={currentIndex}
+        carousel={{ finite: postMedia.length === 1 }}
         on={{
           click: () => fullscreenRef.current?.enter(),
         }}
@@ -620,17 +623,38 @@ function extractTimeFromISO(createdAt, duration) {
                   <media-controller>
                     <video
                       slot="media"
+                      id="videoElement"
                       src={slide.src}
                       crossorigin
+                      type="video/webm"
                       style={{ maxHeight: "90vh", maxWidth: "100%" }}
                     >
                       
                     </video>
+                    <media-settings-menu hidden anchor="auto">
+                      <media-settings-menu-item>
+                        Speed
+                        <media-playback-rate-menu slot="submenu" hidden rates="1 1.25 1.5 1.75 2 2.50 3 3.50 4 4.50 5 6 7 8 9 10">
+                          <div slot="title">Speed</div>
+                        </media-playback-rate-menu>
+                      </media-settings-menu-item>
+                      <media-settings-menu-item>
+                        Quality
+                        <media-rendition-menu slot="submenu" hidden>
+                          <div slot="title">Quality</div>
+                        </media-rendition-menu>
+                      </media-settings-menu-item>
+                    </media-settings-menu>
                     <media-control-bar>
+                    <media-play-button></media-play-button>
                        <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
-                      <media-play-button></media-play-button>
                       <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
+                      <media-time-display></media-time-display>
                       <media-time-range></media-time-range>
+                      <media-duration-display></media-duration-display>
+                      <media-pip-button></media-pip-button>
+                      <media-fullscreen-button></media-fullscreen-button>
+                      <media-settings-menu-button></media-settings-menu-button>
                     </media-control-bar>
                   </media-controller>
                   {/* <video

@@ -15,6 +15,7 @@ import { createMember } from "../../redux/actions/members.action";
 import Invitation from "./Invitation";
 import { AlertDialog, TransferOnwerShip } from "../modals";
 import { selectboxObserver } from "../../helpers/commonfunctions";
+import { socket } from "../../helpers/auth";
 
 function EditableField({ selectedMember, field, label, value, onChange, isEditing, onEditClick, error, roles, printval }) {
   const inputRef = useRef(null);
@@ -158,6 +159,7 @@ function TeamMembersPage() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [loader, setLoader] = useState(false);
   const [updateloader, setUpdateLoader] = useState(false);
+  // const [memberMeta, setMemberMeta] = useState({})
   // const [disable, setDisable] = useState(true);
   const workspaceState = useSelector((state) => state.workspace);
   const [show, setShow] = useState(false);
@@ -236,7 +238,9 @@ function TeamMembersPage() {
 
   useEffect(() => {
     if (apiResult.success) {
-      // setDisable(false);
+      if(apiResult.updatedMember){
+        socket.emit('refresh_record_type', selectedMember?._id)
+      }
       setLoader(false);
       setUpdateLoader(false)
       setRows([{ email: "", role: "" }]);
@@ -254,6 +258,8 @@ function TeamMembersPage() {
       setIsActive(false);
       setShowDialog(false)
     }
+
+    
   }, [apiResult, workspaceState]);
 
   useEffect(() => {
@@ -281,8 +287,17 @@ function TeamMembersPage() {
       setEditedMember({
         name: selectedMember.name,
         role: selectedMember.role?._id,
-        rolename: selectedMember.role?.name
+        rolename: selectedMember.role?.name,
+        memberMeta: selectedMember?.memberMeta
       });
+      // if( selectedMember?.memberMetas && selectedMember?.memberMetas.length > 0){
+      //   const memberMeta = selectedMember?.memberMetas.reduce((acc, meta) => {
+      //     acc[meta.meta_key] = meta.meta_value;
+      //     return acc;
+      //   }, {});
+      //   setMemberMeta(memberMeta)
+      // }
+      
     }
   }, [selectedMember]);
 
@@ -302,20 +317,37 @@ function TeamMembersPage() {
         ...prevState,
         [field]: value.target.files[0],
       }));
-    } else {
+    } else if (field === "memberMeta") {
+      
+      console.log('role value: ', value.target.value)
+      const metakey = value.target.name;
+      const meta_value = value.target.value;
+
+      setEditedMember((prevState) => ({
+        ...prevState,
+        memberMeta: {
+          ...prevState.memberMeta,
+          [metakey]: meta_value,
+        },
+      }));
+
+    }
+    else if (field === "role") {
+      console.log('role value: ', value)
+      const matchingRole = roles.find(role => role._id === value);
+      setEditedMember((prevState) => ({
+        ...prevState,
+        ['rolename']: matchingRole?.name,
+      }));
+      if (value !== "") {
+        removeError(field);
+      }
+    }
+    else {
       setEditedMember((prevState) => ({
         ...prevState,
         [field]: value,
       }));
-
-      if (field === "role") {
-        console.log('role value: ', value)
-        const matchingRole = roles.find(role => role._id === value);
-        setEditedMember((prevState) => ({
-          ...prevState,
-          ['rolename']: matchingRole?.name,
-        }));
-      }
 
       if (value !== "") {
         removeError(field);
@@ -439,9 +471,15 @@ function TeamMembersPage() {
     return changes;
   };
 
+  const handleMetaChange = ({ target: { name, value } }) => {
+   
+  }
+
   const handleUpdateSubmit = async (event) => {
     event.preventDefault();
     const changes = compareMembers(selectedMember, editedMember);
+
+    
     if (Object.keys(changes).length > 0) {
 
       const updatedErrorsPromises = Object.entries(changes).map(async ([fieldName, value]) => {
@@ -477,12 +515,16 @@ function TeamMembersPage() {
           avatar: false
           // Add other usermeta fields
         });
-
+       
         if (Object.keys(changes).length > 0) {
           setUpdateLoader(true)
           const formData = new FormData();
           for (const [key, value] of Object.entries(changes)) {
-            formData.append(key, value);
+            if (typeof value === 'object') {
+              formData.append(key, JSON.stringify(value)); // Convert objects to JSON string
+            } else {
+              formData.append(key, value);
+            }
           }
           await dispatch(updateMember(selectedMember?._id, formData))
           //  setLoader(false)
@@ -491,6 +533,7 @@ function TeamMembersPage() {
     } else { }
   };
 
+  
   const pagetopbar = () => {
     return (
       <div className='page--title px-md-2 pt-3'>
@@ -640,6 +683,32 @@ function TeamMembersPage() {
                     roles={roles}
                   />
                 </ListGroup>
+                {currentMember &&
+                  Object.keys(currentMember).length > 0 &&
+                  currentMember.role?.slug !== "owner" &&
+                  selectedMember?.role?.slug === "owner" ? null : (currentMember &&
+                    Object.keys(currentMember).length > 0 &&
+                    currentMember.role?.permissions?.members ===
+                    "view_and_edit") ||
+                    selectedMember?._id === currentMember?._id ? (
+                  <>
+                    <ListGroup.Item>
+                      <strong>Recording Type</strong>
+                      <Form.Select className="form-control" id="member-meta" onChange={(event) => handleFieldChange("memberMeta", event)}
+                        value={editedMember?.memberMeta?.recording} name="recording">
+                        <option key={`both`} value='both'>Screenshot And Video</option>
+                        <option key={`screenshot_only`} value='screenshot_only'>Screenshot Only</option>
+                        <option key={`video_only`} value='video_only'>Video Only</option>
+                      </Form.Select>
+                    </ListGroup.Item>
+                  </>
+                ) : (
+
+                  <></>
+                )}
+                  
+                  
+                
               </Card.Text>
               <div className="text-end mt-3">
                 {currentMember &&
