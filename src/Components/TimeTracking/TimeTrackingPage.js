@@ -1005,26 +1005,43 @@ function extractTimeFromISO(createdAt, duration) {
                                           ((currentVideoPage[recording?._id] || 1) - 1) * videosPerPage,
                                           (currentVideoPage[recording?._id] || 1) * videosPerPage
                                         )
-                                        .map((videoData, j) => (
-                                          <Card key={`video-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
-                                            <Card.Body onClick={() => handleLightBox("video", meta.meta_value, j)}>
-                                              <video
-                                                height="175px"
-                                                preload="metadata"
-                                                muted
-                                                onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
-                                                controls={false}
-                                              >
-                                                <source src={videoData?.url} type="video/webm" />
-                                                Your browser does not support the video tag.
-                                              </video>
-                                              <p>
-                                                <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                                <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ))}
+                                        .map((videoData, j) =>
+                                          videoData?.url === 'video_disabled' ? (
+                                            <Card key={`blank-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
+                                              <Card.Body>
+                                                <img
+                                                  className="card-img-top"
+                                                  src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
+                                                  alt="screenshot"
+                                                />
+                                                <p>
+                                                  <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
+                                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                </p>
+                                              </Card.Body>
+                                            </Card>
+                                          ) : (
+                                            <Card key={`video-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
+                                              <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
+                                                <video
+                                                  height="175px"
+                                                  preload="metadata"
+                                                  muted
+                                                  onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
+                                                  controls={false}
+                                                >
+                                                  <source src={videoData?.url} type="video/webm" />
+                                                  Your browser does not support the video tag.
+                                                </video>
+                                                <p>
+                                                  <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
+                                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                </p>
+                                              </Card.Body>
+                                            </Card>
+                                          )
+                                        )}
+
                                 
                                       {/* Pagination Controls */}
                                       <div style={{ marginTop: "10px", textAlign: "center" }}>

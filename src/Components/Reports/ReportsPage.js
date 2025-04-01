@@ -1150,7 +1150,23 @@ const TaskList = ({ report }) => {
                                                 ((currentVideoPage[report?.project?._id] || 1) - 1) * videosPerPage,
                                                 (currentVideoPage[report?.project?._id] || 1) * videosPerPage
                                               )
-                                              .map((videoData, j) => (
+                                              .map((videoData, j) => 
+                                                videoData?.url === 'video_disabled' ? (
+                                                  <Card key={`blank-card-${report?.project?._id}-${currentVideoPage[report?.project?._id] || 1}-${i}-${j}`}>
+                                                    <Card.Body>
+                                                      <img
+                                                        className="card-img-top"
+                                                        src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
+                                                        alt="screenshot"
+                                                      />
+                                                      <p>
+                                                      <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                                                      <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
+                                                      <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                      </p>
+                                                    </Card.Body>
+                                                  </Card>
+                                                ) : (
                                                 <Card key={`video-card-${report?.project?._id}-${currentVideoPage[report?.project?._id] || 1}-${i}-${j}`}>
                                                   <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
                                                     <video
@@ -1203,21 +1219,7 @@ const TaskList = ({ report }) => {
                                             </div>
                                           </>
                                         );
-                                        // return meta.meta_value.map((videoData, j) => (
-                                        //   <Card key={`video-card-${i}-${j}`}>
-                                        //     <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                        //       <video controls height="175px">
-                                        //         <source src={videoData?.url} type="video/webm" />
-                                        //         Your browser does not support the video tag.
-                                        //       </video>
-                                        //       <p>
-                                        //         <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                        //         <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
-                                        //         <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                        //       </p>
-                                        //     </Card.Body>
-                                        //   </Card>
-                                        // ));
+                                        
                                       }
 
                                       return null; // Return null if no condition is met
@@ -1399,7 +1401,23 @@ const TaskList = ({ report }) => {
 
                                       // Handle videos tab
                                       if (screenshotTab === "Videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((videoData, j) => (
+                                        return meta.meta_value.map((videoData, j) => 
+                                          videoData?.url === 'video_disabled' ? (
+                                            <Card key={`video-card-${i}-${j}`}>
+                                              <Card.Body>
+                                                <img
+                                                  className="card-img-top"
+                                                  src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
+                                                  alt="screenshot"
+                                                />
+                                                <p>
+                                                  <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                                                  <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
+                                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                </p>
+                                              </Card.Body>
+                                            </Card>
+                                          ) : (
                                           <Card key={`video-card-${i}-${j}`}>
                                             <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
                                               <video controls height="175px">
