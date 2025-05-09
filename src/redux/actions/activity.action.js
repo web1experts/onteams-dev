@@ -5,7 +5,8 @@ import * as auth from '../../helpers/auth';
 import {
     ACTIVITY_COMMON_ERROR,
     LIVE_ACTIVITY_LIST_SUCCESS,
-    RECORDED_ACTIVITY_SUCCESS
+    RECORDED_ACTIVITY_SUCCESS,
+    RECORDING_DELETE_SUCCESS
 } from "./types";
 // console.log('Environment : ', process.env.NODE_ENV)
 const config = {
@@ -59,6 +60,24 @@ export const getRecoredActivity = (id, status, filtereddate) => {
     
       if (response.data && response.data.success) {
          await dispatch({ type: RECORDED_ACTIVITY_SUCCESS, payload: response.data });
+      } else {
+         await dispatch({ type: ACTIVITY_COMMON_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
+export const deleteRecoredActivity = (payload) => {
+
+  return async (dispatch) => {
+    try {
+
+      const response = await API.apiDeleteUrl('activity', '/recordings', payload)
+    
+      if (response.data && response.data.success) {
+         await dispatch({ type: RECORDING_DELETE_SUCCESS, payload: response.data });
       } else {
          await dispatch({ type: ACTIVITY_COMMON_ERROR, payload: response.data.message });
       }

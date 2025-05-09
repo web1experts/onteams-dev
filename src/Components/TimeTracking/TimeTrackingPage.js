@@ -8,7 +8,7 @@ import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
 import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
-import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
+import { getliveActivity, getRecoredActivity, deleteRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket, currentMemberProfile } from "../../helpers/auth";
 import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime } from "../../helpers/commonfunctions";
@@ -71,6 +71,30 @@ function TimeTrackingPage() {
 
   const videoRef = useRef(null);
   const videoPlyrRef = useRef(null)
+
+  const [selectedScreenshots, setSelectedScreenshots] = useState({});
+
+  const handleSelectRecording = (activityId, index) => {
+    setSelectedScreenshots(prev => {
+      const selectedForActivity = prev[activityId] || [];
+      const isSelected = selectedForActivity.includes(index);
+  
+      return {
+        ...prev,
+        [activityId]: isSelected
+          ? selectedForActivity.filter(i => i !== index)
+          : [...selectedForActivity, index]
+      };
+    });
+  };
+
+  const deleteRecordedData  = () => {
+    dispatch(deleteRecoredActivity({
+      type: screenshotTab.toLowerCase(),
+      data: selectedScreenshots
+    }))
+  }
+  
     const peerConnections = {}
     function startsharing(userID, status){
       socket.emit('joinRoom', userID)
@@ -146,28 +170,7 @@ function TimeTrackingPage() {
     }
   }, [filters])
 
-  /*useEffect(() => {
-    if (open) {
-      const player = new Plyr(videoPlyrRef.current, {
-        controls: [
-          "play",
-          "rewind",
-          "fast-forward",
-          "progress",
-          "current-time",
-          "mute",
-          "volume",
-          "settings",
-          "fullscreen",
-        ],
-        settings: ["speed", "quality"],
-      });
 
-      return () => {
-        player.destroy();
-      };
-    }
-  }, [open]);*/
 
 
   useEffect(() => {
@@ -301,7 +304,12 @@ function TimeTrackingPage() {
     }
 
     if( activitystate?.recordedActivity ){
+      setSelectedScreenshots({})
       setRecordedActivities(activitystate?.recordedActivity)
+    }
+
+    if(activitystate.success){
+      handleRecordedActivity()
     }
   }, [activitystate])
 
@@ -511,34 +519,6 @@ function TimeTrackingPage() {
     );
 };
 
-function extractTimeFromISO(createdAt, duration) {
-  if (createdAt && duration) {
-    // Parse the ISO strings to Date objects
-    const startDate = new Date(createdAt);
-    const endDate = new Date(duration);
-
-    // Calculate the difference in milliseconds
-    const diffInMilliseconds = endDate - startDate;
-    if (diffInMilliseconds < 0) {
-      return '00:00';
-    }
-    // Convert milliseconds to seconds
-    const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
-     // Check if the difference is less than 60 seconds
-     if (diffInSeconds < 60) {
-      return `${diffInSeconds} secs`;
-    }
-    // Calculate hours and minutes
-    const hours = Math.floor(diffInSeconds / 3600); // Total hours
-    const minutes = Math.floor((diffInSeconds % 3600) / 60); // Remaining minutes
-
-    // Format and return as hh:mm
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  }
-  return '00:00';
-}
-
-
   const showDate = () => {
     // if (activeInnerTab === 'InnerRecorded') {
       return (
@@ -588,6 +568,16 @@ function extractTimeFromISO(createdAt, duration) {
       return (
         <>
             <ListGroup horizontal className="screens--shots">
+            {
+              selectedScreenshots &&
+              Object.keys(selectedScreenshots).length > 0 &&
+              Object.values(selectedScreenshots).some(arr => arr.length > 0) && (
+                <ListGroup.Item key={'delete-group'} active={true} onClick={() => deleteRecordedData()}>
+                  Delete Selected
+                </ListGroup.Item>
+              )
+            }
+
               <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
                 Screenshots
               </ListGroup.Item>
@@ -989,6 +979,15 @@ function extractTimeFromISO(createdAt, duration) {
                                   return meta.meta_value.map((screenshotData, j) => (
                                     <Card key={`screenshot-card-${i}-${j}`}>
                                       <Card.Body>
+                                        { screenshotData?.is_deleted !== true && 
+                                          <div className="d-flex justify-content-between align-items-start">
+                                            <Form.Check
+                                              type="checkbox"
+                                              checked={selectedScreenshots[recording?._id]?.includes(j) || false}
+                                              onChange={() => handleSelectRecording(recording?._id, j)}
+                                            />
+                                          </div>
+                                        }
                                         <img
                                           className="card-img-top"
                                           src={screenshotData?.url}
@@ -1014,6 +1013,21 @@ function extractTimeFromISO(createdAt, duration) {
                                           (currentVideoPage[recording?._id] || 1) * videosPerPage
                                         )
                                         .map((videoData, j) =>
+                                          videoData?.is_deleted === true ? (
+                                            <Card key={`blank-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
+                                              <Card.Body>
+                                                <img
+                                                  className="card-img-top"
+                                                  src={videoData.url}
+                                                  alt="screenshot"
+                                                />
+                                                <p>
+                                                  <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
+                                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                </p>
+                                              </Card.Body>
+                                            </Card>
+                                          ) :
                                           videoData?.url === 'video_disabled' ? (
                                             <Card key={`blank-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
                                               <Card.Body>
@@ -1031,6 +1045,15 @@ function extractTimeFromISO(createdAt, duration) {
                                           ) : (
                                             <Card key={`video-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
                                               <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
+                                              { videoData?.is_deleted !== true && 
+                                                <div className="d-flex justify-content-between align-items-start">
+                                                  <Form.Check
+                                                    type="checkbox"
+                                                    checked={selectedScreenshots[recording?._id]?.includes(j) || false}
+                                                    onChange={() => handleSelectRecording(recording?._id, j)}
+                                                  />
+                                                </div>
+                                              }
                                                 <video
                                                   height="175px"
                                                   preload="metadata"

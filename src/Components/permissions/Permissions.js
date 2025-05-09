@@ -36,6 +36,18 @@ function PermissionsPage() {
   const [permissions, setPermissions] = useState({});
   const [expanded, setExpanded] = useState({});
   const [memberFeeds, setMemberFeed] = useState([]);
+
+  const handleToggleExpandAll = () => {
+      const areAllExpanded = permissionModules.every(mod => expanded[mod.slug]);
+    
+      const newExpandedState = {};
+      permissionModules.forEach(mod => {
+        newExpandedState[mod.slug] = !areAllExpanded;
+      });
+    
+      setExpanded(newExpandedState);
+    };
+
   const toggleExpand = (module) => {
     setExpanded((prev) => ({
       ...prev,
@@ -80,6 +92,39 @@ function PermissionsPage() {
       };
     });
   };
+
+   const handleSelectAllPermissions = (isChecked) => {
+      const updatedPermissions = {};
+    
+      permissionModules.forEach((mod) => {
+        const modSlug = mod.slug;
+        const currentModPerms = permissions?.[modSlug] || {};
+    
+        const updatedModPerms = {};
+    
+        // Set all boolean permissions to true/false
+        (mod.permissions || []).forEach((perm) => {
+          updatedModPerms[perm] = isChecked;
+        });
+    
+        // For modules that have selected_members, add them
+        if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
+          if (isChecked) {
+            const allMemberIds = memberFeeds.map((m) => String(m._id));
+            if (modSlug === "projects") {
+              allMemberIds.push("unassigned");
+            }
+            updatedModPerms["selected_members"] = allMemberIds;
+          } else {
+            updatedModPerms["selected_members"] = [];
+          }
+        }
+    
+        updatedPermissions[modSlug] = updatedModPerms;
+      });
+    
+      setPermissions((prev) => ({ ...prev, ...updatedPermissions }));
+    };
 
   const handleSelectAll = (modSlug, isChecked) => {
     const memberIds = memberFeeds.map((member) => String(member._id));
@@ -413,14 +458,39 @@ function PermissionsPage() {
                 <div className="card--header">
                   <FormGroup className="form-group mb-0 pb-0">
                     <Form.Check
-                     type="checkbox"
-                     id="all"
-                     label="Select All Permissions"
+                      type="checkbox"
+                      id="all"
+                      label="Select All Permissions"
+                      checked={permissionModules.every((mod) => {
+                        const modSlug = mod.slug;
+                        const modPerms = permissions?.[modSlug] || {};
+  
+                        const allPermsChecked = (mod.permissions || []).every((perm) => modPerms[perm] === true);
+  
+                        const selectedIds = modPerms["selected_members"] || [];
+                        const allMemberIds = memberFeeds.map((m) => String(m._id));
+                        if (modSlug === "projects") allMemberIds.push("unassigned");
+  
+                        const allMembersChecked = selectedIds.length === allMemberIds.length &&
+                          allMemberIds.every((id) => selectedIds.includes(id));
+  
+                        if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
+                          return allPermsChecked && allMembersChecked;
+                        }
+  
+                        return allPermsChecked;
+                      })}
+                      onChange={(e) => handleSelectAllPermissions(e.target.checked)}
                     />
                   </FormGroup>
-                  <Button type="button" variant="link" className="p-0">Expand All</Button>
+                  <Button type="button" variant="link" className="p-0" onClick={handleToggleExpandAll}>
+                    {permissionModules.every(mod => expanded[mod.slug]) ? "Collapse All" : "Expand All"}
+                  </Button>
                 </div>
-              <Accordion>
+              <Accordion activeKey={Object.entries(expanded)
+                    .filter(([_, v]) => v)
+                    .map(([k]) => k)}
+                  alwaysOpen>
                 {permissionModules.map((mod) => {
                   const modSlug = mod.slug;
                   const modPerms = permissions?.[modSlug] || {};
@@ -430,7 +500,12 @@ function PermissionsPage() {
                   return (
                     
                     <Accordion.Item eventKey={modSlug}>
-                      <Accordion.Header>{mod.name} <span className="per--count">0/6</span></Accordion.Header>
+                      <Accordion.Header onClick={() => {
+                          setExpanded(prev => ({
+                            ...prev,
+                            [modSlug]: !prev[modSlug]
+                          }));
+                        }}>{mod.name} <span className="per--count">0/6</span></Accordion.Header>
                       <Accordion.Body>
                       <div className="transition-all">
 
@@ -489,9 +564,26 @@ function PermissionsPage() {
                                       label={member.name}
                                       checked={modPerms["selected_members"]?.includes(String(member._id))}
                                       onChange={() => toggleMembers(modSlug, "selected_members", member._id)}
+                                      className="sub-items"
                                     />
                                   ))
                                 }
+                                {modSlug === "projects" && (
+                                  <Form.Check
+                                    key={`${modSlug}-${perm}-unassigned`}
+                                    type="checkbox"
+                                    id={`${modSlug}-${perm}-unassigned`}
+                                    label="Unassigned"
+                                    checked={modPerms["selected_members"]?.includes('unassigned')}
+                                    disabled={activeRole?.slug === "owner"}
+                                    onChange={() => {
+                                      if (activeRole.slug !== "owner") {
+                                        toggleMembers(modSlug, "selected_members", 'unassigned');
+                                      }
+                                    }}
+                                    className="sub-items"
+                                  />
+                                )}
                                 </>
                               }
                               </>
