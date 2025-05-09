@@ -6,6 +6,7 @@ import {
   ListGroup,
   Table,
   Modal,
+  FormGroup,
   Accordion,
   FloatingLabel,
 } from "react-bootstrap";
@@ -409,6 +410,16 @@ function PermissionsPage() {
               <h2 className="text-2xl font-semibold mb-4">Permissions</h2>
               {activeRole &&
               <>
+                <div className="card--header">
+                  <FormGroup className="form-group mb-0 pb-0">
+                    <Form.Check
+                     type="checkbox"
+                     id="all"
+                     label="Select All Permissions"
+                    />
+                  </FormGroup>
+                  <Button type="button" variant="link" className="p-0">Expand All</Button>
+                </div>
               <Accordion>
                 {permissionModules.map((mod) => {
                   const modSlug = mod.slug;
@@ -419,13 +430,13 @@ function PermissionsPage() {
                   return (
                     
                     <Accordion.Item eventKey={modSlug}>
-                      <Accordion.Header>{mod.name}</Accordion.Header>
+                      <Accordion.Header>{mod.name} <span className="per--count">0/6</span></Accordion.Header>
                       <Accordion.Body>
-                      <div className="ml-6 mt-2 space-y-1 transition-all pb-2">
+                      <div className="transition-all">
 
                       {/* Permissions List */}
                       {/* {isExpanded && ( */}
-                        <div className="ml-6 mt-2 space-y-1 transition-all pb-2">
+                        <div className="transition-all">
                         {(mod.permissions || []).map((perm) => {
                           if (perm === 'view') {
                             return (
@@ -495,11 +506,11 @@ function PermissionsPage() {
                   );
                 })}
 
-                <div className="mt-6 text-right">
-                  <Button variant="primary" onClick={handleSave}>
-                    Save Permissions
-                  </Button>
-                </div>
+                  <div className="mt-4 text-end">
+                    <Button variant="primary" onClick={handleSave}>
+                      Save Permissions
+                    </Button>
+                  </div>
                 </Accordion>
                 </>
               }
