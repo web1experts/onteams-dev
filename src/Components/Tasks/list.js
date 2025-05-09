@@ -19,7 +19,7 @@ const TasksList = React.memo((props) => {
     const commonState = useSelector(state => state.common)
     const apiResult = useSelector(state => state.task);
     const [showtaskform, setShowtaskform] = useState({})
-    const taskFeed = useSelector(state => state.task.tasks);
+    const taskFeed = useSelector(state => state.task?.tasks);
     const [taskslists, setTasksLists] = useState([])
     const handleTaskShow = () => dispatch(togglePopups('taskform', true))
     const [currentProject, setCurrentProject] = useState({})
@@ -69,7 +69,7 @@ const TasksList = React.memo((props) => {
                     ...taskslists[apiResult.newTask?.tab],
                     tasks: [
                         apiResult.newTask,
-                        ...taskslists[apiResult.newTask?.tab].tasks.filter(
+                        ...taskslists[apiResult.newTask?.tab]?.tasks?.filter(
                             (task) => task._id !== apiResult.newTask._id
                         )
                     ]
@@ -87,7 +87,7 @@ const TasksList = React.memo((props) => {
                 ...prev,
                 [apiResult.UpdatedTask.tab]: {
                     ...prev[apiResult.UpdatedTask.tab],
-                    tasks: prev[apiResult.UpdatedTask.tab].tasks.map(task =>
+                    tasks: prev[apiResult.UpdatedTask.tab]?.tasks?.map(task =>
                         task._id === apiResult.UpdatedTask._id ? apiResult.UpdatedTask : task
                     )
                 }
@@ -108,7 +108,7 @@ const TasksList = React.memo((props) => {
     
         try {
             if (sourceTabId === destinationTabId) {
-                const reorderedTasks = Array.from(taskslists[sourceTabId].tasks);
+                const reorderedTasks = Array.from(taskslists[sourceTabId]?.tasks);
                 replacedTaskId = reorderedTasks[destination.index]?._id;
                 // No change
                 if (source.index === destination.index) return;
@@ -117,7 +117,7 @@ const TasksList = React.memo((props) => {
                 reorderedTasks.splice(destination.index, 0, removed);
     
                 // Check if the new order is actually different
-                const hasChanged = reorderedTasks.some((task, idx) => task._id !== taskslists[sourceTabId].tasks[idx]?._id);
+                const hasChanged = reorderedTasks.some((task, idx) => task._id !== taskslists[sourceTabId]?.tasks[idx]?._id);
                 if (!hasChanged) return;
     
                 setTasksLists({
@@ -138,8 +138,8 @@ const TasksList = React.memo((props) => {
     
                 await dispatch(reorderTasks({ tasks: tasksToUpdate }));
             } else {
-                const sourceTasks = Array.from(taskslists[sourceTabId].tasks);
-                const destinationTasks = Array.from(taskslists[destinationTabId].tasks);
+                const sourceTasks = Array.from(taskslists[sourceTabId]?.tasks);
+                const destinationTasks = Array.from(taskslists[destinationTabId]?.tasks);
                 replacedTaskId = destinationTasks[destination.index]?._id;
     
                 const [movedTask] = sourceTasks.splice(source.index, 1);
@@ -147,8 +147,8 @@ const TasksList = React.memo((props) => {
     
                 // Check if the task was already in the destination index
                 if (
-                    taskslists[sourceTabId].tasks[source.index]?._id ===
-                    taskslists[destinationTabId].tasks[destination.index]?._id &&
+                    taskslists[sourceTabId]?.tasks[source.index]?._id ===
+                    taskslists[destinationTabId]?.tasks[destination.index]?._id &&
                     sourceTabId === destinationTabId
                 ) {
                     return;
@@ -192,7 +192,7 @@ const TasksList = React.memo((props) => {
     
         try {
             if (sourceTabId === destinationTabId) {
-                const reorderedTasks = Array.from(taskslists[sourceTabId].tasks);
+                const reorderedTasks = Array.from(taskslists[sourceTabId]?.tasks);
                 replacedTaskId = reorderedTasks[destination.index]?._id;
                 // No change
                 if (source.index === destination.index) return;
@@ -201,7 +201,7 @@ const TasksList = React.memo((props) => {
                 reorderedTasks.splice(destination.index, 0, removed);
     
                 // Check if the new order is actually different
-                const hasChanged = reorderedTasks.some((task, idx) => task._id !== taskslists[sourceTabId].tasks[idx]?._id);
+                const hasChanged = reorderedTasks.some((task, idx) => task._id !== taskslists[sourceTabId]?.tasks[idx]?._id);
                 if (!hasChanged) return;
     
                 setTasksLists({
@@ -221,16 +221,16 @@ const TasksList = React.memo((props) => {
                 }
                 await dispatch(reorderTasks({ tasks: tasksToUpdate }));
             } else {
-                const sourceTasks = Array.from(taskslists[sourceTabId].tasks);
-                const destinationTasks = Array.from(taskslists[destinationTabId].tasks);
+                const sourceTasks = Array.from(taskslists[sourceTabId]?.tasks);
+                const destinationTasks = Array.from(taskslists[destinationTabId]?.tasks);
                 replacedTaskId = destinationTasks[destination.index]?._id;
                 const [movedTask] = sourceTasks.splice(source.index, 1);
                 destinationTasks.splice(destination.index, 0, movedTask);
     
                 // Check if the task was already in the destination index
                 if (
-                    taskslists[sourceTabId].tasks[source.index]?._id ===
-                    taskslists[destinationTabId].tasks[destination.index]?._id &&
+                    taskslists[sourceTabId]?.tasks[source.index]?._id ===
+                    taskslists[destinationTabId]?.tasks[destination.index]?._id &&
                     sourceTabId === destinationTabId
                 ) {
                     return;
@@ -423,7 +423,7 @@ const TasksList = React.memo((props) => {
                                                                     {task.title}
                                                                     <div className="tasks-form-action">
                                                                         {
-                                                                            task.subtasks && task.subtasks.length > 0 && (
+                                                                            task.subtasks && task.subtasks?.length > 0 && (
                                                                                 <>
                                                                                     <span className="subtask-count" key={`subtask-count-${task._id}`}>
                                                                                         <TiInputChecked />
