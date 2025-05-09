@@ -24,12 +24,14 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.snow.css';
 import AutoLinks from "quill-auto-links";
-import { socket } from "../../helpers/auth";
+import { socket, currentMemberProfile } from "../../helpers/auth";
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE } from "../../redux/actions/types";
+import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE, EDIT_PROJECT_FORM } from "../../redux/actions/types";
 Quill.register("modules/autoLinks", AutoLinks);
 function ProjectsPage() {
+    const memberProfile = currentMemberProfile()
+    
     const [isActiveView, setIsActiveView] = useState(2);
     const dispatch = useDispatch();
     const memberdata = getMemberdata()
@@ -56,7 +58,7 @@ function ProjectsPage() {
     const [isActive, setIsActive] = useState(0);
     const [currentProject, setCurrentProject] = useState({})
     const [showdialog, setShowDialog] = useState(false);
-    const [allMembers, setAllmembers] = useState([{ value: 'all', label: 'All Members' }])
+    const [allMembers, setAllmembers] = useState([])
     const [spinner, setSpinner] = useState(false)
     let fieldErrors = {};
     const quillRef = useRef(null);
@@ -121,7 +123,6 @@ function ProjectsPage() {
                 };
                 return updatedFields; // Return the new state
             });
-
         }
     }, [projectform]);
 
@@ -204,6 +205,40 @@ function ProjectsPage() {
             handleStatusClose()
         }
     }, [selectedStatus, dispatch]);
+
+    useEffect(() => {
+        if (currentProject && Object.keys(currentProject).length > 0) {
+           
+            let fieldsSetup = {
+                title: currentProject.title,
+                status: currentProject.status,
+                client: currentProject.client ? currentProject.client._id || fields['client'] : '',
+                description: currentProject.description || '',
+                start_date: currentProject.start_date ? new Date(currentProject.start_date).toISOString().split('T')[0] : '',
+                due_date: currentProject.due_date ? new Date(currentProject.due_date).toISOString().split('T')[0] : '',
+                files: currentProject.files ? currentProject.files.map(image => image._id) : [],
+                workflow: currentProject.workflow ? currentProject.workflow : {}
+            };
+
+            
+            // Set members if present
+            if (currentProject.members && currentProject.members.length > 0) {
+                let projectMembers = [];
+                let membersdrop = {};
+
+                currentProject.members.forEach(member => {
+                    const { _id, name } = member;
+                    projectMembers.push(_id);
+                    membersdrop[_id] = name;
+                });
+
+                fieldsSetup.members = membersdrop;
+            } else {
+                fieldsSetup.members = [];
+            }
+            dispatch ( updateStateData( EDIT_PROJECT_FORM, fieldsSetup))
+        }
+    }, [currentProject, dispatch]);
 
     const handleListProjects = async () => {
         let selectedfilters = { currentPage: currentPage }
@@ -298,7 +333,7 @@ function ProjectsPage() {
         if (memberFeed && memberFeed.memberData) {
             dispatch(updateStateData(ALL_MEMBERS, memberFeed.memberData))
             setMembers(memberFeed.memberData);
-            const memberarray = [{ value: 'all', label: 'All Members' }]
+            const memberarray = []
             memberFeed.memberData.forEach(member => {
                 memberarray.push({ value: member._id, label: member.name })
             });
@@ -416,7 +451,7 @@ function ProjectsPage() {
             setCurrentPage({})
         }
 
-        if (apiResult.success) {
+        if (apiResult?.success === true) {
             setIsDescEditor(false)
             setFields({ title: '', status: 'in-progress', members: [] })
             handleClose()
@@ -431,6 +466,19 @@ function ProjectsPage() {
                 handleListProjects()
             }
         });
+
+        if( apiResult.success === 'success' && apiResult.updatedProject){
+            // if( apiResult.updatedProject?.status !== currentProject?.status || isNotPresent){ console.log('here now')
+            //     handleListProjects()
+            // }else{
+                setProjects((prevProjects) =>
+                    prevProjects.map((project) =>
+                      project._id === apiResult.updatedProject._id ? apiResult.updatedProject : project
+                    )
+                );  
+                setCurrentProject(apiResult.updatedProject )
+            // } 
+        }
 
     }, [apiResult])
 
@@ -500,15 +548,14 @@ function ProjectsPage() {
         } else {
             return previewComponents.other;
         }
-
         return null;
     };
 
     useEffect(() => {
         if (currentProject && Object.keys(currentProject).length > 0) {
-
             dispatch(updateStateData(CURRENT_PROJECT, currentProject))
         }
+        console.log(currentProject)
     }, [currentProject]);
 
     const handleProjectChange = (project) => {
@@ -548,7 +595,6 @@ function ProjectsPage() {
         setProjects(reorderedProjects);
     };
 
-
     const handleKeyDown = (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
             pasteOccurred.current = true; // Mark that a paste action is expected
@@ -557,25 +603,7 @@ function ProjectsPage() {
 
     const handleRowDoubleClick = (project, index) => {
         if (project.marked_by && project.marked_by.includes(memberdata._id)) {
-            setProjects((prevProjects) => {
-                // Create a new array from the previous projects
-                const updatedProjects = [...prevProjects];
-                // Access the project at index 1
-                const projectToUpdate = updatedProjects[index];
-
-                if (projectToUpdate) {
-                    // Remove the memberId from the marked_by array
-                    const updatedMarkedBy = projectToUpdate.marked_by.filter(id => id !== memberdata._id);
-                    // Update the project's marked_by column
-                    updatedProjects[index] = {
-                        ...projectToUpdate,
-                        marked_by: updatedMarkedBy,
-                    };
-                    
-                }
-
-                return updatedProjects; // Return the updated projects array
-            });
+            
             dispatch(updateProject(project._id, { marked: false }))
         } else {
             dispatch(updateProject(project._id, { marked: true }))
@@ -605,7 +633,6 @@ function ProjectsPage() {
         };
     }, []);
 
-
     return (
         <>
             <div className={isActive === 1 ? 'show--details team--page' : isActive === 2 ? ' view--project team--page' : 'team--page'}>
@@ -616,17 +643,46 @@ function ProjectsPage() {
                                 <h2>Projects
                                     <Button variant="primary" className={isActive !== 0 ? 'd-flex ms-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button>
                                     <Button variant="primary" className={isActive !== 0 ? 'd-flex' : 'd-lg-none'} onClick={handleFilterShow}><MdFilterList /></Button>
-                                    <Button variant="primary" onClick={() => handleShow('new')}><FaPlus /></Button>
+                                    {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
+                                    <Button
+                                        variant="primary"
+                                        onClick={() =>
+                                            handleShow('new') 
+                                        }
+                                        >
+                                        <FaPlus />
+                                    </Button>
+                                    )}
+                                    
                                     <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
                                         <ListGroup.Item key="member-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
                                                 <option value={memberdata?._id}>My Projects</option>
                                                 {
-                                                    allMembers.map((member, index) => {
-                                                        return <option key={`member-projects-${index}`} value={member.value}>{member.label}</option>
-                                                    })
+                                                    (memberProfile?.permissions?.projects?.view_others === true || memberProfile?.role?.slug === 'owner') &&
+                                                    <>
+                                                    {
+                                                        (memberProfile?.permissions?.projects?.selected_members?.length > 0 || memberProfile?.role?.slug === 'owner') && (
+                                                            <option key={`member-projects-all`} value={'all'}>All Members</option>
+                                                        )
+                                                    }
+                                                    
+                                                    {allMembers.map((member, index) => 
+                                                        (memberProfile?.permissions?.projects?.selected_members?.includes(member.value)  || memberProfile?.role?.slug === 'owner') ? (
+                                                          <option key={`member-projects-${index}`} value={member.value}>
+                                                            {member.label}
+                                                          </option>
+                                                        ) : null
+                                                      )
+                                                    }
+                                                    </>
                                                 }
-                                                <option value="unassigned">Unassigned</option>
+                                                {
+                                                    (memberProfile?.permissions?.projects?.selected_members?.includes('unassigned') || memberProfile?.role?.slug === 'owner') && (
+                                                    <option value="unassigned">Unassigned</option>
+                                                    )
+                                                }
+                                                
                                             </Form.Select>
                                         </ListGroup.Item>
                                         <ListGroup.Item key="status-filter-list">
@@ -664,6 +720,9 @@ function ProjectsPage() {
                         </div>
                     }
                     <Container fluid>
+                        {
+                            (memberProfile?.permissions?.projects?.update_projects_order === true || memberProfile?.role?.slug === "owner") ? 
+                        
                         <DragDropContext onDragEnd={handleDragEnd}>
                             <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table draggable--table' : 'project--table'}>
                                 <thead>
@@ -698,32 +757,41 @@ function ProjectsPage() {
                                                                     <tr ref={provided.innerRef}
                                                                         {...provided.draggableProps}
                                                                         {...provided.dragHandleProps}
-                                                                        onDoubleClick={(event) => {
-                                                                            if (event.target.classList.contains('marked-project')) {
-                                                                                event.currentTarget.classList.remove('marked-project')
-
-                                                                            } else {
-                                                                                event.currentTarget.classList.add('marked-project')
-                                                                            }
-
-                                                                            handleRowDoubleClick(project, index)
+                                                                        onDoubleClick={(event) => { 
+                                                                           (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner')
+                                                                            ?
+                                                                                handleRowDoubleClick(project, index)
+                                                                                : console.log('not allowed')
                                                                         }}
                                                                         key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                                             }`}>
                                                                         <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
                                                                         <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td>
                                                                         <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                                            <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={true} showAssignBtn={true} postId={project._id} type="project"
-                                                                            // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(project, memberid, `member--${project._id}-${memberid}`)} 
+                                                                            <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"
                                                                             />
                                                                         </td>
                                                                         <td key={`status-index-${index}`} data-label="Status" className="onHide">
                                                                             <Dropdown className="select--dropdown" key='status-key'>
-                                                                                <Dropdown.Toggle onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); handleStatusShow() }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                                <Dropdown.Toggle onClick={() => { 
+                                                                                    if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
+                                                                                        dispatch(updateStateData(DIRECT_UPDATE, true));
+                                                                                        handleStatusShow();
+                                                                                    } else {
+                                                                                        console.log('Not allowed');
+                                                                                    }
+                                                                                }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
                                                                             </Dropdown>
                                                                         </td>
                                                                         <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                                            <Button variant="outline-primary" onClick={() => setIsActive(1)}>Tasks</Button>
+                                                                            <Button variant="outline-primary" onClick={() => {
+                                                                                (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner')
+                                                                                ?
+                                                                                setIsActive(1)
+                                                                                :
+                                                                                console.log('not allowed to view tasks')
+                                                                            }
+                                                                            }>Tasks</Button>
                                                                             <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
                                                                         </td>
                                                                     </tr>
@@ -747,6 +815,84 @@ function ProjectsPage() {
                                 </Droppable>
                             </Table>
                         </DragDropContext>
+                        :
+                            
+                                <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table draggable--table' : 'project--table'}>
+                                    <thead>
+                                        <tr key="project-table-header">
+                                            {/* <th scope="col" width={20} key="project-hash-header">#</th> */}
+                                            <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Project Name</th>
+                                            <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
+                                            <th scope="col" width='30%' key="project-member-header" className="onHide">Assigned Members</th>
+                                            <th scope="col" key="project-status-header" className="onHide">Status</th>
+                                            <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                   
+                                    <tbody
+                                        id={`projectable-body`}
+                                        className="projects--list"
+                                    >
+                                        {
+                                            (!spinner && projects && projects.length > 0)
+                                                ? projects.map((project, index) => {
+                                                    return (<>
+                                                        <tr onDoubleClick={(event) => { 
+                                                            (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner')
+                                                                ?
+                                                                    handleRowDoubleClick(project, index)
+                                                                    : console.log('not allowed')
+                                                            }}
+                                                            key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
+                                                                }`}>
+                                                            <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
+                                                            <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td>
+                                                            <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
+                                                                <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"
+                                                                />
+                                                            </td>
+                                                            <td key={`status-index-${index}`} data-label="Status" className="onHide">
+                                                                <Dropdown className="select--dropdown" key='status-key'>
+                                                                    <Dropdown.Toggle onClick={() => { 
+                                                                        if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
+                                                                            dispatch(updateStateData(DIRECT_UPDATE, true));
+                                                                            handleStatusShow();
+                                                                        } else {
+                                                                            console.log('Not allowed');
+                                                                        }
+                                                                    }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                </Dropdown>
+                                                            </td>
+                                                            <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
+                                                                <Button variant="outline-primary" onClick={() => {
+                                                                    (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner')
+                                                                    ?
+                                                                    setIsActive(1)
+                                                                    :
+                                                                    console.log('not allowed to view tasks')
+                                                                }
+                                                                }>Tasks</Button>
+                                                                <Button variant="outline-primary" className="ms-2" onClick={() => setIsActive(2)}>View</Button>
+                                                            </td>
+                                                        </tr>
+                                                    </>)
+                                                })
+                                                :
+
+                                                !spinner && isActiveView === 2 &&
+                                                <>
+                                                    <tr key={`noresults-row`} className="no--invite">
+                                                        <td key={`empty-index`} colSpan={9} className="text-center">
+                                                            <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                        </td>
+                                                    </tr>
+                                                </>
+                                        }
+                                    </tbody>
+                                        
+                                </Table>
+
+                        }
                         {
                             isActiveView === 1 && !spinner && projects && projects.length == 0 &&
                             <div className="text-center mt-5">
@@ -767,23 +913,26 @@ function ProjectsPage() {
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {
-                            <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={true} members={currentProject?.members || []} showAssignBtn={true} postId={currentProject?._id} type="project"/>
+                            <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} members={currentProject?.members || []}  postId={currentProject?._id} type="project"/>
                         }
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto ms-xl-0 mt-0 mt-md-0">
                         <Button variant="outline-primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
                         <Button variant="outline-primary" className="btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>View</Button>
-                        <ListGroup.Item className="d-none d-lg-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
-                        {/* <ListGroup.Item key={`gridview`} className="gridView ms-1" action active={activeTab === 'GridView'} onClick={() => setActiveTab('GridView')}><BsGrid /></ListGroup.Item>
-                        <ListGroup.Item key={`listview`} className="ListView ms-1" action active={activeTab === 'ListView'} onClick={() => setActiveTab('ListView')}><FaList /></ListGroup.Item> */}
+                        {
+                            (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
+                                <ListGroup.Item className="d-none d-lg-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
+                            )
+                        }
+                        
                         <ListGroup.Item key={`closekey`} onClick={() => setIsActive(0)}><MdOutlineClose /></ListGroup.Item>
                     </ListGroup>
                 </div>
-                <TasksList activeTab={activeTab} currentProject={currentProject} />
+               {isActive === 1 && <TasksList activeTab={activeTab} currentProject={currentProject} memberProfile={memberProfile} />} 
             </div>
 
-            <SingleProject key={`single-project-view-${currentProject?._id}`} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} />
-            <TaskForm />
+            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} /> }
+            { commonState?.taskForm && <TaskForm memberProfile={memberProfile}/> }
             <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>
                     <Modal.Title>Create New Project</Modal.Title>
@@ -796,7 +945,7 @@ function ProjectsPage() {
                                     <FloatingLabel label="Project Title *">
                                         <Form.Control type="text" name="title" placeholder="Project Title" value={fields['title'] || ""} onChange={handleChange} />
                                     </FloatingLabel>
-                                    {showError('title')}
+                                    
                                 </Form.Group>
                                 <Form.Group className="mb-0 form-group">
                                     <Form.Label>
@@ -812,13 +961,15 @@ function ProjectsPage() {
                                         <Form.Select className="form-control custom-selectbox" placeholder="Select Client" id="client-select" name="client" onChange={handleChange} value={fields['client'] || ''}>
                                             <option value="none">None</option>
                                             {
-                                                clientlist && clientlist.length > 0 &&
+                                                (memberProfile?.permissions?.clients?.view === true && clientlist && clientlist.length > 0 || memberProfile?.role?.slug === "owner" && clientlist && clientlist.length > 0) &&
                                                 clientlist.map((client, index) => {
                                                     return <option key={client._id} value={client._id}>{client.name}</option>
                                                 })
                                             }
                                         </Form.Select>
-                                        <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
+                                        { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
+                                            <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
+                                        )}
                                     </div>
                                     <AddClient show={showClient} toggleshow={handleClientClose} />
                                 </Form.Group>
@@ -848,7 +999,7 @@ function ProjectsPage() {
 
                                                 setTimeout(() => {
                                                     dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
-                                                }, 800)
+                                                }, 10)
                                             }}
                                             formats={formats}
                                             modules={modules}
@@ -931,11 +1082,15 @@ function ProjectsPage() {
                     </div>
                 </Modal.Body>
             </Modal>
-            <StatusModal key="create-project-status" />
+            {/* <StatusModal key="create-project-status" />
             <MemberModal isedit={isEdit} />
             <WorkFlowModal />
-            <FilesModal />
-            <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews} toggle={setPreviewShow} filetoPreview={filetoPreview} />
+            <FilesModal /> */}
+            {commonState?.statusModal && <StatusModal key="create-project-status" /> }
+            {commonState?.membersModal && <MemberModal isedit={isEdit} />}
+            {commonState?.workflowmodal && <WorkFlowModal /> }
+            {commonState?.filesmodal && <FilesModal /> }
+            { showPreview && <FilesPreviewModal showPreview={showPreview} imagePreviews={imagePreviews} toggle={setPreviewShow} filetoPreview={filetoPreview} /> }
             {/*--=-=Delete Modal**/}
             <Modal show={showDelete} onHide={handleDeleteClose} centered size="md" className="add--member--modal">
                 <Modal.Header closeButton>

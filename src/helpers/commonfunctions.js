@@ -376,3 +376,23 @@ export function secondstoMinutes(seconds) {
 
     return `${paddedHours}:${paddedMinutes}`;
 }
+
+
+export function mergePermissions(rolePerms = {}, memberPerms = {}) {
+    const merged = {};
+  
+    for (const module in rolePerms) {
+      merged[module] = {};
+  
+      for (const action in rolePerms[module]) {
+        const memberValue = memberPerms?.[module]?.[action];
+  
+        merged[module][action] = memberValue !== undefined && memberValue !== ''
+          ? memberValue
+          : rolePerms[module][action];
+      }
+    }
+  
+    return merged;
+  }
+  

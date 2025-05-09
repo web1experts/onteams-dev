@@ -35,16 +35,21 @@ const CustomDropdown = ({ items, value, extraClass, onChange }) => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 <div className="drop--scroll">
-                    <Form>
-                        <Form.Group className="form-group mb-3">
-                            <Form.Control
-                                type="text"
-                                placeholder="Search here.."
-                                value={searchTerm}
-                                onChange={handleSearch}
-                            />
-                        </Form.Group>
-                    </Form>
+                    {
+                        (filteredItems.length > 0) && (
+                            <Form>
+                                <Form.Group className="form-group mb-3">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Search here.."
+                                        value={searchTerm}
+                                        onChange={handleSearch}
+                                    />
+                                </Form.Group>
+                            </Form>
+                        )
+                    }
+                    
                     {filteredItems.map(item => (
                         <Dropdown.Item
                             key={item.value}

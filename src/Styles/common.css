@@ -1209,7 +1209,9 @@ span.status--circle.info--color {
 .edit--task--modal .project--form--inputs .task--title .form-control:hover ~ .pencil--edit {
   opacity: 1;
 }
-
+ul#subtasks-ul .form-group .quill--editor svg {
+  opacity: 1 !important;
+}
 @media (max-width:1199px) {
   .project--form {
     height: auto;

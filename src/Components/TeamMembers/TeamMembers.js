@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Stack } from "react-bootstrap";
 import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { getMemberdata } from "../../helpers/commonfunctions";
@@ -15,7 +15,12 @@ import { createMember } from "../../redux/actions/members.action";
 import Invitation from "./Invitation";
 import { AlertDialog, TransferOnwerShip } from "../modals";
 import { selectboxObserver } from "../../helpers/commonfunctions";
-import { socket } from "../../helpers/auth";
+import { socket, currentMemberProfile } from "../../helpers/auth";
+import {
+  updatePermissions
+} from "../../redux/actions/permission.action";
+import { permissionModules } from "../../helpers/permissionsModules";
+
 
 function EditableField({ selectedMember, field, label, value, onChange, isEditing, onEditClick, error, roles, printval }) {
   const inputRef = useRef(null);
@@ -57,7 +62,7 @@ function EditableField({ selectedMember, field, label, value, onChange, isEditin
   }, [isEditing]);
 
   if (field === "role") {
-    console.log('Error: ', error)
+    
     return (
       <ListGroup.Item ref={wrapperRef}>
         <strong>Role</strong>
@@ -134,7 +139,7 @@ function EditableField({ selectedMember, field, label, value, onChange, isEditin
 }
 
 function TeamMembersPage() {
-  //useFilledClass('.form-floating .form-control');
+  const memberProfile = currentMemberProfile()
   const currentMember = getMemberdata();
   //const addToast = useToast();
   const [isActive, setIsActive] = useState(0);
@@ -148,7 +153,7 @@ function TeamMembersPage() {
       setIsActive(true);
     }
   };
-
+  const apiPermission = useSelector((state) => state.permissions);
   const [isActiveView, setIsActiveView] = useState(2);
   const [rows, setRows] = useState([{ email: "", role: "" }]);
   const [errors, setErrors] = useState([]);
@@ -170,6 +175,7 @@ function TeamMembersPage() {
       setShow(false);
     });
   };
+  const [ tab, setTab] = useState('details')
   const handleShow = () => setShow(true);
   const [activeTab, setActiveTab] = useState("Members");
   // const [activeSubTab, setActiveSubTab] = useState("Grid");
@@ -220,6 +226,15 @@ function TeamMembersPage() {
 
   useEffect(() => {
     dispatch(getAvailableRolesByWorkspace());
+    let prm = {};
+    permissionModules.forEach((mod) => {
+      prm[mod.slug] = {}; // Initialize object for each module
+      mod.permissions.forEach((p) => {
+        prm[mod.slug][p] = '';
+      });
+    });
+
+    setPermissions(prm);
   }, []);
 
   useEffect(() => {
@@ -263,6 +278,22 @@ function TeamMembersPage() {
   }, [apiResult, workspaceState]);
 
   useEffect(() => {
+      setLoader(false);
+      if (apiPermission.success) {
+        
+        if (apiPermission.updatedMember) {
+          const updatedMemberFeeds = memberFeeds.map(m =>
+            m._id.toString() === apiPermission.updatedMember._id.toString()
+              ? apiPermission.updatedMember
+              : m
+          );
+          console.log("updatedMemberFeeds:::: ", updatedMemberFeeds);
+          setMemberFeed(updatedMemberFeeds);
+        }
+      }
+    }, [apiPermission]);
+
+  useEffect(() => {
     if (
       workspaceState.available_roles &&
       workspaceState.available_roles.length > 0
@@ -297,6 +328,68 @@ function TeamMembersPage() {
       //   }, {});
       //   setMemberMeta(memberMeta)
       // }
+
+      const merged = {};
+            
+      // Step 1: Initialize merged with empty string values
+      permissionModules.forEach((mod) => {
+        merged[mod.slug] = {};
+        mod.permissions.forEach((p) => {
+          merged[mod.slug][p] = '';
+        });
+      });
+      
+      // setPermissions((prev) => {
+      //   const newPerms = selectedMember?.memberMeta?.permissions || {};
+        
+      //   for (const module in merged) {
+      //     for (const key in merged[module]) {
+      //       // If the key exists in newPerms[module], use its value
+      //       if (newPerms?.[module] && key in newPerms[module]) {
+      //         merged[module][key] = newPerms[module][key];
+      //       } else {
+      //         // Otherwise, set it to ''
+      //         merged[module][key] = '';
+      //       }
+      //     }
+      //   }
+      
+      //   return merged;
+      // });
+
+      setPermissions((prev) => {
+        const newPerms = selectedMember?.memberMeta?.permissions || {};
+      
+        // Clone merged to avoid mutating the original reference
+        const updated = { ...merged };
+      
+        // First, update existing keys in merged
+        for (const module in updated) {
+          updated[module] = { ...updated[module] }; // clone inner object
+          for (const key in updated[module]) {
+            if (newPerms?.[module] && key in newPerms[module]) {
+              updated[module][key] = newPerms[module][key];
+            } else {
+              updated[module][key] = '';
+            }
+          }
+        }
+      
+        // Then, add any missing modules or keys from newPerms
+        for (const module in newPerms) {
+          if (!updated[module]) {
+            updated[module] = {};
+          }
+          for (const key in newPerms[module]) {
+            if (!(key in updated[module])) {
+              updated[module][key] = newPerms[module][key];
+            }
+          }
+        }
+      
+        return updated;
+      });
+      
       
     }
   }, [selectedMember]);
@@ -318,8 +411,7 @@ function TeamMembersPage() {
         [field]: value.target.files[0],
       }));
     } else if (field === "memberMeta") {
-      
-      console.log('role value: ', value.target.value)
+       
       const metakey = value.target.name;
       const meta_value = value.target.value;
 
@@ -338,6 +430,7 @@ function TeamMembersPage() {
       setEditedMember((prevState) => ({
         ...prevState,
         ['rolename']: matchingRole?.name,
+        ['role']: matchingRole._id
       }));
       if (value !== "") {
         removeError(field);
@@ -471,9 +564,125 @@ function TeamMembersPage() {
     return changes;
   };
 
-  const handleMetaChange = ({ target: { name, value } }) => {
-   
-  }
+ const [permissions, setPermissions] = useState({});
+  const [expanded, setExpanded] = useState({});
+
+  const toggleExpand = (module) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [module]: !prev[module],
+    }));
+  };
+
+  const toggleView = (module) => {
+    const isChecked = !(permissions?.[module]?.view || false);
+
+    const currentPerms = permissions?.[module] || {};
+    const updated = {
+      ...currentPerms,
+      view: isChecked,
+    };
+
+    if (!isChecked) {
+      const moduleData = permissionModules.find((m) => m.slug === module);
+      if (moduleData) {
+        (moduleData.permissions || []).forEach((perm) => {
+          if (perm !== "view") {
+            updated[perm] = false;
+          }
+        });
+      }
+    }
+
+    setPermissions((prev) => ({
+      ...prev,
+      [module]: updated,
+    }));
+  };
+  const togglePermission = (module, perm) => {
+    setPermissions((prev) => {
+      const currentPerms = prev?.[module] || {};
+      return {
+        ...prev,
+        [module]: {
+          ...currentPerms,
+          [perm]: !currentPerms?.[perm],
+        },
+      };
+    });
+  };
+
+  const handleSelectAll = (modSlug, isChecked) => {
+    const memberIds = memberFeeds.map((member) => String(member._id));
+    memberIds.push('unassigned')
+    if (isChecked) {
+      setPermissions((prev) => {
+        const currentPerms = prev?.[modSlug] || {};
+        const currentMembers = currentPerms['selected_members'] || [];
+    
+        return {
+          ...prev,
+          [modSlug]: {
+            ...currentPerms,
+            ['selected_members']: memberIds,
+          },
+        };
+      });
+    } else {
+      setPermissions((prev) => {
+        const currentPerms = prev?.[modSlug] || {};
+        return {
+          ...prev,
+          [modSlug]: {
+            ...currentPerms,
+            ['selected_members']: [],
+          },
+        };
+      });
+    }
+  };
+  
+
+  const toggleMembers = (module, perm, memberId) => {
+    setPermissions((prev) => {
+      const currentPerms = prev?.[module] || {};
+      const currentMembers = currentPerms[perm] || [];
+  
+      const updatedMembers = currentMembers.includes(memberId)
+        ? currentMembers.filter((id) => id !== memberId)
+        : [...currentMembers, memberId];
+  
+      return {
+        ...prev,
+        [module]: {
+          ...currentPerms,
+          [perm]: updatedMembers,
+        },
+      };
+    });
+  };
+  
+
+  useEffect(() => {
+    console.log("permissions:: ", permissions);
+  }, [permissions]);
+
+  const handleSave = async (e) => {
+    setLoader(true);
+      try {
+        const roleData = {
+          memberId: selectedMember._id,
+          permissions,
+          type: "member",
+        };
+        setLoader(true);
+        dispatch(updatePermissions(roleData));
+      } catch (err) {
+        setLoader(false);
+        console.error("Error adding role:", err);
+        alert("Error adding role");
+      }
+  };
 
   const handleUpdateSubmit = async (event) => {
     event.preventDefault();
@@ -543,10 +752,15 @@ function TeamMembersPage() {
               <h2>
                 Members
                 <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none ms-auto ms-md-2'} onClick={handleSearchShow}><MdSearch /></Button>
-                <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
+                {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                  <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
+                  
+                )}
                 <ListGroup horizontal className={isActive ? "d-none" : "ms-auto d-none d-md-flex"}>
                   <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Members"} onClick={() => { setsearchTerm(''); setActiveTab("Members") }}>Members</ListGroup.Item>
+                  {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                   <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Invitees"} onClick={() => { setsearchTerm(''); setActiveTab("Invitees") }}>Invitations</ListGroup.Item>
+                  )}
                   <ListGroup.Item className='d-none d-lg-block'>
                     <Form onSubmit={(e) => {e.preventDefault()}}>
                       <Form.Group className="mb-0 form-group">
@@ -643,95 +857,245 @@ function TeamMembersPage() {
           toggleActive={setIsActive}
         />
       )}
-
+      { isActive &&
       <div className="details--member--view">
         <div className="wrapper--title">
           <div className="projecttitle">
             <h3><strong>Member Details</strong></h3>
           </div>
+         
           <ListGroup horizontal>
+          <Button variant="outline-primary" className={`btn--view d-none d-sm-flex${tab === 'details' ? ' active' : ''}`} onClick={() => setTab('details')}>Details</Button>
+          { (memberProfile?.permissions?.members?.update_permissions === true || memberProfile?.role?.slug === "owner") && (
+          <Button variant="outline-primary" className={`btn--view d-none d-sm-flex${tab === 'permissions' ? ' active' : ''}`} onClick={() => {
+           setTab('permissions')
+            }}>Permissions</Button>
+          )}
             <ListGroup.Item onClick={() => setIsActive(0)}>
               <MdOutlineClose />
             </ListGroup.Item>
           </ListGroup>
         </div>
-        <div className="rounded--box">
-          <Card>
-            <div className="card--img">
-              <Card.Img variant="top" src={selectedMember?.avatar ?? "./images/default.jpg"} />
-            </div>
-            <Card.Body>
-              <Card.Title>Member Information</Card.Title>
-              <Card.Text>
-                <ListGroup>
-                  <ListGroup.Item>
-                    <strong>Name</strong> {selectedMember?.name}
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <strong>Email</strong> {selectedMember?.email}
-                  </ListGroup.Item>
-                  <EditableField
-                    selectedMember={selectedMember}
-                    field="role"
-                    label="Role"
-                    value={editedMember?.role}
-                    onChange={(value) => handleFieldChange("role", value)}
-                    isEditing={isEditing.role}
-                    onEditClick={() => handleEditClick("role")}
-                    error={errors["role"] && errors["role"]}
-                    printval={editedMember.rolename}
-                    roles={roles}
-                  />
-                </ListGroup>
-                {currentMember &&
-                  Object.keys(currentMember).length > 0 &&
-                  currentMember.role?.slug !== "owner" &&
-                  selectedMember?.role?.slug === "owner" ? null : (currentMember &&
-                    Object.keys(currentMember).length > 0 &&
-                    currentMember.role?.permissions?.members ===
-                    "view_and_edit") ||
-                    selectedMember?._id === currentMember?._id ? (
-                  <>
+        { tab === 'details' ?
+          <div className="rounded--box">
+            <Card>
+              <div className="card--img">
+                <Card.Img variant="top" src={selectedMember?.avatar ?? "./images/default.jpg"} />
+              </div>
+              <Card.Body>
+                <Card.Title>Member Information</Card.Title>
+                <Card.Text>
+                  <ListGroup>
                     <ListGroup.Item>
-                      <strong>Recording Type</strong>
-                      <Form.Select className="form-control" id="member-meta" onChange={(event) => handleFieldChange("memberMeta", event)}
+                      <strong>Name</strong> {selectedMember?.name}
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <strong>Email</strong> {selectedMember?.email}
+                    </ListGroup.Item>
+                    {(memberProfile?.permissions?.members?.create_edit_delete === true  || memberProfile?.role?.slug === "owner")?
+                      <EditableField
+                        selectedMember={selectedMember}
+                        field="role"
+                        label="Role"
+                        value={editedMember?.role}
+                        onChange={(value) => handleFieldChange("role", value)}
+                        isEditing={isEditing.role}
+                        onEditClick={() => handleEditClick("role")}
+                        error={errors["role"] && errors["role"]}
+                        printval={editedMember.rolename}
+                        roles={roles}
+                      />
+                      :
+                      <>
+                      <ListGroup.Item>
+                        <strong>Role</strong> {editedMember.rolename}
+                      </ListGroup.Item>
+                      </>
+                    }
+                  </ListGroup>
+                  
+                  <ListGroup.Item>
+                    <strong>Recording Type</strong>
+                    {
+                      (memberProfile?.permissions?.members?.create_edit_delete === true &&
+                      selectedMember?._id !== currentMember?._id || memberProfile?.role?.slug === "owner") ? 
+
+                        <Form.Select className="form-control" id="member-meta" onChange={(event) => handleFieldChange("memberMeta", event)}
                         value={editedMember?.memberMeta?.recording} name="recording">
                         <option key={`both`} value='both'>Screenshot And Video</option>
                         <option key={`screenshot_only`} value='screenshot_only'>Screenshot Only</option>
                         <option key={`video_only`} value='video_only'>Video Only</option>
                       </Form.Select>
-                    </ListGroup.Item>
-                  </>
-                ) : (
+                      :
+                      <span>{editedMember?.memberMeta?.recording
+                        ?.replace(/_/g, ' ')
+                        .replace(/^./, (char) => char.toUpperCase())}</span>
+                    }
+                   
+                  </ListGroup.Item>
+                    
+                    
+                    
+                  
+                </Card.Text>
+                <div className="text-end mt-3">
+                  {
+                      (memberProfile?.permissions?.members?.create_edit_delete === true &&
+                      selectedMember?._id !== currentMember?._id  || memberProfile?.role?.slug === "owner") ? (
+                    <>
+                      <Button variant="danger" className="me-3" onClick={() => setShowDialog(true)}>Delete</Button>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                  {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ?
+                  <Button variant="primary" disabled={updateloader} onClick={handleUpdateSubmit}>{updateloader ? 'Please Wait...' : 'Save Changes'}</Button>
+                  :
+                  <></>
+                  }
+                </div>
+              </Card.Body>
+            </Card>
+          </div>
+        :
+        <div className="rounded-box">
+        <Card>
+          <Card.Body>
+              <Card.Title>Permissions</Card.Title>
+              
+                <>
+                <Accordion>
+                  {permissionModules.map((mod) => {
+                    const modSlug = mod.slug;
+                    const modPerms = permissions?.[modSlug] || {};
+                    const isExpanded = expanded?.[modSlug] || false;
+                    const isViewChecked = !!modPerms.view;
+  
+                    return (
+                      <Accordion.Item eventKey={modSlug}>
+                            <Accordion.Header>{mod.name}</Accordion.Header>
+                            <Accordion.Body>
+                            <div className="ml-6 mt-2 space-y-1 transition-all pb-2">
+                            {(mod.permissions || []).map((perm) => {
+                              if (perm === 'view') {
+                                return (
+                                  <Form.Check
+                                    key={`${modSlug}--view`}
+                                    type="checkbox"
+                                    id={`${modSlug}-view`}
+                                    label="View"
+                                    checked={!!modPerms.view}
+                                    disabled={selectedMember?.role?.slug === "owner"}
+                                    onChange={() => {
+                                      if(selectedMember?.role?.slug !== "owner"){ 
+                                        toggleView(modSlug)
+                                      }}
+                                    }
+                                  />
+                                );
+                              }
 
-                  <></>
-                )}
-                  
-                  
-                
-              </Card.Text>
-              <div className="text-end mt-3">
-                {currentMember &&
-                  Object.keys(currentMember).length > 0 &&
-                  currentMember.role?.slug !== "owner" &&
-                  selectedMember?.role?.slug === "owner" ? null : (currentMember &&
-                    Object.keys(currentMember).length > 0 &&
-                    currentMember.role?.permissions?.members ===
-                    "view_and_edit") ||
-                    selectedMember?._id === currentMember?._id ? (
-                  <>
-                    <Button variant="danger" className="me-3" onClick={() => setShowDialog(true)}>Delete</Button>
+                              return (
+                                <>
+                                  <Form.Check
+                                    key={perm}
+                                    type="checkbox"
+                                    id={`${modSlug}-${perm}`}
+                                    label={perm
+                                      .replace(/[_-]/g, " ")
+                                      .replace(/^\w/, (l) => l.toUpperCase())}
+                                    disabled={!isViewChecked}
+                                    checked={!!modPerms[perm]}
+                                    readOnly={selectedMember?.role?.slug === "owner"}
+                                    onChange={() => {
+                                      if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
+
+                                    }}
+                                    className={!isViewChecked ? 'parent-item text-muted' : 'parent-item'}
+                                  />
+                              
+                              {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
+                                perm === "view_others" &&
+                                modPerms[perm] === true &&
+                                <>
+                                <Form.Check
+                                  key={`${modSlug}-${perm}-select-all`}
+                                  type="checkbox"
+                                  id={`${modSlug}-${perm}-select-all`}
+                                  label="Select all"
+                                  disabled={selectedMember?.role?.slug === "owner"}
+                                  checked={memberFeeds.every((member) =>
+                                    modPerms["selected_members"]?.includes(String(member._id))
+                                  )}
+                                  onChange={(e) => {
+                                    if(selectedMember?.role?.slug !== "owner"){ 
+                                      handleSelectAll(modSlug, e.target.checked)
+                                    }
+                                  }}
+                                  className="sub-items"
+                                />
+                                <>
+                                  {memberFeeds.map((member) => (
+                                    <Form.Check
+                                      key={`${modSlug}-${perm}-${member._id}`}
+                                      type="checkbox"
+                                      id={`${modSlug}-${perm}-${member._id}`}
+                                      label={member.name}
+                                      checked={modPerms["selected_members"]?.includes(String(member._id))}
+                                      disabled={selectedMember?.role?.slug === "owner"}
+                                      onChange={() => {
+                                        if (selectedMember?.role?.slug !== "owner") {
+                                          toggleMembers(modSlug, "selected_members", member._id);
+                                        }
+                                      }}
+                                      className="sub-items"
+                                    />
+                                  ))}
+
+                                  {modSlug === "projects" && (
+                                    <Form.Check
+                                      key={`${modSlug}-${perm}-unassigned`}
+                                      type="checkbox"
+                                      id={`${modSlug}-${perm}-unassigned`}
+                                      label="Unassigned"
+                                      checked={modPerms["selected_members"]?.includes('unassigned')}
+                                      disabled={selectedMember?.role?.slug === "owner"}
+                                      onChange={() => {
+                                        if (selectedMember?.role?.slug !== "owner") {
+                                          toggleMembers(modSlug, "selected_members", 'unassigned');
+                                        }
+                                      }}
+                                      className="sub-items"
+                                    />
+                                  )}
+                                  </>
+
+                                </>
+                                }
+                                </>
+                              );
+                              
+                            })}
+
+                          </div>
+                            </Accordion.Body>
+                          </Accordion.Item>
+                      
+                    );
+                  })}
+                  </Accordion>
+                  <div className="mt-6 text-right">
+                    <Button variant="primary" onClick={handleSave} disabled={loader}>
+                      { loader ? 'Please wait...' : 'Save Permissions'}
+                    </Button>
+                  </div>
                   </>
-                ) : (
-                  <></>
-                )}
-                <Button variant="primary" disabled={updateloader} onClick={handleUpdateSubmit}>{updateloader ? 'Please Wait...' : 'Save Changes'}</Button>
-              </div>
-            </Card.Body>
+              </Card.Body>
           </Card>
         </div>
+        }
       </div>
-
+        }
       <Modal show={show} onHide={handleClose} centered size="lg" className="add--team--member--modal add--member--modal" onShow={() => selectboxObserver()}>
         <Modal.Header closeButton>
           <Modal.Title>Add Member</Modal.Title>

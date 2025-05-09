@@ -1713,83 +1713,83 @@ Project Task View CSS=-=-=
   border-top: 10px solid rgb(195, 84, 9);
 }
 
-.workflow--color-0 {
+.flow--circle.workflow--color-0 {
   background: #999999;
 }
 
-.workflow--color-1 {
+.flow--circle.workflow--color-1 {
   background: #FEBBCC;
 }
 
-.workflow--color-2 {
+.flow--circle.workflow--color-2 {
   background: #ecc259;
 }
 
-.workflow--color-3 {
+.flow--circle.workflow--color-3 {
   background: #5ace5d;
 }
 
-.workflow--color-4 {
+.flow--circle.workflow--color-4 {
   background: darkblue;
 }
 
-.workflow--color-5 {
+.flow--circle.workflow--color-5 {
   background: rgb(193, 236, 129);
 }
 
-.workflow--color-6 {
+.flow--circle.workflow--color-6 {
   background: #f6cf87;
 }
 
-.workflow--color-7 {
+.flow--circle.workflow--color-7 {
   background: #9398f3;
 }
 
-.workflow--color-8 {
+.flow--circle.workflow--color-8 {
   background: #36c1f8;
 }
 
-.workflow--color-9 {
+.flow--circle.workflow--color-9 {
   background: rgb(245, 158, 99);
 }
 
-.workflow--color-10 {
+.flow--circle.workflow--color-10 {
   background: #5d58f3;
 }
 
-.workflow--color-11 {
+.flow--circle.workflow--color-11 {
   background: #615055;
 }
 
-.workflow--color-12 {
+.flow--circle.workflow--color-12 {
   background: #ecb72e;
 }
 
-.workflow--color-13 {
+.flow--circle.workflow--color-13 {
   background: #f45555;
 }
 
-.workflow--color-14 {
+.flow--circle.workflow--color-14 {
   background: rgb(234, 130, 50);
 }
 
-.workflow--color-15 {
+.flow--circle.workflow--color-15 {
   background: rgb(71, 190, 237);
 }
 
-.workflow--color-16 {
+.flow--circle.workflow--color-16 {
   background: #49a0e3;
 }
 
-.workflow--color-17 {
+.flow--circle.workflow--color-17 {
   background: #b6d215;
 }
 
-.workflow--color-18 {
+.flow--circle.workflow--color-18 {
   background: #0a86b7;
 }
 
-.workflow--color-19 {
+.flow--circle.workflow--color-19 {
   background: rgb(195, 84, 9);
 }
 
@@ -1833,11 +1833,11 @@ Project Task View CSS=-=-=
   background: rgba(0, 0, 0, 0.1);
 }
 
-.projects--grid .task--list ul li {
+.projects--grid .task--list ul li .task-card {
   padding: 1rem;
   margin-bottom: 0.6rem;
   cursor: pointer;
-  background: #ffffff90;
+  background: rgba(255, 255, 255, .95);
   position: relative;
   font-size: 0.9rem;
   display: flex;

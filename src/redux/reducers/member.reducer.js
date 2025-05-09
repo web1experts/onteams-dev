@@ -18,7 +18,8 @@ import {
     INVITE_DELETE_FAILED,
     RESEND_INVITE_SUCCESS,
     RESEND_INVITE_FAILED,
-    CLEAR_MESSAGES
+    CLEAR_MESSAGES,
+    MEMBERS_BY_ROLES
 } from "../actions/types";
 
 const initialState = {
@@ -58,6 +59,12 @@ export default (state = initialState, action) => {
             members: action.payload.membersData,
             createMember: initialState.createMember,
             invite: false,
+        }
+    case MEMBERS_BY_ROLES:
+        
+        return {
+            ...state,
+            memberslist: action.payload.memberdata,
         }
     case LIST_MEMBER_FAILED:
         return {

@@ -4,15 +4,15 @@ import { FaList, FaPlus, FaTrashAlt } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { BsGrid } from "react-icons/bs";
 import { MdOutlineClose, MdSearch } from "react-icons/md";
-import { ListClients, createClient, deleteClient, updateClient } from "../../redux/actions/client.action";
+import { ListClients, deleteClient, updateClient } from "../../redux/actions/client.action";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { jwtDecode } from "jwt-decode"
-import { useToast } from "../../context/ToastContext";
 import AddClient from "./AddClient";
 import { AlertDialog } from "../modals";
 import Spinner from 'react-bootstrap/Spinner';
+import { currentMemberProfile } from "../../helpers/auth";
 
 function EditableField({ field, label, value, onChange, isEditing, onEditClick, error }) {
   const inputRef = useRef(null);
@@ -68,7 +68,7 @@ function EditableField({ field, label, value, onChange, isEditing, onEditClick, 
 function ClientsPage() {
   const [spinner, setSpinner] = useState(false)
   const inputs = document.querySelectorAll('.form-floating .form-control');
-
+  const memberProfile = currentMemberProfile()
   inputs.forEach(input => {
     input.addEventListener('input', function () {
       if (this.value) {
@@ -405,7 +405,10 @@ function ClientsPage() {
               <Col sm={12}>
                 <h2>Clients
                   <Button variant="primary" className={isActive ? 'd-flex ms-md-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button>
-                  <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
+                  {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                    <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
+                    
+                  )}
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
                     <ListGroup.Item className='d-none d-lg-block'>
                       <Form onSubmit={(e) => {e.preventDefault()}}>
@@ -470,6 +473,7 @@ function ClientsPage() {
           </Container>
         </div>
       </div>
+      {selectedClient &&
       <div className="details--wrapper">
         <div className="wrapper--title">
           <div className="projecttitle">
@@ -485,33 +489,53 @@ function ClientsPage() {
           <Card>
             <div className="card--img">
               <Form.Control type="file" id="upload--img" hidden onChange={(e) => handleFieldChange('avatar', e)} accept=".jpg, .jpeg, .png, .gif" />
+              {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ? (
+                <>
+                <Form.Label for="upload--img">
+                  {
+                    avatarPreview ? 
+                      <Card.Img variant="top" src={avatarPreview} />
+                    :
+                    isEditing.remove_avatar === false && editedClient?.avatar ?
+                    <Card.Img variant="top" src={editedClient?.avatar ?? "./images/default.jpg"} />
+                    :
+                      <Card.Img variant="top" src={"./images/default.jpg"} />
+                  }
+                  
+                  {!editedClient?.avatar &&
+                    <span>Add Photo</span>
+                  }
+                  {editedClient?.avatar &&
+                    <span>Edit Photo</span>
+                  }
+
+                </Form.Label>
+                {editedClient?.avatar && isEditing.remove_avatar === false &&
+                  <span className="remove--photo" onClick={removeAvatar}><FaTrashAlt /></span>
+                }
+                </>
+              )
+              :
               <Form.Label for="upload--img">
-                {
-                  avatarPreview ? 
-                    <Card.Img variant="top" src={avatarPreview} />
-                  :
-                  isEditing.remove_avatar === false && editedClient?.avatar ?
-                  <Card.Img variant="top" src={editedClient?.avatar ?? "./images/default.jpg"} />
-                  :
-                    <Card.Img variant="top" src={"./images/default.jpg"} />
-                }
-
-                {!editedClient?.avatar &&
-                  <span>Add Photo</span>
-                }
-                {editedClient?.avatar &&
-                  <span>Edit Photo</span>
-                }
-
-              </Form.Label>
-              {editedClient?.avatar && isEditing.remove_avatar === false &&
-                <span className="remove--photo" onClick={removeAvatar}><FaTrashAlt /></span>
-              }
+                  {
+                    avatarPreview ? 
+                      <Card.Img variant="top" src={avatarPreview} />
+                    :
+                    isEditing.remove_avatar === false && editedClient?.avatar ?
+                    <Card.Img variant="top" src={editedClient?.avatar ?? "./images/default.jpg"} />
+                    :
+                      <Card.Img variant="top" src={"./images/default.jpg"} />
+                  }
+                
+                </Form.Label>
+            }
             </div>
             <Card.Body>
               <Card.Title>Client Information</Card.Title>
               <Card.Text>
                 <ListGroup>
+                {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ?
+                <>
                   <EditableField
                     field="name"
                     label="Client Name"
@@ -525,16 +549,28 @@ function ClientsPage() {
                     fieldserrors['name'] &&
                     <span className="error">{fieldserrors.name}</span>
                   }
+                  </>
+                  :
+                  <>
+                    <strong>Client Name</strong> {editedClient?.name}
+                  </>
+                  }
                 </ListGroup>
               </Card.Text>
+              
               <div className="text-end mt-3">
-                <Button variant="danger" className="me-3" onClick={() => setShowDialog(true)}>Delete</Button>
-                <Button variant="primary" onClick={handleUpdateSubmit} disabled={loader}> {loader ? 'Please wait...' : 'Save Changes'}</Button>
+                {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                <>
+                  <Button variant="danger" className="me-3" onClick={() => setShowDialog(true)}>Delete</Button>
+                  <Button variant="primary" onClick={handleUpdateSubmit} disabled={loader}> {loader ? 'Please wait...' : 'Save Changes'}</Button>
+                  </>
+                  
+                )}
               </div>
             </Card.Body>
           </Card>
         </div>
-        <AddClient show={show} toggleshow={setShow} />
+        
         <AlertDialog
           showdialog={showdialog}
           toggledialog={setShowDialog}
@@ -542,6 +578,8 @@ function ClientsPage() {
           callback={handledeleteClient}
         />
       </div>
+      }
+      {show && <AddClient show={show} toggleshow={setShow} /> }
       {/*--=-=Search Modal**/}
       <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
         <Modal.Header closeButton>

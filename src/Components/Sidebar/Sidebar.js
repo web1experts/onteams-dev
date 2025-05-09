@@ -17,22 +17,19 @@ import { getloggedInUser, decryptJsonData, encryptJsonData, currentMemberProfile
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthorization } from '../../helpers/api';
 import { Link, useLocation } from "react-router-dom";
-import { transformString, parseIfValidJSON, getMemberdata } from '../../helpers/commonfunctions';
+import { transformString, parseIfValidJSON, getMemberdata, mergePermissions } from '../../helpers/commonfunctions';
 import { logout } from '../../redux/actions/auth.actions';
 
 function SidebarPanel() {
     const secretKey = process.env.REACT_APP_SECRET_KEY
     const dispatch = useDispatch()
-    const { currentMember } = useSelector(state => state.member);
     const updateDashboard = useSelector( state => state.workspace.updateDashboard)
     const workspacestate = useSelector( state => state.workspace)
     const authstate = useSelector( state => state.auth)
-    const memberdata = getMemberdata()
-    const [show, setShow] = useState(false);
-    const captureClose = () => setShow(false);
-    const captureShow = () => setShow(true);
+
     const currentLoggedUser = getloggedInUser();
     const memberProfile = currentMemberProfile()
+
     const location = useLocation();
     let companyname = '';
     let selectedCompId;
@@ -44,10 +41,10 @@ function SidebarPanel() {
         setShowDropdown(isOpen);
     };
 
-    const handleItemClick = (companyId) => {
-        handleClick(companyId);
-        setShowDropdown(false);
-    };
+    // const handleItemClick = (companyId) => {
+    //     handleClick(companyId);
+    //     setShowDropdown(false);
+    // };
     
     const encryptedCompany = localStorage.getItem('current_dashboard');
     if (encryptedCompany && encryptedCompany !== "") {
@@ -94,15 +91,15 @@ function SidebarPanel() {
 
     
 
-    const onChange = (selectedvalue) => {
-        const selected = companies.find(company => company.company._id === selectedvalue);
-        localStorage.setItem('current_dashboard', JSON.stringify({ name: selected.company.name, id: selected.company._id }));
-        localStorage.setItem('mt_featureSwitches', JSON.stringify(selected?.memberData || null))
-        // setAuthorization()
-        setTimeout(function () {
-            window.location.reload();
-        }, 1000)
-    }
+    // const onChange = (selectedvalue) => {
+    //     const selected = companies.find(company => company.company._id === selectedvalue);
+    //     localStorage.setItem('current_dashboard', JSON.stringify({ name: selected.company.name, id: selected.company._id }));
+    //     localStorage.setItem('mt_featureSwitches', JSON.stringify(selected?.memberData || null))
+    //     // setAuthorization()
+    //     setTimeout(function () {
+    //         window.location.reload();
+    //     }, 1000)
+    // }
 
     const handleClick = (selectedvalue) => {
         const selected = companies.find(company => company.company._id === selectedvalue);
@@ -158,25 +155,53 @@ function SidebarPanel() {
                         <Nav>
                             <Link key="dashboard-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} to="/dashboard"><span className="nav--item--icon"><LuLayoutDashboard /></span> Dashboard</Link>
                             {
-                                memberdata && memberdata.role?.permissions && memberdata.role?.permissions.projects && memberdata.role?.permissions.projects !== 'none' &&
-                                <Link key="project-menu" onClick={handleToggler}  className={`nav-link ${location.pathname === '/projects' ? 'active' : ''}`} to="/projects"><span className="nav--item--icon"><RxDashboard /></span> Projects</Link>
-                            }
-                            {
-                                memberdata && memberdata.role?.permissions && memberdata.role?.permissions.clients && memberdata.role?.permissions.clients !== 'none' &&
-                                <Link  key="client-menu" onClick={handleToggler}  className={`nav-link ${location.pathname === '/clients' ? 'active' : ''}`} to="/clients"><span className="nav--item--icon"><GrGroup /></span> Clients</Link>
-                            }
-                            {
-                                memberdata && memberdata.role?.permissions && memberdata.role?.permissions.members && memberdata.role?.permissions.members !== 'none' &&
-                                <Link  key="members-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/team-members' ? 'active' : ''}`} to="/team-members"><span className="nav--item--icon"><AiOutlineTeam /></span> Team Members</Link>
-                            }
+                                (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner') && (
+                                    <Link
+                                    key="project-menu"
+                                    onClick={handleToggler}
+                                    className={`nav-link ${location.pathname === '/projects' ? 'active' : ''}`}
+                                    to="/projects"
+                                    >
+                                    <span className="nav--item--icon"><RxDashboard /></span> Projects
+                                    </Link>
+                                )
+                                }
 
-                            <Link  key="tracking-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/time-tracking' ? 'active' : ''}`} to="/time-tracking"><span className="nav--item--icon"><LuTimer /></span> Time Tracking</Link>
-                            {/* <Link  key="invite-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/invitations' ? 'active' : ''}`} to="/invitations"><span className="nav--item--icon"><HiUserPlus /></span> Invitations</Link> */}
-                            <Link  key="reports-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/reports' ? 'active' : ''}`} to="/reports"><span className="nav--item--icon"><TbReport /></span> Reports</Link>
-                            <Link  key="holidays-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/holidays' ? 'active' : ''}`} to="/holidays"><span className="nav--item--icon"><BsCalendar2Week /></span> Holidays</Link>
-                            <Link  key="attendance-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/attendance' ? 'active' : ''}`} to="/attendance"><span className="nav--item--icon"><CgCalendarDates /></span> Attendance</Link>
-                            {/* <Link  key="docs-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><CgFileDocument /></span> Docs</Link> */}
-                            {/* <Link  key="chats-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><BiChat /></span> Chats</Link> */}
+                            
+                            {
+                                (memberProfile?.permissions && memberProfile?.permissions?.clients?.view === true  || memberProfile?.role?.slug === 'owner') && (
+                                <Link  key="client-menu" onClick={handleToggler}  className={`nav-link ${location.pathname === '/clients' ? 'active' : ''}`} to="/clients"><span className="nav--item--icon"><GrGroup /></span> Clients</Link>
+                                )
+                            }
+                            {
+                                (memberProfile?.permissions && memberProfile?.permissions?.members?.view === true   || memberProfile?.role?.slug === 'owner') && (
+                                <Link  key="members-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/team-members' ? 'active' : ''}`} to="/team-members"><span className="nav--item--icon"><AiOutlineTeam /></span> Team Members</Link>
+                                )
+                            }
+                            {
+                                (memberProfile?.permissions && memberProfile?.permissions?.tracking?.view === true   || memberProfile?.role?.slug === 'owner' ) && (
+                                <Link  key="tracking-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/time-tracking' ? 'active' : ''}`} to="/time-tracking"><span className="nav--item--icon"><LuTimer /></span> Time Tracking</Link>
+                                )
+                            }
+                                {/* <Link  key="invite-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/invitations' ? 'active' : ''}`} to="/invitations"><span className="nav--item--icon"><HiUserPlus /></span> Invitations</Link> */}
+                            {
+                                (memberProfile?.permissions && memberProfile?.permissions?.reports?.view === true   || memberProfile?.role?.slug === 'owner') && (
+                                <Link  key="reports-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/reports' ? 'active' : ''}`} to="/reports"><span className="nav--item--icon"><TbReport /></span> Reports</Link>
+                                )
+                            }
+                            {
+                                (memberProfile?.permissions && memberProfile?.permissions?.holidays?.view === true   || memberProfile?.role?.slug === 'owner') && (
+                                <Link  key="holidays-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/holidays' ? 'active' : ''}`} to="/holidays"><span className="nav--item--icon"><BsCalendar2Week /></span> Holidays</Link>
+                                )
+                            }
+                            {
+                                (memberProfile?.permissions && memberProfile?.permissions?.attendance?.view === true  || memberProfile?.role?.slug === 'owner') && (
+                                <Link  key="attendance-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/attendance' ? 'active' : ''}`} to="/attendance"><span className="nav--item--icon"><CgCalendarDates /></span> Attendance</Link>
+                                )
+                            }
+                            <Link  key="docs-menu" onClick={handleToggler} className="nav-link" to="/permissions"><span className="nav--item--icon"><CgFileDocument /></span> Roles & Permission</Link>
+                            
+                                {/* <Link  key="chats-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><BiChat /></span> Chats</Link> */}
                             {/* <Link  key="notes-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><CgNotes /></span> Notes</Link> */}
                             {/* <Link  key="invoice-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/invoice' ? 'active' : ''}`} to="/invoice"><span className="nav--item--icon"><TbFileInvoice /></span> Invoice</Link> */}
                             {/* <Link  key="password-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><RiLockPasswordLine /></span> Password Manager</Link> */}
@@ -185,29 +210,7 @@ function SidebarPanel() {
                         </Nav>
                     </Navbar.Collapse>
                 </Navbar>
-                {/* <Button variant="primary" className="screen--record" onClick={ captureShow}>REC</Button> */}
             </div>
-
-            <Modal show={show} onHide={captureClose} className="captureModal" centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Screen Capture Widget</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Tabs defaultActiveKey="Screenshot" id="capture--Tabs">
-                        <Tab eventKey="Screenshot" title={<span><BiScreenshot /> Screenshot</span>}>
-                            <Button variant="primary" onClick={captureClose}><BsRecord2 /> Capture</Button>
-                        </Tab>
-                        <Tab eventKey="Video" title={<span><RiCamera3Line /> Video</span>}>
-                            <div class="live--video--capture">
-                                <span class="status--circle gray--circle"></span>
-                                <p>0:00/05:00</p>
-                                <span className="mic--icon"><FaMicrophone /></span>
-                            </div>
-                            <Button variant="primary" onClick={captureClose}><BsRecord2 /> Capture</Button>
-                        </Tab>
-                    </Tabs>
-                </Modal.Body>
-            </Modal>
         </>
     );
 }

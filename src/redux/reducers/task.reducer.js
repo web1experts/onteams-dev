@@ -27,7 +27,8 @@ import {
         comment: null,
         singleTask: null,
         message_variant: null,
-        tasks: null
+        tasks: null,
+        reorder: null
     };
     
     export default (state = initialState, action) => {
@@ -36,7 +37,8 @@ import {
             return {
                 ...state,
                  success: false,
-                // message: action.payload.message,
+                 successfull: false,
+                 UpdatedTask: null,
                 error: null,
                 // message_variant: 'success',
                 newTask: action.payload.task
@@ -78,10 +80,10 @@ import {
         
         case PUT_TASK_SUCCESS:
             return {
-                currentTask: action.payload.updatedTask,
-                success: true,
-                message: action.payload.message,
-                message_variant: 'success',
+                UpdatedTask: action.payload.updatedTask,
+                success: action.payload.refresh,
+                // message: action.payload.message,
+                // message_variant: 'success',
             }
         case PUT_TASK_FAILED:
             return{
@@ -90,11 +92,14 @@ import {
             }
         case TASK_REORDER:
             return {
-                successfull: true
+                successfull: true,
+                UpdatedTask: action.payload.UpdatedTask,
+                reorder: 'pass'
             }
         case TASK_REORDER_ERROR:
             return{
-                successfull: false
+                successfull: false,
+                reorder: 'fail'
             }
         case TASK_COMMON_ERROR: 
             return {
@@ -106,6 +111,8 @@ import {
                 ...state,
                 message: null,
                 message_variant: null,
+                UpdatedTask: null,
+                newTask: null
             };
         case CURRENT_TASK: 
             return {

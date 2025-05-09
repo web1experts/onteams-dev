@@ -7,15 +7,17 @@ import { formatDateinString, selectboxObserver } from "../../helpers/commonfunct
 import { ListAttendance } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import DatePicker from "react-multi-date-picker";
+import { currentMemberProfile } from "../../helpers/auth";
 function AttendancePage() {
   const dispatch = useDispatch()
+  const memberProfile = currentMemberProfile()
   const attendanceFeed = useSelector(state => state.attendance.attendances)
   const apiResult = useSelector(state => state.attendance)
   const [ attendances, setAttendances] = useState([])
   const memberFeed = useSelector((state) => state.member.members)
   const [members, setMembers] = useState([])
   const [isActive, setIsActive] = useState(false);
-  const [ filters, setFilters] = useState({});
+  const [ filters, setFilters] = useState({member: memberProfile?._id});
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -69,15 +71,21 @@ function AttendancePage() {
                     <ListGroup.Item>
                       <Form className="d-flex align-items-center">
                         <Form.Group className="mb-0 form-group me-3">
-                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
-                          <option value="all">Members</option>
-                          {
-                              members.map((member, index) => {
-                                  return <option selected={filters['member'] && filters['member'] === member._id ? true : false} key={`member-projects-${index}`} value={member._id}>{member.name}</option>
-                              })
-                          }
-                        </Form.Select>
-                          
+                        {(memberProfile?.permissions?.members?.view === true && memberProfile?.permissions?.attendance?.view_others === true && memberProfile?.permissions?.attendance?.selected_members?.length > 0 || memberProfile?.role?.slug === "owner") && (
+                          <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
+                            {
+                              (memberProfile?.permissions?.attendance?.view_others === true || memberProfile?.role?.slug === 'owner') &&
+                              <option value="all">All Members</option>
+                            }
+                           
+                            {
+                                members.map((member, index) => 
+                                  (memberProfile?.permissions?.attendance?.selected_members?.includes(member._id)  || memberProfile?.role?.slug === 'owner') ? (
+                                     <option selected={filters['member'] && filters['member'] === member._id ? true : false} key={`member-projects-${index}`} value={member._id}>{member.name}</option>
+                                  ) : null)
+                            }
+                          </Form.Select>
+                        )}
                         </Form.Group>
                         <Form.Group className="mb-0 form-group">
                           <DatePicker 

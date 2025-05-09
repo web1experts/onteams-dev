@@ -63,7 +63,7 @@ export const ListTasks = (projectId) => {
 export const createTask = (payload) =>{
     return async (dispatch)=>{
         try{
-            const response = await API.apiPost('task', payload);
+            const response = await API.apiPost('task', payload); console.log(response.data)
             if(response.data && response.data.success){
                 await dispatch({ type: CREATE_TASK_SUCCESS, payload:response.data});
             }else{

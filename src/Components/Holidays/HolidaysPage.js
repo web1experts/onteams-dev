@@ -7,9 +7,10 @@ import { getFieldRules, validateField } from "../../helpers/rules";
 import DatePicker from "react-multi-date-picker";
 import { formatDateinString } from "../../helpers/commonfunctions";
 import { createHoliday, ListHolidays, deleteHoliday, updateHoliday } from "../../redux/actions/holiday.action";
-
+import { currentMemberProfile } from "../../helpers/auth";
 function HolidaysPage() {
   const dispatch = useDispatch()
+  const memberProfile = currentMemberProfile()
   const [ date, setDate] = useState('')
   const holidaysFeed = useSelector(state => state.holiday.holidays)
   const apiResult = useSelector(state => state.holiday)
@@ -131,29 +132,14 @@ const handleDelete = (id) => {
               </Col>
               <Col xs={6} md={7}>
                 <ListGroup horizontal>
-                    {/* <ListGroup.Item className='d-none d-lg-block'>
-                      <Form>
-                        <Form.Group className="mb-0 form-group">
-                        <DatePicker 
-                          key={'date-filter'}
-                          name="date"
-                          weekStartDayIndex={1}
-                          id='datepicker'
-                          value={date} 
-                          format="YYYY-MM-DD"
-                          dateSeparator=" - " 
-                          onChange={async (value) => {
-                              setDate(value)
-                            }
-                          }          
-                          className="form-control"
-                          placeholder="YYYY-MM-DD"
-                      />
-                        </Form.Group>
-                      </Form>
-                    </ListGroup.Item> */}
+                    
                     <ListGroup.Item>
-                      <Button variant="primary" className="" onClick={handleShow}><FaPlus /> Add Holidays</Button>
+                      {
+                        (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && ( 
+                        <Button variant="primary" className="" onClick={handleShow}><FaPlus /> Add Holidays</Button>
+                        )
+                      }
+                      
                     </ListGroup.Item>
                   </ListGroup>
               </Col>
@@ -193,10 +179,22 @@ const handleDelete = (id) => {
                               <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                               <Dropdown.Menu>
                                 <Dropdown.Item key={`edit-item-${index}`} onClick={() => {
-                                  setEditItem(holiday);
-                                  handleShow()
+                                  if(memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner'){
+                                    setEditItem(holiday);
+                                    handleShow()
+                                  }else{
+                                    console.log('action not allowed')
+                                  }
+                                  
                                 }}>Edit</Dropdown.Item>
-                                <Dropdown.Item key={`delete-item-${index}`}onClick={() => handleDelete(holiday._id)}>Delete</Dropdown.Item>
+                                <Dropdown.Item key={`delete-item-${index}`}onClick={() => {
+                                  if(memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner'){
+                                    handleDelete(holiday._id)
+                                  }else{
+                                    console.log('action not allowed')
+                                  }
+                              
+                                }}>Delete</Dropdown.Item>
                               </Dropdown.Menu>
                             </Dropdown>
                           </td>

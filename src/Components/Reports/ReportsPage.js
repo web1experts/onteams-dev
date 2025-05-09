@@ -10,13 +10,15 @@ import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/co
 import { MdFilterList } from "react-icons/md";
 import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
-import { ListProjects, ListMemberProjects } from "../../redux/actions/project.action";
+import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
 import { ListTasks } from "../../redux/actions/task.action";
+import { currentMemberProfile } from "../../helpers/auth";
 import "media-chrome";
 import "media-chrome/dist/menu"
 function ReportsPage() {
   const dispatch = useDispatch()
+  const memberProfile = currentMemberProfile()
   const datePickerRef = useRef(null)
   const manuldatePickerRef = useRef(null)
   const memberdata = getMemberdata()
@@ -116,7 +118,19 @@ function ReportsPage() {
   }
 
   const handleListProjects = async () => {
-      await dispatch(ListProjects({}));
+    if( memberProfile?.role?.slug === "owner"){
+        await dispatch(ListProjectsByMembers({members: 'all'}));
+    }else{
+      const members = Array.from(new Set([
+        memberProfile?._id,
+        ...(memberProfile?.permissions?.reports?.view_others
+            ? (memberProfile?.permissions?.reports?.selected_members || [])
+            : [])
+      ].filter(Boolean)));
+      
+        await dispatch(ListProjectsByMembers({members: members}));
+    }
+    
       await dispatch(ListMemberProjects(memberdata?._id));
   }
 
@@ -949,9 +963,17 @@ const TaskList = ({ report }) => {
                       <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || memberdata?._id}>
                         <option value={memberdata?._id}>My Reports</option>
                         {
-                            members.map((member, index) => {
-                                return <option key={`member-${index}`} value={member._id}>{member.name}</option>
-                            })
+                          (memberProfile?.permissions?.reports?.view_others === true && memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') &&
+                          <>
+                          {
+                            members.map((member, index) => 
+                              (memberProfile?.permissions?.reports?.selected_members?.includes(member._id)  || memberProfile?.role?.slug === 'owner') ? (
+                                <option key={`member-${index}`} value={member._id}>{member.name}</option>
+                              ) : null
+                            
+                            )
+                          }
+                          </>
                         }
                       </Form.Select>
                         
@@ -1057,9 +1079,11 @@ const TaskList = ({ report }) => {
                     </Form>
                   </ListGroup.Item>
                   }
-                  <ListGroup.Item>
-                    <Button variant="primary" onClick={handleShow}>Manual Time</Button>
-                  </ListGroup.Item>
+                  { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                    <ListGroup.Item>
+                      <Button variant="primary" onClick={handleShow}>Manual Time</Button>
+                    </ListGroup.Item>
+                  )}
                 </ListGroup>
               </Col>
             </Row>

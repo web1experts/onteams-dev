@@ -13,6 +13,7 @@ import { MemberInitials } from "../common/memberInitials";
 import { socket } from "../../helpers/auth";
 const TasksList = React.memo((props) => {
     const dispatch = useDispatch()
+    const memberProfile = props.memberProfile || {}
     const [fields, setFields] = useState({ title: '' })
     const [errors, setErrors] = useState({})
     const commonState = useSelector(state => state.common)
@@ -43,6 +44,8 @@ const TasksList = React.memo((props) => {
        });
     }, [commonState.currentProject])
 
+ 
+
     useEffect(() => {
         if (commonState?.currentProject && commonState?.currentProject?._id) {
             handleListTasks()
@@ -59,83 +62,232 @@ const TasksList = React.memo((props) => {
 
     useEffect(() => {
         if( apiResult.newTask){
+           
             setTasksLists({
                 ...taskslists,
                 [apiResult.newTask?.tab]: {
-                    ...taskslists[apiResult.newTask],
-                    tasks: [apiResult.newTask, ...taskslists[apiResult.newTask?.tab].tasks] // Add new task at the beginning
+                    ...taskslists[apiResult.newTask?.tab],
+                    tasks: [
+                        apiResult.newTask,
+                        ...taskslists[apiResult.newTask?.tab].tasks.filter(
+                            (task) => task._id !== apiResult.newTask._id
+                        )
+                    ]
                 }
-            });
+            });   
         }
 
         if (apiResult.success) {
             handleListTasks()
             setShowtaskform(false)
         }
+
+        if( apiResult.UpdatedTask){ 
+            setTasksLists(prev => ({
+                ...prev,
+                [apiResult.UpdatedTask.tab]: {
+                    ...prev[apiResult.UpdatedTask.tab],
+                    tasks: prev[apiResult.UpdatedTask.tab].tasks.map(task =>
+                        task._id === apiResult.UpdatedTask._id ? apiResult.UpdatedTask : task
+                    )
+                }
+            }));
+        } 
     }, [apiResult])
 
-    const handleDragEnd = (result) => {
+    const handleDragEnd = async (result) => {
         const { source, destination, draggableId } = result;
-        // If there's no destination (i.e., the item was dropped outside), do nothing
         if (!destination) return;
+    
         const taskId = draggableId.split('-')[1];
-        // Check if the task was moved within the same tab or to a different tab
-        const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
-        const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
+        const sourceTabId = source.droppableId.split('-')[1];
+        const destinationTabId = destination.droppableId.split('-')[1];
         let replacedTaskId = null;
-
-        if (sourceTabId === destinationTabId) {
-            // Handle reordering within the same tab
-            const reorderedTasks = Array.from(taskslists[sourceTabId].tasks);
-            replacedTaskId = reorderedTasks[destination.index]?._id;
-
-            const [removed] = reorderedTasks.splice(source.index, 1); // Remove task from the source position
-            reorderedTasks.splice(destination.index, 0, removed); // Add task to the destination position
-            // Update the state with the reordered tasks
-            setTasksLists({
-                ...taskslists,
-                [sourceTabId]: { ...taskslists[sourceTabId], tasks: reorderedTasks }
-            });
-            
-            const tasksToUpdate =
-            {
-                task_id: taskId,
-                tabId: sourceTabId,
-                order: destination.index,
-
+    
+        const prevState = JSON.parse(JSON.stringify(taskslists));
+    
+        try {
+            if (sourceTabId === destinationTabId) {
+                const reorderedTasks = Array.from(taskslists[sourceTabId].tasks);
+                replacedTaskId = reorderedTasks[destination.index]?._id;
+                // No change
+                if (source.index === destination.index) return;
+    
+                const [removed] = reorderedTasks.splice(source.index, 1);
+                reorderedTasks.splice(destination.index, 0, removed);
+    
+                // Check if the new order is actually different
+                const hasChanged = reorderedTasks.some((task, idx) => task._id !== taskslists[sourceTabId].tasks[idx]?._id);
+                if (!hasChanged) return;
+    
+                setTasksLists({
+                    ...taskslists,
+                    [sourceTabId]: { ...taskslists[sourceTabId], tasks: reorderedTasks }
+                });
+    
+                const tasksToUpdate = reorderedTasks.map((task, index) => ({
+                    task_id: task._id,
+                    order: index,
+                    tabId: sourceTabId
+                }));
+    
+                if (!navigator.onLine) {
+                    setTasksLists(prevState);
+                    return;
+                }
+    
+                await dispatch(reorderTasks({ tasks: tasksToUpdate }));
+            } else {
+                const sourceTasks = Array.from(taskslists[sourceTabId].tasks);
+                const destinationTasks = Array.from(taskslists[destinationTabId].tasks);
+                replacedTaskId = destinationTasks[destination.index]?._id;
+    
+                const [movedTask] = sourceTasks.splice(source.index, 1);
+                destinationTasks.splice(destination.index, 0, movedTask);
+    
+                // Check if the task was already in the destination index
+                if (
+                    taskslists[sourceTabId].tasks[source.index]?._id ===
+                    taskslists[destinationTabId].tasks[destination.index]?._id &&
+                    sourceTabId === destinationTabId
+                ) {
+                    return;
+                }
+                setTasksLists({
+                    ...taskslists,
+                    [sourceTabId]: { ...taskslists[sourceTabId], tasks: sourceTasks },
+                    [destinationTabId]: { ...taskslists[destinationTabId], tasks: destinationTasks }
+                });
+    
+                const tasksToUpdate = destinationTasks.map((task, index) => ({
+                    task_id: task._id,
+                    order: index,
+                    tabId: destinationTabId,
+                    ...(task._id === movedTask._id && { tab_update: true })
+                }));
+    
+                if (!navigator.onLine) {
+                    setTasksLists(prevState);
+                    return;
+                }
+                await dispatch(reorderTasks({ tasks: tasksToUpdate }));
             }
-            dispatch(reorderTasks({ tasks: tasksToUpdate }));
-        } else {
-            // Handle moving between different tabs
-            const sourceTasks = Array.from(taskslists[sourceTabId].tasks);
-            const destinationTasks = Array.from(taskslists[destinationTabId].tasks);
-            replacedTaskId = destinationTasks[destination.index]?._id;
-            const [movedTask] = sourceTasks.splice(source.index, 1); // Remove task from the source tab
-            destinationTasks.splice(destination.index, 0, movedTask); // Add task to the destination tab
-            // Update the state for both source and destination tabs
-            setTasksLists({
-                ...taskslists,
-                [sourceTabId]: { ...taskslists[sourceTabId], tasks: sourceTasks },
-                [destinationTabId]: { ...taskslists[destinationTabId], tasks: destinationTasks }
-            });
-
-            const tasksToUpdate =
-            {
-                task_id: taskId,
-                tabId: destinationTabId,
-                order: destination.index,
-                tab_update: true
-
-            }
-            dispatch(reorderTasks({ tasks: tasksToUpdate }));
+        } catch (error) {
+            console.error("Reorder failed, rolling back...", error);
+            setTasksLists(prevState);
         }
     };
+    
+
+    const handleDragEndOld = async (result) => {
+        const { source, destination, draggableId } = result;
+        if (!destination) return;
+    
+        const taskId = draggableId.split('-')[1];
+        const sourceTabId = source.droppableId.split('-')[1];
+        const destinationTabId = destination.droppableId.split('-')[1];
+        let replacedTaskId = null;
+    
+        const prevState = JSON.parse(JSON.stringify(taskslists));
+    
+        try {
+            if (sourceTabId === destinationTabId) {
+                const reorderedTasks = Array.from(taskslists[sourceTabId].tasks);
+                replacedTaskId = reorderedTasks[destination.index]?._id;
+                // No change
+                if (source.index === destination.index) return;
+    
+                const [removed] = reorderedTasks.splice(source.index, 1);
+                reorderedTasks.splice(destination.index, 0, removed);
+    
+                // Check if the new order is actually different
+                const hasChanged = reorderedTasks.some((task, idx) => task._id !== taskslists[sourceTabId].tasks[idx]?._id);
+                if (!hasChanged) return;
+    
+                setTasksLists({
+                    ...taskslists,
+                    [sourceTabId]: { ...taskslists[sourceTabId], tasks: reorderedTasks }
+                });
+    
+                const tasksToUpdate = reorderedTasks.map((task, index) => ({
+                    task_id: task._id,
+                    order: index,
+                    tabId: sourceTabId
+                }));
+    
+                if (!navigator.onLine) {
+                    setTasksLists(prevState);
+                    return;
+                }
+                await dispatch(reorderTasks({ tasks: tasksToUpdate }));
+            } else {
+                const sourceTasks = Array.from(taskslists[sourceTabId].tasks);
+                const destinationTasks = Array.from(taskslists[destinationTabId].tasks);
+                replacedTaskId = destinationTasks[destination.index]?._id;
+                const [movedTask] = sourceTasks.splice(source.index, 1);
+                destinationTasks.splice(destination.index, 0, movedTask);
+    
+                // Check if the task was already in the destination index
+                if (
+                    taskslists[sourceTabId].tasks[source.index]?._id ===
+                    taskslists[destinationTabId].tasks[destination.index]?._id &&
+                    sourceTabId === destinationTabId
+                ) {
+                    return;
+                }
+    
+                setTasksLists({
+                    ...taskslists,
+                    [sourceTabId]: { ...taskslists[sourceTabId], tasks: sourceTasks },
+                    [destinationTabId]: { ...taskslists[destinationTabId], tasks: destinationTasks }
+                });
+    
+                const tasksToUpdate = destinationTasks.map((task, index) => ({
+                    task_id: task._id,
+                    order: index,
+                    tabId: destinationTabId,
+                    ...(task._id === movedTask._id && { tab_update: true })
+                }));
+    
+                if (!navigator.onLine) {
+                    setTasksLists(prevState);
+                    return;
+                }
+    
+                await dispatch(reorderTasks({ tasks: tasksToUpdate }));
+            }
+        } catch (error) {
+            console.error("Reorder failed, rolling back...", error);
+            setTasksLists(prevState);
+        }
+    };
+    
 
     const handleChange = ({ target: { name, value } }) => {
         setFields({ ...fields, [name]: value })
         setErrors({ ...errors, [name]: '' });
-
     };
+
+    function getStyle(style, snapshot) {
+        if (snapshot.isDragging) {
+            return {
+                ...style,
+                // transform: `${style?.transform} rotate(5deg)`, // Add scale while dragging
+                zIndex: 999,                                   // Keep on top
+            };
+        }
+    
+        if (snapshot.isDropAnimating) {
+            return {
+                ...style,
+                transitionDuration: `0.001s`,                  // Fast drop
+                // transform: `${style?.transform} rotate(5deg)`, // Tiny spin on drop
+            };
+        }
+    
+        return style;
+    }
+    
 
     const handleTasksubmit = async (e) => {
         e.preventDefault(); 
@@ -201,216 +353,315 @@ const TasksList = React.memo((props) => {
                                 <div key={tab._id} className={`task--grid workflow--color-${index}`}>
                                     <h5>
                                         {tab.title}
-                                        <Button
-                                            variant="primary"
-                                            onClick={() => {
-                                                if( !showtaskform[tab._id] || showtaskform[tab._id] === false ){
-                                                    setFields({ title: '', tab: tab._id, project_id: currentProject?._id, order: 0 })
-                                                    setShowtaskform({ [tab._id]: true })
-                                                }
-                                               
-                                            }}
-                                        >
-                                            <FaPlus />
-                                        </Button>
-                                    </h5>
-                                    <Droppable droppableId={`droppable-${tab._id}`} type="TASKS">
-                                        {(provided) => (
-                                            <ul
-                                                id={`workflow-tab-${tab._id}`}
-                                                className="tasks--list"
-                                                ref={provided.innerRef}
-                                                {...provided.droppableProps}
-                                                style={{ overflowY: 'auto', height: '100%' }}
+                                        {( memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) && (
+                                            <Button
+                                                variant="primary"
+                                                onClick={() => {
+                                                    if( !showtaskform[tab._id] || showtaskform[tab._id] === false ){
+                                                        setFields({ title: '', tab: tab._id, project_id: currentProject?._id, order: 0 })
+                                                        setShowtaskform({ [tab._id]: true })
+                                                    } 
+                                                }}
                                             >
-                                                {
-                                                    showtaskform[tab._id] && showtaskform[tab._id] === true &&
-                                                    <li class="task--button">
-                                                        <Form onSubmit={(e) => {
-                                                            e.stopPropagation()
-                                                            handleTasksubmit(e)
-                                                            //closetask(tab._id)
-                                                        }}>
-                                                            <Form.Group className="mb-0 form-group">
-                                                                <FloatingLabel label="Task Title *">
-                                                                    <Form.Control type="text" name="title" placeholder="Task Title" onChange={handleChange} readOnly={loader} />
-                                                                </FloatingLabel>
-                                                                <span className="close-task" onClick={() => { closetask(tab._id) }}><FaRegTimesCircle /></span>
-                                                            </Form.Group>
-                                                            <Form.Text muted>Press enter to add</Form.Text>
-                                                        </Form>
-                                                    </li>
-                                                }
-
-                                                {
-                                                    taskslists[tab._id]?.tasks &&  taskslists[tab._id]?.tasks?.length > 0 && 
-
-                                                    taskslists[tab._id]?.tasks?.map((task, index) => (
-                                                    <Draggable
-                                                        key={task?._id}
-                                                        draggableId={`task-${task?._id}`}
-                                                        index={index}
-                                                    >
-                                                        {(provided) => (
-                                                            <li
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps}
-                                                                className="task--button"
-                                                                onClick={async () => {
-                                                                    await dispatch(updateStateData(ACTIVE_FORM_TYPE, 'task_edit'));
-                                                                    await dispatch(updateStateData(CURRENT_TASK, task))
-                                                                    handleTaskShow();
-                                                                }}
-                                                            >
-                                                                {task.title}
-                                                                <div className="tasks-form-action">
-                                                                    {
-                                                                        task.subtasks && task.subtasks.length > 0 && (
-                                                                            <>
-                                                                                <span className="subtask-count" key={`subtask-count-${task._id}`}>
-                                                                                    <TiInputChecked />
-                                                                                    {task.subtasks.filter(subtask => subtask.status === true).length} / {task.subtasks.length}
-                                                                                </span>
-                                                                            </>
-                                                                        )
-                                                                    }
-                                                                    {
-                                                                        task.files && task.files.length > 0 &&
-                                                                            <>
-                                                                                <span className="files-count" key={`files-count-${task._id}`}>
-                                                                                    <GrAttachment />
-                                                                                   {task.files.length}
-                                                                                </span>
-                                                                            </>
-                                                                    }
-                                                                    <p className="m-0 ms-auto">
-                                                                        {task?.members && task?.members.length > 0 && (
-                                                                            <MemberInitials  directUpdate={true} members={task?.members} showRemove={false} showAssign={false} postId={task._id} type = "task"
-                                                                           />
-                                                                        )}
-                                                                    </p>
-                                                                </div>
-                                                            </li>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
-                                                {provided.placeholder}
-                                            </ul>
+                                                <FaPlus />
+                                            </Button>
                                         )}
-                                    </Droppable>
-                                </div>
-                            ))
+                                    </h5>
+                                    {( memberProfile?.permissions?.projects.create_edit_delete_task === true && memberProfile?.permissions?.projects.update_tasks_order === true || memberProfile?.role?.slug === 'owner' ) ?
+                                        <Droppable droppableId={`droppable-${tab._id}`} type="TASKS">
+                                            {(provided, snapshot) => (
+                                                <ul
+                                                    id={`workflow-tab-${tab._id}`}
+                                                    className="tasks--list"
+                                                    ref={provided.innerRef}
+                                                    {...provided.droppableProps}
+                                                    style={{ overflowY: 'auto', height: '100%' }}
+                                                >
+                                                    
+                                                    {
+                                                        showtaskform[tab._id] && showtaskform[tab._id] === true &&
+                                                        <li className="task--button">
+                                                            <Form onSubmit={(e) => {
+                                                                e.stopPropagation()
+                                                                handleTasksubmit(e)
+                                                                //closetask(tab._id)
+                                                            }}>
+                                                                <Form.Group className="mb-0 form-group">
+                                                                    <FloatingLabel label="Task Title *">
+                                                                        <Form.Control type="text" name="title" placeholder="Task Title" onChange={handleChange} readOnly={loader} />
+                                                                    </FloatingLabel>
+                                                                    <span className="close-task" onClick={() => { closetask(tab._id) }}><FaRegTimesCircle /></span>
+                                                                </Form.Group>
+                                                                <Form.Text muted>Press enter to add</Form.Text>
+                                                            </Form>
+                                                        </li>
+                                                    }
+
+                                                    {
+                                                        taskslists[tab._id]?.tasks &&  taskslists[tab._id]?.tasks?.length > 0 && 
+
+                                                        taskslists[tab._id]?.tasks?.map((task, index) => (
+                                                        <Draggable
+                                                            key={task?._id}
+                                                            draggableId={`task-${task?._id}`}
+                                                            index={index}
+                                                        >
+                                                            {(provided, snapshot) => (
+                                                                <li
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                    className="task--button"
+                                                                    onClick={async () => {
+                                                                        await dispatch(updateStateData(ACTIVE_FORM_TYPE, 'task_edit'));
+                                                                        await dispatch(updateStateData(CURRENT_TASK, task))
+                                                                        handleTaskShow();
+                                                                    }}
+                                                                    style={getStyle(provided.draggableProps.style, snapshot)}
+                                                                >
+                                                                    <div className="task-card">
+                                                                    {task.title}
+                                                                    <div className="tasks-form-action">
+                                                                        {
+                                                                            task.subtasks && task.subtasks.length > 0 && (
+                                                                                <>
+                                                                                    <span className="subtask-count" key={`subtask-count-${task._id}`}>
+                                                                                        <TiInputChecked />
+                                                                                        {task.subtasks.filter(subtask => subtask.status === true).length} / {task.subtasks.length}
+                                                                                    </span>
+                                                                                </>
+                                                                            )
+                                                                        }
+                                                                        {
+                                                                            task.files && task.files.length > 0 &&
+                                                                                <>
+                                                                                    <span className="files-count" key={`files-count-${task._id}`}>
+                                                                                        <GrAttachment />
+                                                                                    {task.files.length}
+                                                                                    </span>
+                                                                                </>
+                                                                        }
+                                                                        <p className="m-0 ms-auto">
+                                                                            {task?.members && task?.members.length > 0 && (
+                                                                                <MemberInitials  directUpdate={true} members={task?.members} showRemove={false} showAssign={false} postId={task._id} type = "task"
+                                                                            />
+                                                                            )}
+                                                                        </p>
+                                                                    </div>
+                                                                    </div>
+                                                                </li>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                
+                                                {provided.placeholder}  
+                                                </ul>
+                                            )}
+                                        </Droppable>
+                                    :
+                                    ( memberProfile?.permissions?.projects.create_edit_delete_task === true  || memberProfile?.role?.slug === 'owner' ) ?
+                                        <ul
+                                            id={`workflow-tab-${tab._id}`}
+                                            className="tasks--list"
+                                            style={{ overflowY: 'auto', height: '100%' }}
+                                        >
+                                        
+                                        {
+                                            showtaskform[tab._id] && showtaskform[tab._id] === true &&
+                                            <li className="task--button">
+                                                <Form onSubmit={(e) => {
+                                                    e.stopPropagation()
+                                                    handleTasksubmit(e)
+                                                }}>
+                                                    <Form.Group className="mb-0 form-group">
+                                                        <FloatingLabel label="Task Title *">
+                                                            <Form.Control type="text" name="title" placeholder="Task Title" onChange={handleChange} readOnly={loader} />
+                                                        </FloatingLabel>
+                                                        <span className="close-task" onClick={() => { closetask(tab._id) }}><FaRegTimesCircle /></span>
+                                                    </Form.Group>
+                                                    <Form.Text muted>Press enter to add</Form.Text>
+                                                </Form>
+                                            </li>
+                                        }
+
+                                        {
+                                            taskslists[tab._id]?.tasks &&  taskslists[tab._id]?.tasks?.length > 0 && 
+
+                                            taskslists[tab._id]?.tasks?.map((task, index) => (
+                                            
+                                                    <li className="task--button"
+                                                        onClick={async () => {
+                                                            await dispatch(updateStateData(ACTIVE_FORM_TYPE, 'task_edit'));
+                                                            await dispatch(updateStateData(CURRENT_TASK, task))
+                                                            handleTaskShow();
+                                                        }}
+                                                    >
+                                                        <div className="task-card">
+                                                        {task.title}
+                                                        <div className="tasks-form-action">
+                                                            {
+                                                                task.subtasks && task.subtasks.length > 0 && (
+                                                                    <>
+                                                                        <span className="subtask-count" key={`subtask-count-${task._id}`}>
+                                                                            <TiInputChecked />
+                                                                            {task.subtasks.filter(subtask => subtask.status === true).length} / {task.subtasks.length}
+                                                                        </span>
+                                                                    </>
+                                                                )
+                                                            }
+                                                            {
+                                                                task.files && task.files.length > 0 &&
+                                                                    <>
+                                                                        <span className="files-count" key={`files-count-${task._id}`}>
+                                                                            <GrAttachment />
+                                                                        {task.files.length}
+                                                                        </span>
+                                                                    </>
+                                                            }
+                                                            <p className="m-0 ms-auto">
+                                                                {task?.members && task?.members.length > 0 && (
+                                                                    <MemberInitials  directUpdate={true} members={task?.members} showRemove={false} showAssign={false} postId={task._id} type = "task"
+                                                                />
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                        </div>
+                                                    </li>
+                                                
+                                            
+                                        ))}
+                                        </ul>
+                                        :
+                                        ( memberProfile?.permissions?.projects.update_tasks_order === true  || memberProfile?.role?.slug === 'owner' ) ?
+                                        
+                                        <Droppable droppableId={`droppable-${tab._id}`} type="TASKS">
+                                            {(provided, snapshot) => (
+                                                <ul
+                                                    id={`workflow-tab-${tab._id}`}
+                                                    className="tasks--list"
+                                                    ref={provided.innerRef}
+                                                    {...provided.droppableProps}
+                                                    style={{ overflowY: 'auto', height: '100%' }}
+                                                >
+                                                
+                                                    {
+                                                        taskslists[tab._id]?.tasks &&  taskslists[tab._id]?.tasks?.length > 0 && 
+
+                                                        taskslists[tab._id]?.tasks?.map((task, index) => (
+                                                        <Draggable
+                                                            key={task?._id}
+                                                            draggableId={`task-${task?._id}`}
+                                                            index={index}
+                                                        >
+                                                            {(provided, snapshot) => (
+                                                                <li
+                                                                    onClick={async () => {
+                                                                        await dispatch(updateStateData(ACTIVE_FORM_TYPE, 'task_edit'));
+                                                                        await dispatch(updateStateData(CURRENT_TASK, task))
+                                                                        handleTaskShow();
+                                                                    }}
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                    className="task--button"
+                                                                    
+                                                                    style={getStyle(provided.draggableProps.style, snapshot)}
+                                                                >
+                                                                    <div className="task-card">
+                                                                    {task.title}
+                                                                    <div className="tasks-form-action">
+                                                                        {
+                                                                            task.subtasks && task.subtasks.length > 0 && (
+                                                                                <>
+                                                                                    <span className="subtask-count" key={`subtask-count-${task._id}`}>
+                                                                                        <TiInputChecked />
+                                                                                        {task.subtasks.filter(subtask => subtask.status === true).length} / {task.subtasks.length}
+                                                                                    </span>
+                                                                                </>
+                                                                            )
+                                                                        }
+                                                                        {
+                                                                            task.files && task.files.length > 0 &&
+                                                                                <>
+                                                                                    <span className="files-count" key={`files-count-${task._id}`}>
+                                                                                        <GrAttachment />
+                                                                                    {task.files.length}
+                                                                                    </span>
+                                                                                </>
+                                                                        }
+                                                                        <p className="m-0 ms-auto">
+                                                                            {task?.members && task?.members.length > 0 && (
+                                                                                <MemberInitials  directUpdate={false} members={task?.members} showRemove={false} showAssign={false} postId={task._id} type = "task"
+                                                                            />
+                                                                            )}
+                                                                        </p>
+                                                                    </div>
+                                                                    </div>
+                                                                </li>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                
+                                                {provided.placeholder}  
+                                                </ul>
+                                            )}
+                                        </Droppable>
+                                        :
+                                        <ul
+                                            id={`workflow-tab-${tab._id}`}
+                                            className="tasks--list"
+                                            style={{ overflowY: 'auto', height: '100%' }}
+                                        >
+                                        
+                                        {
+                                            taskslists[tab._id]?.tasks &&  taskslists[tab._id]?.tasks?.length > 0 && 
+
+                                            taskslists[tab._id]?.tasks?.map((task, index) => (
+                                            
+                                                    <li className="task--button" onClick={async () => {
+                                                        await dispatch(updateStateData(ACTIVE_FORM_TYPE, 'task_edit'));
+                                                        await dispatch(updateStateData(CURRENT_TASK, task))
+                                                        handleTaskShow();
+                                                    }}>
+                                                        <div className="task-card">
+                                                        {task.title}
+                                                        <div className="tasks-form-action">
+                                                            {
+                                                                task.subtasks && task.subtasks.length > 0 && (
+                                                                    <>
+                                                                        <span className="subtask-count" key={`subtask-count-${task._id}`}>
+                                                                            <TiInputChecked />
+                                                                            {task.subtasks.filter(subtask => subtask.status === true).length} / {task.subtasks.length}
+                                                                        </span>
+                                                                    </>
+                                                                )
+                                                            }
+                                                            {
+                                                                task.files && task.files.length > 0 &&
+                                                                    <>
+                                                                        <span className="files-count" key={`files-count-${task._id}`}>
+                                                                            <GrAttachment />
+                                                                        {task.files.length}
+                                                                        </span>
+                                                                    </>
+                                                            }
+                                                            <p className="m-0 ms-auto">
+                                                                {task?.members && task?.members.length > 0 && (
+                                                                    <MemberInitials  directUpdate={false} members={task?.members} showRemove={false} showAssign={false} postId={task._id} type = "task"
+                                                                />
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        }
+                                    </div>
+                                ))
                         }
                     </div>
                 </DragDropContext>
-            )}
-            {props?.activeTab === 'ListView' && (
-                <Accordion defaultActiveKey="0" className="bg-light p-3">
-                    <Accordion.Item eventKey="0">
-                        <Accordion.Header>Assigned Task</Accordion.Header>
-                        <span type="button" variant="primary" className="btn btn-primary" onClick={handleTaskShow}><FaPlus /></span>
-                        <Accordion.Body>
-                            <ListGroup>
-                                <ListGroup.Item key={"design"} className="active--task">
-                                    <span className="play--timer">
-                                        <FaPlay />
-                                        <FaPause className="d-none" />
-                                    </span>
-                                    Design Landing Page
-                                </ListGroup.Item>
-                            </ListGroup>
-                            <ListGroup>
-                                <ListGroup.Item key={"designi"}>
-                                    <span className="pause--timer">
-                                        <FaPlay className="d-none" />
-                                        <FaPause />
-                                    </span>
-                                    Design Landing Page
-                                    <span className="time--span">01:22:32</span>
-                                </ListGroup.Item>
-                            </ListGroup>
-
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey="1">
-                        <Accordion.Header>In Progress</Accordion.Header>
-                        <Accordion.Body>
-                            <ListGroup>
-                                <ListGroup.Item key={"design1"} className="active--task">
-                                    <span className="play--timer">
-                                        <FaPlay />
-                                        <FaPause className="d-none" />
-                                    </span>
-                                    Design Landing Page
-                                    {/* <span class="time--span">01:22:32</span> */}
-                                </ListGroup.Item>
-                            </ListGroup>
-                            <ListGroup>
-                                <ListGroup.Item key={"design2"}>
-                                    <span className="pause--timer">
-                                        <FaPlay className="d-none" />
-                                        <FaPause />
-                                    </span>
-                                    Design Landing Page
-                                    <span className="time--span">01:22:32</span>
-                                </ListGroup.Item>
-                            </ListGroup>
-
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey="2">
-                        <Accordion.Header>In Review</Accordion.Header>
-                        <Accordion.Body>
-                            <ListGroup>
-                                <ListGroup.Item key={"design3"} className="active--task">
-                                    <span className="play--timer">
-                                        <FaPlay />
-                                        <FaPause className="d-none" />
-                                    </span>
-                                    Design Landing Page
-                                    {/* <span class="time--span">01:22:32</span> */}
-                                </ListGroup.Item>
-                            </ListGroup>
-                            <ListGroup>
-                                <ListGroup.Item key={"design4"}>
-                                    <span className="pause--timer">
-                                        <FaPlay className="d-none" />
-                                        <FaPause />
-                                    </span>
-                                    Design Landing Page
-                                    <span className="time--span">01:22:32</span>
-                                </ListGroup.Item>
-                            </ListGroup>
-
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey="3">
-                        <Accordion.Header>Completed</Accordion.Header>
-                        <Accordion.Body>
-                            <ListGroup>
-                                <ListGroup.Item key={"design6"} className="active--task">
-                                    <span className="play--timer">
-                                        <FaPlay />
-                                        <FaPause className="d-none" />
-                                    </span>
-                                    Design Landing Page
-                                    {/* <span class="time--span">01:22:32</span> */}
-                                </ListGroup.Item>
-                            </ListGroup>
-                            <ListGroup>
-                                <ListGroup.Item key={"design7"}>
-                                    <span className="pause--timer">
-                                        <FaPlay className="d-none" />
-                                        <FaPause />
-                                    </span>
-                                    Design Landing Page
-                                    <span className="time--span">01:22:32</span>
-                                </ListGroup.Item>
-                            </ListGroup>
-                        </Accordion.Body>
-                    </Accordion.Item>
-                </Accordion>
             )}
         </>
     )

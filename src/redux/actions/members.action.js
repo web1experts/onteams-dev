@@ -21,7 +21,8 @@ import {
     RESEND_INVITE_SUCCESS,
     RESEND_INVITE_FAILED,
     GET_SINGLE_MEMBER_SUCCESS,
-    GET_SINGLE_MEMBER_FAILED
+    GET_SINGLE_MEMBER_FAILED,
+    MEMBERS_BY_ROLES
 } from "./types";
 
 const config = {
@@ -202,4 +203,22 @@ export const getSingleMemberByUserAndCompanyId = () => {
         errorRequest(err, dispatch);
       }
     };
-  }
+}
+
+export const getMembersGroupByRoles = () => {
+    return async (dispatch) => {
+        try {
+          const response = await API.apiGet('member','/members-by-roles')
+    
+          if (response.data && response.data.success) {
+            await dispatch({ type: MEMBERS_BY_ROLES, payload: response.data });
+          } 
+          else {
+              console.log('Failed request')
+            await dispatch({ type: LIST_MEMBER_FAILED, payload: response.data.message });
+          }
+        } catch (err) {
+          errorRequest(err, dispatch);
+        }
+    };
+}

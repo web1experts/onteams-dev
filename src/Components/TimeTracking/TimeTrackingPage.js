@@ -10,13 +10,14 @@ import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , 
 import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
 import { getliveActivity, getRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
-import { socket, refreshSocket } from "../../helpers/auth";
+import { socket, refreshSocket, currentMemberProfile } from "../../helpers/auth";
 import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 import "media-chrome";
 import "media-chrome/dist/menu";
 
 function TimeTrackingPage() {
+  const memberProfile = currentMemberProfile()
   let totalhours = 0;
   let totalProjecthours = 0
   const currentMember = getMemberdata();
@@ -89,6 +90,13 @@ function TimeTrackingPage() {
     if (Object.keys(filters).length > 0) {
         selectedfilters = { ...selectedfilters, ...filters }
     }
+
+    if( memberProfile?.permissions?.tracking?.view_others === true && memberProfile?.permissions?.tracking?.selected_members?.length > 0){
+      selectedfilters = { ...selectedfilters, ['selected_members']: memberProfile?.permissions?.tracking?.selected_members  }
+    }else{
+      selectedfilters = { ...selectedfilters, ['selected_members']: [memberProfile?._id]  }
+    }
+
     await dispatch(getliveActivity(selectedfilters))
     setSpinner(false)
   }

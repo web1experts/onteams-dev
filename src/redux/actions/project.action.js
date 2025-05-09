@@ -59,6 +59,21 @@ export const ListProjects = (payload) => {
     }
 }
 
+export const ListProjectsByMembers = (payload) => {
+    return async (dispatch) => {
+        try{
+            const response = await API.apiPostUrl('project','/by-members', payload);
+            if(response.data && response.data.success){
+            await dispatch({ type: LIST_PROJECT_SUCCESS, payload: response.data })
+            }else{
+            await dispatch({ type: LIST_PROJECT_FAILED, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+}
+
 export const ListMemberProjects = (memberId) => {
     return async (dispatch) => {
         try{

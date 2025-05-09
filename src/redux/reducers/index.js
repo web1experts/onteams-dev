@@ -28,5 +28,6 @@ export default combineReducers({
   common: commonReducer,
   holiday: holidayReducer,
   attendance: attendanceReducer,
-  reports: reportReducer   
+  reports: reportReducer,
+  permissions: permissionReducer
 });

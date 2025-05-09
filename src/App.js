@@ -3,7 +3,7 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { withRouter } from "./Components/wrapper";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { publicRoutes, privateRoutes, hideSidebarRoutes } from "./routes";
-import { socket } from "./helpers/auth";
+import { socket, currentMemberProfile } from "./helpers/auth";
 import { parseIfValidJSON } from "./helpers/commonfunctions";
 import SidebarPanel from "./Components/Sidebar/Sidebar";
 import { REFRESH_DASHBOARDS } from "./redux/actions/types";
@@ -22,6 +22,7 @@ const secretKey = process.env.REACT_APP_SECRET_KEY;
 function App(props) {
 
   const token = isAuth();
+  const memberProfile = currentMemberProfile()
   const [hideSideBar, setHideSideBar] = useState(true);
   const [loggedIn, setLoggedIn] = useState(token ? true : false);
   const [currentLoggedInUser, setCurrentLoggedInUser] = useState(null);
@@ -140,6 +141,14 @@ function App(props) {
   /*****************************    using for dynamic routing  *******************/
   const getRoutes = (routes, _privateRoute) => {
     return routes.map((route, _privateRoute) => {
+      // If the route has a 'module' key, check permissions
+      if (route.module) {
+        const hasPermission =
+          memberProfile?.permissions?.[route.module]?.view === true ||
+          memberProfile?.role?.slug === 'owner';
+  
+        if (!hasPermission) return null;
+      }
       if (route.route) {
         return (
           <Route

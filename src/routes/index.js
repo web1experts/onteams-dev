@@ -21,7 +21,7 @@ import TimeTrackingPage from "../Components/TimeTracking/TimeTrackingPage";
 import SettingPage from "../Components/Settings/SettingPage";
 import DashboardPage from "../Components/Dashboard/DashboardPage";
 import DesktopPage from "../Components/Desktop/DesktopPage";
-
+import PermissionsPage from "../Components/permissions/Permissions";
 const commonRouter = [
     {
         type: 'page',
@@ -95,6 +95,7 @@ const publicRoutes = [
         key: 'HOLIDAYS',
         component: <HolidaysPage/>,
         route: '/holidays',
+        module: 'holidays'
     },
     {
         type: 'page',
@@ -102,6 +103,7 @@ const publicRoutes = [
         key: 'ATTENDANCE',
         component: <AttendancePage/>,
         route: '/attendance',
+        module: 'attendance'
     },
     {
         type: 'page',
@@ -116,6 +118,7 @@ const publicRoutes = [
         key: 'REPORTS',
         component: <ReportsPage/>,
         route: '/reports',
+        module: 'reports'
     },
     {
         type: 'page',
@@ -136,6 +139,14 @@ const privateRoutes = [
         component: <Navigate to="/dashboard" />,
         route: "*"
 
+    },
+    {
+        type: "page",
+        name: 'permissions',
+        key: 'PERMISSIONS',
+        component: <PermissionsPage />,
+        route: "/permissions",
+        module: 'role_permissions'
     },
     {
         type: 'page',
@@ -164,6 +175,7 @@ const privateRoutes = [
         key: 'TEAM_MEMBERS',
         component: <TeamMembersPage/>,
         route: '/team-members',
+        module: 'members'
     },
     {
         type: 'page',
@@ -171,6 +183,7 @@ const privateRoutes = [
         key: 'CLIENTS',
         component: <ClientsPage/>,
         route: '/clients',
+        module: 'clients'
     },
     {
         type: 'page',
@@ -178,6 +191,7 @@ const privateRoutes = [
         key: 'PROJECTS',
         component: <ProjectsPage/>,
         route: '/projects',
+        module: 'projects'
     },
     {
         type: 'page',
@@ -192,6 +206,7 @@ const privateRoutes = [
         key: 'HOLIDAYS',
         component: <HolidaysPage/>,
         route: '/holidays',
+        module: 'holidays'
     },
     {
         type: 'page',
@@ -199,6 +214,7 @@ const privateRoutes = [
         key: 'ATTENDANCE',
         component: <AttendancePage/>,
         route: '/attendance',
+        module: 'attendance'
     },
     {
         type: 'page',
@@ -213,6 +229,7 @@ const privateRoutes = [
         key: 'REPORTS',
         component: <ReportsPage/>,
         route: '/reports',
+        module: 'reports'
     },
     {
         type: 'page',
@@ -220,6 +237,7 @@ const privateRoutes = [
         key: 'TIME_TRACKING',
         component: <TimeTrackingPage/>,
         route: '/time-tracking',
+        module: 'tracking'
     },
     {
         type: 'page',

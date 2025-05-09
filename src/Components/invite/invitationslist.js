@@ -5,7 +5,9 @@ import { FaEllipsisV,FaList } from "react-icons/fa";
 import { BsGrid } from "react-icons/bs";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite, resendInvite } from "../../redux/actions/members.action";
 import Spinner from 'react-bootstrap/Spinner';
+import { currentMemberProfile } from "../../helpers/auth";
 function InvitationList(props) {
+  const memberProfile = currentMemberProfile()
   const [activeSubTab, setActiveSubTab] = useState("Grid");
   const [isActive, setIsActive] = useState(false);
   const dispatch = useDispatch();
@@ -117,34 +119,60 @@ function InvitationList(props) {
                                   <Dropdown.Toggle variant="primary">
                                     <FaEllipsisV />
                                   </Dropdown.Toggle>
-                                  <Dropdown.Menu>
-                                    {props.listfor && props.listfor === "company" ? (
+                                  {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ? 
+                                    <>
+                                    <Dropdown.Menu>
+                                      {props.listfor && props.listfor === "company" ? (
+                                        <>
+                                          <Dropdown.Item
+                                            onClick={() =>
+                                              sentInviteAgain(invitation._id)
+                                            }
+                                          >
+                                            Send Again
+                                          </Dropdown.Item>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Dropdown.Item
+                                            onClick={() =>
+                                              acceptInvite(invitation.inviteToken)
+                                            }
+                                          >
+                                            Accept
+                                          </Dropdown.Item>
+                                        </>
+                                      )}
+                                      <Dropdown.Item
+                                        onClick={() => rejectInvite(invitation._id)}
+                                      >
+                                        {props.listfor && props.listfor === "company" ? 'Delete' : 'Decline' }
+                                      </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                    </>
+                                    :
                                       <>
-                                        <Dropdown.Item
-                                          onClick={() =>
-                                            sentInviteAgain(invitation._id)
-                                          }
-                                        >
-                                          Send Again
-                                        </Dropdown.Item>
+                                      <Dropdown.Menu>
+                                      {props.listfor && props.listfor !== "company" && (
+                                        
+                                        <>
+                                          <Dropdown.Item
+                                            onClick={() =>
+                                              acceptInvite(invitation.inviteToken)
+                                            }
+                                          >
+                                            Accept
+                                          </Dropdown.Item>
+                                        </>
+                                      )}
+                                      <Dropdown.Item
+                                        onClick={() => rejectInvite(invitation._id)}
+                                      >
+                                        {props.listfor && props.listfor === "company" ? 'Delete' : 'Decline' }
+                                      </Dropdown.Item>
+                                    </Dropdown.Menu>
                                       </>
-                                    ) : (
-                                      <>
-                                        <Dropdown.Item
-                                          onClick={() =>
-                                            acceptInvite(invitation.inviteToken)
-                                          }
-                                        >
-                                          Accept
-                                        </Dropdown.Item>
-                                      </>
-                                    )}
-                                    <Dropdown.Item
-                                      onClick={() => rejectInvite(invitation._id)}
-                                    >
-                                      {props.listfor && props.listfor === "company" ? 'Delete' : 'Decline' }
-                                    </Dropdown.Item>
-                                  </Dropdown.Menu>
+                                    }
                                 </Dropdown>
                                 <Card.Img variant="top" src="./images/default.jpg" />
                                 <Card.Body>

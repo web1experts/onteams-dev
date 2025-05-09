@@ -11,20 +11,18 @@ import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
 import { useDropzone } from 'react-dropzone'
 import fileIcon from './../../images/file-icon-image.jpg'
-import { selectboxObserver, parseDateWithoutTimezone } from "../../helpers/commonfunctions";
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
+import { selectboxObserver } from "../../helpers/commonfunctions";
 import { togglePopups, updateStateData } from "../../redux/actions/common.action";
-import {  EDIT_PROJECT_FORM, ASSIGN_MEMBER, RESET_FORMS, CURRENT_PROJECT, DIRECT_UPDATE } from "../../redux/actions/types";
+import {  EDIT_PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, DIRECT_UPDATE } from "../../redux/actions/types";
 import { MemberInitials } from "../common/memberInitials";
 import ReactQuill, { Quill }  from 'react-quill';
 import AutoLinks from "quill-auto-links";
 import 'react-quill/dist/quill.snow.css';
-import DatePicker from "react-multi-date-picker";
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
 Quill.register("modules/autoLinks", AutoLinks);
 function SingleProject(props) {
     const dispatch = useDispatch();
+    const memberProfile = props.memberProfile || {}
     const quillRef = useRef(null);
     const pasteOccurred = useRef(false);
     const commonState = useSelector( state => state.common)
@@ -33,25 +31,19 @@ function SingleProject(props) {
     const [loader, setLoader] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
-    const [selectedMembers, setselectedMembers] = useState({});
     const[ editormode, setEditorMode] = useState( false )
     const apiResult = useSelector(state => state.project);
     const apiClient = useSelector(state => state.client)
     const [clientlist, setClientList] = useState([])
-    const [members, setMembers] = useState([])
     const [isActive, setIsActive] = useState(2);
     const [currentProject, setCurrentProject] = useState({})
     const [showdialog, setShowDialog] = useState(false);
-    const [allMembers, setAllmembers] = useState([{ value: 'all', label: 'All Members' }])
-    const [showStatus, setStatusShow] = useState(false);
     const handleStatusClose = () =>  dispatch(togglePopups('status', false));
     const handleStatusShow = () => dispatch(togglePopups('status', true));
-    const [isEdit, setIsEdit] = useState(false)
     const [showClient, setClientShow] = useState(false);
     const handleClientClose = () => setClientShow(false);
     const handleClientShow = () => setClientShow(true);
     const [ selectedworkflow, setSelectedWorkflow] = useState({})
-    const [showWorkflow, setWorkflowShow] = useState(false);
     const handleWorkflowClose = () => dispatch( togglePopups('workflow',false ));
     const handleWorkflowShow = async () => {
        await dispatch( updateStateData(DIRECT_UPDATE, false))
@@ -142,7 +134,6 @@ function SingleProject(props) {
             if (currentProject.description && currentProject.description !== "") {
                 setIsEditor(true);
             }
-
             // Set members if present
             if (currentProject.members && currentProject.members.length > 0) {
                 let projectMembers = [];
@@ -155,10 +146,8 @@ function SingleProject(props) {
                 });
 
                 fieldsSetup.members = membersdrop;
-               // setselectedMembers(membersdrop);
             } else {
                 fieldsSetup.members = [];
-                //setselectedMembers({});
             }
             setTimeout(function () {
                 selectboxObserver()
@@ -182,27 +171,6 @@ function SingleProject(props) {
         event.preventDefault(); // Ensure the default behavior is prevented
         document.getElementById('updateattachments').click();
     }
-
-    // const addMember = (member) => {
-    //     setFields(prevFields => ({
-    //         ...prevFields,
-    //         members: Array.from(new Set([...prevFields.members, member._id]))
-    //     }));
-
-    //     const { _id, name } = member;
-    //     setselectedMembers((prevSelectedMembers = {}) => {
-    //         // Check if the memberId is not already in the selectedMembers object
-    //         if (!prevSelectedMembers.hasOwnProperty(_id)) {
-    //             return {
-    //                 ...prevSelectedMembers,
-    //                 [_id]: name,
-    //             };
-    //         } else {
-    //             return prevSelectedMembers;
-    //         }
-    //     });
-
-    // };
 
     const handleDownload = (url) => {
         const link = document.createElement('a');
@@ -251,25 +219,10 @@ function SingleProject(props) {
         }
     }, [selectedFiles])
 
-
-    // Function to remove the last member
-    // const removeMember = (member, directUpdate = false) => {
-    //     const updatedSelectedMembers = { ...commonState.editProjectForm.members };
-    //         delete updatedSelectedMembers[member];
-    //     if( directUpdate === true ){
-    //         const memberIds = Object.keys(updatedSelectedMembers);
-    //         dispatch(updateProject(currentProject._id, { members: memberIds }))
-    //     }else{
-    //         dispatch( updateStateData( EDIT_PROJECT_FORM, {...commonState.editProjectForm, members: updatedSelectedMembers}))
-    //     }
-    // };
-
-
     const handleEditor = event => {
         setIsEditor(current => !current);
     };
-
-
+    
     const handlePreviewShow = (file) => {
         setFiletoPreview(file)
         setPreviewShow(true)
@@ -285,8 +238,6 @@ function SingleProject(props) {
         });
     };
 
-    
-
     const handleclientSearch = (e) => {
         setClientSearchTerm(e.target.value);
     };
@@ -294,8 +245,6 @@ function SingleProject(props) {
     const filteredItems = clientlist.filter(item =>
         item.name.toLowerCase().includes(clientsearchTerm.toLowerCase())
     );
-
-
 
     const handleRemove = (indexToRemove) => {
         // Filter out the file to remove from both selectedFiles and imagePreviews
@@ -322,18 +271,6 @@ function SingleProject(props) {
         setFields({ ...fields, ['workflow']: flow });
         setSelectedWorkflow( flow )
     }
-
-    // const handleRemoveMember = async (project, memberId, targetelement = null) => {
-
-    //     document.getElementById(targetelement).classList.add('disabled-pointer');
-    //     const currentMembers = project.members;
-    //     const updatedMembers = currentMembers
-    //         .filter(member => member._id !== memberId)
-    //         .map(member => member._id);
-    //     await dispatch(updateProject(project._id, { members: updatedMembers, remove_member: true }))
-    //     document.getElementById(targetelement).classList.remove('disabled-pointer');
-    //     // removeMember(memberId)
-    // }
 
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
@@ -376,8 +313,6 @@ function SingleProject(props) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true)
-
-       
         const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
             // Get rules for the current field
             const rules = getFieldRules('project', fieldName);
@@ -398,14 +333,11 @@ function SingleProject(props) {
         // Check if there are any errors
         const hasError = Object.keys(fieldErrors).length > 0;
 
-
         // If there are errors, update the errors state
         if (hasError) {
             setLoader(false)
             setErrors(fieldErrors);
         } else {
-            // console.log('Updated Project Fields:: ', fields)
-            // return;
             const formData = new FormData();
             for (const [key, value] of Object.entries(fields)) {
                 if (typeof value === 'object' && key === 'images') {
@@ -435,13 +367,9 @@ function SingleProject(props) {
                     formData.append(key, value)
                 }
             }
-
             let payload = formData;
-
-
             await dispatch(updateProject(currentProject._id, payload))
             setLoader(false)
-
         }
     }
 
@@ -449,7 +377,6 @@ function SingleProject(props) {
         await dispatch(deleteProject(currentProject._id))
         await dispatch( updateStateData(CURRENT_PROJECT, {}))
         await dispatch(updateStateData(RESET_FORMS, 'edit_project'))
-        //props.closeview(0)
     }
 
     const handleRemovefiles = (id) => {
@@ -461,9 +388,9 @@ function SingleProject(props) {
     }
 
     const renderPreview = (type, preview, index) => {
-        const { src, _id } = preview;
+        const { src, _id } = preview; 
         const mimetype = (preview.mimetype) ? preview.mimetype : src.split('.').pop().toLowerCase();
-
+        console.log('src:: ', mimetype)
         const previewComponents = {
             image: (
                 <div className="preview--cell" key={`image-${type}-${_id}`}>
@@ -522,12 +449,9 @@ function SingleProject(props) {
         return null;
     };
 
-
     const handleDateclose = useCallback(() => {
         setDateshow(false);
     }, []); // Empty dependency array means this function is memoized and won't change across renders
-
-
 
     return (
         <>
@@ -542,12 +466,8 @@ function SingleProject(props) {
                     
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`project-assign-${currentProject?._id}`} className="me-3">Members</ListGroup.Item>
-                        
-                        {/* {fields['members'] && Object.keys(fields.members).length > 0 && ( */}
-                            <MemberInitials showRemove={true} members={currentProject?.members || []} directUpdate={true} showAssignBtn={true} postId={currentProject?._id} type = "project" 
-                            // onMemberClick={(memberid, extraparam = false) => handleRemoveMember(currentProject, memberid, `member--${currentProject?._id}-${memberid}`)}
+                            <MemberInitials showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} members={fields?.members || []} directUpdate={true} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={currentProject?._id} type = "project" 
                             />
-                        {/* )} */}
                     </ListGroup>
                     <ListGroup horizontal className="ms-auto">
                         <Button variant="outline-primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}>Tasks</Button>
@@ -555,6 +475,8 @@ function SingleProject(props) {
                         <ListGroup.Item key={`closekey`} onClick={() => props.closeview(0)}><MdOutlineClose /></ListGroup.Item>
                     </ListGroup>
                 </div>
+                {(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === "owner") ? 
+                <>
                 <div className="project--form rounded--box">
                     <div className="project--form--inputs">
                         <Form onSubmit={handleSubmit}>
@@ -598,18 +520,20 @@ function SingleProject(props) {
                                                     />
                                                 </Form.Group>
                                             </Form>
-                                            <Dropdown.Item
-                                                key={'None'}
-                                                className={!fields['client'] ? 'selected--option' : ''}
-                                                onClick={() => { handleChange({ target: { name: 'client', value: '' } })}}
-                                                href="#"
-                                            >
-                                               None
-                                            </Dropdown.Item>
+                                            
                                             {
-                                                filteredItems && filteredItems.length > 0 &&
-
-                                                filteredItems.map((client, index) => {
+                                                
+                                                (memberProfile?.permissions?.clients?.view === true && filteredItems && filteredItems.length > 0 || memberProfile?.role?.slug === "owner") &&
+                                                <>
+                                                <Dropdown.Item
+                                                    key={'None'}
+                                                    className={!fields['client'] ? 'selected--option' : ''}
+                                                    onClick={() => { handleChange({ target: { name: 'client', value: '' } })}}
+                                                    href="#"
+                                                >
+                                                None
+                                                </Dropdown.Item>
+                                                {filteredItems.map((client, index) => {
                                                     return <Dropdown.Item
                                                             key={client._id}
                                                             className={client._id === fields['client'] ? 'selected--option' : ''}
@@ -618,14 +542,16 @@ function SingleProject(props) {
                                                         >
                                                             {client.name} {client._id === fields['client'] && <FaCheck />}
                                                         </Dropdown.Item>
-                                                })
-
+                                                })}
+                                                </>
                                             }
                                         </div>
                                     </Dropdown.Menu>
                                 </Dropdown>
-                                  
-                                    <Button variant="primary" onClick={handleClientShow}><FaPlus /> Client</Button>
+                                    
+                                    { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
+                                        <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
+                                    )}
                                 </div>
                                 <AddClient show={showClient} toggleshow={handleClientClose} />
                             </Form.Group>
@@ -651,9 +577,9 @@ function SingleProject(props) {
                                             onChange={(value) => {
                                                 setFields({...fields, ['description']: value})
                                                 setErrors({ ...errors, ['description']: '' });
-                                                setTimeout(() => {
+                                                // setTimeout(() => {
                                                     dispatch( updateStateData( EDIT_PROJECT_FORM,  {['description']: value }))
-                                                },800)
+                                                // },800)
                                             }}
                                             formats={formats} 
                                             modules={modules}
@@ -719,30 +645,11 @@ function SingleProject(props) {
                             <div className="m-0 d-flex align-items-center flex-wrap">
                                     {
                                         fields.members && Object.keys(fields.members).length > 0 && 
-                                        <MemberInitials directUpdate={false} members={fields['members']} showRemove={true} showall={true} showAssignBtn={false} postId={currentProject?._id} type = "project" 
-                                        // onMemberClick={(memberid, extraparam = false) => removeMember( memberid)} 
+                                        <MemberInitials directUpdate={false} members={fields['members']} showRemove={true} showall={true} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === "owner" ) ? true: false} postId={currentProject?._id} type = "project" 
+                                       
                                         />
-
                                     }
-                                {/* {fields.members && Object.keys(fields.members).length > 0 && (
-                                    <>
-                                        {Object.entries(fields.members).slice(0).map(([id, name], memberindex) => (
-                                            <ListGroup.Item action key={`member-${memberindex}`}>
-                                                <MemberInitials title={name} id={`member-${id}-${memberindex}`}>
-                                                    <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
-                                                </MemberInitials>
-                                                <span
-                                                    className="remove-icon"
-                                                    id={`member-${currentProject?._id}-${id}`}
-                                                    onClick={() => removeMember(id)}
-                                                >
-                                                    <MdOutlineClose />
-                                                </span>
-                                            </ListGroup.Item>
-                                        ))}
-                                        
-                                    </>
-                                )} */}
+                              
                             </div>
                             <ListGroup.Item key="assign-files-key" onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
                             <div className="output--file-preview">
@@ -769,36 +676,163 @@ function SingleProject(props) {
                         </ListGroup>
                     </div>
                 </div>
-            </div>
+                {/*--=-=Upload Files Modal**/}
+                    <Modal show={showUpload} onHide={handleUploadClose} centered size="md" className="upload--status">
+                    <Modal.Header closeButton>
+                        <Modal.Title>Attach Files</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form {...getRootProps()}>
+                            <Form.Group>
+                                <Form.Control type="file" hidden multiple name="images[]" onChange={(e) => handleSelectedFiles(Array.from(e.target.files))} {...getInputProps()} id="updateattachments" />
+                                <Form.Label className="file--upload" for="updateattachments" onClick="handleLabelClick(event)">
+                                    <span><FaUpload /></span>
+                                    <p>Drop your files here or <strong>browse</strong></p>
+                                </Form.Label>
+                            </Form.Group>
 
-            {/*--=-=Upload Files Modal**/}
-            <Modal show={showUpload} onHide={handleUploadClose} centered size="md" className="upload--status">
-                <Modal.Header closeButton>
-                    <Modal.Title>Attach Files</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form {...getRootProps()}>
-                        <Form.Group>
-                            <Form.Control type="file" hidden multiple name="images[]" onChange={(e) => handleSelectedFiles(Array.from(e.target.files))} {...getInputProps()} id="updateattachments" />
-                            <Form.Label className="file--upload" for="updateattachments" onClick="handleLabelClick(event)">
-                                <span><FaUpload /></span>
-                                <p>Drop your files here or <strong>browse</strong></p>
-                            </Form.Label>
-                        </Form.Group>
+                        </Form>
+                        <div className="preview--grid">
+                            {imagePreviews.map((preview, index) => (
+                                <div key={`uploaded-preview-${index}`} className="file-preview">{renderPreview('new', preview, index)}</div>
+                            ))}
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => { setSelectedFiles([]); setImagePreviews([]); handleUploadClose(); }}>Cancel</Button>
+                        <Button variant="primary" onClick={handleattachfiles}>Attach</Button>
+                    </Modal.Footer>
+                </Modal>
+                </>
+                :
+                    <div className="project--form rounded--box">
+                        <div className="project--form--inputs">
+                            <Form onSubmit={(e) => {return false}}>
+                                <Form.Group className="mb-0 form-group">
+                                    <FloatingLabel label="Project Title *">
+                                        <Form.Control type="text" name="title" placeholder="Project Title" value={currentProject?.title || ""}  />
+                                    </FloatingLabel>
+                                    {showError('title')}
+                                </Form.Group>
+                                <Form.Group className="mb-0 form-group">
+                                    <Form.Label>
+                                        <small>Status</small>
+                                        <div className="status--modal">
+                                            <span className={`${currentProject?.status === 'in-progress' ? 'progress--circle' : currentProject?.status === 'on-hold' ? 'hold--circle' : currentProject?.status === 'completed' ? 'complete--circle' : ''} status--circle`}></span> {currentProject?.status?.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())} <FaChevronDown />
+                                        </div>
+                                    </Form.Label>
+                                </Form.Group>
+                                <Form.Group className="mb-0 form-group" key={`clientbox-${currentProject?._id}`}>
+                                    <Form.Label>
+                                        <small>Client</small>
+                                    </Form.Label>
+                                    <div className="client--input">
+                                        <Dropdown className={`select--dropdown`}>
+                                            <Dropdown.Toggle variant="success" key={`success-selectkey-${Math.floor(Math.random() * 1001)}`}>
+                                            {
+                                            currentProject?.client?.name || 'None'
+                                            }
+                                            </Dropdown.Toggle>
+                                            
+                                        </Dropdown>
+                                    </div>
+                                </Form.Group>
+                                <Form.Group className="mb-0 form-group">
+                                    <Form.Label>
+                                        <small>Workflow</small>
+                                        <div className="workflow--modal">
+                                            <span className="workflow--selected">{currentProject?.workflow?.title  ? 'Current Workflow' : 'Current Workflow'} <FaChevronDown /></span>
+                                        </div>
+                                    </Form.Label>
+                                </Form.Group>
+                                <Form.Group className="mb-0 form-group">
+                                    <Form.Label className="w-100 m-0">
+                                        <small>Description</small>
+                                        
+                                    </Form.Label>
+                                    <div className={(isEditor ||  currentProject?.description && currentProject?.description !== "") ? 'text--editor show--editor' : 'text--editor'}>
+                                            <ReactQuill 
+                                                value={currentProject?.description || ''}
+                                                formats={formats} 
+                                                modules={modules}
+                                                disabled
+                                                ref={quillRef}
+                                            />
+                                            
+                                        </div>
+                                </Form.Group>
+                                <Form.Group className="mb-0 form-group pb-0">
+                                    <Form.Label>
+                                        <small>Start/Due Date</small>
+                                    </Form.Label>
+                                    <Row>
+                                    {(!currentProject?.start_date && !currentProject?.due_date) ? (
+                                            <label 
+                                                htmlFor="startdate--picker" 
+                                                className="task--date--picker" 
+                                            >
+                                                <FaRegCalendarAlt /> Set due date
+                                            </label>
+                                        ) : (
+                                            <label 
+                                                htmlFor="startdate--picker" 
+                                                className="task--date--change" 
+                                            >
+                                                { currentProject?.start_date && (
+                                                    new Date(currentProject.start_date).toISOString().split('T')[0]
+                                                )}
 
-                    </Form>
-                    <div className="preview--grid">
-                        {imagePreviews.map((preview, index) => (
-                            <div key={`uploaded-preview-${index}`} className="file-preview">{renderPreview('new', preview, index)}</div>
-                        ))}
+                                                { currentProject?.start_date && currentProject?.due_date && (
+                                                    <span>/</span>
+                                                )}
+
+                                                { currentProject?.due_date && (
+                                                    <>
+                                                        {new Date(currentProject.due_date).toISOString().split('T')[0]}
+                                                    </>
+                                                )}
+
+                                                {(currentProject?.start_date || currentProject?.due_date) && (
+                                                    <MdOutlineCancel />
+                                                )}
+                                                                    
+                                            </label>
+                                        )}
+                                        
+                                    </Row>
+                                </Form.Group>
+                            </Form>
+                        </div>
+                        <div className="project--form--actions">
+                            <h4>Actions</h4>
+                            <ListGroup>
+                                <ListGroup.Item key="assign-membermodal-key"><FaPlus /> Assign to</ListGroup.Item>
+                                <div className="m-0 d-flex align-items-center flex-wrap">
+                                        {
+                                            currentProject?.members && Object.keys(currentProject?.members).length > 0 && 
+                                            <MemberInitials directUpdate={false} members={currentProject?.members} showRemove={false} showall={true} showAssignBtn={false} postId={currentProject?._id} type = "project" />
+
+                                        }
+                                </div>
+                                <ListGroup.Item key="assign-files-key"><GrAttachment /> Attach files</ListGroup.Item>
+                                <div className="output--file-preview">
+                                    <div className="preview--grid">
+                                        {
+                                            currentProject.files && currentProject.files.length > 0 &&
+                                            currentProject.files.map((preview, index) => (
+                                                <div key={index}>{renderPreview('old', preview, index)}</div>
+                                            ))
+                                        }
+                                        {/* {!showUpload && imagePreviews.map((preview, index) => (
+                                            <div key={`uploaded-preview-${index}`} className="file-preview">{renderPreview('new', preview, index)}</div>
+                                        ))} */}
+                                    </div>
+                                </div>
+                            </ListGroup>
+                        </div>
                     </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => { setSelectedFiles([]); setImagePreviews([]); handleUploadClose(); }}>Cancel</Button>
-                    <Button variant="primary" onClick={handleattachfiles}>Attach</Button>
-                </Modal.Footer>
-            </Modal>
-
+                }
+            </div>
 
             {/*--=-=File Preview Modal**/}
             <Modal show={showPreview} onHide={handlePreviewClose} size="xl" className="file--preview--modal">

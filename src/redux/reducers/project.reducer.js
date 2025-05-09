@@ -84,8 +84,8 @@ import {
         
         case PUT_PROJECT_SUCCESS:
             return {
-                updatedProject: action.payload.message,
-                success: true,
+                updatedProject: action.payload.updatedProject,
+                success: action.payload.success,
                 message: action.payload.message,
                 message_variant: 'success',
             }

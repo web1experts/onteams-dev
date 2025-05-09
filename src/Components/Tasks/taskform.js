@@ -27,7 +27,7 @@ import 'react-quill/dist/quill.snow.css';
 import AutoLinks from "quill-auto-links";
 Quill.register("modules/autoLinks", AutoLinks);
 
-export const TaskForm = () => {
+export const TaskForm = (props) => {
     const modules = {
         toolbar: [
             [{ 'header': '1' }, { 'header': '2' }],
@@ -50,7 +50,7 @@ export const TaskForm = () => {
         'link'
     ];
 
-
+    const memberProfile = props.memberProfile
 
     const dispatch = useDispatch()
     const quillRef = useRef(null);
@@ -120,6 +120,12 @@ export const TaskForm = () => {
         }
 
     }, [apiResult.currentTask])
+    useEffect(() => {
+        if (apiResult.UpdatedTask) {
+            setCurrentTask(apiResult.UpdatedTask)
+        }
+
+    }, [apiResult.UpdatedTask])
 
     useEffect(() => {
         if (apiResult.tasks?.taskData && Object.keys(apiResult.tasks.taskData).length > 0) {
@@ -253,10 +259,11 @@ export const TaskForm = () => {
         }
     }, [taskForm.images])
 
-    const TaskUpdate = async () => {
+    const TaskUpdate = async () => { 
         if (currentTask?.description === fields?.description) {
             return false;
         }
+        // console.log(currentTask?.description  + '===' + fields?.description)
         await dispatch(updateTask(currentTask._id, { description: fields?.description }))
 
     }
@@ -272,11 +279,12 @@ export const TaskForm = () => {
 
     const handleRemovefiles = (id) => {
         let previousfiles = fields['files']
+        
         const updatedFiles = previousfiles.filter(file => file !== id);
         setFields({ ...fields, ['files']: updatedFiles })
         const previewfiles = currentTask.files.filter(file => file._id !== id);
         dispatch(updateStateData(CURRENT_TASK, { ...currentTask, ['files']: previewfiles }));
-        dispatch(updateTask(currentTask._id, { files: previewfiles }))
+        dispatch(updateTask(currentTask._id, { files: updatedFiles }))
     }
 
     const handleRemove = (indexToRemove) => {
@@ -292,6 +300,7 @@ export const TaskForm = () => {
 
         const { src, _id } = preview;
         const mimetype = (preview.mimetype) ? preview.mimetype : src?.split('.').pop().toLowerCase();
+       
         const previewComponents = {
             image: (
                 <div className="preview--cell">
@@ -351,18 +360,17 @@ export const TaskForm = () => {
     const [taskModalState, setTaskModalState] = useState(refreshstates(commonState.active_formtype || false))
 
     const handlesubtaskChange = (index, oldval, newval, directupdate = false) => {
-
-        const newSubtasks = [...subtasks];
-        newSubtasks[index] = (typeof oldval === "object" && oldval._id) ? { ...oldval, ['title']: newval } : newval; // Update the specific subtask
-        setSubtasks(newSubtasks); // Update the local state with the new subtasks array
-        setFields({ ...fields, ['subtasks']: newSubtasks })
-        // Dispatch the updated subtasks to global state
-        dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks }));
-        if (directupdate === true) {
-            dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
+        if(memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+            const newSubtasks = [...subtasks];
+            newSubtasks[index] = (typeof oldval === "object" && oldval._id) ? { ...oldval, ['title']: newval } : newval; // Update the specific subtask
+            setSubtasks(newSubtasks); // Update the local state with the new subtasks array
+            setFields({ ...fields, ['subtasks']: newSubtasks })
+            // Dispatch the updated subtasks to global state
+            dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks }));
+            if (directupdate === true) {
+                dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
+            }
         }
-        // 
-
     }
 
     const handleChange = ({ target: { name, value } }) => {
@@ -374,8 +382,10 @@ export const TaskForm = () => {
         // }
     };
     const addSubtask = () => {
-        setissubopen(true)
-        setSubtasks([...subtasks, '']);
+        if(memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+            setissubopen(true)
+            setSubtasks([...subtasks, '']);
+        }
     }
 
     const removeSubtask = (index) => {
@@ -388,25 +398,27 @@ export const TaskForm = () => {
 
     // Function to handle blur event on subtask input
     const handleBlur = (index) => {
-        const subtaskValue = subtasks[index];
-        if (subtaskValue === '') {
-            removeSubtask(index);
-            setissubopen(false)
-        } else {
-            const updatedSubtask = {
-                title: subtaskValue,
-                _id: 0, // Replace with your method to generate a unique ID
-                order: 0, // Use index as the order, or modify as needed
-                status: false // Default status, update as necessary
-            };
+        if((memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' )){
+            const subtaskValue = subtasks[index];
+            if (subtaskValue === '') {
+                removeSubtask(index);
+                setissubopen(false)
+            } else {
+                const updatedSubtask = {
+                    title: subtaskValue,
+                    _id: 0, // Replace with your method to generate a unique ID
+                    order: 0, // Use index as the order, or modify as needed
+                    status: false // Default status, update as necessary
+                };
 
-            // Update `subtasks` with the new object at the specified index
-            const updatedSubtasks = [...subtasks];
-            updatedSubtasks[index] = updatedSubtask;
-            setSubtasks(updatedSubtasks)
+                // Update `subtasks` with the new object at the specified index
+                const updatedSubtasks = [...subtasks];
+                updatedSubtasks[index] = updatedSubtask;
+                setSubtasks(updatedSubtasks)
 
-            dispatch(updateTask(currentTask._id, { subtasks: updatedSubtasks }))
+                dispatch(updateTask(currentTask._id, { subtasks: updatedSubtasks }))
 
+            }
         }
     };
 
@@ -463,7 +475,11 @@ export const TaskForm = () => {
                                 (typeof subtask === 'object') &&
                                 <>
                                     <GrDrag />
-                                    <input type='checkbox' onChange={(e) => { updateSubtask(e.target.checked, index) }} checked={
+                                    <input type='checkbox' onChange={(e) => { 
+                                        
+                                            updateSubtask(e.target.checked, index)
+                                        
+                                    }} checked={
                                         subtask?.status || false
                                     } />
                                 </>
@@ -649,21 +665,30 @@ export const TaskForm = () => {
     return (
         <>
             <Modal show={modalstate} onHide={async () => {
-                TaskUpdate()
-                dispatch(updateStateData(CURRENT_TASK, {})); dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project')); dispatch(togglePopups('taskform', false));
+                if(memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                    TaskUpdate()
+                }
+                
+                dispatch(updateStateData(CURRENT_TASK, {})); dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project')); 
+                dispatch(togglePopups('taskform', false));
             }
             } centered size="lg" className="add--member--modal edit--task--modal modalbox" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="project--form">
+                        { (memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) ?
+                        <>
                         <div className="project--form--inputs" data-tabid={fields['tab']}>
                             <Form onSubmit={() => { return false }} key={`taskform-${commonState?.taskForm?.tab}`}>
                                 <Form.Group className="mb-0 form-group task--title">
                                     <Form.Label><small>Title</small></Form.Label>
                                     <Form.Control type="text" key={`task-title-${commonState?.taskForm?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || ""} onChange={handleChange} onBlur={(e) => {
                                         if (currentTask.title !== fields['title']) {
-                                            dispatch(updateTask(currentTask._id, { title: fields['title'] }))
+                                            if(memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                                                dispatch(updateTask(currentTask._id, { title: fields['title'] }))
+                                            }
+                                            
                                         }
                                     }} />
                                     {showError('title')}
@@ -924,7 +949,7 @@ export const TaskForm = () => {
                                 <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus />Assign to</ListGroup.Item>
                                 <p className="m-0">
                                     {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                        <MemberInitials directUpdate={true} members={fields['members']} showRemove={true} showall={true} showAssign={false} postId={`${currentTask?._id}`} type="task" />
+                                        <MemberInitials directUpdate={true} members={fields['members']} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner') ? true : false} showall={true} showAssign={false} postId={`${currentTask?._id}`} type="task" />
                                     )}
                                 </p>
 
@@ -946,7 +971,12 @@ export const TaskForm = () => {
                                     <label onClick={() => { setDatePickerModal(true) }}><FaRegCalendarAlt /> Due date</label>
                                     <label onClick={() => { setDatePickerModal(true) }} className='date--new w-100 mb-0'>{fields['due_date'] ? fields['due_date'] : ''}</label>
                                 </ListGroup.Item>
-                                <ListGroup.Item onClick={() => { setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus(true) }}>
+                                <ListGroup.Item onClick={() => { 
+                                    if(memberProfile?.permissions?.projects?.update_tasks_order === true || memberProfile?.role?.slug === 'owner'){
+                                        setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus(true) 
+                                    }
+                                    
+                                    }}>
                                     <LuWorkflow />Workflow status
                                     <Form.Group className="mb-0 form-group pb-0">
                                         <Form.Label>
@@ -969,18 +999,263 @@ export const TaskForm = () => {
                                     </Form.Group>
                                 </ListGroup.Item>
                                 <ListGroup.Item className='text-danger' onClick={async () => {
-                                    setLoader(true)
-                                    await dispatch(deleteTask(currentTask._id))
-                                    setLoader(false)
-                                    dispatch(togglePopups('taskform', false))
+                                    if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner'){
+                                        setLoader(true)
+                                        await dispatch(deleteTask(currentTask._id))
+                                        setLoader(false)
+                                        dispatch(togglePopups('taskform', false))
+                                    }
                                 }} disabled={loader}><FaRegTrashAlt
                                     /> {loader ? 'Please wait...' : 'Delete'}</ListGroup.Item>
                             </ListGroup>
                         </div>
+                        </>
+                        :
+                            <>
+                                <div className="project--form--inputs" data-tabid={fields['tab']}>
+                                    <Form onSubmit={() => { return false }} key={`taskform-${commonState?.taskForm?.tab}`}>
+                                        <Form.Group className="mb-0 form-group task--title">
+                                            <Form.Label><small>Title</small></Form.Label>
+                                            <Form.Control type="text" key={`task-title-${commonState?.taskForm?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || ""} readOnly/>
+                                        </Form.Group>
+
+                                        <Form.Group className="mb-0 form-group">
+                                            <Form.Label className="w-100 m-0">
+                                                <small>Description</small>
+                                            </Form.Label>
+                                            <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
+                                                <ReactQuill
+                                                    value={fields['description'] || ''}
+                                                    disabled
+                                                    readOnly
+                                                    ref={quillRef}
+                                                    modules={modules}
+                                                    formats={formats}
+                                                />
+                                            </div>
+                                        </Form.Group>
+
+                                        <Form.Group className="mb-0 form-group pb-0">
+                                            <Form.Label className="w-100 m-0">
+                                                <small>Subtasks</small>
+                                            </Form.Label>
+                                        </Form.Group>
+
+                                        <div className='subtasks-List'>
+                                            <ul
+                                                id={`subtasks-ul`}
+                                                className="subtasks--list"
+                                            >
+                                                {
+                                                    subtasks && subtasks.length > 0 &&
+                                                    subtasks.map((subtask, index) => (
+
+                                                        <li>
+                                                            <Form.Group className="mb-0 form-group pb-0" key={`subtask-${index}`}>
+                                                                {
+                                                                    (typeof subtask === 'object') &&
+                                                                    <>
+                                                                        <GrDrag />
+                                                                        <input type='checkbox' checked={
+                                                                            subtask?.status || false
+                                                                        } />
+                                                                    </>
+                                                                }
+                                                                    <div  className="form-control"
+                                                                                contentEditable={typeof subtask === 'object' && enablesubtaskedit[subtask._id] === true}
+                                                                                suppressContentEditableWarning={true}
+                                                                                
+                                            
+                                                                                onClick={(e) => {
+                                                                                    if (e.target.tagName === 'A') {
+                                                                                        e.stopPropagation();
+                                                                                        return;
+                                                                                    }
+                                                                                    const selection = window.getSelection();
+                                                                                    if (selection && selection.type === 'Range') {
+                                                                                        // User is selecting text, so don't move the caret
+                                                                                        return;
+                                                                                    }
+                                                                                }}
+                                            
+                                                                                
+                                                                                id={`editable-subtask-${subtask._id}`}
+                                                                                style={{
+                                                                                    cursor: enablesubtaskedit[subtask._id] ? 'text' : 'pointer',
+                                                                                    border: 'none',
+                                                                                    padding: '0.5rem 0',
+                                                                                    minHeight: '2rem',
+                                                                                    overflowWrap: 'break-word',
+                                                                                }}
+                                                                                placeholder="Enter subtask"
+                                                                                dangerouslySetInnerHTML={{
+                                                                                    __html: typeof subtask === 'object'
+                                                                                        ? makeLinksClickable(String(subtask.title).replace(/\n/g, '<br/>')) // Ensure title is a string
+                                                                                        : makeLinksClickable(String(subtask).replace(/\n/g, '<br/>')),      // Ensure subtask is a string
+                                                                                }}
+                                            
+                                                                            >
+
+                                                                        </div>
+                                                                    </Form.Group>
+                                                                </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                                
+                                        <Form.Group className="mb-0 mt-3 form-group">
+                                            <Form.Label className="w-100 m-0">
+                                                <small>Task chat</small>
+                                            </Form.Label>
+                                            {
+                                                currentTask && currentTask.comments && currentTask.comments.length > 0 &&
+                                                <Row key={`task-comments-${currentTask?._idß}`}>
+                                                    <Col sm={12}>
+                                                        {
+                                                            currentTask.comments.map((comment, index) => {
+                                                                return (
+                                                                    <p className='d-flex task--message' key={`comment-${comment._id}`}>
+                                                                        <div className='msg-member-info'>
+                                                                            {
+                                                                                comment?.author?.avatar && comment?.author?.avatar !== null ?
+
+                                                                                    <Image src={comment?.author?.avatar} roundedCircle />
+                                                                                    :
+                                                                                    <Initials title={comment?.author?.name}>
+                                                                                        <span className={`team--initial nm-${comment?.author?.name?.substring(0, 1).toLowerCase()}`}>
+                                                                                            {comment?.author?.name?.substring(0, 1).toUpperCase()}
+                                                                                        </span>
+                                                                                    </Initials>
+                                                                            }
+
+
+                                                                            <div className='msg-view'>
+                                                                                <small>{formatTimeAgo(comment?.createdAt)}</small>
+                                                                                {/* Render sanitized HTML content */}
+                                                                                <p dangerouslySetInnerHTML={{ __html: makeLinksClickable(comment.text) }} />
+
+                                                                            </div>
+                                                                        </div>
+                                                                    </p>
+                                                                )
+                                                            })
+                                                        }
+                                                    </Col>
+                                                </Row>
+                                            }
+
+                                            
+                                        </Form.Group>
+
+                                        {currentTask?.taskmeta?.length > 0 &&
+
+                                            currentTask.taskmeta.sort((a, b) => {
+                                                // Sort such that 'timeline' comes before 'task_created_updated'
+                                                const order = ['timeline', 'task_created_updated'];
+                                                return order.indexOf(a.meta_key) - order.indexOf(b.meta_key);
+                                            }).map((meta, index) => {
+                                                // Conditionally render based on the meta_key value
+                                                if (meta.meta_key === 'timeline') {
+                                                    return (
+                                                        <Form.Group className="mb-0 mt-3 form-group">
+                                                            <Form.Label className="w-100 m-0">
+                                                                <small>Timeline</small>
+                                                            </Form.Label>
+                                                            <div className='timeline--container' key={`timeline-area-${currentTask?._id}`}>
+                                                                {
+                                                                    meta?.meta_value?.length > 0 &&
+                                                                    meta.meta_value.map((timeline, index) => {
+                                                                        return (
+                                                                            <div className='timeline--blip'>
+                                                                                <div className='timeline--blip--line'></div>
+                                                                                <div className={`timeline--blip--status workflow--color-${index}`}></div>
+                                                                                <div className='blip--container'>
+                                                                                    <small>{formatDate(timeline?.createdAt)}</small>
+                                                                                    <p dangerouslySetInnerHTML={{ __html: timeline.message }}></p>
+                                                                                    {/* <p>Status changed to <strong>in review</strong> by <strong>Php Web1 Experts</strong></p> */}
+                                                                                </div>
+                                                                            </div>
+                                                                        )
+                                                                    })
+
+                                                                }
+
+                                                            </div>
+                                                        </Form.Group>
+                                                    );
+                                                } else if (meta.meta_key === 'task_created_updated') {
+                                                    return (
+                                                        <div className='task--cr--status'>
+                                                            <p className='mb-0'>Created on: <strong>{timeAgo(meta?.createdAt)} by {meta.meta_value?.created_by}</strong></p>
+                                                            {
+                                                                meta.meta_value?.updated_by && meta.meta_value?.updated_by !== "" &&
+                                                                <p className='mb-0'>Last update: <strong>{timeAgo(meta?.updatedAt)} by {meta.meta_value?.updated_by}</strong></p>
+                                                            }
+
+                                                        </div>
+                                                    );
+                                                }
+                                            })
+                                        }
+                                    </Form>
+                                </div> 
+                                <div className="project--form--actions">
+                                    <h4>Actions</h4>
+                                    <ListGroup>
+                                        <ListGroup.Item><FaPlus />Assign to</ListGroup.Item>
+                                        <p className="m-0">
+                                            {fields['members'] && Object.keys(fields['members']).length > 0 && (
+                                                <MemberInitials directUpdate={false} members={fields['members']} showRemove={false} showall={true} showAssign={false} postId={`${currentTask?._id}`} type="task" />
+                                            )}
+                                        </p>
+
+                                        <ListGroup.Item><GrAttachment />Attach files</ListGroup.Item>
+                                        <div className="output--file-preview">
+                                            <div className="preview--grid">
+                                                {
+                                                    currentTask && currentTask.files && currentTask.files.length > 0 &&
+                                                    currentTask.files.map((preview, index) => (
+                                                        <div key={index}>{renderPreview('old', preview, index)}</div>
+                                                    ))
+                                                }
+                                                
+                                            </div>
+                                        </div>
+                                        <ListGroup.Item>
+                                            <label ><FaRegCalendarAlt /> Due date</label>
+                                            <label  className='date--new w-100 mb-0'>{fields['due_date'] ? fields['due_date'] : ''}</label>
+                                        </ListGroup.Item>
+                                        <ListGroup.Item>
+                                            <LuWorkflow />Workflow status
+                                            <Form.Group className="mb-0 form-group pb-0">
+                                                <Form.Label>
+                                                    {
+                                                        commonState.currentProject && commonState.currentProject.workflow && commonState.currentProject.workflow.tabs && commonState.currentProject.workflow.tabs.length > 0 &&
+                                                        <div className="status--modal" >
+                                                            {commonState.currentProject.workflow.tabs.map((status, index) =>
+                                                                // Directly compare and return if matched
+                                                                status._id === commonState?.taskForm?.tab ? (
+                                                                    <div key={`status-${index}`} className="status-item">
+                                                                        <span className={`status--circle workflow--color-${index}`}></span>
+                                                                        {status.title} <FaChevronDown />
+                                                                    </div>
+                                                                ) : null // Return null for non-matching items
+                                                            )}
+
+                                                        </div>
+                                                    }
+                                                </Form.Label>
+                                            </Form.Group>
+                                        </ListGroup.Item>
+                                        
+                                    </ListGroup>
+                                </div>
+                            </>
+                        }
                     </div>
                 </Modal.Body>
             </Modal>
-            <Modal show={datePickerModal} centered size="md" className="date--picker--modal">
+            <Modal show={datePickerModal} onHide={() => { setDatePickerModal(false) }}  centered size="md" className="date--picker--modal">
                 <Modal.Header closeButton>
                     {/* <Modal.Title>Workflow status</Modal.Title> */}
                 </Modal.Header>
