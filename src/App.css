@@ -2015,6 +2015,15 @@ Project Task View CSS=-=-=
   height: 35px
 }
 
+.card--header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f7f7f7;
+  padding: .5rem 1rem;
+  margin: 1rem 0;
+}
+
 .accordion {
   border-radius: 0.5rem;
   -webkit-border-radius: 0.5rem;
@@ -2032,24 +2041,28 @@ Project Task View CSS=-=-=
 }
 
 .accordion .accordion-button {
-  display: block;
+  display: flex;
   width: 100%;
   text-align: left;
   color: #7BCCB8;
   font-weight: 500;
   background: #7BCCB810;
   text-decoration: none;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   position: relative;
-  border: 0;
+  border: 1px solid #7BCCB850;
   box-shadow: none;
+  border-bottom: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 3.5rem;
 }
 
 .accordion-button::after {
   display: inline-block;
   position: absolute;
   right: 15px;
-  top: 15px;
+  top: 12px;
 }
 
 .accordion span.btn-primary {
@@ -2072,14 +2085,29 @@ Project Task View CSS=-=-=
 
 .accordion .accordion-button.collapsed {
   color: #333333;
-  background: #ffffff;
+  background: #f7f7f7;
   font-weight: 500;
+  border: 1px solid transparent;
 }
 
 .accordion .accordion-body {
   margin-top: 0;
   padding: 1rem;
-  padding-top: 0;
+  border: 1px solid #7BCCB850;
+  border-top: 0;
+}
+
+.form-check-input:checked {
+  background-color: #6fccb8;
+  border-color: #6fccb8;
+}
+
+.accordion .accordion-body .form-check+.form-check {
+  margin-top: 1rem;
+}
+
+.accordion .accordion-body .sub-items {
+  margin-left: 20px;
 }
 
 .accordion-button:focus {

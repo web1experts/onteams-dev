@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Stack } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Stack, FormGroup } from "react-bootstrap";
 import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { getMemberdata } from "../../helpers/commonfunctions";
@@ -964,6 +964,16 @@ function TeamMembersPage() {
               <Card.Title>Permissions</Card.Title>
               
                 <>
+                <div className="card--header">
+                  <FormGroup className="form-group mb-0 pb-0">
+                    <Form.Check
+                     type="checkbox"
+                     id="all"
+                     label="Select All Permissions"
+                    />
+                  </FormGroup>
+                  <Button type="button" variant="link" className="p-0">Expand All</Button>
+                </div>
                 <Accordion>
                   {permissionModules.map((mod) => {
                     const modSlug = mod.slug;
@@ -973,9 +983,9 @@ function TeamMembersPage() {
   
                     return (
                       <Accordion.Item eventKey={modSlug}>
-                            <Accordion.Header>{mod.name}</Accordion.Header>
+                            <Accordion.Header>{mod.name} <span className="per--count">0/6</span> </Accordion.Header>
                             <Accordion.Body>
-                            <div className="ml-6 mt-2 space-y-1 transition-all pb-2">
+                            <div className="transition-all">
                             {(mod.permissions || []).map((perm) => {
                               if (perm === 'view') {
                                 return (
@@ -1084,7 +1094,7 @@ function TeamMembersPage() {
                     );
                   })}
                   </Accordion>
-                  <div className="mt-6 text-right">
+                  <div className="mt-4 text-end">
                     <Button variant="primary" onClick={handleSave} disabled={loader}>
                       { loader ? 'Please wait...' : 'Save Permissions'}
                     </Button>
