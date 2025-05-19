@@ -17,6 +17,7 @@ import { currentMemberProfile } from "../../helpers/auth";
 import { Link } from "react-router-dom";
 import "media-chrome";
 import "media-chrome/dist/menu"
+import ManualTime from "./ManualTime";
 function ReportsPage() {
   const dispatch = useDispatch()
   const memberProfile = currentMemberProfile()
@@ -29,6 +30,7 @@ function ReportsPage() {
   const [remarks, setRemarks] = useState('')
   const [ loader, setLoader] = useState(false)
   const [show, setShow] = useState(false);
+  const [showNew, setShowNew] = useState(false);
   const [spinner, setSpinner] = useState(false)
   const [currentVideoPage, setCurrentVideoPage] = useState({});
   const videosPerPage = 12; // Adjust as needed
@@ -36,6 +38,9 @@ function ReportsPage() {
     setShow(false);
     setFields({})
     setEntries([])
+  }
+  const handleCloseNew = () => {
+    setShowNew(false);
   }
   const handleRemarks = () => {
     setremarksActive(current => !current)
@@ -51,6 +56,7 @@ function ReportsPage() {
     setRemarks(e.target.value)
   }
   const handleShow = () => setShow(true);
+  const handleNewShow = () => setShowNew(true);
   const memberFeed = useSelector((state) => state.member.members)
   const projectFeed = useSelector(state => state.project.projects);
   const [ projects, setProjects ] = useState([])
@@ -930,9 +936,6 @@ const TaskList = ({ report }) => {
               </Col>
               <Col>
                 <ListGroup horizontal>
-                  <ListGroup.Item>
-                    <Button type="primary" as={Link} to="/manual-time" >Manual Time Approve</Button>
-                  </ListGroup.Item>
                   <ListGroup.Item className="d-none d-xl-block">
                   <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('sort_by', event.target.value)} value={filters['sort_by'] || 'members'}>
                       <option value="">Sort by</option>
@@ -1065,9 +1068,14 @@ const TaskList = ({ report }) => {
                   </ListGroup.Item>
                   }
                   { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                    <ListGroup.Item>
-                      <Button variant="primary" onClick={handleShow}>Manual Time</Button>
-                    </ListGroup.Item>
+                    <Dropdown className="select--dropdown">
+                      <Dropdown.Toggle variant="success" id="dropdown-basic">Manual Time</Dropdown.Toggle>
+                  
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={handleShow}>Manual Time</Dropdown.Item>
+                        <Dropdown.Item onClick={handleNewShow} to="/manual-time" >Manual Time Approval</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   )}
                 </ListGroup>
               </Col>
@@ -1829,7 +1837,14 @@ const TaskList = ({ report }) => {
         </Modal.Footer>
       </Modal>
 
-      
+      <Modal show={showNew} onHide={handleCloseNew} centered size="lg" className="AddReportModal AddTimeModal">
+        <Modal.Header closeButton>
+          <Modal.Title>Manual Time Approval</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ManualTime />
+        </Modal.Body>
+      </Modal>
       {/*--=-=Filter Modal**/}
       <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal">
         <Modal.Header closeButton>

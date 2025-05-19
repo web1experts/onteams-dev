@@ -97,29 +97,8 @@ function ManualTime() {
 
   return (
     <>
-      <div className="team--page">
-        <div className="page--title px-md-2 pt-3">
-          <Container fluid>
-            <Row>
-              <Col>
-                <h2>Manaul Time</h2>
-              </Col>
-            </Row>
-          </Container>
-        </div>
-        <div className="page--wrapper daily--reports px-md-2 py-3">
-          {spinner && (
-            <div className="loading-bar">
-              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
-            </div>
-          )}
-          <Container fluid>
-            <div className="reports-section">
-              <div
-                className="rounded--box activity--box"
-                key="activity-box"
-              >
-                
+      <div className="reports-section">
+            
                 <Accordion defaultActiveKey="0">
                   {Object.entries(manualTimeList).map(([date, members], index) => (
                     <Accordion.Item eventKey={index.toString()} key={date}>
@@ -128,9 +107,9 @@ function ManualTime() {
                       <Table responsive="xl">
                         <thead>
                             <tr key="manaul-time-table-header">
-                                <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Member Name</th>
+                                <th scope="col" width='40%' key="project-name-header"><abbr>#</abbr> Member Name</th>
                                 <th scope="col" width='20%' key="project-client-header" className="onHide">Time Added</th>
-                                <th scope="col" width='25%' key="project-action-header" className="onHide">Actions</th>
+                                <th scope="col" width='20%' key="project-action-header" className="onHide">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -154,12 +133,8 @@ function ManualTime() {
                     </Accordion.Item>
                   ))}
                 </Accordion>
-                
-              </div>
+             
             </div>
-          </Container>
-        </div>
-      </div>
       { show && 
         <Modal
           show={show}

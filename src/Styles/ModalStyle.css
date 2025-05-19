@@ -154,7 +154,7 @@
     position: relative;
 }
 
-.add--team--member--modal form .btn, .add--member--modal form .btn {
+.add--team--member--modal form .btn-link, .add--member--modal form .btn-link {
     padding: 0;
     color: #de0606;
     padding-bottom: 0;
