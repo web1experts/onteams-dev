@@ -163,7 +163,7 @@ export default (state = initialState, action) => {
     case PUT_MEMBER_SUCCESS:
         return {
             ...state,
-            updatedMember: action.payload.message,
+            updatedMember: action.payload.updatedMember,
             message: action.payload.message,
             success: true,
             message_variant: 'success',

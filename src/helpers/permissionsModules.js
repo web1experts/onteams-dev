@@ -33,7 +33,9 @@ export const permissionModules = [
     slug: 'tracking',
     permissions: [
       "view",
-      "view_others"
+      "view_others",
+      "delete_recordings"
+
     ],
   },
   {
@@ -42,7 +44,8 @@ export const permissionModules = [
     permissions: [
       "view",
       "view_others",
-      "create_edit_delete"
+      "create_edit_delete",
+      "update_manual_time"
     ],
   },
   {
@@ -63,3 +66,44 @@ export const permissionModules = [
     ],
   } 
 ];
+
+export const permissionsLabel = {
+  "projects": {
+    "view": "View Projects",
+    "view_others": "View Other Members Projects",
+    "create_edit_delete_project": "Create/Edit/Delete Projects",
+    "create_edit_delete_task": "Create/Edit/Delete Tasks",
+    "update_projects_order": "Change Projects Order",
+    "update_tasks_order": "Change Tasks Order"
+  },
+  clients: {
+    "view": "View Clients",
+    "create_edit_delete": "Create/Edit/Delete Clients"
+  },
+  members: {
+    "view": "View Members",
+    "create_edit_delete": "Create/Edit/Delete Members",
+    "update_permissions": "Update Member Permissions"
+  },
+  tracking: {
+    "view": "View Tracked Time",
+    "view_others" : "View Others Tracked Time",
+    "delete_recordings": "Delete Recordings"
+    
+  },
+  reports: {
+    "view": "View Report",
+    "view_others": "View Other Members Report",
+    "create_edit_delete": "Create/Edit/Delete Report",
+    "update_manual_time": "Update Manual Time Of Members"
+  },
+  holidays: {
+    "view": "View Holidays",
+    "create_edit_delete": "Create/Edit/Delete Holidays"
+  },
+  attendance: {
+    "view": "View Attendance",
+    "create_edit": "Edit Attendance",
+    "view_others": "View Other Members Attendance"
+  }
+}

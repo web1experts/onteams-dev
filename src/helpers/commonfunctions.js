@@ -82,6 +82,9 @@ export const roles =[
 
 export const selectboxObserver = () => {
     const selects = document.querySelectorAll('select.custom-selectbox');
+     if (!selects || selects.length === 0){
+      return;
+     } 
         selects.forEach(select => {
             renderCustomDropdown(select);
 

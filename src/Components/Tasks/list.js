@@ -353,7 +353,7 @@ const TasksList = React.memo((props) => {
                                 <div key={tab._id} className={`task--grid workflow--color-${index}`}>
                                     <h5>
                                         {tab.title}
-                                        {( memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) && (
+                                        {( memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) && (
                                             <Button
                                                 variant="primary"
                                                 onClick={() => {
@@ -367,7 +367,7 @@ const TasksList = React.memo((props) => {
                                             </Button>
                                         )}
                                     </h5>
-                                    {( memberProfile?.permissions?.projects.create_edit_delete_task === true && memberProfile?.permissions?.projects.update_tasks_order === true || memberProfile?.role?.slug === 'owner' ) ?
+                                    {( memberProfile?.permissions?.projects?.create_edit_delete_task === true && memberProfile?.permissions?.projects.update_tasks_order === true || memberProfile?.role?.slug === 'owner' ) ?
                                         <Droppable droppableId={`droppable-${tab._id}`} type="TASKS">
                                             {(provided, snapshot) => (
                                                 <ul
@@ -459,7 +459,7 @@ const TasksList = React.memo((props) => {
                                             )}
                                         </Droppable>
                                     :
-                                    ( memberProfile?.permissions?.projects.create_edit_delete_task === true  || memberProfile?.role?.slug === 'owner' ) ?
+                                    ( memberProfile?.permissions?.projects?.create_edit_delete_task === true  || memberProfile?.role?.slug === 'owner' ) ?
                                         <ul
                                             id={`workflow-tab-${tab._id}`}
                                             className="tasks--list"

@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Navbar, Nav, Dropdown, Modal, Button, Tabs, Tab } from "react-bootstrap";
+import { Navbar, Nav, Dropdown} from "react-bootstrap";
 import { LuLayoutDashboard, LuTimer } from "react-icons/lu";
 import { RxDashboard } from "react-icons/rx";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrGroup } from "react-icons/gr";
-import { HiUserPlus } from "react-icons/hi2";
-import { TbFileInvoice, TbReport } from "react-icons/tb";
-import { BsCalendar2Week, BsRecord2 } from "react-icons/bs";
-import { CgCalendarDates, CgFileDocument, CgNotes } from "react-icons/cg";
-import { BiChat, BiScreenshot } from "react-icons/bi";
-import { RiCamera3Line, RiLockPasswordLine, RiSettingsLine } from "react-icons/ri";
+import { TbReport } from "react-icons/tb";
+import { BsCalendar2Week } from "react-icons/bs";
+import { CgCalendarDates} from "react-icons/cg";
+import { RiSettingsLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
-import { FaMicrophone } from "react-icons/fa";
 import { MdOutlineManageAccounts } from "react-icons/md";
-import { getloggedInUser, decryptJsonData, encryptJsonData, currentMemberProfile} from '../../helpers/auth';
+import { getloggedInUser, currentMemberProfile} from '../../helpers/auth';
 import { useDispatch, useSelector } from "react-redux";
-import { setAuthorization } from '../../helpers/api';
 import { Link, useLocation } from "react-router-dom";
 import { transformString, parseIfValidJSON, getMemberdata, mergePermissions } from '../../helpers/commonfunctions';
 import { logout } from '../../redux/actions/auth.actions';
@@ -199,14 +195,6 @@ function SidebarPanel() {
                                 <Link  key="attendance-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/attendance' ? 'active' : ''}`} to="/attendance"><span className="nav--item--icon"><CgCalendarDates /></span> Attendance</Link>
                                 )
                             }
-                            <Link  key="docs-menu" onClick={handleToggler} className="nav-link" to="/permissions"><span className="nav--item--icon"><CgFileDocument /></span> Roles & Permission</Link>
-                            
-                                {/* <Link  key="chats-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><BiChat /></span> Chats</Link> */}
-                            {/* <Link  key="notes-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><CgNotes /></span> Notes</Link> */}
-                            {/* <Link  key="invoice-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/invoice' ? 'active' : ''}`} to="/invoice"><span className="nav--item--icon"><TbFileInvoice /></span> Invoice</Link> */}
-                            {/* <Link  key="password-menu" onClick={handleToggler} className="nav-link" to="/"><span className="nav--item--icon"><RiLockPasswordLine /></span> Password Manager</Link> */}
-                            {/* <Nav.Link href="#"><span className="nav--item--icon"><RiSettingsLine /></span> Setting</Nav.Link>
-                            <Nav.Link href="#"><span className="nav--item--icon"><FiLogOut /></span> Logout</Nav.Link> */}
                         </Nav>
                     </Navbar.Collapse>
                 </Navbar>

@@ -14,6 +14,7 @@ import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/p
 import DatePicker from "react-multi-date-picker";
 import { ListTasks } from "../../redux/actions/task.action";
 import { currentMemberProfile } from "../../helpers/auth";
+import { Link } from "react-router-dom";
 import "media-chrome";
 import "media-chrome/dist/menu"
 function ReportsPage() {
@@ -397,6 +398,9 @@ function ReportsPage() {
     for (const activity of activities) {
         const { duration } = activity;
         if(type !== 'all' && activity?.type !== type){
+          continue;
+        }
+        if( activity?.type === 'manual' && activity?.is_approved === false){
           continue;
         }
         totalSeconds += duration 
@@ -800,28 +804,6 @@ const TaskList = ({ report }) => {
               }
               if (activeTab === "videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
                 let idx = 0
-                // return meta.meta_value.map((videoData, j) => {
-                //   if(videoData.task !== taskId){return null}else{
-                //     const currentIdx = idx;
-                //     idx++;
-                //       return (
-                //         <Card key={`video-card-${i}-${j}`}>
-                //           <Card.Body 
-                //           onClick={() => triggerLightBox('video', meta.meta_value, currentIdx)}
-                //           >
-                //             <video controls height="175px">
-                //               <source src={videoData?.url} type="video/webm" />
-                //               Your browser does not support the video tag.
-                //             </video>
-                //             <p>
-                //               <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                //               <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                //             </p>
-                //           </Card.Body>
-                //         </Card>
-                //       )
-                //     }
-                //   });
                 
                 return (
                   <>
@@ -948,6 +930,9 @@ const TaskList = ({ report }) => {
               </Col>
               <Col>
                 <ListGroup horizontal>
+                  <ListGroup.Item>
+                    <Button type="primary" as={Link} to="/manual-time" >Manual Time Approve</Button>
+                  </ListGroup.Item>
                   <ListGroup.Item className="d-none d-xl-block">
                   <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('sort_by', event.target.value)} value={filters['sort_by'] || 'members'}>
                       <option value="">Sort by</option>

@@ -21,7 +21,8 @@ import TimeTrackingPage from "../Components/TimeTracking/TimeTrackingPage";
 import SettingPage from "../Components/Settings/SettingPage";
 import DashboardPage from "../Components/Dashboard/DashboardPage";
 import DesktopPage from "../Components/Desktop/DesktopPage";
-import PermissionsPage from "../Components/permissions/Permissions";
+import ManualTime from "../Components/Reports/ManualTime";
+
 const commonRouter = [
     {
         type: 'page',
@@ -141,12 +142,11 @@ const privateRoutes = [
 
     },
     {
-        type: "page",
-        name: 'permissions',
-        key: 'PERMISSIONS',
-        component: <PermissionsPage />,
-        route: "/permissions",
-        module: 'role_permissions'
+        type: 'page',
+        name: 'Manual Time Approve',
+        key: 'MANUAL_TIME_APPROVE',
+        component: <ManualTime />,
+        route: '/manual-time'
     },
     {
         type: 'page',

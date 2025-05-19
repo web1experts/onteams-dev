@@ -399,7 +399,7 @@ function TimeTrackingPage() {
     if (activeTab === 'Recordings') {
       return (
         <>
-          {showDate()}
+          {/* {showDate()} */}
           <ListGroup.Item key="filter-key-5" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
             <Form>
               <Form.Group className="mb-0 form-group">
@@ -655,15 +655,6 @@ function TimeTrackingPage() {
                       <media-settings-menu-button></media-settings-menu-button>
                     </media-control-bar>
                   </media-controller>
-                  {/* <video
-                    controls
-                    autoPlay={false}
-                    style={{ maxHeight: "90vh", maxWidth: "100%" }}
-                    ref={videoPlyrRef} className="plyr"
-                  >
-                    <source src={slide.src} type="video/webm" />
-                    Your browser does not support the video tag.
-                  </video> */}
                 </div>
               );
             }
@@ -885,7 +876,8 @@ function TimeTrackingPage() {
             }}>
               Recorded
             </ListGroup.Item>
-            {showDate()}
+            {
+              activeInnerTab === "InnerRecorded" && showDate()}
             <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
               <BsArrowClockwise onClick={handleRecordedActivity}/>
             </ListGroup.Item>
@@ -979,7 +971,7 @@ function TimeTrackingPage() {
                                   return meta.meta_value.map((screenshotData, j) => (
                                     <Card key={`screenshot-card-${i}-${j}`}>
                                       <Card.Body>
-                                        { screenshotData?.is_deleted !== true && 
+                                        { (screenshotData?.is_deleted !== true && memberProfile?.permissions?.tracking?.delete_recordings === true && memberProfile?._id === recording?.member) && 
                                           <div className="d-flex justify-content-between align-items-start">
                                             <Form.Check
                                               type="checkbox"
@@ -1045,7 +1037,7 @@ function TimeTrackingPage() {
                                           ) : (
                                             <Card key={`video-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
                                               <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                              { videoData?.is_deleted !== true && 
+                                              { videoData?.is_deleted !== true && memberProfile?.permissions?.tracking?.delete_recordings === true && memberProfile?._id === recording?.member && 
                                                 <div className="d-flex justify-content-between align-items-start">
                                                   <Form.Check
                                                     type="checkbox"

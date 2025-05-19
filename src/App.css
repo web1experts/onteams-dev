@@ -3046,6 +3046,18 @@ pre {
   border-radius: 0;
   flex: 1 1 100%;
   max-width: 100%;
+  position: relative;
+}
+
+.setting--tabs .list-group .list-group-item .btn {
+  position: absolute;
+  right: 15px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  padding: 0;
+  width: 30px;
+  height: 30px;
 }
 
 .setting--tabs .list-group-horizontal>.list-group-item:first-child:not(:last-child) {
@@ -3075,6 +3087,21 @@ pre {
   gap: 1.5rem;
   height: 100%;
   padding: 1.2rem;
+}
+
+.setting--page .permission__page .card {
+  flex-flow: row wrap;
+  gap: 1rem;
+  height: auto;
+}
+
+.setting--page .permission__page .card--header {
+  flex: 1 1 100%;
+  margin: 0;
+}
+
+.setting--page .permission__page .accordion {
+  flex: 1 1 100%;
 }
 
 .setting--page .rounded--box .card .card--img {

@@ -499,6 +499,7 @@ function SingleProject(props) {
                                     <small>Client</small>
                                 </Form.Label>
                                 <div className="client--input">
+                                {(memberProfile?.permissions?.clients?.view === true && filteredItems && filteredItems.length > 0 || memberProfile?.role?.slug === "owner") ?
                                 <Dropdown className={`select--dropdown`}>
                                     <Dropdown.Toggle variant="success" key={`success-selectkey-${Math.floor(Math.random() * 1001)}`}>
                                     {
@@ -523,7 +524,7 @@ function SingleProject(props) {
                                             
                                             {
                                                 
-                                                (memberProfile?.permissions?.clients?.view === true && filteredItems && filteredItems.length > 0 || memberProfile?.role?.slug === "owner") &&
+                                                
                                                 <>
                                                 <Dropdown.Item
                                                     key={'None'}
@@ -548,7 +549,15 @@ function SingleProject(props) {
                                         </div>
                                     </Dropdown.Menu>
                                 </Dropdown>
-                                    
+                                    :
+                                    <>
+                                    {
+                                        clientlist && clientlist.length > 0
+                                            ? clientlist.find((client) => client._id === fields['client'])?.name || 'None'
+                                            : 'None'
+                                    }
+                                    </>
+                                }
                                     { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
                                         <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
                                     )}

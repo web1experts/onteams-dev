@@ -4,7 +4,8 @@ import {
     PERMISSIONS_FAILED,
     PERMISSIONS_SUCCESS,
     ROLE_SUCCESS,
-    CLEAR_MESSAGES
+    CLEAR_MESSAGES,
+    ROLE_DELETE_SUCCESS
 } from "../actions/types";
 import * as auth from '../../helpers/auth';
 
@@ -32,11 +33,12 @@ export default (state = initialState, action) => {
                 savedrole: action.payload?.savedRole ||  false
             }
         case PERMISSIONS_FAILED: 
+        
         return {
             ...state,
             success: false,
             message: action.payload,
-            message_variant: 'error'
+            message_variant: 'danger'
         }
         case ROLE_SUCCESS: 
             return {
@@ -45,6 +47,14 @@ export default (state = initialState, action) => {
                 message: action.payload.message,
                 message_variant: 'success',
                 savedrole: action.payload.savedrole
+            }
+        case ROLE_DELETE_SUCCESS: 
+            return {
+                ...state,
+                success: true,
+                message: action.payload.message,
+                message_variant: 'success',
+                deletedRole: action.payload.deletedRole
             }
         case CLEAR_MESSAGES: {
             return {

@@ -75,10 +75,7 @@ a:focus {
 }
 
 .AddTimeModal .btn {
-  padding: 0;
   font-size: 1rem;
-  width: 42px;
-  height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

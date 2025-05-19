@@ -657,7 +657,7 @@ function ProjectsPage() {
                                     <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
                                         <ListGroup.Item key="member-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
-                                                <option value={memberdata?._id}>My Projects</option>
+                                                <option value={memberdata?._id} key="my-projects-option">My Projects</option>
                                                 {
                                                     (memberProfile?.permissions?.projects?.view_others === true || memberProfile?.role?.slug === 'owner') &&
                                                     <>
@@ -958,15 +958,19 @@ function ProjectsPage() {
                                 <Form.Group className="mb-0 form-group">
                                     <Form.Label><small>Client</small></Form.Label>
                                     <div className="client--input">
+                                    {
+                                        (memberProfile?.permissions?.clients?.view === true && clientlist && clientlist.length > 0 || memberProfile?.role?.slug === "owner" && clientlist && clientlist.length > 0) ?
                                         <Form.Select className="form-control custom-selectbox" placeholder="Select Client" id="client-select" name="client" onChange={handleChange} value={fields['client'] || ''}>
                                             <option value="none">None</option>
                                             {
-                                                (memberProfile?.permissions?.clients?.view === true && clientlist && clientlist.length > 0 || memberProfile?.role?.slug === "owner" && clientlist && clientlist.length > 0) &&
-                                                clientlist.map((client, index) => {
+                                                clientlist?.map((client, index) => {
                                                     return <option key={client._id} value={client._id}>{client.name}</option>
                                                 })
                                             }
                                         </Form.Select>
+                                        :
+                                        <Form.Label><small>None</small></Form.Label>
+                                        }
                                         { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
                                             <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
                                         )}
@@ -1067,7 +1071,7 @@ function ProjectsPage() {
                                 <ListGroup.Item onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
                                 <div className="output--file-preview">
                                     <div className="preview--grid">
-                                        {imagePreviews.map((preview, index) => (
+                                        {imagePreviews?.map((preview, index) => (
                                             <div key={`uploaded-preview-${index}`} className="file-preview">{renderPreview('new', preview, index)}</div>
                                         ))}
                                     </div>
@@ -1123,7 +1127,7 @@ function ProjectsPage() {
                         <ListGroup.Item key="member-filter-list">
                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'} >
                                 {
-                                    allMembers.map((member, index) => {
+                                    allMembers?.map((member, index) => {
                                         return <option key={`member-option--${index}`} value={member.value}>{member.label}</option>
                                     })
                                 }

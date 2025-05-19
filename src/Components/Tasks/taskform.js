@@ -185,9 +185,9 @@ export const TaskForm = (props) => {
                 fieldsSetup.members = [];
                 //setselectedMembers({});
             }
-            setTimeout(function () {
-                selectboxObserver()
-            }, 150)
+            // setTimeout(function () {
+            //     selectboxObserver()
+            // }, 150)
             dispatch(updateStateData(TASK_FORM, fieldsSetup))
         }
     }, [currentTask]);
@@ -360,7 +360,7 @@ export const TaskForm = (props) => {
     const [taskModalState, setTaskModalState] = useState(refreshstates(commonState.active_formtype || false))
 
     const handlesubtaskChange = (index, oldval, newval, directupdate = false) => {
-        if(memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+        if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
             const newSubtasks = [...subtasks];
             newSubtasks[index] = (typeof oldval === "object" && oldval._id) ? { ...oldval, ['title']: newval } : newval; // Update the specific subtask
             setSubtasks(newSubtasks); // Update the local state with the new subtasks array
@@ -382,7 +382,7 @@ export const TaskForm = (props) => {
         // }
     };
     const addSubtask = () => {
-        if(memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+        if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
             setissubopen(true)
             setSubtasks([...subtasks, '']);
         }
@@ -398,7 +398,7 @@ export const TaskForm = (props) => {
 
     // Function to handle blur event on subtask input
     const handleBlur = (index) => {
-        if((memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' )){
+        if((memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' )){
             const subtaskValue = subtasks[index];
             if (subtaskValue === '') {
                 removeSubtask(index);
@@ -665,19 +665,21 @@ export const TaskForm = (props) => {
     return (
         <>
             <Modal show={modalstate} onHide={async () => {
-                if(memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
                     TaskUpdate()
                 }
                 
                 dispatch(updateStateData(CURRENT_TASK, {})); dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project')); 
                 dispatch(togglePopups('taskform', false));
             }
-            } centered size="lg" className="add--member--modal edit--task--modal modalbox" onShow={() => selectboxObserver()}>
+            } centered size="lg" className="add--member--modal edit--task--modal modalbox" 
+            //onShow={() => selectboxObserver()}
+            >
                 <Modal.Header closeButton>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="project--form">
-                        { (memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) ?
+                        { (memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) ?
                         <>
                         <div className="project--form--inputs" data-tabid={fields['tab']}>
                             <Form onSubmit={() => { return false }} key={`taskform-${commonState?.taskForm?.tab}`}>
@@ -685,7 +687,7 @@ export const TaskForm = (props) => {
                                     <Form.Label><small>Title</small></Form.Label>
                                     <Form.Control type="text" key={`task-title-${commonState?.taskForm?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || ""} onChange={handleChange} onBlur={(e) => {
                                         if (currentTask.title !== fields['title']) {
-                                            if(memberProfile?.permissions?.projects.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                                            if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
                                                 dispatch(updateTask(currentTask._id, { title: fields['title'] }))
                                             }
                                             

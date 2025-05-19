@@ -1,13 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Form, ListGroup, Table, Card, FloatingLabel } from "react-bootstrap";
+import {
+  Button,
+  Form,
+  ListGroup,
+  Table,
+  Card,
+  Modal,
+  FloatingLabel,
+  FormGroup,
+  Accordion,
+} from "react-bootstrap";
 import { FaChevronDown, FaEdit, FaTrashAlt } from "react-icons/fa";
-import Spinner from 'react-bootstrap/Spinner';
-import { getUserProfile, updateProfile } from "../../redux/actions/auth.actions";
+import Spinner from "react-bootstrap/Spinner";
+import {
+  getUserProfile,
+  updateProfile,
+} from "../../redux/actions/auth.actions";
 import { getFieldRules, validateField } from "../../helpers/rules";
-import { parseIfValidJSON } from "../../helpers/commonfunctions";
-const secretKey = process.env.REACT_APP_SECRET_KEY
-function EditableField({ field, type, label, value, onChange, isEditing, onEditClick, error }) {
+import { AlertDialog } from "../modals";
+import { permissionModules } from "../../helpers/permissionsModules";
+import { FaPlus } from "react-icons/fa";
+import {
+  updatePermissions,
+  addRoleWithPermissions,
+  deleteRole
+} from "../../redux/actions/permission.action";
+import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
+import { Listmembers } from "../../redux/actions/members.action";
+const secretKey = process.env.REACT_APP_SECRET_KEY;
+function EditableField({
+  field,
+  type,
+  label,
+  value,
+  onChange,
+  isEditing,
+  onEditClick,
+  error,
+}) {
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
   const [originalValue, setOriginalValue] = useState(value);
@@ -15,7 +46,7 @@ function EditableField({ field, type, label, value, onChange, isEditing, onEditC
   useEffect(() => {
     function handleClickOutside(event) {
       if (inputRef.current && !inputRef.current.contains(event.target)) {
-        if (inputRef.current.value.trim() === '') {
+        if (inputRef.current.value.trim() === "") {
           onChange(originalValue);
         }
         onEditClick(false);
@@ -26,60 +57,223 @@ function EditableField({ field, type, label, value, onChange, isEditing, onEditC
       if (inputRef.current) {
         inputRef.current.focus();
       }
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     } else {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isEditing, onEditClick, value]);
 
-  
-
   return (
     <ListGroup.Item>
-
       {isEditing ? (
         <>
           <strong>{label}</strong>
           <FloatingLabel>
-            <Form.Control placeholder={label} type={type} name={`${field}`} ref={inputRef} value={value} onChange={(e) => onChange(e.target.value)} />
+            <Form.Control
+              placeholder={label}
+              type={type}
+              name={`${field}`}
+              ref={inputRef}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+            />
           </FloatingLabel>
         </>
-
       ) : (
         <>
-          <strong>{label}</strong> {value} <FaEdit onClick={() => onEditClick(true)} />
-          <span className='error'>{error}</span>
+          <strong>{label}</strong> {value}{" "}
+          <FaEdit onClick={() => onEditClick(true)} />
+          <span className="error">{error}</span>
         </>
       )}
     </ListGroup.Item>
   );
-
 }
-
 
 function SettingPage() {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isActive, setIsActive] = useState(false);
-  const [fieldserrors, setFieldErrors] = useState({ name: '' });
-  const [ profile, setProfile ] = useState({})
-  const [ profileFields, setProfileFields ] = useState({})
-  const authprofile = useSelector(state => state.auth.profile)
-  const [ userProfile, setUserProfile ] = useState({})
+  const [fieldserrors, setFieldErrors] = useState({ name: "" });
+  const [profile, setProfile] = useState({});
+  const [profileFields, setProfileFields] = useState({});
+  const authprofile = useSelector((state) => state.auth.profile);
+  const [userProfile, setUserProfile] = useState({});
   const [loader, setLoader] = useState(false);
-  const [spinner, setSpinner] = useState(false)
+  const [spinner, setSpinner] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   let fieldErrors = {};
-  let hasError = false
+  let hasError = false;
   const [isEditing, setIsEditing] = useState({
     name: false,
-    avatar: false
+    avatar: false,
   });
-  const handleClick = event => {
-    setIsActive(current => !current);
+  let defaultrole;
+  const [fields, setFields] = useState({ name: "" });
+  const [errors, setErrors] = useState({});
+  const [show, setShow] = useState(false);
+  const [showdelete, setShowDelete] = useState(false);
+  const [activeKey, setActiveKey] = useState(null);
+  const [activeRole, setActiveRole] = useState({});
+  const workspace = useSelector((state) => state.workspace);
+  const members = useSelector((state) => state.member);
+  const apiPermission = useSelector((state) => state.permissions);
+  const memberFeed = useSelector((state) => state.member.members);
+  const [roles, setRoles] = useState([]);
+  const [memberslist, setMemberslist] = useState([]);
+  const [permissions, setPermissions] = useState({});
+  const [expanded, setExpanded] = useState({});
+  const [memberFeeds, setMemberFeed] = useState([]);
+
+  const handleToggleExpandAll = () => {
+    const areAllExpanded = permissionModules.every((mod) => expanded[mod.slug]);
+
+    const newExpandedState = {};
+    permissionModules.forEach((mod) => {
+      newExpandedState[mod.slug] = !areAllExpanded;
+    });
+
+    setExpanded(newExpandedState);
+  };
+
+  const toggleExpand = (module) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [module]: !prev[module],
+    }));
+  };
+
+  const toggleView = (module) => {
+    const isChecked = !(permissions?.[module]?.view || false);
+
+    const currentPerms = permissions?.[module] || {};
+    const updated = {
+      ...currentPerms,
+      view: isChecked,
+    };
+
+    if (!isChecked) {
+      const moduleData = permissionModules.find((m) => m.slug === module);
+      if (moduleData) {
+        (moduleData.permissions || []).forEach((perm) => {
+          if (perm !== "view") {
+            updated[perm] = false;
+          }
+        });
+      }
+    }
+
+    setPermissions((prev) => ({
+      ...prev,
+      [module]: updated,
+    }));
+  };
+  const togglePermission = (module, perm) => {
+    setPermissions((prev) => {
+      const currentPerms = prev?.[module] || {};
+      return {
+        ...prev,
+        [module]: {
+          ...currentPerms,
+          [perm]: !currentPerms?.[perm],
+        },
+      };
+    });
+  };
+
+  const handleSelectAllPermissions = (isChecked) => {
+    const updatedPermissions = {};
+
+    permissionModules.forEach((mod) => {
+      const modSlug = mod.slug;
+      const currentModPerms = permissions?.[modSlug] || {};
+
+      const updatedModPerms = {};
+
+      // Set all boolean permissions to true/false
+      (mod.permissions || []).forEach((perm) => {
+        updatedModPerms[perm] = isChecked;
+      });
+
+      // For modules that have selected_members, add them
+      if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
+        if (isChecked) {
+          const allMemberIds = memberFeeds.map((m) => String(m._id));
+          if (modSlug === "projects") {
+            allMemberIds.push("unassigned");
+          }
+          updatedModPerms["selected_members"] = allMemberIds;
+        } else {
+          updatedModPerms["selected_members"] = [];
+        }
+      }
+
+      updatedPermissions[modSlug] = updatedModPerms;
+    });
+
+    setPermissions((prev) => ({ ...prev, ...updatedPermissions }));
+  };
+
+  const handleSelectAll = (modSlug, isChecked) => {
+    const memberIds = memberFeeds.map((member) => String(member._id));
+    if (isChecked) {
+      setPermissions((prev) => {
+        const currentPerms = prev?.[modSlug] || {};
+        const currentMembers = currentPerms["selected_members"] || [];
+
+        return {
+          ...prev,
+          [modSlug]: {
+            ...currentPerms,
+            ["selected_members"]: memberIds,
+          },
+        };
+      });
+    } else {
+      setPermissions((prev) => {
+        const currentPerms = prev?.[modSlug] || {};
+        return {
+          ...prev,
+          [modSlug]: {
+            ...currentPerms,
+            ["selected_members"]: [],
+          },
+        };
+      });
+    }
+  };
+
+  const toggleMembers = (module, perm, memberId) => {
+    setPermissions((prev) => {
+      const currentPerms = prev?.[module] || {};
+      const currentMembers = currentPerms[perm] || [];
+
+      const updatedMembers = currentMembers.includes(memberId)
+        ? currentMembers.filter((id) => id !== memberId)
+        : [...currentMembers, memberId];
+
+      return {
+        ...prev,
+        [module]: {
+          ...currentPerms,
+          [perm]: updatedMembers,
+        },
+      };
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setPermissions((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  const handleClick = (event) => {
+    setIsActive((current) => !current);
   };
 
   const handleEditClick = (fieldName) => {
@@ -87,22 +281,21 @@ function SettingPage() {
   };
 
   const refreshProfile = async () => {
-    setSpinner( true)
+    setSpinner(true);
     await dispatch(getUserProfile());
-    setSpinner( false )
-  }
+    setSpinner(false);
+  };
 
   useEffect(() => {
     refreshProfile();
-  },[])
-
+  }, []);
 
   const handleFieldChange = (field, value) => {
     if (field === "avatar") {
       setProfile((prevState) => ({
         ...prevState,
         [field]: value.target.files[0],
-        ['remove_avatar']: false
+        ["remove_avatar"]: false,
       }));
       setAvatarPreview(URL.createObjectURL(value.target.files[0]));
     } else {
@@ -111,14 +304,53 @@ function SettingPage() {
         [field]: value,
       }));
       if (value !== "") {
-        setFieldErrors({ ...fieldErrors, [field]: "" })
+        setFieldErrors({ ...fieldErrors, [field]: "" });
       }
     }
-};
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const updatedErrorsPromises = Object.entries(fields).map(
+      async ([fieldName, value]) => {
+        if (value === "") {
+          return { fieldName, error: "Field cannot be blank" };
+        } else {
+          return { fieldName, error: "" };
+        }
+      }
+    );
+
+    // Wait for all promises to resolve
+    const updatedErrorsArray = await Promise.all(updatedErrorsPromises);
+    const errors = {};
+    updatedErrorsArray.forEach(({ fieldName, error }) => {
+      if (error) {
+        errors[fieldName] = error;
+      }
+    });
+    const hasError = Object.keys(errors).length > 0;
+
+    if (hasError) {
+      setErrors(errors);
+      return;
+    }
+    try {
+      const roleData = {
+        name: fields.name,
+        permissions,
+      };
+      
+      setLoader(true);
+      dispatch(addRoleWithPermissions(roleData));
+    } catch (err) {
+      console.error("Error adding role:", err);
+      alert("Error adding role");
+    }
+  };
   useEffect(() => {
-    if( authprofile ){ 
-      setUserProfile( authprofile)
+    if (authprofile) {
+      setUserProfile(authprofile);
       // if( localStorage.hasItem('current_loggedin_user')){
       //   const jsondata = parseIfValidJSON(localStorage.getItem('current_loggedin_user'));
 
@@ -129,27 +361,26 @@ function SettingPage() {
       //     localStorage.setItem('current_loggedin_user', JSON.stringify(jsondata, secretKey));
       //   }
       // }
-      
     }
-  }, [authprofile ])
+  }, [authprofile]);
 
   useEffect(() => {
     setProfile({
       email: userProfile.email,
       name: userProfile.name,
-      avatar: userProfile.avatar
-    })
+      avatar: userProfile.avatar,
+    });
     setProfileFields({
       email: userProfile.email,
       name: userProfile.name,
-      avatar: userProfile.avatar
-    })
+      avatar: userProfile.avatar,
+    });
     setIsEditing({
       name: false,
       avatar: false,
-      remove_avatar: false
+      remove_avatar: false,
     });
-  }, [userProfile])
+  }, [userProfile]);
 
   const compareProfile = (original, edited) => {
     const changes = {};
@@ -163,24 +394,24 @@ function SettingPage() {
 
   const handleUpdateSubmit = async (event) => {
     event.preventDefault();
-    
+
     const changes = compareProfile(profileFields, profile);
     if (Object.keys(changes).length > 0) {
-      setLoader(true)
+      setLoader(true);
 
-
-      const updatedErrorsPromises = Object.entries(changes).map(async ([fieldName, value]) => {
-        // Get rules for the current field
-        const rules = getFieldRules('profile', fieldName);
-        // Validate the field
-        const error = await validateField('profile', fieldName, value, rules);
-        // If error exists, return it as part of the resolved promise
-        return { fieldName, error };
-      });
+      const updatedErrorsPromises = Object.entries(changes).map(
+        async ([fieldName, value]) => {
+          // Get rules for the current field
+          const rules = getFieldRules("profile", fieldName);
+          // Validate the field
+          const error = await validateField("profile", fieldName, value, rules);
+          // If error exists, return it as part of the resolved promise
+          return { fieldName, error };
+        }
+      );
 
       // Wait for all promises to resolve
       const updatedErrorsArray = await Promise.all(updatedErrorsPromises);
-
 
       updatedErrorsArray.forEach(({ fieldName, error }) => {
         if (error) {
@@ -194,929 +425,865 @@ function SettingPage() {
       // If there are errors, update the errors state
       if (hasError) {
         setFieldErrors(fieldErrors);
-        setLoader(false)
+        setLoader(false);
       } else {
-        
-        console.log('Profile changes: ', changes)
+        console.log("Profile changes: ", changes);
         if (Object.keys(changes).length > 0) {
-          
           const formData = new FormData();
           for (const [key, value] of Object.entries(changes)) {
             formData.append(key, value);
           }
-          if( isEditing.remove_avatar === true ){
-            formData.append('remove_avatar', true);
+          if (isEditing.remove_avatar === true) {
+            formData.append("remove_avatar", true);
           }
-          await dispatch(updateProfile(userProfile?._id, formData))
-          
+          await dispatch(updateProfile(userProfile?._id, formData));
         }
         setIsEditing({
           name: false,
           avatar: false,
-          remove_avatar: false
+          remove_avatar: false,
         });
-        setLoader(false)
+        setLoader(false);
       }
     } else {
-      setLoader(false)
+      setLoader(false);
     }
   };
 
   const removeAvatar = () => {
-    setAvatarPreview( null );
-    setIsEditing({...isEditing, ['remove_avatar']: true })
-    setProfile({ ...profile, ['avatar'] : false })
+    setAvatarPreview(null);
+    setIsEditing({ ...isEditing, ["remove_avatar"]: true });
+    setProfile({ ...profile, ["avatar"]: false });
+  };
+
+  useEffect(() => {
+    if (activeRole) {
+      const merged = {};
+
+      // Step 1: Initialize merged with empty string values
+      permissionModules.forEach((mod) => {
+        merged[mod.slug] = {};
+        mod.permissions.forEach((p) => {
+          merged[mod.slug][p] = "";
+        });
+      });
+
+     
+      setPermissions((prev) => {
+        const newPerms = activeRole.permissions || {};
+
+        // Clone merged to avoid mutating the original reference
+        const updated = { ...merged };
+
+        // First, update existing keys in merged
+        for (const module in updated) {
+          updated[module] = { ...updated[module] }; // clone inner object
+          for (const key in updated[module]) {
+            if (newPerms?.[module] && key in newPerms[module]) {
+              updated[module][key] = newPerms[module][key];
+            } else {
+              updated[module][key] = "";
+            }
+          }
+        }
+
+        // Then, add any missing modules or keys from newPerms
+        for (const module in newPerms) {
+          if (!updated[module]) {
+            updated[module] = {};
+          }
+          for (const key in newPerms[module]) {
+            if (!(key in updated[module])) {
+              updated[module][key] = newPerms[module][key];
+            }
+          }
+        }
+
+        return updated;
+      });
+      setFields({...fields, ['name']: activeRole?.name})
+    }
+  }, [activeRole]);
+
+  const handleDeleteRole = async (e) => {
+    setLoader(true); console.log(activeRole._id)
+    dispatch(deleteRole(activeRole._id))
   }
+
+  const handleSave = async (e) => {
+    try {
+      const roleData = {
+        role: activeRole._id,
+        permissions,
+        type: "default",
+        name: fields['name']
+      };
+      setLoader(true);
+      dispatch(updatePermissions(roleData));
+    } catch (err) {
+      console.error("Error adding role:", err);
+      alert("Error adding role");
+    }
+  };
+  const handleShow = () => {
+    setShow((prev) => !prev);
+    setFields({})
+  };
+
+  useEffect(() => {
+    if( show === true){
+      setActiveRole({})
+    }else{ 
+      if (Array.isArray(roles) && roles.length > 0) {
+        setActiveRole(roles[0]);
+      }
+    }
+  },[show])
+
+  const showError = (name) => {
+    if (errors[name]) return <span className="error">{errors[name]}</span>;
+    return null;
+  };
+
+  const handleRoleList = async () => {
+    await dispatch(
+      getAvailableRolesByWorkspace({ fields: "_id name permissions" })
+    );
+  };
+
+  useEffect(() => {
+    if (memberFeed && memberFeed.memberData) {
+      setMemberFeed(memberFeed.memberData);
+    }
+  }, [memberFeed]);
+
+  useEffect(() => {
+    setLoader(false);
+    setShowDelete(false)
+    if (apiPermission.success) {
+      setShow(false);
+      setPermissions({})
+      if (apiPermission.savedrole) {
+        const savedrole = apiPermission.savedrole;
+        setFields({...fields, ['name']: savedrole.name})
+        setRoles((prev) => {
+          const index = prev.findIndex((role) => role._id === savedrole._id);
+          if (index !== -1) {
+            // Replace existing role
+            return prev.map((role) =>
+              role._id === savedrole._id ? savedrole : role
+            );
+          } else {
+            // Add new role
+            return [...prev, savedrole];
+          }
+        });
+        
+      }
+      if( apiPermission.deletedRole){
+        setRoles((prev) => prev.filter((role) => role._id !== apiPermission.deletedRole?._id));
+      }
+      if (apiPermission.updatedMeta) {
+        const meta = apiPermission.updatedMeta?.meta_value;
+        const memberIdToUpdate = apiPermission.updatedMeta?.member;
+
+        setMemberslist((prev) => {
+          const existing = prev[activeKey];
+
+          if (!existing) return prev;
+
+          const updatedMembers = existing.members.map((member) => {
+            if (member._id === memberIdToUpdate) {
+              return {
+                ...member,
+                permissions: meta, // or savedrole.permissions if that’s what you want
+              };
+            }
+            return member;
+          });
+
+          return {
+            ...prev,
+            [activeKey]: {
+              ...existing,
+              members: updatedMembers,
+            },
+          };
+        });
+      }
+    }
+  }, [apiPermission]);
+
+  useEffect(() => {
+    handleRoleList();
+    let prm = {};
+    permissionModules.forEach((mod) => {
+      prm[mod.slug] = {}; // Initialize object for each module
+      mod.permissions.forEach((p) => {
+        prm[mod.slug][p] = "";
+      });
+    });
+
+    setPermissions(prm);
+    dispatch(Listmembers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (workspace.available_roles) {
+      setRoles(workspace.available_roles);
+      defaultrole = workspace.available_roles[0];
+      setActiveRole(workspace.available_roles[0]);
+    }
+  }, [workspace]);
 
   return (
     <>
-     
-        <div className='team--page'>
-          <div className='page--wrapper setting--page'>
-          {
-              spinner &&
-              <div class="loading-bar">
-                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
-              </div>
-          }
-            <div className="setting--tabs">
-              <h2>Settings</h2>
-              <ListGroup horizontal className={isActive ? 'toggle--menu' : ''}>
-                <ListGroup.Item action active={activeTab === "Profile"} onClick={() => setActiveTab("Profile")}>Profile</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Projects"} onClick={() => setActiveTab("Projects")}>Projects</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Clients"} onClick={() => setActiveTab("Clients")}>Clients</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "TimeTracking"} onClick={() => setActiveTab("TimeTracking")}>Time Tracking</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Members"} onClick={() => setActiveTab("Members")}>Team Members</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Reports"} onClick={() => setActiveTab("Reports")}>Reports</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Holidays"} onClick={() => setActiveTab("Holidays")}>Holidays</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Attendance"} onClick={() => setActiveTab("Attendance")}>Attendance</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Docs"} onClick={() => setActiveTab("Docs")}>Docs</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Notes"} onClick={() => setActiveTab("Notes")}>Notes</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Invoices"} onClick={() => setActiveTab("Invoices")}>Invoices</ListGroup.Item>
-                <ListGroup.Item action active={activeTab === "Passwords"} onClick={() => setActiveTab("Passwords")}>Passwords</ListGroup.Item>
-              </ListGroup>
+      <div className="team--page">
+        <div className="page--wrapper setting--page">
+          {spinner && (
+            <div class="loading-bar">
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
-            {activeTab === "Profile" && (
-              <div className="rounded--box">
-                <Card>
-                <div className="card--img">
-                  <Form.Control type="file" id="upload--avatar" name="avatar" hidden onChange={(e) => handleFieldChange('avatar', e)} accept=".jpg, .jpeg, .png, .gif"/>
-                  <Form.Label htmlFor="upload--avatar">
-                    {
-                      isEditing.remove_avatar === false ? 
-                      <Card.Img variant="top" src={avatarPreview ?? userProfile?.avatar ?? "./images/default.jpg"} />
-                      :
-                      <Card.Img variant="top" src={"./images/default.jpg"} />
-                    }
-                    
-                    {!userProfile?.avatar && 
-                      <span>Add Photo</span>
-                    }
-                    {userProfile?.avatar && 
-                      <span>Edit Photo</span>
-                    }
-                    
-                  </Form.Label>
-                  {userProfile?.avatar && 
-                      
-                        <span className="remove--photo" onClick={removeAvatar}><FaTrashAlt /></span>
-                      
-                    }
-                </div>
-                  
-                  <Card.Body>
-                    
-                    {
-                      
-                      <ListGroup>
-                        <ListGroup.Item>
-                          <strong>Email</strong> {profile?.email}
-                        </ListGroup.Item>
-                        <EditableField
-                          field="name"
-                          label="Name"
-                          type="text"
-                          value={profile?.name}
-                          onChange={(value) => handleFieldChange('name', value)}
-                          isEditing={isEditing.name}
-                          onEditClick={() => handleEditClick('name')}
-                          error={fieldserrors['name'] && fieldserrors['name']}
-                        />
-                      </ListGroup>
-                    }
-                    
-                    <div className="text-end mt-3">
-                      <Button variant="primary" onClick={handleUpdateSubmit} disabled={loader}> { loader ? 'Please wait...': 'Save Changes' }</Button>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </div>
-            )}
-            {activeTab === "Projects" && (
-              <div className="rounded--box">
-                <h5>Projects Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View" type="radio" name="switch" checked />
-                  <label for="View">View</label>
-                  <input id="Add" type="radio" name="switch" />
-                  <label for="Add">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View01" type="radio" name="switch01" checked />
-                          <label for="View01">View</label>
-                          <input id="Add01" type="radio" name="switch01" />
-                          <label for="Add01">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View1" type="radio" name="switch1" checked />
-                          <label for="View1">View</label>
-                          <input id="Add1" type="radio" name="switch1" />
-                          <label for="Add1">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h5>Tasks Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View3" type="radio" name="switch3" checked />
-                  <label for="View3">View</label>
-                  <input id="Add3" type="radio" name="switch3" />
-                  <label for="Add3">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View4" type="radio" name="switch4" checked />
-                          <label for="View4">View</label>
-                          <input id="Add4" type="radio" name="switch4" />
-                          <label for="Add4">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View5" type="radio" name="switch5" checked />
-                          <label for="View5">View</label>
-                          <input id="Add5" type="radio" name="switch5" />
-                          <label for="Add5">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Clients" && (
-              <div className="rounded--box">
-                <h5>Clients Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View6" type="radio" name="switch6" checked />
-                  <label for="View6">View</label>
-                  <input id="Add6" type="radio" name="switch6" />
-                  <label for="Add6">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View7" type="radio" name="switch7" checked />
-                          <label for="View7">View</label>
-                          <input id="Add7" type="radio" name="switch7" />
-                          <label for="Add7">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View8" type="radio" name="switch8" checked />
-                          <label for="View8">View</label>
-                          <input id="Add8" type="radio" name="switch8" />
-                          <label for="Add8">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "TimeTracking" && (
-              <div className="rounded--box">
-                <h5>View Time Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View9" type="radio" name="switch9" checked />
-                  <label for="View9">View</label>
-                  <input id="Add9" type="radio" name="switch9" />
-                  <label for="Add9">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View10" type="radio" name="switch10" checked />
-                          <label for="View10">View</label>
-                          <input id="Add10" type="radio" name="switch10" />
-                          <label for="Add10">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View11" type="radio" name="switch11" checked />
-                          <label for="View11">View</label>
-                          <input id="Add11" type="radio" name="switch11" />
-                          <label for="Add11">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h5>Approve Time Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View12" type="radio" name="switch12" checked />
-                  <label for="View12">View</label>
-                  <input id="Add12" type="radio" name="switch12" />
-                  <label for="Add12">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View13" type="radio" name="switch13" checked />
-                          <label for="View13">View</label>
-                          <input id="Add13" type="radio" name="switch13" />
-                          <label for="Add13">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View14" type="radio" name="switch14" checked />
-                          <label for="View14">View</label>
-                          <input id="Add14" type="radio" name="switch14" />
-                          <label for="Add14">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Members" && (
-              <div className="rounded--box">
-                <h5>Team Members Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View15" type="radio" name="switch15" checked />
-                  <label for="View15">View</label>
-                  <input id="Add15" type="radio" name="switch15" />
-                  <label for="Add15">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View16" type="radio" name="switch16" checked />
-                          <label for="View16">View</label>
-                          <input id="Add16" type="radio" name="switch16" />
-                          <label for="Add16">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View17" type="radio" name="switch17" checked />
-                          <label for="View17">View</label>
-                          <input id="Add17" type="radio" name="switch17" />
-                          <label for="Add17">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Reports" && (
-              <div className="rounded--box">
-                <h5>Reports Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View18" type="radio" name="switch18" checked />
-                  <label for="View18">View</label>
-                  <input id="Add18" type="radio" name="switch18" />
-                  <label for="Add18">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View19" type="radio" name="switch19" checked />
-                          <label for="View19">View</label>
-                          <input id="Add19" type="radio" name="switch19" />
-                          <label for="Add19">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View20" type="radio" name="switch20" checked />
-                          <label for="View20">View</label>
-                          <input id="Add20" type="radio" name="switch20" />
-                          <label for="Add20">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Holidays" && (
-              <div className="rounded--box">
-                <h5>Holidays Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View21" type="radio" name="switch21" checked />
-                  <label for="View21">View</label>
-                  <input id="Add21" type="radio" name="switch21" />
-                  <label for="Add21">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View22" type="radio" name="switch22" checked />
-                          <label for="View22">View</label>
-                          <input id="Add22" type="radio" name="switch22" />
-                          <label for="Add22">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View23" type="radio" name="switch23" checked />
-                          <label for="View23">View</label>
-                          <input id="Add23" type="radio" name="switch23" />
-                          <label for="Add23">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Attendance" && (
-              <div className="rounded--box">
-                <h5>Attendance Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View24" type="radio" name="switch24" checked />
-                  <label for="View24">View</label>
-                  <input id="Add24" type="radio" name="switch24" />
-                  <label for="Add24">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View25" type="radio" name="switch25" checked />
-                          <label for="View25">View</label>
-                          <input id="Add25" type="radio" name="switch25" />
-                          <label for="Add25">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View26" type="radio" name="switch26" checked />
-                          <label for="View26">View</label>
-                          <input id="Add26" type="radio" name="switch26" />
-                          <label for="Add26">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Docs" && (
-              <div className="rounded--box">
-                <h5>Docs Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View27" type="radio" name="switch27" checked />
-                  <label for="View27">View</label>
-                  <input id="Add27" type="radio" name="switch27" />
-                  <label for="Add27">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View28" type="radio" name="switch28" checked />
-                          <label for="View28">View</label>
-                          <input id="Add28" type="radio" name="switch28" />
-                          <label for="Add28">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View29" type="radio" name="switch29" checked />
-                          <label for="View29">View</label>
-                          <input id="Add29" type="radio" name="switch29" />
-                          <label for="Add29">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Notes" && (
-              <div className="rounded--box">
-                <h5>Notes Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View30" type="radio" name="switch30" checked />
-                  <label for="View30">View</label>
-                  <input id="Add30" type="radio" name="switch30" />
-                  <label for="Add30">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View31" type="radio" name="switch31" checked />
-                          <label for="View31">View</label>
-                          <input id="Add31" type="radio" name="switch31" />
-                          <label for="Add31">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View32" type="radio" name="switch32" checked />
-                          <label for="View32">View</label>
-                          <input id="Add32" type="radio" name="switch32" />
-                          <label for="Add32">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Invoices" && (
-              <div className="rounded--box">
-                <h5>Invoices Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View33" type="radio" name="switch33" checked />
-                  <label for="View33">View</label>
-                  <input id="Add33" type="radio" name="switch33" />
-                  <label for="Add33">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View34" type="radio" name="switch34" checked />
-                          <label for="View34">View</label>
-                          <input id="Add34" type="radio" name="switch34" />
-                          <label for="Add34">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View35" type="radio" name="switch35" checked />
-                          <label for="View35">View</label>
-                          <input id="Add35" type="radio" name="switch35" />
-                          <label for="Add35">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
-            )}
-            {activeTab === "Passwords" && (
-              <div className="rounded--box">
-                <h5>Password Settings</h5>
-                <hr />
-                <h6 class="mb-2">Managers</h6>
-                <h6 class="mb-1">Default Permissions</h6>
-                <p>Default permissions will be applied for the newly added members.</p>
-                <div class="switch-wrapper">
-                  <input id="View36" type="radio" name="switch36" checked />
-                  <label for="View36">View</label>
-                  <input id="Add36" type="radio" name="switch36" />
-                  <label for="Add36">Add / Edit / Delete</label>
-                </div>
-                <h6 class="mb-2 mt-3">Users</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View37" type="radio" name="switch37" checked />
-                          <label for="View37">View</label>
-                          <input id="Add37" type="radio" name="switch37" />
-                          <label for="Add37">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <h6 class="mb-2">Managers</h6>
-                <Table responsive="lg">
-                  <thead>
-                    <tr>
-                      <th>Member</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><span><img src="images/tarun.jpg" alt="..." /></span>Tarun Giri</td>
-                      <td>
-                        <div class="switch-wrapper">
-                          <input id="View38" type="radio" name="switch38" checked />
-                          <label for="View38">View</label>
-                          <input id="Add38" type="radio" name="switch38" />
-                          <label for="Add38">Add / Edit / Delete</label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-                <div className="text-end mt-3">
-                  <Button variant="primary">Save Changes</Button>
-                  <Button variant="secondary">Cancel</Button>
-                </div>
-              </div>
+          )}
+          <div className="setting--tabs">
+            <h2>Settings</h2>
+            <ListGroup horizontal className={isActive ? "toggle--menu" : ""}>
+              <ListGroup.Item
+                action
+                active={activeTab === "Profile"}
+                onClick={() => setActiveTab("Profile")}
+              >
+                Profile
+              </ListGroup.Item>
+              <ListGroup.Item
+                action
+                active={activeTab === "Permissions"}
+                onClick={() => {
+                  setActiveTab("Permissions");
+                }}
+              >
+                Role & Permissions{" "}
+                <Button variant="primary" onClick={() => handleShow()}>
+                  <FaPlus />
+                </Button>
+              </ListGroup.Item>
+            </ListGroup>
+            {activeTab === "Permissions" && (
+              <>
+                <ListGroup
+                  horizontal
+                  className={isActive ? "toggle--menu" : ""}
+                >
+                  {roles.map((role, index) => {
+                    return (
+                      <ListGroup.Item
+                        key={`role-${role._id}`}
+                        action
+                        active={activeRole?._id === role._id}
+                        onClick={() => setActiveRole(role)}
+                      >
+                        {role.name}
+                      </ListGroup.Item>
+                    );
+                  })}
+                </ListGroup>
+              </>
             )}
           </div>
+          {activeTab === "Profile" && (
+            <div className="rounded--box">
+              <Card>
+                <div className="card--img">
+                  <Form.Control
+                    type="file"
+                    id="upload--avatar"
+                    name="avatar"
+                    hidden
+                    onChange={(e) => handleFieldChange("avatar", e)}
+                    accept=".jpg, .jpeg, .png, .gif"
+                  />
+                  <Form.Label htmlFor="upload--avatar">
+                    {isEditing.remove_avatar === false ? (
+                      <Card.Img
+                        variant="top"
+                        src={
+                          avatarPreview ??
+                          userProfile?.avatar ??
+                          "./images/default.jpg"
+                        }
+                      />
+                    ) : (
+                      <Card.Img variant="top" src={"./images/default.jpg"} />
+                    )}
+
+                    {!userProfile?.avatar && <span>Add Photo</span>}
+                    {userProfile?.avatar && <span>Edit Photo</span>}
+                  </Form.Label>
+                  {userProfile?.avatar && (
+                    <span className="remove--photo" onClick={removeAvatar}>
+                      <FaTrashAlt />
+                    </span>
+                  )}
+                </div>
+
+                <Card.Body>
+                  {
+                    <ListGroup>
+                      <ListGroup.Item>
+                        <strong>Email</strong> {profile?.email}
+                      </ListGroup.Item>
+                      <EditableField
+                        field="name"
+                        label="Name"
+                        type="text"
+                        value={profile?.name}
+                        onChange={(value) => handleFieldChange("name", value)}
+                        isEditing={isEditing.name}
+                        onEditClick={() => handleEditClick("name")}
+                        error={fieldserrors["name"] && fieldserrors["name"]}
+                      />
+                    </ListGroup>
+                  }
+
+                  <div className="text-end mt-3">
+                    <Button
+                      variant="primary"
+                      onClick={handleUpdateSubmit}
+                      disabled={loader}
+                    >
+                      {" "}
+                      {loader ? "Please wait..." : "Save Changes"}
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </div>
+          )}
+          {activeTab === "Permissions" && (
+            <div className="rounded--box permission__page">
+              <div className="wrapper--title">
+                <div className="projecttitle">
+                  <h3>
+                    <strong>Role & Permissions</strong>
+                  </h3>
+                </div>
+              </div>
+              <Card horizontal>
+                {activeRole && Object.keys(activeRole).length > 0 && (
+                  <>
+                    <div className="card--header">
+                      <FormGroup className="form-group mb-0 pb-0">
+                        <FloatingLabel label="Role name">
+                          <Form.Control
+                            type="text"
+                            className={
+                            "form-control"
+                            }
+                            placeholder="Role name"
+                            name="name"
+                            value={fields['name']}
+                            onChange={(e) => {
+                              const { value} = e.target;
+                              setFields({...fields, ['name']: value})
+                            }}
+                          />
+                        </FloatingLabel>
+                      </FormGroup>
+                      </div>
+                      <div className="card--header">
+                      <FormGroup className="form-group mb-0 pb-0">
+                        <Form.Check
+                          type="checkbox"
+                          id="all"
+                          label="Select All Permissions"
+                          checked={permissionModules.every((mod) => {
+                            const modSlug = mod.slug;
+                            const modPerms = permissions?.[modSlug] || {};
+
+                            const allPermsChecked = (
+                              mod.permissions || []
+                            ).every((perm) => modPerms[perm] === true);
+
+                            const selectedIds =
+                              modPerms["selected_members"] || [];
+                            const allMemberIds = memberFeeds.map((m) =>
+                              String(m._id)
+                            );
+                            if (modSlug === "projects")
+                              allMemberIds.push("unassigned");
+
+                            const allMembersChecked =
+                              selectedIds.length === allMemberIds.length &&
+                              allMemberIds.every((id) =>
+                                selectedIds.includes(id)
+                              );
+
+                            if (
+                              [
+                                "tracking",
+                                "projects",
+                                "reports",
+                                "attendance",
+                              ].includes(modSlug)
+                            ) {
+                              return allPermsChecked && allMembersChecked;
+                            }
+
+                            return allPermsChecked;
+                          })}
+                          onChange={(e) =>
+                            handleSelectAllPermissions(e.target.checked)
+                          }
+                        />
+                      </FormGroup>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="p-0"
+                        onClick={handleToggleExpandAll}
+                      >
+                        {permissionModules.every((mod) => expanded[mod.slug])
+                          ? "Collapse All"
+                          : "Expand All"}
+                      </Button>
+                    </div>
+                    <Accordion
+                      activeKey={Object.entries(expanded)
+                        .filter(([_, v]) => v)
+                        .map(([k]) => k)}
+                      alwaysOpen
+                    >
+                      {permissionModules.map((mod) => {
+                        const modSlug = mod.slug;
+                        const modPerms = permissions?.[modSlug] || {};
+                        const isExpanded = expanded?.[modSlug] || false;
+                        const isViewChecked = !!modPerms.view;
+                        const truePermissionCount = Object.values(
+                          modPerms
+                        ).filter((val) => val === true).length;
+                        return (
+                          <Accordion.Item eventKey={modSlug}>
+                            <Accordion.Header
+                              onClick={() => {
+                                setExpanded((prev) => ({
+                                  ...prev,
+                                  [modSlug]: !prev[modSlug],
+                                }));
+                              }}
+                            >
+                              {mod.name}{" "}
+                              <span className="per--count">
+                                {truePermissionCount}/{mod?.permissions?.length}
+                              </span>
+                            </Accordion.Header>
+                            <Accordion.Body>
+                              <div className="transition-all">
+                                {/* Permissions List */}
+                                {/* {isExpanded && ( */}
+                                <div className="transition-all">
+                                  {(mod.permissions || []).map((perm) => {
+                                    if (perm === "view") {
+                                      return (
+                                        <Form.Check
+                                          key={`${modSlug}--view`}
+                                          type="checkbox"
+                                          id={`${modSlug}-view`}
+                                          label="View"
+                                          checked={!!modPerms.view}
+                                          onChange={() => toggleView(modSlug)}
+                                        />
+                                      );
+                                    }
+
+                                    return (
+                                      <>
+                                        <Form.Check
+                                          key={perm}
+                                          type="checkbox"
+                                          id={`${modSlug}-${perm}`}
+                                          label={perm
+                                            .replace(/[_-]/g, " ")
+                                            .replace(/^\w/, (l) =>
+                                              l.toUpperCase()
+                                            )}
+                                          disabled={!isViewChecked}
+                                          checked={!!modPerms[perm]}
+                                          onChange={() =>
+                                            togglePermission(modSlug, perm)
+                                          }
+                                          className={
+                                            !isViewChecked ? "text-muted" : ""
+                                          }
+                                        />
+                                        {[
+                                          "tracking",
+                                          "projects",
+                                          "reports",
+                                        ].includes(modSlug) &&
+                                          perm === "view_others" &&
+                                          modPerms[perm] === true && (
+                                            <>
+                                              <Form.Check
+                                                key={`${modSlug}-${perm}-select-all`}
+                                                type="checkbox"
+                                                id={`${modSlug}-${perm}-select-all`}
+                                                label="Select all"
+                                                checked={memberFeeds.every(
+                                                  (member) =>
+                                                    modPerms[
+                                                      "selected_members"
+                                                    ]?.includes(
+                                                      String(member._id)
+                                                    )
+                                                )}
+                                                onChange={(e) =>
+                                                  handleSelectAll(
+                                                    modSlug,
+                                                    e.target.checked
+                                                  )
+                                                }
+                                                className="sub-items"
+                                              />
+                                              {memberFeeds.map((member) => (
+                                                <Form.Check
+                                                  key={`${modSlug}-${perm}-${member._id}`}
+                                                  type="checkbox"
+                                                  id={`${modSlug}-${perm}-${member._id}`}
+                                                  label={member.name}
+                                                  checked={modPerms[
+                                                    "selected_members"
+                                                  ]?.includes(
+                                                    String(member._id)
+                                                  )}
+                                                  onChange={() =>
+                                                    toggleMembers(
+                                                      modSlug,
+                                                      "selected_members",
+                                                      member._id
+                                                    )
+                                                  }
+                                                  className="sub-items"
+                                                />
+                                              ))}
+                                              {modSlug === "projects" && (
+                                                <Form.Check
+                                                  key={`${modSlug}-${perm}-unassigned`}
+                                                  type="checkbox"
+                                                  id={`${modSlug}-${perm}-unassigned`}
+                                                  label="Unassigned"
+                                                  checked={modPerms[
+                                                    "selected_members"
+                                                  ]?.includes("unassigned")}
+                                                  disabled={
+                                                    activeRole?.slug === "owner"
+                                                  }
+                                                  onChange={() => {
+                                                    if (
+                                                      activeRole.slug !==
+                                                      "owner"
+                                                    ) {
+                                                      toggleMembers(
+                                                        modSlug,
+                                                        "selected_members",
+                                                        "unassigned"
+                                                      );
+                                                    }
+                                                  }}
+                                                  className="sub-items"
+                                                />
+                                              )}
+                                            </>
+                                          )}
+                                      </>
+                                    );
+                                  })}
+                                </div>
+                                {/* )} */}
+                              </div>
+                            </Accordion.Body>
+                          </Accordion.Item>
+                        );
+                      })}
+
+                      <div className="mt-4 text-end">
+                      <Button variant="danger" onClick={() => setShowDelete(true)}>
+                          Delete Role
+                        </Button>
+                        <Button variant="primary" onClick={handleSave}>
+                          Save Permissions
+                        </Button>
+                      </div>
+                    </Accordion>
+                  </>
+                )}
+              </Card>
+            </div>
+          )}
+          {show && (
+            <Modal show={show} onHide={() => setShow(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Add New Role</Modal.Title>
+              </Modal.Header>
+
+              <Modal.Body>
+                <div className="project--form">
+                  <div className="project--form--inputs">
+                    <Form onSubmit={handleSubmit}>
+                      <Form.Group controlId="roleName">
+                        <FloatingLabel label="Role Name *">
+                          <Form.Control
+                            type="text"
+                            name="name"
+                            value={fields?.name}
+                            onChange={(e) => {
+                              setFields({
+                                ...fields,
+                                ["name"]: e.target.value,
+                              });
+                              setErrors({ ...errors, ["name"]: "" });
+                            }}
+                            disabled={loader}
+                          />
+                        </FloatingLabel>
+
+                        {showError("name")}
+                      </Form.Group>
+
+                      <h5 className="mt-4">Permissions</h5>
+
+                      <>
+                        <div className="card--header">
+                          <FormGroup className="form-group mb-0 pb-0">
+                            <Form.Check
+                              type="checkbox"
+                              id="all"
+                              label="Select All Permissions"
+                              checked={permissionModules.every((mod) => {
+                                const modSlug = mod.slug;
+                                const modPerms = permissions?.[modSlug] || {};
+      
+                                const allPermsChecked = (mod.permissions || []).every(
+                                  (perm) => modPerms[perm] === true
+                                );
+      
+                                const selectedIds =
+                                  modPerms["selected_members"] || [];
+                                const allMemberIds = memberFeeds.map((m) =>
+                                  String(m._id)
+                                );
+                                if (modSlug === "projects")
+                                  allMemberIds.push("unassigned");
+      
+                                const allMembersChecked =
+                                  selectedIds.length === allMemberIds.length &&
+                                  allMemberIds.every((id) =>
+                                    selectedIds.includes(id)
+                                  );
+      
+                                if (
+                                  [
+                                    "tracking",
+                                    "projects",
+                                    "reports",
+                                    "attendance",
+                                  ].includes(modSlug)
+                                ) {
+                                  return allPermsChecked && allMembersChecked;
+                                }
+      
+                                return allPermsChecked;
+                              })}
+                              onChange={(e) =>
+                                handleSelectAllPermissions(e.target.checked)
+                              }
+                            />
+                          </FormGroup>
+                          <Button
+                            type="button"
+                            variant="link"
+                            className="p-0"
+                            onClick={handleToggleExpandAll}
+                          >
+                            {permissionModules.every((mod) => expanded[mod.slug])
+                              ? "Collapse All"
+                              : "Expand All"}
+                          </Button>
+                        </div>
+                        <Accordion
+                          activeKey={Object.entries(expanded)
+                            .filter(([_, v]) => v)
+                            .map(([k]) => k)}
+                          alwaysOpen
+                        >
+                          {permissionModules.map((mod) => {
+                            const modSlug = mod.slug;
+                            const modPerms = permissions?.[modSlug] || {};
+                            const isExpanded = expanded?.[modSlug] || false;
+                            const isViewChecked = !!modPerms.view;
+                            const truePermissionCount = Object.values(
+                              modPerms
+                            ).filter((val) => val === true).length;
+                            return (
+                              <Accordion.Item eventKey={modSlug}>
+                                <Accordion.Header
+                                  onClick={() => {
+                                    setExpanded((prev) => ({
+                                      ...prev,
+                                      [modSlug]: !prev[modSlug],
+                                    }));
+                                  }}
+                                >
+                                  {mod.name}{" "}
+                                  <span className="per--count">
+                                    {truePermissionCount}/{mod?.permissions?.length}
+                                  </span>
+                                </Accordion.Header>
+                                <Accordion.Body>
+                                  <div className="transition-all">
+                                    {/* Permissions List */}
+                                    {/* {isExpanded && ( */}
+                                    <div className="transition-all">
+                                      {(mod.permissions || []).map((perm) => {
+                                        if (perm === "view") {
+                                          return (
+                                            <Form.Check
+                                              key={`${modSlug}--view`}
+                                              type="checkbox"
+                                              id={`${modSlug}-view`}
+                                              label="View"
+                                              checked={!!modPerms.view}
+                                              onChange={() => toggleView(modSlug)}
+                                            />
+                                          );
+                                        }
+      
+                                        return (
+                                          <>
+                                            <Form.Check
+                                              key={perm}
+                                              type="checkbox"
+                                              id={`${modSlug}-${perm}`}
+                                              label={perm
+                                                .replace(/[_-]/g, " ")
+                                                .replace(/^\w/, (l) =>
+                                                  l.toUpperCase()
+                                                )}
+                                              disabled={!isViewChecked}
+                                              checked={!!modPerms[perm]}
+                                              onChange={() =>
+                                                togglePermission(modSlug, perm)
+                                              }
+                                              className={
+                                                !isViewChecked ? "text-muted" : ""
+                                              }
+                                            />
+                                            {[
+                                              "tracking",
+                                              "projects",
+                                              "reports",
+                                            ].includes(modSlug) &&
+                                              perm === "view_others" &&
+                                              modPerms[perm] === true && (
+                                                <>
+                                                  <Form.Check
+                                                    key={`${modSlug}-${perm}-select-all`}
+                                                    type="checkbox"
+                                                    id={`${modSlug}-${perm}-select-all`}
+                                                    label="Select all"
+                                                    checked={memberFeeds.every(
+                                                      (member) =>
+                                                        modPerms[
+                                                          "selected_members"
+                                                        ]?.includes(
+                                                          String(member._id)
+                                                        )
+                                                    )}
+                                                    onChange={(e) =>
+                                                      handleSelectAll(
+                                                        modSlug,
+                                                        e.target.checked
+                                                      )
+                                                    }
+                                                    className="sub-items"
+                                                  />
+                                                  {memberFeeds.map((member) => (
+                                                    <Form.Check
+                                                      key={`${modSlug}-${perm}-${member._id}`}
+                                                      type="checkbox"
+                                                      id={`${modSlug}-${perm}-${member._id}`}
+                                                      label={member.name}
+                                                      checked={modPerms[
+                                                        "selected_members"
+                                                      ]?.includes(String(member._id))}
+                                                      onChange={() =>
+                                                        toggleMembers(
+                                                          modSlug,
+                                                          "selected_members",
+                                                          member._id
+                                                        )
+                                                      }
+                                                      className="sub-items"
+                                                    />
+                                                  ))}
+                                                  {modSlug === "projects" && (
+                                                    <Form.Check
+                                                      key={`${modSlug}-${perm}-unassigned`}
+                                                      type="checkbox"
+                                                      id={`${modSlug}-${perm}-unassigned`}
+                                                      label="Unassigned"
+                                                      checked={modPerms[
+                                                        "selected_members"
+                                                      ]?.includes("unassigned")}
+                                                      disabled={
+                                                        activeRole?.slug === "owner"
+                                                      }
+                                                      onChange={() => {
+                                                        
+                                                          toggleMembers(
+                                                            modSlug,
+                                                            "selected_members",
+                                                            "unassigned"
+                                                          );
+                                                        
+                                                      }}
+                                                      className="sub-items"
+                                                    />
+                                                  )}
+                                                </>
+                                              )}
+                                          </>
+                                        );
+                                      })}
+                                    </div>
+                                    {/* )} */}
+                                  </div>
+                                </Accordion.Body>
+                              </Accordion.Item>
+                            );
+                          })}
+                        </Accordion>
+                      </>
+                      <Button variant="primary" type="submit" disabled={loader}>
+                        {loader ? "Please wait..." : "Save Role"}
+                      </Button>
+                    </Form>
+                  </div>
+                </div>
+              </Modal.Body>
+            </Modal>
+          )}
+
+        {showdelete && (
+          <AlertDialog
+            showdialog={showdelete}
+            toggledialog={setShowDelete}
+            msg="Are you sure?"
+            callback={handleDeleteRole}
+          />
+            
+          )}
         </div>
+      </div>
     </>
   );
 }
