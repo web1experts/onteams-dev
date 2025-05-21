@@ -94,7 +94,7 @@ function TimeTrackingPage() {
       data: selectedScreenshots
     }))
   }
-  
+
     const peerConnections = {}
     function startsharing(userID, status){
       socket.emit('joinRoom', userID)
@@ -535,10 +535,26 @@ function TimeTrackingPage() {
                     value={filtereddate} 
                     format="YYYY-MM-DD"
                     range
+                    multiple={false}
                     numberOfMonths={2}
                     dateSeparator=" - " 
                     onChange={async (value) => {
-                        setFilteredDate(value)
+                        // setFilteredDate(value)
+                        const formatDate = (date) => {
+                          const d = new Date(date);
+                          const year = d.getFullYear();
+                          const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+                          const day = String(d.getDate()).padStart(2, '0');
+                          return `${year}-${month}-${day}`;
+                        };
+
+                        if (Array.isArray(value)) {
+                          const formatted = value.map(formatDate);
+                          setFilteredDate(formatted);
+                        } else {
+                          const formatted = formatDate(value);
+                          setFilteredDate(formatted);
+                        }
                       }
                     }          
                     className="form-control"
