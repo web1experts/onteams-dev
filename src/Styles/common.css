@@ -312,28 +312,72 @@ textarea.form-control {
   background: none;
   height: auto;
   color: rgba(var(--bs-body-color-rgb), .65);
+  position: relative;
 }
 
 .form-floating>.form-control:focus~label,
 .form-floating>.form-control:not(:placeholder-shown)~label {
-  transform: scale(.85) translateY(-1rem) translateX(1rem);
-  -webkit-transform: scale(.85) translateY(-1rem) translateX(1rem);
+  transform: scale(.85) translateY(-.75rem) translateX(1rem);
+  -webkit-transform: scale(.85) translateY(-.75rem) translateX(1rem);
   color: rgb(80, 151, 129);
+  background: transparent;
+}
+
+.form-floating>.form-control:focus~label::before,
+.form-floating>.form-control:not(:placeholder-shown)~label::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  content: '';
+  width: 100%;
   background: #ffffff;
+  height: 3px;
+  margin: auto 0;
+  z-index: -1;
+  border-radius: 50px 0 0 0;
 }
 
 .form-floating>.form-control:-webkit-autofill~label {
-  transform: scale(.85) translateY(-1rem) translateX(1rem);
-  -webkit-transform: scale(.85) translateY(-1rem) translateX(1rem);
+  transform: scale(.85) translateY(-.65rem) translateX(1rem);
+  -webkit-transform: scale(.85) translateY(-.65rem) translateX(1rem);
   color: rgb(80, 151, 129);
+  background: transparent;
+}
+
+.form-floating>.form-control:-webkit-autofill~label::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  content: '';
+  width: 100%;
   background: #ffffff;
+  height: 3px;
+  margin: auto 0;
+  z-index: -1;
+  border-radius: 50px 0 0 0;
 }
 
 .form-floating>.form-control:-moz-autofill~label {
-  transform: scale(.85) translateY(-1rem) translateX(1rem);
-  -webkit-transform: scale(.85) translateY(-1rem) translateX(1rem);
+  transform: scale(.85) translateY(-.65rem) translateX(1rem);
+  -webkit-transform: scale(.85) translateY(-.65rem) translateX(1rem);
   color: rgb(80, 151, 129);
+  background: transparent;
+}
+
+.form-floating>.form-control:-moz-autofill~label::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  content: '';
+  width: 100%;
   background: #ffffff;
+  height: 3px;
+  margin: auto 0;
+  z-index: -1;
+  border-radius: 50px 0 0 0;
 }
 
 .form-floating>.form-control-plaintext:not(:placeholder-shown),

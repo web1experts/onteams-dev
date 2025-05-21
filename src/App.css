@@ -92,7 +92,8 @@ body {
   border-left-width: 1px;
 }
 
-.page--title .list-group-item-action.active, .page--title .refresh--btn {
+.page--title .list-group-item-action.active,
+.page--title .refresh--btn {
   color: #ffffff;
   background: #7BCCB8;
 }
@@ -305,8 +306,10 @@ body {
   line-height: 34.3px;
 }
 
-.page--wrapper .draggable--table th:nth-child(4), .page--wrapper .draggable--table td:nth-child(4), 
-.page--wrapper .draggable--table th:last-child, .page--wrapper .draggable--table td:last-child {
+.page--wrapper .draggable--table th:nth-child(4),
+.page--wrapper .draggable--table td:nth-child(4),
+.page--wrapper .draggable--table th:last-child,
+.page--wrapper .draggable--table td:last-child {
   flex: none;
   min-width: 170px;
 }
@@ -521,6 +524,32 @@ button.input-error.dropdown-toggle.btn.btn-success {
   margin-top: 1rem;
 }
 
+.project--form--actions .add--member {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 5px;
+}
+
+.project--form--actions .add--member .btn {
+  min-width: fit-content;
+  padding: 0;
+  width: 35px;
+  text-decoration: none;
+  height: 35px;
+  border-radius: 100px;
+  -webkit-border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+}
+
+.project--form--actions .add--member .btn svg {
+  margin: 0;
+}
+
 .details--projects--view .project--form--actions {
   max-width: 20%;
   position: relative;
@@ -541,7 +570,8 @@ button.input-error.dropdown-toggle.btn.btn-success {
   bottom: 0;
 }
 
-.project--form--actions .members--list, .project--form--actions .members--list:last-child {
+.project--form--actions .members--list,
+.project--form--actions .members--list:last-child {
   position: relative;
   width: 100%;
   max-width: 100%;
@@ -880,13 +910,12 @@ button.input-error.dropdown-toggle.btn.btn-success {
 }
 
 .rounded--box .card img.card-img-top {
-  max-width: 100%;
   min-width: 100%;
-  object-fit: none;
+  object-fit: cover;
   background: #eeeeee40;
-  height: auto;
+  height: 100%;
   width: 100%;
-  max-width: 400px;
+  max-width: 100%;
   border-radius: 20px;
   -webkit-border-radius: 20px
 }
@@ -942,6 +971,8 @@ button.input-error.dropdown-toggle.btn.btn-success {
 
 .rounded--box .card .card--img {
   position: relative;
+  max-width: 400px;
+  min-width: 400px;
 }
 
 .rounded--box .card .remove--photo {
@@ -983,18 +1014,9 @@ table tr.marked-project td {
   background: rgba(123, 204, 184, .125);
 }
 
-.show--details .table tr.project--active td,
-.view--project .table tr.project--active td {
-  border-bottom-color: #6FCCB8;
-  border-top-color: #6FCCB8;
-  margin-bottom: 0;
-  border-top-width: 1px;
-  border-bottom-width: 1px;
-}
-
 .table>:not(caption)>*>* {
   border-top-width: var(--bs-border-width);
-  margin-bottom: -1px;
+  margin-bottom: 0;
   border-bottom-width: var(--bs-border-width);
   box-shadow: none;
 }
@@ -1004,16 +1026,25 @@ table tr.marked-project td {
   margin-bottom: 0;
 }
 
-.show--details .table>:not(caption)>*>*, .view--project .table>:not(caption)>*>*, .view--invitee .table>:not(caption)>*>* {
+.show--details .table>:not(caption)>*>*,
+.view--project .table>:not(caption)>*>*,
+.view--invitee .table>:not(caption)>*>* {
   border-top-width: var(--bs-border-width);
   margin-bottom: 0;
   border-top-color: #eeeeee;
   border-bottom-width: 0;
 }
 
-.show--details .table tr.project--active + tr td,
-.view--project .table tr.project--active + tr td {
+.show--details .table tr.project--active+tr td,
+.view--project .table tr.project--active+tr td {
   border-top-width: 0;
+}
+
+.show--details .table tr.project--active td,
+.view--project .table tr.project--active td {
+  border-top: 1px solid #6FCCB8;
+  margin-bottom: 0;
+  border-bottom: 1px solid #6FCCB8;
 }
 
 .show--details .g-4,
@@ -1030,9 +1061,20 @@ table tr.marked-project td {
   padding-right: 0;
 }
 
+.view--project .table .onHide,
+.view--invitee .table .onHide,
+.clients--table tr td img {
+  display: none;
+}
+
+.show--details .table .onHide {
+  display: none !important;
+}
+
 .show--details .table .onHide,
 .view--project .table .onHide,
-.view--invitee .table .onHide, .clients--table tr td img {
+.view--invitee .table .onHide,
+.clients--table tr td img {
   display: none;
 }
 
@@ -1124,7 +1166,8 @@ table tr.marked-project td {
 }
 
 .modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"],
-.select--dropdown .dropdown-menu[data-popper-placement="bottom-start"] {
+.select--dropdown .dropdown-menu[data-popper-placement="bottom-start"],
+.select--dropdown .dropdown-menu[data-popper-placement="bottom-end"] {
   margin-bottom: 0;
   margin-top: 15px;
 }
@@ -1135,6 +1178,16 @@ table tr.marked-project td {
   margin-top: 0;
   top: auto !important;
   bottom: 100% !important;
+}
+
+.team--page .page--title .select--dropdown .dropdown-menu[data-popper-placement="bottom-end"] {
+  left: auto !important;
+  right: 0 !important;
+}
+
+.team--page .page--title .select--dropdown .dropdown-menu[data-popper-placement="bottom-end"]::before {
+  right: 30px;
+  left: auto;
 }
 
 .add--team--member--modal .select--dropdown {
@@ -1820,7 +1873,8 @@ Project Task View CSS=-=-=
 .projects--grid .task--list .task--grid ul {
   max-height: calc(100% - 65px);
   overflow-y: auto;
-  margin-top: 1rem;
+  margin-top: 0;
+  padding-top: 1rem;
   padding-bottom: 0.5rem;
   padding-right: 0.25rem;
 }
@@ -1878,6 +1932,7 @@ Project Task View CSS=-=-=
   transform: scale(.85) translateY(-.8rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.8rem) translateX(1rem);
 }
+
 
 .projects--grid .task--list ul li .tasks-form-action {
   display: flex;
@@ -2005,6 +2060,7 @@ Project Task View CSS=-=-=
   font-weight: 600;
   letter-spacing: -1px;
   border-radius: 100px;
+  -webkit-border-radius: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2013,6 +2069,10 @@ Project Task View CSS=-=-=
 .projects--page .table .more--member {
   width: 35px;
   height: 35px
+}
+
+.projects--page .list-group-horizontal>.list-group-item:last-child:not(:first-child) {
+  border-radius: 100px;
 }
 
 .card--header {
@@ -2628,7 +2688,10 @@ pre {
   justify-content: flex-end;
 }
 
-.wrapper--title .live--tabs .list-group-item, .screens--tabs .list-group .list-group-item, .screens--shots .list-group-item, .accordion .screens--shots .list-group-item {
+.wrapper--title .live--tabs .list-group-item,
+.screens--tabs .list-group .list-group-item,
+.screens--shots .list-group-item,
+.accordion .screens--shots .list-group-item {
   border-radius: 25px;
   -webkit-border-radius: 25px;
   width: auto;
@@ -2694,7 +2757,8 @@ pre {
 
 .wrapper--title .live--tabs .active,
 .screens--tabs .list-group .active,
-.screens--shots .active, .accordion .screens--shots .active {
+.screens--shots .active,
+.accordion .screens--shots .active {
   color: #ffffff;
   background-color: #7BCCB8;
   border-color: #7BCCB8;
@@ -2704,7 +2768,8 @@ pre {
 
 .wrapper--title .live--tabs .list-group-item+.list-group-item.active,
 .screens--tabs .list-group .list-group-item+.list-group-item-action.active,
-.screens--shots .list-group-item+.list-group-item-action.active, .accordion .screens--shots .list-group-item+.list-group-item-action.active {
+.screens--shots .list-group-item+.list-group-item-action.active,
+.accordion .screens--shots .list-group-item+.list-group-item-action.active {
   border: 1px solid #7BCCB8;
 }
 
@@ -2838,12 +2903,14 @@ pre {
   margin-left: 1rem;
 }
 
-.activity--box .expand--button button .close--fullscreen, .activity--box .exit--fullscreen button .open--fullscreen,
+.activity--box .expand--button button .close--fullscreen,
+.activity--box .exit--fullscreen button .open--fullscreen,
 .activity--box .expand--button .enter--screen {
   display: none;
 }
 
-.activity--box .exit--fullscreen button .close--fullscreen, .fullscreen--box .expand--button .enter--screen {
+.activity--box .exit--fullscreen button .close--fullscreen,
+.fullscreen--box .expand--button .enter--screen {
   display: flex;
 }
 
@@ -2857,7 +2924,10 @@ pre {
   font-size: 22px;
 }
 
-.fullscreen--box .expand--button .btn.active, .fullscreen--box .expand--button .btn.show, .fullscreen--box .expand--button .btn:first-child:active, .fullscreen--box .expand--button :not(.btn-check)+.btn:active {
+.fullscreen--box .expand--button .btn.active,
+.fullscreen--box .expand--button .btn.show,
+.fullscreen--box .expand--button .btn:first-child:active,
+.fullscreen--box .expand--button :not(.btn-check)+.btn:active {
   color: #ffffff;
   background-color: transparent;
   border-color: transparent;
@@ -2917,7 +2987,9 @@ pre {
   max-height: calc(100dvh - 50px);
 }
 
-.fullscreen--box .current--player .timer--task h5, .fullscreen--box .current--player .timer--task p, .fullscreen--box .current--player .timer--task span {
+.fullscreen--box .current--player .timer--task h5,
+.fullscreen--box .current--player .timer--task p,
+.fullscreen--box .current--player .timer--task span {
   display: none;
 }
 
@@ -2986,7 +3058,9 @@ pre {
   max-width: 100%;
 }
 
-.activity--box .card .card-body video, .activity--box .card .card-body iframe, .activity--box .card .card-body img {
+.activity--box .card .card-body video,
+.activity--box .card .card-body iframe,
+.activity--box .card .card-body img {
   max-width: 100%;
   object-fit: cover;
   height: 180px;
@@ -3074,6 +3148,35 @@ pre {
 .setting--tabs .list-group .list-group-item:focus {
   color: #89ccb8;
   background: #89ccb820;
+}
+
+.setting--tabs .role--list .list-group-item {
+  margin: 0;
+  border-radius: 0;
+  background-color: transparent;
+  border-top: 1px solid #eeeeee;
+  padding: .85rem 1.5rem;
+  color: #000000;
+  font-weight: 500;
+  text-transform: capitalize;
+  border-radius: 0;
+  flex: 1 1 100%;
+  max-width: 100%;
+  position: relative;
+}
+
+.setting--tabs .role--list .list-group-item:hover,
+.setting--tabs .role--list .list-group-item:focus {
+  color: #89ccb8;
+  background: #89ccb820;
+}
+
+.setting--tabs .role--list .list-group-item.active {
+  color: #89ccb8;
+  background: transparent;
+  border-style: solid;
+  border-width: 1px 0;
+  border-color: #89ccb8;
 }
 
 .setting--page .rounded--box {
@@ -3436,7 +3539,8 @@ pre {
   display: block;
 }
 
-.page--wrapper .project--grid--table th abbr, .page--wrapper .project--grid--table td abbr {
+.page--wrapper .project--grid--table th abbr,
+.page--wrapper .project--grid--table td abbr {
   display: none;
 }
 
@@ -3473,7 +3577,8 @@ pre {
   max-width: 100%;
 }
 
-.project--table tr.no--invite td, .project--table tr.no--invite td:last-child {
+.project--table tr.no--invite td,
+.project--table tr.no--invite td:last-child {
   min-width: 100%;
   width: 100%;
   max-width: 100%;
@@ -3562,7 +3667,8 @@ pre {
 .view--invitee .project--grid--table th,
 .view--invitee .project--grid--table td {
   display: table-cell;
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: 0;
+  border-top: 1px solid #eeeeee;
   text-align: left;
   overflow: hidden;
   max-width: 190px;
@@ -3598,7 +3704,8 @@ pre {
   text-align: center !important;
 }
 
-.page--wrapper .clients--grid--table td span img, .page--wrapper .clients--grid--table td.project--title--td span img {
+.page--wrapper .clients--grid--table td span img,
+.page--wrapper .clients--grid--table td.project--title--td span img {
   border-radius: 100px;
   -webkit-border-radius: 100px;
   height: 130px;
@@ -3725,8 +3832,9 @@ Media CSS-=-==
     max-width: 25%;
   }
 
-  .project--grid--table tr, .activity--box .card-group .card {
-    max-width: calc(20% - 8px);
+  .project--grid--table tr,
+  .activity--box .card-group .card {
+    max-width: calc(25% - 8px);
   }
 }
 
@@ -3771,7 +3879,8 @@ Media CSS-=-==
     min-width: 170px;
   }
 
-  .project--grid--table tr, .activity--box .card-group .card {
+  .project--grid--table tr,
+  .activity--box .card-group .card {
     max-width: calc(25% - 8px);
   }
 
@@ -3810,13 +3919,15 @@ Media CSS-=-==
     margin-left: .25rem;
   }
 
-  .projects--page .table .list-group-item .team--initial, .projects--page .table .list-group-item .team--image, 
-  .projects--page .table .list-group-item .btn, .project--form--actions .list-group-item .team--initial, 
+  .projects--page .table .list-group-item .team--initial,
+  .projects--page .table .list-group-item .team--image,
+  .projects--page .table .list-group-item .btn,
+  .project--form--actions .list-group-item .team--initial,
   .tasks-form-action .list-group-item .team--initial {
     width: 30px;
     height: 30px;
   }
-  
+
   .projects--page .table .more--member {
     width: 30px;
     height: 30px;
@@ -3964,9 +4075,10 @@ Media CSS-=-==
     opacity: 1;
   }
 
-  .page--wrapper table td.project--title--td span {
+  .show--details .page--wrapper table td.project--title--td span {
     max-width: fit-content;
     padding-right: 10px;
+    margin: 0;
   }
 
   .page--wrapper .draggable--table th:nth-child(2),
@@ -4211,7 +4323,7 @@ Media CSS-=-==
     margin-left: .5rem;
   }
 
-  .clients--table td span img {
+  .page--wrapper .clients--table td span.onHide {
     border-radius: 100px;
     -webkit-border-radius: 100px;
     height: 130px;
@@ -4221,6 +4333,10 @@ Media CSS-=-==
     width: 130px;
     display: block;
     overflow: hidden;
+  }
+
+  .page--wrapper .clients--table td img {
+    display: block;
   }
 
   .clients--table td,
@@ -4291,7 +4407,7 @@ Media CSS-=-==
   .show--details .clients--table td:last-child,
   .show--details .clients--table td+td {
     text-align: left !important;
-    border-bottom: 1px solid #eeeeee;
+    /* border-bottom: 1px solid #eeeeee; */
   }
 
   .show--details table tr,
@@ -4345,11 +4461,21 @@ Media CSS-=-==
   }
 
   .clients--table td.project--title--td span.onHide {
+    display: block !important;
+  }
+
+  .show--details .page--wrapper table td.project--title--td span {
+    max-width: -moz-fit-content;
+    max-width: fit-content;
+    padding-right: 10px;
+    text-overflow: ellipsis;
+    width: 100%;
+    overflow: hidden;
     display: block;
   }
 
   .show--details .clients--table td.project--title--td span.onHide {
-    display: none;
+    display: none !important;
   }
 
   .rmdp-input {
@@ -4420,7 +4546,8 @@ Media CSS-=-==
     flex: 1 1;
   }
 
-  .wrapper--title .screens--shots, .wrapper--title .screens--shots+.list-group-item {
+  .wrapper--title .screens--shots,
+  .wrapper--title .screens--shots+.list-group-item {
     margin-top: .5rem;
   }
 
@@ -4432,7 +4559,8 @@ Media CSS-=-==
     flex: auto;
   }
 
-  .team--page .page--title h2 .btn, .page--title .refresh--btn {
+  .team--page .page--title h2 .btn,
+  .page--title .refresh--btn {
     width: 36px;
     height: 36px;
     padding: 0;
@@ -4602,7 +4730,8 @@ Media CSS-=-==
     gap: 0;
   }
 
-  .details--projects--view .projecttitle, .details--projects--grid .projecttitle {
+  .details--projects--view .projecttitle,
+  .details--projects--grid .projecttitle {
     max-width: calc(100% - 60px);
   }
 }

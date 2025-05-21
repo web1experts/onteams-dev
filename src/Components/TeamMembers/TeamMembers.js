@@ -1235,8 +1235,8 @@ function TeamMembersPage() {
                     <FaRegTrashAlt />
                   </Button>
                 )} */}
-                
-                <Form.Group className="mb-0 form-group">
+                <Button variant="primary" onClick={() => {showPermissionsModal(row.role, index)}}>Select Role</Button>
+                {/* <Form.Group className="mb-0 form-group">
                   <Form.Select
                     placeholder="Select role"
                     area-label="Role"
@@ -1265,7 +1265,7 @@ function TeamMembersPage() {
                   (row.role !== "") && (
                     <Button variant="link" className="view-perm-btn" onClick={() => {showPermissionsModal(row.role, index)}}><FaUserLock /></Button>
                   )
-                }
+                } */}
                 {rows.length > 1 && (
                   <Button variant="link" onClick={() => removeRow(index)}>
                     <FaRegTrashAlt />
@@ -1287,13 +1287,52 @@ function TeamMembersPage() {
       { showPermissions &&
         <Modal show={showPermissions} onHide={() => setShowPermissions( false )} centered size="lg" className="add--team--member--modal add--member--modal" >
           <Modal.Header closeButton>
-            <Modal.Title>Permissions</Modal.Title>
+            <Modal.Title>Roles & Permissions</Modal.Title>
           </Modal.Header>
             <Modal.Body>
+              <Form onSubmit={handleSubmit}>
+                {rows.map((row, index) => (
+                  <div className="form-row" key={`row-${index}`}>
+                    <Form.Group className="mb-0 form-group">
+                      <Form.Select
+                        placeholder="Select role"
+                        area-label="Role"
+                        name="role"
+                        controlId="floatingSelect"
+                        className={
+                          errors[index] &&
+                            errors[index]["role"] &&
+                            errors[index]["role"] !== ""
+                            ? "input-error custom-selectbox"
+                            : "form-control custom-selectbox"
+                        }
+                        value={row.role}
+                        onChange={(e) => handleChange(index, e, "role")}
+                      >
+                        <option value="role">Select role</option>
+                        {roles.map((role, roleIndex) => (
+                          <option key={`role-${roleIndex}`} value={role._id}>
+                            {role.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      {showError([index], 'role')}
+                    </Form.Group>
+                    {/* {
+                      (row.role !== "") && (
+                        <Button variant="link" className="view-perm-btn" onClick={() => {showPermissionsModal(row.role, index)}}><FaUserLock /></Button>
+                      )
+                    } */}
+                    {rows.length > 1 && (
+                      <Button variant="link" onClick={() => removeRow(index)}>
+                        <FaRegTrashAlt />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </Form>
               <Card>
                 <Card.Body>
-                    <Card.Title>Permissions</Card.Title>
-                    
                       <>
                       <div className="card--header">
                         <FormGroup className="form-group mb-0 pb-0">
@@ -1451,15 +1490,13 @@ function TeamMembersPage() {
                           );
                         })}
                         </Accordion>
-                        <div className="mt-4 text-end">
-                          <Button variant="primary" onClick={handleSavePermissions}>
-                          Save Permissions
-                          </Button>
-                        </div>
-                        </>
+                      </>
                     </Card.Body>
                 </Card>
             </Modal.Body>
+            <Modal.Footer>
+              <Button variant="primary" onClick={handleSavePermissions} disabled={loader}>{loader ? "Please Wait..." : "Save"}</Button>
+            </Modal.Footer>
         </Modal>
       }
 

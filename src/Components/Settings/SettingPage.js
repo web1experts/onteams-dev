@@ -672,7 +672,7 @@ function SettingPage() {
               <>
                 <ListGroup
                   horizontal
-                  className={isActive ? "toggle--menu" : ""}
+                  className={isActive ? "toggle--menu" : "role--list"}
                 >
                   {roles.map((role, index) => {
                     return (
