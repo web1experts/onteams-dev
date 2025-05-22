@@ -786,16 +786,11 @@ function TeamMembersPage() {
     } else { }
   };
 
-  const showPermissionsModal = (id, index) => {
-    setMemberIndex( index )
-    if( rows[index] && rows[index]?.permissions && rows[index]?.role === id){
+  const showPermissionsModal = (index) => {
+     setMemberIndex( index )
+    if( rows[index] && rows[index]?.permissions){
       setPermissions(rows[index]?.permissions)
-    }else{
-      const matchedRole = roles.find(role => role._id === id);
-      const matchedPermissions = matchedRole ? matchedRole.permissions : [];
-      setPermissions(matchedPermissions)
     }
-    
     setShowPermissions( true )
   }
 
@@ -1235,7 +1230,9 @@ function TeamMembersPage() {
                     <FaRegTrashAlt />
                   </Button>
                 )} */}
-                <Button variant="primary" onClick={() => {showPermissionsModal(row.role, index)}}>Select Role</Button>
+                
+                <Button variant="primary" onClick={() => {showPermissionsModal(index)}}>Select Role</Button>
+                {showError([index], 'role')}
                 {/* <Form.Group className="mb-0 form-group">
                   <Form.Select
                     placeholder="Select role"
@@ -1290,9 +1287,9 @@ function TeamMembersPage() {
             <Modal.Title>Roles & Permissions</Modal.Title>
           </Modal.Header>
             <Modal.Body>
-              <Form onSubmit={handleSubmit}>
-                {rows.map((row, index) => (
-                  <div className="form-row" key={`row-${index}`}>
+              
+                {/* {rows.map((row, index) => ( */}
+                  <div className="form-row" key={`row-role-select`}>
                     <Form.Group className="mb-0 form-group">
                       <Form.Select
                         placeholder="Select role"
@@ -1300,14 +1297,19 @@ function TeamMembersPage() {
                         name="role"
                         controlId="floatingSelect"
                         className={
-                          errors[index] &&
-                            errors[index]["role"] &&
-                            errors[index]["role"] !== ""
-                            ? "input-error custom-selectbox"
-                            : "form-control custom-selectbox"
+                          // errors[index] &&
+                          //   errors[index]["role"] &&
+                          //   errors[index]["role"] !== ""
+                          //   ? "input-error custom-selectbox"
+                            "form-control custom-selectbox"
                         }
-                        value={row.role}
-                        onChange={(e) => handleChange(index, e, "role")}
+                        value={rows[memberIndex]?.role}
+                        onChange={(e) => {
+                          handleChange(memberIndex, e, "role")
+                          const matchedRole = roles.find(role => role._id === e.target.value);
+                          const matchedPermissions = matchedRole ? matchedRole.permissions : [];
+                          setPermissions(matchedPermissions)
+                        }}
                       >
                         <option value="role">Select role</option>
                         {roles.map((role, roleIndex) => (
@@ -1316,183 +1318,174 @@ function TeamMembersPage() {
                           </option>
                         ))}
                       </Form.Select>
-                      {showError([index], 'role')}
+                     
                     </Form.Group>
-                    {/* {
-                      (row.role !== "") && (
-                        <Button variant="link" className="view-perm-btn" onClick={() => {showPermissionsModal(row.role, index)}}><FaUserLock /></Button>
-                      )
-                    } */}
-                    {rows.length > 1 && (
-                      <Button variant="link" onClick={() => removeRow(index)}>
-                        <FaRegTrashAlt />
-                      </Button>
-                    )}
                   </div>
-                ))}
-              </Form>
-              <Card>
-                <Card.Body>
-                      <>
-                      <div className="card--header">
-                        <FormGroup className="form-group mb-0 pb-0">
-                        <Form.Check
-                          type="checkbox"
-                          id="all"
-                          label="Select All Permissions"
-                          checked={permissionModules.every((mod) => {
+                {/* ))} */}
+              {(rows[memberIndex]?.role !== null && rows[memberIndex]?.role !== "role") &&
+                <Card>
+                  <Card.Body>
+                        <>
+                        <div className="card--header" data-roleid={rows[memberIndex]?.role}>
+                          <FormGroup className="form-group mb-0 pb-0">
+                          <Form.Check
+                            type="checkbox"
+                            id="all"
+                            label="Select All Permissions"
+                            checked={permissionModules.every((mod) => {
+                              const modSlug = mod.slug;
+                              const modPerms = permissions?.[modSlug] || {};
+
+                              const allPermsChecked = (mod.permissions || []).every((perm) => modPerms[perm] === true);
+
+                              const selectedIds = modPerms["selected_members"] || [];
+                              const allMemberIds = memberFeeds.map((m) => String(m._id));
+                              if (modSlug === "projects") allMemberIds.push("unassigned");
+
+                              const allMembersChecked = selectedIds.length === allMemberIds.length &&
+                                allMemberIds.every((id) => selectedIds.includes(id));
+
+                              if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
+                                return allPermsChecked && allMembersChecked;
+                              }
+
+                              return allPermsChecked;
+                            })}
+                            onChange={(e) => handleSelectAllPermissions(e.target.checked)}
+                          />
+
+                          </FormGroup>
+                          <Button type="button" variant="link" className="p-0" onClick={handleToggleExpandAll}>
+                            {permissionModules.every(mod => expanded[mod.slug]) ? "Collapse All" : "Expand All"}
+                          </Button>
+
+                        
+                        </div>
+                        <Accordion  activeKey={Object.entries(expanded)
+                            .filter(([_, v]) => v)
+                            .map(([k]) => k)}
+                          alwaysOpen>
+                          {permissionModules.map((mod) => {
                             const modSlug = mod.slug;
                             const modPerms = permissions?.[modSlug] || {};
+                            const isExpanded = expanded?.[modSlug] || false;
+                            const isViewChecked = !!modPerms.view;
+                            const truePermissionCount = Object.values(modPerms).filter(val => val === true).length;
 
-                            const allPermsChecked = (mod.permissions || []).every((perm) => modPerms[perm] === true);
-
-                            const selectedIds = modPerms["selected_members"] || [];
-                            const allMemberIds = memberFeeds.map((m) => String(m._id));
-                            if (modSlug === "projects") allMemberIds.push("unassigned");
-
-                            const allMembersChecked = selectedIds.length === allMemberIds.length &&
-                              allMemberIds.every((id) => selectedIds.includes(id));
-
-                            if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
-                              return allPermsChecked && allMembersChecked;
-                            }
-
-                            return allPermsChecked;
-                          })}
-                          onChange={(e) => handleSelectAllPermissions(e.target.checked)}
-                        />
-
-                        </FormGroup>
-                        <Button type="button" variant="link" className="p-0" onClick={handleToggleExpandAll}>
-                          {permissionModules.every(mod => expanded[mod.slug]) ? "Collapse All" : "Expand All"}
-                        </Button>
-
-                      
-                      </div>
-                      <Accordion  activeKey={Object.entries(expanded)
-                          .filter(([_, v]) => v)
-                          .map(([k]) => k)}
-                        alwaysOpen>
-                        {permissionModules.map((mod) => {
-                          const modSlug = mod.slug;
-                          const modPerms = permissions?.[modSlug] || {};
-                          const isExpanded = expanded?.[modSlug] || false;
-                          const isViewChecked = !!modPerms.view;
-                          const truePermissionCount = Object.values(modPerms).filter(val => val === true).length;
-
-                          return (
-                            <Accordion.Item eventKey={modSlug}>
-                                  <Accordion.Header onClick={() => {
-                                    setExpanded(prev => ({
-                                      ...prev,
-                                      [modSlug]: !prev[modSlug]
-                                    }));
-                                  }}>{mod.name} <span className="per--count">{truePermissionCount}/{mod?.permissions?.length}</span> </Accordion.Header>
-                                  <Accordion.Body>
-                                  <div className="transition-all">
-                                  {(mod.permissions || []).map((perm) => {
-                                    if (perm === 'view') {
-                                      return (
-                                        <Form.Check
-                                          key={`${modSlug}--view`}
-                                          type="checkbox"
-                                          id={`${modSlug}-view`}
-                                          label="View"
-                                          checked={!!modPerms.view}
-                                          onChange={() => {
-                                            toggleView(modSlug)
-                                          }
-                                          }
-                                        />
-                                      );
-                                    }
-
-                                    return (
-                                      <>
-                                        <Form.Check
-                                          key={perm}
-                                          type="checkbox"
-                                          id={`${modSlug}-${perm}`}
-                                          label={perm
-                                            .replace(/[_-]/g, " ")
-                                            .replace(/^\w/, (l) => l.toUpperCase())}
-                                          
-                                          checked={!!modPerms[perm]}
-                                          onChange={() => {
-                                            togglePermission(modSlug, perm)}
-
-                                          }
-                                          className={!isViewChecked ? 'parent-item text-muted' : 'parent-item'}
-                                        />
-                                    
-                                    {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
-                                      perm === "view_others" &&
-                                      modPerms[perm] === true &&
-                                      <>
-                                      <Form.Check
-                                        key={`${modSlug}-${perm}-select-all`}
-                                        type="checkbox"
-                                        id={`${modSlug}-${perm}-select-all`}
-                                        label="Select all"
-                                        
-                                        checked={memberFeeds.every((member) =>
-                                          modPerms["selected_members"]?.includes(String(member._id))
-                                        )}
-                                        onChange={(e) => {
-                                          
-                                            handleSelectAll(modSlug, e.target.checked)
-                                          
-                                        }}
-                                        className="sub-items"
-                                      />
-                                      <>
-                                        {memberFeeds.map((member) => (
+                            return (
+                              <Accordion.Item eventKey={modSlug}>
+                                    <Accordion.Header onClick={() => {
+                                      setExpanded(prev => ({
+                                        ...prev,
+                                        [modSlug]: !prev[modSlug]
+                                      }));
+                                    }}>{mod.name} <span className="per--count">{truePermissionCount}/{mod?.permissions?.length}</span> </Accordion.Header>
+                                    <Accordion.Body>
+                                    <div className="transition-all">
+                                    {(mod.permissions || []).map((perm) => {
+                                      if (perm === 'view') {
+                                        return (
                                           <Form.Check
-                                            key={`${modSlug}-${perm}-${member._id}`}
+                                            key={`${modSlug}--view`}
                                             type="checkbox"
-                                            id={`${modSlug}-${perm}-${member._id}`}
-                                            label={member.name}
-                                            checked={modPerms["selected_members"]?.includes(String(member._id))}
-                                            
+                                            id={`${modSlug}-view`}
+                                            label="View"
+                                            checked={!!modPerms.view}
                                             onChange={() => {
-                                              toggleMembers(modSlug, "selected_members", member._id);
-                                            }}
-                                            className="sub-items"
+                                              toggleView(modSlug)
+                                            }
+                                            }
                                           />
-                                        ))}
-
-                                        {modSlug === "projects" && (
-                                          <Form.Check
-                                            key={`${modSlug}-${perm}-unassigned`}
-                                            type="checkbox"
-                                            id={`${modSlug}-${perm}-unassigned`}
-                                            label="Unassigned"
-                                            checked={modPerms["selected_members"]?.includes('unassigned')}
-                                            onChange={() => {
-                                                toggleMembers(modSlug, "selected_members", 'unassigned');
-                                            }}
-                                            className="sub-items"
-                                          />
-                                        )}
-                                        </>
-
-                                      </>
+                                        );
                                       }
-                                      </>
-                                    );
-                                    
-                                  })}
 
-                                </div>
-                                  </Accordion.Body>
-                                </Accordion.Item>
-                            
-                          );
-                        })}
-                        </Accordion>
-                      </>
-                    </Card.Body>
-                </Card>
+                                      return (
+                                        <>
+                                          <Form.Check
+                                            key={perm}
+                                            type="checkbox"
+                                            id={`${modSlug}-${perm}`}
+                                            label={perm
+                                              .replace(/[_-]/g, " ")
+                                              .replace(/^\w/, (l) => l.toUpperCase())}
+                                            
+                                            checked={!!modPerms[perm]}
+                                            onChange={() => {
+                                              togglePermission(modSlug, perm)}
+
+                                            }
+                                            className={!isViewChecked ? 'parent-item text-muted' : 'parent-item'}
+                                          />
+                                      
+                                      {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
+                                        perm === "view_others" &&
+                                        modPerms[perm] === true &&
+                                        <>
+                                        <Form.Check
+                                          key={`${modSlug}-${perm}-select-all`}
+                                          type="checkbox"
+                                          id={`${modSlug}-${perm}-select-all`}
+                                          label="Select all"
+                                          
+                                          checked={memberFeeds.every((member) =>
+                                            modPerms["selected_members"]?.includes(String(member._id))
+                                          )}
+                                          onChange={(e) => {
+                                            
+                                              handleSelectAll(modSlug, e.target.checked)
+                                            
+                                          }}
+                                          className="sub-items"
+                                        />
+                                        <>
+                                          {memberFeeds.map((member) => (
+                                            <Form.Check
+                                              key={`${modSlug}-${perm}-${member._id}`}
+                                              type="checkbox"
+                                              id={`${modSlug}-${perm}-${member._id}`}
+                                              label={member.name}
+                                              checked={modPerms["selected_members"]?.includes(String(member._id))}
+                                              
+                                              onChange={() => {
+                                                toggleMembers(modSlug, "selected_members", member._id);
+                                              }}
+                                              className="sub-items"
+                                            />
+                                          ))}
+
+                                          {modSlug === "projects" && (
+                                            <Form.Check
+                                              key={`${modSlug}-${perm}-unassigned`}
+                                              type="checkbox"
+                                              id={`${modSlug}-${perm}-unassigned`}
+                                              label="Unassigned"
+                                              checked={modPerms["selected_members"]?.includes('unassigned')}
+                                              onChange={() => {
+                                                  toggleMembers(modSlug, "selected_members", 'unassigned');
+                                              }}
+                                              className="sub-items"
+                                            />
+                                          )}
+                                          </>
+
+                                        </>
+                                        }
+                                        </>
+                                      );
+                                      
+                                    })}
+
+                                  </div>
+                                    </Accordion.Body>
+                                  </Accordion.Item>
+                              
+                            );
+                          })}
+                          </Accordion>
+                        </>
+                      </Card.Body>
+                  </Card>
+                }
             </Modal.Body>
             <Modal.Footer>
               <Button variant="primary" onClick={handleSavePermissions} disabled={loader}>{loader ? "Please Wait..." : "Save"}</Button>
