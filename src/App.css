@@ -300,6 +300,10 @@ body {
   line-height: 33px;
 }
 
+.page--wrapper .draggable--table th {
+  background: #ECEEF0;
+}
+
 .show--details .draggable--table td,
 .view--project .draggable--table td,
 .view--invitee .draggable--table td {
@@ -1011,7 +1015,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .team--Cards.active,
 table tr.active td,
 table tr.marked-project td {
-  background: #ECEEF0;
+  background: #0E749010;
 }
 
 .table>:not(caption)>*>* {
@@ -3566,7 +3570,7 @@ pre {
 }
 
 .project--grid--table tr.marked-project {
-  background: #ECEEF0;
+  background: #0E749010;
 }
 
 .project--grid--table tr.marked-project td {
