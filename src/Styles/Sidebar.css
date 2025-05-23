@@ -118,7 +118,7 @@ Sidebar CSS-=-=
   font-weight: 500;
   font-size: 1rem;
   background: none;
-  border-bottom: 1px solid #7bccb840;
+  border-bottom: 1px solid #0891B240;
   display: block;
   padding: .75rem 1.5rem;
   text-decoration: none;
@@ -142,7 +142,7 @@ Sidebar CSS-=-=
 
 .navbar-brand .dropdown .dropdown-item .initial--name {
   align-items: center;
-  background: #7BCCB8;
+  background: #0891B2;
   border-radius: 100px;
   -webkit-border-radius: 100px;
   color: #ffffff;
@@ -220,18 +220,21 @@ Sidebar CSS-=-=
 
 .navbar-light .navbar-nav .nav-link .nav--item--icon svg {
   font-size: 24px;
-  color: #6FCCB8;
+  color: #0891B2;
 }
 
-.navbar-light .navbar-nav .nav-link:hover,
 .navbar-light .navbar-nav .active>.nav-link,
 .navbar-light .navbar-nav .nav-link.active,
 .navbar-light .navbar-nav .nav-link.show,
 .navbar-light .navbar-nav .show>.nav-link,
-.navbar-light .navbar-nav .nav-link:focus,
+.navbar-light .navbar-nav .nav-link:focus {
+  color: #ffffff;
+  background: #0891B2;
+}
+
 .navbar-light .navbar-nav .nav-link:hover {
   color: #ffffff;
-  background: #6FCCB8;
+  background: #0E7490;
 }
 
 .navbar-light .navbar-nav .active>.nav-link svg,
@@ -247,7 +250,7 @@ Sidebar CSS-=-=
   align-items: center;
   animation: pulse 2s infinite;
   -webkit-animation: pulse 2s infinite;
-  background: #5ead9a;
+  background: #0E7490;
   border-radius: 100px;
   -webkit-border-radius: 100px;
   -moz-border-radius: 100px;
@@ -309,7 +312,7 @@ Sidebar CSS-=-=
     right: -35px;
     top: 15px;
     border: 0;
-    background: #5ead9a;
+    background: #0E7490;
     border-radius: 0 5px 5px 0;
     -webkit-border-radius: 0 5px 5px 0;
     box-shadow: none;
@@ -329,7 +332,7 @@ Sidebar CSS-=-=
   }
 
   .navbar-toggler.collapsed {
-    background: #5ead9a;
+    background: #0E7490;
   }
 
   .navbar-toggler-icon {

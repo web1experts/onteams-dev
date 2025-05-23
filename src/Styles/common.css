@@ -106,20 +106,20 @@ fieldset:disabled .btn {
 }
 
 .btn:focus-visible {
-  background-color: #5ead9a;
-  border-color: #5ead9a;
+  background-color: #0E7490;
+  border-color: #0E7490;
 }
 
 .btn-primary {
   color: #ffffff;
-  background-color: #6FCCB8;
-  border-color: #6FCCB8;
+  background-color: #0891B2;
+  border-color: #0891B2;
 }
 
 .btn-outline-primary {
-  color: #6FCCB8;
+  color: #0891B2;
   background-color: transparent;
-  border-color: #6FCCB8;
+  border-color: #0891B2;
 }
 
 .btn-secondary:not(:disabled):not(.disabled).active:focus,
@@ -147,8 +147,8 @@ fieldset:disabled .btn {
 .btn-primary:not(:disabled):not(.disabled):active,
 .show>.btn-primary.dropdown-toggle {
   color: #ffffff;
-  background-color: #5ead9a;
-  border-color: #5ead9a;
+  background-color: #0E7490;
+  border-color: #0E7490;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px !important;
   -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px !important;
   outline: none;
@@ -171,17 +171,17 @@ strong.activity-type-text {
 .btn:first-child:active,
 :not(.btn-check)+.btn:active {
   color: #ffffff;
-  background-color: #5fb39f;
-  border-color: #5fb39f;
+  background-color: #0E7490;
+  border-color: #0E7490;
   box-shadow: none
 }
 
 .btn:focus-visible {
-  background-color: #5fb39f;
-  border-color: #5fb39f;
+  background-color: #0E7490;
+  border-color: #0E7490;
 }
 a.active-workspace.dropdown-item {
-  background: #7bccb840 !important;
+  background: #0891B240 !important;
 }
 .form-control:focus {
   box-shadow: none;
@@ -449,11 +449,11 @@ textarea.form-control {
 }
 
 .common--form p a {
-  color: #6FCCB8;
+  color: #0891B2;
 }
 
 .common--form p a:hover {
-  color: #5ead9a;
+  color: #0E7490;
   text-decoration: underline;
 }
 
@@ -514,7 +514,7 @@ textarea.form-control {
 }
 
 .nm-o {
-  background: #5fb39f;
+  background: #0E7490;
 }
 
 .nm-p {
@@ -757,7 +757,7 @@ Add Project Modal CSS-=-=-
 }
 
 .project--form--inputs form .text--editor .editor--options li a {
-  background: #7bccb810;
+  background: #0891B210;
   color: #333;
   display: block;
   font-size: .8rem;
@@ -849,11 +849,11 @@ Add Project Modal CSS-=-=-
 }
 
 .workflow--modal .workflow--selected {
-  background: #7BCCB820;
+  background: #0891B220;
   color: #333333;
   padding: 0.5rem .75rem;
   display: inline-block;
-  border-top: 3px solid #7BCCB8;
+  border-top: 3px solid #0891B2;
   border-radius: .25rem;
   -webkit-border-radius: .25rem;
 }
@@ -880,7 +880,7 @@ Add Project Modal CSS-=-=-
 
 .status--modal .status--list .list-group-item {
   align-items: center;
-  background: #7bccb820;
+  background: #0891B220;
   border-radius: .25rem;
   cursor: pointer;
   display: flex;
@@ -891,8 +891,8 @@ Add Project Modal CSS-=-=-
 }
 
 .status--modal .status--list .status--active {
-  background: #7bccb820;
-  color: #7BCCB8;
+  background: #0891B220;
+  color: #0891B2;
 }
 
 .status--modal .status--list .list-group-item .status--circle {
@@ -1111,7 +1111,7 @@ Add Project Modal CSS-=-=-
 }
 
 .upload--status .file--upload:hover {
-  background: #7bccb810;
+  background: #0E749010;
 }
 
 .upload--status .file--upload span {
@@ -1142,7 +1142,7 @@ Add Project Modal CSS-=-=-
 }
 
 .upload--status label.file--upload p strong {
-  color: #7bccb8;
+  color: #0891B2;
   font-weight: 500;
 }
 

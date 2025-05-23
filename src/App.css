@@ -15,7 +15,7 @@
 
 body {
   font-family: "Poppins", sans-serif;
-  background: #ffffff;
+  background: #F8FAFC;
   color: #454545;
   font-size: 15px;
   font-weight: 400;
@@ -73,10 +73,10 @@ body {
 .page--title .list-group-item-action {
   align-items: center;
   background: none;
-  border: 1px solid #7bccb8;
+  border: 1px solid #0891B2;
   border-radius: 50px;
   -webkit-border-radius: 50px;
-  color: #7bccb8;
+  color: #0891B2;
   cursor: pointer;
   display: flex;
   height: auto;
@@ -95,7 +95,7 @@ body {
 .page--title .list-group-item-action.active,
 .page--title .refresh--btn {
   color: #ffffff;
-  background: #7BCCB8;
+  background: #0891B2;
 }
 
 .page--title .refresh--btn {
@@ -115,8 +115,8 @@ body {
 
 .page--title .list-group-item-action:hover {
   color: #ffffff;
-  background: #5ead9a;
-  border: 1px solid #5ead9a;
+  background: #0E7490;
+  border: 1px solid #0E7490;
 }
 
 .page--title .list-group-horizontal>.list-group-item:last-child:not(:first-child) {
@@ -149,8 +149,8 @@ body {
 .page--wrapper .nav-tabs button {
   align-items: center;
   background: none;
-  border: 2px solid #7bccb8;
-  color: #7bccb8;
+  border: 2px solid #0891B2;
+  color: #0891B2;
   cursor: pointer;
   display: flex;
   font-size: 16px;
@@ -166,17 +166,17 @@ body {
 }
 
 .page--wrapper .nav-tabs button.active {
-  background: #7bccb8;
+  background: #0891B2;
   color: #ffffff;
   box-shadow: none;
-  border: 2px solid #7bccb8;
+  border: 2px solid #0891B2;
 }
 
 .page--wrapper .nav-tabs button:hover {
-  background: #5ead9a;
+  background: #0E7490;
   color: #ffffff;
   box-shadow: none;
-  border: 2px solid #5ead9a;
+  border: 2px solid #0E7490;
 }
 
 .page--wrapper .nav-tabs {
@@ -220,7 +220,7 @@ body {
 .team--Cards .dropdown-menu:before,
 .page--wrapper table td .dropdown-menu::before {
   border: 10px solid;
-  border-color: transparent transparent #7BCCB8;
+  border-color: transparent transparent #0891B2;
   content: "";
   height: 0;
   left: 20px;
@@ -238,7 +238,7 @@ body {
 
 .team--Cards .dropdown .dropdown-item,
 .page--wrapper table td .dropdown-item {
-  background: #7bccb8;
+  background: #0891B2;
   border: 0;
   border-bottom: 1px solid #00000014;
   box-shadow: none;
@@ -253,7 +253,7 @@ body {
 
 .team--Cards .dropdown .dropdown-item:hover,
 .page--wrapper table td .dropdown-item:hover {
-  background: #5ead9a;
+  background: #0E7490;
   color: #fff;
 }
 
@@ -298,6 +298,10 @@ body {
   width: auto;
   flex: 1 1;
   line-height: 33px;
+}
+
+.page--wrapper .draggable--table th {
+  background: #ECEEF0;
 }
 
 .show--details .draggable--table td,
@@ -643,7 +647,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 
 .wrapper--title .list-group-item,
 .wrapper--title .active {
-  background: #7BCCB8;
+  background: #0891B2;
   border-radius: 100px;
   -webkit-border-radius: 100px;
   font-size: 20px;
@@ -657,12 +661,12 @@ button.input-error.dropdown-toggle.btn.btn-success {
   color: #ffffff;
   cursor: pointer;
   margin-left: 0.25rem;
-  border: 1px solid #7BCCB8;
+  border: 1px solid #0891B2;
 }
 
 .wrapper--title .list-group-item:hover {
-  background: #5ead9a;
-  border: 1px solid #5ead9a;
+  background: #0E7490;
+  border: 1px solid #0E7490;
   color: #ffffff;
 }
 
@@ -684,22 +688,22 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .wrapper--title .ListView,
 .wrapper--title .gridView {
   background: #ffffff;
-  color: #7BCCB8;
-  border: 1px solid #7BCCB8;
+  color: #0891B2;
+  border: 1px solid #0891B2;
 }
 
 .wrapper--title .active,
 .wrapper--title .gridView.active {
-  background: #7BCCB8;
+  background: #0891B2;
   color: #ffffff;
-  border: 1px solid #7BCCB8;
+  border: 1px solid #0891B2;
 }
 
 .wrapper--title .ListView:hover,
 .wrapper--title .gridView:hover,
 .wrapper--title .active:hover {
   border: 1px solid transparent;
-  background: #5ead9a;
+  background: #0E7490;
 }
 
 .details--projects--view .projecttitle,
@@ -737,7 +741,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .wrapper--title h3 span {
   display: block;
   font-size: 70%;
-  color: #5ead9a;
+  color: #0E7490;
   font-weight: 500;
   min-height: 20px;
   overflow: hidden;
@@ -762,9 +766,9 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .wrapper--title .btn--view.active,
 .wrapper--title .btn--view:hover,
 .wrapper--title .btn--view:focus-visible {
-  background: #7BCCB8;
+  background: #0E7490;
   color: #ffffff;
-  border: 1px solid #7BCCB8;
+  border: 1px solid #0E7490;
 }
 
 .disabled-pointer {
@@ -999,7 +1003,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #7bccb8;
+  background: #0891B2;
   color: #ffffff;
   padding: 0.5rem 1rem;
   border-radius: 50px;
@@ -1011,7 +1015,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .team--Cards.active,
 table tr.active td,
 table tr.marked-project td {
-  background: rgba(123, 204, 184, .125);
+  background: #0E749010;
 }
 
 .table>:not(caption)>*>* {
@@ -1042,9 +1046,9 @@ table tr.marked-project td {
 
 .show--details .table tr.project--active td,
 .view--project .table tr.project--active td {
-  border-top: 1px solid #6FCCB8;
+  border-top: 1px solid #0891B2;
   margin-bottom: 0;
-  border-bottom: 1px solid #6FCCB8;
+  border-bottom: 1px solid #0891B2;
 }
 
 .show--details .g-4,
@@ -1253,7 +1257,7 @@ table tr.marked-project td {
 .modal .select--dropdown .dropdown-item,
 .rounded--box .select--dropdown .dropdown-item,
 .common--form .select--dropdown .dropdown-item {
-  background: #7bccb810;
+  background: #0891B210;
   border: 0;
   border-radius: .25rem;
   -webkit-border-radius: .25rem;
@@ -1296,8 +1300,8 @@ table tr.marked-project td {
 .modal .select--dropdown .selected--option,
 .rounded--box .select--dropdown .selected--option,
 .common--form .select--dropdown .selected--option {
-  color: #7bccb8;
-  background: #7bccb820;
+  color: #0891B2;
+  background: #0891B220;
 }
 
 .page--wrapper table td .select--dropdown .dropdown-item:hover,
@@ -1306,7 +1310,7 @@ table tr.marked-project td {
 .rounded--box .select--dropdown .dropdown-item:hover,
 .common--form .select--dropdown .dropdown-item:hover {
   color: #333333;
-  background: #7bccb830;
+  background: #0E749030;
 }
 
 .modal .select--dropdown .btn,
@@ -1366,7 +1370,7 @@ table tr.marked-project td {
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
-  background-color: #7bccb8;
+  background-color: #0891B2;
   color: white;
 }
 
@@ -1948,7 +1952,7 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list ul li:hover {
-  background: #7BCCB820;
+  background: #0E749020;
 }
 
 .projects--grid .task--list ul li.task--button:hover {
@@ -1956,7 +1960,7 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list ul li.active--task {
-  background: #7BCCB810;
+  background: #0E749010;
 }
 
 .projects--grid .task--list ul li .timer--task {
@@ -1973,7 +1977,7 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list ul li.active--task .timer--task {
-  background: #7BCCB8;
+  background: #0891B2;
   color: #ffffff;
   opacity: 1;
 }
@@ -1984,7 +1988,7 @@ Project Task View CSS=-=-=
   height: 30px;
   border-radius: 100px;
   -webkit-border-radius: 100px;
-  background: #7BCCB880;
+  background: #0891B280;
   color: #ffffff;
   opacity: 0;
   text-align: center;
@@ -2104,13 +2108,13 @@ Project Task View CSS=-=-=
   display: flex;
   width: 100%;
   text-align: left;
-  color: #7BCCB8;
+  color: #0891B2;
   font-weight: 500;
-  background: #7BCCB810;
+  background: #0891B210;
   text-decoration: none;
   padding: 0.75rem 1rem;
   position: relative;
-  border: 1px solid #7BCCB850;
+  border: 1px solid #0891B250;
   box-shadow: none;
   border-bottom: 0;
   align-items: center;
@@ -2135,7 +2139,7 @@ Project Task View CSS=-=-=
   text-align: center;
   width: 30px;
   height: 30px;
-  background: #7BCCB8;
+  background: #0891B2;
   color: #ffffff;
   z-index: 111;
   display: flex;
@@ -2153,13 +2157,13 @@ Project Task View CSS=-=-=
 .accordion .accordion-body {
   margin-top: 0;
   padding: 1rem;
-  border: 1px solid #7BCCB850;
+  border: 1px solid #0891B250;
   border-top: 0;
 }
 
 .form-check-input:checked {
-  background-color: #6fccb8;
-  border-color: #6fccb8;
+  background-color: #0891B2;
+  border-color: #0891B2;
 }
 
 .accordion .accordion-body .form-check+.form-check {
@@ -2181,7 +2185,7 @@ Project Task View CSS=-=-=
 .accordion .list-group .list-group-item {
   padding: 1rem;
   cursor: pointer;
-  background: #7BCCB810;
+  background: #0891B210;
   position: relative;
   font-size: 1rem;
   display: flex;
@@ -2196,7 +2200,7 @@ Project Task View CSS=-=-=
 
 .accordion .list-group .list-group-item .play--timer,
 .accordion .list-group .list-group-item .pause--timer {
-  background: #7BCCB8;
+  background: #0891B2;
   color: #ffffff;
   vertical-align: middle;
   width: 25px;
@@ -2213,7 +2217,7 @@ Project Task View CSS=-=-=
 }
 
 .accordion .list-group .list-group-item .pause--timer {
-  background: #7BCCB850;
+  background: #0891B250;
 }
 
 .accordion .list-group .list-group-item .time--span {
@@ -2230,7 +2234,7 @@ Project Task View CSS=-=-=
 }
 
 .accordion .list-group .active--task .time--span {
-  background: #7BCCB8;
+  background: #0891B2;
   color: #ffffff;
   opacity: 1;
 }
@@ -2265,9 +2269,9 @@ Project Task View CSS=-=-=
   display: block;
   width: 100%;
   text-align: left;
-  color: #7BCCB8;
+  color: #0891B2;
   font-weight: 500;
-  background: #7BCCB810;
+  background: #0891B210;
   text-decoration: none;
   padding: 0.75rem 1rem;
   position: relative;
@@ -2336,7 +2340,7 @@ Project Task View CSS=-=-=
   display: flex;
   align-items: center;
   margin-top: 0.5rem;
-  border-bottom: 1px solid #7BCCB820;
+  border-bottom: 1px solid #0891B220;
   padding-bottom: 0.5rem;
 }
 
@@ -2361,7 +2365,7 @@ Project Task View CSS=-=-=
   min-height: 25px;
   border-radius: 0.25rem;
   color: #ffffff;
-  background: #7BCCB8;
+  background: #0891B2;
   font-weight: 500;
   cursor: pointer;
 }
@@ -2377,7 +2381,7 @@ pre {
 .AddReportModal ul li {
   display: flex;
   align-items: center;
-  background: #7BCCB810;
+  background: #0891B210;
   border-radius: 0.25rem;
   padding: 0.5rem 0.75rem;
   margin-bottom: 0.25rem;
@@ -2516,7 +2520,7 @@ pre {
   margin-right: 1rem;
   font-size: 0.9rem;
   border-bottom: 2px solid transparent;
-  color: #7BCCB880;
+  color: #0891B280;
   border-radius: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
@@ -2537,10 +2541,10 @@ pre {
 .timeSheetModal button.list-group-item:hover,
 .timeSheetModal button.list-group-item:focus,
 .timeSheetModal .list-group-horizontal>.list-group-item+.list-group-item.active {
-  color: #7BCCB8;
+  color: #0E7490;
   background-color: transparent;
   border: 0;
-  border-bottom: 1px solid #7BCCB8;
+  border-bottom: 1px solid #0E7490;
 }
 
 .modal-open .timeSheetModal {
@@ -2679,7 +2683,7 @@ pre {
 
 .current--player .task--timer strong {
   display: block;
-  color: #7BCCB8;
+  color: #0891B2;
   font-size: 1.75rem;
   font-weight: 500;
 }
@@ -2697,7 +2701,7 @@ pre {
   width: auto;
   height: auto;
   padding: 0;
-  color: #7BCCB8;
+  color: #0891B2;
   border: 1px solid transparent;
   background: #ffffff;
   padding: .45rem .75rem;
@@ -2710,7 +2714,7 @@ pre {
   -webkit-border-radius: 50px;
   margin-right: 0;
   margin-left: 0.5rem;
-  border: 1px solid #7BCCB8;
+  border: 1px solid #0891B2;
 }
 
 .accordion .screens--shots .list-group-item:last-child:not(:first-child) {
@@ -2724,7 +2728,7 @@ pre {
   height: 40px;
   min-width: 40px;
   margin: 0;
-  background: #7BCCB8;
+  background: #0891B2;
   color: #ffffff;
 }
 
@@ -2742,7 +2746,7 @@ pre {
   border-radius: 5px;
   -webkit-border-radius: 5px;
   padding: .35rem .75rem;
-  background: #7BCCB820;
+  background: #0891B220;
   margin-right: 0;
   margin-left: .5rem;
 }
@@ -2760,8 +2764,8 @@ pre {
 .screens--shots .active,
 .accordion .screens--shots .active {
   color: #ffffff;
-  background-color: #7BCCB8;
-  border-color: #7BCCB8;
+  background-color: #0891B2;
+  border-color: #0891B2;
   box-shadow: none;
   outline: none;
 }
@@ -2770,7 +2774,7 @@ pre {
 .screens--tabs .list-group .list-group-item+.list-group-item-action.active,
 .screens--shots .list-group-item+.list-group-item-action.active,
 .accordion .screens--shots .list-group-item+.list-group-item-action.active {
-  border: 1px solid #7BCCB8;
+  border: 1px solid #0891B2;
 }
 
 .screens--tabs .list-group .list-group-item+.list-group-item-action.active {
@@ -2830,7 +2834,7 @@ pre {
   width: auto;
   height: auto;
   padding: 0;
-  color: #7BCCB8;
+  color: #0891B2;
   border: 1px solid transparent;
   background: #ffffff;
   padding: .45rem .75rem;
@@ -2840,8 +2844,8 @@ pre {
 
 .page--title .date-filters .active {
   color: #ffffff;
-  background-color: #7BCCB8;
-  border-color: #7BCCB8;
+  background-color: #0891B2;
+  border-color: #0891B2;
   box-shadow: none;
   outline: none;
 }
@@ -3010,7 +3014,7 @@ pre {
 
 .screens--tabs p span {
   display: block;
-  color: #7BCCB8;
+  color: #0891B2;
   font-size: 1rem;
 }
 
@@ -3146,8 +3150,8 @@ pre {
 .setting--tabs .list-group .list-group-item:hover,
 .setting--tabs .list-group .list-group-item.active,
 .setting--tabs .list-group .list-group-item:focus {
-  color: #89ccb8;
-  background: #89ccb820;
+  color: #0E7490;
+  background: #0E749020;
 }
 
 .setting--tabs .role--list .list-group-item {
@@ -3167,8 +3171,8 @@ pre {
 
 .setting--tabs .role--list .list-group-item:hover,
 .setting--tabs .role--list .list-group-item:focus {
-  color: #89ccb8;
-  background: #89ccb820;
+  color: #0E7490;
+  background: #0E749020;
 }
 
 .setting--tabs .role--list .list-group-item.active {
@@ -3419,7 +3423,7 @@ pre {
   font-weight: 500;
   font-size: 1rem;
   background: none;
-  border-bottom: 1px solid #7bccb840;
+  border-bottom: 1px solid #0891B240;
   display: block;
   padding: .75rem 1.5rem;
   text-decoration: none;
@@ -3428,7 +3432,7 @@ pre {
 
 .onteamsio--page .dropdown .dropdown-item .initial--name {
   align-items: center;
-  background: #7BCCB8;
+  background: #0891B2;
   border-radius: 100px;
   -webkit-border-radius: 100px;
   color: #ffffff;
@@ -3460,22 +3464,22 @@ pre {
 }
 
 .onteamsio--page .timer--task h5 small {
-  color: #7BCCB8;
+  color: #0891B2;
   display: block;
 }
 
 .onteamsio--page .task--timer {
-  background: #7BCCB810;
+  background: #0891B210;
   padding: 1rem 2rem;
   margin-top: 1.5rem;
-  border: 2px solid #7BCCB8;
+  border: 2px solid #0891B2;
   -webkit-border-radius: 0.5rem;
   border-radius: 0.5rem;
 }
 
 .onteamsio--page .task--timer strong {
   display: block;
-  color: #7BCCB8;
+  color: #0891B2;
   font-size: 2.2rem;
 }
 
@@ -3566,7 +3570,7 @@ pre {
 }
 
 .project--grid--table tr.marked-project {
-  background: rgba(123, 204, 184, .125);
+  background: #0E749010;
 }
 
 .project--grid--table tr.marked-project td {
@@ -3611,7 +3615,7 @@ pre {
 
 .project--grid--table tr.project--active,
 .clients--grid--table .project--active {
-  background: #7bccb820;
+  background: #0891B220;
 }
 
 .project--grid--table tr.project--active td,
@@ -4289,7 +4293,7 @@ Media CSS-=-==
   }
 
   .project--table tr.project--active {
-    background: #7bccb820;
+    background: #0891B220;
   }
 
   .project--table tr.project--active td {

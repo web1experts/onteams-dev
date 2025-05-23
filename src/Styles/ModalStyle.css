@@ -64,9 +64,9 @@
 
 .captureModal .nav-tabs .nav-link {
     border: 0;
-    background: #7BCCB810;
-    color: #7BCCB8;
-    border: 1px solid #7BCCB8;
+    background: #0891B210;
+    color: #0891B2;
+    border: 1px solid #0891B2;
     border-radius: 0.5rem 0 0 0.5rem;
     padding: 10px 30px;
     display: flex;
@@ -78,9 +78,9 @@
 }
 
 .captureModal .nav-tabs .active {
-    background: #7BCCB8;
+    background: #0891B2;
     color: #ffffff;
-    border: 1px solid #7BCCB8;
+    border: 1px solid #0891B2;
 }
 
 .captureModal .nav-tabs .nav-item:last-child .nav-link {
@@ -280,7 +280,7 @@
 
 .file--preview--modal .modal-title .dropdown-menu::before {
     border: 10px solid;
-    border-color: transparent transparent #7BCCB8;
+    border-color: transparent transparent #0891B2;
     content: "";
     height: 0;
     left: 20px;
@@ -297,7 +297,7 @@
 }
 
 .file--preview--modal .modal-title .dropdown-item {
-    background: #7bccb8;
+    background: #0891B2;
     border: 0;
     border-bottom: 1px solid #00000014;
     box-shadow: none;
@@ -318,7 +318,7 @@
 }
 
 .file--preview--modal .modal-title .dropdown-item:hover {
-    background: #5ead9a;
+    background: #0E7490;
     color: #fff;
 }
 
@@ -331,7 +331,7 @@
 
 .file--preview--modal .modal-title .btn:focus,
 .file--preview--modal .modal-title .btn:hover {
-    background: #7BCCB8;
+    background: #0E7490;
     color: #ffffff;
     box-shadow: none;
     outline: none;
@@ -358,7 +358,7 @@
 }
 
 .edit--task--modal form .input-group #send-message:hover {
-    background: #5ead9a;
+    background: #0E7490;
     color: #ffffff;
 }
 
@@ -611,7 +611,7 @@ ul#subtasks-ul li textarea.form-control+button {
     margin-top: 10px;
     padding: 0;
     box-shadow: none;
-    background: #7BCCB8;
+    background: #0891B2;
     padding: 0;
     min-width: max-content;
     border: 0;
@@ -624,7 +624,7 @@ ul#subtasks-ul li textarea.form-control+button {
 
 .task--message .dropdown .dropdown-menu::before {
     border: 8px solid;
-    border-color: transparent transparent #7BCCB8;
+    border-color: transparent transparent #0891B2;
     content: "";
     height: 0;
     right: 5px;
@@ -635,7 +635,7 @@ ul#subtasks-ul li textarea.form-control+button {
 }
 
 .task--message .dropdown .dropdown-menu[data-popper-placement="top-end"]:before {
-    border-color: #7BCCB8 transparent transparent;
+    border-color: #0891B2 transparent transparent;
     right: 5px;
     top: auto;
     bottom: -16px;
@@ -665,7 +665,7 @@ ul#subtasks-ul li textarea.form-control+button {
 }
 
 .message--edit {
-    background: #6fccb81a;
+    background: #0891B21a;
     padding: .5rem;
     border-radius: 0.5rem;
     margin: .5rem 0 .75rem;
