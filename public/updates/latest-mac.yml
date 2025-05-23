@@ -1,8 +1,8 @@
-version: 1.0.0
+version: 2.8.3
 files:
   - url: https://app.onteams.ai/downloads/onteams-darwin-x64.zip
-    sha512: 9kjdU...
+    sha512: N2QxZmM5ZWY0MTA5NDExYmVmMWNmODJjYjc0NDY1ZjU3ZTM1ZGIwOWZjMDdlMzJmN2Y3YTlmN2UwZWRmMzEzMjBkYTU1YzA1NDAwYjgzODg4NDZlOGM5ZDlkMTI0NDQ4MmViZGViNTdjYjdhMWIyNTJjZWU1NTMwOTdmNWZhZjUgIG9udGVhbXMtZGFyd2luLXg2NC56aXAK
     size: 98765432
 path: https://app.onteams.ai/downloads/onteams-darwin-x64.zip
-sha512: 9kjdU...
-releaseDate: '2024-02-21T12:34:56.789Z'
+sha512: N2QxZmM5ZWY0MTA5NDExYmVmMWNmODJjYjc0NDY1ZjU3ZTM1ZGIwOWZjMDdlMzJmN2Y3YTlmN2UwZWRmMzEzMjBkYTU1YzA1NDAwYjgzODg4NDZlOGM5ZDlkMTI0NDQ4MmViZGViNTdjYjdhMWIyNTJjZWU1NTMwOTdmNWZhZjUgIG9udGVhbXMtZGFyd2luLXg2NC56aXAK
+releaseDate: '2025-05-23T12:34:56.789Z'
