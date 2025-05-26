@@ -14,6 +14,7 @@ import commonReducer from "./common.reducer";
 import holidayReducer from "./holiday.reducer";
 import attendanceReducer from "./attendance.reducer";
 import reportReducer from "./report.reducer";
+import paymentReducer from "./payment.reducer";
 export default combineReducers({
   auth: authReducer,
   project: projectReducer,
@@ -29,5 +30,6 @@ export default combineReducers({
   holiday: holidayReducer,
   attendance: attendanceReducer,
   reports: reportReducer,
-  permissions: permissionReducer
+  permissions: permissionReducer,
+  payment: paymentReducer
 });

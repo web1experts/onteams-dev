@@ -22,7 +22,7 @@ import SettingPage from "../Components/Settings/SettingPage";
 import DashboardPage from "../Components/Dashboard/DashboardPage";
 import DesktopPage from "../Components/Desktop/DesktopPage";
 import ManualTime from "../Components/Reports/ManualTime";
-
+import PlansPage from "../Components/subscriptions/Plans";
 const commonRouter = [
     {
         type: 'page',
@@ -89,37 +89,6 @@ const publicRoutes = [
         key: 'UN_MATCH',
         component: <Navigate to="/login" />,
         route: "*"
-    },
-    {
-        type: 'page',
-        name: 'Holidays',
-        key: 'HOLIDAYS',
-        component: <HolidaysPage/>,
-        route: '/holidays',
-        module: 'holidays'
-    },
-    {
-        type: 'page',
-        name: 'Attendance',
-        key: 'ATTENDANCE',
-        component: <AttendancePage/>,
-        route: '/attendance',
-        module: 'attendance'
-    },
-    {
-        type: 'page',
-        name: 'Invoice',
-        key: 'INVOICE',
-        component: <InvoicePage/>,
-        route: '/invoice',
-    },
-    {
-        type: 'page',
-        name: 'Reports',
-        key: 'REPORTS',
-        component: <ReportsPage/>,
-        route: '/reports',
-        module: 'reports'
     },
     {
         type: 'page',
@@ -260,6 +229,13 @@ const privateRoutes = [
         component: <DesktopPage/>,
         route: '/onteamsio',
     },
+    {
+        type: 'page',
+        name: 'Plans',
+        key: 'PLANS',
+        component: <PlansPage />,
+        route: '/plans'
+    }
 ];
 const hideSidebarRoutes = [
     '/login',

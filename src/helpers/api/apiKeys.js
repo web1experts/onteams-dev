@@ -29,7 +29,9 @@ const apiKeys = {
     holidays: '/holidays',
     attendance: 'attendance',
     reports: 'reports',
-    permissions: 'permissions'
+    permissions: 'permissions',
+    subscription: 'subscription',
+    payment: 'payment'
 };
   
 export default apiKeys;
