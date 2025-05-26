@@ -15,7 +15,7 @@
 
 body {
   font-family: "Poppins", sans-serif;
-  background: #F8FAFC;
+  background: transparent;
   color: #454545;
   font-size: 15px;
   font-weight: 400;
@@ -1020,7 +1020,7 @@ table tr.marked-project td {
 
 .table>:not(caption)>*>* {
   border-top-width: var(--bs-border-width);
-  margin-bottom: 0;
+  margin-bottom: -1px;
   border-bottom-width: var(--bs-border-width);
   box-shadow: none;
 }
