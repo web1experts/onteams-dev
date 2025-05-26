@@ -319,7 +319,7 @@ textarea.form-control {
 .form-floating>.form-control:not(:placeholder-shown)~label {
   transform: scale(.85) translateY(-.75rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.75rem) translateX(1rem);
-  color: rgb(80, 151, 129);
+  color: #0891B2;
   background: transparent;
 }
 
@@ -341,7 +341,7 @@ textarea.form-control {
 .form-floating>.form-control:-webkit-autofill~label {
   transform: scale(.85) translateY(-.65rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.65rem) translateX(1rem);
-  color: rgb(80, 151, 129);
+  color: #0891B2;
   background: transparent;
 }
 
@@ -362,7 +362,7 @@ textarea.form-control {
 .form-floating>.form-control:-moz-autofill~label {
   transform: scale(.85) translateY(-.65rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.65rem) translateX(1rem);
-  color: rgb(80, 151, 129);
+  color: #0891B2;
   background: transparent;
 }
 
@@ -422,7 +422,7 @@ textarea.form-control {
 .common--form .form-floating>.form-control:not(:placeholder-shown)~label {
   transform: scale(.85) translateY(-.9rem) translateX(1.2rem);
   -webkit-transform: scale(.85) translateY(-.9rem) translateX(1.2rem);
-  color: rgb(80, 151, 129);
+  color: #0891B2;
   background: #ffffff;
 }
 
