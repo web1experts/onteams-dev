@@ -332,11 +332,20 @@ function TeamMembersPage() {
         role: false,
       });
 
+      const cleanedMeta = { ...selectedMember?.memberMeta };
+
+    if (cleanedMeta?.permissions) {
+      delete cleanedMeta.permissions;
+    }
+    // Add 'recordings' key with value 'both' if not present
+    if (!('recordings' in cleanedMeta)) {
+      cleanedMeta.recordings = 'both';
+    }
       setEditedMember({
         name: selectedMember.name,
         role: selectedMember.role?._id,
         rolename: selectedMember.role?.name,
-        memberMeta: selectedMember?.memberMeta
+        memberMeta: cleanedMeta //selectedMember?.memberMeta
       });
       const merged = {};
             
@@ -417,7 +426,7 @@ function TeamMembersPage() {
 
     }
     else if (field === "role") {
-      console.log('role value: ', value)
+      
       const matchingRole = roles.find(role => role._id === value);
       setEditedMember((prevState) => ({
         ...prevState,
@@ -924,7 +933,7 @@ function TeamMembersPage() {
          
           <ListGroup horizontal>
           <Button variant="outline-primary" className={`btn--view d-none d-sm-flex${tab === 'details' ? ' active' : ''}`} onClick={() => setTab('details')}>Details</Button>
-          { (memberProfile?.permissions?.members?.update_permissions === true || memberProfile?.role?.slug === "owner") && (
+          { (memberProfile?.permissions?.members?.update_permissions === true && selectedMember?.role?.slug !== "owner" || memberProfile?.role?.slug === "owner") && (
           <Button variant="outline-primary" className={`btn--view d-none d-sm-flex${tab === 'permissions' ? ' active' : ''}`} onClick={() => {
            setTab('permissions')
             }}>Permissions</Button>
@@ -1065,7 +1074,7 @@ function TeamMembersPage() {
                     const modSlug = mod.slug;
                     const modPerms = permissions?.[modSlug] || {};
                     const isExpanded = expanded?.[modSlug] || false;
-                    const isViewChecked = !!modPerms.view; console.log(Object.values(modPerms))
+                    const isViewChecked = !!modPerms.view; 
                     const truePermissionCount = Object.values(modPerms).filter(val => val === true).length;
 
                     return (
@@ -1087,11 +1096,12 @@ function TeamMembersPage() {
                                     id={`${modSlug}-view`}
                                     label="View"
                                     checked={!!modPerms.view}
-                                    disabled={selectedMember?.role?.slug === "owner"}
+                                    //disabled={selectedMember?.role?.slug === "owner"}
                                     onChange={() => {
-                                      if(selectedMember?.role?.slug !== "owner"){ 
+                                     // if(selectedMember?.role?.slug !== "owner"){ 
                                         toggleView(modSlug)
-                                      }}
+                                      }
+                                    //}
                                     }
                                   />
                                 );
@@ -1108,10 +1118,10 @@ function TeamMembersPage() {
                                       .replace(/^\w/, (l) => l.toUpperCase())}
                                     disabled={!isViewChecked}
                                     checked={!!modPerms[perm]}
-                                    readOnly={selectedMember?.role?.slug === "owner"}
+                                    //readOnly={selectedMember?.role?.slug === "owner"}
                                     onChange={() => {
-                                      if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
-
+                                      //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
+                                      togglePermission(modSlug, perm)
                                     }}
                                     className={!isViewChecked ? 'parent-item text-muted' : 'parent-item'}
                                   />
@@ -1125,14 +1135,14 @@ function TeamMembersPage() {
                                   type="checkbox"
                                   id={`${modSlug}-${perm}-select-all`}
                                   label="Select all"
-                                  disabled={selectedMember?.role?.slug === "owner"}
+                                  //disabled={selectedMember?.role?.slug === "owner"}
                                   checked={memberFeeds.every((member) =>
                                     modPerms["selected_members"]?.includes(String(member._id))
                                   )}
                                   onChange={(e) => {
-                                    if(selectedMember?.role?.slug !== "owner"){ 
+                                    //if(selectedMember?.role?.slug !== "owner"){ 
                                       handleSelectAll(modSlug, e.target.checked)
-                                    }
+                                   // }
                                   }}
                                   className="sub-items"
                                 />
@@ -1144,11 +1154,11 @@ function TeamMembersPage() {
                                       id={`${modSlug}-${perm}-${member._id}`}
                                       label={member.name}
                                       checked={modPerms["selected_members"]?.includes(String(member._id))}
-                                      disabled={selectedMember?.role?.slug === "owner"}
+                                     // disabled={selectedMember?.role?.slug === "owner"}
                                       onChange={() => {
-                                        if (selectedMember?.role?.slug !== "owner") {
+                                        //if (selectedMember?.role?.slug !== "owner") {
                                           toggleMembers(modSlug, "selected_members", member._id);
-                                        }
+                                       // }
                                       }}
                                       className="sub-items"
                                     />
@@ -1161,11 +1171,11 @@ function TeamMembersPage() {
                                       id={`${modSlug}-${perm}-unassigned`}
                                       label="Unassigned"
                                       checked={modPerms["selected_members"]?.includes('unassigned')}
-                                      disabled={selectedMember?.role?.slug === "owner"}
+                                      // disabled={selectedMember?.role?.slug === "owner"}
                                       onChange={() => {
-                                        if (selectedMember?.role?.slug !== "owner") {
+                                        // if (selectedMember?.role?.slug !== "owner") {
                                           toggleMembers(modSlug, "selected_members", 'unassigned');
-                                        }
+                                        // }
                                       }}
                                       className="sub-items"
                                     />

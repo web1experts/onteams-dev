@@ -277,38 +277,81 @@ function SingleProject(props) {
         return null
     }
 
-    const handleKeyDown = (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
-            pasteOccurred.current = true; // Mark that a paste action is expected
-            console.log('Paste keyboard shortcut detected');
-        }
-    };
+    // const handleKeyDown = (e) => {
+    //     if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+    //         pasteOccurred.current = true; // Mark that a paste action is expected
+    //         console.log('Paste keyboard shortcut detected');
+    //     }
+    // };
 
-    const handlePaste = (e) => {
-        const pastedData = e.clipboardData.getData('text');
-        console.log('Pasted content:', pastedData);
-        pasteOccurred.current = true; // Set the paste flag to true
+    // const handlePaste = (e) => {
+    //     const pastedData = e.clipboardData.getData('text');
+    //     console.log('Pasted content:', pastedData);
+    //     pasteOccurred.current = true; // Set the paste flag to true
 
-        setTimeout(function(){
-            pasteOccurred.current = false;
-        },500)
-    };
+    //     setTimeout(function(){
+    //         pasteOccurred.current = false;
+    //     },500)
+    // };
 
-    useEffect(() => {
-        // Add the paste listener to the editor
-        if (quillRef.current) {
-          const editor = quillRef.current.getEditor();
-          editor.root.addEventListener('paste', handlePaste);
-        }
+    // useEffect(() => {
+    //     // Add the paste listener to the editor
+    //     if (quillRef.current) {
+    //       const editor = quillRef.current.getEditor();
+    //       editor.root.addEventListener('paste', handlePaste);
+    //     }
     
-        // Cleanup the event listener on unmount
-        return () => {
-          if (quillRef.current) {
-            const editor = quillRef.current.getEditor();
-            editor.root.removeEventListener('paste', handlePaste);
-          }
-        };
-      }, []);
+    //     // Cleanup the event listener on unmount
+    //     return () => {
+    //       if (quillRef.current) {
+    //         const editor = quillRef.current.getEditor();
+    //         editor.root.removeEventListener('paste', handlePaste);
+    //       }
+    //     };
+    //   }, []);
+
+    const handleKeyDown = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+        pasteOccurred.current = true;
+        console.log('Paste keyboard shortcut detected');
+    }
+
+    // Optional: Handle Shift+Enter to insert a line break manually
+    if (e.key === 'Enter' && e.shiftKey) {
+        e.preventDefault(); // Prevent default if needed
+        const editor = quillRef.current?.getEditor();
+        if (editor) {
+            const range = editor.getSelection(true);
+            editor.insertText(range.index, '\n');
+            editor.setSelection(range.index + 1);
+        }
+    }
+};
+
+const handlePaste = (e) => {
+    const pastedData = e.clipboardData.getData('text');
+    console.log('Pasted content:', pastedData);
+    pasteOccurred.current = true;
+
+    setTimeout(() => {
+        pasteOccurred.current = false;
+    }, 500);
+};
+
+useEffect(() => {
+    const editor = quillRef.current?.getEditor();
+    const root = editor?.root;
+
+    if (root) {
+        root.addEventListener('paste', handlePaste);
+    }
+
+    return () => {
+        if (root) {
+            root.removeEventListener('paste', handlePaste);
+        }
+    };
+}, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -587,7 +630,7 @@ function SingleProject(props) {
                                                 setFields({...fields, ['description']: value})
                                                 setErrors({ ...errors, ['description']: '' });
                                                 // setTimeout(() => {
-                                                    dispatch( updateStateData( EDIT_PROJECT_FORM,  {['description']: value }))
+                                                    // dispatch( updateStateData( EDIT_PROJECT_FORM,  {['description']: value }))
                                                 // },800)
                                             }}
                                             formats={formats} 

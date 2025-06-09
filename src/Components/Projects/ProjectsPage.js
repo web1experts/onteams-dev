@@ -1001,9 +1001,9 @@ function ProjectsPage() {
                                                 setFields({ ...fields, ['description']: value })
                                                 setErrors({ ...errors, ['description']: '' });
 
-                                                setTimeout(() => {
-                                                    dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
-                                                }, 10)
+                                                // setTimeout(() => {
+                                                //     dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
+                                                // }, 10)
                                             }}
                                             formats={formats}
                                             modules={modules}

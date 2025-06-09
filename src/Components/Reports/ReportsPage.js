@@ -1073,7 +1073,12 @@ const TaskList = ({ report }) => {
                   
                       <Dropdown.Menu>
                         <Dropdown.Item onClick={handleShow}>Manual Time</Dropdown.Item>
-                        <Dropdown.Item onClick={handleNewShow} to="/manual-time" >Manual Time Approval</Dropdown.Item>
+                        {
+                          memberProfile?.permissions?.reports?.update_manual_time && (
+                            <Dropdown.Item onClick={handleNewShow} to="/manual-time" >Manual Time Approval</Dropdown.Item>
+                          )
+                        }
+                        
                       </Dropdown.Menu>
                     </Dropdown>
                   )}

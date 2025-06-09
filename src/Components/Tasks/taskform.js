@@ -3,7 +3,7 @@ import { debounce } from 'lodash';
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, ListGroup, Row, Col, InputGroup, Dropdown, Image } from "react-bootstrap";
 import { MdFileDownload } from "react-icons/md";
-import { FaEllipsisV, FaPlus, FaRegTrashAlt, FaChevronDown, FaCheck } from "react-icons/fa";
+import { FaEllipsisV, FaPlus, FaRegTrashAlt, FaChevronDown, FaCheck, FaEdit } from "react-icons/fa";
 import { selectboxObserver, getMemberdata, makeLinksClickable, formatTimeAgo, parseDateWithoutTimezone, timeAgo } from "../../helpers/commonfunctions";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
@@ -76,7 +76,7 @@ export const TaskForm = (props) => {
     const [showPreview, setPreviewShow] = useState(false);
     const handlePreviewClose = () => setPreviewShow(false);
     const [currentTask, setCurrentTask] = useState(apiResult.currentTask || {})
-    const [enablesubtaskedit, setEnableSubtakEdit] = useState({})
+    const [enablesubtaskedit, setEnableSubtaskEdit] = useState({})
     const [ShowCommentModel, setShowCommentModel] = useState(false);
     const handleCloseCommentModel = () => setShowCommentModel(false);
     const handleDatetModal = () => setDatePickerModal(false);
@@ -121,6 +121,7 @@ export const TaskForm = (props) => {
 
     }, [apiResult.currentTask])
     useEffect(() => {
+        
         if (apiResult.UpdatedTask) {
             setCurrentTask(apiResult.UpdatedTask)
         }
@@ -455,7 +456,139 @@ export const TaskForm = (props) => {
     };
 
 
-    const renderSubtasks = () => {
+const [editValues, setEditValues] = useState({});
+
+const renderSubtasks = () => {
+    return subtasks.map((subtask, index) => {
+        const isEditing = typeof subtask === 'object' && enablesubtaskedit[subtask._id];
+        const subtaskText = typeof subtask === 'object' ? subtask.title || '' : subtask;
+        
+        return (
+            <Draggable
+                key={`subtaskindex-${index}`}
+                draggableId={`sub-task-${index}`}
+                index={index}
+            >
+                {(provided) => (
+                    <li
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                    >
+                        <Form.Group className="mb-0 form-group pb-0" key={`subtask-${index}`}>
+                            {typeof subtask === 'object' && !isEditing && (
+                                <>
+                                    <GrDrag />
+                                    <input
+                                        type="checkbox"
+                                        onChange={(e) => updateSubtask(e.target.checked, index)}
+                                        checked={subtask?.status || false}
+                                    />
+                                </>
+                            )}
+
+                            {isEditing ? (
+                                <textarea
+                                    className="form-control"
+                                    rows="2"
+                                    autoFocus
+                                    value={editValues[subtask._id] || ''}
+                                    onChange={(e) =>
+                                        setEditValues((prev) => ({
+                                            ...prev,
+                                            [subtask._id]: e.target.value,
+                                        }))
+                                    }
+                                    onBlur={(e) => {
+                                        handlesubtaskChange(index, subtask, e.target.value, true);
+                                        setEnableSubtaskEdit((prev) => ({
+                                            ...prev,
+                                            [subtask._id]: false,
+                                        }));
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            e.target.blur();
+                                        }
+                                    }}
+                                />
+                            ) : typeof subtask === 'object' ? (
+                                <div
+                                    className="form-control"
+                                    style={{
+                                        cursor: 'pointer',
+                                        border: 'none',
+                                        padding: '0.5rem 0',
+                                        minHeight: '2rem',
+                                        overflowWrap: 'break-word',
+                                    }}
+                                    dangerouslySetInnerHTML={{
+                                        __html: makeLinksClickable(
+                                            String(subtask.title || '').replace(/\n/g, '<br/>')
+                                        ),
+                                    }}
+                                />
+                            ) : (
+                                <div className="message--area">
+                                    <div
+                                        className="textarea--content"
+                                        dangerouslySetInnerHTML={{
+                                            __html: subtask?.replace(/\n/g, '<br>&nbsp;'),
+                                        }}
+                                    />
+                                    <textarea
+                                        className="form-control mb-5"
+                                        rows="1"
+                                        onBlur={() => handleBlur(index)}
+                                        name={`subtask-${index}`}
+                                        placeholder="Enter subtask"
+                                        value={subtask}
+                                        onChange={({ target: { value } }) =>
+                                            handlesubtaskChange(index, subtask, value)
+                                        }
+                                        onKeyDown={(event) => {
+                                            if (event.key === 'Enter' && !event.shiftKey) {
+                                                event.preventDefault();
+                                                handleBlur(index);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            {typeof subtask === 'object' && !isEditing && (
+                                <div className="d-flex align-items-center gap-2 mt-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setEnableSubtaskEdit((prev) => ({
+                                                ...prev,
+                                                [subtask._id]: true,
+                                            }));
+                                            setEditValues((prev) => ({
+                                                ...prev,
+                                                [subtask._id]: subtask.title?.replace(/<br\s*\/?>/g, '\n') || '',
+                                            }));
+                                        }}
+                                    >
+                                        <FaEdit />
+                                    </button>
+                                    <button type="button" onClick={() => removeSubtask(index)}>
+                                        <FaRegTrashAlt />
+                                    </button>
+                                </div>
+                            )}
+                        </Form.Group>
+                    </li>
+                )}
+            </Draggable>
+        );
+    });
+};
+
+    
+    const renderSubtaskssss = () => {
 
         return subtasks.map((subtask, index) => (
 
@@ -533,7 +666,7 @@ export const TaskForm = (props) => {
                                             return;
                                         }
                                         if (typeof subtask === 'object') {
-                                            setEnableSubtakEdit({ [subtask._id]: true });
+                                            setEnableSubtaskEdit({ [subtask._id]: true });
 
                                             // Set caret to the end after enabling edit
                                             setTimeout(() => {
@@ -552,7 +685,7 @@ export const TaskForm = (props) => {
                                     onBlur={(e) => {
                                         if (typeof subtask === 'object') {
                                             console.log('On blur')
-                                            setEnableSubtakEdit({ [subtask._id]: false });
+                                            setEnableSubtaskEdit({ [subtask._id]: false });
                                             // Save content, converting <br> to \n
                                             let content = e.target.innerHTML
                                                 .replace(/<a\s+href="[^"]*"[^>]*>(.*?)<\/a>/g, '$1')  // Convert <a> tags to plain text
