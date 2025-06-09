@@ -396,6 +396,10 @@ ul#subtasks-ul .form-group .message--area+button {
     white-space: pre-wrap;
 }
 
+ul#subtasks-ul .form-group .new--textarea {
+    position: relative;
+}
+
 .edit--task--modal form .input-group .textarea--content, ul#subtasks-ul .form-group .textarea--content {
     position: relative;
     width: 100%;
@@ -492,6 +496,10 @@ ul#subtasks-ul .form-group button {
 
 ul#subtasks-ul .form-group button:hover {
     color: #de0606;
+}
+
+ul#subtasks-ul .form-group .edit--button:hover {
+    color: #0891B2;
 }
 
 ul#subtasks-ul .form-group:hover button {

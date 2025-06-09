@@ -489,7 +489,7 @@ const renderSubtasks = () => {
 
                             {isEditing ? (
                                 <textarea
-                                    className="form-control"
+                                    className="form-control new--textarea"
                                     rows="2"
                                     autoFocus
                                     value={editValues[subtask._id] || ''}
@@ -560,6 +560,7 @@ const renderSubtasks = () => {
                             {typeof subtask === 'object' && !isEditing && (
                                 <div className="d-flex align-items-center gap-2 mt-1">
                                     <button
+                                        className='edit--button'
                                         type="button"
                                         onClick={() => {
                                             setEnableSubtaskEdit((prev) => ({
