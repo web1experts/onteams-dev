@@ -13,8 +13,8 @@
     background: #dc3545;
 }
 .captureModal .status--circle {
-    border-radius: 100px;
-    -webkit-border-radius: 100px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
     display: inline-block;
     vertical-align: text-top;
     width: 20px;
@@ -38,8 +38,8 @@
     text-align: center;
     line-height: 45px;
     cursor: pointer;
-    border-radius: 100px;
-    -webkit-border-radius: 100px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
     border: 1px solid #99999940;
     font-size: 28px;
     transition: all 0.4s cubic-bezier(.4, 0, .2, 1);
@@ -352,8 +352,8 @@
     width: 36px;
     height: 36px;
     margin: auto 0 0;
-    border-radius: 100px;
-    -webkit-border-radius: 100px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
     color: #777777;
 }
 
@@ -553,8 +553,8 @@ ul#subtasks-ul li textarea.form-control+button {
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    border-radius: 100px;
-    -webkit-border-radius: 100px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
 }
 
 .task--message .msg-member-info img {
@@ -564,8 +564,8 @@ ul#subtasks-ul li textarea.form-control+button {
     align-items: center;
     justify-content: center;
     object-fit: cover;
-    border-radius: 100px;
-    -webkit-border-radius: 100px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
 }
 
 .task--message .msg-member-info p {
@@ -788,7 +788,7 @@ input.form-error, select.form-error {
     height: 18px;
     content: '';
     background: #eeeeee;
-    border-radius: 100px;
+    border-radius: 5px;
 }
 
 .timeline--container .timeline--blip--line {

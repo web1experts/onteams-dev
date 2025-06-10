@@ -74,7 +74,7 @@ function Workspace(props) {
   return (
   
       <div className="team--page">
-        <div className="page--title p-md-3 py-3 pb-0">
+        <div className="page--title p-md-3 py-3 bg-white border-bottom">
           <Container fluid>
             <Row>
               <Col sm={12}>

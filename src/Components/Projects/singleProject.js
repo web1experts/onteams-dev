@@ -5,6 +5,7 @@ import { FaChevronDown, FaPlus, FaRegTrashAlt, FaUpload, FaEllipsisV, FaCheck, F
 import { MdFileDownload, MdOutlineClose, MdOutlineCancel } from "react-icons/md";
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
+import { FaArrowRight } from "react-icons/fa";
 import { updateProject, deleteProject } from "../../redux/actions/project.action"
 import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
@@ -499,7 +500,9 @@ useEffect(() => {
     return (
         <>
             <div className="details--projects--view">
-                <div className="wrapper--title">
+                <div className="wrapper--title py-3 bg-white border-bottom">
+                    <Button variant="light px-2 py-1" key={`closekey`} onClick={() => props.closeview(0)}><FaArrowRight /></Button>
+                    
                     <div className="projecttitle">
                         <h3 key={`project-title-${currentProject?._id}`}>
                             <strong>{currentProject?.title}</strong>
@@ -512,10 +515,9 @@ useEffect(() => {
                             <MemberInitials showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} members={fields?.members || []} directUpdate={true} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={currentProject?._id} type = "project" 
                             />
                     </ListGroup>
-                    <ListGroup horizontal className="ms-auto">
-                        <Button variant="outline-primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}>Tasks</Button>
-                        <Button variant="outline-primary" className="active btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>View</Button>
-                        <ListGroup.Item key={`closekey`} onClick={() => props.closeview(0)}><MdOutlineClose /></ListGroup.Item>
+                    <ListGroup horizontal className="ms-auto bg-light">
+                        <Button variant="secondary" className="active btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>Details</Button>
+                        <Button variant="primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}>Tasks</Button>
                     </ListGroup>
                 </div>
                 {(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === "owner") ? 
@@ -602,7 +604,7 @@ useEffect(() => {
                                     </>
                                 }
                                     { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
-                                        <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
+                                        <Button variant="light" onClick={handleClientShow}><FaPlus /> Clients</Button>
                                     )}
                                 </div>
                                 <AddClient show={showClient} toggleshow={handleClientClose} />
@@ -723,7 +725,7 @@ useEffect(() => {
                         <ListGroup className="mt-auto mb-0">
                             <ListGroup.Item className="text-center">
                                 <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
-                                <Button variant="danger" key='delete-key' onClick={() => setShowDialog(true)}>Delete</Button>
+                                <Button variant="secondary" key='delete-key' onClick={() => setShowDialog(true)}>Delete</Button>
                             </ListGroup.Item>
                         </ListGroup>
                     </div>

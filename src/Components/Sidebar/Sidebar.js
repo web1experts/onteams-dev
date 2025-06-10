@@ -144,12 +144,11 @@ function SidebarPanel() {
                                 </div>
                             </Dropdown.Menu>
                         </Dropdown>
-
                     </Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" className="d-flex d-lg-none" onClick={handleToggler} />
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" className="d-flex" onClick={handleToggler} />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav>
-                            <Link key="dashboard-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} to="/dashboard"><span className="nav--item--icon"><LuLayoutDashboard /></span> Dashboard</Link>
+                            <Link key="dashboard-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} to="/dashboard"><span className="nav--item--icon"><LuLayoutDashboard /></span> <strong>Dashboard</strong></Link>
                             {
                                 (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner') && (
                                     <Link
@@ -158,7 +157,7 @@ function SidebarPanel() {
                                     className={`nav-link ${location.pathname === '/projects' ? 'active' : ''}`}
                                     to="/projects"
                                     >
-                                    <span className="nav--item--icon"><RxDashboard /></span> Projects
+                                    <span className="nav--item--icon"><RxDashboard /></span> <strong>Projects</strong>
                                     </Link>
                                 )
                                 }
@@ -166,33 +165,33 @@ function SidebarPanel() {
                             
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.clients?.view === true  || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="client-menu" onClick={handleToggler}  className={`nav-link ${location.pathname === '/clients' ? 'active' : ''}`} to="/clients"><span className="nav--item--icon"><GrGroup /></span> Clients</Link>
+                                <Link  key="client-menu" onClick={handleToggler}  className={`nav-link ${location.pathname === '/clients' ? 'active' : ''}`} to="/clients"><span className="nav--item--icon"><GrGroup /></span> <strong>Clients</strong></Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.members?.view === true   || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="members-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/team-members' ? 'active' : ''}`} to="/team-members"><span className="nav--item--icon"><AiOutlineTeam /></span> Team Members</Link>
+                                <Link  key="members-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/team-members' ? 'active' : ''}`} to="/team-members"><span className="nav--item--icon"><AiOutlineTeam /></span> <strong>Team Members</strong></Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.tracking?.view === true   || memberProfile?.role?.slug === 'owner' ) && (
-                                <Link  key="tracking-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/time-tracking' ? 'active' : ''}`} to="/time-tracking"><span className="nav--item--icon"><LuTimer /></span> Time Tracking</Link>
+                                <Link  key="tracking-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/time-tracking' ? 'active' : ''}`} to="/time-tracking"><span className="nav--item--icon"><LuTimer /></span> <strong>Time Tracking</strong></Link>
                                 )
                             }
                                 {/* <Link  key="invite-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/invitations' ? 'active' : ''}`} to="/invitations"><span className="nav--item--icon"><HiUserPlus /></span> Invitations</Link> */}
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.reports?.view === true   || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="reports-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/reports' ? 'active' : ''}`} to="/reports"><span className="nav--item--icon"><TbReport /></span> Reports</Link>
+                                <Link  key="reports-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/reports' ? 'active' : ''}`} to="/reports"><span className="nav--item--icon"><TbReport /></span> <strong>Reports</strong></Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.holidays?.view === true   || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="holidays-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/holidays' ? 'active' : ''}`} to="/holidays"><span className="nav--item--icon"><BsCalendar2Week /></span> Holidays</Link>
+                                <Link  key="holidays-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/holidays' ? 'active' : ''}`} to="/holidays"><span className="nav--item--icon"><BsCalendar2Week /></span> <strong>Holidays</strong></Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.attendance?.view === true  || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="attendance-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/attendance' ? 'active' : ''}`} to="/attendance"><span className="nav--item--icon"><CgCalendarDates /></span> Attendance</Link>
+                                <Link  key="attendance-menu" onClick={handleToggler} className={`nav-link ${location.pathname === '/attendance' ? 'active' : ''}`} to="/attendance"><span className="nav--item--icon"><CgCalendarDates /></span> <strong>Attendance</strong></Link>
                                 )
                             }
                         </Nav>

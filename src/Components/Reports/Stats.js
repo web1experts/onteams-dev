@@ -57,7 +57,7 @@ function Stats() {
       />
 
       <div className='team--page'>
-        <div className='page--title px-md-2 pt-3'>
+        <div className='page--title px-md-2 py-3 bg-white border-bottom'>
           <Container fluid>
             <Row>
               <Col>

@@ -56,14 +56,15 @@ a:focus {
   margin-right: 5px;
 }
 
-.ql-snow .ql-color-picker .ql-picker-label svg, .ql-snow .ql-icon-picker .ql-picker-label svg {
+.ql-snow .ql-color-picker .ql-picker-label svg,
+.ql-snow .ql-icon-picker .ql-picker-label svg {
   vertical-align: top;
 }
 
 .btn {
   padding: .45rem 1.5rem;
-  border-radius: 50px;
-  -webkit-border-radius: 50px;
+  border-radius: .5rem;
+  -webkit-border-radius: .5rem;
   box-shadow: none;
   font-size: 1rem;
   text-transform: capitalize;
@@ -106,20 +107,20 @@ fieldset:disabled .btn {
 }
 
 .btn:focus-visible {
-  background-color: #0E7490;
-  border-color: #0E7490;
+  background-color: linear-gradient(to left, #ff5858 0%, #f857a6 100%);
+  border-color: transparent;
 }
 
 .btn-primary {
   color: #ffffff;
-  background-color: #0891B2;
-  border-color: #0891B2;
+  background: linear-gradient(to left, #ff5858 0%, #f857a6 100%);
+  border-color: transparent;
 }
 
 .btn-outline-primary {
-  color: #0891B2;
+  color: #ff5858;
   background-color: transparent;
-  border-color: #0891B2;
+  border-color: #ff5858;
 }
 
 .btn-secondary:not(:disabled):not(.disabled).active:focus,
@@ -147,17 +148,34 @@ fieldset:disabled .btn {
 .btn-primary:not(:disabled):not(.disabled):active,
 .show>.btn-primary.dropdown-toggle {
   color: #ffffff;
-  background-color: #0E7490;
-  border-color: #0E7490;
+  background: linear-gradient(to left, #ff5858 0%, #f857a6 100%);
+  border-color: transparent;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px !important;
   -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px !important;
   outline: none;
 }
 
-.btn-check:checked+.btn:focus-visible, .btn.active:focus-visible, .btn.show:focus-visible, .btn:first-child:active:focus-visible, :not(.btn-check)+.btn:active:focus-visible {
+.btn-check:checked+.btn:focus-visible,
+.btn.active:focus-visible,
+.btn.show:focus-visible,
+.btn:first-child:active:focus-visible,
+:not(.btn-check)+.btn:active:focus-visible {
   box-shadow: none !important;
   outline: none;
 }
+
+.btn-warning {
+    --bs-btn-bg: rgba(254, 240, 138, .5);
+    --bs-btn-border-color: rgba(254, 240, 138, .5);
+    --bs-btn-hover-bg: rgba(254, 240, 138, .85);
+    --bs-btn-hover-border-color: rgba(254, 240, 138, .85);
+    --bs-btn-focus-shadow-rgb: 217,164,6;
+    --bs-btn-active-bg: rgba(254, 240, 138, .85);
+    --bs-btn-active-border-color: rgba(254, 240, 138, .85);
+    --bs-btn-disabled-bg: rgba(254, 240, 138, .5);
+    --bs-btn-disabled-border-color: rgba(254, 240, 138, .5);
+}
+
 strong.activity-type-text {
   text-transform: capitalize;
 }
@@ -171,18 +189,26 @@ strong.activity-type-text {
 .btn:first-child:active,
 :not(.btn-check)+.btn:active {
   color: #ffffff;
-  background-color: #0E7490;
-  border-color: #0E7490;
+  background-color: linear-gradient(to left, #ff5858 0%, #f857a6 100%);
+  border-color: transparent;
   box-shadow: none
 }
 
 .btn:focus-visible {
-  background-color: #0E7490;
-  border-color: #0E7490;
+  background-color: linear-gradient(to left, #ff5858 0%, #f857a6 100%);
+  border-color: transparent;
 }
+
+.btn-secondary {
+    --bs-btn-color: #6c757d;
+    --bs-btn-bg: #eeeeee;
+    --bs-btn-border-color: #eeeeee;
+}
+
 a.active-workspace.dropdown-item {
-  background: #0891B240 !important;
+  background: #33333340 !important;
 }
+
 .form-control:focus {
   box-shadow: none;
 }
@@ -215,14 +241,18 @@ Login Forms CSS-=-=
   object-position: center;
 }
 
-.btn-check:checked+.btn:focus-visible, .btn.active:focus-visible, .btn.show:focus-visible, .btn:first-child:active:focus-visible, :not(.btn-check)+.btn:active:focus-visible {
+.btn-check:checked+.btn:focus-visible,
+.btn.active:focus-visible,
+.btn.show:focus-visible,
+.btn:first-child:active:focus-visible,
+:not(.btn-check)+.btn:active:focus-visible {
   box-shadow: none;
 }
 
 .form-control,
 .form-select {
-  border-radius: 50px;
-  -webkit-border-radius: 50px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
   min-height: 40px;
   padding: .5rem 1.2rem;
 }
@@ -319,7 +349,7 @@ textarea.form-control {
 .form-floating>.form-control:not(:placeholder-shown)~label {
   transform: scale(.85) translateY(-.75rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.75rem) translateX(1rem);
-  color: #0891B2;
+  color: #333333;
   background: transparent;
 }
 
@@ -341,7 +371,7 @@ textarea.form-control {
 .form-floating>.form-control:-webkit-autofill~label {
   transform: scale(.85) translateY(-.65rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.65rem) translateX(1rem);
-  color: #0891B2;
+  color: #333333;
   background: transparent;
 }
 
@@ -362,7 +392,7 @@ textarea.form-control {
 .form-floating>.form-control:-moz-autofill~label {
   transform: scale(.85) translateY(-.65rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.65rem) translateX(1rem);
-  color: #0891B2;
+  color: #333333;
   background: transparent;
 }
 
@@ -422,7 +452,7 @@ textarea.form-control {
 .common--form .form-floating>.form-control:not(:placeholder-shown)~label {
   transform: scale(.85) translateY(-.9rem) translateX(1.2rem);
   -webkit-transform: scale(.85) translateY(-.9rem) translateX(1.2rem);
-  color: #0891B2;
+  color: #333333;
   background: #ffffff;
 }
 
@@ -449,11 +479,11 @@ textarea.form-control {
 }
 
 .common--form p a {
-  color: #0891B2;
+  color: #333333;
 }
 
 .common--form p a:hover {
-  color: #0E7490;
+  color: #ff5858;
   text-decoration: underline;
 }
 
@@ -603,7 +633,8 @@ Add Project Modal CSS-=-=-
   margin-left: 0.25rem;
 }
 
-.project--form--inputs form .status--circle, .project--form--actions .list-group-item .status--circle {
+.project--form--inputs form .status--circle,
+.project--form--actions .list-group-item .status--circle {
   height: 14px;
   margin-right: .5rem;
   margin-top: -2px;
@@ -657,7 +688,6 @@ Add Project Modal CSS-=-=-
   align-items: center;
   text-decoration: none;
   padding: .5rem 1rem;
-  color: #ffffff;
 }
 
 .project--form--inputs form .client--input .btn svg {
@@ -675,8 +705,8 @@ Add Project Modal CSS-=-=-
 }
 
 .rmdp-input {
-  border-radius: 50px;
-  -webkit-border-radius: 50px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
   min-height: 40px;
   padding: .5rem 1.2rem;
   display: block;
@@ -725,7 +755,8 @@ Add Project Modal CSS-=-=-
 
 .ql-snow .ql-tooltip {
   box-shadow: none;
-  left: 0 !important;;
+  left: 0 !important;
+  ;
 }
 
 .text--editor .ql-editor {
@@ -757,7 +788,7 @@ Add Project Modal CSS-=-=-
 }
 
 .project--form--inputs form .text--editor .editor--options li a {
-  background: #0891B210;
+  background: #33333310;
   color: #333;
   display: block;
   font-size: .8rem;
@@ -849,11 +880,11 @@ Add Project Modal CSS-=-=-
 }
 
 .workflow--modal .workflow--selected {
-  background: #0891B220;
+  background: #33333320;
   color: #333333;
   padding: 0.5rem .75rem;
   display: inline-block;
-  border-top: 3px solid #0891B2;
+  border-top: 3px solid #333333;
   border-radius: .25rem;
   -webkit-border-radius: .25rem;
 }
@@ -880,7 +911,7 @@ Add Project Modal CSS-=-=-
 
 .status--modal .status--list .list-group-item {
   align-items: center;
-  background: #0891B220;
+  background: #33333320;
   border-radius: .25rem;
   cursor: pointer;
   display: flex;
@@ -891,8 +922,8 @@ Add Project Modal CSS-=-=-
 }
 
 .status--modal .status--list .status--active {
-  background: #0891B220;
-  color: #0891B2;
+  background: #33333320;
+  color: #333333;
 }
 
 .status--modal .status--list .list-group-item .status--circle {
@@ -924,8 +955,8 @@ Add Project Modal CSS-=-=-
 }
 
 .modal .select2-container--default .select2-selection--single {
-  border-radius: 50px;
-  -webkit-border-radius: 50px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
   padding: .5rem .75rem;
   display: block;
   width: 100%;
@@ -1013,11 +1044,13 @@ Add Project Modal CSS-=-=-
   cursor: grab;
 }
 
-.add--workflow--modal .workflow--list .list-group-item:first-child .drag--icon, .add--workflow--modal .workflow--list .list-group-item:last-child .drag--icon {
+.add--workflow--modal .workflow--list .list-group-item:first-child .drag--icon,
+.add--workflow--modal .workflow--list .list-group-item:last-child .drag--icon {
   display: none;
 }
 
-.add--workflow--modal .workflow--list .list-group-item:first-child, .add--workflow--modal .workflow--list .list-group-item:last-child {
+.add--workflow--modal .workflow--list .list-group-item:first-child,
+.add--workflow--modal .workflow--list .list-group-item:last-child {
   min-height: 45px;
 }
 
@@ -1062,8 +1095,8 @@ Add Project Modal CSS-=-=-
   align-items: center;
   background: rgba(0, 0, 0, 0.08);
   color: rgba(0, 0, 0, 0.87);
-  border-radius: 50px;
-  -webkit-border-radius: 50px;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
   font-size: 0.8125rem;
 }
 
@@ -1142,7 +1175,7 @@ Add Project Modal CSS-=-=-
 }
 
 .upload--status label.file--upload p strong {
-  color: #0891B2;
+  color: #333333;
   font-weight: 500;
 }
 
@@ -1247,12 +1280,14 @@ span.status--circle.info--color {
   font-size: 20px;
 }
 
-.edit--task--modal .project--form--inputs .task--title .form-control:hover ~ .pencil--edit {
+.edit--task--modal .project--form--inputs .task--title .form-control:hover~.pencil--edit {
   opacity: 1;
 }
+
 ul#subtasks-ul .form-group .quill--editor svg {
   opacity: 1 !important;
 }
+
 @media (max-width:1199px) {
   .project--form {
     height: auto;

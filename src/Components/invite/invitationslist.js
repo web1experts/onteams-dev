@@ -82,7 +82,7 @@ function InvitationList(props) {
     <>
       
         <div className={isActive ? "show--details team--page" : "team--page"}>
-          <div className= "page--title p-md-3 py-3 pb-0">
+          <div className= "page--title p-md-3 py-3 bg-white border-bottom">
           <Container fluid>
               <Row>
                 <Col sm={isActive ? 12 : 5}>
