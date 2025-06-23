@@ -95,7 +95,7 @@ function InvitationList(props) {
           {
               showloader &&
               <div class="loading-bar">
-                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                  <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
             <Container fluid>

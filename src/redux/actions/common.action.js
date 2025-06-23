@@ -14,7 +14,10 @@ import {
     ALL_MEMBERS,
     PROJECT_FORM,
     TASK_FORM,
-    ACTIVE_FORM_TYPE
+    ACTIVE_FORM_TYPE,
+    SIDEBAR_OPEN,
+    SIDEBAR_SMALL,
+    THEME_COLOR
 ,} from "../actions/types";
 export const updateStateData  = ( type, data = '' ) => {
     return async (dispatch) => {
@@ -51,5 +54,23 @@ export const togglePopups = ( popup, popup_state ) => {
                 break;
         }
         
+    }
+}
+
+export const toggleSidebar = ( payload ) => { 
+    return async (dispatch) => {
+        await dispatch({ type: SIDEBAR_OPEN, payload: payload });
+    }
+}
+
+export const toggleSidebarSmall = ( payload ) => { 
+    return async (dispatch) => {
+        await dispatch({ type: SIDEBAR_SMALL, payload: payload });
+    }
+}
+
+export const toggleTheme = (theme) => { 
+    return async (dispatch) => {
+        await dispatch({ type: THEME_COLOR, payload: theme})
     }
 }

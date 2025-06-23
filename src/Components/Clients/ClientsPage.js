@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table } from "react-bootstrap";
 import { FaList, FaPlus, FaTrashAlt } from "react-icons/fa";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiSidebar, FiMail, FiPhone } from "react-icons/fi";
 import { BsGrid } from "react-icons/bs";
+import { GrExpand } from "react-icons/gr";
+import { MdOutlineSearch } from "react-icons/md";
 import { MdOutlineClose, MdSearch } from "react-icons/md";
 import { ListClients, deleteClient, updateClient } from "../../redux/actions/client.action";
+import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getFieldRules, validateField } from '../../helpers/rules';
@@ -44,7 +47,7 @@ function EditableField({ field, label, value, onChange, isEditing, onEditClick, 
 
 
   return (
-    <ListGroup.Item>
+    <>
 
       {isEditing ? (
         <>
@@ -59,7 +62,7 @@ function EditableField({ field, label, value, onChange, isEditing, onEditClick, 
           <p className='error'><span className='error'>{error}</span></p>
         </>
       )}
-    </ListGroup.Item>
+    </>
   );
 
 }
@@ -68,6 +71,9 @@ function EditableField({ field, label, value, onChange, isEditing, onEditClick, 
 function ClientsPage() {
   const [spinner, setSpinner] = useState(false)
   const inputs = document.querySelectorAll('.form-floating .form-control');
+   const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
+   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
+   const commonState = useSelector(state => state.common)
   const memberProfile = currentMemberProfile()
   inputs.forEach(input => {
     input.addEventListener('input', function () {
@@ -403,22 +409,33 @@ function ClientsPage() {
           <Container fluid>
             <Row>
               <Col sm={12}>
-                <h2>Clients
-                  <Button variant="primary" className={isActive ? 'd-flex ms-md-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button>
-                  {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                <h2>
+                  <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                  Clients
+                  {/* <Button variant="primary" className={isActive ? 'd-flex ms-md-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button> */}
+                  {/* {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                     <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
                     
-                  )}
+                  )} */}
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
                     <ListGroup.Item className='d-none d-lg-block'>
-                      <Form onSubmit={(e) => {e.preventDefault()}}>
-                        <Form.Group className="mb-0 form-group">
-                          <Form.Control type="text" placeholder="Search Client.." onChange={(e) => setSearch(e.target.value)} />
-                        </Form.Group>
+                      <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
+                          <Form.Group className="mb-0 form-group">
+                              <MdOutlineSearch />
+                              <Form.Control type="text" placeholder="Search Client.." onChange={(e) => setSearch(e.target.value)} />
+                          </Form.Group>
                       </Form>
                     </ListGroup.Item>
-                    <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
-                    <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                    <ListGroup horizontal>
+                        <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                    </ListGroup>
+                  </ListGroup>
+                  <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex bg-white expand--icon ms-3'}>
+                      <ListGroup.Item onClick={handleSidebar}><GrExpand /></ListGroup.Item>
+                      {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                        <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                      )}
                   </ListGroup>
                 </h2>
               </Col>
@@ -429,18 +446,17 @@ function ClientsPage() {
           {
               spinner &&
               <div className="loading-bar">
-                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                  <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
           <Container fluid>
-            <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table clients--grid--table' : isActiveView === 2 ? 'project--table clients--table' : 'project--table clients--table'}>
-              <thead>
+            <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table clients--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table clients--table new--project--rows' : 'project--table clients--table new--project--rows'}>
+              {/* <thead>
                 <tr key={'client-table-header'}>
-                  {/* <th width={20}>#</th> */}
                   <th><abbr>#</abbr> Member Name</th>
                   <th className="onHide" width={50}>Action</th>
                 </tr>
-              </thead>
+              </thead> */}
               <tbody>
                 {
                   (!spinner && clientFeeds && clientFeeds.length > 0)
@@ -448,8 +464,17 @@ function ClientsPage() {
                       return (<>
                         <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={isActive ? () => handleClick(client) : () => { return false; }}>
                           {/* <td>{index + 1}</td> */}
-                          <td className="cursor--pointer project--title--td"><span className="onHide"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span><span><abbr>{index + 1}.</abbr> {client.name}</span></td>
-                          <td className="onHide"><Button variant="primary" onClick={() => handleClick(client)}>View</Button></td>
+                          <td className="cursor--pointer project--title--td">
+                            <div className="project--name">
+                              <abbr className="onHide">{index + 1}</abbr>
+                              <div className="title--span">
+                                <span className="client--img"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span>
+                                <span>{client.name}</span>
+                              </div>
+                              
+                            </div>
+                          </td>
+                          <td className="onHide"><Button variant="primary" onClick={() => {handleSidebarSmall();handleClick(client);}}>View</Button></td>
                         </tr>
                       </>)
                     })
@@ -475,18 +500,17 @@ function ClientsPage() {
       </div>
       {selectedClient &&
       <div className="details--wrapper">
-        <div className="wrapper--title">
+        <div className="wrapper--title py-2 bg-white border-bottom">
           <div className="projecttitle">
             <h3><strong>Client Details</strong></h3>
           </div>
-          <ListGroup horizontal>
-            <ListGroup.Item onClick={() => handleClosePannel()}>
-              <MdOutlineClose />
-            </ListGroup.Item>
+          <ListGroup horizontal className="ms-auto">
+            <ListGroup.Item onClick={handleSidebar} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+            <ListGroup.Item className="btn btn-primary" onClick={() => {handleSidebarSmall(true);handleClosePannel(0);}}><MdOutlineClose /></ListGroup.Item>
           </ListGroup>
         </div>
         <div className="rounded--box client--box">
-          <Card>
+          <Card className="contact--card">
             <div className="card--img">
               <Form.Control type="file" id="upload--img" hidden onChange={(e) => handleFieldChange('avatar', e)} accept=".jpg, .jpeg, .png, .gif" />
               {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ? (
@@ -514,9 +538,9 @@ function ClientsPage() {
                   <span className="remove--photo" onClick={removeAvatar}><FaTrashAlt /></span>
                 }
                 </>
-              )
-              :
-              <Form.Label for="upload--img">
+                )
+                :
+                <Form.Label for="upload--img">
                   {
                     avatarPreview ? 
                       <Card.Img variant="top" src={avatarPreview} />
@@ -528,40 +552,49 @@ function ClientsPage() {
                   }
                 
                 </Form.Label>
-            }
+              }
             </div>
             <Card.Body>
-              <Card.Title>Client Information</Card.Title>
+              <Card.Title><FiMail /> Client Information</Card.Title>
               <Card.Text>
                 <ListGroup>
-                {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ?
-                <>
-                  <EditableField
-                    field="name"
-                    label="Client Name"
-                    value={editedClient?.name}
-                    onChange={(value) => handleFieldChange('name', value)}
-                    isEditing={isEditing.name}
-                    onEditClick={() => handleEditClick('name')}
-                    error={fieldserrors['name'] && fieldserrors['name']}
-                  />
-                  {
-                    fieldserrors['name'] &&
-                    <span className="error">{fieldserrors.name}</span>
-                  }
-                  </>
-                  :
-                  <>
-                    <strong>Client Name</strong> {editedClient?.name}
-                  </>
-                  }
+                  <ListGroup.Item>
+                    <span className="info--icon"><FiMail /></span>
+                    <p>
+                      <small>Client Name</small>
+                      {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ?
+                      <>
+                        <EditableField
+                          field="name"
+                          // label="Client Name"
+                          value={editedClient?.name}
+                          onChange={(value) => handleFieldChange('name', value)}
+                          isEditing={isEditing.name}
+                          onEditClick={() => handleEditClick('name')}
+                          error={fieldserrors['name'] && fieldserrors['name']}
+                        />
+                        {
+                          fieldserrors['name'] &&
+                          <span className="error">{fieldserrors.name}</span>
+                        }
+                        </>
+                        :
+                        <>
+                          {editedClient?.name}
+                        </>
+                        }
+                    </p>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <span className="info--icon"><FiPhone /></span>
+                    <p><small>Email</small>+1 (555) 123-4567</p>
+                  </ListGroup.Item>
                 </ListGroup>
               </Card.Text>
-              
               <div className="text-end mt-3">
                 {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                 <>
-                  <Button variant="danger" className="me-3" onClick={() => setShowDialog(true)}>Delete</Button>
+                  <Button variant="secondary" className="me-3" onClick={() => setShowDialog(true)}>Delete</Button>
                   <Button variant="primary" onClick={handleUpdateSubmit} disabled={loader}> {loader ? 'Please wait...' : 'Save Changes'}</Button>
                   </>
                   
@@ -570,7 +603,7 @@ function ClientsPage() {
             </Card.Body>
           </Card>
         </div>
-        
+
         <AlertDialog
           showdialog={showdialog}
           toggledialog={setShowDialog}

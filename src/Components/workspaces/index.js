@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Modal, Table, Dropdown} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup, ButtonGroup} from "react-bootstrap";
 import { FaPlus, FaEllipsisV } from "react-icons/fa";
-import SidebarPanel from "../Sidebar/Sidebar";
+import { FiSidebar } from "react-icons/fi";
+import { GrExpand } from "react-icons/gr";
+import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import WorkspaceForm from "./workspaceform";
 import { refreshUserWorkspace } from "../../redux/actions/auth.actions";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +14,9 @@ import { deleteWorkspace } from "../../redux/actions/workspace.action";
 import Spinner from 'react-bootstrap/Spinner';
 function Workspace(props) {
   const [spinner, setSpinner] = useState( true)
+  const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
+  const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true));
+  const commonState = useSelector(state => state.common)
   const dispatch = useDispatch();
   const currentMember = getMemberdata();
   const [show, setShow] = useState(false);
@@ -79,8 +84,14 @@ function Workspace(props) {
             <Row>
               <Col sm={12}>
                 <h2>
+                  <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);}}><FiSidebar /></span>
                   Workspace{" "}
-                  <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
+                  <ListGroup horizontal className="ms-auto">
+                    <ListGroup horizontal className="bg-white expand--icon ms-3">
+                        <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                        <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                    </ListGroup>
+                  </ListGroup>
                 </h2>
               </Col>
             </Row>
@@ -90,18 +101,18 @@ function Workspace(props) {
         {
               spinner &&
               <div class="loading-bar">
-                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                  <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
           <Container fluid>
-            <Table responsive="lg">
-              <thead>
+            <Table responsive="lg" className="project--table clients--table new--project--rows">
+              {/* <thead>
                 <tr>
                   <th width={30}>#</th>
                   <th>Name</th>
                   <th width={30}>Action</th>
                 </tr>
-              </thead>
+              </thead> */}
               <tbody>
                 {
                    
@@ -109,8 +120,15 @@ function Workspace(props) {
                   workspaces.map((workspace, index) => (
 
                     <tr key={`row-${index}`}>
-                      <td width={30}>{index + 1 }</td>
-                      <td><strong>{workspace.company?.name}</strong></td>
+                      {/* <td width={30}>{index + 1 }</td> */}
+                      <td className="cursor--pointer project--title--td">
+                        <div className="project--name">
+                            <abbr className="onHide">{index + 1 }</abbr> 
+                            <div className="title--span team--span">
+                                <span>{workspace.company?.name}</span>
+                            </div>
+                        </div>
+                      </td>
                       <td>
                         <Dropdown>
                           <Dropdown.Toggle variant="primary">

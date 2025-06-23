@@ -28,6 +28,7 @@ function App(props) {
   const [currentLoggedInUser, setCurrentLoggedInUser] = useState(null);
   const apiResultAuth = useSelector((state) => state.auth);
   const userCompanies = useSelector((state) => state.auth.userCompanies);
+  const commonState = useSelector((state) => state.common);
   const [currentMember, setCurrentMember] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
@@ -126,7 +127,27 @@ function App(props) {
     };
   }, [dispatch, props.deleteComment]);
 
- 
+ useEffect(() => {
+  let themecolor = localStorage.getItem('theme_color')
+  if( !themecolor){
+    themecolor = 'linear-gradient(135deg, #1E90FF, #00BFFF)'
+  }
+  document.documentElement.style.setProperty(
+    '--theme-gradient',
+    themecolor
+  );
+}, []);
+
+ useEffect(() => {
+  if( commonState.current_theme){ console.log('here ')
+    document.documentElement.style.setProperty(
+    '--theme-gradient',
+    commonState.current_theme
+  );
+  }
+  
+}, [commonState]);
+
   /************************   helping functions  ***********************************/
   // Function to determine if the header should be shown
   const showHeader = () => {

@@ -20,7 +20,10 @@ import {
     ASSIGN_MEMBER,
     TASK_FORM_TYPE,
     SHOW_TASK_MODAL,
-    CREATE_POST_LIST_COMMENT
+    SIDEBAR_OPEN,
+    SIDEBAR_SMALL,
+    CREATE_POST_LIST_COMMENT,
+    THEME_COLOR
 } from "../actions/types";
 
 const initialState = {
@@ -40,6 +43,9 @@ const initialState = {
     active_formtype: null,
     task_formtype: null,
     assign_members_direct: false,
+    sidebar_open: false,
+    sidebar_small: false,
+    current_theme: ''
 };
 
 export default (state = initialState, action) => {
@@ -163,7 +169,22 @@ export default (state = initialState, action) => {
             ...state,
             task_formtype: action.payload
         }
+    case SIDEBAR_OPEN: 
+        return {
+            ...state,
+            sidebar_open: action.payload
+        }
+    case SIDEBAR_SMALL: 
+        return {
+            ...state,
+            sidebar_small: action.payload
+        }
+    case THEME_COLOR: 
     
+        return {
+            ...state,
+            current_theme: action.payload
+        }
     default: return state;
   }
 };

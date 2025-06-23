@@ -3,12 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Dropdown, ListGroup, Table } from "react-bootstrap";
 import { FaEllipsisV, FaPlus, FaCheck } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
+import { GrExpand } from "react-icons/gr";
+import { FiSidebar } from "react-icons/fi";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import DatePicker from "react-multi-date-picker";
 import { formatDateinString } from "../../helpers/commonfunctions";
 import { createHoliday, ListHolidays, deleteHoliday, updateHoliday } from "../../redux/actions/holiday.action";
+import { togglePopups, updateStateData,toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { currentMemberProfile } from "../../helpers/auth";
 function HolidaysPage() {
+  const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
+  const commonState = useSelector(state => state.common)
   const dispatch = useDispatch()
   const memberProfile = currentMemberProfile()
   const [ date, setDate] = useState('')
@@ -125,23 +130,22 @@ const handleDelete = (id) => {
         <div className='page--title px-md-2 py-3 bg-white border-bottom'>
           <Container fluid>
             <Row className="align-items-center">
-              <Col xs={6} md={5}>
-                <h2>Holidays
-                  <Button variant="primary" className={isActive ? 'd-flex' : 'd-lg-none'} onClick={handleFilterShow}><MdFilterList /></Button>
+              <Col md={12}>
+                <h2>
+                  <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span> Holidays
+                  <ListGroup horizontal className="ms-auto">
+                    <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
+                      <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                      <ListGroup.Item>
+                        {
+                          (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && ( 
+                          <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                          )
+                        }
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </ListGroup>  
                 </h2>
-              </Col>
-              <Col xs={6} md={7}>
-                <ListGroup horizontal>
-                    
-                    <ListGroup.Item>
-                      {
-                        (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && ( 
-                        <Button variant="primary" className="" onClick={handleShow}><FaPlus /> Add Holidays</Button>
-                        )
-                      }
-                      
-                    </ListGroup.Item>
-                  </ListGroup>
               </Col>
             </Row>
           </Container>
@@ -150,31 +154,41 @@ const handleDelete = (id) => {
         {
             spinner &&
             <div className="loading-bar">
-                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
         }
           <Container fluid>
-            <Table responsive="lg" className="holiday--table">
-              <thead>
+            <Table responsive="lg" className="holiday--table project--table new--project--rows">
+              {/* <thead>
                 <tr key={`holiday-table-head`}>
                   <th scope="col"><abbr title="Number">#</abbr> Date</th>
                   <th scope="col">Occasion</th>
                   <th scope="col">Type</th>
                   <th scope="col" width={30}>Action</th>
                 </tr>
-              </thead>
+              </thead> */}
               <tbody>
               {
                 (holidays && holidays.length > 0)
                     ? holidays.map((holiday, index) => {
                       return (<>
                         <tr key={`holiday-row-${index}`}>
-                          <td key={`date-td-${index}`} data-label="Date"><abbr>{index + 1 }.</abbr> {formatDateinString(holiday.date)}</td>
-                          <td key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion}</td>
-                          <td key={`type-td-${index}`} data-label="Type">{holiday.type.split(' ') // Split the sentence into words
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter and make the rest lowercase
-    .join(' ')}</td>
+                          <td key={`date-td-${index}`} data-label="Date">
+                            <div className="project--name d-flex align-items-center gap-3">
+                                <abbr>{index + 1 }</abbr> 
+                                <div className="title--span d-flex align-items-start gap-1 flex-column">
+                                  <span key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion}</span>
+                                  <strong>{formatDateinString(holiday.date)}</strong>
+                                </div>
+                            </div>
+                          </td>
+                          
                           <td key={`action-td-${index}`}>
+                            <span className="me-3" key={`type-td-${index}`} data-label="Type">
+                              {holiday.type.split(' ') // Split the sentence into words
+                              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter and make the rest lowercase
+                              .join(' ')}
+                            </span>
                             <Dropdown>
                               <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
                               <Dropdown.Menu>

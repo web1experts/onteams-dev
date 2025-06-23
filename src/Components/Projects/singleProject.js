@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Button, Modal, Form, FloatingLabel, ListGroup, Dropdown } from "react-bootstrap";
+import { Row, Button, Modal, Form, FloatingLabel, ListGroup, Dropdown, ListGroupItem } from "react-bootstrap";
 import { FaChevronDown, FaPlus, FaRegTrashAlt, FaUpload, FaEllipsisV, FaCheck, FaRegCalendarAlt } from "react-icons/fa";
 import { MdFileDownload, MdOutlineClose, MdOutlineCancel } from "react-icons/md";
 import { FiFileText } from "react-icons/fi";
-import { GrAttachment } from "react-icons/gr";
-import { FaArrowRight } from "react-icons/fa";
+import { GrAttachment, GrExpand } from "react-icons/gr";
+import { FiSidebar } from "react-icons/fi";
 import { updateProject, deleteProject } from "../../redux/actions/project.action"
 import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
@@ -13,7 +13,7 @@ import { AlertDialog } from "../modals";
 import { useDropzone } from 'react-dropzone'
 import fileIcon from './../../images/file-icon-image.jpg'
 import { selectboxObserver } from "../../helpers/commonfunctions";
-import { togglePopups, updateStateData } from "../../redux/actions/common.action";
+import { togglePopups, updateStateData,toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import {  EDIT_PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, DIRECT_UPDATE } from "../../redux/actions/types";
 import { MemberInitials } from "../common/memberInitials";
 import ReactQuill, { Quill }  from 'react-quill';
@@ -45,6 +45,8 @@ function SingleProject(props) {
     const handleClientClose = () => setClientShow(false);
     const handleClientShow = () => setClientShow(true);
     const [ selectedworkflow, setSelectedWorkflow] = useState({})
+    const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
+    const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
     const handleWorkflowClose = () => dispatch( togglePopups('workflow',false ));
     const handleWorkflowShow = async () => {
        await dispatch( updateStateData(DIRECT_UPDATE, false))
@@ -496,13 +498,27 @@ useEffect(() => {
     const handleDateclose = useCallback(() => {
         setDateshow(false);
     }, []); // Empty dependency array means this function is memoized and won't change across renders
+    
+    // const [projectToggle, setProjectToggle ] = useState(false)
+    // const handleToggles = () => {
+    //     if(commonState.sidebar_small === false ){ console.log('1')
+    //         handleSidebarSmall()
+    //     }else if(commonState.sidebar_small === true){
+    //         setProjectToggle(true)
+    //             console.log('2')
+    //     }else{
+    //         setProjectToggle(false)
+    //         handleSidebarSmall()
+    //             console.log('3')
+    //     }
+    // }
+    
 
     return (
         <>
             <div className="details--projects--view">
-                <div className="wrapper--title py-3 bg-white border-bottom">
-                    <Button variant="light px-2 py-1" key={`closekey`} onClick={() => props.closeview(0)}><FaArrowRight /></Button>
-                    
+                <div className="wrapper--title py-2 bg-white border-bottom">
+                    <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                     <div className="projecttitle">
                         <h3 key={`project-title-${currentProject?._id}`}>
                             <strong>{currentProject?.title}</strong>
@@ -515,9 +531,13 @@ useEffect(() => {
                             <MemberInitials showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} members={fields?.members || []} directUpdate={true} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={currentProject?._id} type = "project" 
                             />
                     </ListGroup>
-                    <ListGroup horizontal className="ms-auto bg-light">
+                    <ListGroup horizontal className="ms-auto bg-light d-none d-sm-flex">
                         <Button variant="secondary" className="active btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>Details</Button>
                         <Button variant="primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}>Tasks</Button>
+                    </ListGroup>
+                    <ListGroup horizontal>
+                         <ListGroup.Item onClick={props.toggleSidebars} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+                         <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {props.closeview(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
                     </ListGroup>
                 </div>
                 {(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === "owner") ? 

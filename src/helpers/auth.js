@@ -195,6 +195,10 @@ export function removeRemember() {
   return true;
 }
 
+export function saveTheme(theme){
+  localStorage.setItem('theme_color', theme);
+}
+
 export function logout() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('appId');

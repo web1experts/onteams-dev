@@ -6,8 +6,11 @@ import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, 
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
+import { FiSidebar } from "react-icons/fi";
+import { GrExpand } from "react-icons/gr";
 import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
-import { MdOutlineClose, MdFilterList, MdSearch } from "react-icons/md";
+import { MdOutlineClose, MdOutlineSearch } from "react-icons/md";
+import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { getliveActivity, getRecoredActivity, deleteRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket, currentMemberProfile } from "../../helpers/auth";
@@ -24,8 +27,12 @@ function TimeTrackingPage() {
   const [spinner, setSpinner] = useState(false)
   const [activityspinner, setActSpinner] = useState(false)
   const [isActive, setIsActive] = useState(false);
+   const [isActiveView, setIsActiveView] = useState(2);
   const [isScreenActive, setIsScreenActive] = useState(false);
   const [ recordedRefresh, setRecordedRefresh ] = useState(true)
+  const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
+  const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
+  const commonState = useSelector(state => state.common)
   const handleClick = (activity) => {
     setIsActive(current => !current);
     setRecordedRefresh( true )
@@ -401,8 +408,9 @@ function TimeTrackingPage() {
         <>
           {/* {showDate()} */}
           <ListGroup.Item key="filter-key-5" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-            <Form>
+            <Form className="search-filter-list">
               <Form.Group className="mb-0 form-group">
+                <MdOutlineSearch />
                 <Form.Control type="text" name="search" placeholder="Search by name" />
               </Form.Group>
             </Form>
@@ -524,7 +532,34 @@ function TimeTrackingPage() {
       return (
         <>
           <ListGroup.Item className="no--style">
-            <Form>
+            <Form className="d-flex align-items-center">
+              <Form.Group className="mb-0 form-group me-2">
+                <Dropdown className="select--dropdown">
+                  <Dropdown.Toggle variant="success">Today</Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <div className="drop--scroll">
+                      <Dropdown.Item className="selected--option" href="#/action-1">Today</Dropdown.Item>
+                      <Dropdown.Item href="#/action-1">Yesterday</Dropdown.Item>
+                      <Dropdown.Item href="#/action-1">Last 7 days</Dropdown.Item>
+                      <Dropdown.Item href="#/action-1">Last week</Dropdown.Item>
+                      <Dropdown.Item href="#/action-1">Last 2 weeks</Dropdown.Item>
+                      <Dropdown.Item href="#/action-1">This month</Dropdown.Item>
+                      <Dropdown.Item href="#/action-1">Last month</Dropdown.Item>
+                      <Dropdown.Item href="#/action-1">Custom</Dropdown.Item>
+                    </div>
+                  </Dropdown.Menu>
+                </Dropdown>
+                {/* <Form.Select className="custom-selectbox">
+                  <option selected>Today</option>
+                  <option value="Yesterday">Yesterday</option>
+                  <option value="Last 7 days">Last 7 days</option>
+                  <option value="Last week">Last week</option>
+                  <option value="Last 2 weeks">Last 2 weeks</option>
+                  <option value="This month">This month</option>
+                  <option value="Last month">Last month</option>
+                  <option value="custom">Custom</option>
+                </Form.Select> */}
+              </Form.Group>
               <Form.Group className="mb-0 form-group">
                 <DatePicker 
                     key={'date-filter'}
@@ -584,22 +619,23 @@ function TimeTrackingPage() {
       return (
         <>
             <ListGroup horizontal className="screens--shots">
-            {
-              selectedScreenshots &&
-              Object.keys(selectedScreenshots).length > 0 &&
-              Object.values(selectedScreenshots).some(arr => arr.length > 0) && (
-                <ListGroup.Item key={'delete-group'} active={true} onClick={() => deleteRecordedData()}>
-                  Delete Selected
-                </ListGroup.Item>
-              )
-            }
-
-              <ListGroup.Item key={'screenshots1-tab-key'} action active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
-                Screenshots
-              </ListGroup.Item>
-              <ListGroup.Item key={'videos1-tab-key'} action active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
-                Videos
-              </ListGroup.Item>
+              <ListGroup horizontal className="bg-light">
+                {
+                  selectedScreenshots &&
+                  Object.keys(selectedScreenshots).length > 0 &&
+                  Object.values(selectedScreenshots).some(arr => arr.length > 0) && (
+                    <Button variant="secondary" className="btn--view" key={'delete-group'} active={true} onClick={() => deleteRecordedData()}>
+                      Delete Selected
+                    </Button>
+                  )
+                }
+                <Button variant="secondary" className="btn--view" key={'screenshots1-tab-key'} active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
+                  Screenshots
+                </Button>
+                <Button variant="primary" className="btn--view" key={'videos1-tab-key'} active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
+                  Videos
+                </Button>
+              </ListGroup>
             </ListGroup>
         </>
       )
@@ -684,22 +720,30 @@ function TimeTrackingPage() {
           <Container fluid>
             <Row>
               <Col sm={12}>
-                <h2>Activity
-                  <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
-                  <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button>
+                
+                <h2><span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
+                  {/* <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
+                  <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button> */}
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
-                    <ListGroup.Item className="refresh--btn list-group-item-action d-none d-md-flex">
-                      <BsArrowClockwise onClick={handleLiveActivityList}/>
-                    </ListGroup.Item>
-                    <ListGroup.Item action active={activeTab === "Live"} onClick={() => {
-                      if( currentActivity && Object.keys(currentActivity)){
-                        const cact = currentActivity
-                        leaveRoom(currentActivity?._id)
-                        setCurrentActivity(cact);
-                      }
-                      setActiveTab("Live")}}>Live</ListGroup.Item>
-                    <ListGroup.Item action active={activeTab === "Recordings"} onClick={() => {setActiveTab("Recordings")}}>Recorded</ListGroup.Item>
+                    
+                    <ListGroup horizontal>
+                        <ListGroup.Item action active={activeTab === "Live"} onClick={() => {
+                          if( currentActivity && Object.keys(currentActivity)){
+                            const cact = currentActivity
+                            leaveRoom(currentActivity?._id)
+                            setCurrentActivity(cact);
+                          }
+                          setActiveTab("Live")}}>Live
+                        </ListGroup.Item>
+                        <ListGroup.Item action active={activeTab === "Recordings"} onClick={() => {setActiveTab("Recordings")}}>Recorded</ListGroup.Item>
+                    </ListGroup>
                     {showTabs()}
+                    <ListGroup horizontal className="bg-white expand--icon ms-3">
+                        <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                        <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
+                          <BsArrowClockwise onClick={handleLiveActivityList}/>
+                        </ListGroup.Item>
+                    </ListGroup>
                   </ListGroup>
                 </h2>
               </Col>
@@ -710,17 +754,17 @@ function TimeTrackingPage() {
           {
               spinner &&
               <div className="loading-bar">
-                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                  <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
           <Container fluid>
             {activeTab === "Live" && (
               <>
                 <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
-                <Table responsive="lg" className="activity--table">
-                  <thead>
+                <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table draggable--table new--project--rows' : 'project--table new--project--rows'}>
+                  <thead className="mb-2 onHide">
                     <tr key="tracking-table-header">
-                      <th scope="col"><abbr>#</abbr> Member Name</th>
+                      <th scope="col">Member Name</th>
                       <th scope="col" className="onHide">Project Name</th>
                       <th scope="col" className="onHide">Task Name</th>
                       <th scope="col" className="onHide">Project Time</th>
@@ -751,17 +795,20 @@ function TimeTrackingPage() {
                                         // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
                                       }
                                   }} >
-                                    <span><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name}
-                                      {
-                                        activity?.latestActivity?.status ? 
-                                        <small className="status--circle active--color"></small>
-                                        :
-                                        activity?.latestActivity?.status === false  ?
-                                        <small className="status--circle idle--color"></small>
-                                        :
-                                        <small className="status--circle inactive--color"></small>
-                                      }
-                                    </span>
+                                    <div className="project--name">
+                                        <span>
+                                          {activity.name}
+                                          {
+                                            activity?.latestActivity?.status ? 
+                                            <small className="status--circle active--color"></small>
+                                            :
+                                            activity?.latestActivity?.status === false  ?
+                                            <small className="status--circle idle--color"></small>
+                                            :
+                                            <small className="status--circle inactive--color"></small>
+                                          }
+                                      </span>
+                                    </div>
                                 </td>
                                 <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
                                 <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></td>
@@ -777,7 +824,7 @@ function TimeTrackingPage() {
                                     <Badge bg="danger">Inactive</Badge>
                                     }
                                 </td>
-                                <td  key={`view-act-${activity?._id}`} className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
+                                <td  key={`view-act-${activity?._id}`} className="onHide text-lg-end"><Button variant="primary" onClick={() => {handleSidebarSmall();handleClick(activity);}}>View Activity</Button></td>
                               </tr>
                               
                             </>
@@ -809,12 +856,11 @@ function TimeTrackingPage() {
             {activeTab === "Recordings" && (
               <>
                 <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
-                <Table responsive="lg" className="activity--table">
-                  <thead>
+                <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table draggable--table new--project--rows' : 'project--table new--project--rows'}>
+                  <thead className="mb-2 onHide">
                     <tr key={'recorded-table-header'}>
-                      {/* <th scope="col" width={20}>#</th> */}
-                      <th scope="col" width={300}><abbr>#</abbr> Member Name</th>
-                      <th scope="col" className="onHide">Total Time</th>
+                      <th scope="col" width={300}> Member Name</th>
+                      <th scope="col" className="onHide ms-auto">Total Time</th>
                       <th scope="col" className="onHide text-lg-end">View</th>
                     </tr>
                   </thead>
@@ -840,21 +886,22 @@ function TimeTrackingPage() {
                                         setRecordedRefresh( true )
                                         setCurrentActivity(activity)
                                       }
-                                  }} ><abbr key={`index-${index}`}>{index + 1}.</abbr> {activity.name} 
-                                  {
-                                    activity?.latestActivity?.status ? 
-                                    <small className="status--circle active--color"></small>
-                                    :
-                                    activity?.latestActivity?.status === false  ?
-                                    <small className="status--circle idle--color"></small>
-                                    :
-                                    <small className="status--circle inactive--color"></small>
-                                  }
+                                  }} >
+                                    <div className="project--name">
+                                      {activity.name} 
+                                      {
+                                        activity?.latestActivity?.status ? 
+                                        <small className="status--circle active--color"></small>
+                                        :
+                                        activity?.latestActivity?.status === false  ?
+                                        <small className="status--circle idle--color"></small>
+                                        :
+                                        <small className="status--circle inactive--color"></small>
+                                      }
+                                    </div>
                                 </td>
-                                
-                                <td data-label="Total Time" className="onHide">{ convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</td>
-                                
-                                <td className="onHide text-lg-end"><Button variant="primary" onClick={() => handleClick(activity)}>View Activity</Button></td>
+                                <td data-label="Total Time" className="onHide ms-auto">{ convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</td>
+                                <td className="onHide text-lg-end"><Button variant="primary" onClick={() => {handleSidebarSmall();handleClick(activity);}}>View Activity</Button></td>
                               </tr>
                               
                             </>
@@ -874,42 +921,49 @@ function TimeTrackingPage() {
         </div>
       </div>
       <div className="details--wrapper">
-        <div className="wrapper--title">
+        <div className="wrapper--title py-2 bg-white border-bottome">
           <ListGroup horizontal className="live--tabs">
-            <ListGroup.Item key={'live-key'} action active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
-             if( currentActivity && Object.keys(currentActivity)){
-              const cact = currentActivity
-              leaveRoom(currentActivity?._id)
-              startsharing(currentActivity?._id, currentActivity?.latestActivity?.status)
-            }
-            }}>
-              Live
-            </ListGroup.Item>
-            <ListGroup.Item key={'recored-key'} action active={activeInnerTab === "InnerRecorded"} onClick={() => {setActiveInnerTab("InnerRecorded")
-              if( currentActivity && Object.keys(currentActivity)){
-                leaveRoom(currentActivity?._id)
-              }
-            }}>
-              Recorded
-            </ListGroup.Item>
+            <ListGroup horizontal className="bg-light me-3">
+              <Button variant="secondary" className="btn--view" key={'live-key'} active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
+                if( currentActivity && Object.keys(currentActivity)){
+                  const cact = currentActivity
+                  leaveRoom(currentActivity?._id)
+                  startsharing(currentActivity?._id, currentActivity?.latestActivity?.status)
+                }
+                }}>
+                Live
+              </Button>
+              <Button variant="primary" className="btn--view" key={'recored-key'} active={activeInnerTab === "InnerRecorded"} onClick={() => {setActiveInnerTab("InnerRecorded")
+                if( currentActivity && Object.keys(currentActivity)){
+                  leaveRoom(currentActivity?._id)
+                }
+              }}>
+                Recorded
+              </Button>
+            </ListGroup>
+            
             {
-              activeInnerTab === "InnerRecorded" && showDate()}
-            <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
-              <BsArrowClockwise onClick={handleRecordedActivity}/>
-            </ListGroup.Item>
+              activeInnerTab === "InnerRecorded" && showDate()
+            }
           </ListGroup>
           <ListGroup horizontal>
             {showRecordedTabs()}
-            <ListGroup.Item key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false);}}>
-              <MdOutlineClose />
-            </ListGroup.Item>
+            <ListGroup horizontal className="bg-white expand--icon ms-3">
+              <ListGroup.Item onClick={handleSidebar} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+              <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
+                <BsArrowClockwise onClick={handleRecordedActivity}/>
+              </ListGroup.Item>
+              <ListGroup.Item className="btn btn-primary" key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false);handleSidebarSmall(true);}}>
+                <MdOutlineClose />
+              </ListGroup.Item>
+            </ListGroup>
           </ListGroup>
         </div>
         <div className={isScreenActive ? 'rounded--box activity--box fullscreen--box' : 'rounded--box activity--box'}>
           {
               activityspinner &&
               <div className="loading-bar">
-                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                  <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
           {activeInnerTab === "InnerLive" && (

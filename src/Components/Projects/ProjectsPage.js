@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown, ListGroupItem } from "react-bootstrap";
 import { FaChevronDown, FaPlus, FaList, FaRegTrashAlt, FaRegCalendarAlt, FaCog } from "react-icons/fa";
 import { MdFileDownload, MdFilterList, MdOutlineClose, MdSearch, MdOutlineCancel } from "react-icons/md";
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment } from "react-icons/gr";
 import { BsGrid,BsEye } from "react-icons/bs";
-import { GoTasklist } from "react-icons/go";
-import { FaArrowRight } from "react-icons/fa";
+import { BiEdit } from "react-icons/bi";
+import { GrExpand } from "react-icons/gr";
+import { FiSidebar } from "react-icons/fi";
 import { MdOutlineSearch, MdDragIndicator } from "react-icons/md";
 import { ListProjects, createProject, updateProject, deleteProject, reorderedProject } from "../../redux/actions/project.action"
 import { Listmembers } from "../../redux/actions/members.action";
@@ -21,7 +22,7 @@ import { selectboxObserver, getMemberdata } from "../../helpers/commonfunctions"
 import SingleProject from "./singleProject";
 import { TaskForm } from "../Tasks/taskform";
 import TasksList from "../Tasks/list";
-import { togglePopups, updateStateData } from "../../redux/actions/common.action";
+import { togglePopups, updateStateData,toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { MemberInitials } from "../common/memberInitials";
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -171,6 +172,8 @@ function ProjectsPage() {
 
     const handleStatusClose = () => dispatch(togglePopups('status', false));
     const handleStatusShow = () => dispatch(togglePopups('status', true));
+    const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
+    const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
     const selectedStatus = useSelector(state => state.common.selectedStatus)
 
     const [showClient, setClientShow] = useState(false);
@@ -636,29 +639,44 @@ function ProjectsPage() {
         };
     }, []);
 
+    const [projectToggle, setProjectToggle ] = useState(false)
+    const handleToggles = () => {
+        if(commonState.sidebar_small === false ){ console.log('1')
+            handleSidebarSmall()
+        }else if(commonState.sidebar_small === true && projectToggle === false){
+            setProjectToggle(true)
+             console.log('2')
+        }else{
+            setProjectToggle(false)
+            handleSidebarSmall()
+             console.log('3')
+        }
+    }
+
     return (
         <>
-            <div className={isActive === 1 ? 'show--details team--page' : isActive === 2 ? ' view--project team--page' : 'team--page'}>
+            <div
+                className={
+                    `${isActive === 1 ? 'show--details team--page' : 
+                    isActive === 2 ? 'view--project team--page' : 
+                    'team--page'} ${projectToggle === true ? 'project-collapse' : ''}`
+                }
+            >
+
                 <div className='page--title px-md-2 py-3 bg-white border-bottom'>
                     <Container fluid>
                         <Row>
                             <Col sm={12} lg={12}>
-                                <h2>Projects
-                                    <Button variant="primary" className={isActive !== 0 ? 'd-flex ms-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button>
-                                    <Button variant="primary" className={isActive !== 0 ? 'd-flex' : 'd-lg-none'} onClick={handleFilterShow}><MdFilterList /></Button>
+                                <h2>
+                                    <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                                    Projects
+                                    {/* <Button variant="primary" className={isActive !== 0 ? 'd-flex ms-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button> */}
+                                    <Button variant="primary" className={isActive !== 0 ? 'd-flex d-md-none' : 'd-md-none ms-auto onHide'} onClick={handleFilterShow}><MdFilterList /></Button>
                                     {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
-                                    <Button
-                                        variant="primary"
-                                        onClick={() =>
-                                            handleShow('new') 
-                                        }
-                                        >
-                                        <FaPlus />
-                                    </Button>
+                                        <Button variant="primary" className={isActive !== 0 ? 'd-flex d-md-none' : 'd-md-none onHide'} onClick={() => handleShow('new') }><FaPlus /></Button>
                                     )}
-                                    
-                                    <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
-                                        <ListGroup.Item key="member-filter-list">
+                                    <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-md-flex'}>
+                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-md-flex'} key="member-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
                                                 <option value={memberdata?._id} key="my-projects-option">My Projects</option>
                                                 {
@@ -688,7 +706,7 @@ function ProjectsPage() {
                                                 
                                             </Form.Select>
                                         </ListGroup.Item>
-                                        <ListGroup.Item key="status-filter-list">
+                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-md-flex'} key="status-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
                                                 <option value="all">View All</option>
                                                 <option value="in-progress">In Progress</option>
@@ -696,7 +714,7 @@ function ProjectsPage() {
                                                 <option value="completed">Completed</option>
                                             </Form.Select>
                                         </ListGroup.Item>
-                                        <ListGroup.Item key="search-filter-list">
+                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-lg-flex'} key="search-filter-list">
                                             <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
                                                 <Form.Group className="mb-0 form-group">
                                                     <MdOutlineSearch />
@@ -704,16 +722,18 @@ function ProjectsPage() {
                                                 </Form.Group>
                                             </Form>
                                         </ListGroup.Item>
-                                        <ListGroup horizontal>
+                                        <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'd-none d-lg-flex'}>
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                                         </ListGroup>
+                                        <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'bg-white expand--icon ms-3 d-none d-md-flex'}>
+                                            <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                                            {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
+                                                <ListGroup.Item className="btn btn-primary" onClick={() => handleShow('new') }><FaPlus /></ListGroup.Item>
+                                            )}
+                                        </ListGroup>
                                     </ListGroup>
                                 </h2>
-                                <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-none mt-3 mt-xl-0'}>
-                                    <ListGroup.Item action className="view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
-                                    <ListGroup.Item action className="view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
-                                </ListGroup>
                             </Col>
                         </Row>
                     </Container>
@@ -722,7 +742,7 @@ function ProjectsPage() {
                     {
                         spinner &&
                         <div className="loading-bar">
-                            <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                            <img src="images/OnTeam-icon.png" className="flipchar" />
                         </div>
                     }
                     <Container fluid>
@@ -740,7 +760,7 @@ function ProjectsPage() {
                                         <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
                                     </tr>
                                 </thead> */}
-                                <Droppable droppableId={`droppable-project-table`} type="PROJECTS">
+                                <Droppable droppableId={`droppable-project-table`} type="PROJECTS" direction={isActiveView === 1 ? "horizontal" : "vertical"}>
                                     {(provided) => (
                                         <tbody
                                             id={`projectable-body`}
@@ -771,13 +791,13 @@ function ProjectsPage() {
                                                                         key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                                             }`}>
                                                                         <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                                            <MdDragIndicator />
                                                                             <div className="project--name">
-                                                                                <span>
-                                                                                    {/* <abbr key={`index-${index}`}>{index + 1}.</abbr>  */}
-                                                                                    {project.title}
-                                                                                </span>
-                                                                                <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'>__</span>}</strong>
+                                                                                <div className="drag--indicator"><abbr className="onHide" key={`index-${index}`}>#{index + 1}</abbr><MdDragIndicator className="onHide" /></div>
+                                                                                <div className="title--initial">{project.title.charAt(0)}</div>
+                                                                                <div className="title--span flex-column align-items-start gap-0">
+                                                                                    <span>{project.title}</span>
+                                                                                    <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'>__</span>}</strong>
+                                                                                </div>
                                                                             </div>
                                                                         </td>
                                                                         {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
@@ -792,45 +812,31 @@ function ProjectsPage() {
                                                                                         } else {
                                                                                             console.log('Not allowed');
                                                                                         }
-                                                                                    }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                                    }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
                                                                                 </Dropdown>
                                                                             </div>
                                                                             <div key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end task--buttons">
-                                                                                <Button variant="secondary" className="me-2" onClick={() => setIsActive(2)}><BsEye /> Details</Button>
+                                                                                <Button variant="primary" className="me-2" 
+                                                                                    onClick={() => {
+                                                                                        setIsActive(2);
+                                                                                    }}>
+                                                                                    <BsEye /> Details</Button>
                                                                                 <Button variant="primary" onClick={() => {
-                                                                                    (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner')
-                                                                                    ?
-                                                                                    setIsActive(1)
-                                                                                    :
-                                                                                    console.log('not allowed to view tasks')
-                                                                                }
-                                                                                }><GoTasklist /> Tasks</Button>
-                                                                                
+                                                                                   
+                                                                                    if (
+                                                                                        memberProfile?.permissions?.projects?.view === true ||
+                                                                                        memberProfile?.role?.slug === 'owner'
+                                                                                    ) {
+                                                                                    setIsActive(1);
+                                                                                    } else {
+                                                                                        console.log('not allowed to view tasks');
+                                                                                    }
+                                                                                }}
+                                                                                >
+                                                                                    <BiEdit /> Tasks
+                                                                                </Button>
                                                                             </div>
                                                                         </td>
-                                                                        {/* <td key={`status-index-${index}`} data-label="Status" className="onHide">
-                                                                            <Dropdown className="select--dropdown" key='status-key'>
-                                                                                <Dropdown.Toggle onClick={() => { 
-                                                                                    if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
-                                                                                        dispatch(updateStateData(DIRECT_UPDATE, true));
-                                                                                        handleStatusShow();
-                                                                                    } else {
-                                                                                        console.log('Not allowed');
-                                                                                    }
-                                                                                }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                                            </Dropdown>
-                                                                        </td> */}
-                                                                        {/* <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                                            <Button variant="secondary" onClick={() => {
-                                                                                (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner')
-                                                                                ?
-                                                                                setIsActive(1)
-                                                                                :
-                                                                                console.log('not allowed to view tasks')
-                                                                            }
-                                                                            }><GoTasklist /> Tasks</Button>
-                                                                            <Button variant="secondary" className="me-2" onClick={() => setIsActive(2)}>View</Button>
-                                                                        </td> */}
                                                                     </tr>
                                                                 )}
                                                             </Draggable>
@@ -853,83 +859,121 @@ function ProjectsPage() {
                             </Table>
                         </DragDropContext>
                         :
+                        <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table draggable--table new--project--rows' : 'project--table new--project--rows'}>
+                            {/* <thead>
+                                <tr key="project-table-header">
+                                    <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Project Name</th>
+                                    <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
+                                    <th scope="col" width='30%' key="project-member-header" className="onHide">Assigned Members</th>
+                                    <th scope="col" key="project-status-header" className="onHide">Status</th>
+                                    <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
+                                </tr>
+                            </thead> */}
                             
-                                <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table' : isActiveView === 2 ? 'project--table draggable--table' : 'project--table'}>
-                                    <thead>
-                                        <tr key="project-table-header">
-                                            {/* <th scope="col" width={20} key="project-hash-header">#</th> */}
-                                            <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Project Name</th>
-                                            <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
-                                            <th scope="col" width='30%' key="project-member-header" className="onHide">Assigned Members</th>
-                                            <th scope="col" key="project-status-header" className="onHide">Status</th>
-                                            <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
-                                        </tr>
-                                    </thead>
-                                   
-                                    <tbody
-                                        id={`projectable-body`}
-                                        className="projects--list"
-                                    >
-                                        {
-                                            (!spinner && projects && projects.length > 0)
-                                                ? projects.map((project, index) => {
-                                                    return (<>
-                                                        <tr onDoubleClick={(event) => { 
-                                                            (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner')
-                                                                ?
-                                                                    handleRowDoubleClick(project, index)
-                                                                    : console.log('not allowed')
-                                                            }}
-                                                            key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
-                                                                }`}>
-                                                            <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}><span><abbr key={`index-${index}`}>{index + 1}.</abbr> {project.title}</span></td>
-                                                            <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td>
-                                                            <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                                <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"
-                                                                />
-                                                            </td>
-                                                            <td key={`status-index-${index}`} data-label="Status" className="onHide">
-                                                                <Dropdown className="select--dropdown" key='status-key'>
-                                                                    <Dropdown.Toggle onClick={() => { 
-                                                                        if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
-                                                                            dispatch(updateStateData(DIRECT_UPDATE, true));
-                                                                            handleStatusShow();
-                                                                        } else {
-                                                                            console.log('Not allowed');
-                                                                        }
-                                                                    }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                                </Dropdown>
-                                                            </td>
-                                                            <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                                <Button variant="secondary" className="me-2" onClick={() => setIsActive(2)}><BsEye /> Details</Button>
-                                                                <Button variant="primary" onClick={() => {
-                                                                    (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner')
-                                                                    ?
-                                                                    setIsActive(1)
-                                                                    :
-                                                                    console.log('not allowed to view tasks')
-                                                                }
-                                                                }><GoTasklist /> Tasks</Button>
+                            <tbody
+                                id={`projectable-body`}
+                                className="projects--list"
+                            >
+                                {
+                                    (!spinner && projects && projects.length > 0)
+                                        ? projects.map((project, index) => {
+                                            return (<>
+                                                <tr onDoubleClick={(event) => { 
+                                                    (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner')
+                                                        ?
+                                                            handleRowDoubleClick(project, index)
+                                                            : console.log('not allowed')
+                                                    }}
+                                                    key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
+                                                        }`}>
+                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
+                                                        <div className="project--name">
+                                                            <abbr className="onHide" key={`index-${index}`}>{index + 1}</abbr> 
+                                                            <div className="title--span flex-column align-items-start gap-0">
+                                                                <span>{project.title}</span>
+                                                                <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'>__</span>}</strong>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
+                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
+                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
+                                                        <div key={`status-index-${index}`} data-label="Status" className="onHide status__key">
+                                                            <Dropdown className="select--dropdown" key='status-key'>
+                                                                <Dropdown.Toggle onClick={() => { 
+                                                                    if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
+                                                                        dispatch(updateStateData(DIRECT_UPDATE, true));
+                                                                        handleStatusShow();
+                                                                    } else {
+                                                                        console.log('Not allowed');
+                                                                    }
+                                                                }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                            </Dropdown>
+                                                        </div>
+                                                        <div key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end task--buttons">
+                                                            <Button variant="primary" className="me-2" 
+                                                                onClick={() => {
+                                                                    
+                                                                    setIsActive(2);
+                                                                }}>
+                                                                <BsEye /> Details</Button>
+                                                            <Button variant="primary" onClick={() => {
                                                                 
-                                                            </td>
-                                                        </tr>
-                                                    </>)
-                                                })
-                                                :
+                                                                if (
+                                                                    memberProfile?.permissions?.projects?.view === true ||
+                                                                    memberProfile?.role?.slug === 'owner'
+                                                                ) {
+                                                                setIsActive(1);
+                                                                } else {
+                                                                    console.log('not allowed to view tasks');
+                                                                }
+                                                            }}
+                                                            >
+                                                                <BiEdit /> Tasks
+                                                            </Button>
+                                                        </div>
+                                                    </td>
+                                                    {/* <td key={`status-index-${index}`} data-label="Status" className="onHide">
+                                                        <Dropdown className="select--dropdown" key='status-key'>
+                                                            <Dropdown.Toggle onClick={() => { 
+                                                                if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
+                                                                    dispatch(updateStateData(DIRECT_UPDATE, true));
+                                                                    handleStatusShow();
+                                                                } else {
+                                                                    console.log('Not allowed');
+                                                                }
+                                                            }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                        </Dropdown>
+                                                    </td>
+                                                    <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
+                                                        <Button variant="secondary" className="me-2" onClick={() => setIsActive(2)}><BsEye /> Details</Button>
+                                                        <Button variant="primary" onClick={() => {
+                                                            (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner')
+                                                            ?
+                                                            setIsActive(1)
+                                                            :
+                                                            console.log('not allowed to view tasks')
+                                                        }
+                                                        }><BiEdit /> Tasks</Button>
+                                                        
+                                                    </td> */}
+                                                </tr>
+                                            </>)
+                                        })
+                                        :
 
-                                                !spinner && isActiveView === 2 &&
-                                                <>
-                                                    <tr key={`noresults-row`} className="no--invite">
-                                                        <td key={`empty-index`} colSpan={9} className="text-center">
-                                                            <h2 className="mt-2 text-center">No Projects Found</h2>
-                                                        </td>
-                                                    </tr>
-                                                </>
-                                        }
-                                    </tbody>
-                                        
-                                </Table>
-
+                                        !spinner && isActiveView === 2 &&
+                                        <>
+                                            <tr key={`noresults-row`} className="no--invite">
+                                                <td key={`empty-index`} colSpan={9} className="text-center">
+                                                    <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                </td>
+                                            </tr>
+                                        </>
+                                }
+                            </tbody>
+                                
+                        </Table>
                         }
                         {
                             isActiveView === 1 && !spinner && projects && projects.length == 0 &&
@@ -941,8 +985,8 @@ function ProjectsPage() {
                 </div>
             </div>
             <div className="details--projects--grid projects--grid">
-                <div className="wrapper--title py-3 bg-white border-bottom">
-                    <Button variant="light px-2 py-1" key={`closekey`} onClick={() => setIsActive(0)}><FaArrowRight /></Button>
+                <div className="wrapper--title py-2 bg-white border-bottom">
+                    <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                     <div className="projecttitle">
                         <h3>
                             <strong>{currentProject?.title}</strong>
@@ -955,22 +999,24 @@ function ProjectsPage() {
                             <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} members={currentProject?.members || []}  postId={currentProject?._id} type="project"/>
                         }
                     </ListGroup>
-                    <ListGroup horizontal className="bg-light ms-auto ms-xl-0 mt-0 mt-md-0">
+                    <ListGroup horizontal className="bg-light ms-auto ms-xl-0 mt-0 mt-md-0 d-none d-sm-flex">
                         <Button variant="secondary" className="btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>Details</Button>
                         <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
                     </ListGroup>
                     <ListGroup horizontal>
+                         <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
                         {
                             (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
                                 <ListGroup.Item className="d-none d-lg-flex" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
                             )
                         }
+                        <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
                     </ListGroup>
                 </div>
                {isActive === 1 && <TasksList activeTab={activeTab} currentProject={currentProject} memberProfile={memberProfile} />} 
             </div>
 
-            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} /> }
+            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} /> }
             { commonState?.taskForm && <TaskForm memberProfile={memberProfile}/> }
             <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>

@@ -374,7 +374,7 @@ function PermissionsPage() {
         <div className="page--wrapper setting--page">
           {spinner && (
             <div class="loading-bar">
-              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+              <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
           )}
           <div className="setting--tabs">

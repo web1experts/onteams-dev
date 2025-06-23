@@ -110,7 +110,7 @@ function LoginPage() {
                     </Col>
                     <Col sm={12} lg={6} className="px-0">
                         <div className="common--form">
-                            <img className="logo--sm" src="../images/OnTeam-Logo.png" alt="MyTeams" />
+                            <img className="logo--sm" src="../images/OnTeam-icon.png" alt="MyTeams" />
                             <Form onSubmit={onSubmit}>
                                 <h2>Login to your account</h2>
                                 <Form.Group className="mb-3 form-group">

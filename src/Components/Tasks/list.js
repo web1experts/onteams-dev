@@ -342,7 +342,7 @@ const TasksList = React.memo((props) => {
             {
                 spinner &&
                 <div className="loading-bar">
-                    <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                    <img src="images/OnTeam-icon.png" className="flipchar" />
                 </div>
             }
             {props.activeTab === 'GridView' && (
