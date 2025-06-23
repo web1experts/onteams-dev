@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form } from "react-bootstrap";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaVideo, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye } from 'react-icons/fa';
-import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiSend, FiX } from "react-icons/fi";
+import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiSend, FiX, FiClock, FiCalendar } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { MdLaptopMac, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { BsChat, BsHeart, BsClock } from "react-icons/bs";
-import { LuQuote } from "react-icons/lu";
-import { HiOutlineLightningBolt } from "react-icons/hi";
+import { HiOutlineLightningBolt, HiOutlineLocationMarker } from "react-icons/hi";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite} from "../../redux/actions/members.action";
 import { createPost, ListPosts, likePost } from "../../redux/actions/post.action";
 import DOMPurify from 'dompurify';
@@ -181,6 +180,19 @@ function DashboardPage() {
         <div className='page--wrapper p-md-3 py-3 pt-5 mt-3 text-center'>
           <Container fluid>
             <Row className="justify-content-center">
+              <Col sm={12}>
+                <Card className="daily--star daily--welcome">
+                  <div className="card--icon">
+                    <div className="star--icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sunset w-6 h-6 text-white"><path d="M12 10V2"></path><path d="m4.93 10.93 1.41 1.41"></path><path d="M2 18h2"></path><path d="M20 18h2"></path><path d="m19.07 10.93-1.41 1.41"></path><path d="M22 22H2"></path><path d="m16 6-4 4-4-4"></path><path d="M16 18a4 4 0 0 0-8 0"></path></svg></div>
+                    <h6 className="mb-0"><strong>Good Afternoon, <span>Paramjeet Singh!</span></strong> <small><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-4 h-4"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg> Ready to make today extraordinary?</small></h6>
+                  </div>
+                  <div className="card-body">
+                    <h3><FiClock /> 05:03 PM</h3>
+                    <p className="text-end"><HiOutlineLocationMarker />Asia/Calcutta</p>
+                    <h4><FiCalendar /> Monday, June 23, 2025</h4>
+                  </div>
+                </Card>
+              </Col>
               <Col lg={8}>
                 <ListGroup className="invitation--list">
                   {invitationsFeeds && invitationsFeeds.length > 0 &&

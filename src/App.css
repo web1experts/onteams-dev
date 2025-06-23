@@ -370,7 +370,7 @@ body {
 
 .page--wrapper .draggable--table th,
 .page--wrapper .draggable--table td {
-  width: auto;
+  /* width: auto; */
   flex: 1 1;
   /* line-height: 33px; */
 }
@@ -632,6 +632,17 @@ body {
 
 .page--wrapper table td button {
   padding: 0.25rem .85rem;
+  line-height: 25px;
+}
+
+.page--wrapper table td.task--buttons button {
+  padding: 0;
+  width: 35px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
   line-height: 25px;
 }
 
@@ -3946,6 +3957,11 @@ pre {
   color: #ffffff;
 }
 
+.dashboard--page .daily--welcome {
+  background: var(--theme-gradient);
+  flex-flow: row wrap;
+}
+
 .dashboard--page .daily--star::before,
 .dashboard--page .daily--star::after {
   position: absolute;
@@ -3966,6 +3982,32 @@ pre {
   -webkit-transform: translateX(-5rem) translateY(-5rem);
 }
 
+.daily--welcome .card--icon h6 {
+  display: flex;
+  flex-flow: column wrap;
+  font-size: 35px;
+  font-weight: 600;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.daily--welcome .card--icon h6 strong {
+  font-weight: 600;
+}
+
+.daily--welcome .card--icon h6 span {
+  color: rgb(253 224 71);
+}
+
+.daily--welcome .card--icon h6 small {
+  font-size: 25px;
+  font-weight: normal;
+}
+
+.daily--welcome .card--icon h6 small svg {
+  color: rgb(253 224 71);
+}
+
 .dashboard--page .daily--star::after {
   right: 0;
   top: 0;
@@ -3973,6 +4015,23 @@ pre {
   margin: auto 0;
   transform: translateX(5rem) translateY(0rem);
   -webkit-transform: translateX(5rem) translateY(0rem);
+}
+
+.dashboard--page .daily--welcome::before {
+  left: 0;
+  bottom: 0;
+  top: auto;
+  transform: translateX(-5rem) translateY(5rem);
+  -webkit-transform: translateX(-5rem) translateY(5rem);
+}
+
+.dashboard--page .daily--welcome::after {
+  right: 0;
+  top: 0;
+  bottom: auto;
+  margin: auto 0;
+  transform: translateX(5rem) translateY(-5rem);
+  -webkit-transform: translateX(5rem) translateY(-5rem);
 }
 
 .app--title {
@@ -4127,6 +4186,56 @@ ul#icon-tabs .nav-link span svg {
   width: 3rem;
   height: 3rem;
   display: flex;
+}
+
+.daily--welcome .star--icon {
+    padding: 12px;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 1.5rem;
+    -webkit-border-radius: 1.5rem;
+}
+
+.daily--welcome .star--icon svg {
+  width: 32px;
+  height: auto;
+}
+
+.daily--welcome .card-body {
+    flex: none;
+    margin-left: auto;
+    text-align: left;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    background: #ffffff26;
+    padding: 2rem;
+    border: 1px solid #fff3;
+    border-radius: .75rem;
+    -webkit-border-radius: .75rem;
+}
+
+.daily--welcome .card-body h3, .daily--welcome .card-body h4, .daily--welcome .card-body p {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: 1rem;
+}
+
+.daily--welcome .card-body p {
+  justify-content: flex-end;
+  border-bottom: 1px solid #fff3;
+  padding-bottom: .75rem;
+  margin-bottom: .75rem;
+}
+
+.daily--welcome .card-body h3 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.daily--welcome .card-body h4 {
+  margin: 0;
+  font-size: 18px;
 }
 
 .dashboard--page .team--updates {
@@ -4441,7 +4550,6 @@ ul#icon-tabs .nav-link span svg {
   -webkit-transform: scale(1.05);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  background: rgb(255 255 255 / 20%);
   cursor: pointer;
 }
 
