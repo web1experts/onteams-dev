@@ -10,7 +10,7 @@ import { BsChat, BsHeart, BsClock } from "react-icons/bs";
 import { LuQuote } from "react-icons/lu";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite} from "../../redux/actions/members.action";
-import { createPost, ListPosts } from "../../redux/actions/post.action";
+import { createPost, ListPosts, likePost } from "../../redux/actions/post.action";
 import DOMPurify from 'dompurify';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -21,6 +21,7 @@ function DashboardPage() {
   const memberstate = useSelector((state) => state.member);
   const invitationsFeed = useSelector((state) => state.member.invitations);
   const postFeed = useSelector((state) => state.post.posts);
+  const postApi = useSelector( (state) => state.post);
   const [invitationsFeeds, setInvitationsFeed] = useState([]);
   const [isActive, setIsActive] = useState(0);
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
@@ -118,6 +119,16 @@ function DashboardPage() {
     }
   }, [postFeed])
 
+  useEffect(() => {
+    if( postApi.singlePost){
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postApi.singlePost._id ? postApi.singlePost : post
+        )
+      );
+    }
+  }, [postApi])
+
   const acceptInvite = (token) => {
     dispatch(acceptCompanyinvite({ token: token }));
   };
@@ -138,6 +149,13 @@ function DashboardPage() {
     handlePosts()
   },[ ])
 
+  const handleLike = async (postId) => {
+    try {
+      dispatch(likePost(postId));
+    } catch (err) {
+      console.error('Error liking post:', err);
+    }
+  };
   
 
   return (
@@ -251,7 +269,7 @@ function DashboardPage() {
 
 
                           <div className="d-flex gap-3 text-muted mt-3 align-items-center">
-                            <span><BsHeart className="me-1" /> {post.likes?.length || 0}</span>
+                            <span><BsHeart onClick={() => {handleLike(post._id)}} className="me-1" /> {post.likes?.length || 0}</span>
                             <span><BsChat className="me-1" /> 0</span>
                           </div>
                         </Col>

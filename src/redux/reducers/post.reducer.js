@@ -2,7 +2,8 @@ import {
     POST_FAILED,
     POST_LIST_SUCCESS,
     POST_SUCCESS,
-    CLEAR_MESSAGES
+    CLEAR_MESSAGES,
+    LIKE_POST_SUCCESS
 
 } from "../actions/types";
     
@@ -45,6 +46,12 @@ import {
                 error: '',
                 message: null,
                 message_variant: null,
+                singlePost: null
+            }
+        case LIKE_POST_SUCCESS: 
+            return {
+                ...state,
+                singlePost: action.payload.post
             }
         default: return state;
       }
