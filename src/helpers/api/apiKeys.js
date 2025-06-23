@@ -31,7 +31,8 @@ const apiKeys = {
     reports: 'reports',
     permissions: 'permissions',
     subscription: 'subscription',
-    payment: 'payment'
+    payment: 'payment',
+    post: 'post'
 };
   
 export default apiKeys;

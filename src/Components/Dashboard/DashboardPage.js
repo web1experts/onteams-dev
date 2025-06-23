@@ -1,30 +1,102 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Col, Row, Card, Button, Alert, ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form } from "react-bootstrap";
+import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form } from "react-bootstrap";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaVideo, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye } from 'react-icons/fa';
-import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiSend } from "react-icons/fi";
+import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiSend, FiX } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { MdLaptopMac, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { BsChat, BsHeart, BsClock } from "react-icons/bs";
 import { LuQuote } from "react-icons/lu";
 import { HiOutlineLightningBolt } from "react-icons/hi";
-import { acceptCompanyinvite, listCompanyinvite, deleteInvite, resendInvite} from "../../redux/actions/members.action";
-import { Link } from "react-router-dom";
+import { acceptCompanyinvite, listCompanyinvite, deleteInvite} from "../../redux/actions/members.action";
+import { createPost, ListPosts } from "../../redux/actions/post.action";
+import DOMPurify from 'dompurify';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
+dayjs.extend(relativeTime);
 function DashboardPage() {
   const dispatch = useDispatch()
   const memberstate = useSelector((state) => state.member);
   const invitationsFeed = useSelector((state) => state.member.invitations);
-  const apiResult = useSelector((state) => state.member);
+  const postFeed = useSelector((state) => state.post.posts);
   const [invitationsFeeds, setInvitationsFeed] = useState([]);
   const [isActive, setIsActive] = useState(0);
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const commonState = useSelector(state => state.common)
   const [show, setShow] = useState(false);
-
+  const [ posts, setPosts] = useState([])
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const [ loading, setLoading] = useState( false);
+  const [ fields, setFields ] = useState(
+    { 
+      type: 'text',
+      content: '',
+      files: [],
+    });
+  const [ error, setError] = useState('');
+
+  const handleTextChange = (e) => {
+    setFields({ ...fields, content: e.target.value });
+  };
+  const removeFile = (index) => {
+    const newFiles = [...fields.files];
+    newFiles.splice(index, 1);
+    setFields({ ...fields, files: newFiles });
+  };
+
+  const handleSubmit = async () => {
+  const { type, content, files } = fields;
+
+    // Basic validation logic
+    if (!type) {
+      setError('Please select a post type.');
+      return;
+    }
+
+    if ((type === 'text' || type === 'quote') && !content.trim()) {
+      setError('Content cannot be empty.');
+      return;
+    }
+
+    if ((type === 'image' || type === 'video') && (!files || files.length === 0)) {
+      setError(`Please upload at least one ${type === 'image' ? 'image' : 'video'}.`);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('type', type);
+      formData.append('content', content);
+
+      files.forEach((file) => formData.append('files', file));
+
+      await dispatch(createPost(formData));
+
+      handleClose();
+      setFields({ type: 'text', content: '', files: [] });
+    } catch (err) {
+      console.error('Error creating post:', err);
+      setError('Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const fileList = Array.from(e.target.files);
+    const accepted = fields.type === 'image' 
+      ? fileList.filter(f => f.type.startsWith('image/')) 
+      : fileList.filter(f => f.type.startsWith('video/'));
+    setFields({ ...fields, files: accepted });
+  };
+  const handlePosts = async () => {
+    await dispatch(ListPosts());
+  }
 
   const handleInvitationList = async () => {
     await dispatch(
@@ -39,6 +111,12 @@ function DashboardPage() {
       setInvitationsFeed(invitationsFeed.inviteData);
     }
   }, [invitationsFeed]);
+
+  useEffect(() => {
+    if( postFeed ){
+      setPosts(postFeed)
+    }
+  }, [postFeed])
 
   const acceptInvite = (token) => {
     dispatch(acceptCompanyinvite({ token: token }));
@@ -57,43 +135,10 @@ function DashboardPage() {
 
   useEffect(() => {
     handleInvitationList()
+    handlePosts()
   },[ ])
 
-  const updates = [
-    {
-      name: "Sarah Johnson",
-      time: "2 hours ago",
-      text: "Just completed the user research phase for the e-commerce redesign project. Great insights from our customer interviews! 🎯",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-      likes: 12,
-      comments: 3,
-      shares: 1,
-      image: null,
-      quote: null,
-    },
-    {
-      name: "Mike Chen",
-      time: "4 hours ago",
-      text: "Check out this amazing wireframe mockup for our mobile app! The user flow is really coming together nicely.",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      likes: 18,
-      comments: 5,
-      shares: 4,
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f", // Replace with your actual image
-      quote: null,
-    },
-    {
-      name: "Emily Rodriguez",
-      time: "6 hours ago",
-      text: "Design is not just what it looks like and feels like. Design is how it works. – Steve Jobs. This quote perfectly captures what we are trying to achieve with our new design system! ✨",
-      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-      likes: 25,
-      comments: 8,
-      shares: 6,
-      image: null,
-      quote: true,
-    }
-  ];
+  
 
   return (
     <>
@@ -168,36 +213,52 @@ function DashboardPage() {
                     </Col>
                   </Row>
 
-                  {updates.map((update, index) => (
-                    <Card key={index} className="mb-4 p-3 rounded-4 inner--card">
+                  {
+                  (!posts || posts.length === 0) ?
+                    <div className="text-center text-muted py-5">
+                      <p>No team updates yet.</p>
+                    </div>
+
+                  :
+                  posts.map((post) => (
+                    <Card key={post._id} className="mb-4 p-3 rounded-4 inner--card">
                       <Row className="mb-2">
                         <Col xs="auto">
-                          <Image src={update.avatar} roundedCircle width={40} height={40} />
+                          <Image
+                            src={post.author?.avatar || '/default-avatar.png'}
+                            roundedCircle
+                            width={40}
+                            height={40}
+                          />
                         </Col>
                         <Col>
-                          <strong>{update.name}</strong>{' '}
+                          <strong>{post.author?.name || 'Unknown'}</strong>{' '}
                           <span className="text-muted" style={{ fontSize: '0.875rem' }}>
-                            • {update.time}
+                            • {dayjs(post.createdAt).fromNow()}
                           </span>
-                          {update.quote ? (
-                            <blockquote className="blockquote p-3 rounded mt-3">
-                              <LuQuote className="me-2" />
-                              <p className="mb-0" style={{ fontStyle: 'italic' }}>{update.text}</p>
-                            </blockquote>
-                          ) : (
-                            <p>{update.text}</p>
+
+                         <div className="mt-3">
+                          {post.post_type === 'text' && <p>{post.content}</p>}
+
+                          {['image', 'quote', 'video'].includes(post.post_type) && (
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(post.content),
+                              }}
+                            />
                           )}
-                          {update.image && (
-                            <Image src={update.image} alt="Post content" fluid className="rounded" />
-                          )}
+                        </div>
+
+
                           <div className="d-flex gap-3 text-muted mt-3 align-items-center">
-                            <span><BsHeart className="me-1" /> {update.likes}</span>
-                            <span><BsChat className="me-1" /> {update.comments}</span>
+                            <span><BsHeart className="me-1" /> {post.likes?.length || 0}</span>
+                            <span><BsChat className="me-1" /> 0</span>
                           </div>
                         </Col>
                       </Row>
                     </Card>
                   ))}
+
                 </Card> 
               </Col>
               <Col lg={4}>
@@ -348,48 +409,96 @@ function DashboardPage() {
         </Modal.Header>
         <Modal.Body className="bg-light pt-4">
           <Tabs defaultActiveKey="text" id="icon-tabs">
-            <Tab eventKey="text" title={<span><FaRegFileAlt /> Text</span>}>
+            <Tab eventKey="text" onClick={() => {
+              setFields({...fields, ['type']: 'text'})
+            }} title={<span><FaRegFileAlt /> Text</span>}>
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Message</Form.Label>
-                  <Form.Control as="textarea" placeholder="What's happening with you work? Share updates, achievements, or insights..." rows={7} />
+                  <Form.Control as="textarea" placeholder="What's happening with you work? Share updates, achievements, or insights..." rows={7} value={fields.content}
+                onChange={handleTextChange} />
                 </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="quote" title={<span><FaQuoteRight /> Quote</span>}>
+            <Tab eventKey="quote" onClick={() => {
+              setFields({...fields, ['type']: 'quote'})
+            }} title={<span><FaQuoteRight /> Quote</span>}>
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Add a Quote</Form.Label>
-                  <Form.Control as="textarea" placeholder="Share an inspiring quote or meaningful message..." rows={7} />
+                  <Form.Control as="textarea" placeholder="Share an inspiring quote or meaningful message..." rows={7} value={fields.content}
+                onChange={handleTextChange} />
                 </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="image" title={<span><FaImage /> Image</span>}>
+            <Tab eventKey="image" onClick={() => {
+              setFields({...fields, ['type']: 'image'})
+            }}  title={<span><FaImage /> Image</span>}>
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Add Image</Form.Label>
-                  <label for="imageUpload" className="update--file--upload">
+                  <label for="imageUpload" className="update--file--upload" onChange={handleFileChange} accept="image/*" >
                     <Form.Control type="file" multiple id="imageUpload" hidden />
                     <span><FiUpload /> Browse or Drag and Drop images here <small>(Supported file formats: jpg, png, gif)</small></span>
                   </label>
+                  <div className="mt-3 d-flex flex-wrap gap-3">
+                  {fields.files.map((file, idx) => (
+                    <div key={idx} className="position-relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt="preview"
+                        width="100"
+                        height="100"
+                        style={{ objectFit: 'cover', borderRadius: 8 }}
+                      />
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => removeFile(idx)}
+                        className="position-absolute top-0 end-0 p-1"
+                      >
+                        <FiX size={14} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
                 </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="video" title={<span><FaVideo /> Video</span>}>
+            <Tab eventKey="video" onClick={() => {
+              setFields({...fields, ['type']: 'video'})
+            }}  title={<span><FaVideo /> Video</span>}>
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Add Video</Form.Label>
                   <label for="videoUpload" className="update--file--upload">
-                    <Form.Control type="file" id="videoUpload" hidden />
+                    <Form.Control type="file" id="videoUpload" hidden accept="video/mp4"  onChange={handleFileChange} />
                     <span><FiUpload /> Browse or Drag and Drop video here <small>(Supported file format: mp4)</small></span>
                   </label>
+                  <div className="mt-3">
+                    {fields.files.map((file, idx) => (
+                      <div key={idx} className="d-flex align-items-center justify-content-between mb-2">
+                        <div>
+                          <strong>{file.name}</strong> – {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline-danger"
+                          onClick={() => removeFile(idx)}
+                        >
+                          <FiX />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </Form.Group>
               </Form>
             </Tab>
           </Tabs>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleClose}><FiSend /> Share Update</Button>
+          <Button variant="primary" onClick={handleSubmit} disabled={loading}><FiSend /> { loading ? 'Sharing...' : 'Share Update '}</Button>
+          <p>{error}</p>
         </Modal.Footer>
       </Modal>
     </>
