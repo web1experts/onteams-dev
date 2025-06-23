@@ -635,17 +635,6 @@ body {
   line-height: 25px;
 }
 
-.page--wrapper table td.task--buttons button {
-  padding: 0;
-  width: 35px;
-  height: 35px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  line-height: 25px;
-}
-
 .page--wrapper table td .dropdown {
   display: inline-block;
 }
