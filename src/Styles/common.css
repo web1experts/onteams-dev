@@ -1111,6 +1111,62 @@ Add Project Modal CSS-=-=-
   cursor: pointer;
 }
 
+.add--workflow--modal .tab-content {
+    border: 1px solid var(--bs-border-color);
+    border-top: 0;
+    padding: 1rem;
+}
+
+.add--workflow--modal .custom--field svg {
+    width: 40px;
+    height: auto;
+    margin-bottom: 1rem;
+    color: #64748b;
+}
+
+.custom--field {
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    padding: 3rem;
+    color: #64748b;
+}
+
+.add--workflow--modal .custom--field .btn svg {
+    width: 20px;
+    height: auto;
+    margin-bottom: 0;
+    color: inherit;
+}
+
+.add--new--field {
+  background: rgb(238 242 255);
+  padding: 1rem;
+  border-radius: .75rem;
+  border: 1px solid rgb(199 210 254);
+}
+
+.added--fields .card {
+  background: rgb(248 250 252);
+  border: 1px solid rgb(226 232 240);
+  border-radius: .75rem;
+  -webkit-border-radius: .75rem;
+  padding: 1rem;
+  font-size: .875rem;
+}
+
+.added--fields .card .card-body {
+  padding: 0;
+}
+
+.add--workflow--modal .nav-tabs .nav-link {
+  color: #495057;
+}
+
+.add--workflow--modal .nav-tabs .nav-item.show .nav-link, .add--workflow--modal .nav-tabs .nav-link.active {
+    color: var(--bs-nav-tabs-link-active-color);
+}
+
 .select2-container--open {
   z-index: 111111;
 }

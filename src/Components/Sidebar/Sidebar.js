@@ -335,7 +335,7 @@ function SidebarPanel() {
                                 </Form.Group>
                             </Col>
                         </Row>
-                        <Form.Group className="btn--group d-flex gap-3">
+                        <Form.Group className="btn--group d-flex gap-3 mt-4">
                             <Button variant="primary" onClick={handleApply}>Apply Custom Theme</Button>
                             <Button variant="secondary" onClick={() => setShowCreateOption(false)}>Cancel</Button>
                         </Form.Group>

@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form } from "react-bootstrap";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaVideo, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye } from 'react-icons/fa';
-import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiSend, FiX, FiClock, FiCalendar } from "react-icons/fi";
+import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye } from 'react-icons/fa';
+import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiClock, FiCalendar, FiSend, FiYoutube } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
+import { LuVideo } from "react-icons/lu";
 import { MdLaptopMac, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { BsChat, BsHeart, BsClock } from "react-icons/bs";
 import { HiOutlineLightningBolt, HiOutlineLocationMarker } from "react-icons/hi";
@@ -433,43 +434,46 @@ function DashboardPage() {
         </div>
       </div>
 
-      <Modal show={show} onHide={handleClose} centered size="lg">
+      <Modal show={show} onHide={handleClose} centered size="lg" className="theme--modal">
         <Modal.Header closeButton className="py-3">
-          <Modal.Title>Create Team Update</Modal.Title>
+           <Modal.Title>
+              <span className="nav--item--icon"><FiSend /></span>
+              <strong>Share Team Update <small>Share your progress, thoughts, or inspiration</small></strong>
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="bg-light pt-4">
+        <Modal.Body className="p-4">
           <Tabs defaultActiveKey="text" id="icon-tabs">
-            <Tab eventKey="text" onClick={() => {
-              setFields({...fields, ['type']: 'text'})
-            }} title={<span><FaRegFileAlt /> Text</span>}>
+            <Tab eventKey="text" onClick={() => {setFields({...fields, ['type']: 'text'})}} title={<span><FaRegFileAlt /> Text</span>}>
               <Form>
                 <Form.Group className="mb-3">
-                  <Form.Label>Message</Form.Label>
-                  <Form.Control as="textarea" placeholder="What's happening with you work? Share updates, achievements, or insights..." rows={7} value={fields.content}
-                onChange={handleTextChange} />
+                  <Form.Label>Title (Optional)</Form.Label>
+                  <Form.Control type="text" placeholder="Add a title to your post..."  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Content *</Form.Label>
+                  <Form.Control required as="textarea" placeholder="What's happening with you work? Share updates, achievements, or insights..." rows={5} value={fields.content} onChange={handleTextChange} />
                 </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="quote" onClick={() => {
-              setFields({...fields, ['type']: 'quote'})
-            }} title={<span><FaQuoteRight /> Quote</span>}>
+            <Tab eventKey="quote" onClick={() => {setFields({...fields, ['type']: 'quote'})}} title={<span><FaQuoteRight /> Quote</span>}>
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Add a Quote</Form.Label>
-                  <Form.Control as="textarea" placeholder="Share an inspiring quote or meaningful message..." rows={7} value={fields.content}
-                onChange={handleTextChange} />
+                  <Form.Control as="textarea" placeholder="Share an inspiring quote or meaningful message..." rows={5} value={fields.content} onChange={handleTextChange} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Author (Optional)</Form.Label>
+                  <Form.Control type="text" placeholder="Quote author..."  />
                 </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="image" onClick={() => {
-              setFields({...fields, ['type']: 'image'})
-            }}  title={<span><FaImage /> Image</span>}>
+            <Tab eventKey="image" onClick={() => { setFields({...fields, ['type']: 'image'}) }}  title={<span><FaImage /> Image</span>}>
               <Form>
                 <Form.Group className="mb-3">
-                  <Form.Label>Add Image</Form.Label>
+                  <Form.Label>Upload Image *</Form.Label>
                   <label for="imageUpload" className="update--file--upload" onChange={handleFileChange} accept="image/*" >
                     <Form.Control type="file" multiple id="imageUpload" hidden />
-                    <span><FiUpload /> Browse or Drag and Drop images here <small>(Supported file formats: jpg, png, gif)</small></span>
+                    <span><FiUpload /> Click to upload an image <small>PNG, JPG, GIF up to 10MB</small></span>
                   </label>
                   <div className="mt-3 d-flex flex-wrap gap-3">
                   {fields.files.map((file, idx) => (
@@ -493,35 +497,58 @@ function DashboardPage() {
                   ))}
                 </div>
                 </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Caption</Form.Label>
+                  <Form.Control as="textarea" placeholder="Add a caption to your image..." rows={5} />
+                </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="video" onClick={() => {
-              setFields({...fields, ['type']: 'video'})
-            }}  title={<span><FaVideo /> Video</span>}>
+            <Tab eventKey="video" onClick={() => {setFields({...fields, ['type']: 'video'})}}  title={<span><LuVideo /> Video</span>}>
               <Form>
-                <Form.Group className="mb-3">
-                  <Form.Label>Add Video</Form.Label>
-                  <label for="videoUpload" className="update--file--upload">
-                    <Form.Control type="file" id="videoUpload" hidden accept="video/mp4"  onChange={handleFileChange} />
-                    <span><FiUpload /> Browse or Drag and Drop video here <small>(Supported file format: mp4)</small></span>
-                  </label>
-                  <div className="mt-3">
-                    {fields.files.map((file, idx) => (
-                      <div key={idx} className="d-flex align-items-center justify-content-between mb-2">
-                        <div>
-                          <strong>{file.name}</strong> – {(file.size / 1024 / 1024).toFixed(2)} MB
+                <Form.Label>Video Type</Form.Label>
+                <Tabs defaultActiveKey="youtube" id="video--type">
+                  <Tab eventKey="youtube" title={<span><FiYoutube /> Youtube</span>}>
+                    <Form.Group className="mb-3">
+                        <Form.Label>YouTube URL *</Form.Label>
+                        <Form.Control type="url" placeholder="https://www.youtube.com/watch?v=..."  />
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Description</Form.Label>
+                        <Form.Control as="textarea" placeholder="Why are you sharing this video?" rows={5} />
+                      </Form.Group>
+                  </Tab>
+                  <Tab eventKey="vimeo" title={<span><LuVideo /> Vimeo</span>}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Vimeo URL *</Form.Label>
+                      <Form.Control type="url" placeholder="https://vimeo.com/..."  />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Description</Form.Label>
+                      <Form.Control as="textarea" placeholder="Why are you sharing this video?" rows={5} />
+                    </Form.Group>
+                  </Tab>
+                  <Tab eventKey="upload" title={<span><FiUpload /> Upload</span>}>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Upload Video *</Form.Label>
+                        <label for="videoUpload" className="update--file--upload">
+                          <Form.Control type="file" id="videoUpload" hidden accept="video/mp4"  onChange={handleFileChange} />
+                          <span><FiUpload /> Click to upload a video <small>MP4, MOV, AVI up to 100MB</small></span>
+                        </label>
+                        <div className="mt-3">
+                          {fields.files.map((file, idx) => (
+                            <div key={idx} className="d-flex align-items-center justify-content-between mb-2">
+                              <div><strong>{file.name}</strong> – {(file.size / 1024 / 1024).toFixed(2)} MB</div>
+                              <Button size="sm" variant="outline-danger" onClick={() => removeFile(idx)} ><FiX /></Button>
+                            </div>
+                          ))}
                         </div>
-                        <Button
-                          size="sm"
-                          variant="outline-danger"
-                          onClick={() => removeFile(idx)}
-                        >
-                          <FiX />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </Form.Group>
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <Form.Label>Description</Form.Label>
+                        <Form.Control as="textarea" placeholder="Why are you sharing this video?" rows={5} />
+                      </Form.Group>
+                  </Tab>
+                </Tabs>
               </Form>
             </Tab>
           </Tabs>

@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateOwnership } from '../../redux/actions/workspace.action';
 import useFilledClass from "../customHooks/useFilledclass";
 import {updateProject} from "../../redux/actions/project.action"
-import { Button, Modal, Form, ListGroup, FloatingLabel, Dropdown , Alert} from "react-bootstrap";
+import { Button, Modal, Form, ListGroup, FloatingLabel, Dropdown , Alert, Tabs, Tab, Card, Badge, Row, Col } from 'react-bootstrap';
 import { selectboxObserver } from "../../helpers/commonfunctions";
-import { FaCheck, FaPlusCircle, FaTimesCircle, FaUpload, FaRegTrashAlt, FaEllipsisV, FaTrashAlt, FaRegTimesCircle } from "react-icons/fa";
+import { FaCheck, FaPlusCircle, FaTimesCircle, FaUpload, FaRegTrashAlt, FaEllipsisV, FaTrashAlt, FaRegTimesCircle, FaRegEdit } from "react-icons/fa";
 import fileIcon from './../../images/file-icon-image.jpg'
 import { ListWorkflows } from '../../redux/actions/workflow.action';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -14,6 +14,8 @@ import { updateTask } from '../../redux/actions/task.action';
 import { PROJECT_FORM, EDIT_PROJECT_FORM } from '../../redux/actions/types';
 import { MdFileDownload } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
+import { FiPlus } from "react-icons/fi";
+import { LuSettings } from "react-icons/lu";
 import { MdArrowDownward } from "react-icons/md";
 import { GrDrag } from "react-icons/gr";
 import { dataObject } from '../../helpers/objectdata';
@@ -759,15 +761,233 @@ export const  WorkFlowModal =  (props) => {
       };
     });
   };
-  
+  const FieldCard = ({ id, type, title, options }) => {
+  return (
+    <Card className="mb-3">
+      <Card.Body>
+        <Row className="align-items-center mb-2">
+          <Col xs="auto">
+            <Badge pill bg="light" text="dark">
+              #{id}
+            </Badge>
+          </Col>
+          <Col>
+            <h5 className="mb-0 fw-bold">{title}</h5>
+          </Col>
+          <Col xs="auto">
+            <Badge bg={type === 'radio' ? 'secondary' : 'primary'}>
+              {type === 'radio' ? 'Radio' : 'Text Field'}
+            </Badge>
+          </Col>
+        </Row>
+
+        {type === 'radio' && (
+          <>
+            <Badge bg="info" className="mb-2">
+              {options.length} options
+            </Badge>
+            <Row className="mb-3">
+              {options.map((opt, i) => (
+                <Col key={i} className="mb-1">
+                  <Form.Control value={opt} readOnly />
+                </Col>
+              ))}
+            </Row>
+          </>
+        )}
+
+        <Row>
+          <Col>
+            <Button variant="light" className="me-2">
+              Add to Columns
+            </Button>
+          </Col>
+          <Col xs="auto">
+            <Button variant="outline-primary" className="me-2 border-0 p-0 text-info">
+              <FaRegEdit />
+            </Button>
+            <Button variant="outline-danger" className="border-0 p-0">
+              <FaRegTrashAlt />
+            </Button>
+          </Col>
+        </Row>
+      </Card.Body>
+    </Card>
+  );
+};
+
+  const [showInitialMessage, setShowInitialMessage] = useState(true);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showAddedFields, setShowAddedFields] = useState(false);
+  const [fieldType, setFieldType] = useState('');
+  const [options, setOptions] = useState([]);
+  const [newOption, setNewOption] = useState('');
+
+  const handleAddFieldClick = () => {
+    setShowInitialMessage(false);
+    setShowOptions(true);
+    setShowAddedFields(false);
+  };
+
+  const handleAddNewClick = () => {
+    setShowOptions(false);
+    setShowAddedFields(true);
+  };
+
+  const handleCancelClick = () => {
+    setShowOptions(false);
+  };
+
+  const handleFieldTypeChange = (e) => {
+    setFieldType(e.target.value);
+    setOptions([]); // Reset options when changing field type
+  };
+
+  const handleAddOption = () => {
+    if (newOption.trim()) {
+      setOptions([...options, newOption.trim()]);
+      setNewOption('');
+    }
+  };
+
+  const removeOption = (index) => {
+    const newOpts = options.filter((_, i) => i !== index);
+    setOptions(newOpts);
+  };
+
+  const shouldShowOptions = ['dropdown', 'badge', 'radio'].includes(fieldType);
+
   return (
     <>      
       <Modal show={modalstate} onHide={handleWorkflowClose} centered size="lg" className="add--workflow--modal">
                 <Modal.Header closeButton>
-                    <Modal.Title>Workflows</Modal.Title>
+                    <Modal.Title>Settings</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  { commonState.active_formtype !== "edit_project" &&
+                  <Tabs defaultActiveKey="customFields" id="setting--tabs">
+                    <Tab eventKey="customFields" title="Custom Fields">
+                      {showInitialMessage && (
+                        <div className='custom--field'>
+                          <h3>No custom fields added yet</h3>
+                          <p>Click "Add Field" to create custom fields for your project</p>
+                          <Button variant='primary' className='field--btn' onClick={handleAddFieldClick}>
+                            Add Field
+                          </Button>
+                        </div>
+                      )}
+
+                      {showOptions && (
+                        <div className='field--options'>
+                          <h4 className='d-flex align-items-center justify-content-between mb-2'><span><LuSettings /> Custom Fields</span></h4>
+                          <div className='add--new--field'>
+                            <h5>Add New Custom Field</h5>
+                            <Form>
+                              <Row>
+                                <Col>
+                                  <Form.Group className="mb-3 col">
+                                    <Form.Label>Field Name *</Form.Label>
+                                    <Form.Control type="text" placeholder="Enter field name" />
+                                  </Form.Group>
+                                </Col>
+                                <Col>
+                                  <Form.Group className="mb-3 col">
+                                    <Form.Label>Field Type *</Form.Label>
+                                    <Form.Select value={fieldType} onChange={handleFieldTypeChange}>
+                                      <option value="text">Text Field</option>
+                                      <option value="email">Email</option>
+                                      <option value="phone">Phone Number</option>
+                                      <option value="textarea">Textarea</option>
+                                      <option value="dropdown">Dropdown</option>
+                                      <option value="badge">Badge</option>
+                                      <option value="date">Date</option>
+                                      <option value="password">Password</option>
+                                      <option value="range">Range</option>
+                                      <option value="checkbox">Checkbox</option>
+                                      <option value="radio">Radio</option>
+                                    </Form.Select>
+                                  </Form.Group>
+                                </Col>
+                              </Row>
+                              {shouldShowOptions && (
+                                <>
+                                  <Form.Group className="mb-3">
+                                    <Form.Label>Options *</Form.Label>
+                                    <div className="d-flex">
+                                      <Form.Control
+                                        type="text"
+                                        placeholder="Add option..."
+                                        value={newOption}
+                                        onChange={(e) => setNewOption(e.target.value)}
+                                      />
+                                      <Button
+                                        type="button"
+                                        onClick={handleAddOption}
+                                        style={{ marginLeft: '10px' }}
+                                      >
+                                        Add
+                                      </Button>
+                                    </div>
+                                  </Form.Group>
+
+                                  <div className="mb-3 d-flex flex-wrap gap-2">
+                                    {options.map((opt, idx) => (
+                                      <div key={idx} style={{
+                                        backgroundColor: '#e0e7ff',
+                                        padding: '5px 10px',
+                                        borderRadius: '20px',
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                      }}>
+                                        <span style={{ marginRight: '10px', color: '#3730a3', fontWeight: 500 }}>{opt}</span>
+                                        <span style={{ cursor: 'pointer' }} onClick={() => removeOption(idx)}>×</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </>
+                              )}
+                              <Row>
+                                <Col>
+                                  <Form.Group controlId="formBasicCheckbox">
+                                    <Form.Check type="checkbox" label="Include in columns" />
+                                  </Form.Group>
+                                </Col>
+                                <Col className='text-end'>
+                                  <Button variant="secondary" type="button" onClick={handleCancelClick}>
+                                    Cancel
+                                  </Button>
+                                  <Button variant="info" type="button" className='add--new--btn ms-3' onClick={handleAddNewClick}>
+                                    Add Field
+                                  </Button>
+                                </Col>
+                              </Row>
+                            </Form>
+                          </div>
+                        </div>
+                      )}
+
+                      {showAddedFields && (
+                        <div className='added--fields'>
+                          <h4 className='d-flex align-items-center justify-content-between mb-4'><span><LuSettings /> Custom Fields</span> <Button variant='primary' className='field--btn' onClick={handleAddFieldClick}><FiPlus /> Add Field</Button></h4>
+                          <h5>Added Custom Fields</h5>
+                          <div>
+                            <FieldCard
+                              id={1}
+                              type="radio"
+                              title="fdgdb"
+                              options={['fbefn', 'hbefwnb', 'bfebnefnb']}
+                            />
+                            <FieldCard
+                              id={2}
+                              type="text"
+                              title="terte"
+                              options={[]} // no options for text field
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </Tab>
+                    <Tab eventKey="workflow" title="Workflows">
+                      { commonState.active_formtype !== "edit_project" &&
                         <Form.Group className="mb-3 form-group">
                             <Form.Label>Select Workflow</Form.Label>
                             <Dropdown className="select--dropdown">
@@ -806,141 +1026,143 @@ export const  WorkFlowModal =  (props) => {
                                     </div>
                                 </Dropdown.Menu>
                             </Dropdown>
-                           
+                            
                         </Form.Group>
                       }
-                        <Form.Group className="mb-0 form-group" >
-                            {
-                              showAlert &&
-                              <Alert variant="danger" onClose={() => setshowAlert(false)} dismissible>
-                                <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
-                                <p>
-                                  {AlertMsg}
-                                </p>
-                              </Alert>
-                            }
-                            <Form.Label><strong>Taskboard setup</strong></Form.Label>
-                            <p>Add, remove, reorder and rename the worksteps to reflect the way you work.</p>
-                            {
-                              workflowModalState?.workflow && Object.keys(workflowModalState?.workflow).length > 0 && showWorkflow &&
-                            <>
-                              <ListGroup className='workflow--list'>
-                                <DragDropContext onDragEnd={handleDragEnd}>
-                                  <Droppable droppableId="droppabletabs" type="droppableTabsItem" direction="vertical">
-                                    {(provided) => (
-                                      <ListGroup
-                                        className="workflow--list"
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
-                                      >
-                                        {Object.keys(workflowModalState?.workflow).length > 0 && workflowModalState?.workflow?._id && workflowModalState?.workflow?.tabs?.length > 0 &&
-                                          workflowModalState?.workflow?.tabs.map((tab, index) => (
-                                           <>
-                                           {index == 1 && (
-                                              <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0 arrow--icon'>
-                                                <MdArrowDownward />
-                                              </ListGroup.Item>
-                                            )}
-                                           {index === workflowModalState?.workflow?.tabs.length - 1 && (
-                                              <>
-                                              <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0' key={`addflow-btn`}>
-                                                <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
-                                              </ListGroup.Item>
-                                              <ListGroup.Item className='border-0 justify-content-center pt-0 pt-0 pb-0 arrow--icon'>
-                                                <MdArrowDownward />
-                                              </ListGroup.Item>
-                                              </>
-                                            )}
-                                            <Draggable
-                                              key={`tabitem-${index}`}
-                                              draggableId={`tab-${index}`} // Unique draggableId
-                                              index={index}
-                                              isDragDisabled={
-                                                index === 0 || index === workflowModalState?.workflow?.tabs.length - 1
-                                              } // Disable drag for first and last items
-                                            >
-                                              {(provided) => (
-                                                <ListGroup.Item
-                                                  key={`tab-item-${index}`}
-                                                  ref={provided.innerRef}
-                                                  {...provided.draggableProps}
-                                                  {...provided.dragHandleProps}
-                                                >
-                                                  {typeof tab === 'object' && tab !== null ? (
-                                                    <>
-                                                      <span className='drag--icon'><GrDrag /></span>
-                                                      <span className={`flow--circle workflow--color-${index}`}></span> {tab.title}
-                                                      <small
-                                                        className='ms-auto'
-                                                        type="button"
-                                                        title={tab.title}
-                                                        onClick={() => handleEditShow(index, tab.title)}
-                                                      >
-                                                        <CiEdit />
-                                                      </small>
-                                                      {
-                                                      index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
-                                                        <span className="delete--workstep ms-2" onClick={() => {
-                                                          if( commonState?.currentProject?._id && commonState?.currentProject.workflow?.tabs){
-                                                            const tabdata = commonState?.currentProject.workflow?.tabs.find(t => t._id === tab._id);
+                      <Form.Group className="mb-0 form-group" >
+                          {
+                            showAlert &&
+                            <Alert variant="danger" onClose={() => setshowAlert(false)} dismissible>
+                              <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+                              <p>
+                                {AlertMsg}
+                              </p>
+                            </Alert>
+                          }
+                          <Form.Label><strong>Taskboard setup</strong></Form.Label>
+                          <p>Add, remove, reorder and rename the worksteps to reflect the way you work.</p>
+                          {
+                            workflowModalState?.workflow && Object.keys(workflowModalState?.workflow).length > 0 && showWorkflow &&
+                          <>
+                            <ListGroup className='workflow--list'>
+                              <DragDropContext onDragEnd={handleDragEnd}>
+                                <Droppable droppableId="droppabletabs" type="droppableTabsItem" direction="vertical">
+                                  {(provided) => (
+                                    <ListGroup
+                                      className="workflow--list"
+                                      ref={provided.innerRef}
+                                      {...provided.droppableProps}
+                                    >
+                                      {Object.keys(workflowModalState?.workflow).length > 0 && workflowModalState?.workflow?._id && workflowModalState?.workflow?.tabs?.length > 0 &&
+                                        workflowModalState?.workflow?.tabs.map((tab, index) => (
+                                          <>
+                                          {index == 1 && (
+                                            <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0 arrow--icon'>
+                                              <MdArrowDownward />
+                                            </ListGroup.Item>
+                                          )}
+                                          {index === workflowModalState?.workflow?.tabs.length - 1 && (
+                                            <>
+                                            <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0' key={`addflow-btn`}>
+                                              <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
+                                            </ListGroup.Item>
+                                            <ListGroup.Item className='border-0 justify-content-center pt-0 pt-0 pb-0 arrow--icon'>
+                                              <MdArrowDownward />
+                                            </ListGroup.Item>
+                                            </>
+                                          )}
+                                          <Draggable
+                                            key={`tabitem-${index}`}
+                                            draggableId={`tab-${index}`} // Unique draggableId
+                                            index={index}
+                                            isDragDisabled={
+                                              index === 0 || index === workflowModalState?.workflow?.tabs.length - 1
+                                            } // Disable drag for first and last items
+                                          >
+                                            {(provided) => (
+                                              <ListGroup.Item
+                                                key={`tab-item-${index}`}
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                              >
+                                                {typeof tab === 'object' && tab !== null ? (
+                                                  <>
+                                                    <span className='drag--icon'><GrDrag /></span>
+                                                    <span className={`flow--circle workflow--color-${index}`}></span> {tab.title}
+                                                    <small
+                                                      className='ms-auto'
+                                                      type="button"
+                                                      title={tab.title}
+                                                      onClick={() => handleEditShow(index, tab.title)}
+                                                    >
+                                                      <CiEdit />
+                                                    </small>
+                                                    {
+                                                    index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
+                                                      <span className="delete--workstep ms-2" onClick={() => {
+                                                        if( commonState?.currentProject?._id && commonState?.currentProject.workflow?.tabs){
+                                                          const tabdata = commonState?.currentProject.workflow?.tabs.find(t => t._id === tab._id);
 
-                                                            // Get the taskCount
-                                                            const taskCount = tabdata ? tabdata.taskCount : 0;
-                                                            if( taskCount > 0){
-                                                              setshowAlert( true)
-                                                              setAlertMsg("This workflow contains task. Move them into another flow and try again.")
-                                                              // addToast("This workflow contains task. Move them into another flow and try again.", 'danger');
-                                                            }else{
-                                                              removetab(index)
-                                                            }
+                                                          // Get the taskCount
+                                                          const taskCount = tabdata ? tabdata.taskCount : 0;
+                                                          if( taskCount > 0){
+                                                            setshowAlert( true)
+                                                            setAlertMsg("This workflow contains task. Move them into another flow and try again.")
+                                                            // addToast("This workflow contains task. Move them into another flow and try again.", 'danger');
                                                           }else{
                                                             removetab(index)
                                                           }
-                                                          
-                                                        }}><FaRegTimesCircle /></span>
-                                                      }
-                                                      
-                                                    </>
-                                                  ) : (
-                                                    <>
-                                                      <span className='drag--icon'><GrDrag /></span>
-                                                      <span className={`flow--circle workflow--color-${index}`}></span> {tab}
-                                                      <small
-                                                        className='ms-auto'
-                                                        type="button"
-                                                        title="Filter"
-                                                        onClick={() => handleEditShow(index, tab)}
-                                                      >
-                                                        <CiEdit />
-                                                      </small>
-                                                      {
-                                                      index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
-                                                        <span className="delete--workstep ms-2" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
-                                                      }
-                                                      
-                                                    </>
-                                                  )}
-                                                </ListGroup.Item>
-                                              )}
-                                            </Draggable>
-                                            </>
-                                          ))}
-                                        {provided.placeholder}
-                                      </ListGroup>
-                                    )}
-                                  </Droppable>
-                                </DragDropContext>
+                                                        }else{
+                                                          removetab(index)
+                                                        }
+                                                        
+                                                      }}><FaRegTimesCircle /></span>
+                                                    }
+                                                    
+                                                  </>
+                                                ) : (
+                                                  <>
+                                                    <span className='drag--icon'><GrDrag /></span>
+                                                    <span className={`flow--circle workflow--color-${index}`}></span> {tab}
+                                                    <small
+                                                      className='ms-auto'
+                                                      type="button"
+                                                      title="Filter"
+                                                      onClick={() => handleEditShow(index, tab)}
+                                                    >
+                                                      <CiEdit />
+                                                    </small>
+                                                    {
+                                                    index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
+                                                      <span className="delete--workstep ms-2" onClick={() => {removetab(index)}}><FaRegTimesCircle /></span>
+                                                    }
+                                                    
+                                                  </>
+                                                )}
+                                              </ListGroup.Item>
+                                            )}
+                                          </Draggable>
+                                          </>
+                                        ))}
+                                      {provided.placeholder}
+                                    </ListGroup>
+                                  )}
+                                </Droppable>
+                              </DragDropContext>
 
-                                
-                              </ListGroup>
-                            </>
-                        }
-                        </Form.Group>
+                              
+                            </ListGroup>
+                          </>
+                      }
+                      </Form.Group>
+                      <Form.Group className='d-flex gap-3 align-items-center justify-content-end mt-4'>
+                        <Button variant="secondary" onClick={handleWorkflowClose}>Cancel</Button>
+                        <Button variant="primary" onClick={handleSelect}>Select</Button>
+                      </Form.Group>
+                    </Tab>
+                  </Tabs>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleWorkflowClose}>Cancel</Button>
-                    <Button variant="primary" onClick={handleSelect}>Select</Button>
-                </Modal.Footer>
             </Modal>
             <Modal show={showEdit} onHide={handleEditClose} centered size="md" className="add--workflow--modal">
                 <Modal.Header closeButton>

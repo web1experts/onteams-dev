@@ -524,6 +524,25 @@ useEffect(() => {
                             <strong>{currentProject?.title}</strong>
                             <span>{currentProject?.client?.name}</span>
                         </h3>
+                        {/* <Dropdown>
+                            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                                <h3 key={`project-title-${currentProject?._id}`}>
+                                    <strong>{currentProject?.title}</strong>
+                                    <span>{currentProject?.client?.name}</span>
+                                </h3>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                {projects.map((project, index) => {
+                                    return (<>
+                                        <Dropdown.Item value={project._id}>
+                                            <strong>{project.title}</strong>
+                                            <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
+                                        </Dropdown.Item>
+                                    </>
+                                    )
+                                })}
+                            </Dropdown.Menu>
+                        </Dropdown> */}
                     </div>
                     
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
