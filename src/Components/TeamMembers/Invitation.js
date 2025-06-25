@@ -7,11 +7,13 @@ import { permissionModules } from "../../helpers/permissionsModules";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { GrExpand } from "react-icons/gr";
-import { FiMail, FiSidebar, FiBriefcase, FiShield, FiPhone, FiCalendar } from "react-icons/fi";
+import { TbArrowsSort } from "react-icons/tb";
+import { FiMail, FiBriefcase, FiShield, FiPhone, FiCalendar } from "react-icons/fi";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite, resendInvite, Listmembers} from "../../redux/actions/members.action";
 import { MdOutlineClose, MdSearch } from "react-icons/md";
 import { updatePermissions } from "../../redux/actions/permission.action";
 function Invitation(props) {
+  const [isActiveView, setIsActiveView] = useState(2);
   const [rows, setRows] = useState([{ email: "", role: "" }]);
   const [ showPermissions, setShowPermissions] = useState( false)
   const [memberIndex, setMemberIndex] = useState('')
@@ -381,9 +383,21 @@ function Invitation(props) {
       handleInvitationList();
     }
   }, [memberstate]);
+
+
+  const [projectToggle, setProjectToggle ] = useState(false)
+  const handleToggles = () => {
+      if(commonState.sidebar_small === false ){ console.log('1')
+          handleSidebarSmall()
+      }else{
+          setProjectToggle(false)
+          handleSidebarSmall()
+            console.log('3')
+      }
+  }
   return (
     <>
-      <div className={isActive ? 'view--invitee team--page' : 'team--page'}>
+      <div className={`${isActive ? 'view--invitee team--page project-collapse' : 'team--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
         {props.topbar()}
         <div className="page--wrapper px-md-2 pt-3">
           {
@@ -396,70 +410,62 @@ function Invitation(props) {
             {props.activeTab === "Invitees" && (
 
               <>
-                <Table responsive="lg" className={props.activeSubTab === 1 ? 'project--grid--table clients--grid--table project--grid--new--table' : props.activeSubTab === 2 ? 'project--table clients--table new--project--rows' : 'project--table clients--table new--project--rows'}>
-                  {/* <thead>
-                    <tr>
-                      <th><abbr>#</abbr> Email Address</th>
-                      <th className="onHide">Role</th>
-                      <th className="onHide">Action</th>
-                    </tr>
-                  </thead> */}
-                  <tbody>
-                    {invitationsFeeds && invitationsFeeds.length > 0 ? (
-                      invitationsFeeds.map((invitation, index) => {
-                        return (
-                          <>
-                            <tr key={`member-table-row-${index}`} className={invitation._id === selectedInvitation?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(invitation) : () => { return false; }}>
-                              {/* <td>{index + 1}</td> */}
-                              <td className="cursor--pointer project--title--td">
-                                  <span>
-                                    <img variant="top" src="./images/default.jpg" />
-                                  </span>
-                                <div className="project--name">
-                                  <span>{invitation.email}</span>
-                                  <strong>
-                                    {invitation.role?.name?.replace(
-                                      /\b\w/g,
-                                      function (char) {
-                                        return char.toUpperCase();
-                                      }
-                                    )}
-                                  </strong>
+              {/* <div className={isActiveView === 1 ? 'project--grid--table project--grid--new--table table-responsive-xl' : isActiveView === 2 ? 'project--table draggable--table new--project--rows table-responsive-xl' : 'project--table new--project--rows table-responsive-xl'}></div> */}
+                <div className={props.activeSubTab === 1 ? 'project--grid--table project--grid--new--table table-responsive-xl' : props.activeSubTab === 2 ? 'project--table draggable--table new--project--rows table-responsive-xl' : 'project--table new--project--rows table-responsive-xl'}>
+                  <Table>
+                    <thead className="onHide">
+                        <tr key="project-table-header">
+                            <th scope="col" className="sticky" key="project-name-header">
+                                <div className="d-flex align-items-center justify-content-between">
+                                    Member
                                 </div>
-                              </td>
-                              {/* <td>
-                                <span className="onHide">
-                                  <img variant="top" src="./images/default.jpg" />
-                                </span>
-                                <span><abbr>{index + 1}.</abbr> {invitation.email}</span></td>
-                              <td className="onHide">
-                                {invitation.role?.name?.replace(
-                                  /\b\w/g,
-                                  function (char) {
-                                    return char.toUpperCase();
-                                  }
-                                )}
-                              </td> */}
-                              <td className="onHide">
-                                <Button variant="primary" onClick={() => { handleTableToggle(invitation); setIsActive(true); handleSidebarSmall(); }}>View</Button>
-                              </td>
-
-                            </tr>
-                          </>
-                        );
-                      })
-                    ) :
-                      !showloader && invitationsFeeds && invitationsFeeds.length === 0 &&
-                      <tr className="no--invite">
-                        <td colSpan={4}>
-                          <h2 className="mt-2 text-center">
-                            There are no invitations.
-                          </h2>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </Table>
+                            </th>
+                            <th width='10%' scope="col" key="project-status-header" className="onHide text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {invitationsFeeds && invitationsFeeds.length > 0 ? (
+                        invitationsFeeds.map((invitation, index) => {
+                          return (
+                            <>
+                              <tr key={`member-table-row-${index}`} className={invitation._id === selectedInvitation?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(invitation) : () => { return false; }}>
+                                <td className="project--title--td sticky" data-label="Member Name">
+                                  <div className="d-flex justify-content-between">
+                                      <div className="project--name">
+                                          <div className="drag--indicator"><abbr>#{index + 1}</abbr></div>
+                                          <div className="title--initial">{invitation.email.charAt(0)}</div>
+                                          <div className="title--span flex-column align-items-start gap-0">
+                                            <span>{invitation.email}</span>
+                                            <strong>
+                                              {invitation.role?.name?.replace(
+                                                /\b\w/g,
+                                                function (char) {
+                                                  return char.toUpperCase();
+                                                }
+                                              )}
+                                            </strong>
+                                          </div>
+                                      </div>
+                                  </div>
+                                </td>
+                                <td className="onHide text-end"><Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(invitation); setIsActive(true); }}>View</Button></td>
+                              </tr>
+                            </>
+                          );
+                        })
+                      ) :
+                        !showloader && invitationsFeeds && invitationsFeeds.length === 0 &&
+                        <tr className="no--invite">
+                          <td colSpan={4}>
+                            <h2 className="mt-2 text-center">
+                              There are no invitations.
+                            </h2>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </Table>
+                </div>
               </>
             )}
           </Container>
@@ -470,24 +476,9 @@ function Invitation(props) {
           <div className="projecttitle">
             <h3><strong>Member Details</strong></h3>
           </div>
-          {/* <ListGroup horizontal>
-            <Button variant="outline-primary" className={`btn--view d-none d-sm-flex${tab === 'details' ? ' active' : ''}`} onClick={() => setTab('details')}>Details</Button>
-            { (memberProfile?.permissions?.members?.update_permissions === true || memberProfile?.role?.slug === "owner") && (
-            <Button variant="outline-primary" className={`btn--view d-none d-sm-flex${tab === 'permissions' ? ' active' : ''}`} onClick={() => {
-              setTab('permissions')
-              }}>Permissions</Button>
-            )}
-            <ListGroup.Item onClick={() => {
-              if (props.toggleActive) {
-                props.toggleActive(false)
-              } setIsActive(0)
-            }}>
-              <MdOutlineClose />
-            </ListGroup.Item>
-          </ListGroup> */}
           <ListGroup horizontal>
-            <ListGroup.Item onClick={handleSidebar} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
-            <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {handleSidebarSmall(true);if (props.toggleActive) {
+            <ListGroup.Item nClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+            <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {if (props.toggleActive) {
                 props.toggleActive(false)
               } setIsActive(0);}}><MdOutlineClose /></ListGroup.Item>
           </ListGroup>
@@ -498,7 +489,7 @@ function Invitation(props) {
             <div className="card--img">
               <Card.Img variant="top" src={selectedInvitation?.avatar ?? "./images/default.jpg"} />
             </div>
-            <Card.Body>
+            <Card.Body className="p-0 ps-4">
               <Card.Title><FiMail /> Contact Information</Card.Title>
               <Card.Text>
                 <ListGroup>
@@ -512,11 +503,6 @@ function Invitation(props) {
                   </ListGroup.Item>
                 </ListGroup>
               </Card.Text>
-            </Card.Body>
-          </Card>
-          <Card className="work--card">
-            <Card.Body>
-              <Card.Title><FiBriefcase /> Work Information</Card.Title>
               <Card.Text>
                 <ListGroup>
                   <ListGroup.Item>
@@ -529,6 +515,20 @@ function Invitation(props) {
                   </ListGroup.Item>
                 </ListGroup>
               </Card.Text>
+              <div className="text-end mt-4">
+                <Button variant="secondary" onClick={() => rejectInvite(selectedInvitation?._id)}>{props.listfor && props.listfor === "company" ? "Delete" : "Decline"}</Button>
+                {props.listfor &&
+                  props.listfor === "company" ? (
+                  <>
+                    <Button variant="primary" className="ms-3" onClick={() => sentInviteAgain(selectedInvitation?._id)}>Send Again</Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="primary" className="ms-3" onClick={() => acceptInvite(selectedInvitation?.inviteToken)}>Accept</Button>
+                  </>
+                )
+                }
+              </div>
             </Card.Body>
           </Card>
           <Card className="permission--card">
@@ -685,20 +685,7 @@ function Invitation(props) {
             </Card.Body>
           </Card>
         </div>
-        <div className="text-end mt-4">
-          <Button variant="secondary" onClick={() => rejectInvite(selectedInvitation?._id)}>{props.listfor && props.listfor === "company" ? "Delete" : "Decline"}</Button>
-          {props.listfor &&
-            props.listfor === "company" ? (
-            <>
-              <Button variant="primary" className="ms-3" onClick={() => sentInviteAgain(selectedInvitation?._id)}>Send Again</Button>
-            </>
-          ) : (
-            <>
-              <Button variant="primary" className="ms-3" onClick={() => acceptInvite(selectedInvitation?.inviteToken)}>Accept</Button>
-            </>
-          )
-          }
-        </div>
+        
       </div>
     { showPermissions &&
       <Modal show={showPermissions} onHide={() => setShowPermissions( false )} centered size="lg" className="add--team--member--modal add--member--modal" >

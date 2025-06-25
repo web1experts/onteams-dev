@@ -5,6 +5,7 @@ import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiPhone, FiCalendar, FiVideo } from "react-icons/fi";
 import { BsGrid } from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
+import { TbArrowsSort } from "react-icons/tb";
 import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
 import { getMemberdata } from "../../helpers/commonfunctions";
 import { Listmembers, deleteMember, updateMember } from "../../redux/actions/members.action";
@@ -665,6 +666,17 @@ function TeamMembersPage() {
     }
   };
 
+  const [projectToggle, setProjectToggle ] = useState(false)
+    const handleToggles = () => {
+        if(commonState.sidebar_small === false ){ console.log('1')
+            handleSidebarSmall()
+        }else{
+            setProjectToggle(false)
+            handleSidebarSmall()
+              console.log('3')
+        }
+    }
+
 
   const handleSelectAllPermissions = (isChecked) => {
     const updatedPermissions = {};
@@ -822,9 +834,7 @@ function TeamMembersPage() {
           <Row>
             <Col sm={12}>
               <h2>
-                <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                 Members
-                {/* <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none ms-auto ms-md-2'} onClick={handleSearchShow}><MdSearch /></Button> */}
                 <ListGroup horizontal className={isActive ? "d-none" : "me-4 ms-auto d-none d-md-flex"}>
                   <ListGroup horizontal>
                     <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Members"} onClick={() => { setsearchTerm(''); setActiveTab("Members") }}>Team Members</ListGroup.Item>
@@ -846,12 +856,12 @@ function TeamMembersPage() {
                     <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                     <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
-                  <ListGroup horizontal className="bg-white expand--icon ms-3">
-                      <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
-                      {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                        <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
-                      )}
-                  </ListGroup>
+                  <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex bg-white expand--icon ms-3'}>
+                    <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
+                    {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                      <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                    )}
+                </ListGroup>
                 </ListGroup>
               </h2>
             </Col>
@@ -864,7 +874,7 @@ function TeamMembersPage() {
   return (
     <>
       {activeTab === "Members" && (
-        <div className={isActive ? 'show--details team--page' : 'team--page'}>
+        <div className={`${isActive ? 'show--details team--page project-collapse' : 'team--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
           {pagetopbar()}
           <div className="page--wrapper px-md-2 py-3">
             {
@@ -875,47 +885,55 @@ function TeamMembersPage() {
             }
             <Container fluid>
               <>
-                <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table clients--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table clients--table new--project--rows' : 'project--table clients--table new--project--rows'}>
-                  {/* <thead>
-                    <tr>
-                      <th><abbr>#</abbr> Member Name</th>
-                      <th className="onHide">Role</th>
-                      <th className="onHide">Email Address</th>
-                      <th className="onHide">Action</th>
-                    </tr>
-                  </thead> */}
-                  <tbody>
-                    {!showloader && memberFeeds && memberFeeds.length > 0 ? (
-                      memberFeeds.map((member, idx) => (
-                        <tr key={`member-table-row-${idx}`} className={member._id === selectedMember?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(member) : () => { return false; }}>
-                          {/* <td>{idx + 1}</td> */}
-                          <td className="cursor--pointer project--title--td">
-                            <div className="project--name">
-                                <abbr className="onHide">{idx + 1}</abbr> 
-                                <span className="client--img"><img variant="top" src={member.avatar || "./images/default.jpg"} /></span>
-                                <div className="title--span team--span">
-                                    <span>{member.name}</span>
-                                    <strong>{member.role?.name}</strong>
+                <div className={isActiveView === 1 ? 'project--grid--table project--grid--new--table table-responsive-xl' : isActiveView === 2 ? 'project--table draggable--table new--project--rows table-responsive-xl' : 'project--table new--project--rows table-responsive-xl'}>
+                  <Table>
+                    <thead className="onHide">
+                        <tr key="project-table-header">
+                            <th scope="col" className="sticky" key="project-name-header">
+                                <div className="d-flex align-items-center justify-content-between">
+                                    Member
                                 </div>
-                            </div>
-                          </td>
-                          {/* <td className="onHide">{member.email}</td> */}
-                          <td className="onHide">
-                            <Button variant="primary" onClick={() => { handleTableToggle(member); setIsActive(true); handleSidebarSmall(); }}>View</Button>
-                          </td>
+                            </th>
+                            <th scope="col" key="project-status-header" className="onHide">Email <small><TbArrowsSort /></small></th>
+                            <th scope="col" key="project-status-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
+                            <th scope="col" key="project-status-header" className="onHide">Joining Date</th>
+                            <th width='10%' scope="col" key="project-status-header" className="onHide text-end">Actions</th>
                         </tr>
-                      ))
-                    ) : !showloader && memberFeeds && memberFeeds.length === 0 &&
-                    <tr className="no--invite">
-                      <td colSpan={5}>
-                        <h2 className="mt-2 text-center">
-                          Members Not Found
-                        </h2>
-                      </td>
-                    </tr>
-                    }
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {!showloader && memberFeeds && memberFeeds.length > 0 ? (
+                        memberFeeds.map((member, idx) => (
+                          <tr key={`member-table-row-${idx}`} className={member._id === selectedMember?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(member) : () => { return false; }}>
+                            <td className="project--title--td sticky" data-label="Member Name">
+                              <div className="d-flex justify-content-between">
+                                  <div className="project--name">
+                                      <div className="drag--indicator"><abbr>#{idx + 1}</abbr></div>
+                                      <div className="title--initial">{member.name.charAt(0)}</div>
+                                      <div className="title--span flex-column align-items-start gap-0">
+                                        <span>{member.name}</span>
+                                        <strong>{member.role?.name}</strong>
+                                      </div>
+                                  </div>
+                              </div>
+                            </td>
+                            <td className="onHide new__td">{member.email}</td>
+                            <td className="onHide new__td">+1 (555) 123-4567</td>
+                            <td className="onHide new__td">19 February 2019</td>
+                            <td className="onHide text-end"><Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(member); setIsActive(true); }}>View</Button></td>
+                          </tr>
+                        ))
+                      ) : !showloader && memberFeeds && memberFeeds.length === 0 &&
+                      <tr className="no--invite">
+                        <td colSpan={5}>
+                          <h2 className="mt-2 text-center">
+                            Members Not Found
+                          </h2>
+                        </td>
+                      </tr>
+                      }
+                    </tbody>
+                  </Table>
+                </div>
               </>
             </Container>
           </div>
@@ -938,18 +956,9 @@ function TeamMembersPage() {
           <div className="projecttitle">
             <h3><strong>Member Details</strong></h3>
           </div>
-          
-          {/* <ListGroup horizontal>
-            <Button variant="outline-primary" className={`btn--view d-none d-sm-flex${tab === 'details' ? ' active' : ''}`} onClick={() => setTab('details')}>Details</Button>
-            { (memberProfile?.permissions?.members?.update_permissions === true && selectedMember?.role?.slug !== "owner" || memberProfile?.role?.slug === "owner") && (
-            <Button variant="outline-primary" className={`btn--view d-none d-sm-flex${tab === 'permissions' ? ' active' : ''}`} onClick={() => {
-            setTab('permissions')
-              }}>Permissions</Button>
-            )}
-          </ListGroup> */}
           <ListGroup horizontal>
-            <ListGroup.Item onClick={handleSidebar} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
-            <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {handleSidebarSmall(true);setIsActive(0);}}><MdOutlineClose /></ListGroup.Item>
+            <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+            <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);}}><MdOutlineClose /></ListGroup.Item>
           </ListGroup>
         </div>
        

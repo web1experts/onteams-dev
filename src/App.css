@@ -633,6 +633,10 @@ body {
   opacity: 0;
 }
 
+.table {
+    margin-bottom: 0;
+}
+
 .page--wrapper table td.project--title--td span,
 .new--project--rows .project--name strong {
   cursor: pointer;
@@ -641,7 +645,8 @@ body {
   line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  max-width: 200px;
+  max-width: 230px;
+  text-overflow: ellipsis;
 }
 
 .page--wrapper table td.project--title--td span {
@@ -782,6 +787,19 @@ table.draggable--table {
 
 .clients--table tr {
   cursor: pointer;
+}
+
+.clients--page .new--project--rows tr:hover, .team-members--page .new--project--rows tr:hover {
+  cursor: auto;
+}
+
+.clients--page .new--project--rows tr:hover abbr, .clients--page .project--grid--new--table tr:hover abbr, 
+.team-members--page .new--project--rows tr:hover abbr, .team-members--page .project--grid--new--table tr:hover abbr {
+  opacity: 1;
+}
+
+.clients--page .project--grid--table td:last-child, .team-members--page .project--grid--table td:last-child {
+  order: 2;
 }
 
 @media (min-width:768px) {
@@ -2489,21 +2507,25 @@ table tr.marked-project td {
 
 .bg-success {
   color: rgb(6 95 70);
-  background-color: rgb(209 250 229 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(209 250 229) !important;
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
 .bg-danger {
-  --bs-bg-opacity: 1;
-  background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1)) !important;
-  border-color: rgb(254 202 202 / var(--tw-border-opacity, 1));
-  color: rgb(153 27 27 / var(--tw-text-opacity, 1));
+  background-color: rgb(254 226 226) !important;
+  border-color: rgb(254 202 202);
+  color: rgb(153 27 27);
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
 .bg-warning {
-  --bs-bg-opacity: 1;
-  background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1)) !important;
-  border-color: rgb(253 230 138 / var(--tw-border-opacity, 1));
-  color: rgb(146 64 14 / var(--tw-text-opacity, 1));
+  background-color: rgb(254 243 199) !important;
+  border-color: rgb(253 230 138);
+  color: rgb(146 64 14);
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
 .projects--page .table .badge {
@@ -2745,8 +2767,6 @@ Project Task View CSS=-=-=
   align-items: center;
   border-radius: 0.5rem;
   -webkit-border-radius: 0.5rem;
-  /* box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);
-    -webkit-box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05); */
   border: 1px solid rgb(226 232 240);
   flex-flow: row wrap;
   font-weight: 500;
@@ -3567,17 +3587,6 @@ pre {
   position: relative;
 }
 
-/* .show--details .page--wrapper table td.project--title--td .status--circle,
-.view--project .page--wrapper table td.project--title--td .status--circle {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  width: 8px;
-  height: 8px;
-} */
-
 .activity--table table .active--color {
   background: green;
 }
@@ -3701,16 +3710,6 @@ pre {
   border-bottom-left-radius: .5rem;
 }
 
-/* .wrapper--title .live--tabs .refresh--btn {
-  padding: 0;
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  margin: 0;
-  background: rgb(100 116 139);
-  color: #ffffff;
-} */
-
 .wrapper--title .screens--shots .list-group-item:first-child:not(:last-child) {
   border-bottom-left-radius: .5rem;
   border-top-right-radius: .5rem;
@@ -3781,21 +3780,6 @@ pre {
   min-height: 35px;
   padding: .5rem 1.2rem;
 }
-
-/* .wrapper--title .live--tabs .list-group-item:first-child:not(:last-child) {
-  border-bottom-left-radius: 5px;
-  border-top-right-radius: 5px;
-}
-
-.screens--tabs .list-group .list-group-item:first-child:not(:last-child) {
-  border-bottom-left-radius: 5px;
-  border-top-right-radius: 5px;
-} */
-
-/* .wrapper--title .live--tabs .list-group-item:last-child:not(:first-child) {
-  border-top-right-radius: 5px;
-  border-bottom-left-radius: 5px;
-} */
 
 .rmdp-calendar {
   padding: 1rem;
@@ -3873,11 +3857,8 @@ pre {
 }
 
 .screens--tabs {
-  /* padding: .5rem 0 .5rem 0;
-  border-bottom: 1px solid #eeeeee; */
   z-index: 111;
   top: 0;
-  /* background: #ffffff; */
 }
 
 .activity--box {
@@ -4389,6 +4370,16 @@ pre {
   margin: auto 0;
   transform: translateX(5rem) translateY(-5rem);
   -webkit-transform: translateX(5rem) translateY(-5rem);
+}
+
+.dashboard--page .open--comment {
+  cursor: pointer;
+}
+
+.team--updates .inner--card video, .team--updates .inner--card iframe {
+    object-fit: cover;
+    height: 100%;
+    border-radius: var(--bs-border-radius)!important;
 }
 
 .app--title {
@@ -5353,6 +5344,7 @@ ul#icon-tabs .nav-link span svg {
   box-shadow: none;
   border: 0;
   border-radius: 0;
+  overflow: visible;
 }
 
 .page--wrapper .project--grid--table th .project--name,
@@ -5549,11 +5541,11 @@ ul#icon-tabs .nav-link span svg {
 
 .attendance--table table th {
   font-weight: 500;
-  color: rgb(100 116 139 / var(--tw-text-opacity, 1));
+  color: rgb(100 116 139);
   letter-spacing: .05em;
   font-size: .85rem;
   line-height: 1rem;
-  background: rgb(248 250 252 / var(--tw-bg-opacity, 1));
+  background: rgb(248 250 252);
 }
 
 .attendance--table .mem--name img {
@@ -5588,8 +5580,8 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .attendance--table .bg--emerald {
-  color: rgb(6 95 70 / var(--tw-text-opacity, 1));
-  background: rgb(209 250 229 / var(--tw-bg-opacity, 1));
+  color: rgb(6 95 70);
+  background: rgb(209 250 229);
 }
 
 .attendance--table .table {
@@ -5606,29 +5598,36 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .attendance--table .bg--amber {
-  color: rgb(146 64 14 / var(--tw-text-opacity, 1));
-  background: rgb(254 243 199 / var(--tw-bg-opacity, 1));
+  color: rgb(146 64 14);
+  background: rgb(254 243 199);
 }
 
 .attendance--table .bg--red {
-  color: rgb(153 27 27 / var(--tw-text-opacity, 1));
-  background: rgb(254 226 226 / var(--tw-bg-opacity, 1));
+  color: rgb(153 27 27);
+  background: rgb(254 226 226);
 }
 
 .attendance--table .bg--blue {
-  color: rgb(30 64 175 / var(--tw-text-opacity, 1));
-  background: rgb(219 234 254 / var(--tw-bg-opacity, 1));
+  color: rgb(30 64 175);
+  background: rgb(219 234 254);
 }
 
-.project--grid--table tr.project--active,
-.clients--grid--table .project--active {
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, .25);
+.project--grid--table tr.project--active, .clients--grid--table .project--active {
+    background: #ecf1fa50;
+    border: 1px solid #e3eaf7;
 }
 
 .project--grid--table tr.project--active td,
 .clients--grid--table .project--active td {
   background: none;
+}
+
+.project--grid--table tr.project--active td.new__td {
+    background: rgb(15 23 42 / 5%);
+    padding: .5rem .75rem;
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    order: 1;
 }
 
 .project--grid--table thead,

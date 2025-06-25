@@ -52,9 +52,6 @@ a:focus {
   outline: none;
 }
 
-.toast-body {
-  color: #fff;
-}
 
 .ql-toolbar.ql-snow .ql-formats {
   margin-right: 5px;
@@ -189,7 +186,7 @@ fieldset:disabled .btn {
     --bs-btn-active-border-color: rgb(191 219 254);
     --bs-btn-color: rgb(30 64 175);
     --bs-btn-hover-color: rgb(30 64 175);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .btn-danger {
@@ -202,7 +199,7 @@ fieldset:disabled .btn {
     --bs-btn-active-border-color: rgb(254 249 195 / 80%);
     --bs-btn-color: rgb(133 77 14);
     --bs-btn-hover-color: rgb(133 77 14);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .btn-success {
@@ -215,7 +212,7 @@ fieldset:disabled .btn {
     --bs-btn-active-border-color: rgb(187 247 208);
     --bs-btn-color: rgb(22 101 52);
     --bs-btn-hover-color: rgb(22 101 52);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 strong.activity-type-text {
@@ -525,110 +522,6 @@ textarea.form-control {
   color: rgb(15 23 42);
   text-decoration: underline;
 }
-
-/* .nm-a {
-  background: #91C8E4;
-}
-
-.nm-b {
-  background: #9288F8;
-}
-
-.nm-c {
-  background: #FBA1B7;
-}
-
-.nm-d {
-  background: #F4D160;
-}
-
-.nm-e {
-  background: #35A29F;
-}
-
-.nm-f {
-  background: #AAC8A7;
-}
-
-.nm-g {
-  background: #E08E6D;
-}
-
-.nm-h {
-  background: #FFC7EA;
-}
-
-.nm-i {
-  background: #FFC436;
-}
-
-.nm-j {
-  background: #A8DF8E;
-}
-
-.nm-k {
-  background: #F0B86E;
-}
-
-.nm-l {
-  background: #33BBC5;
-}
-
-.nm-m {
-  background: #BEADFA;
-}
-
-.nm-n {
-  background: #9ED2BE;
-}
-
-.nm-o {
-  background: #0E7490;
-}
-
-.nm-p {
-  background: #91C8E4;
-}
-
-.nm-q {
-  background: #7A316F;
-}
-
-.nm-r {
-  background: #7A9D54;
-}
-
-.nm-s {
-  background: #F4D160;
-}
-
-.nm-t {
-  background: #F31559;
-}
-
-.nm-u {
-  background: #64CCC5;
-}
-
-.nm-v {
-  background: #FFA41B;
-}
-
-.nm-w {
-  background: #99DBF5;
-}
-
-.nm-x {
-  background: #FFE7A0;
-}
-
-.nm-y {
-  background: #E8AA42;
-}
-
-.nm-z {
-  background: #803618;
-} */
 
 .toast-container {
   position: fixed;
