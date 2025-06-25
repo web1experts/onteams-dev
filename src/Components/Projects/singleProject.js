@@ -48,6 +48,7 @@ function SingleProject(props) {
     const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
     const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
     const handleWorkflowClose = () => dispatch( togglePopups('workflow',false ));
+    const projects = props.projects;
     const handleWorkflowShow = async () => {
        await dispatch( updateStateData(DIRECT_UPDATE, false))
         dispatch( togglePopups('workflow',true));
@@ -516,15 +517,15 @@ useEffect(() => {
 
     return (
         <>
-            <div className="details--projects--view">
+            <div className="details--projects--view common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
-                    <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                    {/* <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span> */}
                     <div className="projecttitle">
-                        <h3 key={`project-title-${currentProject?._id}`}>
+                        {/* <h3 key={`project-title-${currentProject?._id}`}>
                             <strong>{currentProject?.title}</strong>
                             <span>{currentProject?.client?.name}</span>
-                        </h3>
-                        {/* <Dropdown>
+                        </h3> */}
+                        <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
                                 <h3 key={`project-title-${currentProject?._id}`}>
                                     <strong>{currentProject?.title}</strong>
@@ -532,17 +533,19 @@ useEffect(() => {
                                 </h3>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                {projects.map((project, index) => {
-                                    return (<>
-                                        <Dropdown.Item value={project._id}>
-                                            <strong>{project.title}</strong>
-                                            <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
-                                        </Dropdown.Item>
-                                    </>
-                                    )
-                                })}
+                                <div className="drop--scroll">
+                                    {projects.map((project, index) => {
+                                        return (<>
+                                            <Dropdown.Item value={project._id}>
+                                                <strong>{project.title}</strong>
+                                                <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
+                                            </Dropdown.Item>
+                                        </>
+                                        )
+                                    })}
+                                </div>
                             </Dropdown.Menu>
-                        </Dropdown> */}
+                        </Dropdown>
                     </div>
                     
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
