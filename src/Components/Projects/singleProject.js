@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Button, Modal, Form, FloatingLabel, ListGroup, Dropdown, ListGroupItem } from "react-bootstrap";
-import { FaChevronDown, FaPlus, FaRegTrashAlt, FaUpload, FaEllipsisV, FaCheck, FaRegCalendarAlt } from "react-icons/fa";
+import { FaChevronDown, FaPlus, FaRegTrashAlt, FaUpload, FaEllipsisV, FaCheck, FaRegCalendarAlt, FaCog } from "react-icons/fa";
 import { MdFileDownload, MdOutlineClose, MdOutlineCancel } from "react-icons/md";
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment, GrExpand } from "react-icons/gr";
@@ -556,6 +556,13 @@ useEffect(() => {
                     <ListGroup horizontal className="ms-auto bg-light d-none d-sm-flex">
                         <Button variant="secondary" className="active btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>Details</Button>
                         <Button variant="primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}>Tasks</Button>
+                    </ListGroup>
+                    <ListGroup>
+                        {
+                        (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
+                            <ListGroup.Item className="d-lg-flex me-2" key={`work-settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
+                        )
+                        }
                     </ListGroup>
                     <ListGroup horizontal>
                          <ListGroup.Item onClick={props.toggleSidebars} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>

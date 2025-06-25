@@ -32,7 +32,8 @@ const apiKeys = {
     permissions: 'permissions',
     subscription: 'subscription',
     payment: 'payment',
-    post: 'post'
+    post: 'post',
+    custom_field: 'custom_field'
 };
   
 export default apiKeys;

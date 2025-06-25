@@ -26,6 +26,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.snow.css';
 import AutoLinks from "quill-auto-links";
+import { CustomFieldModal } from "../modals/customFields";
 import { socket, currentMemberProfile } from "../../helpers/auth";
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -62,6 +63,7 @@ function ProjectsPage() {
     const [showdialog, setShowDialog] = useState(false);
     const [allMembers, setAllmembers] = useState([])
     const [spinner, setSpinner] = useState(false)
+    const [ showCustomFields, setShowCustomFields] = useState( false )
     let fieldErrors = {};
     const quillRef = useRef(null);
     const pasteOccurred = useRef(false);
@@ -356,6 +358,10 @@ function ProjectsPage() {
     const showError = (name) => {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
         return null
+    }
+
+    const toggleCustomFields = () => {
+       setShowCustomFields(prev => !prev);
     }
 
     const handleSubmit = async (e) => {
@@ -715,11 +721,8 @@ function ProjectsPage() {
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                                         </ListGroup>
                                         <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'bg-white expand--icon ms-3 d-none d-md-flex'}>
-                                            {
-                                                (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
-                                                    <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
-                                                )
-                                            }
+                                        <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                                            
                                             <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                                             {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
                                                 <ListGroup.Item className="btn btn-primary" onClick={() => handleShow('new') }><FaPlus /></ListGroup.Item>
@@ -1004,10 +1007,6 @@ function ProjectsPage() {
                 <div className="wrapper--title py-2 bg-white border-bottom">
                     {/* <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span> */}
                     <div className="projecttitle">
-                        {/* <h3>
-                            <strong>{currentProject?.title}</strong>
-                            <span>{currentProject?.client?.name}</span>
-                        </h3> */}
                         <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
                                 <h3>
@@ -1040,6 +1039,13 @@ function ProjectsPage() {
                         <Button variant="secondary" className="btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>Details</Button>
                         <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
                     </ListGroup>
+                    {/* <ListGroup>
+                        {
+                        (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
+                            <ListGroup.Item className="d-lg-flex me-2" key={`work-settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
+                        )
+                        }
+                    </ListGroup> */}
                     <ListGroup horizontal>
                         <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
                         <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
@@ -1050,6 +1056,9 @@ function ProjectsPage() {
 
             {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} projects={projects} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} /> }
             { commonState?.taskForm && <TaskForm memberProfile={memberProfile}/> }
+            
+            { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module='projects' />}
+
             <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>
                     <Modal.Title>Create New Project</Modal.Title>
