@@ -11,13 +11,14 @@ import { BsChat, BsHeart, BsClock } from "react-icons/bs";
 import { HiOutlineLightningBolt, HiOutlineLocationMarker } from "react-icons/hi";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite} from "../../redux/actions/members.action";
 import { createPost, ListPosts, likePost } from "../../redux/actions/post.action";
-import DOMPurify from 'dompurify';
+import { LuQuote } from "react-icons/lu";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-
+import DateTimeCard from "../common/DateTimeCard";
 dayjs.extend(relativeTime);
 function DashboardPage() {
   const dispatch = useDispatch()
+  
   const memberstate = useSelector((state) => state.member);
   const invitationsFeed = useSelector((state) => state.member.invitations);
   const postFeed = useSelector((state) => state.post.posts);
@@ -39,8 +40,31 @@ function DashboardPage() {
     });
   const [ error, setError] = useState('');
 
-  const handleTextChange = (e) => {
-    setFields({ ...fields, content: e.target.value });
+  const handlevideoTypeChange = (type) => {
+    setFields({
+      ...fields, ['videoType']: type
+    });
+  }
+  const handletypeChange = (type) => { 
+    setFields({
+      type: type,
+      title: '',
+      content: '',
+      caption: '',
+      imageUrl: '',
+      quote: '',
+      quoteAuthor: '',
+      videoType: 'youtube',
+      youtubeUrl: '',
+      vimeoUrl: '',
+      videoUrl: '',
+      description: ''
+    });
+
+  }
+
+  const handleTextChange = ({ target: { name, value, type } }) => {
+    setFields({ ...fields, [name]: value });
   };
   const removeFile = (index) => {
     const newFiles = [...fields.files];
@@ -49,44 +73,132 @@ function DashboardPage() {
   };
 
   const handleSubmit = async () => {
-  const { type, content, files } = fields;
+  const {
+    type,
+    title,
+    content,
+    caption,
+    quote,
+    quoteAuthor,
+    videoType,
+    youtubeUrl,
+    vimeoUrl,
+    description,
+    files,
+  } = fields;
 
-    // Basic validation logic
-    if (!type) {
-      setError('Please select a post type.');
+  // Basic validation
+  if (!type) {
+    setError('Please select a post type.');
+    return;
+  }
+
+  if (type === 'text' && !content.trim()) {
+    setError('Text content cannot be empty.');
+    return;
+  }
+
+  if (type === 'quote' && !quote.trim()) {
+    setError('Quote content cannot be empty.');
+    return;
+  }
+
+  if (type === 'image' && (!files || files.length === 0)) {
+    setError('Please upload at least one image.');
+    return;
+  }
+
+  if (type === 'video') {
+    if (!videoType) {
+      setError('Please select a video type.');
       return;
     }
 
-    if ((type === 'text' || type === 'quote') && !content.trim()) {
-      setError('Content cannot be empty.');
+    if (videoType === 'youtube' && !youtubeUrl.trim()) {
+      setError('Please provide a YouTube URL.');
       return;
     }
 
-    if ((type === 'image' || type === 'video') && (!files || files.length === 0)) {
-      setError(`Please upload at least one ${type === 'image' ? 'image' : 'video'}.`);
+    if (videoType === 'vimeo' && !vimeoUrl.trim()) {
+      setError('Please provide a Vimeo URL.');
       return;
     }
 
-    setLoading(true);
+    if (videoType === 'upload' && (!files || files.length === 0)) {
+      setError('Please upload at least one video file.');
+      return;
+    }
+  }
 
-    try {
-      const formData = new FormData();
-      formData.append('type', type);
+  setLoading(true);
+
+  try {
+    const formData = new FormData();
+    formData.append('type', type);
+
+    if (type === 'text') {
+      formData.append('title', title || '');
       formData.append('content', content);
-
-      files.forEach((file) => formData.append('files', file));
-
-      await dispatch(createPost(formData));
-
-      handleClose();
-      setFields({ type: 'text', content: '', files: [] });
-    } catch (err) {
-      console.error('Error creating post:', err);
-      setError('Something went wrong.');
-    } finally {
-      setLoading(false);
     }
-  };
+
+    if (type === 'quote') {
+      formData.append('quote', quote);
+      formData.append('quoteAuthor', quoteAuthor || '');
+    }
+
+    if (type === 'image') {
+      formData.append('caption', caption || '');
+    }
+
+    if (type === 'video') {
+      formData.append('videoType', videoType);
+      formData.append('description', description || '');
+
+      if (videoType === 'youtube') {
+        formData.append('youtubeUrl', youtubeUrl);
+      }
+
+      if (videoType === 'vimeo') {
+        formData.append('vimeoUrl', vimeoUrl);
+      }
+    }
+
+    // Attach files if present
+    if (files && files.length > 0) {
+      files.forEach((file) => formData.append('files', file));
+    }
+
+    // Dispatch the post creation
+    const res = await dispatch(createPost(formData))
+
+    // Add the new post to the top of the list
+    if (res?.post) {
+      setPosts((prevPosts) => [res.post, ...prevPosts]);
+    }
+
+    // Reset and close modal
+    handleClose();
+    setFields({
+      type: 'text',
+      title: '',
+      content: '',
+      caption: '',
+      quote: '',
+      quoteAuthor: '',
+      videoType: '',
+      youtubeUrl: '',
+      vimeoUrl: '',
+      description: '',
+      files: [],
+    });
+  } catch (err) {
+    console.error('Error creating post:', err);
+    setError('Something went wrong. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleFileChange = (e) => {
     const fileList = Array.from(e.target.files);
@@ -127,6 +239,10 @@ function DashboardPage() {
         )
       );
     }
+
+    if (postApi.createPost) {
+      setPosts((prevPosts) => [postApi.createPost, ...prevPosts]);
+    }
   }, [postApi])
 
   const acceptInvite = (token) => {
@@ -157,7 +273,9 @@ function DashboardPage() {
     }
   };
   
+  
 
+  
   return (
     <>
       <div className={isActive === 1 ? 'show--details team--page dashboard--page' : isActive === 2 ? ' view--project team--page dashboard--page' : 'team--page dashboard--page'}>
@@ -182,17 +300,7 @@ function DashboardPage() {
           <Container fluid>
             <Row className="justify-content-center">
               <Col sm={12}>
-                <Card className="daily--star daily--welcome">
-                  <div className="card--icon">
-                    <div className="star--icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sunset w-6 h-6 text-white"><path d="M12 10V2"></path><path d="m4.93 10.93 1.41 1.41"></path><path d="M2 18h2"></path><path d="M20 18h2"></path><path d="m19.07 10.93-1.41 1.41"></path><path d="M22 22H2"></path><path d="m16 6-4 4-4-4"></path><path d="M16 18a4 4 0 0 0-8 0"></path></svg></div>
-                    <h6 className="mb-0"><strong>Good Afternoon, <span>Paramjeet Singh!</span></strong> <small><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-4 h-4"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg> Ready to make today extraordinary?</small></h6>
-                  </div>
-                  <div className="card-body">
-                    <h3><FiClock /> 05:03 PM</h3>
-                    <p className="text-end"><HiOutlineLocationMarker />Asia/Calcutta</p>
-                    <h4><FiCalendar /> Monday, June 23, 2025</h4>
-                  </div>
-                </Card>
+                <DateTimeCard />
               </Col>
               <Col lg={8}>
                 <ListGroup className="invitation--list">
@@ -256,7 +364,7 @@ function DashboardPage() {
                       <Row className="mb-2">
                         <Col xs="auto">
                           <Image
-                            src={post.author?.avatar || '/default-avatar.png'}
+                            src={post.author?.avatar || '/images/default.jpg'}
                             roundedCircle
                             width={40}
                             height={40}
@@ -268,27 +376,99 @@ function DashboardPage() {
                             • {dayjs(post.createdAt).fromNow()}
                           </span>
 
-                         <div className="mt-3">
-                          {post.post_type === 'text' && <p>{post.content}</p>}
+                          <div className="mt-3">
+                            {/* Text Post */}
+                            {post.post_type === 'text' && (
+                              <>
+                                {post.title && <h5>{post.title}</h5>}
+                                <p>{post.content}</p>
+                              </>
+                            )}
 
-                          {['image', 'quote', 'video'].includes(post.post_type) && (
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(post.content),
-                              }}
-                            />
-                          )}
-                        </div>
+                            {/* Image Post */}
+                            {post.post_type === 'image' && (
+                              <>
+                                {post.caption && <p>{post.caption}</p>}
+                                {Array.isArray(post.files) &&
+                                  post.files.map((img, i) => (
+                                    <Image
+                                      key={i}
+                                      src={img.url}
+                                      alt={img.file_name}
+                                      fluid
+                                      className="rounded"
+                                    />
+                                  ))}
+                              </>
+                            )}
 
+                            {/* Quote Post */}
+                            {post.post_type === 'quote' && (
+                              <blockquote className="blockquote p-3 rounded mt-3">
+                                <LuQuote className="me-2" />
+                                <p className="mb-0" style={{ fontStyle: 'italic' }}>
+                                {post.content}
+                                </p>
+                                {post?.quoteAuthor && (
+                                  <p><strong>- {post.quoteAuthor}</strong></p>
+                                )}
+                              </blockquote>
+                            )}
 
+                            {/* Video Post */}
+                            {post.post_type === 'video' && (
+                              <>
+                                {post.videoType === 'youtube' && (
+                                  <div className="ratio ratio-16x9">
+                                    <iframe
+                                      src={post.content}
+                                      title="YouTube Video"
+                                      allowFullScreen
+                                    ></iframe>
+                                  </div>
+                                )}
+                                {post.videoType === 'vimeo' && (
+                                  <div className="ratio ratio-16x9">
+                                    <iframe
+                                      src={post.content}
+                                      title="Vimeo Video"
+                                      allowFullScreen
+                                    ></iframe>
+                                  </div>
+                                )}
+                                {post.videoType === 'upload' && Array.isArray(post.files) && (
+                                  post.files.map((vid, i) => (
+                                    <video
+                                      key={i}
+                                      controls
+                                      className="mb-2 rounded w-100"
+                                      style={{ maxHeight: 400 }}
+                                    >
+                                      <source src={vid.url} type="video/mp4" />
+                                      Your browser does not support the video tag.
+                                    </video>
+                                  ))
+                                )}
+                                {post.description && <p>{post.description}</p>}
+                              </>
+                            )}
+                          </div>
+
+                          {/* Likes / Comments */}
                           <div className="d-flex gap-3 text-muted mt-3 align-items-center">
-                            <span><BsHeart onClick={() => {handleLike(post._id)}} className="me-1" /> {post.likes?.length || 0}</span>
-                            <span><BsChat className="me-1" /> 0</span>
+                            <span>
+                              <BsHeart onClick={() => handleLike(post._id)} className="me-1" />{' '}
+                              {post.likes?.length || 0}
+                            </span>
+                            <span>
+                              <BsChat className="me-1" /> 0
+                            </span>
                           </div>
                         </Col>
                       </Row>
                     </Card>
                   ))}
+
 
                 </Card> 
               </Col>
@@ -344,7 +524,7 @@ function DashboardPage() {
                         </Card.Link>
                       </Card>
                     </CardGroup>
-                    <div className="latest--version">
+                    {/* <div className="latest--version">
                       <Container>
                         <Card className="mb-3 version--card">
                           <Card.Body className="p-2">
@@ -385,7 +565,7 @@ function DashboardPage() {
                           </Card.Body>
                         </Card>
                       </Container>
-                    </div>
+                    </div> */}
                   </div>
                   <div className="download--wrapper mt-5">
                     <div className="image--title help--card">
@@ -408,7 +588,7 @@ function DashboardPage() {
                       </Container>
                     </div>
                   </div>
-                  <div className="download--wrapper mt-5 mb-5">
+                  {/* <div className="download--wrapper mt-5 mb-5">
                     <div className="help--card today--card">
                       <span><FaRegEye /></span>
                       <h3>Today's Overview <small>Quick insights</small></h3>
@@ -427,7 +607,7 @@ function DashboardPage() {
                         </Card>
                       </Container>
                     </div>
-                  </div>
+                  </div> */}
               </Col>
             </Row>
           </Container>
@@ -442,32 +622,33 @@ function DashboardPage() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-4">
-          <Tabs defaultActiveKey="text" id="icon-tabs">
-            <Tab eventKey="text" onClick={() => {setFields({...fields, ['type']: 'text'})}} title={<span><FaRegFileAlt /> Text</span>}>
+          <Tabs defaultActiveKey="text" id="icon-tabs" activeKey={fields?.type}
+          onSelect={(k) => handletypeChange(k)}>
+            <Tab eventKey="text" title={<span><FaRegFileAlt /> Text</span>}>
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Title (Optional)</Form.Label>
-                  <Form.Control type="text" placeholder="Add a title to your post..."  />
+                  <Form.Control type="text" placeholder="Add a title to your post..." name="title" value={fields?.title} onChange={handleTextChange} />
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Content *</Form.Label>
-                  <Form.Control required as="textarea" placeholder="What's happening with you work? Share updates, achievements, or insights..." rows={5} value={fields.content} onChange={handleTextChange} />
+                  <Form.Control required as="textarea" placeholder="What's happening with you work? Share updates, achievements, or insights..." rows={5} name="content" value={fields?.content} onChange={handleTextChange} />
                 </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="quote" onClick={() => {setFields({...fields, ['type']: 'quote'})}} title={<span><FaQuoteRight /> Quote</span>}>
+            <Tab eventKey="quote"  title={<span><FaQuoteRight /> Quote</span>}>
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Add a Quote</Form.Label>
-                  <Form.Control as="textarea" placeholder="Share an inspiring quote or meaningful message..." rows={5} value={fields.content} onChange={handleTextChange} />
+                  <Form.Control as="textarea" placeholder="Share an inspiring quote or meaningful message..." rows={5} name="quote" value={fields?.quote} onChange={handleTextChange} />
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Author (Optional)</Form.Label>
-                  <Form.Control type="text" placeholder="Quote author..."  />
+                  <Form.Control type="text" placeholder="Quote author..." name="quoteAuthor" value={fields?.quoteAuthor} onChange={handleTextChange} />
                 </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="image" onClick={() => { setFields({...fields, ['type']: 'image'}) }}  title={<span><FaImage /> Image</span>}>
+            <Tab eventKey="image" title={<span><FaImage /> Image</span>}>
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Upload Image *</Form.Label>
@@ -476,7 +657,7 @@ function DashboardPage() {
                     <span><FiUpload /> Click to upload an image <small>PNG, JPG, GIF up to 10MB</small></span>
                   </label>
                   <div className="mt-3 d-flex flex-wrap gap-3">
-                  {fields.files.map((file, idx) => (
+                  {fields?.files?.map((file, idx) => (
                     <div key={idx} className="position-relative">
                       <img
                         src={URL.createObjectURL(file)}
@@ -499,32 +680,33 @@ function DashboardPage() {
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Caption</Form.Label>
-                  <Form.Control as="textarea" placeholder="Add a caption to your image..." rows={5} />
+                  <Form.Control as="textarea" placeholder="Add a caption to your image..." rows={5} value={fields?.caption} name="caption" onChange={handleTextChange} />
                 </Form.Group>
               </Form>
             </Tab>
-            <Tab eventKey="video" onClick={() => {setFields({...fields, ['type']: 'video'})}}  title={<span><LuVideo /> Video</span>}>
+            <Tab eventKey="video"  title={<span><LuVideo /> Video</span>}>
               <Form>
                 <Form.Label>Video Type</Form.Label>
-                <Tabs defaultActiveKey="youtube" id="video--type">
+                <Tabs defaultActiveKey="youtube" id="video--type" activeKey={fields?.videoType}
+                  onSelect={(k) => handlevideoTypeChange(k)}>
                   <Tab eventKey="youtube" title={<span><FiYoutube /> Youtube</span>}>
                     <Form.Group className="mb-3">
                         <Form.Label>YouTube URL *</Form.Label>
-                        <Form.Control type="url" placeholder="https://www.youtube.com/watch?v=..."  />
+                        <Form.Control type="url" placeholder="https://www.youtube.com/watch?v=..." value={fields?.youtubeUrl} name="youtubeUrl" onChange={handleTextChange}  />
                       </Form.Group>
                       <Form.Group className="mb-3">
                         <Form.Label>Description</Form.Label>
-                        <Form.Control as="textarea" placeholder="Why are you sharing this video?" rows={5} />
+                        <Form.Control as="textarea" name="description" value={fields?.description} onChange={handleTextChange} placeholder="Why are you sharing this video?" rows={5} />
                       </Form.Group>
                   </Tab>
                   <Tab eventKey="vimeo" title={<span><LuVideo /> Vimeo</span>}>
                     <Form.Group className="mb-3">
                       <Form.Label>Vimeo URL *</Form.Label>
-                      <Form.Control type="url" placeholder="https://vimeo.com/..."  />
+                      <Form.Control type="url" placeholder="https://vimeo.com/..." value={fields?.vimeoUrl} name="vimeoUrl" onChange={handleTextChange}  />
                     </Form.Group>
                     <Form.Group className="mb-3">
                       <Form.Label>Description</Form.Label>
-                      <Form.Control as="textarea" placeholder="Why are you sharing this video?" rows={5} />
+                      <Form.Control as="textarea" name="description" value={fields?.description} onChange={handleTextChange} placeholder="Why are you sharing this video?" rows={5} />
                     </Form.Group>
                   </Tab>
                   <Tab eventKey="upload" title={<span><FiUpload /> Upload</span>}>
@@ -535,7 +717,7 @@ function DashboardPage() {
                           <span><FiUpload /> Click to upload a video <small>MP4, MOV, AVI up to 100MB</small></span>
                         </label>
                         <div className="mt-3">
-                          {fields.files.map((file, idx) => (
+                          {fields?.files?.map((file, idx) => (
                             <div key={idx} className="d-flex align-items-center justify-content-between mb-2">
                               <div><strong>{file.name}</strong> – {(file.size / 1024 / 1024).toFixed(2)} MB</div>
                               <Button size="sm" variant="outline-danger" onClick={() => removeFile(idx)} ><FiX /></Button>
@@ -545,7 +727,7 @@ function DashboardPage() {
                       </Form.Group>
                       <Form.Group className="mb-3">
                         <Form.Label>Description</Form.Label>
-                        <Form.Control as="textarea" placeholder="Why are you sharing this video?" rows={5} />
+                        <Form.Control as="textarea" name="description" value={fields?.description} onChange={handleTextChange} placeholder="Why are you sharing this video?" rows={5} />
                       </Form.Group>
                   </Tab>
                 </Tabs>
