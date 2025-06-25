@@ -641,9 +641,6 @@ function ProjectsPage() {
     const handleToggles = () => {
         if(commonState.sidebar_small === false ){ console.log('1')
             handleSidebarSmall()
-        }else if(commonState.sidebar_small === true && projectToggle === false){
-            setProjectToggle(true)
-             console.log('2')
         }else{
             setProjectToggle(false)
             handleSidebarSmall()
@@ -653,13 +650,13 @@ function ProjectsPage() {
 
     return (
         <>
-            <div className={ `${isActive === 1 ? 'show--details team--page' : isActive === 2 ? 'view--project team--page' :  'team--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
+            <div className={ `${isActive === 1 ? 'show--details team--page project-collapse' : isActive === 2 ? 'view--project team--page project-collapse' :  'team--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
                 <div className='page--title px-md-2 py-3 bg-white border-bottom'>
                     <Container fluid>
                         <Row>
                             <Col sm={12} lg={12}>
                                 <h2>
-                                    <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                                    {/* <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span> */}
                                     Projects
                                     {/* <Button variant="primary" className={isActive !== 0 ? 'd-flex ms-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button> */}
                                     <Button variant="primary" className={isActive !== 0 ? 'd-flex d-md-none' : 'd-md-none ms-auto onHide'} onClick={handleFilterShow}><MdFilterList /></Button>
@@ -772,7 +769,6 @@ function ProjectsPage() {
                                                 className="projects--list"
                                                 ref={provided.innerRef}
                                                 {...provided.droppableProps}
-                                            // style={{ overflowY: 'auto', height: '100%' }}
                                             >
                                                 {
                                                     (!spinner && projects && projects.length > 0)
@@ -796,7 +792,7 @@ function ProjectsPage() {
                                                                             key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                                                 }`}>
                                                                             <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                                                <div className="d-flex justify-content-between flex-wrap">
+                                                                                <div className="d-flex justify-content-between">
                                                                                     <div className="project--name">
                                                                                         <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr><MdDragIndicator /></div>
                                                                                         <div className="title--initial">{project.title.charAt(0)}</div>
@@ -884,20 +880,22 @@ function ProjectsPage() {
                         </DragDropContext>
                         :
                         <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table draggable--table new--project--rows' : 'project--table new--project--rows'}>
-                            {/* <thead>
+                             <thead className="onHide">
                                 <tr key="project-table-header">
-                                    <th scope="col" width='20%' key="project-name-header"><abbr>#</abbr> Project Name</th>
-                                    <th scope="col" width='20%' key="project-client-header" className="onHide">Client Name</th>
-                                    <th scope="col" width='30%' key="project-member-header" className="onHide">Assigned Members</th>
-                                    <th scope="col" key="project-status-header" className="onHide">Status</th>
-                                    <th scope="col" width='25%' key="project-action-header" className="onHide text-md-end">Actions</th>
+                                    <th scope="col" className="sticky" key="project-name-header">
+                                        <div className="d-flex align-items-center justify-content-between">
+                                            Project <span key="project-action-header" className="onHide">Actions</span>
+                                        </div>
+                                    </th>
+                                    <th scope="col" key="project-status-header" className="onHide">Status <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="project-status-header" className="onHide">Priority <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="project-member-header" className="onHide">Assigned Members <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="project-client-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="project-member-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="project-action-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
                                 </tr>
-                            </thead> */}
-                            
-                            <tbody
-                                id={`projectable-body`}
-                                className="projects--list"
-                            >
+                            </thead>
+                            <tbody id={`projectable-body`} className="projects--list">
                                 {
                                     (!spinner && projects && projects.length > 0)
                                         ? projects.map((project, index) => {
@@ -910,54 +908,41 @@ function ProjectsPage() {
                                                     }}
                                                     key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                         }`}>
-                                                    <td className="project--title--td" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                        <div className="project--name">
-                                                            <abbr className="onHide" key={`index-${index}`}>{index + 1}</abbr> 
-                                                            <div className="title--span flex-column align-items-start gap-0">
-                                                                <span>{project.title}</span>
-                                                                <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'>__</span>}</strong>
+                                                    <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
+                                                        <div className="d-flex justify-content-between">
+                                                            <div className="project--name">
+                                                                <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr><MdDragIndicator /></div>
+                                                                <div className="title--initial">{project.title.charAt(0)}</div>
+                                                                <div className="title--span flex-column align-items-start gap-0">
+                                                                    <span>{project.title}</span>
+                                                                    <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'>__</span>}</strong>
+                                                                </div>
+                                                            </div>
+                                                            <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons sticky">
+                                                                <Button variant="primary" className="me-2" 
+                                                                    onClick={() => {
+                                                                        setIsActive(2);
+                                                                    }}>
+                                                                    <BsEye /></Button>
+                                                                <Button variant="primary" onClick={() => {
+                                                                    
+                                                                    if (
+                                                                        memberProfile?.permissions?.projects?.view === true ||
+                                                                        memberProfile?.role?.slug === 'owner'
+                                                                    ) {
+                                                                    setIsActive(1);
+                                                                    } else {
+                                                                        console.log('not allowed to view tasks');
+                                                                    }
+                                                                }}
+                                                                >
+                                                                    <BiEdit />
+                                                                </Button>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
-                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles">
-                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
-                                                        <div key={`status-index-${index}`} data-label="Status" className="onHide status__key">
-                                                            <Dropdown className="select--dropdown" key='status-key'>
-                                                                <Dropdown.Toggle onClick={() => { 
-                                                                    if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
-                                                                        dispatch(updateStateData(DIRECT_UPDATE, true));
-                                                                        handleStatusShow();
-                                                                    } else {
-                                                                        console.log('Not allowed');
-                                                                    }
-                                                                }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                            </Dropdown>
-                                                        </div>
-                                                        <div key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end task--buttons">
-                                                            <Button variant="primary" className="me-2" 
-                                                                onClick={() => {
-                                                                    
-                                                                    setIsActive(2);
-                                                                }}>
-                                                                <BsEye /> Details</Button>
-                                                            <Button variant="primary" onClick={() => {
-                                                                
-                                                                if (
-                                                                    memberProfile?.permissions?.projects?.view === true ||
-                                                                    memberProfile?.role?.slug === 'owner'
-                                                                ) {
-                                                                setIsActive(1);
-                                                                } else {
-                                                                    console.log('not allowed to view tasks');
-                                                                }
-                                                            }}
-                                                            >
-                                                                <BiEdit /> Tasks
-                                                            </Button>
-                                                        </div>
-                                                    </td>
-                                                    {/* <td key={`status-index-${index}`} data-label="Status" className="onHide">
+                                                    
+                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
                                                         <Dropdown className="select--dropdown" key='status-key'>
                                                             <Dropdown.Toggle onClick={() => { 
                                                                 if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
@@ -966,21 +951,28 @@ function ProjectsPage() {
                                                                 } else {
                                                                     console.log('Not allowed');
                                                                 }
-                                                            }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'secondary' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                            }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
                                                         </Dropdown>
                                                     </td>
-                                                    <td key={`actions-index-${index}`} data-label="Actions" className="onHide text-md-end">
-                                                        <Button variant="secondary" className="me-2" onClick={() => setIsActive(2)}><BsEye /> Details</Button>
-                                                        <Button variant="primary" onClick={() => {
-                                                            (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner')
-                                                            ?
-                                                            setIsActive(1)
-                                                            :
-                                                            console.log('not allowed to view tasks')
-                                                        }
-                                                        }><BiEdit /> Tasks</Button>
-                                                        
-                                                    </td> */}
+                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
+                                                        <Dropdown className="select--dropdown" key='status-key'>
+                                                            <Dropdown.Toggle onClick={() => { 
+                                                                if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
+                                                                    dispatch(updateStateData(DIRECT_UPDATE, true));
+                                                                    handleStatusShow();
+                                                                } else {
+                                                                    console.log('Not allowed');
+                                                                }
+                                                            }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                        </Dropdown>
+                                                    </td>
+                                                    {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
+                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles min__width">
+                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
+                                                    </td>
+                                                    <td className="onHide new__td">15/02/2025</td>
+                                                    <td className="onHide new__td">15/02/2025</td>
+                                                    <td className="onHide new__td">15/02/2025</td>
                                                 </tr>
                                             </>)
                                         })
@@ -1008,15 +1000,15 @@ function ProjectsPage() {
                     </Container>
                 </div>
             </div>
-            <div className="details--projects--grid projects--grid">
+            <div className="details--projects--grid projects--grid common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
-                    <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                    {/* <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span> */}
                     <div className="projecttitle">
-                        <h3>
+                        {/* <h3>
                             <strong>{currentProject?.title}</strong>
                             <span>{currentProject?.client?.name}</span>
-                        </h3>
-                        {/* <Dropdown>
+                        </h3> */}
+                        <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
                                 <h3>
                                     <strong>{currentProject?.title}</strong>
@@ -1024,17 +1016,19 @@ function ProjectsPage() {
                                 </h3>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                {projects.map((project, index) => {
-                                    return (<>
-                                        <Dropdown.Item value={project._id}>
-                                            <strong>{project.title}</strong>
-                                            <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
-                                        </Dropdown.Item>
-                                    </>
-                                    )
-                                })}
+                                <div className="drop--scroll">
+                                    {projects.map((project, index) => {
+                                        return (<>
+                                            <Dropdown.Item value={project._id}>
+                                                <strong>{project.title}</strong>
+                                                <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
+                                            </Dropdown.Item>
+                                        </>
+                                        )
+                                    })}
+                                </div>
                             </Dropdown.Menu>
-                        </Dropdown> */}
+                        </Dropdown>
                     </div>
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
@@ -1054,7 +1048,7 @@ function ProjectsPage() {
                {isActive === 1 && <TasksList activeTab={activeTab} currentProject={currentProject} memberProfile={memberProfile} />} 
             </div>
 
-            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} /> }
+            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} projects={projects} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} /> }
             { commonState?.taskForm && <TaskForm memberProfile={memberProfile}/> }
             <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>

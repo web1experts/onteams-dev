@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Dropdown, ListGroup, Table } from "react-bootstrap";
-import { FaEllipsisV, FaPlus, FaCheck } from "react-icons/fa";
-import { MdFilterList } from "react-icons/md";
+import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Dropdown, ListGroup, Table, Card, Badge } from "react-bootstrap";
+import dayjs from 'dayjs';
+import { FaEllipsisV, FaPlus, FaCheck, FaList } from "react-icons/fa";
 import { GrExpand } from "react-icons/gr";
-import { FiSidebar } from "react-icons/fi";
+import { BsGrid } from "react-icons/bs";
+import { HiOutlineLocationMarker } from "react-icons/hi";
+import { MdOutlineCheck } from "react-icons/md";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import DatePicker from "react-multi-date-picker";
 import { formatDateinString } from "../../helpers/commonfunctions";
+import { FiCalendar, FiGift } from 'react-icons/fi';
 import { createHoliday, ListHolidays, deleteHoliday, updateHoliday } from "../../redux/actions/holiday.action";
-import { togglePopups, updateStateData,toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
+import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { currentMemberProfile } from "../../helpers/auth";
 function HolidaysPage() {
+  const [isActiveView, setIsActiveView] = useState(2);
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const commonState = useSelector(state => state.common)
   const dispatch = useDispatch()
@@ -123,6 +127,31 @@ const showError = (name) => {
 const handleDelete = (id) => {
   dispatch(deleteHoliday(id))
 }
+
+const getStatusBadge = (dateString) => {
+  const inputDate = new Date(dateString);
+  const today = new Date();
+
+  // Remove time portion for accurate comparison
+  const isSameDay = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+
+  if (isSameDay(inputDate, today)) return <Badge bg="primary">today</Badge>;
+  if (inputDate < today) return <Badge bg="secondary">past</Badge>;
+  return <Badge bg="success">upcoming</Badge>;
+
+
+};
+
+const getDaysLeft = (date) => {
+  const today = dayjs();
+  const target = dayjs(date);
+  const diff = target.diff(today, 'day');
+  return diff >= 0 ? `${diff} days left` : '';
+};
+
   return (
     <>
 
@@ -131,9 +160,25 @@ const handleDelete = (id) => {
           <Container fluid>
             <Row className="align-items-center">
               <Col md={12}>
-                <h2>
-                  <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span> Holidays
+                <h2>Holidays
                   <ListGroup horizontal className="ms-auto">
+                    <ListGroup.Item>
+                      <Dropdown className="select--dropdown">
+                        <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> 2025</Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            <div class="drop--scroll">
+                              <a href="#" class="dropdown-item" role="button">2023</a>
+                              <a href="#" class="dropdown-item" role="button">2024</a>
+                              <a href="#" class="selected--option dropdown-item" role="button">2025 <MdOutlineCheck /></a>
+                              <a href="#" class="dropdown-item" role="button">2026</a>
+                            </div>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                    </ListGroup.Item>
+                    <ListGroup horizontal>
+                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                    </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                       <ListGroup.Item>
@@ -157,76 +202,111 @@ const handleDelete = (id) => {
                 <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
         }
-          <Container fluid>
-            <Table responsive="lg" className="holiday--table project--table new--project--rows">
-              {/* <thead>
-                <tr key={`holiday-table-head`}>
-                  <th scope="col"><abbr title="Number">#</abbr> Date</th>
-                  <th scope="col">Occasion</th>
-                  <th scope="col">Type</th>
-                  <th scope="col" width={30}>Action</th>
-                </tr>
-              </thead> */}
-              <tbody>
-              {
-                (holidays && holidays.length > 0)
-                    ? holidays.map((holiday, index) => {
-                      return (<>
-                        <tr key={`holiday-row-${index}`}>
-                          <td key={`date-td-${index}`} data-label="Date">
-                            <div className="project--name d-flex align-items-center gap-3">
-                                <abbr>{index + 1 }</abbr> 
+          <Container fluid className="pb-5">
+            <Row>
+              <Col lg={4}>
+                <Card className="card--blue">
+                  <Card.Body>
+                    <Card.Title><span>Next Holiday</span>Independence Day</Card.Title>
+                    <Card.Text><FiCalendar /></Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col lg={4}>
+                <Card className="card--pink">
+                  <Card.Body>
+                    <Card.Title><span>This Month</span>1</Card.Title>
+                    <Card.Text><HiOutlineLocationMarker /></Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col lg={4}>
+                <Card className="card--green">
+                  <Card.Body>
+                    <Card.Title><span>Total Holidays</span>19</Card.Title>
+                    <Card.Text><FiGift /></Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+            <div className={isActiveView === 1 ? 'project--grid--table holiday--table--grid' : isActiveView === 2 ? 'project--table holiday--table holidays--list bg-white' : 'project--table holiday--table holidays--list bg-white'}>
+              <h3 class="mb-4 d-flex align-items-center gap-3"><span><FiCalendar /></span>Holiday Calendar - 2025</h3>
+              <Table>
+                <tbody>
+                {
+                  (holidays && holidays.length > 0)
+                      ? holidays.map((holiday, index) => {
+                        return (<>
+                          <tr key={`holiday-row-${index}`} className={''}>
+                            <td key={`date-td-${index}`} data-label="Date">
+                              <div className="project--name d-flex align-items-center gap-4">
+                                <span className="bank">🏛️</span>
                                 <div className="title--span d-flex align-items-start gap-1 flex-column">
-                                  <span key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion}</span>
+                                  <h5 className="d-flex gap-3" key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion} {getStatusBadge(holiday.date)}</h5>
                                   <strong>{formatDateinString(holiday.date)}</strong>
+                                  <p className="m-0">
+                                    <span className="me-3" key={`type-td-${index}`} data-label="Type">
+                                      {holiday.type
+                                        .split(' ')
+                                        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                        .join(' ')}
+                                    </span>
+                                  </p>
                                 </div>
-                            </div>
-                          </td>
-                          
-                          <td key={`action-td-${index}`}>
-                            <span className="me-3" key={`type-td-${index}`} data-label="Type">
-                              {holiday.type.split(' ') // Split the sentence into words
-                              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter and make the rest lowercase
-                              .join(' ')}
-                            </span>
-                            <Dropdown>
-                              <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                <Dropdown.Item key={`edit-item-${index}`} onClick={() => {
-                                  if(memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner'){
-                                    setEditItem(holiday);
-                                    handleShow()
-                                  }else{
-                                    console.log('action not allowed')
-                                  }
-                                  
-                                }}>Edit</Dropdown.Item>
-                                <Dropdown.Item key={`delete-item-${index}`}onClick={() => {
-                                  if(memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner'){
-                                    handleDelete(holiday._id)
-                                  }else{
-                                    console.log('action not allowed')
-                                  }
-                              
-                                }}>Delete</Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </td>
-                        </tr>
-                      </>)
-                    })
-                    :
-                    <></>
+                              </div>
+                            </td>
+                            <td className="text-end text-primary fw-semibold ms-auto d-flex align-items-center">
+                              <span className="days--left">{getDaysLeft(holiday.date)}</span>
+                              <div key={`action-td-${index}`} className="ms-3">
+                                <Dropdown>
+                                  <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
+                                  <Dropdown.Menu>
+                                    <Dropdown.Item
+                                      key={`edit-item-${index}`}
+                                      onClick={() => {
+                                        if (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') {
+                                          setEditItem(holiday);
+                                          handleShow();
+                                        } else {
+                                          console.log('action not allowed');
+                                        }
+                                      }}
+                                    >
+                                      Edit
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                      key={`delete-item-${index}`}
+                                      onClick={() => {
+                                        if (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') {
+                                          handleDelete(holiday._id);
+                                        } else {
+                                          console.log('action not allowed');
+                                        }
+                                      }}
+                                    >
+                                      Delete
+                                    </Dropdown.Item>
+                                  </Dropdown.Menu>
+                                </Dropdown>
+                              </div>
+                            </td>
+                          </tr>
+                        </>)
+                      })
+                      :
+                      <></>
+                }
+                  
+                </tbody>
+              </Table>
+              {
+                holidays && holidays.length == 0 &&
+                  <div className="text-center mt-5">
+                      <h2>No Holidays Found</h2>
+                  </div>
               }
-                
-              </tbody>
-            </Table>
-            {
-               holidays && holidays.length == 0 &&
-                <div className="text-center mt-5">
-                    <h2>No Holidays Found</h2>
-                </div>
-            }
+            </div>
+            
           </Container>
         </div>
       </div>
