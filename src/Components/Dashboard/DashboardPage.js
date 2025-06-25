@@ -18,7 +18,7 @@ import DateTimeCard from "../common/DateTimeCard";
 dayjs.extend(relativeTime);
 function DashboardPage() {
   const dispatch = useDispatch()
-  
+  const [showCommentBox, setShowCommentBox] = useState(false);
   const memberstate = useSelector((state) => state.member);
   const invitationsFeed = useSelector((state) => state.member.invitations);
   const postFeed = useSelector((state) => state.post.posts);
@@ -419,7 +419,7 @@ function DashboardPage() {
                             {post.post_type === 'video' && (
                               <>
                                 {post.videoType === 'youtube' && (
-                                  <div className="ratio ratio-16x9">
+                                  <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
                                     <iframe
                                       src={post.content}
                                       title="YouTube Video"
@@ -428,7 +428,7 @@ function DashboardPage() {
                                   </div>
                                 )}
                                 {post.videoType === 'vimeo' && (
-                                  <div className="ratio ratio-16x9">
+                                  <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
                                     <iframe
                                       src={post.content}
                                       title="Vimeo Video"
@@ -441,8 +441,7 @@ function DashboardPage() {
                                     <video
                                       key={i}
                                       controls
-                                      className="mb-2 rounded w-100"
-                                      style={{ maxHeight: 400 }}
+                                      className="mb-2 rounded-3 w-100"
                                     >
                                       <source src={vid.url} type="video/mp4" />
                                       Your browser does not support the video tag.
@@ -460,16 +459,24 @@ function DashboardPage() {
                               <BsHeart onClick={() => handleLike(post._id)} className="me-1" />{' '}
                               {post.likes?.length || 0}
                             </span>
-                            <span>
+                            <span className="open--comment" onClick={() => setShowCommentBox((prev) => !prev)}>
                               <BsChat className="me-1" /> 0
                             </span>
                           </div>
+                          {showCommentBox && (
+                            <div className="bg-light p-3 rounded-4 mt-3 d-flex flex-column align-items-end gap-3 border-light">
+                              <textarea
+                                className="form-control"
+                                placeholder="Write a comment..."
+                                rows={3}
+                              />
+                              <Button variant="primary">Post</Button>
+                            </div>
+                          )}
                         </Col>
                       </Row>
                     </Card>
                   ))}
-
-
                 </Card> 
               </Col>
               <Col lg={4}>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table } from "react-bootstrap";
 import { FaList, FaPlus, FaTrashAlt } from "react-icons/fa";
-import { FiEdit, FiSidebar, FiMail, FiPhone } from "react-icons/fi";
-import { BsGrid } from "react-icons/bs";
+import { FiEdit, FiMail, FiPhone } from "react-icons/fi";
+import { BsGrid, BsEye } from "react-icons/bs";
+import { TbArrowsSort } from "react-icons/tb";
 import { GrExpand } from "react-icons/gr";
-import { MdOutlineSearch } from "react-icons/md";
-import { MdOutlineClose, MdSearch } from "react-icons/md";
+import { MdOutlineSearch, MdDragIndicator, MdOutlineClose, MdSearch } from "react-icons/md";
 import { ListClients, deleteClient, updateClient } from "../../redux/actions/client.action";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { useNavigate } from "react-router-dom";
@@ -400,23 +400,26 @@ function ClientsPage() {
     return changes;
   };
 
+  const [projectToggle, setProjectToggle ] = useState(false)
+  const handleToggles = () => {
+      if(commonState.sidebar_small === false ){ console.log('1')
+          handleSidebarSmall()
+      }else{
+          setProjectToggle(false)
+          handleSidebarSmall()
+            console.log('3')
+      }
+  }
 
   return (
     <>
-
-      <div className={isActive ? 'show--details team--page' : 'team--page'}>
+      <div className={`${isActive ? 'show--details team--page project-collapse' : 'team--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
         <div className='page--title px-md-2 py-3 bg-white border-bottom'>
           <Container fluid>
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                   Clients
-                  {/* <Button variant="primary" className={isActive ? 'd-flex ms-md-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button> */}
-                  {/* {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                    <Button variant="primary" onClick={handleShow}><FaPlus /></Button>
-                    
-                  )} */}
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
                     <ListGroup.Item className='d-none d-lg-block'>
                       <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
@@ -432,7 +435,7 @@ function ClientsPage() {
                     </ListGroup>
                   </ListGroup>
                   <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex bg-white expand--icon ms-3'}>
-                      <ListGroup.Item onClick={handleSidebar}><GrExpand /></ListGroup.Item>
+                      <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
                       {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                         <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
                       )}
@@ -450,51 +453,62 @@ function ClientsPage() {
               </div>
           }
           <Container fluid>
-            <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table clients--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table clients--table new--project--rows' : 'project--table clients--table new--project--rows'}>
-              {/* <thead>
-                <tr key={'client-table-header'}>
-                  <th><abbr>#</abbr> Member Name</th>
-                  <th className="onHide" width={50}>Action</th>
-                </tr>
-              </thead> */}
-              <tbody>
-                {
-                  (!spinner && clientFeeds && clientFeeds.length > 0)
-                    ? clientFeeds.map((client, index) => {
-                      return (<>
-                        <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={isActive ? () => handleClick(client) : () => { return false; }}>
-                          {/* <td>{index + 1}</td> */}
-                          <td className="cursor--pointer project--title--td">
-                            <div className="project--name">
-                              <abbr className="onHide">{index + 1}</abbr>
-                              <div className="title--span">
-                                <span className="client--img"><img variant="top" src={client.avatar || "./images/default.jpg"} /></span>
-                                <span>{client.name}</span>
-                              </div>
-                              
+            <div className={isActiveView === 1 ? 'project--grid--table project--grid--new--table table-responsive-xl' : isActiveView === 2 ? 'project--table draggable--table new--project--rows table-responsive-xl' : 'project--table new--project--rows table-responsive-xl'}>
+              <Table>
+                <thead className="onHide">
+                    <tr key="project-table-header">
+                        <th scope="col" className="sticky" key="project-name-header">
+                            <div className="d-flex align-items-center justify-content-between">
+                                Client
                             </div>
+                        </th>
+                        <th scope="col" key="project-status-header" className="onHide">Email <small><TbArrowsSort /></small></th>
+                        <th scope="col" key="project-status-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
+                        <th width='10%' scope="col" key="project-status-header" className="onHide text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {
+                    (!spinner && clientFeeds && clientFeeds.length > 0)
+                      ? clientFeeds.map((client, index) => {
+                        return (<>
+                          <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={isActive ? () => handleClick(client) : () => { return false; }}>
+                            {/* <td>{index + 1}</td> */}
+                            <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Client Name">
+                              <div className="d-flex justify-content-between">
+                                  <div className="project--name">
+                                      <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr></div>
+                                      <div className="title--initial">{client.name.charAt(0)}</div>
+                                      <div className="title--span flex-column align-items-start gap-0">
+                                          <span>{client.name}</span>
+                                      </div>
+                                  </div>
+                              </div>
+                            </td>
+                            <td className="onHide new__td">john@gmail.com</td>
+                            <td className="onHide new__td">+1 (555) 123-4567</td>
+                            <td className="onHide text-end"><Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client);}}>View</Button></td>
+                          </tr>
+                        </>)
+                      })
+                      :
+                      
+                      !spinner && isActiveView === 2 &&
+                        <tr className="no--invite">
+                          <td colSpan={3}>
+                            <h2 className="mt-2 text-center">Clients Not Found</h2>
                           </td>
-                          <td className="onHide"><Button variant="primary" onClick={() => {handleSidebarSmall();handleClick(client);}}>View</Button></td>
                         </tr>
-                      </>)
-                    })
-                    :
-                     
-                    !spinner && isActiveView === 2 &&
-                      <tr className="no--invite">
-                        <td colSpan={3}>
-                          <h2 className="mt-2 text-center">Clients Not Found</h2>
-                        </td>
-                      </tr>
-                }
-              </tbody>
-            </Table>
-            {
-                isActiveView === 1 && !spinner && clientFeeds && clientFeeds.length == 0 &&
-                <div className="text-center mt-5">
-                    <h2>No Clients Found</h2>
-                </div>
-            }
+                  }
+                </tbody>
+              </Table>
+              {
+                  isActiveView === 1 && !spinner && clientFeeds && clientFeeds.length == 0 &&
+                  <div className="text-center mt-5">
+                      <h2>No Clients Found</h2>
+                  </div>
+              }
+            </div>
           </Container>
         </div>
       </div>
@@ -505,8 +519,8 @@ function ClientsPage() {
             <h3><strong>Client Details</strong></h3>
           </div>
           <ListGroup horizontal className="ms-auto">
-            <ListGroup.Item onClick={handleSidebar} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
-            <ListGroup.Item className="btn btn-primary" onClick={() => {handleSidebarSmall(true);handleClosePannel(0);}}><MdOutlineClose /></ListGroup.Item>
+            <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+            <ListGroup.Item className="btn btn-primary" onClick={() => {handleClosePannel(0);}}><MdOutlineClose /></ListGroup.Item>
           </ListGroup>
         </div>
         <div className="rounded--box client--box">
@@ -587,7 +601,7 @@ function ClientsPage() {
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <span className="info--icon"><FiPhone /></span>
-                    <p><small>Email</small>+1 (555) 123-4567</p>
+                    <p><small>Phone</small>+1 (555) 123-4567</p>
                   </ListGroup.Item>
                 </ListGroup>
               </Card.Text>
