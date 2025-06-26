@@ -536,7 +536,7 @@ useEffect(() => {
                                 <div className="drop--scroll">
                                     {projects.map((project, index) => {
                                         return (<>
-                                            <Dropdown.Item value={project._id}>
+                                            <Dropdown.Item value={project._id} onClick={() => props?.projectChange(project)}>
                                                 <strong>{project.title}</strong>
                                                 <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
                                             </Dropdown.Item>

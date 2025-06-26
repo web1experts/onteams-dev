@@ -43,7 +43,7 @@ const typeColorMap = {
 
   
   const FieldCard = ({ field, idx }) => {
-    const { _id, type, label, options } = field || {};
+    const { _id, type, label, options, showInTable } = field || {};
     return(
     <Card className="mb-3">
       <Card.Body>
@@ -51,7 +51,14 @@ const typeColorMap = {
           <Col xs="auto">
             <Badge pill bg="light" text="dark">#{idx}</Badge>
           </Col>
+          
           <Col><h5 className="mb-0 fw-bold">{label}</h5></Col>
+          {
+            showInTable &&
+            <Col xs="auto">
+              <Badge pill bg="success" text="dark">In Columns</Badge>
+            </Col>
+          }
           <Col xs="auto">
             <Badge bg={typeColorMap[type] || 'secondary'}>
                 {typeLabelMap[type] || type}
@@ -60,15 +67,23 @@ const typeColorMap = {
           </Col>
         </Row>
 
-        {['radio', 'checkbox', 'dropdown'].includes(type) && (
+        {['radio', 'checkbox', 'dropdown','badge'].includes(type) && (
           <>
             <Badge bg="info" className="mb-2">{options.length} options</Badge>
             <Row className="mb-3">
-              {options.map((opt, i) => (
-                <Col key={i} className="mb-1">
-                  <Form.Control value={opt} readOnly />
-                </Col>
-              ))}
+               <div className="mt-2">
+                  <div className="d-flex flex-wrap gap-1">
+                    {options.map((opt, i) => (
+                      <span
+                      key={i}
+                      className="text-xs bg-white text-secondary px-2 py-1 rounded border"
+                      style={{ fontSize: '0.75rem' }} // Bootstrap doesn't have `text-xs` natively
+                    >
+                      {opt.label}
+                    </span>
+                    ))}
+                  </div>
+                </div>
             </Row>
           </>
         )}
@@ -153,7 +168,7 @@ const typeColorMap = {
   const handleUpdateField = async () => {
     const newErrors = {};
     if (!fields?.name.trim()) newErrors.fieldName = 'Field name is required';
-    if (['radio', 'checkbox', 'dropdown'].includes(fields?.type) && fields?.options.length === 0) {
+    if (['radio', 'checkbox', 'dropdown', 'badge'].includes(fields?.type) && fields?.options.length === 0) {
       newErrors.options = 'At least one option is required';
     }
 
@@ -163,7 +178,7 @@ const typeColorMap = {
 
     const payload = {
       label: fields?.name.trim(),
-      options: ['radio', 'checkbox', 'dropdown'].includes(fields?.type) ? fields?.options : [],
+      options: ['radio', 'checkbox', 'dropdown','badge'].includes(fields?.type) ? fields?.options : [],
       showInTable: fields?.showInTable
     };
     try {
@@ -187,7 +202,7 @@ const typeColorMap = {
     const newErrors = {};
     if (!fields?.name.trim()) newErrors.fieldName = 'Field name is required';
     if (!fields?.type) newErrors.fieldType = 'Field type is required';
-    if (['radio', 'checkbox', 'dropdown'].includes(fields?.type) && fields?.options.length === 0) {
+    if (['radio', 'checkbox', 'dropdown','badge'].includes(fields?.type) && fields?.options.length === 0) {
       newErrors.options = 'At least one option is required';
     }
 
@@ -199,7 +214,7 @@ const typeColorMap = {
       name: createSlug(fields?.name.trim()),
       label: fields?.name.trim(),
       type: fields?.type,
-      options: ['radio', 'checkbox', 'dropdown'].includes(fields?.type) ? fields?.options : [],
+      options: ['radio', 'checkbox', 'dropdown','badge'].includes(fields?.type) ? fields?.options : [],
       showInTable: fields?.showInTable,
       module: props.module
     };
@@ -244,10 +259,17 @@ const typeColorMap = {
 
   const handleAddOption = () => {
     if (newOption.trim()) {
-      // setOptions([...options, newOption.trim()]);
+      const label = newOption.trim();
+      const value = label
+        .toLowerCase()
+        .replace(/\s+/g, '-')         // replace spaces with dashes
+        .replace(/[^a-z0-9\-]/g, ''); // remove special characters
+
+      const newFieldOption = { label, value };
+
       setFields({
         ...fields,
-        options: [...(fields.options || []), newOption.trim()]
+        options: [...(fields.options || []), newFieldOption]
       });
 
       setNewOption('');
@@ -255,13 +277,13 @@ const typeColorMap = {
   };
 
   const removeOption = (index) => {
-    const newOpts = fields?.options.filter((_, i) => i !== index);
-    //setOptions(newOpts);
+    const newOpts = (fields.options || []).filter((_, i) => i !== index);
     setFields({
-        ...fields,
-        options: newOpts
-      });
+      ...fields,
+      options: newOpts
+    });
   };
+
 
   const handleCheck = (e) => {
     const { name, checked } = e.target;
@@ -361,7 +383,7 @@ const typeColorMap = {
                           display: 'flex',
                           alignItems: 'center'
                         }}>
-                          <span style={{ marginRight: '10px', color: '#3730a3', fontWeight: 500 }}>{opt}</span>
+                          <span style={{ marginRight: '10px', color: '#3730a3', fontWeight: 500 }}>{opt.label}</span>
                           <span style={{ cursor: 'pointer' }} onClick={() => removeOption(idx)}>×</span>
                         </div>
                       ))}
@@ -394,9 +416,12 @@ const typeColorMap = {
 
         {showAddedFields && (
           <div className='added--fields'>
-            <h4 className='d-flex align-items-center justify-content-between mb-4'>
-              <Button variant='primary' className='field--btn' onClick={handleAddFieldClick}><FiPlus /> Add Field</Button>
-            </h4>
+            {
+              !isEditing && 
+              <h4 className='d-flex align-items-center justify-content-between mb-4'>
+                <Button variant='primary' className='field--btn' onClick={handleAddFieldClick}><FiPlus /> Add Field</Button>
+              </h4>
+          }
             <h5>Added Custom Fields</h5>
             <div>
               {customFields.length === 0 ? (

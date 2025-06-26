@@ -55,7 +55,7 @@ export function renderDynamicField(config) {
       )}
 
       {/* Select */}
-      {type === 'select' && (
+      {(type === 'select' || type === 'dropdown' || type === 'badge') && (
         <Form.Select {...sharedProps}>
           <option value="">-- Select --</option>
           {options.map((opt) => (
