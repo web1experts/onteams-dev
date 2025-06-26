@@ -4,10 +4,14 @@ import { Button, Modal, Form, Card, Badge, Row, Col } from 'react-bootstrap';
 import {  FaRegTrashAlt,FaRegEdit } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { LuSettings } from "react-icons/lu";
-import { createCustomField } from '../../redux/actions/customfield.action';
+import { createCustomField, fetchCustomFields, updateCustomField } from '../../redux/actions/customfield.action';
 export const  CustomFieldModal =  (props) => {
   const dispatch = useDispatch()
-  const commonState = useSelector( state => state.common)
+  const commonState = useSelector( state => state.common);
+  const apiCustomfields = useSelector( state => state.customfields)
+  useEffect(() => {
+    dispatch(fetchCustomFields({module: 'projects'}))
+  }, [])
 
   const typeLabelMap = {
   text: 'Text Field',
@@ -38,14 +42,16 @@ const typeColorMap = {
 };
 
   
-  const FieldCard = ({ id, type, title, options }) => (
+  const FieldCard = ({ field, idx }) => {
+    const { _id, type, label, options } = field || {};
+    return(
     <Card className="mb-3">
       <Card.Body>
         <Row className="align-items-center mb-2">
           <Col xs="auto">
-            <Badge pill bg="light" text="dark">#{id}</Badge>
+            <Badge pill bg="light" text="dark">#{idx}</Badge>
           </Col>
-          <Col><h5 className="mb-0 fw-bold">{title}</h5></Col>
+          <Col><h5 className="mb-0 fw-bold">{label}</h5></Col>
           <Col xs="auto">
             <Badge bg={typeColorMap[type] || 'secondary'}>
                 {typeLabelMap[type] || type}
@@ -70,13 +76,14 @@ const typeColorMap = {
         <Row>
           
           <Col xs="auto">
-            <Button variant="outline-primary" className="me-2 border-0 p-0 text-info"><FaRegEdit /></Button>
+            <Button variant="outline-primary" className="me-2 border-0 p-0 text-info" onClick={() => {handleFieldEdit(field)}}><FaRegEdit /></Button>
             <Button variant="outline-danger" className="border-0 p-0"><FaRegTrashAlt /></Button>
           </Col>
         </Row>
       </Card.Body>
     </Card>
   );
+}
 
   const [showInitialMessage, setShowInitialMessage] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -88,6 +95,42 @@ const typeColorMap = {
   const [errors, setErrors] = useState({});
   const [customFields, setCustomFields] = useState([]);
   const [includeColumn, setIncludeColumn] = useState(false)
+  const [isEditing, setIsEditing] = useState( false );
+  const [selectedField, setSelectedField] = useState( {} )
+  const [ fields, setFields] = useState({name: '', type: '', showInTable: false, options: []})
+  useEffect(() => { 
+    if( apiCustomfields.customFields){
+      setCustomFields( apiCustomfields.customFields)
+    }
+
+    if( apiCustomfields.newField){
+      setCustomFields((prevCustomFields) => [apiCustomfields.newField, ...prevCustomFields]);
+    }
+
+     if (apiCustomfields.updatedField) {
+      setCustomFields((prevCustomFields) =>
+        prevCustomFields.map((field) =>
+          field._id === apiCustomfields.updatedField._id
+            ? apiCustomfields.updatedField
+            : field
+        )
+      );
+    }
+
+  }, [apiCustomfields]);
+
+  const handleFieldEdit = (field) => {
+    setSelectedField( field );
+    setIsEditing( true )
+    setFields({
+      name:  field?.label,
+      type: field.type,
+      options: field?.options,
+      showInTable: field?.showInTable
+    })
+  }
+
+
   const handleAddFieldClick = () => {
     setShowOptions(true);
     setShowInitialMessage(false);
@@ -107,11 +150,10 @@ const typeColorMap = {
         .replace(/-+/g, '-');           // Replace multiple dashes with one
     }
 
-  const handleAddNewClick = async () => {
+  const handleUpdateField = async () => {
     const newErrors = {};
-    if (!fieldName.trim()) newErrors.fieldName = 'Field name is required';
-    if (!fieldType) newErrors.fieldType = 'Field type is required';
-    if (['radio', 'checkbox', 'dropdown'].includes(fieldType) && options.length === 0) {
+    if (!fields?.name.trim()) newErrors.fieldName = 'Field name is required';
+    if (['radio', 'checkbox', 'dropdown'].includes(fields?.type) && fields?.options.length === 0) {
       newErrors.options = 'At least one option is required';
     }
 
@@ -120,11 +162,45 @@ const typeColorMap = {
     if (Object.keys(newErrors).length > 0) return;
 
     const payload = {
-      name: createSlug(fieldName.trim()),
-      label: fieldName.trim(),
-      type: fieldType,
-      options: ['radio', 'checkbox', 'dropdown'].includes(fieldType) ? options : [],
-      showInTable: includeColumn,
+      label: fields?.name.trim(),
+      options: ['radio', 'checkbox', 'dropdown'].includes(fields?.type) ? fields?.options : [],
+      showInTable: fields?.showInTable
+    };
+    try {
+      // dispatch action here
+      //setCustomFields([...customFields, payload]);
+      await dispatch(updateCustomField(selectedField?._id, payload));
+      console.log('Submitting:', payload);
+
+      setShowOptions(false);
+      setShowAddedFields(true);
+      setFields({name: '', type: '', showInTable: false, options: []})
+      setNewOption('');
+      setIsEditing( false );
+      setSelectedField( {} )
+    } catch (err) {
+      console.error('Failed to add custom field:', err);
+    }
+  }
+
+  const handleAddNewClick = async () => {
+    const newErrors = {};
+    if (!fields?.name.trim()) newErrors.fieldName = 'Field name is required';
+    if (!fields?.type) newErrors.fieldType = 'Field type is required';
+    if (['radio', 'checkbox', 'dropdown'].includes(fields?.type) && fields?.options.length === 0) {
+      newErrors.options = 'At least one option is required';
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    const payload = {
+      name: createSlug(fields?.name.trim()),
+      label: fields?.name.trim(),
+      type: fields?.type,
+      options: ['radio', 'checkbox', 'dropdown'].includes(fields?.type) ? fields?.options : [],
+      showInTable: fields?.showInTable,
       module: props.module
     };
     console.log('Payload:: ', payload)
@@ -136,8 +212,8 @@ const typeColorMap = {
 
       setShowOptions(false);
       setShowAddedFields(true);
-      setFieldName('');
-      setFieldType('');
+      // setFieldName('');
+      // setFieldType('');
       setOptions([]);
       setNewOption('');
     } catch (err) {
@@ -149,23 +225,42 @@ const typeColorMap = {
     setShowOptions(false);
     setShowAddedFields(true);
     setErrors({});
+    setFields({name: '', type: '', showInTable: false, options: []})
+    setIsEditing( false);
+    setSelectedField({})
   };
 
   const handleFieldTypeChange = (e) => {
     setFieldType(e.target.value);
-    setOptions([]);
+    setFields({
+        ...fields,
+        options: []
+      });
+  };
+
+  const handleChange = ({ target: { name, value} }) => {
+      setFields({ ...fields, [name]: value })
   };
 
   const handleAddOption = () => {
     if (newOption.trim()) {
-      setOptions([...options, newOption.trim()]);
+      // setOptions([...options, newOption.trim()]);
+      setFields({
+        ...fields,
+        options: [...(fields.options || []), newOption.trim()]
+      });
+
       setNewOption('');
     }
   };
 
   const removeOption = (index) => {
-    const newOpts = options.filter((_, i) => i !== index);
-    setOptions(newOpts);
+    const newOpts = fields?.options.filter((_, i) => i !== index);
+    //setOptions(newOpts);
+    setFields({
+        ...fields,
+        options: newOpts
+      });
   };
 
   const handleCheck = (e) => {
@@ -174,7 +269,7 @@ const typeColorMap = {
     };
 
 
-  const shouldShowOptions = ['dropdown', 'badge', 'radio', 'checkbox'].includes(fieldType);
+  const shouldShowOptions = ['dropdown', 'badge', 'radio', 'checkbox'].includes(fields?.type);
 
   return (
     <Modal show={true} onHide={props.toggle} centered size="lg" className="add--workflow--modal">
@@ -190,7 +285,7 @@ const typeColorMap = {
           </div>
         )}
 
-        {showOptions && (
+        {(showOptions || isEditing) && (
           <div className='field--options'>
             <div className='add--new--field'>
               <h5>Add New Custom Field</h5>
@@ -201,40 +296,44 @@ const typeColorMap = {
                       <Form.Label>Field Name *</Form.Label>
                       <Form.Control
                         type="text"
-                        name='field_name'
+                        name='name'
                         placeholder="Enter field name"
-                        value={fieldName}
-                        onChange={(e) => setFieldName(e.target.value)}
+                        value={fields?.name}
+                        onChange={handleChange}
                         isInvalid={!!errors.fieldName}
                       />
                       <Form.Control.Feedback type="invalid">{errors.fieldName}</Form.Control.Feedback>
                     </Form.Group>
                   </Col>
-                  <Col>
-                    <Form.Group className="mb-3 col">
-                      <Form.Label>Field Type *</Form.Label>
-                      <Form.Select
-                        value={fieldType}
-                        name='field_type'
-                        onChange={handleFieldTypeChange}
-                        isInvalid={!!errors.fieldType}
-                      >
-                        <option value="">-- Select Type --</option>
-                        <option value="text">Text Field</option>
-                        <option value="email">Email</option>
-                        <option value="phone">Phone Number</option>
-                        <option value="textarea">Textarea</option>
-                        <option value="dropdown">Dropdown</option>
-                        <option value="badge">Badge</option>
-                        <option value="date">Date</option>
-                        <option value="password">Password</option>
-                        <option value="range">Range</option>
-                        <option value="checkbox">Checkbox</option>
-                        <option value="radio">Radio</option>
-                      </Form.Select>
-                      <Form.Control.Feedback type="invalid">{errors.fieldType}</Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
+                  {
+                    !isEditing && 
+                      <Col>
+                        <Form.Group className="mb-3 col">
+                          <Form.Label>Field Type *</Form.Label>
+                          <Form.Select
+                            value={fields?.type}
+                            name='type'
+                            onChange={handleChange}
+                            isInvalid={!!errors.fieldType}
+                          >
+                            <option value="">-- Select Type --</option>
+                            <option value="text">Text Field</option>
+                            <option value="email">Email</option>
+                            <option value="phone">Phone Number</option>
+                            <option value="textarea">Textarea</option>
+                            <option value="dropdown">Dropdown</option>
+                            <option value="badge">Badge</option>
+                            <option value="date">Date</option>
+                            <option value="password">Password</option>
+                            <option value="range">Range</option>
+                            <option value="checkbox">Checkbox</option>
+                            <option value="radio">Radio</option>
+                          </Form.Select>
+                          <Form.Control.Feedback type="invalid">{errors.fieldType}</Form.Control.Feedback>
+                        </Form.Group>
+                      </Col>
+                  }
+                  
                 </Row>
 
                 {shouldShowOptions && (
@@ -254,7 +353,7 @@ const typeColorMap = {
                     </Form.Group>
 
                     <div className="mb-3 d-flex flex-wrap gap-2">
-                      {options.map((opt, idx) => (
+                      {fields?.options.map((opt, idx) => (
                         <div key={idx} style={{
                           backgroundColor: '#e0e7ff',
                           padding: '5px 10px',
@@ -273,18 +372,25 @@ const typeColorMap = {
                 <Row>
                   <Col>
                     <Form.Group controlId="formBasicCheckbox">
-                      <Form.Check type="checkbox" label="Include in columns" name='include_column' onChange={handleCheck} />
+                      <Form.Check type="checkbox" label="Include in columns" name='showInTable' checked={fields?.showInTable} onChange={handleChange} />
                     </Form.Group>
                   </Col>
                   <Col className='text-end'>
                     <Button variant="secondary" type="button" onClick={handleCancelClick}>Cancel</Button>
-                    <Button variant="info" type="button" className='add--new--btn ms-3' onClick={handleAddNewClick}>Add Field</Button>
+                    {
+                      !isEditing ? 
+                      <Button variant="info" type="button" className='add--new--btn ms-3' onClick={handleAddNewClick}>Add Field</Button>
+                      :
+                      <Button variant="info" type="button" className='add--new--btn ms-3' onClick={handleUpdateField}>Update Field</Button>
+                    }
                   </Col>
                 </Row>
               </Form>
             </div>
           </div>
         )}
+
+
 
         {showAddedFields && (
           <div className='added--fields'>
@@ -299,10 +405,8 @@ const typeColorMap = {
                 customFields.map((field, index) => (
                     <FieldCard
                     key={index}
-                    id={index + 1}
-                    type={field.type}
-                    title={field.name}
-                    options={field.options}
+                    idx={index + 1}
+                    field={field}
                     />
                 ))
                 )}
