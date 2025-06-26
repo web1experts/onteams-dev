@@ -50,7 +50,8 @@ body {
   color: #ffffff;
 }
 
-.holidays--page .team--page .page--title h2 .dropdown-toggle svg {
+.holidays--page .team--page .page--title h2 .dropdown-toggle svg, .attendance--page .team--page .page--title h2 .dropdown-toggle svg,
+.holidays--page .team--page .page--title h2 .dropdown-toggle:hover svg, .attendance--page .team--page .page--title h2 .dropdown-toggle:hover svg {
   color: inherit;
   margin-right: .5rem;
 }
@@ -167,7 +168,7 @@ body {
   color: #ffffff;
 }
 
-.holidays--page .team--page .page--title .select--dropdown .btn {
+.holidays--page .team--page .page--title .select--dropdown .btn, .attendance--page .team--page .page--title .select--dropdown .btn {
   min-width: fit-content;
   text-decoration: none;
 }
@@ -255,6 +256,7 @@ body {
   text-transform: capitalize;
   width: auto;
   font-size: 1rem;
+  font-weight: 600;
 }
 
 .list-group-horizontal>.list-group-item+.list-group-item {
@@ -722,6 +724,22 @@ table.draggable--table {
   gap: 15px;
   padding: 1rem 1.5rem;
   flex: 1 1;
+}
+
+.time-tracking--page .new--project--rows .project--title--td .project--name {
+  padding: 0;
+}
+
+.time-tracking--page .show--details .page--wrapper, .time-tracking--page .view--project .page--wrapper, .time-tracking--page .view--invitee .page--wrapper {
+    min-width: 300px;
+}
+
+.time-tracking--page .page--wrapper .draggable--table td.project--title--td {
+  padding: 1rem 1.5rem;
+}
+
+.time-tracking--page .page--wrapper table td button {
+    padding: .5rem .75rem;
 }
 
 .new--project--rows .project--title--td .task--buttons {
@@ -2993,6 +3011,7 @@ Project Task View CSS=-=-=
   font-weight: 700;
   font-size: 30px;
   line-height: 1.75rem;
+  margin-bottom: 0;
 }
 
 .holidays--page .card--blue .card-title {
@@ -5539,77 +5558,147 @@ ul#icon-tabs .nav-link span svg {
   height: auto;
 }
 
-.attendance--table table th {
-  font-weight: 500;
-  color: rgb(100 116 139);
-  letter-spacing: .05em;
-  font-size: .85rem;
-  line-height: 1rem;
-  background: rgb(248 250 252);
+.attendance--page .page--title .view--icon {
+  width: auto;
+  height: auto;
+  padding: .5rem .75rem;
+  gap: .5rem;
 }
 
-.attendance--table .mem--name img {
-  width: 35px;
-  height: 35px;
-  border-radius: 100px;
-  -webkit-border-radius: 100px;
-  object-fit: cover;
+.attendance--stats, .attendance--table {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
+  padding: 2rem;
+  background-color: rgb(255 255 255);
+  border-color: rgb(241 245 249);
+  border-width: 1px;
+  border-radius: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.attendance--table .mem--name div {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  max-width: 300px;
-  position: relative;
+.attendance--stats h3, .attendance--table h3 {
+  font-size: 1.5rem;
 }
 
-.attendance--table .bg--emerald,
-.attendance--table .bg--amber,
-.attendance--table .bg--red,
-.attendance--table .bg--blue {
-  font-weight: 500;
-  font-size: .85rem;
-  border-radius: 100px;
-  -webkit-border-radius: 100px;
-  line-height: 1rem;
-  width: 30px;
-  height: 30px;
+.attendance--stats h3 span, .attendance--table h3 span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.attendance--table .bg--emerald {
-  color: rgb(6 95 70);
-  background: rgb(209 250 229);
+.attendance--stats h3 svg, .attendance--table h3 svg {
+  color: rgb(37 99 235);
 }
 
-.attendance--table .table {
-  margin: 0;
+.attendance--stats .card {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  margin-bottom: 0;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  -webkit-border-radius: 1rem;
 }
 
-.attendance--table .overflow-x-auto {
-  scrollbar-width: thin;
-  scroll-behavior: smooth;
+.attendance--stats .card::after {
+    display: none;
 }
 
-.attendance--table .table td:first-child {
-  min-width: 200px;
+.attendance--stats .card--red {
+    background-image: linear-gradient(to bottom right, #ef4444, #dc2626);
 }
 
-.attendance--table .bg--amber {
-  color: rgb(146 64 14);
-  background: rgb(254 243 199);
+.attendance--stats .card--orange {
+    background-image: linear-gradient(to bottom right, #f97316, #ea580c);
 }
 
-.attendance--table .bg--red {
-  color: rgb(153 27 27);
-  background: rgb(254 226 226);
+.attendance--stats .card--purple {
+    background-image: linear-gradient(to bottom right, #a855f7, #9333ea);
 }
 
-.attendance--table .bg--blue {
-  color: rgb(30 64 175);
-  background: rgb(219 234 254);
+.attendance--stats .card .card-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    color: #ffffff;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    font-size: 35px;
+    width: auto;
+    height: auto;
+}
+
+.attendance--table--list table, .attendance--table--list tbody {
+  display: block;
+}
+
+.attendance--table--list table tr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition-duration: .3s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  padding: 1.5rem;
+  background-image: linear-gradient(to right, #f8fafc, #eff6ff);
+  border-color: rgb(226 232 240);
+  border-width: 1px;
+  border-radius: 1rem;
+}
+
+.attendance--table--list table tr+tr {
+  margin-top: 1rem;
+}
+
+.attendance--table--list table tr td {
+  border: 0;
+  background: none;
+}
+
+.page--wrapper .attendance--table--list table td .title--initial {
+    height: 45px;
+    width: 45px;
+    min-width: 45px;
+    font-weight: 700;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    font-size: 1.2rem;
+}
+
+.attendance--table--list .title--span span, .attendance--table--list table td h4 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.attendance--table--list .title--span strong, .attendance--table--list table td h4 small {
+  font-size: 14px;
+  color: rgb(71 85 105);
+  font-weight: normal;
+}
+
+.attendance--table--list table td h4 small {
+  font-size: 12px;
+}
+
+.attendance--table--list table td .text--green {
+  color: rgb(22 163 74);
+}
+
+.attendance--table--list table td .text--red {
+  color: rgb(220 38 38);
+}
+
+.attendance--table--list table td .text--purple {
+  color: rgb(147 51 234);
+}
+
+.attendance--table--list table td .text--blue {
+  color: rgb(37 99 235);
+}
+
+.attendance--table--list table td .text--orange {
+  color: rgb(234 88 12);
 }
 
 .project--grid--table tr.project--active, .clients--grid--table .project--active {

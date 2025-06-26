@@ -741,7 +741,7 @@ function ProjectsPage() {
                             <img src="images/OnTeam-icon.png" className="flipchar" />
                         </div>
                     }
-                    <Container fluid>
+                    <Container fluid className="pb-5 pt-2">
                         {
                             (memberProfile?.permissions?.projects?.update_projects_order === true || memberProfile?.role?.slug === "owner") ? 
                         

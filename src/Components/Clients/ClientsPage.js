@@ -452,7 +452,7 @@ function ClientsPage() {
                   <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
-          <Container fluid>
+          <Container fluid className="pb-5 pt-2">
             <div className={isActiveView === 1 ? 'project--grid--table project--grid--new--table table-responsive-xl' : isActiveView === 2 ? 'project--table draggable--table new--project--rows table-responsive-xl' : 'project--table new--project--rows table-responsive-xl'}>
               <Table>
                 <thead className="onHide">
