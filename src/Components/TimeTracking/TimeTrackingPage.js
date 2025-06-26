@@ -757,7 +757,7 @@ function TimeTrackingPage() {
                   <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
-          <Container fluid>
+          <Container fluid className="pt-2 py-5">
             {activeTab === "Live" && (
               <>
                 <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>

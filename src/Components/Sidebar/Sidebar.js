@@ -168,8 +168,8 @@ function SidebarPanel() {
             <div className={`${!isActive ? 'open--panel--sidebar panel--sidebar' : 'panel--sidebar'} ${collapseSidebar ? 'collapse-sidebar' : ''} ${sidebarSmall ? 'open--panel--sidebar' : ''}`}>
                 <Navbar expand="lg">
                     <Navbar.Brand>
-                        <img className="d-none d-xl-flex" src="images/OnTeam-Logo.png" alt="" />
-                        <img className="d-flex d-xl-none" src="images/OnTeam-icon.png" alt="" />
+                        <span><img src="images/OnTeam-white-icon.png" alt="" /></span>
+                        <img src="images/OnTeam-Logo-white.png" alt="" />
                     </Navbar.Brand>
                     <div className="current--workspace">
                         <Dropdown>
