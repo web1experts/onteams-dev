@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown, ListGroupItem } from "react-bootstrap";
 import { FaChevronDown, FaPlus, FaList, FaRegTrashAlt, FaRegCalendarAlt, FaCog } from "react-icons/fa";
 import { MdFileDownload, MdFilterList, MdOutlineClose, MdOutlineCancel, MdOutlineSearch, MdDragIndicator } from "react-icons/md";
+import { FiSidebar } from "react-icons/fi";
 import { FiFileText } from "react-icons/fi";
 import { GrAttachment, GrExpand } from "react-icons/gr";
 import { BsGrid,BsEye } from "react-icons/bs";
