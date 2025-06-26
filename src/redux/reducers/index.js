@@ -35,5 +35,5 @@ export default combineReducers({
   permissions: permissionReducer,
   payment: paymentReducer,
   post: postReducer,
-  customfieldReducer: customfieldReducer
+  customfields: customfieldReducer
 });

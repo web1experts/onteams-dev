@@ -1,8 +1,9 @@
 import { 
     CREATE_FIELD_SUCCESS,
-    CREATE_FIELD_FAILED,
+    CUSTOM_FIELDS_LIST,
     FIELD_COMMON_ERROR,
-    CLEAR_MESSAGES
+    CLEAR_MESSAGES,
+    UPDATE_FIELD_SUCCESS
 } from "../actions/types";
 
 const initialState = {
@@ -11,6 +12,7 @@ const initialState = {
     success: false,
     message: null,
     message_variant: null,
+    customeFields: []
 };
 
 export default (state = initialState, action) => {
@@ -20,19 +22,19 @@ export default (state = initialState, action) => {
             ...state,
             message: action.payload.message,
             message_variant: 'success',
-            success: true
+            success: true,
+            newField: action.payload.field
         };
-    case CREATE_FIELD_FAILED :
-        return {
-            ...state,
-            message: action.payload.message ? action.payload.message : action.payload,
-            message_variant: 'danger',
-        }
     
     case FIELD_COMMON_ERROR: 
         return {
             message: action.payload, 
             message_variant: 'danger',
+        }
+    case CUSTOM_FIELDS_LIST: 
+        return {
+            ...state,
+            customFields: action.payload.customFields
         }
     case CLEAR_MESSAGES:
         return {
@@ -40,6 +42,11 @@ export default (state = initialState, action) => {
             message: null,
             message_variant: null,
         };
+    case UPDATE_FIELD_SUCCESS: 
+        return {
+            ...state,
+            updatedField: action.payload.field
+        }
     default: return state;
   }
 };
