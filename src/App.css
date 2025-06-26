@@ -50,8 +50,10 @@ body {
   color: #ffffff;
 }
 
-.holidays--page .team--page .page--title h2 .dropdown-toggle svg, .attendance--page .team--page .page--title h2 .dropdown-toggle svg,
-.holidays--page .team--page .page--title h2 .dropdown-toggle:hover svg, .attendance--page .team--page .page--title h2 .dropdown-toggle:hover svg {
+.holidays--page .team--page .page--title h2 .dropdown-toggle svg,
+.attendance--page .team--page .page--title h2 .dropdown-toggle svg,
+.holidays--page .team--page .page--title h2 .dropdown-toggle:hover svg,
+.attendance--page .team--page .page--title h2 .dropdown-toggle:hover svg {
   color: inherit;
   margin-right: .5rem;
 }
@@ -168,7 +170,8 @@ body {
   color: #ffffff;
 }
 
-.holidays--page .team--page .page--title .select--dropdown .btn, .attendance--page .team--page .page--title .select--dropdown .btn {
+.holidays--page .team--page .page--title .select--dropdown .btn,
+.attendance--page .team--page .page--title .select--dropdown .btn {
   min-width: fit-content;
   text-decoration: none;
 }
@@ -244,7 +247,7 @@ body {
 .page--title .list-group-item-action {
   align-items: center;
   background: none;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   color: rgb(100 116 139);
@@ -268,6 +271,7 @@ body {
 .page--title .refresh--btn {
   color: #ffffff;
   background: var(--theme-gradient);
+  border: 0;
 }
 
 .page--title .refresh--btn {
@@ -296,14 +300,12 @@ body {
 .page--title .list-group-item-action:hover {
   color: #ffffff;
   background: linear-gradient(to bottom right, #0f172a, #1e293b);
-  border: 1px solid #0f172a;
+  border: 0;
 }
 
 .page--title .list-group-horizontal>.list-group-item:last-child:not(:first-child) {
   border-top-right-radius: .5rem;
-  ;
   border-bottom-left-radius: .5rem;
-  ;
 }
 
 .page--title .search-filter-list .form-group .form-control {
@@ -508,7 +510,7 @@ body {
   left: 0;
   background: #ffffff;
   z-index: 1;
-  min-width: 420px
+  max-width: 430px
 }
 
 .page--wrapper .draggable--table td.project--title--td {
@@ -530,11 +532,6 @@ body {
 .page--wrapper .draggable--table thead tr,
 .page--wrapper .draggable--table th:first-child {
   background: linear-gradient(to right, #f8fafc, #f1f5f9);
-}
-
-.page--wrapper .draggable--table th:first-child {
-  padding: 0;
-  padding-left: 1.5rem;
 }
 
 .page--wrapper .draggable--table th:first-child span {
@@ -636,7 +633,7 @@ body {
 }
 
 .table {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .page--wrapper table td.project--title--td span,
@@ -730,8 +727,10 @@ table.draggable--table {
   padding: 0;
 }
 
-.time-tracking--page .show--details .page--wrapper, .time-tracking--page .view--project .page--wrapper, .time-tracking--page .view--invitee .page--wrapper {
-    min-width: 300px;
+.time-tracking--page .show--details .page--wrapper,
+.time-tracking--page .view--project .page--wrapper,
+.time-tracking--page .view--invitee .page--wrapper {
+  min-width: 300px;
 }
 
 .time-tracking--page .page--wrapper .draggable--table td.project--title--td {
@@ -739,7 +738,7 @@ table.draggable--table {
 }
 
 .time-tracking--page .page--wrapper table td button {
-    padding: .5rem .75rem;
+  padding: .5rem .75rem;
 }
 
 .new--project--rows .project--title--td .task--buttons {
@@ -748,6 +747,8 @@ table.draggable--table {
   align-items: center;
   border-left: 1px solid rgb(226 232 240);
   padding: 1rem 1.5rem;
+  min-width: 115px;
+  justify-content: center;
 }
 
 .view--project .new--project--rows .project--title--td .project--name,
@@ -807,16 +808,20 @@ table.draggable--table {
   cursor: pointer;
 }
 
-.clients--page .new--project--rows tr:hover, .team-members--page .new--project--rows tr:hover {
+.clients--page .new--project--rows tr:hover,
+.team-members--page .new--project--rows tr:hover {
   cursor: auto;
 }
 
-.clients--page .new--project--rows tr:hover abbr, .clients--page .project--grid--new--table tr:hover abbr, 
-.team-members--page .new--project--rows tr:hover abbr, .team-members--page .project--grid--new--table tr:hover abbr {
+.clients--page .new--project--rows tr:hover abbr,
+.clients--page .project--grid--new--table tr:hover abbr,
+.team-members--page .new--project--rows tr:hover abbr,
+.team-members--page .project--grid--new--table tr:hover abbr {
   opacity: 1;
 }
 
-.clients--page .project--grid--table td:last-child, .team-members--page .project--grid--table td:last-child {
+.clients--page .project--grid--table td:last-child,
+.team-members--page .project--grid--table td:last-child {
   order: 2;
 }
 
@@ -2185,13 +2190,13 @@ table tr.marked-project td {
   padding: .55rem 2rem .55rem 1.2rem;
 }
 
-.common--project--grid .wrapper--title .btn.active,
+/* .common--project--grid .wrapper--title .btn.active,
 .common--project--grid .wrapper--title .btn.show {
   color: rgb(15 23 42);
   background-color: transparent;
   border-color: transparent;
   box-shadow: none;
-}
+} */
 
 .details--projects--view .project--form--inputs form .client--input .custom-dropdown-container {
   flex: none;
@@ -4395,10 +4400,11 @@ pre {
   cursor: pointer;
 }
 
-.team--updates .inner--card video, .team--updates .inner--card iframe {
-    object-fit: cover;
-    height: 100%;
-    border-radius: var(--bs-border-radius)!important;
+.team--updates .inner--card video,
+.team--updates .inner--card iframe {
+  object-fit: cover;
+  height: 100%;
+  border-radius: var(--bs-border-radius) !important;
 }
 
 .app--title {
@@ -5455,7 +5461,8 @@ ul#icon-tabs .nav-link span svg {
 
 .project--grid--table tr.marked-project,
 .new--project--rows tr.marked-project {
-  background: #ffffff;
+  background: #ecf1fa50;
+  border: 1px solid #e3eaf7;
 }
 
 .project--grid--table tr.marked-project td {
@@ -5482,7 +5489,7 @@ ul#icon-tabs .nav-link span svg {
 
 .project--grid--table td.new__td,
 .project--grid--table tr.marked-project td.new__td {
-  background: rgb(15 23 42 / 5%);
+  background: rgb(248 250 252);
   padding: .5rem .75rem;
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
@@ -5565,7 +5572,8 @@ ul#icon-tabs .nav-link span svg {
   gap: .5rem;
 }
 
-.attendance--stats, .attendance--table {
+.attendance--stats,
+.attendance--table {
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   padding: 2rem;
   background-color: rgb(255 255 255);
@@ -5575,17 +5583,38 @@ ul#icon-tabs .nav-link span svg {
   margin-bottom: 2rem;
 }
 
-.attendance--stats h3, .attendance--table h3 {
+.attendance--excel--table {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0 -2rem;
+}
+
+.page--wrapper .attendance--excel--table td:first-child {
+  width: 250px;
+  min-width: 250px;
+  background: linear-gradient(to right, #f8fafc, #f1f5f9);
+}
+
+.show--details .attendance--stats,
+.show--details .attendance--table {
+  display: none;
+}
+
+.attendance--stats h3,
+.attendance--table h3 {
   font-size: 1.5rem;
 }
 
-.attendance--stats h3 span, .attendance--table h3 span {
+.attendance--stats h3 span,
+.attendance--table h3 span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.attendance--stats h3 svg, .attendance--table h3 svg {
+.attendance--stats h3 svg,
+.attendance--table h3 svg {
   color: rgb(37 99 235);
 }
 
@@ -5599,37 +5628,38 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .attendance--stats .card::after {
-    display: none;
+  display: none;
 }
 
 .attendance--stats .card--red {
-    background-image: linear-gradient(to bottom right, #ef4444, #dc2626);
+  background-image: linear-gradient(to bottom right, #ef4444, #dc2626);
 }
 
 .attendance--stats .card--orange {
-    background-image: linear-gradient(to bottom right, #f97316, #ea580c);
+  background-image: linear-gradient(to bottom right, #f97316, #ea580c);
 }
 
 .attendance--stats .card--purple {
-    background-image: linear-gradient(to bottom right, #a855f7, #9333ea);
+  background-image: linear-gradient(to bottom right, #a855f7, #9333ea);
 }
 
 .attendance--stats .card .card-text {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    color: #ffffff;
-    border-radius: 0;
-    -webkit-border-radius: 0;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    font-size: 35px;
-    width: auto;
-    height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  color: #ffffff;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  font-size: 35px;
+  width: auto;
+  height: auto;
 }
 
-.attendance--table--list table, .attendance--table--list tbody {
+.attendance--table--list table,
+.attendance--table--list tbody {
   display: block;
 }
 
@@ -5639,7 +5669,7 @@ ul#icon-tabs .nav-link span svg {
   justify-content: space-between;
   transition-duration: .3s;
   transition-property: all;
-  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(.4, 0, .2, 1);
   padding: 1.5rem;
   background-image: linear-gradient(to right, #f8fafc, #eff6ff);
   border-color: rgb(226 232 240);
@@ -5657,21 +5687,23 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .page--wrapper .attendance--table--list table td .title--initial {
-    height: 45px;
-    width: 45px;
-    min-width: 45px;
-    font-weight: 700;
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
-    -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
-    font-size: 1.2rem;
+  height: 45px;
+  width: 45px;
+  min-width: 45px;
+  font-weight: 700;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  font-size: 1.2rem;
 }
 
-.attendance--table--list .title--span span, .attendance--table--list table td h4 {
+.attendance--table--list .title--span span,
+.attendance--table--list table td h4 {
   font-size: 18px;
   font-weight: 700;
 }
 
-.attendance--table--list .title--span strong, .attendance--table--list table td h4 small {
+.attendance--table--list .title--span strong,
+.attendance--table--list table td h4 small {
   font-size: 14px;
   color: rgb(71 85 105);
   font-weight: normal;
@@ -5681,29 +5713,175 @@ ul#icon-tabs .nav-link span svg {
   font-size: 12px;
 }
 
-.attendance--table--list table td .text--green {
+.attendance--table--list table td .text--green,
+.attendance--table table td svg.text--green {
   color: rgb(22 163 74);
 }
 
-.attendance--table--list table td .text--red {
+.attendance--table--list table td .text--red,
+.attendance--table table td .text--red {
   color: rgb(220 38 38);
 }
 
-.attendance--table--list table td .text--purple {
+.attendance--table--list table td .text--purple,
+.attendance--table table td .text--purple {
   color: rgb(147 51 234);
 }
 
-.attendance--table--list table td .text--blue {
+.attendance--table--list table td .text--blue,
+.attendance--table table td .text--blue,
+.attendance--table table td .text--blue {
   color: rgb(37 99 235);
 }
 
-.attendance--table--list table td .text--orange {
+.attendance--table--list table td .text--orange,
+.attendance--table table td .text--orange {
   color: rgb(234 88 12);
 }
 
-.project--grid--table tr.project--active, .clients--grid--table .project--active {
-    background: #ecf1fa50;
-    border: 1px solid #e3eaf7;
+.attendance--table table td .bg--blue,
+.attendance--table table td .bg--orange,
+.attendance--table table td .bg--red,
+.attendance--table table td .bg--purple,
+.attendance--table table td .bg--green {
+  font-weight: 700;
+  border-radius: 100px;
+  -webkit-border-radius: 100px;
+  font-size: .75rem;
+  padding: .25rem .75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attendance--excel--table table td .att--badge {
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+  padding-left: .5rem;
+  padding-right: .5rem;
+  border-radius: .5rem;
+  -webkit-border-radius: .5rem;
+  font-size: .75rem;
+  line-height: 1rem;
+}
+
+.attendance--excel--table td strong,
+.attendance--excel--table th strong {
+  display: block;
+  margin-top: .25rem;
+}
+
+.attendance--excel--table td strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.attendance--excel--table th strong {
+  font-size: 18px;
+  margin-top: 0;
+}
+
+.page--wrapper .attendance--excel--table th small {
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.attendance--table table td .bg--blue, .att--status--abbr .bg--blue {
+  color: rgb(30 64 175);
+  background-color: rgb(219 234 254);
+  border: 1px solid rgb(191 219 254);
+}
+
+.attendance--table table td .bg--orange, .att--status--abbr .bg--orange {
+  color: rgb(154 52 18);
+  background-color: rgb(255 237 213);
+  border: 1px solid rgb(254 215 170);
+}
+
+.attendance--table table td .bg--red, .att--status--abbr .bg--red {
+  color: rgb(153 27 27);
+  background-color: rgb(254 226 226);
+  border: 1px solid rgb(254 202 202);
+}
+
+.attendance--table table td .bg--green, .att--status--abbr .bg--green {
+  color: rgb(22 101 52);
+  background-color: rgb(220 252 231);
+  border: 1px solid rgb(187 247 208);
+}
+
+.attendance--table table td .bg--purple, .att--status--abbr .bg--purple {
+  color: rgb(107 33 168);
+  background-color: rgb(243 232 255);
+  border: 1px solid rgb(233 213 255);
+}
+
+.att--status--abbr .bg--blue, .att--status--abbr .bg--red, .att--status--abbr .bg--green, .att--status--abbr .bg--orange, .att--status--abbr .bg--purple {
+  width: 30px;
+  height: 30px;
+  font-size: .75rem;
+  font-weight: 700;
+  border-radius: .5rem;
+}
+
+.attendance--excel--table table .bg--blue {
+  color: rgb(30 64 175);
+  background-color: rgb(239 246 255);
+  border-right: 1px solid rgb(191 219 254);
+  border-bottom: 1px solid rgb(191 219 254);
+}
+
+.attendance--excel--table table .bg--orange {
+  color: rgb(154 52 18);
+  background-color: rgb(255 247 237);
+  border-right: 1px solid rgb(254 215 170);
+  border-bottom: 1px solid rgb(254 215 170);
+}
+
+.attendance--excel--table table .bg--red {
+  color: rgb(153 27 27);
+  background-color: rgb(254 242 242);
+  border-right: 1px solid rgb(254 202 202);
+  border-bottom: 1px solid rgb(254 202 202);
+}
+
+.attendance--excel--table table .bg--green {
+  color: rgb(22 101 52);
+  background-color: rgb(240 253 244);
+  border-right: 1px solid rgb(187 247 208);
+  border-bottom: 1px solid rgb(187 247 208);
+}
+
+.attendance--excel--table table .bg--purple {
+  color: rgb(107 33 168);
+  background-color: rgb(250 245 255);
+  border-right: 1px solid rgb(233 213 255);
+  border-bottom: 1px solid rgb(233 213 255);
+}
+
+.attendance--excel--table table .bg--green strong,
+.attendance--excel--table table .bg--red strong,
+.attendance--excel--table table .bg--blue strong,
+.attendance--excel--table table .bg--orange strong,
+.attendance--excel--table table .bg--purple strong {
+  text-transform: capitalize;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.attendance--excel--table table th.bg--green strong,
+.attendance--excel--table table th.bg--red strong,
+.attendance--excel--table table th.bg--blue strong,
+.attendance--excel--table table th.bg--orange strong,
+.attendance--excel--table table th.bg--purple strong {
+  text-transform: capitalize;
+  font-size: 16px;
+}
+
+.project--grid--table tr.project--active,
+.clients--grid--table .project--active {
+  background: #ecf1fa50;
+  border: 1px solid #e3eaf7;
 }
 
 .project--grid--table tr.project--active td,
@@ -5712,11 +5890,11 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .project--grid--table tr.project--active td.new__td {
-    background: rgb(15 23 42 / 5%);
-    padding: .5rem .75rem;
-    border-radius: .5rem;
-    -webkit-border-radius: .5rem;
-    order: 1;
+  background: rgb(15 23 42 / 5%);
+  padding: .5rem .75rem;
+  border-radius: .5rem;
+  -webkit-border-radius: .5rem;
+  order: 1;
 }
 
 .project--grid--table thead,
@@ -5829,6 +6007,15 @@ ul#icon-tabs .nav-link span svg {
   min-width: 40px;
   height: 40px;
   width: 40px;
+}
+
+.new--project--rows .task--last--buttons, .project--grid--new--table .project--title--td .task--buttons {
+  display: none;
+}
+
+.project--grid--table .task--last--buttons {
+  display: block;
+  order: 3;
 }
 
 .clients--grid--table td+td {
@@ -5978,7 +6165,7 @@ Media CSS-=-==
 
   .project--grid--table tr,
   .activity--box .card-group .card {
-    max-width: calc(25% - 15px);
+    max-width: calc(33.333% - 15px);
   }
 
   .activity--table .draggable--table th:nth-child(1),
@@ -6024,22 +6211,9 @@ Media CSS-=-==
     flex: 1 1;
   }
 
-  .page--wrapper .draggable--table th:nth-child(4),
-  .page--wrapper .draggable--table td:nth-child(4),
-  .page--wrapper .draggable--table th:last-child,
-  .page--wrapper .draggable--table td:last-child {
-    flex: none;
-    min-width: 170px;
-  }
-
-  .activity--table .draggable--table th:nth-child(4),
-  .activity--table .draggable--table td:nth-child(4) {
-    margin-left: 0;
-  }
-
   .project--grid--table tr,
   .activity--box .card-group .card {
-    max-width: calc(25% - 15px);
+    max-width: calc(33.333% - 15px);
   }
 
   .activity--table tr th:last-child {
@@ -6067,22 +6241,8 @@ Media CSS-=-==
     display: inline-flex;
   }
 
-  .page--wrapper .draggable--table th:nth-child(4),
-  .page--wrapper .draggable--table td:nth-child(4) {
-    flex: none;
-    min-width: 120px;
-  }
-
-  .page--wrapper .draggable--table th:last-child,
-  .page--wrapper .draggable--table td:last-child {
-    flex: none;
-    min-width: 150px;
-  }
-
   .rounded--box .card .card-body {
     flex: 1 1 100%;
-    /* padding: 0;
-    padding-top: 1rem; */
   }
 
   .setting--page .rounded--box .card .card-body {
@@ -6097,11 +6257,6 @@ Media CSS-=-==
 
   .page--title .list-group {
     flex-wrap: wrap;
-  }
-
-  .page--wrapper .project--grid--table tbody th,
-  .page--wrapper .project--grid--table tbody td {
-    min-width: 100%;
   }
 
   .page--wrapper table th:first-child,
@@ -6144,7 +6299,7 @@ Media CSS-=-==
 
   .project--grid--table tr,
   .activity--box .card-group .card {
-    max-width: calc(33.333% - 14px);
+    max-width: calc(50% - 14px);
   }
 
   .team--page .page--title .select--dropdown .btn,

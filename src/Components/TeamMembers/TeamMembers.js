@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Stack, FormGroup } from "react-bootstrap";
 import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiPhone, FiCalendar, FiVideo } from "react-icons/fi";
-import { BsGrid } from "react-icons/bs";
+import { BsEye, BsGrid } from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { TbArrowsSort } from "react-icons/tb";
 import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
@@ -834,6 +834,7 @@ function TeamMembersPage() {
           <Row>
             <Col sm={12}>
               <h2>
+                <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                 Members
                 <ListGroup horizontal className={isActive ? "d-none" : "me-4 ms-auto d-none d-md-flex"}>
                   <ListGroup horizontal>
@@ -889,15 +890,21 @@ function TeamMembersPage() {
                   <Table>
                     <thead className="onHide">
                         <tr key="project-table-header">
-                            <th scope="col" className="sticky" key="project-name-header">
-                                <div className="d-flex align-items-center justify-content-between">
-                                    Member
+                            <th scope="col" className="sticky p-0" key="project-name-header">
+                              <div className="d-flex justify-content-between">
+                                <div className="project--name">
+                                    <div className="title--span flex-column align-items-start gap-0">
+                                        <span>Members</span>
+                                    </div>
                                 </div>
+                                  <div className="onHide task--buttons">
+                                    <span key="project-action-header" className="onHide">Actions</span>
+                                </div>
+                              </div>
                             </th>
                             <th scope="col" key="project-status-header" className="onHide">Email <small><TbArrowsSort /></small></th>
                             <th scope="col" key="project-status-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
                             <th scope="col" key="project-status-header" className="onHide">Joining Date</th>
-                            <th width='10%' scope="col" key="project-status-header" className="onHide text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -914,12 +921,21 @@ function TeamMembersPage() {
                                         <strong>{member.role?.name}</strong>
                                       </div>
                                   </div>
+                                  <div className="onHide task--buttons">
+                                      <Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(member); setIsActive(true); }}><BsEye/></Button>
+                                  </div>
                               </div>
                             </td>
                             <td className="onHide new__td">{member.email}</td>
                             <td className="onHide new__td">+1 (555) 123-4567</td>
                             <td className="onHide new__td">19 February 2019</td>
-                            <td className="onHide text-end"><Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(member); setIsActive(true); }}>View</Button></td>
+                            <td className="task--last--buttons">
+                              <div className="d-flex justify-content-between">
+                                  <div className="onHide">
+                                      <Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(member); setIsActive(true); }}><BsEye/> View</Button>
+                                  </div>
+                              </div>
+                            </td>
                           </tr>
                         ))
                       ) : !showloader && memberFeeds && memberFeeds.length === 0 &&

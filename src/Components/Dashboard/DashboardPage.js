@@ -284,7 +284,7 @@ function DashboardPage() {
               <Row>
                   <Col sm={12} lg={12}>
                       <h2>
-                          <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                          <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                           Dashboard
                           <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
                               <ListGroup horizontal className="bg-white expand--icon ms-3">
@@ -516,7 +516,7 @@ function DashboardPage() {
                         <Card.Link href='/downloads/onteams-win32-ia32.zip' download>
                           <CardTitle>
                             <span><FaDesktop /></span>
-                            <h4>Download for Windows <small>Windows 10 or later • 64-bit • Intel & AMD</small></h4>
+                            <h4>Windows App <small>Windows 10 or later • 64-bit • Intel & AMD</small></h4>
                           </CardTitle>
                           <CardBody><FiDownload /></CardBody>
                         </Card.Link>
@@ -525,7 +525,7 @@ function DashboardPage() {
                         <Card.Link href='/downloads/onteams-win32-ia32.zip' download>
                           <CardTitle>
                             <span><MdLaptopMac /></span>
-                            <h4>Download for macOS <small>macOS 11 or later • Intel & Apple Silicon</small></h4>
+                            <h4>IOS App <small>macOS 11 or later • Intel & Apple Silicon</small></h4>
                           </CardTitle>
                           <CardBody><FiDownload /></CardBody>
                         </Card.Link>
