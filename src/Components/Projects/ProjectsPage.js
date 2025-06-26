@@ -695,15 +695,12 @@ function ProjectsPage() {
                         <Row>
                             <Col sm={12} lg={12}>
                                 <h2>
-                                    {/* <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span> */}
+                                    <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                                     Projects
                                     {/* <Button variant="primary" className={isActive !== 0 ? 'd-flex ms-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button> */}
-                                    <Button variant="primary" className={isActive !== 0 ? 'd-flex d-md-none' : 'd-md-none ms-auto onHide'} onClick={handleFilterShow}><MdFilterList /></Button>
-                                    {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
-                                        <Button variant="primary" className={isActive !== 0 ? 'd-flex d-md-none' : 'd-md-none onHide'} onClick={() => handleShow('new') }><FaPlus /></Button>
-                                    )}
+                                    <Button variant="primary" className={isActive !== 0 ? 'd-flex d-xl-none' : 'd-xl-none onHide'} onClick={handleFilterShow}><MdFilterList /></Button>
                                     <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-md-flex'}>
-                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-md-flex'} key="member-filter-list">
+                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-xl-flex'} key="member-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
                                                 <option value={memberdata?._id} key="my-projects-option">My Projects</option>
                                                 {
@@ -733,7 +730,7 @@ function ProjectsPage() {
                                                 
                                             </Form.Select>
                                         </ListGroup.Item>
-                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-md-flex'} key="status-filter-list">
+                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-xl-flex'} key="status-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
                                                 <option value="all">View All</option>
                                                 <option value="in-progress">In Progress</option>
@@ -741,7 +738,7 @@ function ProjectsPage() {
                                                 <option value="completed">Completed</option>
                                             </Form.Select>
                                         </ListGroup.Item>
-                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-lg-flex'} key="search-filter-list">
+                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-xl-flex'} key="search-filter-list">
                                             <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
                                                 <Form.Group className="mb-0 form-group">
                                                     <MdOutlineSearch />
@@ -783,7 +780,7 @@ function ProjectsPage() {
                                 <Table>
                                     <thead className="onHide">
                                         <tr key="project-table-header">
-                                            <th scope="col" className="sticky" key="project-name-header">
+                                            <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
                                                 <div className="d-flex align-items-center justify-content-between">
                                                     Project <span key="project-action-header" className="onHide">Actions</span>
                                                 </div>
@@ -837,7 +834,7 @@ function ProjectsPage() {
                                                                                             <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'></span>}</strong>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons sticky">
+                                                                                    <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons">
                                                                                         <Button variant="primary" className="me-2" 
                                                                                             onClick={() => {
                                                                                                 setIsActive(2);
@@ -892,6 +889,31 @@ function ProjectsPage() {
                                                                             <td className="onHide new__td">15/02/2025</td>
                                                                             <td className="onHide new__td">15/02/2025</td>
                                                                             <td className="onHide new__td">15/02/2025</td>
+                                                                            <td className="task--last--buttons">
+                                                                                <div className="d-flex justify-content-between">
+                                                                                    <div key={`actions-index-${index}`} data-label="Actions" className="onHide">
+                                                                                        <Button variant="primary" className="me-2 px-3 py-2" 
+                                                                                            onClick={() => {
+                                                                                                setIsActive(2);
+                                                                                            }}>
+                                                                                            <BsEye/> Details</Button>
+                                                                                        <Button variant="primary" className="px-3 py-2" onClick={() => {
+                                                                                            
+                                                                                            if (
+                                                                                                memberProfile?.permissions?.projects?.view === true ||
+                                                                                                memberProfile?.role?.slug === 'owner'
+                                                                                            ) {
+                                                                                            setIsActive(1);
+                                                                                            } else {
+                                                                                                console.log('not allowed to view tasks');
+                                                                                            }
+                                                                                        }}
+                                                                                        >
+                                                                                           <BiEdit /> Tasks
+                                                                                        </Button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
                                                                         </tr>
                                                                     )}
                                                                 </Draggable>

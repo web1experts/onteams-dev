@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table } from "react-bootstrap";
-import { FaList, FaPlus, FaTrashAlt } from "react-icons/fa";
-import { FiEdit, FiMail, FiPhone } from "react-icons/fi";
+import { FaEye, FaList, FaPlus, FaTrashAlt } from "react-icons/fa";
+import { FiEdit, FiMail, FiPhone, FiSidebar } from "react-icons/fi";
 import { BsGrid, BsEye } from "react-icons/bs";
 import { TbArrowsSort } from "react-icons/tb";
 import { GrExpand } from "react-icons/gr";
@@ -419,6 +419,7 @@ function ClientsPage() {
             <Row>
               <Col sm={12}>
                 <h2>
+                  <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                   Clients
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
                     <ListGroup.Item className='d-none d-lg-block'>
@@ -457,14 +458,20 @@ function ClientsPage() {
               <Table>
                 <thead className="onHide">
                     <tr key="project-table-header">
-                        <th scope="col" className="sticky" key="project-name-header">
-                            <div className="d-flex align-items-center justify-content-between">
-                                Client
+                        <th scope="col" className="sticky p-0" key="project-name-header">
+                          <div className="d-flex justify-content-between">
+                            <div className="project--name">
+                                <div className="title--span flex-column align-items-start gap-0">
+                                    <span>Client</span>
+                                </div>
                             </div>
+                              <div className="onHide task--buttons">
+                                <span key="project-action-header" className="onHide">Actions</span>
+                            </div>
+                          </div>
                         </th>
                         <th scope="col" key="project-status-header" className="onHide">Email <small><TbArrowsSort /></small></th>
                         <th scope="col" key="project-status-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
-                        <th width='10%' scope="col" key="project-status-header" className="onHide text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -483,11 +490,20 @@ function ClientsPage() {
                                           <span>{client.name}</span>
                                       </div>
                                   </div>
+                                   <div className="onHide task--buttons">
+                                      <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client);}}><BsEye /></Button>
+                                  </div>
                               </div>
                             </td>
                             <td className="onHide new__td">john@gmail.com</td>
                             <td className="onHide new__td">+1 (555) 123-4567</td>
-                            <td className="onHide text-end"><Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client);}}>View</Button></td>
+                            <td className="task--last--buttons">
+                              <div className="d-flex justify-content-between">
+                                  <div className="onHide">
+                                      <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client);}}><BsEye /> View</Button>
+                                  </div>
+                              </div>
+                            </td>
                           </tr>
                         </>)
                       })
