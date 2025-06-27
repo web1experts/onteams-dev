@@ -4,8 +4,6 @@
 
 :root {
   background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
-  --theme-primary: 30, 144, 255;
-  --theme-secondary: 0, 191, 255; 
 }
 
 ::-webkit-scrollbar {

@@ -145,7 +145,6 @@ function SidebarPanel() {
         { name: 'CopperBronze', color: 'linear-gradient(135deg, rgb(184,115,51), rgb(205,127,50))', primaryColor: 'rgb(184,115,51)', secondaryColor: 'rgb(205,127,50)' },
     ];
 
-
     const [selectedTheme, setSelectedTheme] = useState('Ocean Blue');
 
     const [primaryColor, setPrimaryColor] = useState('#3b82f6');
