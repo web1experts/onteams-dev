@@ -103,9 +103,7 @@ function ProjectsPage() {
         dispatch(fetchCustomFields({module: 'projects'}))
     }, [dispatch]);
 
-    useEffect(() => {
-        console.log('all fields:: ', fields)
-    },[ fields])
+ 
 
     useEffect(() => {
         if (clientFeed && clientFeed.clientData && clientFeed.clientData.length > 0) {
@@ -356,9 +354,11 @@ function ProjectsPage() {
         selectboxObserver()
     }
 
-    const handleChange = ({ target: { name, value, type, files } }) => {
-        setFields({ ...fields, [name]: value })
-        dispatch(updateStateData(PROJECT_FORM, { [name]: value }))
+    const handleChange = ({ target: { name, value, type, files, checked } }) => {
+        const finalValue =
+            type === 'checkbox' ? checked : type === 'file' ? files : value;
+        setFields({ ...fields, [name]: finalValue })
+        dispatch(updateStateData(PROJECT_FORM, { [name]: finalValue }))
         setErrors({ ...errors, [name]: '' })
     };
 
@@ -599,7 +599,7 @@ function ProjectsPage() {
         if (currentProject && Object.keys(currentProject).length > 0) {
             dispatch(updateStateData(CURRENT_PROJECT, currentProject))
         }
-        console.log(currentProject)
+        
     }, [currentProject]);
 
     const handleProjectChange = (project) => {
@@ -679,12 +679,12 @@ function ProjectsPage() {
 
     const [projectToggle, setProjectToggle ] = useState(false)
     const handleToggles = () => {
-        if(commonState.sidebar_small === false ){ console.log('1')
+        if(commonState.sidebar_small === false ){ 
             handleSidebarSmall()
         }else{
             setProjectToggle(false)
             handleSidebarSmall()
-             console.log('3')
+            
         }
     }
 
@@ -1110,7 +1110,7 @@ function ProjectsPage() {
                {isActive === 1 && <TasksList activeTab={activeTab} currentProject={currentProject} memberProfile={memberProfile} />} 
             </div>
 
-            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} projects={projects} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} projectChange={handleProjectChange} /> }
+            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} projects={projects} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} projectChange={handleProjectChange} customFields={customFields} /> }
             { commonState?.taskForm && <TaskForm memberProfile={memberProfile}/> }
             
             { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module='projects' />}
@@ -1251,9 +1251,11 @@ function ProjectsPage() {
                                             name: `custom_field[${field.name}]`,
                                             type: field.type,
                                             label: field.label,
-                                            value: fields[field.name] || '',
+                                            value: fields[`custom_field[${field.name}]`] || '',
                                             options: field?.options || [],
                                             onChange: (e) => handleChange(e, field.name),
+                                            fieldId: `new-${field.name}-${index}`,
+                                            range_options: field?.range_options || {}
                                             })
                                         )}
                                         </>

@@ -1,17 +1,20 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, Card, Badge, Row, Col } from 'react-bootstrap';
 import {  FaRegTrashAlt,FaRegEdit } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { LuSettings } from "react-icons/lu";
-import { createCustomField, fetchCustomFields, updateCustomField } from '../../redux/actions/customfield.action';
+import { createCustomField, fetchCustomFields, updateCustomField, deleteField } from '../../redux/actions/customfield.action';
+import { AlertDialog } from '.';
 export const  CustomFieldModal =  (props) => {
+  const formRef = useRef();
   const dispatch = useDispatch()
   const commonState = useSelector( state => state.common);
   const apiCustomfields = useSelector( state => state.customfields)
   useEffect(() => {
     dispatch(fetchCustomFields({module: 'projects'}))
   }, [])
+  const [showdialog, setShowDialog] = useState(false);
 
   const typeLabelMap = {
   text: 'Text Field',
@@ -67,7 +70,7 @@ const typeColorMap = {
           </Col>
         </Row>
 
-        {['radio', 'checkbox', 'dropdown','badge'].includes(type) && (
+        {['radio', 'dropdown','badge'].includes(type) && (
           <>
             <Badge bg="info" className="mb-2">{options.length} options</Badge>
             <Row className="mb-3">
@@ -92,7 +95,7 @@ const typeColorMap = {
           
           <Col xs="auto">
             <Button variant="outline-primary" className="me-2 border-0 p-0 text-info" onClick={() => {handleFieldEdit(field)}}><FaRegEdit /></Button>
-            <Button variant="outline-danger" className="border-0 p-0"><FaRegTrashAlt /></Button>
+            <Button variant="outline-danger" className="border-0 p-0" onClick={() => handleFieldDelete(field._id)}><FaRegTrashAlt /></Button>
           </Col>
         </Row>
       </Card.Body>
@@ -114,13 +117,27 @@ const typeColorMap = {
   const [selectedField, setSelectedField] = useState( {} )
   const [ fields, setFields] = useState({name: '', type: '', showInTable: false, options: []})
   useEffect(() => { 
+    setSelectedField({})
+    setShowDialog(false)
+    setFields({name: '', type: '', showInTable: false, options: []})
     if( apiCustomfields.customFields){
       setCustomFields( apiCustomfields.customFields)
     }
 
-    if( apiCustomfields.newField){
-      setCustomFields((prevCustomFields) => [apiCustomfields.newField, ...prevCustomFields]);
+    if (apiCustomfields.newField) {
+      console.log("Before update:", customFields);
+      console.log("Adding new field:", apiCustomfields.newField);
+
+      setCustomFields((prevCustomFields) => {
+        const updated = [
+          apiCustomfields.newField,
+          ...prevCustomFields.filter(field => field._id !== apiCustomfields.newField._id),
+        ];
+        console.log("After update:", updated);
+        return updated;
+      });
     }
+
 
      if (apiCustomfields.updatedField) {
       setCustomFields((prevCustomFields) =>
@@ -132,6 +149,13 @@ const typeColorMap = {
       );
     }
 
+    if (apiCustomfields.deletedField) {
+      setCustomFields((prevCustomFields) =>
+        prevCustomFields.filter((field) => field._id !== apiCustomfields.deletedField)
+      );
+    }
+
+
   }, [apiCustomfields]);
 
   const handleFieldEdit = (field) => {
@@ -141,15 +165,19 @@ const typeColorMap = {
       name:  field?.label,
       type: field.type,
       options: field?.options,
-      showInTable: field?.showInTable
+      showInTable: field?.showInTable,
+      range_options: field?.range_options || {}
     })
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
 
   const handleAddFieldClick = () => {
     setShowOptions(true);
     setShowInitialMessage(false);
-    setShowAddedFields(false);
+    // setShowAddedFields(false);
     setErrors({});
     setFieldName('');
     setFieldType('');
@@ -168,7 +196,7 @@ const typeColorMap = {
   const handleUpdateField = async () => {
     const newErrors = {};
     if (!fields?.name.trim()) newErrors.fieldName = 'Field name is required';
-    if (['radio', 'checkbox', 'dropdown', 'badge'].includes(fields?.type) && fields?.options.length === 0) {
+    if (['radio', 'dropdown', 'badge'].includes(fields?.type) && fields?.options.length === 0) {
       newErrors.options = 'At least one option is required';
     }
 
@@ -178,8 +206,9 @@ const typeColorMap = {
 
     const payload = {
       label: fields?.name.trim(),
-      options: ['radio', 'checkbox', 'dropdown','badge'].includes(fields?.type) ? fields?.options : [],
-      showInTable: fields?.showInTable
+      options: ['radio',  'dropdown','badge'].includes(fields?.type) ? fields?.options : [],
+      showInTable: fields?.showInTable,
+      range_options: fields?.range_options || {}
     };
     try {
       // dispatch action here
@@ -188,7 +217,7 @@ const typeColorMap = {
       console.log('Submitting:', payload);
 
       setShowOptions(false);
-      setShowAddedFields(true);
+      // setShowAddedFields(true);
       setFields({name: '', type: '', showInTable: false, options: []})
       setNewOption('');
       setIsEditing( false );
@@ -202,7 +231,7 @@ const typeColorMap = {
     const newErrors = {};
     if (!fields?.name.trim()) newErrors.fieldName = 'Field name is required';
     if (!fields?.type) newErrors.fieldType = 'Field type is required';
-    if (['radio', 'checkbox', 'dropdown','badge'].includes(fields?.type) && fields?.options.length === 0) {
+    if (['radio', 'dropdown','badge'].includes(fields?.type) && fields?.options.length === 0) {
       newErrors.options = 'At least one option is required';
     }
 
@@ -214,19 +243,19 @@ const typeColorMap = {
       name: createSlug(fields?.name.trim()),
       label: fields?.name.trim(),
       type: fields?.type,
-      options: ['radio', 'checkbox', 'dropdown','badge'].includes(fields?.type) ? fields?.options : [],
+      options: ['radio', 'dropdown','badge'].includes(fields?.type) ? fields?.options : [],
       showInTable: fields?.showInTable,
-      module: props.module
+      module: props.module,
+      range_options: fields?.range_options || {}
     };
-    console.log('Payload:: ', payload)
+   
     try {
       // dispatch action here
-      setCustomFields([...customFields, payload]);
+      // setCustomFields([...customFields, payload]);
       await dispatch(createCustomField(payload));
-      console.log('Submitting:', payload);
-
-      setShowOptions(false);
-      setShowAddedFields(true);
+     
+      //setShowOptions(false);
+      // setShowAddedFields(true);
       // setFieldName('');
       // setFieldType('');
       setOptions([]);
@@ -238,7 +267,7 @@ const typeColorMap = {
 
   const handleCancelClick = () => {
     setShowOptions(false);
-    setShowAddedFields(true);
+    // setShowAddedFields(true);
     setErrors({});
     setFields({name: '', type: '', showInTable: false, options: []})
     setIsEditing( false);
@@ -256,6 +285,13 @@ const typeColorMap = {
   const handleChange = ({ target: { name, value} }) => {
       setFields({ ...fields, [name]: value })
   };
+
+  const handleRangeChange = ({ target: { name, value} }) => {
+    setFields({
+      ...fields,
+      range_options: {...fields.range_options, [name]: value}
+    });
+  }
 
   const handleAddOption = () => {
     if (newOption.trim()) {
@@ -284,6 +320,15 @@ const typeColorMap = {
     });
   };
 
+  const handleFieldDelete = async (id) => {
+    setShowDialog( true )
+    setSelectedField({ _id: id})
+  }
+
+  const deleteCustomField = () => {
+    dispatch(deleteField(selectedField._id))
+    
+  }
 
   const handleCheck = (e) => {
     const { name, checked } = e.target;
@@ -291,9 +336,11 @@ const typeColorMap = {
     };
 
 
-  const shouldShowOptions = ['dropdown', 'badge', 'radio', 'checkbox'].includes(fields?.type);
+  const shouldShowOptions = ['dropdown', 'badge', 'radio'].includes(fields?.type);
+  const shouldshowRangeOptions = ['range'].includes(fields?.type)
 
   return (
+    <>
     <Modal show={true} onHide={props.toggle} centered size="lg" className="add--workflow--modal">
       <Modal.Header closeButton>
         <Modal.Title><LuSettings /> Custom Fields</Modal.Title>
@@ -311,7 +358,7 @@ const typeColorMap = {
           <div className='field--options'>
             <div className='add--new--field'>
               <h5>Add New Custom Field</h5>
-              <Form>
+              <Form ref={formRef}>
                 <Row>
                   <Col>
                     <Form.Group className="mb-3 col">
@@ -357,6 +404,37 @@ const typeColorMap = {
                   }
                   
                 </Row>
+
+                {
+                  shouldshowRangeOptions && (
+                    <Form.Group className="mb-3">
+                      <Form.Label>Min.</Form.Label>
+                        <Form.Control
+                          type="number"
+                          placeholder="Minimum value"
+                          name='min'
+                          value={fields?.range_options?.min}
+                          onChange={handleRangeChange}
+                        />
+                      <Form.Label>Max.</Form.Label>
+                        <Form.Control
+                          type="number"
+                          placeholder="Maximum value"
+                          name='max'
+                          value={fields?.range_options?.max}
+                          onChange={handleRangeChange}
+                        />
+                      <Form.Label>Steps</Form.Label>
+                        <Form.Control
+                          type="number"
+                          placeholder="Steps"
+                          name='steps'
+                          value={fields?.range_options?.steps}
+                          onChange={handleRangeChange}
+                        />
+                    </Form.Group>
+                  )
+                }
 
                 {shouldShowOptions && (
                   <>
@@ -414,7 +492,7 @@ const typeColorMap = {
 
 
 
-        {showAddedFields && (
+        {/* {showAddedFields && ( */}
           <div className='added--fields'>
             {
               !isEditing && 
@@ -438,8 +516,16 @@ const typeColorMap = {
 
             </div>
           </div>
-        )}
+        {/* )} */}
       </Modal.Body>
     </Modal>
+
+    {showdialog && (<AlertDialog
+            showdialog={showdialog}
+            toggledialog={setShowDialog}
+            msg="Are you sure you want to delete this field?"
+            callback={deleteCustomField}
+        />)}
+      </> 
   );
 }

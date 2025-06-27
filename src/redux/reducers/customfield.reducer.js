@@ -3,7 +3,8 @@ import {
     CUSTOM_FIELDS_LIST,
     FIELD_COMMON_ERROR,
     CLEAR_MESSAGES,
-    UPDATE_FIELD_SUCCESS
+    UPDATE_FIELD_SUCCESS,
+    DELETE_FIELD_SUCCESS
 } from "../actions/types";
 
 const initialState = {
@@ -25,7 +26,14 @@ export default (state = initialState, action) => {
             success: true,
             newField: action.payload.field
         };
-    
+    case DELETE_FIELD_SUCCESS :
+        return {
+            ...state,
+            message: action.payload.message,
+            message_variant: 'success',
+            success: true,
+            deletedField: action.payload.deletedField
+        };
     case FIELD_COMMON_ERROR: 
         return {
             message: action.payload, 
