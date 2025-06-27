@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown, ListGroupItem } from "react-bootstrap";
 import { FaChevronDown, FaPlus, FaList, FaRegTrashAlt, FaRegCalendarAlt, FaCog } from "react-icons/fa";
 import { MdFileDownload, MdFilterList, MdOutlineClose, MdOutlineCancel, MdOutlineSearch, MdDragIndicator } from "react-icons/md";
-import { FiSidebar, FiFileText } from "react-icons/fi";
+import { FiSidebar } from "react-icons/fi";
+import { FiFileText } from "react-icons/fi";
 import { GrAttachment, GrExpand } from "react-icons/gr";
 import { BsGrid,BsEye } from "react-icons/bs";
 import { BiEdit } from "react-icons/bi";
@@ -29,9 +30,12 @@ import AutoLinks from "quill-auto-links";
 import { CustomFieldModal } from "../modals/customFields";
 import { socket, currentMemberProfile } from "../../helpers/auth";
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
+import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { renderDynamicField } from "../common/dynamicFields";
 import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE, EDIT_PROJECT_FORM } from "../../redux/actions/types";
 Quill.register("modules/autoLinks", AutoLinks);
+
 function ProjectsPage() {
     const memberProfile = currentMemberProfile()
     
@@ -46,6 +50,7 @@ function ProjectsPage() {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
     const [selectedMembers, setselectedMembers] = useState([]);
+    const [customFields, setCustomFields] = useState([]);
     const projectFeed = useSelector(state => state.project.projects);
     const apiResult = useSelector(state => state.project);
     const clientFeed = useSelector(state => state.client.clients);
@@ -53,6 +58,7 @@ function ProjectsPage() {
     const memberFeed = useSelector((state) => state.member.members);
     const commonState = useSelector(state => state.common)
     const projectform = useSelector(state => state.common.projectForm)
+    const apiCustomfields = useSelector( state => state.customfields)
     const [clientlist, setClientList] = useState([])
     const [members, setMembers] = useState([])
     const [currentPage, setCurrentPage] = useState(0);
@@ -94,13 +100,38 @@ function ProjectsPage() {
     useEffect(() => {
         selectboxObserver()
         dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
+        dispatch(fetchCustomFields({module: 'projects'}))
     }, [dispatch]);
+
+ 
+
     useEffect(() => {
         if (clientFeed && clientFeed.clientData && clientFeed.clientData.length > 0) {
             setClientList(clientFeed.clientData)
             dispatch(updateStateData(ALL_CLIENTS, clientFeed.clientData))
         }
     }, [clientFeed, dispatch])
+
+    useEffect(() => { 
+        if( apiCustomfields.customFields){
+          setCustomFields( apiCustomfields.customFields)
+        }
+    
+        if( apiCustomfields.newField){
+          setCustomFields((prevCustomFields) => [apiCustomfields.newField, ...prevCustomFields]);
+        }
+    
+         if (apiCustomfields.updatedField) {
+          setCustomFields((prevCustomFields) =>
+            prevCustomFields.map((field) =>
+              field._id === apiCustomfields.updatedField._id
+                ? apiCustomfields.updatedField
+                : field
+            )
+          );
+        }
+    
+    }, [apiCustomfields]);
 
     useEffect(() => {
         if (apiClient.createClient) {
@@ -323,9 +354,11 @@ function ProjectsPage() {
         selectboxObserver()
     }
 
-    const handleChange = ({ target: { name, value, type, files } }) => {
-        setFields({ ...fields, [name]: value })
-        dispatch(updateStateData(PROJECT_FORM, { [name]: value }))
+    const handleChange = ({ target: { name, value, type, files, checked } }) => {
+        const finalValue =
+            type === 'checkbox' ? checked : type === 'file' ? files : value;
+        setFields({ ...fields, [name]: finalValue })
+        dispatch(updateStateData(PROJECT_FORM, { [name]: finalValue }))
         setErrors({ ...errors, [name]: '' })
     };
 
@@ -417,6 +450,7 @@ function ProjectsPage() {
                 }
             }
             let payload = formData;
+            
             await dispatch(createProject(payload))
             setLoader(false)
         }
@@ -565,7 +599,7 @@ function ProjectsPage() {
         if (currentProject && Object.keys(currentProject).length > 0) {
             dispatch(updateStateData(CURRENT_PROJECT, currentProject))
         }
-        console.log(currentProject)
+        
     }, [currentProject]);
 
     const handleProjectChange = (project) => {
@@ -645,12 +679,12 @@ function ProjectsPage() {
 
     const [projectToggle, setProjectToggle ] = useState(false)
     const handleToggles = () => {
-        if(commonState.sidebar_small === false ){ console.log('1')
+        if(commonState.sidebar_small === false ){ 
             handleSidebarSmall()
         }else{
             setProjectToggle(false)
             handleSidebarSmall()
-             console.log('3')
+            
         }
     }
 
@@ -754,12 +788,12 @@ function ProjectsPage() {
                                             </th>
                                             {/* <th scope="col" key="project-action-header" className="onHide sticky">Actions</th> */}
                                             <th scope="col" key="project-status-header" className="onHide">Status <small><TbArrowsSort /></small></th>
-                                            <th scope="col" key="project-status-header" className="onHide">Priority <small><TbArrowsSort /></small></th>
+                                            <th scope="col" key="project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th>
                                             {/* <th scope="col" key="project-client-header" className="onHide">Client</th> */}
                                             <th scope="col" key="project-member-header" className="onHide">Assigned Members <small><TbArrowsSort /></small></th>
-                                            <th scope="col" key="project-client-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
-                                            <th scope="col" key="project-member-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
-                                            <th scope="col" key="project-action-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
+                                            <th scope="col" key="project-start-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
+                                            <th scope="col" key="project-end-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
+                                            <th scope="col" key="project-due-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
                                         </tr>
                                     </thead>
                                     <Droppable droppableId={`droppable-project-table`} type="PROJECTS" direction={isActiveView === 1 ? "horizontal" : "vertical"}>
@@ -798,7 +832,7 @@ function ProjectsPage() {
                                                                                         <div className="title--initial">{project.title.charAt(0)}</div>
                                                                                         <div className="title--span flex-column align-items-start gap-0">
                                                                                             <span>{project.title}</span>
-                                                                                            <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'>__</span>}</strong>
+                                                                                            <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'></span>}</strong>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons">
@@ -837,7 +871,7 @@ function ProjectsPage() {
                                                                                     }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
                                                                                 </Dropdown>
                                                                             </td>
-                                                                            <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
+                                                                            <td key={`priority-index-${index}`} data-label="Status" className="onHide status__key">
                                                                                 <Dropdown className="select--dropdown" key='status-key'>
                                                                                     <Dropdown.Toggle onClick={() => { 
                                                                                         if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
@@ -912,12 +946,12 @@ function ProjectsPage() {
                                             Project <span key="project-action-header" className="onHide">Actions</span>
                                         </div>
                                     </th>
-                                    <th scope="col" key="project-status-header" className="onHide">Status <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="project-status-header" className="onHide">Priority <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="project-member-header" className="onHide">Assigned Members <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="project-client-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="project-member-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="project-action-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="th-project-status-header" className="onHide">Status <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="th-project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="th-project-member-header" className="onHide">Assigned Members <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="th-project-client-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="th-project-enddata-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="th-project-due-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
                                 </tr>
                             </thead>
                             <tbody id={`projectable-body`} className="projects--list">
@@ -967,7 +1001,7 @@ function ProjectsPage() {
                                                         </div>
                                                     </td>
                                                     
-                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
+                                                    <td key={`td-status-index-${index}`} data-label="Status" className="onHide status__key">
                                                         <Dropdown className="select--dropdown" key='status-key'>
                                                             <Dropdown.Toggle onClick={() => { 
                                                                 if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
@@ -979,7 +1013,7 @@ function ProjectsPage() {
                                                             }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
                                                         </Dropdown>
                                                     </td>
-                                                    <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
+                                                    <td key={`td-priority-index-${index}`} data-label="Status" className="onHide status__key">
                                                         <Dropdown className="select--dropdown" key='status-key'>
                                                             <Dropdown.Toggle onClick={() => { 
                                                                 if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
@@ -1040,7 +1074,7 @@ function ProjectsPage() {
                                 <div className="drop--scroll">
                                     {projects.map((project, index) => {
                                         return (<>
-                                            <Dropdown.Item value={project._id}>
+                                            <Dropdown.Item value={project._id} onClick={() => { handleProjectChange(project) }}>
                                                 <strong>{project.title}</strong>
                                                 <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
                                             </Dropdown.Item>
@@ -1076,168 +1110,188 @@ function ProjectsPage() {
                {isActive === 1 && <TasksList activeTab={activeTab} currentProject={currentProject} memberProfile={memberProfile} />} 
             </div>
 
-            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} projects={projects} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} /> }
+            {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} projects={projects} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} projectChange={handleProjectChange} customFields={customFields} /> }
             { commonState?.taskForm && <TaskForm memberProfile={memberProfile}/> }
             
             { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module='projects' />}
-
-            <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Create New Project</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="project--form">
-                        <div className="project--form--inputs">
-                            <Form onSubmit={handleSubmit}>
-                                <Form.Group className="mb-0 form-group">
-                                    <FloatingLabel label="Project Title *">
-                                        <Form.Control type="text" name="title" placeholder="Project Title" value={fields['title'] || ""} onChange={handleChange} />
-                                    </FloatingLabel>
-                                    
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label>
-                                        <small>Status</small>
-                                        <div className="status--modal" onClick={handleStatusShow}>
-                                            <span className={`${fields['status'] === 'in-progress' ? 'progress--circle' : fields['status'] === 'on-hold' ? 'hold--circle' : fields['status'] === 'completed' ? 'complete--circle' : ''} status--circle`}></span> {fields['status']?.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())} <FaChevronDown />
-                                        </div>
-                                    </Form.Label>
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label><small>Client</small></Form.Label>
-                                    <div className="client--input">
-                                    {
-                                        (memberProfile?.permissions?.clients?.view === true && clientlist && clientlist.length > 0 || memberProfile?.role?.slug === "owner" && clientlist && clientlist.length > 0) ?
-                                        <Form.Select className="form-control custom-selectbox" placeholder="Select Client" id="client-select" name="client" onChange={handleChange} value={fields['client'] || ''}>
-                                            <option value="none">None</option>
-                                            {
-                                                clientlist?.map((client, index) => {
-                                                    return <option key={client._id} value={client._id}>{client.name}</option>
-                                                })
-                                            }
-                                        </Form.Select>
-                                        :
-                                        <Form.Label><small>None</small></Form.Label>
-                                        }
-                                        { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
-                                            <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
-                                        )}
-                                    </div>
-                                    <AddClient show={showClient} toggleshow={handleClientClose} />
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label>
-                                        <small>Workflow</small>
-                                        <div className="workflow--modal" onClick={(handleWorkflowShow)}>
-                                            <span className="workflow--selected">{fields['workflow']?.title ? fields['workflow']?.title : workflowstate?.workflows?.[0]?.title || 'Select'} <FaChevronDown /></span>
-                                        </div>
-                                    </Form.Label>
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group">
-                                    <Form.Label className="w-100 m-0">
-                                        <small>Description</small>
+            {show &&
+                <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Create New Project</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="project--form">
+                            <div className="project--form--inputs">
+                                <Form onSubmit={handleSubmit}>
+                                    <Form.Group className="mb-0 form-group">
+                                        <FloatingLabel label="Project Title *">
+                                            <Form.Control type="text" name="title" placeholder="Project Title" value={fields['title'] || ""} onChange={handleChange} />
+                                        </FloatingLabel>
+                                        
+                                    </Form.Group>
+                                    <Form.Group className="mb-0 form-group">
+                                        <Form.Label>
+                                            <small>Status</small>
+                                            <div className="status--modal" onClick={handleStatusShow}>
+                                                <span className={`${fields['status'] === 'in-progress' ? 'progress--circle' : fields['status'] === 'on-hold' ? 'hold--circle' : fields['status'] === 'completed' ? 'complete--circle' : ''} status--circle`}></span> {fields['status']?.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())} <FaChevronDown />
+                                            </div>
+                                        </Form.Label>
+                                    </Form.Group>
+                                    <Form.Group className="mb-0 form-group">
+                                        <Form.Label><small>Client</small></Form.Label>
+                                        <div className="client--input">
                                         {
-                                            !isdescEditor &&
-                                            <strong className="add-descrp" onClick={setIsDescEditor}><FiFileText /> Add a description</strong>
-                                        }
-                                    </Form.Label>
-                                    <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
+                                            (memberProfile?.permissions?.clients?.view === true && clientlist && clientlist.length > 0 || memberProfile?.role?.slug === "owner" && clientlist && clientlist.length > 0) ?
+                                            <Form.Select className="form-control custom-selectbox" placeholder="Select Client" id="client-select" name="client" onChange={handleChange} value={fields['client'] || ''}>
+                                                <option value="none">None</option>
+                                                {
+                                                    clientlist?.map((client, index) => {
+                                                        return <option key={client._id} value={client._id}>{client.name}</option>
+                                                    })
+                                                }
+                                            </Form.Select>
+                                            :
+                                            <Form.Label><small>None</small></Form.Label>
+                                            }
+                                            { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
+                                                <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
+                                            )}
+                                        </div>
+                                        <AddClient show={showClient} toggleshow={handleClientClose} />
+                                    </Form.Group>
+                                    <Form.Group className="mb-0 form-group">
+                                        <Form.Label>
+                                            <small>Workflow</small>
+                                            <div className="workflow--modal" onClick={(handleWorkflowShow)}>
+                                                <span className="workflow--selected">{fields['workflow']?.title ? fields['workflow']?.title : workflowstate?.workflows?.[0]?.title || 'Select'} <FaChevronDown /></span>
+                                            </div>
+                                        </Form.Label>
+                                    </Form.Group>
+                                    <Form.Group className="mb-0 form-group">
+                                        <Form.Label className="w-100 m-0">
+                                            <small>Description</small>
+                                            {
+                                                !isdescEditor &&
+                                                <strong className="add-descrp" onClick={setIsDescEditor}><FiFileText /> Add a description</strong>
+                                            }
+                                        </Form.Label>
+                                        <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
 
-                                        <ReactQuill
-                                            value={fields['description'] || ''}
-                                            onChange={(value) => {
-                                                setFields({ ...fields, ['description']: value })
-                                                setErrors({ ...errors, ['description']: '' });
+                                            <ReactQuill
+                                                value={fields['description'] || ''}
+                                                onChange={(value) => {
+                                                    setFields({ ...fields, ['description']: value })
+                                                    setErrors({ ...errors, ['description']: '' });
 
-                                                // setTimeout(() => {
-                                                //     dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
-                                                // }, 10)
-                                            }}
-                                            formats={formats}
-                                            modules={modules}
-                                            onKeyDown={handleKeyDown}
-                                            ref={quillRef}
-                                        />
-                                    </div>
-                                </Form.Group>
-                                <Form.Group className="mb-0 form-group pb-0">
-                                    <Form.Label>
-                                        <small>Start/Due Date</small>
-                                    </Form.Label>
-                                    <Row>
-                                        {(!fields?.start_date && !fields?.due_date) ? (
-                                            <label
-                                                htmlFor="startdate--picker"
-                                                className="task--date--picker"
-                                                onClick={() => { setDateshow(true); }}
-                                            >
-                                                <FaRegCalendarAlt /> Set due date
-                                            </label>
-                                        ) : (
-                                            <label
-                                                htmlFor="startdate--picker"
-                                                className="task--date--change"
-                                                onClick={() => { setDateshow(true); }}
-                                            >
-                                                {fields?.start_date && (
-                                                    new Date(fields.start_date).toISOString().split('T')[0]
-                                                )}
+                                                    // setTimeout(() => {
+                                                    //     dispatch(updateStateData(PROJECT_FORM, { ['description']: value }))
+                                                    // }, 10)
+                                                }}
+                                                formats={formats}
+                                                modules={modules}
+                                                onKeyDown={handleKeyDown}
+                                                ref={quillRef}
+                                            />
+                                        </div>
+                                    </Form.Group>
+                                    <Form.Group className="mb-0 form-group pb-0">
+                                        <Form.Label>
+                                            <small>Start/Due Date</small>
+                                        </Form.Label>
+                                        <Row>
+                                            {(!fields?.start_date && !fields?.due_date) ? (
+                                                <label
+                                                    htmlFor="startdate--picker"
+                                                    className="task--date--picker"
+                                                    onClick={() => { setDateshow(true); }}
+                                                >
+                                                    <FaRegCalendarAlt /> Set due date
+                                                </label>
+                                            ) : (
+                                                <label
+                                                    htmlFor="startdate--picker"
+                                                    className="task--date--change"
+                                                    onClick={() => { setDateshow(true); }}
+                                                >
+                                                    {fields?.start_date && (
+                                                        new Date(fields.start_date).toISOString().split('T')[0]
+                                                    )}
 
-                                                {fields?.start_date && fields?.due_date && (
-                                                    <span>/</span>
-                                                )}
+                                                    {fields?.start_date && fields?.due_date && (
+                                                        <span>/</span>
+                                                    )}
 
-                                                {fields?.due_date && (
-                                                    <>
-                                                        {new Date(fields.due_date).toISOString().split('T')[0]}
-                                                    </>
-                                                )}
+                                                    {fields?.due_date && (
+                                                        <>
+                                                            {new Date(fields.due_date).toISOString().split('T')[0]}
+                                                        </>
+                                                    )}
 
-                                                {(fields?.start_date || fields?.due_date) && (
-                                                    <MdOutlineCancel
-                                                        onClick={() => {
-                                                            dispatch(updateStateData(PROJECT_FORM, { start_date: '', due_date: '' }));
-                                                        }}
-                                                    />
-                                                )}
-                                            </label>
+                                                    {(fields?.start_date || fields?.due_date) && (
+                                                        <MdOutlineCancel
+                                                            onClick={() => {
+                                                                dispatch(updateStateData(PROJECT_FORM, { start_date: '', due_date: '' }));
+                                                            }}
+                                                        />
+                                                    )}
+                                                </label>
+                                            )}
+                                            <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
+                                        </Row>
+                                    </Form.Group>
+                                    {customFields.length > 0 &&
+                                        <>
+                                        <hr />
+                                            <ListGroup>
+                                                <p className="m-0"> Other Fields</p>
+                                            </ListGroup>
+                                        
+                                        {customFields.map((field, index) =>
+                                            renderDynamicField({
+                                            name: `custom_field[${field.name}]`,
+                                            type: field.type,
+                                            label: field.label,
+                                            value: fields[`custom_field[${field.name}]`] || '',
+                                            options: field?.options || [],
+                                            onChange: (e) => handleChange(e, field.name),
+                                            fieldId: `new-${field.name}-${index}`,
+                                            range_options: field?.range_options || {}
+                                            })
                                         )}
-                                        <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
-                                    </Row>
-                                </Form.Group>
-                            </Form>
-                        </div>
-                        <div className="project--form--actions">
-                            <h4>Actions</h4>
-                            <ListGroup>
-                                <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
-                                <p className="m-0">
-                                    {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                        <MemberInitials directUpdate={false} key={`MemberNames-header-new`} showall={true} members={fields['members']} showAssignBtn={false} postId="new" type="project" showRemove={true} />
-                                    )}
-                                </p>
-                                <ListGroup.Item onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
-                                <div className="output--file-preview">
-                                    <div className="preview--grid">
-                                        {imagePreviews?.map((preview, index) => (
-                                            <div key={`uploaded-preview-${index}`} className="file-preview">{renderPreview('new', preview, index)}</div>
-                                        ))}
+                                        </>
+                                    }
+
+                                </Form>
+                            </div>
+                            <div className="project--form--actions">
+                                <h4>Actions</h4>
+                                <ListGroup>
+                                    <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus /> Assign to</ListGroup.Item>
+                                    <p className="m-0">
+                                        {fields['members'] && Object.keys(fields['members']).length > 0 && (
+                                            <MemberInitials directUpdate={false} key={`MemberNames-header-new`} showall={true} members={fields['members']} showAssignBtn={false} postId="new" type="project" showRemove={true} />
+                                        )}
+                                    </p>
+                                    <ListGroup.Item onClick={handleUploadShow}><GrAttachment /> Attach files</ListGroup.Item>
+                                    <div className="output--file-preview">
+                                        <div className="preview--grid">
+                                            {imagePreviews?.map((preview, index) => (
+                                                <div key={`uploaded-preview-${index}`} className="file-preview">{renderPreview('new', preview, index)}</div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            </ListGroup>
-                            <ListGroup className="mt-auto mb-0">
-                                <ListGroup.Item className="text-center">
-                                    <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
-                                </ListGroup.Item>
-                            </ListGroup>
+                                </ListGroup>
+                                <ListGroup className="mt-auto mb-0">
+                                    <ListGroup.Item className="text-center">
+                                        <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
+                                    </ListGroup.Item>
+                                </ListGroup>
+                            </div>
                         </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
-            {/* <StatusModal key="create-project-status" />
-            <MemberModal isedit={isEdit} />
-            <WorkFlowModal />
-            <FilesModal /> */}
+                    </Modal.Body>
+                </Modal>
+            }
+           
             {commonState?.statusModal && <StatusModal key="create-project-status" /> }
             {commonState?.membersModal && <MemberModal isedit={isEdit} />}
             {commonState?.workflowmodal && <WorkFlowModal /> }

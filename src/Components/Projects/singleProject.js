@@ -20,12 +20,14 @@ import ReactQuill, { Quill }  from 'react-quill';
 import AutoLinks from "quill-auto-links";
 import 'react-quill/dist/quill.snow.css';
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
+import { renderDynamicField } from "../common/dynamicFields";
 Quill.register("modules/autoLinks", AutoLinks);
 function SingleProject(props) {
     const dispatch = useDispatch();
     const memberProfile = props.memberProfile || {}
     const quillRef = useRef(null);
     const pasteOccurred = useRef(false);
+    const projectCustomFields = props.customFields
     const commonState = useSelector( state => state.common)
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [], client: '' });
     const [errors, setErrors] = useState({ title: '' });
@@ -153,6 +155,18 @@ function SingleProject(props) {
             } else {
                 fieldsSetup.members = [];
             }
+
+            if( currentProject.customFields && currentProject.customFields.length > 0){ 
+                currentProject.customFields.forEach(field => {
+                    fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value
+                });
+            }else{
+                projectCustomFields.forEach(field => {
+                    fieldsSetup[`custom_field[${field.name}]`] = ''
+                });
+                
+            }
+
             setTimeout(function () {
                 selectboxObserver()
             }, 150)
@@ -265,11 +279,18 @@ function SingleProject(props) {
     }, [])
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
-    const handleChange = ({ target: { name, value, type, files } }) => {
-        setFields({ ...fields, [name]: value });
-        dispatch( updateStateData( EDIT_PROJECT_FORM,  {[name]: value }))
+    const handleChange = ({ target: { name, value, type, files, checked } }) => { 
+    const finalValue =
+    type === 'checkbox' ? checked : type === 'file' ? files : value;
+   
+        setFields({ ...fields, [name]: finalValue });
+        dispatch( updateStateData( EDIT_PROJECT_FORM,  {[name]: finalValue }))
         setErrors({ ...errors, [name]: '' })
     };
+
+    useEffect(() => {
+        console.log('All fields: ', fields)
+    }, [fields])
 
     const handleWorkflowSelect = (flow) => {
         setFields({ ...fields, ['workflow']: flow });
@@ -437,7 +458,7 @@ useEffect(() => {
     const renderPreview = (type, preview, index) => {
         const { src, _id } = preview; 
         const mimetype = (preview.mimetype) ? preview.mimetype : src.split('.').pop().toLowerCase();
-        console.log('src:: ', mimetype)
+        
         const previewComponents = {
             image: (
                 <div className="preview--cell" key={`image-${type}-${_id}`}>
@@ -532,7 +553,7 @@ useEffect(() => {
                                 <div className="drop--scroll">
                                     {projects.map((project, index) => {
                                         return (<>
-                                            <Dropdown.Item value={project._id}>
+                                            <Dropdown.Item value={project._id} onClick={() => props?.projectChange(project)}>
                                                 <strong>{project.title}</strong>
                                                 <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
                                             </Dropdown.Item>
@@ -732,6 +753,26 @@ useEffect(() => {
                                     )}
                                     <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                 </Row>
+                                {projectCustomFields?.length > 0 &&
+                                    <>
+                                    <hr />
+                                        <ListGroup>
+                                            <p className="m-0"> Other Fields</p>
+                                        </ListGroup>
+                                    
+                                    {projectCustomFields?.map((field, index) =>
+                                        renderDynamicField({
+                                            name: `custom_field[${field.name}]`,
+                                            type: field.type,
+                                            label: field.label,
+                                            value: fields[`custom_field[${field.name}]`] || '',
+                                            options: field?.options || [],
+                                            onChange: (e) => handleChange(e, field.name),
+                                            range_options: field?.range_options || {}
+                                        })
+                                    )}
+                                    </>
+                                }
                             </Form.Group>
                         </Form>
                     </div>

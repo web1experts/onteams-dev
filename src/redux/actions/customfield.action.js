@@ -5,7 +5,8 @@ import {
     CREATE_FIELD_SUCCESS,
     CUSTOM_FIELDS_LIST,
     FIELD_COMMON_ERROR,
-    UPDATE_FIELD_SUCCESS
+    UPDATE_FIELD_SUCCESS,
+    DELETE_FIELD_SUCCESS
 } from "./types";
 
 const config = {
@@ -77,3 +78,19 @@ export const updateCustomField = (id, payload) =>{
         }
     }
 }
+
+export const deleteField = (id) =>{
+    return async (dispatch)=>{
+        try{
+            const response = await API.apiDeleteUrl('custom_field', `/${id}`);
+            if(response.data && response.data.success){
+                await dispatch({ type: DELETE_FIELD_SUCCESS, payload:response.data});
+            }else{
+                await dispatch({ type: FIELD_COMMON_ERROR, payload:response.data.message });
+            }
+        }catch (err){
+            errorRequest(err, dispatch);
+        }
+    }
+}
+
