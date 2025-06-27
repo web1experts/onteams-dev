@@ -3,7 +3,7 @@
 }
 
 :root {
-  background: var(--theme-gradient);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
 }
 
 ::-webkit-scrollbar {
@@ -64,11 +64,11 @@ a:focus {
 }
 
 .btn {
-  padding: .75rem 1.5rem;
+  padding: .55rem 1.2rem;
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   box-shadow: none;
-  font-size: .88rem;
+  font-size: 1rem;
   text-transform: capitalize;
   font-weight: 500;
   border-color: rgb(227 231 241);
@@ -121,7 +121,7 @@ fieldset:disabled .btn {
 
 .btn-primary {
   color: #ffffff;
-  background: var(--theme-gradient);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
   border-color: transparent;
 }
 
@@ -156,7 +156,7 @@ fieldset:disabled .btn {
 .btn-primary:not(:disabled):not(.disabled):active,
 .show>.btn-primary.dropdown-toggle {
   color: #ffffff;
-  background: var(--theme-gradient);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
   border-color: transparent;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
@@ -220,14 +220,7 @@ strong.activity-type-text {
   text-transform: capitalize;
 }
 
-.btn-outline-primary:hover,
-.btn-outline-primary.focus,
-.btn-outline-primary:focus,
-.btn-check:checked+.btn,
-.btn.active,
-.btn.show,
-.btn:first-child:active,
-:not(.btn-check)+.btn:active {
+.btn-outline-primary:hover, .btn-outline-primary.focus, .btn-outline-primary:focus, .btn-check:checked+.btn, .btn.active, .btn.show, :not(.btn-check)+.btn:active {
   color: rgb(15 23 42);
   background-color: rgb(226 232 240);
   border-color: transparent;

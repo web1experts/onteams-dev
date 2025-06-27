@@ -46,7 +46,7 @@ Sidebar CSS-=-=
 }
 
 .navbar-brand span {
-  background: var(--theme-gradient);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -296,7 +296,7 @@ Sidebar CSS-=-=
 }
 
 .panel--sidebar .dropdown a.active-workspace .initial--name {
-  background: var(--theme-gradient);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
   color: #ffffff;
 }
 
@@ -410,7 +410,7 @@ Sidebar CSS-=-=
 .navbar-light .navbar-nav .nav-link:focus .nav--item--icon, 
 .panel--sidebar .dropdown .dropdown-item .theme--item--icon {
   color: #ffffff;
-  background: var(--theme-gradient);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
 }
 
 .navbar-light .navbar-nav .nav-link:hover {
@@ -432,7 +432,7 @@ Sidebar CSS-=-=
   height: .5rem;
   content: '';
   position: absolute;
-  background: var(--theme-gradient);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
   top: 0;
   bottom: 0;
   margin: auto 0;
@@ -572,7 +572,7 @@ Sidebar CSS-=-=
 
 .current--workspace .dropdown .initial--name {
   align-items: center;
-  background: var(--theme-gradient);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   color: #ffffff;

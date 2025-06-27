@@ -782,7 +782,7 @@ function ProjectsPage() {
                                     <thead className="onHide">
                                         <tr key="project-table-header">
                                             <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
-                                                <div className="d-flex align-items-center justify-content-between">
+                                                <div className="d-flex align-items-center justify-content-between border-end">
                                                     Project <span key="project-action-header" className="onHide">Actions</span>
                                                 </div>
                                             </th>
@@ -835,7 +835,7 @@ function ProjectsPage() {
                                                                             key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                                                 }`}>
                                                                             <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                                                <div className="d-flex justify-content-between">
+                                                                                <div className="d-flex justify-content-between border-end">
                                                                                     <div className="project--name">
                                                                                         <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr><MdDragIndicator /></div>
                                                                                         <div className="title--initial">{project.title.charAt(0)}</div>
@@ -951,7 +951,7 @@ function ProjectsPage() {
                              <thead className="onHide">
                                 <tr key="project-table-header">
                                     <th scope="col" className="sticky" key="project-name-header">
-                                        <div className="d-flex align-items-center justify-content-between">
+                                        <div className="d-flex align-items-center justify-content-between border-end">
                                             Project <span key="project-action-header" className="onHide">Actions</span>
                                         </div>
                                     </th>
@@ -977,7 +977,7 @@ function ProjectsPage() {
                                                     key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                         }`}>
                                                     <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                        <div className="d-flex justify-content-between">
+                                                        <div className="d-flex justify-content-between border-end">
                                                             <div className="project--name">
                                                                 <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr><MdDragIndicator /></div>
                                                                 <div className="title--initial">{project.title.charAt(0)}</div>
@@ -1111,7 +1111,7 @@ function ProjectsPage() {
                         )
                         }
                     </ListGroup> */}
-                    <ListGroup horizontal>
+                    <ListGroup horizontal className="bg-white expand--icon gap-2 p-0 b-0 rounded-0 align-items-center">
                         <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
                         <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
                     </ListGroup>

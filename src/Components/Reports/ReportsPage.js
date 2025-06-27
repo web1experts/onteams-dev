@@ -2,12 +2,18 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import { Container, Row, Col, Button, Form, ListGroup, Accordion, Modal, Card, Dropdown, CardGroup, Badge } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaRegEdit, FaCheck, FaAngleRight, FaPlus, FaTrash } from "react-icons/fa";
+import { FaRegEdit, FaCheck, FaAngleRight, FaPlus, FaTrash, FaEye } from "react-icons/fa";
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
-import { MdFilterList } from "react-icons/md";
+import { LuFolderOpen } from 'react-icons/lu';
+import { MdDragIndicator, MdOutlineClose } from "react-icons/md";
+import { FiSidebar } from "react-icons/fi";
+import { AiOutlineTeam } from 'react-icons/ai';
+import { GrExpand } from "react-icons/gr";
+import { TbReport } from 'react-icons/tb';
+import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/project.action";
@@ -19,6 +25,10 @@ import "media-chrome";
 import "media-chrome/dist/menu"
 import ManualTime from "./ManualTime";
 function ReportsPage() {
+  const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
+  const [isActive, setIsActive] = useState(false);
+  const [activeMemberTab, setActiveViewTab] = useState('members'); 
+  const commonState = useSelector(state => state.common)
   const dispatch = useDispatch()
   const memberProfile = currentMemberProfile()
   const datePickerRef = useRef(null)
@@ -422,7 +432,7 @@ function ReportsPage() {
     const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
     const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
 
-    return `${hours} hrs ${minutes} mins`;
+    return `${hours}h ${minutes}m`;
 }
 
 
@@ -629,6 +639,17 @@ const groupTasksById = (activities) => {
   });
 };
 
+const [projectToggle, setProjectToggle ] = useState(false)
+const handleToggles = () => {
+    if(commonState.sidebar_small === false ){ console.log('1')
+        handleSidebarSmall()
+    }else{
+        setProjectToggle(false)
+        handleSidebarSmall()
+          console.log('3')
+    }
+}
+
 const TaskList = ({ report }) => {
   // Group tasks by title and calculate total durations
   const groupedTasks = groupTasksById(report?.activities);
@@ -676,7 +697,7 @@ const TaskList = ({ report }) => {
   const gettaskTab = (tabid) => { 
     if( report?.project?.workflow?.tabs?.length > 0){
       const matchedTabTitle = report.project.workflow.tabs.find(tab => tab._id === tabid)?.title;
-      return <Badge bg="info">{matchedTabTitle}</Badge>
+      return <Badge bg="warning">{matchedTabTitle}</Badge>
     }
     return null;
   }
@@ -755,11 +776,12 @@ const TaskList = ({ report }) => {
           <p className="mb-0">
             <FaAngleRight /> {task.title}
           </p>
-          <strong>{task.duration}</strong>
-          {
+          {/* <strong>{task.duration}</strong> */}
+          {/* {
             gettaskTab(task.tab)
-          }
-          <Button variant="primary" onClick={() => {handleViewReport(task.taskId)}}>View Report</Button>
+          } */}
+          <Button variant="primary" className="mt-3" onClick={() => {handleViewReport(task.taskId)}}><FaEye/> View Report</Button>
+          <Button variant="info" className="mt-3 ms-3"><TbReport /> View Remarks</Button>
         </li>
       ))}
     </ul>
@@ -927,164 +949,151 @@ const TaskList = ({ report }) => {
         }}
       />
 
-      <div className='team--page'>
+      <div className={ `${isActive === 1 ? 'show--details team--page project-collapse holidays--page' : isActive === 2 ? 'view--project team--page project-collapse holidays--page' :  'team--page holidays--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
         <div className='page--title px-md-2 py-3 bg-white border-bottom'>
           <Container fluid>
-            <Row>
-              <Col>
-                <h2>Reports <Button variant="primary" className='d-flex d-xl-none' onClick={handleFilterShow}><MdFilterList /></Button></h2>
-              </Col>
-              <Col>
-                <ListGroup horizontal>
-                  <ListGroup.Item className="d-none d-xl-block">
-                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('sort_by', event.target.value)} value={filters['sort_by'] || 'members'}>
-                      <option value="">Sort by</option>
-                      <option value="members">Members</option>
-                      <option value="projects">Projects</option>
-                  </Form.Select>
-                    
-                  </ListGroup.Item>
-                  {
-                    filters['sort_by'] === 'members' ?
-                  
-                      <ListGroup.Item className="d-none d-xl-block">
-                      <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || memberdata?._id}>
-                        <option value={memberdata?._id}>My Reports</option>
-                        {
-                          (memberProfile?.permissions?.reports?.view_others === true && memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') &&
-                          <>
-                          {
-                            members.map((member, index) => 
-                              (memberProfile?.permissions?.reports?.selected_members?.includes(member._id)  || memberProfile?.role?.slug === 'owner') ? (
-                                <option key={`member-${index}`} value={member._id}>{member.name}</option>
-                              ) : null
-                            
-                            )
-                          }
-                          </>
-                        }
-                      </Form.Select>
-                        
-                      </ListGroup.Item>
-                    :
-                    <>
-                      <ListGroup.Item key="status-filter-list">
-                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project_status', event.target.value)} value={filters['project_status'] || 'in-progress'}>
-                            <option value="all">View All</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="on-hold">On Hold</option>
-                            <option value="completed">Completed</option>
-                        </Form.Select>
-                      </ListGroup.Item>
-                      <ListGroup.Item className="d-none d-xl-block">
-                        <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project', event.target.value)} value={filters['project'] || ''}>
-                          
-                        {projects
-                          .filter(project =>
-                            filters['project_status'] === 'all' || project.status === filters['project_status']
-                          )
-                          .map((project, index) => (
-                            <option key={`project-${index}`} value={project._id}>
-                              {project.title}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </ListGroup.Item>
-                      
-                      </>
-                    }
-                  <ListGroup.Item action className="change--view" active={view === 'group' ? true : false} onClick={(e) => {setView('group')}}>
-                    Group View
-                  </ListGroup.Item>
-                  <ListGroup.Item action className="change--view" active={view === 'single' ? true : false} onClick={(e) => {setView('single');}}>
-                    Single View
-                  </ListGroup.Item>
-                  {
-                    view === 'group' ? 
-                    <ListGroup.Item className="d-none d-xl-block">
-                    <Form>
-                      <Form.Group className="mb-0 form-group">
-                      <DatePicker 
-                        ref={datePickerRef}
-                        key={'date-filter'}
-                        name="date"
-                        weekStartDayIndex={1}
-                        id='datepicker-filter'
-                        value={filtereddate} 
-                        format="YYYY-MM-DD"
-                        range
-                        numberOfMonths={2}
-                        dateSeparator=" - " 
-                        onChange={async (value) => {
-                            setFilteredDate(value)
-                          }
-                        } 
-                        editable={false}         
-                        className="form-control"
-                        placeholder="dd/mm/yyyy"
-                        open={isPickerOpen} // Control visibility with state
-                        onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                        onClose={() => setIsPickerOpen(false)} // Update state when closed
-                        plugins={
-                          [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
-                        } 
-                    />
-                      </Form.Group>
-                    </Form>
-                  </ListGroup.Item>
-                  :
-                  <ListGroup.Item className="d-none d-xl-block">
-                    <Form>
-                      <Form.Group className="mb-0 form-group">
-                      <DatePicker 
-                        ref={datePickerRef}
-                        key={'date-filter'}
-                        name="date"
-                        weekStartDayIndex={1}
-                        id='datepicker-filter'
-                        editable={false}
-                        value={filtereddate} 
-                        format="YYYY-MM-DD"
-                        dateSeparator=" - " 
-                        onChange={async (value) => {
-                            setFilteredDate(value)
-                            datePickerRef.current.closeCalendar()
-                            datePickerRef.current.openCalendar()
-                          }
-                        }          
-                        className="form-control"
-                        placeholder="dd/mm/yyyy"
-                        open={isPickerOpen} // Control visibility with state
-                        onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                        onClose={() => setIsPickerOpen(false)} // Update state when closed
-                        plugins={
-                          [<FilterButton position="bottom" />]
-                        } 
-                        range={false}
-                        multiple={false}
-                    />
-                      </Form.Group>
-                    </Form>
-                  </ListGroup.Item>
-                  }
-                  { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                    <Dropdown className="select--dropdown">
-                      <Dropdown.Toggle variant="success" id="dropdown-basic">Manual Time</Dropdown.Toggle>
-                  
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={handleShow}>Manual Time</Dropdown.Item>
-                        {
-                          memberProfile?.permissions?.reports?.update_manual_time && (
-                            <Dropdown.Item onClick={handleNewShow} to="/manual-time" >Manual Time Approval</Dropdown.Item>
-                          )
-                        }
-                        
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  )}
-                </ListGroup>
-              </Col>
-            </Row>
+              <Row>
+                  <Col sm={12} lg={12}>
+                      <h2>
+                          <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                          Reports
+                          <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
+                            <ListGroup horizontal>
+                              <ListGroup.Item action onClick={() => setActiveViewTab('members')} className={`${activeMemberTab === 'members'? 'd-lg-flex gap-2 active': 'd-lg-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
+                              <ListGroup.Item action onClick={() => setActiveViewTab('projects')} className={`${activeMemberTab === 'projects'? 'd-lg-flex gap-2 active': 'd-lg-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                            </ListGroup>
+                            {
+                              filters['sort_by'] === 'members' ?
+                                <ListGroup.Item className="d-none d-xl-block">
+                                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || memberdata?._id}>
+                                    <option value={memberdata?._id}>My Reports</option>
+                                    {
+                                      (memberProfile?.permissions?.reports?.view_others === true && memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') &&
+                                      <>
+                                      {
+                                        members.map((member, index) => 
+                                          (memberProfile?.permissions?.reports?.selected_members?.includes(member._id)  || memberProfile?.role?.slug === 'owner') ? (
+                                            <option key={`member-${index}`} value={member._id}>{member.name}</option>
+                                          ) : null
+                                        )
+                                      }
+                                      </>
+                                    }
+                                  </Form.Select>
+                                </ListGroup.Item>
+                              :
+                              <>
+                                <ListGroup.Item key="status-filter-list">
+                                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project_status', event.target.value)} value={filters['project_status'] || 'in-progress'}>
+                                      <option value="all">View All</option>
+                                      <option value="in-progress">In Progress</option>
+                                      <option value="on-hold">On Hold</option>
+                                      <option value="completed">Completed</option>
+                                  </Form.Select>
+                                </ListGroup.Item>
+                                <ListGroup.Item className="d-none d-xl-block">
+                                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project', event.target.value)} value={filters['project'] || ''}>
+                                  {projects
+                                    .filter(project =>
+                                      filters['project_status'] === 'all' || project.status === filters['project_status']
+                                    )
+                                    .map((project, index) => (
+                                      <option key={`project-${index}`} value={project._id}>
+                                        {project.title}
+                                      </option>
+                                    ))}
+                                  </Form.Select>
+                                </ListGroup.Item>
+                                {
+                              view === 'group' ? 
+                              <ListGroup.Item className="d-none d-xl-block">
+                              <Form>
+                                <Form.Group className="mb-0 form-group">
+                                <DatePicker 
+                                  ref={datePickerRef}
+                                  key={'date-filter'}
+                                  name="date"
+                                  weekStartDayIndex={1}
+                                  id='datepicker-filter'
+                                  value={filtereddate} 
+                                  format="YYYY-MM-DD"
+                                  range
+                                  numberOfMonths={2}
+                                  dateSeparator=" - " 
+                                  onChange={async (value) => {
+                                      setFilteredDate(value)
+                                    }
+                                  } 
+                                  editable={false}         
+                                  className="form-control"
+                                  placeholder="dd/mm/yyyy"
+                                  open={isPickerOpen} // Control visibility with state
+                                  onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                                  onClose={() => setIsPickerOpen(false)} // Update state when closed
+                                  plugins={
+                                    [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
+                                  } 
+                              />
+                                </Form.Group>
+                              </Form>
+                            </ListGroup.Item>
+                            :
+                              <ListGroup.Item className="d-none d-xl-block">
+                                <Form>
+                                  <Form.Group className="mb-0 form-group">
+                                    <DatePicker 
+                                      ref={datePickerRef}
+                                      key={'date-filter'}
+                                      name="date"
+                                      weekStartDayIndex={1}
+                                      id='datepicker-filter'
+                                      editable={false}
+                                      value={filtereddate} 
+                                      format="YYYY-MM-DD"
+                                      dateSeparator=" - " 
+                                      onChange={async (value) => {
+                                          setFilteredDate(value)
+                                          datePickerRef.current.closeCalendar()
+                                          datePickerRef.current.openCalendar()
+                                        }
+                                      }          
+                                      className="form-control"
+                                      placeholder="dd/mm/yyyy"
+                                      open={isPickerOpen} // Control visibility with state
+                                      onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                                      onClose={() => setIsPickerOpen(false)} // Update state when closed
+                                      plugins={
+                                        [<FilterButton position="bottom" />]
+                                      } 
+                                      range={false}
+                                      multiple={false}
+                                    />
+                                  </Form.Group>
+                                </Form>
+                              </ListGroup.Item>
+                              }
+                              { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                                <Dropdown className="select--dropdown">
+                                  <Dropdown.Toggle variant="success" id="dropdown-basic">Manual Time</Dropdown.Toggle>
+                                  <Dropdown.Menu>
+                                    <Dropdown.Item onClick={handleShow}>Manual Time</Dropdown.Item>
+                                    {
+                                      memberProfile?.permissions?.reports?.update_manual_time && (
+                                        <Dropdown.Item onClick={handleNewShow} to="/manual-time" >Manual Time Approval</Dropdown.Item>
+                                      )
+                                    }
+                                  </Dropdown.Menu>
+                                </Dropdown>
+                              )}
+                              </>
+                            }
+                            <ListGroup horizontal className="bg-white expand--icon ms-3">
+                                <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                            </ListGroup>
+                          </ListGroup>
+                      </h2>
+                  </Col>
+              </Row>
           </Container>
         </div>
         <div className='page--wrapper daily--reports px-md-2 py-3'>
@@ -1094,440 +1103,465 @@ const TaskList = ({ report }) => {
                   <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
-          <Container fluid>
-          <div className="reports-section">
-          <div className="rounded--box activity--box" key='activity-box'>
-            
-              {
-                filters['sort_by'] === 'members' ?
-                  memberReports && memberReports.length > 0 ? 
-                  view === 'group' ?
-                    <Accordion>
-                    {memberReports.map((report, index) => {
-                      return (
-                      <>
-                      
-                      <Accordion.Item eventKey={`group-accord-item-${report?.project?._id}`} key={`group-accord-item-${report?.project?._id}`}>
-                        <div className="screens--tabs">
-                          <Accordion.Header>
-                            {report?.project?.title} <br />
-                          </Accordion.Header>
-                        </div>
-                        <Accordion.Body>
-                          <div className="shots--list pt-3">
-                          <Row>
-                            <Col sm={12}>
-                              <div className="report--info">
-                                <p className="p--card">
-                                  <label>Client Name</label>
-                                  <p>{report?.project?.client?.name}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Track Time</label>
-                                  <p>{calculateTotalTime(report?.activities, 'tracker')}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Manual Time</label>
-                                  <p>{calculateTotalTime(report?.activities, 'manual')}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Total Time Spent</label>
-                                  <p>{calculateTotalTime(report?.activities, 'all')}</p>
-                                </p>
+          <Container fluid className="py-4">
+            {activeMemberTab === 'projects' && (
+              <div className="attendance--table projects--view" id="projects--view">               
+                <div className='attendance--table--list'>
+                    <Table>
+                      <tbody className="bg-white">
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">O</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>On Teams</span>
+                                      <strong>Layout Design changes</strong>
+                                  </div>
                               </div>
-                            </Col>
-                            </Row>
-                            {showRecordedTabs()}
-                            <CardGroup>
-                                {
-                                  report?.activityMetas && report.activityMetas.length > 0 ? (
-                                    report.activityMetas.map((meta, i) => {
-                                      // Handle screenshots tab
-                                      if (screenshotTab === "Screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((screenshotData, j) => (
-                                          <Card key={`screenshot-card-${i}-${j}`}>
-                                            <Card.Body>
-                                              <img
-                                                className="card-img-top"
-                                                src={screenshotData?.url}
-                                                alt="screenshot"
-                                                onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
-                                              />
-                                              <p>
-                                                <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
-                                                <strong>Date: {screenshotData?.taken_time.split('T')[0]}</strong><br />
-                                                <strong>Time: {showAmPmtime(screenshotData?.taken_time)}</strong>
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ));
-                                      }
-
-                                      // Handle videos tab
-                                      if (screenshotTab === "Videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                                        return (
-                                          <>
-                                            {meta.meta_value
-                                              .slice(
-                                                ((currentVideoPage[report?.project?._id] || 1) - 1) * videosPerPage,
-                                                (currentVideoPage[report?.project?._id] || 1) * videosPerPage
-                                              )
-                                              .map((videoData, j) => 
-                                                videoData?.url === 'video_disabled' ? (
-                                                  <Card key={`blank-card-${report?.project?._id}-${currentVideoPage[report?.project?._id] || 1}-${i}-${j}`}>
-                                                    <Card.Body>
-                                                      <img
-                                                        className="card-img-top"
-                                                        src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
-                                                        alt="screenshot"
-                                                      />
-                                                      <p>
-                                                      <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                                      <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
-                                                      <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                      </p>
-                                                    </Card.Body>
-                                                  </Card>
-                                                ) : (
-                                                <Card key={`video-card-${report?.project?._id}-${currentVideoPage[report?.project?._id] || 1}-${i}-${j}`}>
-                                                  <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                                    <video
-                                                      height="175px"
-                                                      preload="metadata"
-                                                      muted
-                                                      onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
-                                                    >
-                                                      <source src={videoData?.url} type="video/webm" />
-                                                      Your browser does not support the video tag.
-                                                    </video>
-                                                    <p>
-                                                    <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                                    <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
-                                                    <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                    </p>
-                                                  </Card.Body>
-                                                </Card>
-                                              ))}
-                                      
-                                            {/* Pagination Controls */}
-                                            <div style={{ marginTop: "10px", textAlign: "center" }}>
-                                              <Button variant="outline-primary"
-                                                disabled={(currentVideoPage[report?.project?._id] || 1) === 1}
-                                                onClick={() =>
-                                                  setCurrentVideoPage((prev) => ({
-                                                    ...prev,
-                                                    [report?.project?._id]: (prev[report?.project?._id] || 1) - 1,
-                                                  }))
-                                                }
-                                              >
-                                                <BsArrowLeftCircleFill />
-                                              </Button>
-                                      
-                                              <span style={{ margin: "0 10px" }}>
-                                                Page {currentVideoPage[report?.project?._id] || 1} of {Math.ceil(meta.meta_value.length / videosPerPage)}
-                                              </span>
-                                      
-                                              <Button variant="outline-primary"
-                                                disabled={(currentVideoPage[report?.project?._id] || 1) >= Math.ceil(meta.meta_value.length / videosPerPage)}
-                                                onClick={() =>
-                                                  setCurrentVideoPage((prev) => ({
-                                                    ...prev,
-                                                    [report?.project?._id]: (prev[report?.project?._id] || 1) + 1,
-                                                  }))
-                                                }
-                                              >
-                                                <BsArrowRightCircleFill />
-                                              </Button>
-                                            </div>
-                                          </>
-                                        );
-                                        
-                                      }
-
-                                      return null; // Return null if no condition is met
-                                    })
-                                  ) : (
-                                    <div>No data available</div> // Display if no data is available
-                                  )
-                                }
-                              </CardGroup>
                             </div>
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      </>
-                      )
-                    })
-                    }
-                    </Accordion>
-                    
-                    :
-                    <Accordion>
-                    {memberReports.map((report, index) => {
-                      return (
-                      <>
-                      
-                      <Accordion.Item key={`single-accord-item-${report?.project?._id}`} eventKey={`single-accord-item-${report?.project?._id}`} onClick={() => {setSelectedReport(report?.project)}}>
-                        <div className="screens--tabs">
-                          <Accordion.Header>{report?.project?.title}
-                          </Accordion.Header>
-                        </div>
-                        <Accordion.Body>
-                          <Row>
-                            <Col sm={12}>
-                              <div className="report--info">
-                                <p className="p--card">
-                                  <label>Client name</label>
-                                  <p>{report?.project?.client?.name}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Track Time</label>
-                                  <p>{calculateTotalTime(report?.activities, 'tracker')}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Manual Time</label>
-                                  <p>{calculateTotalTime(report?.activities, 'manual')}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Total Time Spent</label>
-                                  <p>{calculateTotalTime(report?.activities, 'all')}</p>
-                                </p>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Total Hours: </strong> 4h 47m
                               </div>
-                            </Col>
-                            
-                            <Col sm={12}>
-                              <label>Tasks</label>
-                              <TaskList report={report} />
-                              
-                            </Col>
-                            { memberdata?._id === filters?.member ?
-                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
-                                <label>Remarks</label>
-                                
-                                {
-                                  remarksActive === true ? 
-                                  <>
-                                    <Form.Group className="mb-0 form-group">
-                                      
-                                      <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
-                                        
-                                      </textarea>
-                                    </Form.Group>
-                                    <Button variant="primary" onClick={() => {
-                                      saveRemarks(report?.project?._id)
-                                    }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
-                                    <Button variant="danger" onClick={handleRemarks}>Cancel</Button>
-                                  </>
-                                  :
-                                  <>
-                                    <FaRegEdit onClick={handleRemarks} />
-                                    {
-                                    report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                    report?.project?.projectmeta.map((meta) => {
-                                      if(meta.meta_key === 'remarks'){
-                                        return <pre>{meta.meta_value}</pre>
-                                      }else{
-                                        return null
-                                      }
-                                    })
-                                  }
-                                  </>
-                                }
-                              </Col>
-                              :
-                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
-                                <label>Remarks</label>
-                                    {
-                                    report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                    report?.project?.projectmeta.map((meta) => {
-                                      if(meta.meta_key === 'remarks'){
-                                        return <pre>{meta.meta_value}</pre>
-                                      }else{
-                                        return null
-                                      }
-                                    })
-                                  }
-                              </Col>
-                            }
-                          </Row>
-                          
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      </>
-                      )
-                    })}
-                    </Accordion>
-                  :
-                  <p className="text-center mt-5">No activity available.</p>
-                  :
-
-                  projectReports && projectReports.length > 0 ? 
-                    view === 'group' ?
-                    <Accordion>
-                    {projectReports.map((report, index) => {
-                      return (
-                      <>
-                      
-                      <Accordion.Item eventKey={`member-group-accord-item-${report?.member?._id}`} key={`member-group-accord-item-${report?.member?._id}`}>
-                        <div className="screens--tabs">
-                          <Accordion.Header>Member: {report?.member?.name}</Accordion.Header>
-                        </div>
-                        <Accordion.Body>
-                          <div className="shots--list pt-3">
-                          <Row>
-                            <Col sm={12}>
-                              <div className="report--info">
-                                <p className="p--card">
-                                  <label>Client Name</label>
-                                  <p>{report?.member?.client?.name}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Track Time</label>
-                                  <p>{calculateTotalTime(report?.activities,'tracker')}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Manual Time</label>
-                                  <p>{calculateTotalTime(report?.activities, 'manual')}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Total Time Spent</label>
-                                  <p>{calculateTotalTime(report?.activities, 'all')}</p>
-                                </p>
+                              <div className="text-center">
+                                <strong>Members: </strong> 2
                               </div>
-                            </Col>
-                            </Row>
-                            {showRecordedTabs()}
-                            <CardGroup>
-                                {
-                                  report?.activityMetas && report.activityMetas.length > 0 ? (
-                                    report.activityMetas.map((meta, i) => {
-                                      // Handle screenshots tab
-                                      if (screenshotTab === "Screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((screenshotData, j) => (
-                                          <Card key={`screenshot-card-${i}-${j}`}>
-                                            <Card.Body>
-                                              <img
-                                                className="card-img-top"
-                                                src={screenshotData?.url}
-                                                alt="screenshot"
-                                                onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
-                                              />
-                                              <p>
-                                                <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
-                                                <strong>Date:{screenshotData?.taken_time.split('T')[0]}</strong><br />
-                                                <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ));
-                                      }
-
-                                      // Handle videos tab
-                                      if (screenshotTab === "Videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                                        return meta.meta_value.map((videoData, j) => 
-                                          videoData?.url === 'video_disabled' ? (
-                                            <Card key={`video-card-${i}-${j}`}>
-                                              <Card.Body>
-                                                <img
-                                                  className="card-img-top"
-                                                  src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
-                                                  alt="screenshot"
-                                                />
-                                                <p>
-                                                  <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                                  <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
-                                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                </p>
-                                              </Card.Body>
-                                            </Card>
-                                          ) : (
-                                          <Card key={`video-card-${i}-${j}`}>
-                                            <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                              <video controls height="175px">
-                                                <source src={videoData?.url} type="video/webm" />
-                                                Your browser does not support the video tag.
-                                              </video>
-                                              <p>
-                                                <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                                <strong>Date:{videoData?.start_time.split('T')[0]}</strong><br />
-                                                <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                              </p>
-                                            </Card.Body>
-                                          </Card>
-                                        ));
-                                      }
-
-                                      return null; // Return null if no condition is met
-                                    })
-                                  ) : (
-                                    <div>No data available</div> // Display if no data is available
-                                  )
-                                }
-                              </CardGroup>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      </>
-                      )
-                    })}
-                    </Accordion>
-                    :
-                    <Accordion>
-                    {projectReports.map((report, index) => {
-                      return (
-                      <>
-                      <Accordion.Item eventKey={`single-member-accord-item-${report?.member?._id}`} key={`single-member-accord-item-${report?.member?._id}`} onClick={() => {setSelectedReport(report?.project)}}>
-                        <div className="screens--tabs">
-                          <Accordion.Header>{report?.member?.name} </Accordion.Header>
-                        </div>
-                        <Accordion.Body>
-                          <Row>
-                            <Col sm={12}>
-                              <div className="report--info">
-                                <p className="p--card">
-                                  <label>Client name</label>
-                                  <p>{report?.member?.client?.name}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Track Time</label>
-                                  <p>{calculateTotalTime(report?.activities,'tracker')}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Manual Time</label>
-                                  <p>{calculateTotalTime(report?.activities, 'manual')}</p>
-                                </p>
-                                <p className="p--card">
-                                  <label>Total Time Spent</label>
-                                  <p>{calculateTotalTime(report?.activities, 'all')}</p>
-                                </p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#2</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">O</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>On Teams</span>
+                                      <strong>Layout Design changes</strong>
+                                  </div>
                               </div>
-                            </Col>
-                            
-                            <Col sm={12}>
-                              <label>Tasks</label>
-                              
-                               <TaskList report={report} />
-                            </Col>
-                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-4 bg-light">
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Total Hours: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Members: </strong> 2
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#3</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">O</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>On Teams</span>
+                                      <strong>Layout Design changes</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Total Hours: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Members: </strong> 2
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                </div>
+              </div>
+            )}
+
+            {activeMemberTab === 'members' && (
+              <>
+                <div className="attendance--table members--view" id="members--view">
+                  <div className='attendance--table--list'>
+                    <Table responsive="lg">
+                      <tbody className="bg-white">
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">GS</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Gagandeep Singh</span>
+                                      <strong>UI/UX Designer</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">TG</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Tarun Giri</span>
+                                      <strong>Project Manager</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">PS</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Paramjeet Singh</span>
+                                      <strong>Managing Director</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">AJ</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Abhishek Jaiswal</span>
+                                      <strong>Sr. Web Designer</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">RS</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Ritika Sharma</span>
+                                      <strong>Sr. Human Resources</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">NC</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Nidhi Chandna</span>
+                                      <strong>Sr. Human Resources</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">G</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Hitesh Kumar</span>
+                                      <strong>Software Engineer</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">RS</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Ram Singh</span>
+                                      <strong>Sr. Software Engineer</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">GS</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Gaurav Sharma</span>
+                                      <strong>Sr. Software Engineer</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">ND</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Neha Dutt</span>
+                                      <strong>Sr. Business Developer</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">DE</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>Deepak</span>
+                                      <strong>Office Assistant</strong>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="ms-auto">
+                            <div className="d-flex align-items-center gap-4">
+                              <div className="text-center">
+                                <strong>Project Time: </strong> 4h 47m
+                              </div>
+                              <div className="text-center">
+                                <strong>Projects: </strong> 4
+                              </div>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
+              </>
+            )}
+          </Container>
+        </div>
+      </div>
+      <div className="details--projects--grid projects--grid common--project--grid">
+        <div className="wrapper--title py-2 bg-white border-bottom">
+            <div className="projecttitle">
+              <h3>
+                  <strong>Gagandeep Singh</strong>
+                  <span>UI/UX Designer</span>
+              </h3>
+            </div>
+            <ListGroup horizontal>
+              <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+              <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
+            </ListGroup>
+        </div>
+        <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
+          <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
+            <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects (3)</h3>
+            <div class="d-flex align-items-center gap-4 text-sm">
+              <div class="text-center">
+                  <div class="text-lg font-bold text--blue">113h 15m</div>
+                  <div class="text-slate-600">Total Hours</div>
+              </div>
+              <div class="text-center">
+                  <div class="text-lg font-bold text--green">3</div>
+                  <div class="text-slate-600">Projects</div>
+              </div>
+            </div>
+          </div>
+          {
+            filters['sort_by'] === 'members' ?
+              memberReports && memberReports.length > 0 ? 
+              view === 'single' ?
+              <></>
+              :
+                <div className="single--project--stack">
+                  {memberReports.map((report, index) => {
+                    return (
+                    <>
+                    <div key={`single-accord-item-${report?.project?._id}`} eventKey={`single-accord-item-${report?.project?._id}`} onClick={() => {setSelectedReport(report?.project)}}>
+                      <div className="d-flex align-items-center justify-content-between gap-4">
+                        <h4>{report?.project?.title} <span>{report?.project?.client?.name}</span></h4>
+                        <Badge bg="warning">Progress</Badge>
+                      </div>
+                      <div className="report--info">
+                        <p className="p--card">
+                          <label>Tracked Time</label>
+                          <p>{calculateTotalTime(report?.activities, 'tracker')}</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Manual Time</label>
+                          <p>{calculateTotalTime(report?.activities, 'manual')}</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Total Time</label>
+                          <p>{calculateTotalTime(report?.activities, 'all')}</p>
+                        </p>
+                      </div>
+                      <Row>
+                          <Col sm={12}>
+                            <label>Tasks</label>
+                            <TaskList report={report} />
+                          </Col>
+                          { memberdata?._id === filters?.member ?
+                            <Col sm={12} className="mt-4">
                               <label>Remarks</label>
-                              
                               {
                                 remarksActive === true ? 
                                 <>
                                   <Form.Group className="mb-0 form-group">
                                     
-                                    <textarea class="form-control mt-4" rows={7} data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
+                                    <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
                                       
                                     </textarea>
                                   </Form.Group>
                                   <Button variant="primary" onClick={() => {
                                     saveRemarks(report?.project?._id)
                                   }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
-                                  <Button variant="danger" onClick={handleRemarks}>Cancel</Button>
+                                  <Button variant="secondary" className="ms-3" onClick={handleRemarks}>Cancel</Button>
                                 </>
-                              :
-                              <>
-                                <FaRegEdit onClick={handleRemarks} />
-                                {
+                                :
+                                <>
+                                  <FaRegEdit onClick={handleRemarks} />
+                                  {
                                   report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
                                   report?.project?.projectmeta.map((meta) => {
                                     if(meta.meta_key === 'remarks'){
@@ -1539,23 +1573,147 @@ const TaskList = ({ report }) => {
                                 }
                                 </>
                               }
-                              
                             </Col>
-                          </Row>
-                          
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      </>
-                      )
-                    })}
-                    </Accordion>
-                  :
-                  <p className="text-center mt-5">No activity available.</p>
-              }
-             
+                            :
+                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                              <label>Remarks</label>
+                                  {
+                                  report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                  report?.project?.projectmeta.map((meta) => {
+                                    if(meta.meta_key === 'remarks'){
+                                      return <pre>{meta.meta_value}</pre>
+                                    }else{
+                                      return null
+                                    }
+                                  })
+                                }
+                            </Col>
+                          }
+                        </Row>
+                      </div>
+                    </>
+                    )
+                  })}
+                </div>
+              :
+              <p className="text-center mt-5">No activity available.</p>
+              :
+              projectReports && projectReports.length > 0 ? 
+              view === 'single' ?
+              <></>
+              :
+                <div className="single--project--stack">
+                  {projectReports.map((report, index) => {
+                    return (
+                    <>
+                      <div eventKey={`single-member-accord-item-${report?.member?._id}`} key={`single-member-accord-item-${report?.member?._id}`} onClick={() => {setSelectedReport(report?.project)}}>
+                        <div className="d-flex align-items-center justify-content-between gap-4">
+                          <h4>{report?.member?.name} <span>{report?.member?.client?.name}</span></h4>
+                          <Badge bg="warning">Progress</Badge>
+                        </div>
+                        <div className="report--info">
+                          <p className="p--card">
+                            <label>Tracked Time</label>
+                            <p>{calculateTotalTime(report?.activities,'tracker')}</p>
+                          </p>
+                          <p className="p--card">
+                            <label>Manual Time</label>
+                            <p>{calculateTotalTime(report?.activities, 'manual')}</p>
+                          </p>
+                          <p className="p--card">
+                            <label>Total Time</label>
+                            <p>{calculateTotalTime(report?.activities, 'all')}</p>
+                          </p>
+                        </div>
+                        <Row>
+                          <Col sm={12}>
+                            <label>Tasks</label>
+                            <TaskList report={report} />
+                          </Col>
+                          <Col sm={12} className="mt-4">
+                            <label>Remarks</label>
+                            {
+                              remarksActive === true ? 
+                              <>
+                                <Form.Group className="mb-0 form-group">
+                                  
+                                  <textarea class="form-control mt-4" rows={7} data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
+                                    
+                                  </textarea>
+                                </Form.Group>
+                                <Button variant="primary" onClick={() => {
+                                  saveRemarks(report?.project?._id)
+                                }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
+                                <Button variant="secondary" className="ms-3" onClick={handleRemarks}>Cancel</Button>
+                              </>
+                            :
+                            <>
+                              <FaRegEdit onClick={handleRemarks} />
+                              {
+                                report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                report?.project?.projectmeta.map((meta) => {
+                                  if(meta.meta_key === 'remarks'){
+                                    return <pre>{meta.meta_value}</pre>
+                                  }else{
+                                    return null
+                                  }
+                                })
+                              }
+                              </>
+                            }
+                            
+                          </Col>
+                        </Row>
+                      </div>
+                    </>
+                    )
+                  })}
+                </div>
+              :
+              <p className="text-center mt-5">No activity available.</p>
+            }
+        </div>
+        <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
+          <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
+            <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members (3)</h3>
+            <div class="d-flex align-items-center gap-4 text-sm">
+              <div class="text-center">
+                  <div class="text-lg font-bold text--blue">113h 15m</div>
+                  <div class="text-slate-600">Total Hours</div>
+              </div>
+              <div class="text-center">
+                  <div class="text-lg font-bold text--green">3</div>
+                  <div class="text-slate-600">Members</div>
+              </div>
             </div>
+          </div>
+          <div className="single--project--stack">
+            <div className="d-flex justify-content-between mb-4">
+              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                  <div className="title--initial">GS</div>
+                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                      <span>Gagandeep Singh</span>
+                      <strong>UI/UX Designer</strong>
+                  </div>
+              </div>
             </div>
-          </Container>
+            <div className="report--info">
+              <p className="p--card">
+                <label>Tracked Time</label>
+                <p>6h 50m</p>
+              </p>
+              <p className="p--card">
+                <label>Manual Time</label>
+                <p>1h 30m</p>
+              </p>
+              <p className="p--card">
+                <label>Total Time</label>
+                <p>9h 00m</p>
+              </p>
+            </div>
+            <Button variant="primary" className="mt-3"><FaEye/> View Report</Button>
+            <Button variant="info" className="mt-3 ms-3"><TbReport /> View Remarks</Button>
+          </div>
         </div>
       </div>
       <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal" onShow={() => {selectboxObserver();}}>
