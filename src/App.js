@@ -128,22 +128,46 @@ function App(props) {
   }, [dispatch, props.deleteComment]);
 
  useEffect(() => {
-  let themecolor = localStorage.getItem('theme_color')
+  let themecolor = localStorage.getItem('theme')
   if( !themecolor){
-    themecolor = 'linear-gradient(135deg, #1E90FF, #00BFFF)'
+    themecolor = JSON.stringify({
+      color: 'linear-gradient(135deg, rgb(30,144,255), rgb(0,191,255))',
+      primaryColor: 'rgb(30,144,255)', 
+      secondaryColor: 'rgb(0,191,255)'
+    })
   }
+  const themedata = JSON.parse(themecolor)
   document.documentElement.style.setProperty(
     '--theme-gradient',
-    themecolor
+    themedata.color
+  );
+  document.documentElement.style.setProperty(
+    '--theme-primary',
+    themedata.primaryColor
+  );
+  document.documentElement.style.setProperty(
+    '--theme-secondary',
+    themedata.secondaryColor
   );
 }, []);
 
  useEffect(() => {
-  if( commonState.current_theme){ console.log('here ')
+  if( commonState.current_theme){ console.log('here ',commonState.current_theme)
     document.documentElement.style.setProperty(
-    '--theme-gradient',
-    commonState.current_theme
-  );
+      '--theme-gradient',
+      commonState.current_theme.color
+    );
+
+    document.documentElement.style.setProperty(
+      '--theme-primary',
+      commonState.current_theme.primaryColor
+    );
+    document.documentElement.style.setProperty(
+      '--theme-secondary',
+      commonState.current_theme.secondaryColor
+    );
+
+  
   }
   
 }, [commonState]);

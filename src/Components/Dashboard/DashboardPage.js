@@ -297,7 +297,7 @@ function DashboardPage() {
           </Container>
         </div>
         <div className='page--wrapper p-md-3 py-3 pt-5 mt-3 text-center'>
-          <Container fluid>
+          <Container fluid className="pb-5">
             <Row className="justify-content-center">
               <Col sm={12}>
                 <DateTimeCard />

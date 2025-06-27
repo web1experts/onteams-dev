@@ -196,7 +196,7 @@ export function removeRemember() {
 }
 
 export function saveTheme(theme){
-  localStorage.setItem('theme_color', theme);
+  localStorage.setItem('theme', JSON.stringify(theme));
 }
 
 export function logout() {
@@ -247,3 +247,4 @@ export const LikeComment = (user, postId) => {
 export const DisLikeComment = (user, postId) => {
   socket.emit('disLikePost', { user, postId });
 };
+

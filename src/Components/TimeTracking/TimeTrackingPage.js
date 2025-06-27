@@ -4,11 +4,11 @@ import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown, Accordion } from "react-bootstrap";
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaCheck } from "react-icons/fa";
+import { FaCheck, FaEye } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { FiSidebar } from "react-icons/fi";
+import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
-import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
+import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill, BsEye} from "react-icons/bs";
 import { MdOutlineClose, MdOutlineSearch } from "react-icons/md";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { getliveActivity, getRecoredActivity, deleteRecoredActivity } from "../../redux/actions/activity.action";
@@ -406,21 +406,21 @@ function TimeTrackingPage() {
     if (activeTab === 'Recordings') {
       return (
         <>
-          {/* {showDate()} */}
-          <ListGroup.Item key="filter-key-5" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+          {showDate()}
+          {/* <ListGroup.Item key="filter-key-5" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
             <Form className="search-filter-list">
               <Form.Group className="mb-0 form-group">
                 <MdOutlineSearch />
                 <Form.Control type="text" name="search" placeholder="Search by name" />
               </Form.Group>
             </Form>
-          </ListGroup.Item>
+          </ListGroup.Item> */}
         </>
       )
     } else {
       return (
         <>
-          <ListGroup.Item key="filter-key-6" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+          {/* <ListGroup.Item key="filter-key-6" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('tracker_status', event.target.value)} value={filters['status'] || 'all'}>
                 <option value="all">View All</option>
                 <option value="active">Active</option>
@@ -430,12 +430,13 @@ function TimeTrackingPage() {
             
           </ListGroup.Item>
           <ListGroup.Item key="filter-key-7" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-            <Form>
+            <Form className="search-filter-list">
               <Form.Group className="mb-0 form-group">
+                <MdOutlineSearch />
                 <Form.Control type="text" name="search" placeholder="Search by name" onChange={(event) => handlefilterchange('search', event.target.value)} />
               </Form.Group>
             </Form>
-          </ListGroup.Item>
+          </ListGroup.Item> */}
         </>
       )
     }
@@ -560,7 +561,7 @@ function TimeTrackingPage() {
                   <option value="custom">Custom</option>
                 </Form.Select> */}
               </Form.Group>
-              <Form.Group className="mb-0 form-group">
+              {/* <Form.Group className="mb-0 form-group">
                 <DatePicker 
                     key={'date-filter'}
                     ref={datePickerRef}
@@ -601,7 +602,7 @@ function TimeTrackingPage() {
                       [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
                     } 
                 />
-              </Form.Group>
+              </Form.Group> */}
             </Form>
           </ListGroup.Item>
         </>
@@ -720,12 +721,11 @@ function TimeTrackingPage() {
           <Container fluid>
             <Row>
               <Col sm={12}>
-                
-                <h2><span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
+                <h2>
+                  <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
                   {/* <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
                   <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button> */}
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
-                    
                     <ListGroup horizontal>
                         <ListGroup.Item action active={activeTab === "Live"} onClick={() => {
                           if( currentActivity && Object.keys(currentActivity)){
@@ -738,6 +738,24 @@ function TimeTrackingPage() {
                         <ListGroup.Item action active={activeTab === "Recordings"} onClick={() => {setActiveTab("Recordings")}}>Recorded</ListGroup.Item>
                     </ListGroup>
                     {showTabs()}
+                    <ListGroup.Item key="filter-key-6" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+                      <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('tracker_status', event.target.value)} value={filters['status'] || 'all'}>
+                          <option value="all">View All</option>
+                          <option value="active">Active</option>
+                          <option value="pause">Paused</option>
+                          <option value="inactive">Inactive</option>
+                      </Form.Select>
+                      
+                    </ListGroup.Item>
+                    <ListGroup.Item key="filter-key-7" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
+                      <Form className="search-filter-list">
+                        <Form.Group className="mb-0 form-group">
+                          <MdOutlineSearch />
+                          <Form.Control type="text" name="search" placeholder="Search by name" onChange={(event) => handlefilterchange('search', event.target.value)} />
+                        </Form.Group>
+                      </Form>
+                    </ListGroup.Item>
+                    
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
                         <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                         <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
@@ -757,172 +775,244 @@ function TimeTrackingPage() {
                   <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           }
-          <Container fluid className="pt-2 py-5">
+          <Container fluid className="pt-2 py-3">
             {activeTab === "Live" && (
               <>
-                <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
-                <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table draggable--table new--project--rows' : 'project--table new--project--rows'}>
-                  <thead className="mb-2 onHide">
-                    <tr key="tracking-table-header">
-                      <th scope="col">Member Name</th>
-                      <th scope="col" className="onHide">Project Name</th>
-                      <th scope="col" className="onHide">Task Name</th>
-                      <th scope="col" className="onHide">Project Time</th>
-                      <th scope="col" className="onHide">Total Time</th>
-                      <th scope="col" className="onHide">Status</th>
-                      <th scope="col" className="onHide text-lg-end">View</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      liveactivities.length > 0 ?
-                        liveactivities.map((activity, index) => {
-                          // totalhours += Number(activity?.totalTaskDuration || 0)
-                          // totalProjecthours += Number(activity?.latestActivity?.duration || 0)
-                          return (
-                            <>
-                              <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'project--active': '' } >
-                                {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                <td data-label="Member Name" className="project--title--td" onClick={() => {
-                                      if (isActive && activeInnerTab !== "InnerRecorded") {
-                                        leaveRoom(currentActivity?._id)
-                                        socket.emit('get-tracker-status-update', {userID: activity._id})
-                                        setCurrentActivity(activity);
-                                      }else if(activeInnerTab === "InnerRecorded"){
-                                        setRecordedRefresh( true )
-                                        setCurrentActivity(activity)
-                                        
-                                        // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
-                                      }
-                                  }} >
-                                    <div className="project--name">
-                                        <span>
-                                          {activity.name}
-                                          {
-                                            activity?.latestActivity?.status ? 
-                                            <small className="status--circle active--color"></small>
+                <div className="activity--stats">
+                  <Row>
+                    <Col>
+                      <Card className="text--green">
+                        <Card.Body>
+                          <Card.Title><span>Active</span>2</Card.Title>
+                          <Card.Text><FiMonitor /></Card.Text>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                    <Col>
+                      <Card className="text--orange">
+                        <Card.Body>
+                          <Card.Title><span>On Break</span>2</Card.Title>
+                          <Card.Text><FiCoffee /></Card.Text>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                    <Col>
+                      <Card className="text--gray">
+                        <Card.Body>
+                          <Card.Title><span>Inactive</span>1</Card.Title>
+                          <Card.Text><FiUserX /></Card.Text>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                    <Col>
+                      <Card className="text--blue">
+                        <Card.Body>
+                          <Card.Title><span>Total Hours</span>24.0h</Card.Title>
+                          <Card.Text><FiClock /></Card.Text>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
+                </div>
+                {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
+                <div className="attendance--table activity--table--list">
+                  <div className='attendance--table--list'>
+                    <Table>
+                      <tbody>
+                        {
+                          liveactivities.length > 0 ?
+                            liveactivities.map((activity, index) => {
+                              // totalhours += Number(activity?.totalTaskDuration || 0)
+                              // totalProjecthours += Number(activity?.latestActivity?.duration || 0)
+                              return (
+                                <>
+                                  <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'project--active': '' } >
+                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                    <td data-label="Member Name" className="project--title--td" onClick={() => {
+                                        if (isActive && activeInnerTab !== "InnerRecorded") {
+                                          leaveRoom(currentActivity?._id)
+                                          socket.emit('get-tracker-status-update', {userID: activity._id})
+                                          setCurrentActivity(activity);
+                                        }else if(activeInnerTab === "InnerRecorded"){
+                                          setRecordedRefresh( true )
+                                          setCurrentActivity(activity)
+                                          // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
+                                        }
+                                      }} >
+                                        <div className="d-flex justify-content-between">
+                                          <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                              <div className="title--initial">{activity.name.charAt(0)}</div>
+                                              <div className="title--span flex-column d-flex align-items-start gap-0">
+                                                <span>
+                                                  {activity.name}
+                                                  {
+                                                    activity?.latestActivity?.status ? 
+                                                    <small className="status--circle active--color"></small>
+                                                    :
+                                                    activity?.latestActivity?.status === false  ?
+                                                    <small className="status--circle idle--color"></small>
+                                                    :
+                                                    <small className="status--circle inactive--color"></small>
+                                                  }
+                                                </span>
+                                                  <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || '--' }</strong>
+                                              </div>
+                                          </div>
+                                        </div>
+                                    </td>
+                                    <td className="ms-auto">
+                                      <div className="d-flex align-items-center gap-5">
+                                        <div key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></div>
+                                        <div key={`task-time-${activity?._id}`} className="onHide"><strong>Project Time: </strong>{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
+                                        <div key={`total-time-${activity?._id}`} className="onHide"><strong>Total Time: </strong>{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</div>
+                                        <div key={`status-title-${activity?._id}`} className="onHide">
+                                          { 
+                                            (activity?.latestActivity?.status) ? 
+                                            <Badge bg="success">Active</Badge> : 
+                                            (activity?.latestActivity?.status === false ) ?
+                                            <Badge bg="warning">Break</Badge>
                                             :
-                                            activity?.latestActivity?.status === false  ?
-                                            <small className="status--circle idle--color"></small>
-                                            :
-                                            <small className="status--circle inactive--color"></small>
-                                          }
-                                      </span>
-                                    </div>
-                                </td>
-                                <td data-label="Project Name" key={`project-title-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.project?.title || '--' }</span></td>
-                                <td data-label="Task Name" key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></td>
-                                <td data-label="Task Time" key={`task-time-${activity?._id}`} className="onHide">{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</td>
-                                <td data-label="Total Time" key={`total-time-${activity?._id}`} className="onHide">{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</td>
-                                <td data-label="Status" key={`status-title-${activity?._id}`} className="onHide">
-                                  { 
-                                    (activity?.latestActivity?.status) ? 
-                                    <Badge bg="success">Active</Badge> : 
-                                    (activity?.latestActivity?.status === false ) ?
-                                    <Badge bg="warning">Pause</Badge>
-                                    :
-                                    <Badge bg="danger">Inactive</Badge>
-                                    }
-                                </td>
-                                <td  key={`view-act-${activity?._id}`} className="onHide text-lg-end"><Button variant="primary" onClick={() => {handleSidebarSmall();handleClick(activity);}}>View Activity</Button></td>
+                                            <Badge bg="secondary">Inactive</Badge>
+                                            }
+                                        </div>
+                                        <div key={`view-act-${activity?._id}`} className="onHide text-lg-end">
+                                          <Button variant="primary" onClick={() => {handleClick(activity);}}><FaEye/> View Activity</Button>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </>
+                              )
+                            })
+                            :
+                            !spinner && liveactivities.length === 0  &&
+                              <tr key={`noresults-row`}>
+                                <td colSpan={8} className="text-center"><h3>No Results</h3> </td>
                               </tr>
-                              
-                            </>
-                          )
-                        })
-                        :
-                        !spinner && liveactivities.length === 0  &&
-                          <tr key={`noresults-row`}>
-                            <td colSpan={8} className="text-center"><h3>No Results</h3> </td>
-                          </tr>
-                    }
-                    <tr className="onHide bg-light mobile--hide" key={'hiddenkey'}>
-                      <td></td>
-                      <td></td>
-                      <td><strong>Total Hours</strong></td>
-                      <td><strong>
-                        {/* { formatTime(totalProjecthours) || '00:00'} */}
-                        </strong></td>
-                      <td><strong>
-                        {/* { formatTime(totalhours) || '00:00'} */}
-                        </strong></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  </tbody>
-                </Table>
+                        }
+                        {/* <tr className="onHide bg-light mobile--hide" key={'hiddenkey'}>
+                          <td></td>
+                          <td></td>
+                          <td><strong>Total Hours</strong></td>
+                          <td><strong>
+                            { formatTime(totalProjecthours) || '00:00'}
+                            </strong></td>
+                          <td><strong>
+                           { formatTime(totalhours) || '00:00'}
+                            </strong></td>
+                          <td></td>
+                          <td></td>
+                        </tr> */}
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
+                
               </>
             )}
             {activeTab === "Recordings" && (
               <>
-                <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p>
-                <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table draggable--table new--project--rows' : 'project--table new--project--rows'}>
-                  <thead className="mb-2 onHide">
-                    <tr key={'recorded-table-header'}>
-                      <th scope="col" width={300}> Member Name</th>
-                      <th scope="col" className="onHide ms-auto">Total Time</th>
-                      <th scope="col" className="onHide text-lg-end">View</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {
-                      liveactivities.length > 0 ?
-                        liveactivities.map((activity, index) => {
-                          totalhours += Number(activity?.totalTaskDuration || 0)
-                         
-                          return (
-                            <>
-                              <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
-                                {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                <td data-label="Member Name" onClick={() => {
-                                      // if (isActive) {
-                                      //   setCurrentActivity(activity);
-                                      // }
-                                      if (isActive && activeInnerTab !== "InnerRecorded" || isActive && activeTab !== "Recordings") {
-                                        leaveRoom(currentActivity?._id)
-                                        socket.emit('get-tracker-status-update', {userID: activity._id})
-                                        setCurrentActivity(activity);
-                                      }else if(activeInnerTab === "InnerRecorded" ||  activeTab === "Recordings"){
-                                        setRecordedRefresh( true )
-                                        setCurrentActivity(activity)
-                                      }
-                                  }} >
-                                    <div className="project--name">
-                                      {activity.name} 
-                                      {
-                                        activity?.latestActivity?.status ? 
-                                        <small className="status--circle active--color"></small>
-                                        :
-                                        activity?.latestActivity?.status === false  ?
-                                        <small className="status--circle idle--color"></small>
-                                        :
-                                        <small className="status--circle inactive--color"></small>
-                                      }
-                                    </div>
-                                </td>
-                                <td data-label="Total Time" className="onHide ms-auto">{ convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</td>
-                                <td className="onHide text-lg-end"><Button variant="primary" onClick={() => {handleSidebarSmall();handleClick(activity);}}>View Activity</Button></td>
+                {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
+                <div className="attendance--table activity--table--list">
+                  <div className='attendance--table--list'>
+                    <Table>
+                      <tbody>
+                      {
+                          liveactivities.length > 0 ?
+                            liveactivities.map((activity, index) => {
+                              totalhours += Number(activity?.totalTaskDuration || 0)
+                            
+                              return (
+                                <>
+                                  <tr key={`activity-row-${index}`} className={ (currentActivity && currentActivity?._id === activity._id ) ? 'active': '' } >
+                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                    <td data-label="Member Name" className="project--title--td" onClick={() => {
+                                          // if (isActive) {
+                                          //   setCurrentActivity(activity);
+                                          // }
+                                          if (isActive && activeInnerTab !== "InnerRecorded" || isActive && activeTab !== "Recordings") {
+                                            leaveRoom(currentActivity?._id)
+                                            socket.emit('get-tracker-status-update', {userID: activity._id})
+                                            setCurrentActivity(activity);
+                                          }else if(activeInnerTab === "InnerRecorded" ||  activeTab === "Recordings"){
+                                            setRecordedRefresh( true )
+                                            setCurrentActivity(activity)
+                                          }
+                                      }} >
+                                        <div className="d-flex justify-content-between">
+                                          <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                              <div className="title--initial">{activity.name.charAt(0)}</div>
+                                              <div className="title--span flex-column d-flex align-items-start gap-0">
+                                                <span>
+                                                  {activity.name}
+                                                  {
+                                                    activity?.latestActivity?.status ? 
+                                                    <small className="status--circle active--color"></small>
+                                                    :
+                                                    activity?.latestActivity?.status === false  ?
+                                                    <small className="status--circle idle--color"></small>
+                                                    :
+                                                    <small className="status--circle inactive--color"></small>
+                                                  }
+                                                </span>
+                                                  <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || '--' }</strong>
+                                              </div>
+                                          </div>
+                                        </div>
+                                    </td>
+                                    <td className="ms-auto">
+                                      <div className="d-flex align-items-center gap-5">
+                                        <div className="onHide"><strong>Total Time: </strong>{ convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</div>
+                                        <div className="onHide text-lg-end">
+                                          <Button variant="primary" onClick={() => {handleClick(activity);}}><FaEye/> View Activity</Button>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </>
+                              )
+                            })
+                            :
+                            !spinner && liveactivities.length === 0  &&
+                              <tr key={`noresults-row`}>
+                                <td colSpan={8} className="text-center"><h3>No Results</h3> </td>
                               </tr>
-                              
-                            </>
-                          )
-                        })
-                        :
-                        !spinner && liveactivities.length === 0  &&
-                          <tr key={`noresults-row`}>
-                            <td colSpan={8} className="text-center"><h3>No Results</h3> </td>
-                          </tr>
-                    }
-                  </tbody>
-                </Table>
+                        }
+                      </tbody>
+                    </Table>
+                  </div>
+                </div>
+                
               </>
             )}
           </Container>
         </div>
       </div>
-      <div className="details--wrapper">
-        <div className="wrapper--title py-2 bg-white border-bottome">
-          <ListGroup horizontal className="live--tabs">
+      <div className="details--wrapper common--project--grid">
+        <div className="wrapper--title py-2 bg-white border-bottom">
+            <div className="projecttitle">
+              {/* <h3>
+                  <strong>Alex Chen</strong>
+                  <span>E-commerce Platform</span>
+              </h3> */}
+              <Dropdown>
+                  <Dropdown.Toggle variant="link" id="dropdown-basic">
+                      <h3>
+                          <strong>Alex Chen</strong>
+                          <span>E-commerce Platform</span>
+                      </h3>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                      <div className="drop--scroll">
+                          <Dropdown.Item>
+                            <strong>Alex Chen</strong>
+                            <span>E-commerce Platform</span>
+                          </Dropdown.Item>
+                      </div>
+                  </Dropdown.Menu>
+              </Dropdown>
+          </div>
+          <ListGroup horizontal className="live--tabs me-auto">
             <ListGroup horizontal className="bg-light me-3">
               <Button variant="secondary" className="btn--view" key={'live-key'} active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
                 if( currentActivity && Object.keys(currentActivity)){
@@ -946,14 +1036,14 @@ function TimeTrackingPage() {
               activeInnerTab === "InnerRecorded" && showDate()
             }
           </ListGroup>
-          <ListGroup horizontal>
+          <ListGroup horizontal className="ms-auto p-0">
             {showRecordedTabs()}
-            <ListGroup horizontal className="bg-white expand--icon ms-3">
+            <ListGroup horizontal className="bg-white expand--icon ms-3 p-0 b-0 rounded-0 align-items-center">
               <ListGroup.Item onClick={handleSidebar} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
               <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
                 <BsArrowClockwise onClick={handleRecordedActivity}/>
               </ListGroup.Item>
-              <ListGroup.Item className="btn btn-primary" key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false);handleSidebarSmall(true);}}>
+              <ListGroup.Item className="btn btn-primary" key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false);}}>
                 <MdOutlineClose />
               </ListGroup.Item>
             </ListGroup>

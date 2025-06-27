@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Form, Dropdown, ListGroup, Table, Modal, Button, Card, ListGroupItem } from "react-bootstrap";
 import { FaCheck, FaEye } from "react-icons/fa";
-import { FiCheckCircle, FiCoffee, FiClock, FiCalendar } from "react-icons/fi";
+import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload } from "react-icons/fi";
 import { MdOutlineCheck, MdOutlineClose } from 'react-icons/md';
 import { GrExpand } from "react-icons/gr";
 import { LuTimer } from "react-icons/lu";
+import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
 import { formatDateinString, selectboxObserver } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
@@ -16,7 +17,6 @@ import { currentMemberProfile } from "../../helpers/auth";
 function AttendancePage() {
   const dispatch = useDispatch()
   const memberProfile = currentMemberProfile()
-  const [isActiveView, setIsActiveView] = useState(1);
   const attendanceFeed = useSelector(state => state.attendance.attendances)
   const apiResult = useSelector(state => state.attendance)
   const [ attendances, setAttendances] = useState([])
@@ -68,15 +68,32 @@ function AttendancePage() {
   }, [attendanceFeed])
 
   const [projectToggle, setProjectToggle ] = useState(false)
-    const handleToggles = () => {
-        if(commonState.sidebar_small === false ){ console.log('1')
-            handleSidebarSmall()
-        }else{
-            setProjectToggle(false)
-            handleSidebarSmall()
-              console.log('3')
-        }
-    }
+  const handleToggles = () => {
+      if(commonState.sidebar_small === false ){ console.log('1')
+          handleSidebarSmall()
+      }else{
+          setProjectToggle(false)
+          handleSidebarSmall()
+            console.log('3')
+      }
+  }
+
+  const [date, setDate] = useState(new Date('2025-06-25'));
+
+  const changeDate = (days) => {
+    const newDate = new Date(date);
+    newDate.setDate(date.getDate() + days);
+    setDate(newDate);
+  };
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   return (
     <>
@@ -138,7 +155,10 @@ function AttendancePage() {
           <Container fluid className="pb-5 pt-2">
             {activeTab === 'excel' && (
               <div className="attendance--table excel--view" id="excel--view">
-                <h3 class="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - June 2025</h3>
+                <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
+                  <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - June 2025</h3>
+                  <Button variant="primary"><FiDownload /> Download Excel Excel</Button>
+                </div>
                 <div className='attendance--excel--table draggable--table new--project--rows table-responsive-xl'>
                     <Table>
                         <thead>
@@ -1035,7 +1055,24 @@ function AttendancePage() {
             {activeTab === 'team' && (
               <>
                 <div className="attendance--stats">
-                  <h3 class="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Daily Totals - June 2025</h3>
+                  <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
+                    <h3 class="d-flex align-items-center gap-3 mb-0">
+                      <span><AiOutlineTeam /></span>Team Daily Totals - June 2025
+                    </h3>
+                    <Col md="auto" className="d-flex align-items-center change--date">
+                      <Button variant="light" className="me-2 shadow-sm" onClick={() => changeDate(-1)}>
+                        <MdChevronLeft size={24} />
+                      </Button>
+
+                      <div className="date--change">
+                        {formatDate(date)}
+                      </div>
+
+                      <Button variant="light" className="ms-2 shadow-sm" onClick={() => changeDate(1)}>
+                        <MdChevronRight size={24} />
+                      </Button>
+                    </Col>
+                  </div>
                   <Row>
                     <Col>
                       <Card className="card--green">

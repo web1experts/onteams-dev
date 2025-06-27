@@ -128,22 +128,23 @@ function SidebarPanel() {
     },[commonState ])
 
     const themes = [
-        { name: 'OceanBlue', color: 'linear-gradient(135deg, #1E90FF, #00BFFF)' },
-        { name: 'PurpleDream', color: 'linear-gradient(135deg, #DA70D6, #BA55D3)' },
-        { name: 'ForestGreen', color: 'linear-gradient(135deg, #2E8B57, #3CB371)' },
-        { name: 'SunsetOrange', color: 'linear-gradient(135deg, #FF4500, #FF8C00)' },
-        { name: 'RoyalPurple', color: 'linear-gradient(135deg, #8A2BE2, #9370DB)' },
-        { name: 'GoldenRose', color: 'linear-gradient(135deg, #FFA500, #FF6347)' },
-        { name: 'FreshLime', color: 'linear-gradient(135deg, #32CD32, #ADFF2F)' },
-        { name: 'SkyBlue', color: 'linear-gradient(135deg, #00BFFF, #87CEFA)' },
-        { name: 'ElectricFuchsia', color: 'linear-gradient(135deg, #FF00FF, #FF69B4)' },
-        { name: 'SunnyYellow', color: 'linear-gradient(135deg, #FFD700, #FFA500)' },
-        { name: 'CrimsonCoral', color: 'linear-gradient(135deg, #DC143C, #FF6347)' },
-        { name: 'MidnightBlue', color: 'linear-gradient(135deg, #191970, #4169E1)' },
-        { name: 'EmeraldMint', color: 'linear-gradient(135deg, #2EE59D, #1FBFA4)' },
-        { name: 'MagentaViolet', color: 'linear-gradient(135deg, #C71585, #FF00FF)' },
-        { name: 'CopperBronze', color: 'linear-gradient(135deg, #B87333, #CD7F32)' },
+        { name: 'OceanBlue', color: 'linear-gradient(135deg, rgb(30,144,255), rgb(0,191,255))', primaryColor: 'rgb(30,144,255)', secondaryColor: 'rgb(0,191,255)' },
+        { name: 'PurpleDream', color: 'linear-gradient(135deg, rgb(218,112,214), rgb(186,85,211))', primaryColor: 'rgb(218,112,214)', secondaryColor: 'rgb(186,85,211)' },
+        { name: 'ForestGreen', color: 'linear-gradient(135deg, rgb(46,139,87), rgb(60,179,113))', primaryColor: 'rgb(46,139,87)', secondaryColor: 'rgb(60,179,113)' },
+        { name: 'SunsetOrange', color: 'linear-gradient(135deg, rgb(255,69,0), rgb(255,140,0))', primaryColor: 'rgb(255,69,0)', secondaryColor: 'rgb(255,140,0)' },
+        { name: 'RoyalPurple', color: 'linear-gradient(135deg, rgb(138,43,226), rgb(147,112,219))', primaryColor: 'rgb(138,43,226)', secondaryColor: 'rgb(147,112,219)' },
+        { name: 'GoldenRose', color: 'linear-gradient(135deg, rgb(255,165,0), rgb(255,99,71))', primaryColor: 'rgb(255,165,0)', secondaryColor: 'rgb(255,99,71)' },
+        { name: 'FreshLime', color: 'linear-gradient(135deg, rgb(50,205,50), rgb(173,255,47))', primaryColor: 'rgb(50,205,50)', secondaryColor: 'rgb(173,255,47)' },
+        { name: 'SkyBlue', color: 'linear-gradient(135deg, rgb(0,191,255), rgb(135,206,250))', primaryColor: 'rgb(0,191,255)', secondaryColor: 'rgb(135,206,250)' },
+        { name: 'ElectricFuchsia', color: 'linear-gradient(135deg, rgb(255,0,255), rgb(255,105,180))', primaryColor: 'rgb(255,0,255)', secondaryColor: 'rgb(255,105,180)' },
+        { name: 'SunnyYellow', color: 'linear-gradient(135deg, rgb(255,215,0), rgb(255,165,0))', primaryColor: 'rgb(255,215,0)', secondaryColor: 'rgb(255,165,0)' },
+        { name: 'CrimsonCoral', color: 'linear-gradient(135deg, rgb(220,20,60), rgb(255,99,71))', primaryColor: 'rgb(220,20,60)', secondaryColor: 'rgb(255,99,71)' },
+        { name: 'MidnightBlue', color: 'linear-gradient(135deg, rgb(25,25,112), rgb(65,105,225))', primaryColor: 'rgb(25,25,112)', secondaryColor: 'rgb(65,105,225)' },
+        { name: 'EmeraldMint', color: 'linear-gradient(135deg, rgb(46,229,157), rgb(31,191,164))', primaryColor: 'rgb(46,229,157)', secondaryColor: 'rgb(31,191,164)' },
+        { name: 'MagentaViolet', color: 'linear-gradient(135deg, rgb(199,21,133), rgb(255,0,255))', primaryColor: 'rgb(199,21,133)', secondaryColor: 'rgb(255,0,255)' },
+        { name: 'CopperBronze', color: 'linear-gradient(135deg, rgb(184,115,51), rgb(205,127,50))', primaryColor: 'rgb(184,115,51)', secondaryColor: 'rgb(205,127,50)' },
     ];
+
 
     const [selectedTheme, setSelectedTheme] = useState('Ocean Blue');
 
@@ -276,7 +277,7 @@ function SidebarPanel() {
                         <Row>
                             {themes.map((theme, index) => (
                                 <Col key={index} md={4} className="mb-4">
-                                    <Card className={`theme--card ${selectedTheme === theme.name ? 'active--theme' : ''}`} onClick={() => {setSelectedTheme(theme.name); saveTheme(theme.color);dispatch(toggleTheme(theme.color))}} style={{ cursor: 'pointer', borderRadius: '12px', overflow: 'hidden', position: 'relative' }}>
+                                    <Card className={`theme--card ${selectedTheme === theme.name ? 'active--theme' : ''}`} onClick={() => {setSelectedTheme(theme.name); saveTheme(theme);dispatch(toggleTheme(theme))}} style={{ cursor: 'pointer', borderRadius: '12px', overflow: 'hidden', position: 'relative' }}>
                                         <div className="themg--bg" style={{ background: theme.color, height: '60px', }}>
                                             {selectedTheme === theme.name && (
                                                 <span
@@ -290,7 +291,7 @@ function SidebarPanel() {
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
-                                                        boxShadow: '0 0 5px rgba(0,0,0,0.2)',
+                                                        boxShadow: '0 0 5px rgb(0,0,0,0.2)',
                                                     }}
                                                 >
                                                     <MdCheck color="#0d6efd" size={16} />
