@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form } from "react-bootstrap";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye } from 'react-icons/fa';
+import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye, FaPlus } from 'react-icons/fa';
 import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiClock, FiCalendar, FiSend, FiYoutube } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { LuVideo } from "react-icons/lu";
@@ -279,12 +279,12 @@ function DashboardPage() {
   return (
     <>
       <div className={isActive === 1 ? 'show--details team--page dashboard--page' : isActive === 2 ? ' view--project team--page dashboard--page' : 'team--page dashboard--page'}>
-        <div className='page--title px-md-2 py-3 bg-white border-bottom'>
+        {/* <div className='page--title px-md-2 py-3 bg-white border-bottom'>
           <Container fluid>
               <Row>
                   <Col sm={12} lg={12}>
                       <h2>
-                          <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                          <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                           Dashboard
                           <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
                               <ListGroup horizontal className="bg-white expand--icon ms-3">
@@ -295,14 +295,14 @@ function DashboardPage() {
                   </Col>
               </Row>
           </Container>
-        </div>
+        </div> */}
         <div className='page--wrapper p-md-3 py-3 pt-5 mt-3 text-center'>
           <Container fluid className="pb-5">
             <Row className="justify-content-center">
               <Col sm={12}>
                 <DateTimeCard />
               </Col>
-              <Col lg={8}>
+              <Col xl={8}>
                 <ListGroup className="invitation--list">
                   {invitationsFeeds && invitationsFeeds.length > 0 &&
                         invitationsFeeds.map((invitation, index) => {
@@ -348,7 +348,7 @@ function DashboardPage() {
                       </div>
                     </Col>
                     <Col>
-                      <h5 className="mb-0 d-flex align-items-center justify-content-between">Team Updates <Button onClick={handleShow} variant="primary">Create Update</Button></h5>
+                      <h5 className="mb-0 d-flex align-items-center justify-content-between">Team Updates <Button onClick={handleShow} variant="primary"><FaPlus/></Button></h5>
                     </Col>
                   </Row>
 
@@ -479,7 +479,7 @@ function DashboardPage() {
                   ))}
                 </Card> 
               </Col>
-              <Col lg={4}>
+              <Col xl={4}>
                   <div className="download--wrapper">
                     <div className="app--title">
                       <div className="image--title">

@@ -104,7 +104,7 @@ function AttendancePage() {
               <Col sm={12}>
                 <h2>
                   Attendance
-                  <ListGroup horizontal className="ms-auto">
+                  <ListGroup horizontal className="ms-lg-auto">
                     <ListGroup.Item>
                       <Dropdown className="select--dropdown">
                         <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> June 2025</Dropdown.Toggle>
@@ -1133,7 +1133,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1166,7 +1166,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1199,7 +1199,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1232,7 +1232,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1265,7 +1265,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1298,7 +1298,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1331,7 +1331,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1364,7 +1364,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1397,7 +1397,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1430,7 +1430,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
@@ -1463,7 +1463,7 @@ function AttendancePage() {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
+                          <td className="ms-lg-auto">
                             <div className="d-flex align-items-center gap-4">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>

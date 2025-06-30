@@ -722,7 +722,7 @@ function TimeTrackingPage() {
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
+                  <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
                   {/* <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
                   <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button> */}
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
@@ -861,7 +861,7 @@ function TimeTrackingPage() {
                                         </div>
                                     </td>
                                     <td className="ms-auto">
-                                      <div className="d-flex align-items-center gap-5">
+                                      <div className="d-flex align-items-center gap-5 flex-wrap">
                                         <div key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></div>
                                         <div key={`task-time-${activity?._id}`} className="onHide"><strong>Project Time: </strong>{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
                                         <div key={`total-time-${activity?._id}`} className="onHide"><strong>Total Time: </strong>{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</div>

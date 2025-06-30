@@ -419,7 +419,7 @@ function ClientsPage() {
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                  <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                   Clients
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
                     <ListGroup.Item className='d-none d-lg-block'>

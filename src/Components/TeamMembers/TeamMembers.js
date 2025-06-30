@@ -834,16 +834,16 @@ function TeamMembersPage() {
           <Row>
             <Col sm={12}>
               <h2>
-                <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                 Members
-                <ListGroup horizontal className={isActive ? "d-none" : "me-4 ms-auto d-none d-md-flex"}>
+                <ListGroup horizontal className={isActive ? "d-none" : "me-3 ms-auto d-none d-md-flex"}>
                   <ListGroup horizontal>
                     <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Members"} onClick={() => { setsearchTerm(''); setActiveTab("Members") }}>Team Members</ListGroup.Item>
                     {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                       <ListGroup.Item className='d-none d-md-block' action active={activeTab === "Invitees"} onClick={() => { setsearchTerm(''); setActiveTab("Invitees") }}>Invitations</ListGroup.Item>
                     )}
                   </ListGroup>
-                  <ListGroup.Item className='d-none d-lg-block ms-3'>
+                  <ListGroup.Item className='d-none d-xl-block ms-3'>
                     <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
                       <Form.Group className="mb-0 form-group">
                         <MdOutlineSearch />
@@ -852,19 +852,27 @@ function TeamMembersPage() {
                     </Form>
                   </ListGroup.Item>
                 </ListGroup>
-                <ListGroup horizontal className={isActive ? "d-none" : "d-none d-md-flex"}>
+                <ListGroup horizontal className={isActive ? "d-none" : "d-flex ms-auto ms-md-0"}>
                   <ListGroup horizontal>
                     <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                     <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
-                  <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex bg-white expand--icon ms-3'}>
+                  <ListGroup horizontal className={isActive ? 'd-none' : 'd-flex bg-white expand--icon'}>
                     <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
                     {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                       <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
                     )}
-                </ListGroup>
+                  </ListGroup>
                 </ListGroup>
               </h2>
+              <ListGroup horizontal className={isActive ? "d-none" : "me-auto mt-3 ms-0 d-flex d-md-none justify-content-start"}>
+                <ListGroup horizontal>
+                  <ListGroup.Item action active={activeTab === "Members"} onClick={() => { setsearchTerm(''); setActiveTab("Members") }}>Team Members</ListGroup.Item>
+                  {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                    <ListGroup.Item action active={activeTab === "Invitees"} onClick={() => { setsearchTerm(''); setActiveTab("Invitees") }}>Invitations</ListGroup.Item>
+                  )}
+                </ListGroup>
+              </ListGroup>
             </Col>
           </Row>
         </Container>
@@ -891,14 +899,14 @@ function TeamMembersPage() {
                     <thead className="onHide">
                         <tr key="project-table-header">
                             <th scope="col" className="sticky p-0" key="project-name-header">
-                              <div className="d-flex justify-content-between">
+                              <div className="d-flex justify-content-between flex-wrap">
                                 <div className="project--name">
                                     <div className="title--span flex-column align-items-start gap-0">
                                         <span>Members</span>
                                     </div>
                                 </div>
-                                  <div className="onHide task--buttons">
-                                    <span key="project-action-header" className="onHide">Actions</span>
+                                <div className="onHide task--buttons">
+                                  <span key="project-action-header" className="onHide">Actions</span>
                                 </div>
                               </div>
                             </th>
@@ -912,7 +920,7 @@ function TeamMembersPage() {
                         memberFeeds.map((member, idx) => (
                           <tr key={`member-table-row-${idx}`} className={member._id === selectedMember?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(member) : () => { return false; }}>
                             <td className="project--title--td sticky" data-label="Member Name">
-                              <div className="d-flex justify-content-between">
+                              <div className="d-flex justify-content-between flex-wrap">
                                   <div className="project--name">
                                       <div className="drag--indicator"><abbr>#{idx + 1}</abbr></div>
                                       <div className="title--initial">{member.name.charAt(0)}</div>
@@ -930,7 +938,7 @@ function TeamMembersPage() {
                             <td className="onHide new__td">+1 (555) 123-4567</td>
                             <td className="onHide new__td">19 February 2019</td>
                             <td className="task--last--buttons">
-                              <div className="d-flex justify-content-between">
+                              <div className="d-flex justify-content-between flex-wrap">
                                   <div className="onHide">
                                       <Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(member); setIsActive(true); }}><BsEye/> View</Button>
                                   </div>

@@ -654,6 +654,9 @@ const TaskList = ({ report }) => {
   // Group tasks by title and calculate total durations
   const groupedTasks = groupTasksById(report?.activities);
   const [ViewReport, setViewReport] = useState(false);
+  const [showRemarks, setShowRemarks] = useState(false);
+  const handleRemarksClose = () => setShowRemarks(false);
+  const handleShowRemarks = () => setShowRemarks(true);
   const handleReportClose = () => setViewReport(false);
   const fullscreenrefrence = React.useRef(null);
   const [taskId, setTaskId] = useState('')
@@ -704,88 +707,88 @@ const TaskList = ({ report }) => {
 
   return (
     <>
-    <Lightbox
-      open={reportopen}
-      close={() => setReportOpen(false)}
-      slides={lightboxMedia}
-      plugins={[Fullscreen]}
-      fullscreen={{ ref: fullscreenrefrence }}
-      carousel={{ finite: lightboxMedia.length === 1 }}
-      index={slideIndex}
-      on={{
-        click: () => fullscreenrefrence.current?.enter(),
-      }}
-      render={{
-        slide: ({slide}) => {
-          if (slide?.type === "video") {
-            return (
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <media-controller>
-                    <video
-                      slot="media"
-                      src={slide.src}
-                      style={{ maxHeight: "90vh", maxWidth: "100%" }}
-                    >
-                      
-                    </video>
-                    <media-settings-menu hidden anchor="auto">
-                      <media-settings-menu-item>
-                        Speed
-                        <media-playback-rate-menu slot="submenu" hidden rates="1 1.25 1.5 1.75 2 2.50 3 3.50 4 4.50 5 6 7 8 9 10">
-                          <div slot="title">Speed</div>
-                        </media-playback-rate-menu>
-                      </media-settings-menu-item>
-                      <media-settings-menu-item>
-                        Quality
-                        <media-rendition-menu slot="submenu" hidden>
-                          <div slot="title">Quality</div>
-                        </media-rendition-menu>
-                      </media-settings-menu-item>
-                      
-                    </media-settings-menu>
-                    <media-control-bar>
-                    <media-play-button></media-play-button>
-                       <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
-                      
-                      <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
-                      <media-time-display></media-time-display>
-                      <media-time-range slot="center-controls"></media-time-range>
-                      <media-duration-display></media-duration-display><media-pip-button></media-pip-button>
-                      <media-fullscreen-button></media-fullscreen-button>
-                      <media-settings-menu-button></media-settings-menu-button>
-                    </media-control-bar>
-                  </media-controller>
-                {/* <video
-                  controls
-                  autoPlay={false}
-                  style={{ maxHeight: "90vh", maxWidth: "100%" }}
-                >
-                  <source src={slide.src} type="video/webm" />
-                  Your browser does not support the video tag.
-                </video> */}
-              </div>
-            );
-          }
-          return null; // Default render for images will be used
-        },
-      }}
-    />
-    <ul>
-      {groupedTasks.map((task, index) => (
-        <li key={`grouped-task-${index}`}>
-          <p className="mb-0">
-            <FaAngleRight /> {task.title}
-          </p>
-          {/* <strong>{task.duration}</strong> */}
-          {/* {
-            gettaskTab(task.tab)
-          } */}
-          <Button variant="primary" className="mt-3" onClick={() => {handleViewReport(task.taskId)}}><FaEye/> View Report</Button>
-          <Button variant="info" className="mt-3 ms-3"><TbReport /> View Remarks</Button>
-        </li>
-      ))}
-    </ul>
-    <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" key={`reports-${taskId}`} className="timeSheetModal">
+      <Lightbox
+        open={reportopen}
+        close={() => setReportOpen(false)}
+        slides={lightboxMedia}
+        plugins={[Fullscreen]}
+        fullscreen={{ ref: fullscreenrefrence }}
+        carousel={{ finite: lightboxMedia.length === 1 }}
+        index={slideIndex}
+        on={{
+          click: () => fullscreenrefrence.current?.enter(),
+        }}
+        render={{
+          slide: ({slide}) => {
+            if (slide?.type === "video") {
+              return (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <media-controller>
+                      <video
+                        slot="media"
+                        src={slide.src}
+                        style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                      >
+                        
+                      </video>
+                      <media-settings-menu hidden anchor="auto">
+                        <media-settings-menu-item>
+                          Speed
+                          <media-playback-rate-menu slot="submenu" hidden rates="1 1.25 1.5 1.75 2 2.50 3 3.50 4 4.50 5 6 7 8 9 10">
+                            <div slot="title">Speed</div>
+                          </media-playback-rate-menu>
+                        </media-settings-menu-item>
+                        <media-settings-menu-item>
+                          Quality
+                          <media-rendition-menu slot="submenu" hidden>
+                            <div slot="title">Quality</div>
+                          </media-rendition-menu>
+                        </media-settings-menu-item>
+                        
+                      </media-settings-menu>
+                      <media-control-bar>
+                      <media-play-button></media-play-button>
+                        <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
+                        
+                        <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
+                        <media-time-display></media-time-display>
+                        <media-time-range slot="center-controls"></media-time-range>
+                        <media-duration-display></media-duration-display><media-pip-button></media-pip-button>
+                        <media-fullscreen-button></media-fullscreen-button>
+                        <media-settings-menu-button></media-settings-menu-button>
+                      </media-control-bar>
+                    </media-controller>
+                  {/* <video
+                    controls
+                    autoPlay={false}
+                    style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                  >
+                    <source src={slide.src} type="video/webm" />
+                    Your browser does not support the video tag.
+                  </video> */}
+                </div>
+              );
+            }
+            return null; // Default render for images will be used
+          },
+        }}
+      />
+      <ul>
+        {groupedTasks.map((task, index) => (
+          <li key={`grouped-task-${index}`}>
+            <p className="mb-0">
+              <FaAngleRight /> {task.title}
+            </p>
+            {/* <strong>{task.duration}</strong> */}
+            {/* {
+              gettaskTab(task.tab)
+            } */}
+            <Button variant="primary" className="mt-3" onClick={() => {handleViewReport(task.taskId)}}><FaEye/> View Report</Button>
+            <Button variant="info" className="mt-3 ms-3" onClick={() => {handleShowRemarks()}}><TbReport /> View Remarks</Button>
+          </li>
+        ))}
+      </ul>
+      <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" key={`reports-${taskId}`} className="timeSheetModal">
         <Modal.Header closeButton>
           <ListGroup horizontal>
             <ListGroup.Item action active={activeTab === "screenshots"} onClick={() => setActiveTab("screenshots")}>
@@ -911,7 +914,57 @@ const TaskList = ({ report }) => {
         </div>
         </Modal.Body>
       </Modal>
-      </>
+      <Modal show={showRemarks} onHide={handleRemarksClose} centered size="lg" className="theme--modal">
+        <Modal.Header closeButton className="py-3">
+           <Modal.Title>
+              <span className="nav--item--icon"><TbReport /></span>
+              <strong>Project Remarks <small>E-commerce Platform</small></strong>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+          <div className="single--project--stack">
+            <div class="d-flex justify-content-between mb-2 align-items-start">
+              <div class="project--name d-flex justify-content-between gap-3 align-items-center">
+                <div class="title--initial">1</div>
+                <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+              </div>
+              <Badge bg="secondary">Day 1</Badge>
+            </div>
+            <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
+          </div>
+          <div className="single--project--stack">
+            <div class="d-flex justify-content-between mb-2 align-items-start">
+              <div class="project--name d-flex justify-content-between gap-3 align-items-center">
+                <div class="title--initial">2</div>
+                <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+              </div>
+              <Badge bg="secondary">Day 2</Badge>
+            </div>
+            <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
+          </div>
+          <div className="single--project--stack">
+            <div class="d-flex justify-content-between mb-2 align-items-start">
+              <div class="project--name d-flex justify-content-between gap-3 align-items-center">
+                <div class="title--initial">3</div>
+                <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+              </div>
+              <Badge bg="secondary">Day 3</Badge>
+            </div>
+            <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
+          </div>
+          <div className="single--project--stack">
+            <div class="d-flex justify-content-between mb-2 align-items-start">
+              <div class="project--name d-flex justify-content-between gap-3 align-items-center">
+                <div class="title--initial">4</div>
+                <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+              </div>
+              <Badge bg="secondary">Day 4</Badge>
+            </div>
+            <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 
@@ -955,7 +1008,7 @@ const TaskList = ({ report }) => {
               <Row>
                   <Col sm={12} lg={12}>
                       <h2>
-                          <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                          <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                           Reports
                           <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
                             <ListGroup horizontal>
@@ -1122,8 +1175,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Total Hours: </strong> 4h 47m
                               </div>
@@ -1147,8 +1200,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Total Hours: </strong> 4h 47m
                               </div>
@@ -1172,8 +1225,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Total Hours: </strong> 4h 47m
                               </div>
@@ -1209,8 +1262,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1234,8 +1287,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1259,8 +1312,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1284,8 +1337,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1309,8 +1362,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1334,8 +1387,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1359,8 +1412,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1384,8 +1437,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1409,8 +1462,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1434,8 +1487,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1459,8 +1512,8 @@ const TaskList = ({ report }) => {
                               </div>
                             </div>
                           </td>
-                          <td className="ms-auto">
-                            <div className="d-flex align-items-center gap-4">
+                          <td className="ms-xl-auto">
+                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                               <div className="text-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
@@ -1496,7 +1549,7 @@ const TaskList = ({ report }) => {
         <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
             <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects (3)</h3>
-            <div class="d-flex align-items-center gap-4 text-sm">
+            <div class="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
               <div class="text-center">
                   <div class="text-lg font-bold text--blue">113h 15m</div>
                   <div class="text-slate-600">Total Hours</div>
@@ -1676,7 +1729,7 @@ const TaskList = ({ report }) => {
         <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
             <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members (3)</h3>
-            <div class="d-flex align-items-center gap-4 text-sm">
+            <div class="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
               <div class="text-center">
                   <div class="text-lg font-bold text--blue">113h 15m</div>
                   <div class="text-slate-600">Total Hours</div>

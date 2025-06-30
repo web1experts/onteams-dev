@@ -17,9 +17,14 @@ body {
   font-family: system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
   background: #F8FAFC;
   color: #454545;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
+  height: 100dvh;
+}
+
+.App, #root {
+  height: 100%;
 }
 
 .team--page .page--title h2 {
@@ -5572,8 +5577,6 @@ ul#icon-tabs .nav-link span svg {
 .project--grid--table td:last-child {
   border: 0;
   border-top: 0;
-  /* padding-bottom: 0;
-  text-align: left !important; */
 }
 
 .project--grid--table td::before {
@@ -5957,6 +5960,36 @@ ul#icon-tabs .nav-link span svg {
   font-weight: normal;
 }
 
+.modal .single--project--stack .title--initial {
+    align-items: center;
+    background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 1rem;
+    font-weight: 500;
+    height: 35px;
+    width: 35px;
+    min-width: 35px;
+    justify-content: center;
+    margin-right: 0;
+    padding: .25rem 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.modal .single--project--stack .title--span span {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.modal .single--project--stack .title--span strong {
+    font-size: 14px;
+    color: rgb(71 85 105);
+    font-weight: normal;
+}
+
 .page--wrapper .attendance--excel--table th small {
   font-size: 12px;
   text-transform: capitalize;
@@ -6077,11 +6110,6 @@ ul#icon-tabs .nav-link span svg {
 .project--grid--table th {
   display: none;
 }
-
-/* .project--table th:last-child,
-.project--table td:last-child {
-  text-align: right;
-} */
 
 .project--grid--new--table td {
   padding: 0;
@@ -6271,7 +6299,7 @@ ul#icon-tabs .nav-link span svg {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(100% - 7.7rem);
+  width: calc(100% - 16rem);
   height: 100%;
   z-index: 99;
   top: 0;
@@ -6616,6 +6644,57 @@ Media CSS-=-==
   .page--title .search-filter-list .form-group .form-control {
     min-width: 190px;
   }
+
+  .daily--welcome .card-body {
+    margin-left: 0;
+    margin-top: 1.5rem;
+    flex: 1 1;
+  }
+
+  .dashboard--page .daily--star {
+    text-align: left;
+  }
+  
+  .daily--welcome .card--icon h6 {
+    font-size: 30px;
+  }
+
+  .page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
+    min-width: 430px;
+  }
+
+  .page--wrapper .draggable--table th {
+    min-width: 250px;
+  }
+
+  .attendance--table--list tbody {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .attendance--table--list table tr {
+    align-items: flex-start;
+    flex-flow: column wrap;
+    flex: 1 1 100%;
+    max-width: calc(50% - .5rem);
+  }
+
+  .attendance--table--list table tr td:last-child .d-flex {
+    flex-flow: column wrap;
+    align-items: flex-start !important;
+
+  }
+
+  .attendance--table--list table tr td {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .attendance--table--list table tr+tr {
+    margin-top: 0;
+  }
 }
 
 @media screen and (max-width:992px) {
@@ -6649,9 +6728,44 @@ Media CSS-=-==
     font-size: 14px;
   }
 
-  .projects--page .page--wrapper table th:first-child,
-  .projects--page .page--wrapper table td:first-child {
+  .projects--page .page--wrapper table th:first-child, .projects--page .page--wrapper table td:first-child {
+    min-width: -moz-fit-content;
     min-width: fit-content;
+    width: auto;
+    max-width: fit-content;
+    background: none;
+  }
+
+  .new--project--rows .project--title--td .project--name {
+    padding: 0;
+  }
+
+  .project--grid--table tr.marked-project, .page--wrapper .draggable--table tr.marked-project td:first-child, .new--project--rows tr.marked-project {
+    border: 0;
+  }
+
+  .page--wrapper .draggable--table tr.marked-project td:first-child {
+    background: none;
+  }
+
+  .page--wrapper .draggable--table th, .page--wrapper .draggable--table td {
+    border: 0;
+    padding: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .new--project--rows .project--title--td .task--buttons {
+    border-left: 0;
+    padding: 0;
+    min-width: 115px;
+    justify-content: center;
+    margin: 1rem 0 0;
+    flex: 1 1 100%;
+  }
+
+  .border-end {
+    border-right: 0!important;
   }
 
   .projects--page .page--wrapper table th:last-child,
@@ -6745,12 +6859,18 @@ Media CSS-=-==
   .activity--table tr,
   .invoice--table tr {
     border: 1px solid #eeeeee;
-    border-radius: .25rem;
-    -webkit-border-radius: .25rem;
+    border-radius: 1rem;
+    -webkit-border-radius: 1rem;
     margin-bottom: 0;
     position: relative;
     padding: 1rem;
     outline: none;
+  }
+
+  .page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
+    min-width: 0;
+    width: auto;
+    max-width: 100%;
   }
 
   .project--name {
@@ -6799,8 +6919,8 @@ Media CSS-=-==
 
   .project--grid--new--table .status__key,
   .project--table .status__key {
-    position: absolute;
-    top: 1rem;
+    position: relative;
+    top: 0;
   }
 
   table tr:focus,
@@ -6821,19 +6941,10 @@ Media CSS-=-==
     display: none;
   }
 
-  .holiday--table,
-  .holiday--table td,
-  .holiday--table tr,
-  .project--table,
-  .project--table td,
-  .project--table tr,
-  .activity--table,
-  .activity--table td,
-  .activity--table tr,
-  .invoice--table,
-  .invoice--table td,
-  .invoice--table tr {
+  .holiday--table, .holiday--table td, .holiday--table tr, .project--table, .project--table td, .project--table tr, .activity--table, .activity--table td, .activity--table tr, .invoice--table, .invoice--table td, .invoice--table tr {
     display: block;
+    border: 0;
+    box-shadow: none;
   }
 
   .holiday--table td+td,
@@ -6857,11 +6968,6 @@ Media CSS-=-==
     border-top: 0;
     padding-bottom: 0;
   }
-
-  /* .project--table th:last-child,
-  .project--table td:last-child {
-    text-align: left !important;
-  } */
 
   .project--table tr.project--active td {
     background: none;
@@ -6915,6 +7021,25 @@ Media CSS-=-==
     max-width: 100%;
     position: static;
     line-height: normal;
+  }
+
+  .page--wrapper .draggable--table td.new__td,
+  .page--wrapper .draggable--table tr.marked-project td.new__td {
+    background: rgb(248 250 252);
+    padding: .5rem .75rem;
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+  }
+
+  .page--wrapper .draggable--table tr.project--active td.new__td {
+    background: rgb(15 23 42 / 5%);
+    padding: .5rem .75rem;
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+  }
+
+  .page--wrapper .draggable--table td+td {
+    margin-top: .5rem;
   }
 
   .loading-bar {
@@ -7017,6 +7142,10 @@ Media CSS-=-==
   .page--wrapper table td {
     padding: 0;
   }
+
+  .attendance--table--list table tr {
+    padding: 1rem;
+  }
 }
 
 @media screen and (max-width:767px) {
@@ -7046,7 +7175,7 @@ Media CSS-=-==
   .show--project .open--sidebar,
   .open--panel--sidebar~.team--page .open--sidebar,
   span.open--sidebar {
-    display: none;
+    display: none !important;
   }
 
   .navbar-brand,
@@ -7054,6 +7183,13 @@ Media CSS-=-==
   .open--panel--sidebar .navbar-toggler,
   .navbar-light .navbar-nav .nav-link strong {
     display: none !important;
+  }
+
+  .navbar-light .navbar-nav .active>.nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.show, .navbar-light .navbar-nav .show>.nav-link, .navbar-light .navbar-nav .nav-link:focus {
+    color: #ffffff;
+    padding: 0;
+    border: 0;
+    background: none;
   }
 
   .panel--sidebar .navbar {
@@ -7073,7 +7209,7 @@ Media CSS-=-==
   }
 
   .navbar-light .navbar-nav .nav-link {
-    padding: 10px;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7176,6 +7312,13 @@ Media CSS-=-==
 
   .page--title .rmdp-input {
     min-height: 36px;
+  }
+
+  .attendance--table--list table tr {
+    padding: 1rem;
+    flex-flow: column wrap;
+    gap: 1rem;
+    align-items: flex-start;
   }
 }
 
@@ -7328,10 +7471,6 @@ Media CSS-=-==
   .wrapper--title {
     gap: 0;
   }
-
-  /* .common--project--grid .projecttitle {
-    max-width: calc(100% - 60px);
-  } */
 }
 
 @media screen and (max-width:414px) {

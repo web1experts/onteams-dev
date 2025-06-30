@@ -540,7 +540,7 @@ useEffect(() => {
         <>
             <div className="details--projects--view common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
-                    <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                    <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                     <div className="projecttitle">
                         <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">

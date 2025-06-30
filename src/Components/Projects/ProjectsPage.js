@@ -696,7 +696,7 @@ function ProjectsPage() {
                         <Row>
                             <Col sm={12} lg={12}>
                                 <h2>
-                                    <span className="open--sidebar me-3 d-flex d-lg-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                                    <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                                     Projects
                                     {/* <Button variant="primary" className={isActive !== 0 ? 'd-flex ms-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button> */}
                                     <Button variant="primary" className={isActive !== 0 ? 'd-flex d-xl-none' : 'd-xl-none onHide'} onClick={handleFilterShow}><MdFilterList /></Button>
@@ -826,7 +826,7 @@ function ProjectsPage() {
                                                                             key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                                                 }`}>
                                                                             <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                                                <div className="d-flex justify-content-between border-end">
+                                                                                <div className="d-flex justify-content-between border-end flex-wrap">
                                                                                     <div className="project--name">
                                                                                         <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr><MdDragIndicator /></div>
                                                                                         <div className="title--initial">{project.title.charAt(0)}</div>
@@ -860,18 +860,6 @@ function ProjectsPage() {
                                                                             </td>
                                                                             
                                                                             <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
-                                                                                <Dropdown className="select--dropdown" key='status-key'>
-                                                                                    <Dropdown.Toggle onClick={() => { 
-                                                                                        if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
-                                                                                            dispatch(updateStateData(DIRECT_UPDATE, true));
-                                                                                            handleStatusShow();
-                                                                                        } else {
-                                                                                            console.log('Not allowed');
-                                                                                        }
-                                                                                    }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                                                </Dropdown>
-                                                                            </td>
-                                                                            <td key={`priority-index-${index}`} data-label="Status" className="onHide status__key">
                                                                                 <Dropdown className="select--dropdown" key='status-key'>
                                                                                     <Dropdown.Toggle onClick={() => { 
                                                                                         if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
