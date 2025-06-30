@@ -794,6 +794,15 @@ function ProjectsPage() {
                                             <th scope="col" key="project-start-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
                                             <th scope="col" key="project-end-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
                                             <th scope="col" key="project-due-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
+                                            {/* {Array.isArray(customFields) && customFields
+                                                .filter(field => field?.showInTable !== false)
+                                                .map((field, idx) => (
+                                                    <th scope="col" key={`project-${field.name || idx}-header`} className="onHide">
+                                                    {field.label}
+                                                    </th>
+                                                ))
+                                            } */}
+
                                         </tr>
                                     </thead>
                                     <Droppable droppableId={`droppable-project-table`} type="PROJECTS" direction={isActiveView === 1 ? "horizontal" : "vertical"}>
