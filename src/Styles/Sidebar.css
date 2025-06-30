@@ -67,10 +67,6 @@ Sidebar CSS-=-=
   max-width: 25px;
 }
 
-.panel--sidebar .dropdown {
-  padding: 1.5rem 0;
-}
-
 .panel--sidebar .dropdown-toggle {
     padding: .85rem;
     width: 100%;
@@ -515,7 +511,7 @@ Sidebar CSS-=-=
 .panel--sidebar .dropdown {
   position: sticky;
   bottom: 0;
-  padding: 20px;
+  padding: 15px 15px 15px 12px;
   background: transparent;
   text-align: center;
 }
@@ -524,8 +520,9 @@ Sidebar CSS-=-=
   position: relative;
   text-align: left;
   background: none;
-  padding: 1rem;
+  padding: 15px 15px 15px 12px;
   bottom: auto;
+  margin-bottom: 15px;
   border-bottom: 1px solid #33415580;
 }
 

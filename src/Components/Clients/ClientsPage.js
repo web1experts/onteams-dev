@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Dropdown } from "react-bootstrap";
 import { FaEye, FaList, FaPlus, FaTrashAlt } from "react-icons/fa";
 import { FiEdit, FiMail, FiPhone, FiSidebar } from "react-icons/fi";
 import { BsGrid, BsEye } from "react-icons/bs";
@@ -458,17 +458,10 @@ function ClientsPage() {
               <Table>
                 <thead className="onHide">
                     <tr key="project-table-header">
-                        <th scope="col" className="sticky p-0" key="project-name-header">
-                          <div className="d-flex justify-content-between">
-                            <div className="project--name">
-                                <div className="title--span flex-column align-items-start gap-0">
-                                    <span>Client</span>
-                                </div>
+                      <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
+                            <div className="d-flex align-items-center justify-content-between border-end">
+                                Clients <span key="project-action-header" className="onHide">Actions</span>
                             </div>
-                              <div className="onHide task--buttons">
-                                <span key="project-action-header" className="onHide">Actions</span>
-                            </div>
-                          </div>
                         </th>
                         <th scope="col" key="project-status-header" className="onHide">Email <small><TbArrowsSort /></small></th>
                         <th scope="col" key="project-status-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
@@ -482,9 +475,9 @@ function ClientsPage() {
                           <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={isActive ? () => handleClick(client) : () => { return false; }}>
                             {/* <td>{index + 1}</td> */}
                             <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Client Name">
-                              <div className="d-flex justify-content-between">
+                              <div className="d-lg-flex justify-content-between border-end flex-wrap">
                                   <div className="project--name">
-                                      <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr></div>
+                                      <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr></div>
                                       <div className="title--initial">{client.name.charAt(0)}</div>
                                       <div className="title--span flex-column align-items-start gap-0">
                                           <span>{client.name}</span>
@@ -529,10 +522,25 @@ function ClientsPage() {
         </div>
       </div>
       {selectedClient &&
-      <div className="details--wrapper">
+      <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
           <div className="projecttitle">
-            <h3><strong>Client Details</strong></h3>
+            <Dropdown>
+              <Dropdown.Toggle variant="link" id="dropdown-basic">
+                  <h3>
+                      <strong>M H, LU</strong>
+                      <span>E-commerce Platform</span>
+                  </h3>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                  <div className="drop--scroll">
+                      <Dropdown.Item>
+                        <strong>Alex Chen</strong>
+                        <span>E-commerce Platform</span>
+                      </Dropdown.Item>
+                  </div>
+              </Dropdown.Menu>
+          </Dropdown>
           </div>
           <ListGroup horizontal className="ms-auto">
             <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>

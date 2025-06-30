@@ -780,31 +780,25 @@ function TimeTrackingPage() {
               <>
                 <div className="activity--stats">
                   <Row>
-                    <Col>
+                    <Col className="card--stack">
                       <Card className="text--green">
                         <Card.Body>
                           <Card.Title><span>Active</span>2</Card.Title>
                           <Card.Text><FiMonitor /></Card.Text>
                         </Card.Body>
                       </Card>
-                    </Col>
-                    <Col>
                       <Card className="text--orange">
                         <Card.Body>
                           <Card.Title><span>On Break</span>2</Card.Title>
                           <Card.Text><FiCoffee /></Card.Text>
                         </Card.Body>
                       </Card>
-                    </Col>
-                    <Col>
                       <Card className="text--gray">
                         <Card.Body>
                           <Card.Title><span>Inactive</span>1</Card.Title>
                           <Card.Text><FiUserX /></Card.Text>
                         </Card.Body>
                       </Card>
-                    </Col>
-                    <Col>
                       <Card className="text--blue">
                         <Card.Body>
                           <Card.Title><span>Total Hours</span>24.0h</Card.Title>
@@ -840,7 +834,7 @@ function TimeTrackingPage() {
                                         }
                                       }} >
                                         <div className="d-flex justify-content-between">
-                                          <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                          <div className="project--name d-flex justify-content-md-between gap-3 align-items-center">
                                               <div className="title--initial">{activity.name.charAt(0)}</div>
                                               <div className="title--span flex-column d-flex align-items-start gap-0">
                                                 <span>
@@ -861,7 +855,7 @@ function TimeTrackingPage() {
                                         </div>
                                     </td>
                                     <td className="ms-auto">
-                                      <div className="d-flex align-items-center gap-5 flex-wrap">
+                                      <div className="d-flex align-items-center gap-3 mt-3 mt-xl-0 gap-xl-5 flex-wrap">
                                         <div key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></div>
                                         <div key={`task-time-${activity?._id}`} className="onHide"><strong>Project Time: </strong>{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
                                         <div key={`total-time-${activity?._id}`} className="onHide"><strong>Total Time: </strong>{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</div>
@@ -940,7 +934,7 @@ function TimeTrackingPage() {
                                           }
                                       }} >
                                         <div className="d-flex justify-content-between">
-                                          <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                          <div className="project--name d-flex justify-content-md-between gap-3 align-items-center">
                                               <div className="title--initial">{activity.name.charAt(0)}</div>
                                               <div className="title--span flex-column d-flex align-items-start gap-0">
                                                 <span>

@@ -10,7 +10,7 @@ import { MdOutlineCheck } from "react-icons/md";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import DatePicker from "react-multi-date-picker";
 import { formatDateinString } from "../../helpers/commonfunctions";
-import { FiCalendar, FiGift } from 'react-icons/fi';
+import { FiCalendar, FiGift, FiSidebar } from 'react-icons/fi';
 import { createHoliday, ListHolidays, deleteHoliday, updateHoliday } from "../../redux/actions/holiday.action";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -139,8 +139,8 @@ const getStatusBadge = (dateString) => {
     d1.getDate() === d2.getDate();
 
   if (isSameDay(inputDate, today)) return <Badge bg="primary">today</Badge>;
-  if (inputDate < today) return <Badge bg="secondary">past</Badge>;
-  return <Badge bg="success">upcoming</Badge>;
+  if (inputDate < today) return <Badge className="mt-1 mt-xl-0" bg="secondary">past</Badge>;
+  return <Badge className="mt-1 mt-xl-0" bg="success">upcoming</Badge>;
 
 
 };
@@ -160,7 +160,9 @@ const getDaysLeft = (date) => {
           <Container fluid>
             <Row className="align-items-center">
               <Col md={12}>
-                <h2>Holidays
+                <h2>
+                  <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                  Holidays
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup.Item>
                       <Dropdown className="select--dropdown">
@@ -175,9 +177,9 @@ const getDaysLeft = (date) => {
                         </Dropdown.Menu>
                     </Dropdown>
                     </ListGroup.Item>
-                    <ListGroup horizontal>
-                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
-                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                    <ListGroup horizontal className="d-none d-xl-flex">
+                        <ListGroup.Item action className="d-none d-xl-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                        <ListGroup.Item action className="d-none d-xl-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
@@ -203,7 +205,7 @@ const getDaysLeft = (date) => {
             </div>
         }
           <Container fluid className="pb-5 pt-2">
-            <Row>
+            <Row className="gap-3 gap-lg-0">
               <Col lg={4}>
                 <Card className="card--blue">
                   <Card.Body>
@@ -242,9 +244,9 @@ const getDaysLeft = (date) => {
                               <div className="project--name d-flex align-items-center gap-4">
                                 <span className="bank">🏛️</span>
                                 <div className="title--span d-flex align-items-start gap-1 flex-column">
-                                  <h5 className="d-flex gap-3" key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion} {getStatusBadge(holiday.date)}</h5>
+                                  <h5 className="d-xl-flex gap-3 align-items-start" key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion} {getStatusBadge(holiday.date)}</h5>
                                   <strong>{formatDateinString(holiday.date)}</strong>
-                                  <p className="m-0">
+                                  <p className="mb-0">
                                     <span className="me-3" key={`type-td-${index}`} data-label="Type">
                                       {holiday.type
                                         .split(' ')
@@ -255,7 +257,7 @@ const getDaysLeft = (date) => {
                                 </div>
                               </div>
                             </td>
-                            <td className="text-end text-primary fw-semibold ms-auto d-flex align-items-center">
+                            <td className="text-end text-primary fw-semibold ms-xl-auto d-flex justify-content-between mt-3 mt-xl-0 align-items-center">
                               <span className="days--left">{getDaysLeft(holiday.date)}</span>
                               <div key={`action-td-${index}`} className="ms-3">
                                 <Dropdown>

@@ -104,7 +104,7 @@ function AttendancePage() {
               <Col sm={12}>
                 <h2>
                   Attendance
-                  <ListGroup horizontal className="ms-lg-auto">
+                  <ListGroup horizontal className="ms-auto">
                     <ListGroup.Item>
                       <Dropdown className="select--dropdown">
                         <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> June 2025</Dropdown.Toggle>
@@ -132,15 +132,19 @@ function AttendancePage() {
                         </Dropdown.Menu>
                     </Dropdown>
                     </ListGroup.Item>
-                    <ListGroup horizontal>
-                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-flex view--icon active': 'd-lg-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
-                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-flex view--icon active': 'd-lg-flex view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                    <ListGroup horizontal className="d-none d-lg-flex">
+                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-flex d-none view--icon active': 'd-lg-flex d-none view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
+                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-flex d-none view--icon active': 'd-lg-flex d-none view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>
+                <ListGroup horizontal>
+                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-none d-flex view--icon active mt-3 mt-lg-0': 'mt-3 mt-lg-0 d-lg-none d-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
+                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-none d-flex mt-3 mt-lg-0 view--icon active': 'd-lg-none d-flex mt-3 mt-lg-0 view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                    </ListGroup>
               </Col>
             </Row>
           </Container>
@@ -155,7 +159,7 @@ function AttendancePage() {
           <Container fluid className="pb-5 pt-2">
             {activeTab === 'excel' && (
               <div className="attendance--table excel--view" id="excel--view">
-                <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
+                <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
                   <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - June 2025</h3>
                   <Button variant="primary"><FiDownload /> Download Excel Excel</Button>
                 </div>
@@ -1055,17 +1059,17 @@ function AttendancePage() {
             {activeTab === 'team' && (
               <>
                 <div className="attendance--stats">
-                  <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
+                  <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
                     <h3 class="d-flex align-items-center gap-3 mb-0">
                       <span><AiOutlineTeam /></span>Team Daily Totals - June 2025
                     </h3>
-                    <Col md="auto" className="d-flex align-items-center change--date">
+                    <Col md="auto" className="d-flex align-items-center change--date mt-2 mt-md-0">
                       <Button variant="light" className="me-2 shadow-sm" onClick={() => changeDate(-1)}>
                         <MdChevronLeft size={24} />
                       </Button>
 
                       <div className="date--change">
-                        {formatDate(date)}
+                        <span>{formatDate(date)}</span>
                       </div>
 
                       <Button variant="light" className="ms-2 shadow-sm" onClick={() => changeDate(1)}>
@@ -1074,39 +1078,31 @@ function AttendancePage() {
                     </Col>
                   </div>
                   <Row>
-                    <Col>
+                    <Col className="card--stack">
                       <Card className="card--green">
                         <Card.Body>
                           <Card.Title><span>Present</span>10</Card.Title>
                           <Card.Text><FiCheckCircle /></Card.Text>
                         </Card.Body>
                       </Card>
-                    </Col>
-                    <Col>
                       <Card className="card--red">
                         <Card.Body>
                           <Card.Title><span>Absent</span>2</Card.Title>
                           <Card.Text><AiOutlineCloseCircle /></Card.Text>
                         </Card.Body>
                       </Card>
-                    </Col>
-                    <Col>
                       <Card className="card--orange">
                         <Card.Body>
                           <Card.Title><span>Short (2h)</span>2</Card.Title>
                           <Card.Text><FiCoffee /></Card.Text>
                         </Card.Body>
                       </Card>
-                    </Col>
-                    <Col>
                       <Card className="card--blue">
                         <Card.Body>
                           <Card.Title><span>Half Day</span>5</Card.Title>
                           <Card.Text><FiClock /></Card.Text>
                         </Card.Body>
                       </Card>
-                    </Col>
-                    <Col>
                       <Card className="card--purple">
                         <Card.Body>
                           <Card.Title><span>Short Leave (6h)</span>2</Card.Title>
@@ -1124,7 +1120,7 @@ function AttendancePage() {
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">GS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Gagandeep Singh</span>
@@ -1134,7 +1130,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1150,14 +1146,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">TG</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Tarun Giri</span>
@@ -1167,7 +1163,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1183,14 +1179,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">PS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Paramjeet Singh</span>
@@ -1200,7 +1196,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1216,14 +1212,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">AJ</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Abhishek Jaiswal</span>
@@ -1233,7 +1229,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1249,14 +1245,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">RS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Ritika Sharma</span>
@@ -1266,7 +1262,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1282,14 +1278,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">NC</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Nidhi Chandna</span>
@@ -1299,7 +1295,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1315,14 +1311,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">G</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Hitesh Kumar</span>
@@ -1332,7 +1328,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1348,14 +1344,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">RS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Ram Singh</span>
@@ -1365,7 +1361,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1381,14 +1377,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">GS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Gaurav Sharma</span>
@@ -1398,7 +1394,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1414,14 +1410,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">ND</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Neha Dutt</span>
@@ -1431,7 +1427,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1447,14 +1443,14 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                              <div className="project--name d-flex gap-3 align-items-center">
                                   <div className="title--initial">DE</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Deepak</span>
@@ -1464,7 +1460,7 @@ function AttendancePage() {
                             </div>
                           </td>
                           <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-4">
+                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
                               </div>
@@ -1480,7 +1476,7 @@ function AttendancePage() {
                               <div className="text-center">
                                 <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1497,10 +1493,22 @@ function AttendancePage() {
       <div className="details--projects--grid projects--grid common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
             <div className="projecttitle">
-              <h3>
-                  <strong>Gagandeep Singh</strong>
-                  <span>UI/UX Designer</span>
-              </h3>
+              <Dropdown>
+                <Dropdown.Toggle variant="link" id="dropdown-basic">
+                  <h3>
+                    <strong>Gagandeep Singh</strong>
+                    <span>UI/UX Designer</span>
+                  </h3>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <div className="drop--scroll">
+                        <Dropdown.Item>
+                          <strong>Gagandeep Singh</strong>
+                          <span>UI/UX Designer</span>
+                        </Dropdown.Item>
+                    </div>
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
             <ListGroup horizontal>
                 <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>

@@ -231,15 +231,15 @@ function App(props) {
   return (
     <div className="App">
        <section className={`module__wrapper ${window.location.pathname.replace(/^\/+|\/+$/g, '')}--page`}>
-       {hideSideBar && islogin && 
-        <SidebarPanel />
-       }
-      <ToastAlerts />
-      {loggedIn ? (
-        <Routes>{getRoutes(privateRoutes)}</Routes>
-      ) : (
-        <Routes>{getRoutes(publicRoutes)}</Routes>
-      )}
+        {hideSideBar && islogin && 
+          <SidebarPanel />
+        }
+        <ToastAlerts />
+        {loggedIn ? (
+          <Routes>{getRoutes(privateRoutes)}</Routes>
+        ) : (
+          <Routes>{getRoutes(publicRoutes)}</Routes>
+        )}
       </section>
     </div>
   );

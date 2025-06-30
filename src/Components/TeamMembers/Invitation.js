@@ -430,9 +430,9 @@ function Invitation(props) {
                             <>
                               <tr key={`member-table-row-${index}`} className={invitation._id === selectedInvitation?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(invitation) : () => { return false; }}>
                                 <td className="project--title--td sticky" data-label="Member Name">
-                                  <div className="d-flex justify-content-between">
+                                  <div className="d-flex justify-content-between border-end flex-wrap">
                                       <div className="project--name">
-                                          <div className="drag--indicator"><abbr>#{index + 1}</abbr></div>
+                                          <div className="drag--indicator"><abbr>{index + 1}</abbr></div>
                                           <div className="title--initial">{invitation.email.charAt(0)}</div>
                                           <div className="title--span flex-column align-items-start gap-0">
                                             <span>{invitation.email}</span>

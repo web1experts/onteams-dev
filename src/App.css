@@ -162,7 +162,7 @@ body {
 .team--page .page--title h2 .btn:focus-visible,
 .team--page .page--title h2 .btn:focus-within {
   color: #ffffff;
-  background: linear-gradient(to bottom right, #0f172a, #1e293b);
+  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   border-color: #0f172a;
   outline: none;
 }
@@ -248,6 +248,14 @@ body {
   width: 18px;
 }
 
+.page--title .expand--icon .list-group-item:hover, .wrapper--title .expand--icon .list-group-item:hover {
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+}
+
+.page--title .expand--icon .list-group-item:hover svg, .wrapper--title .expand--icon .list-group-item:hover svg {
+  color: #ffffff;
+}
+
 .page--title .list-group-item-action {
   align-items: center;
   background: none;
@@ -303,7 +311,7 @@ body {
 
 .page--title .list-group-item-action:hover {
   color: #ffffff;
-  background: linear-gradient(to bottom right, #0f172a, #1e293b);
+  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   border: 0;
 }
 
@@ -367,14 +375,14 @@ body {
 }
 
 .page--wrapper .nav-tabs button.active {
-  background: rgb(100 116 139);
+  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   color: #ffffff;
   box-shadow: none;
   border: 2px solid rgb(100 116 139);
 }
 
 .page--wrapper .nav-tabs button:hover {
-  background: rgb(100 116 139);
+  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   color: #ffffff;
   box-shadow: none;
   border: 2px solid rgb(100 116 139);
@@ -497,7 +505,7 @@ body {
 .page--wrapper .draggable--table th,
 .page--wrapper .draggable--table td {
   border: 0;
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   border-right: 1px solid rgb(226 232 240);
   border-bottom: 1px solid rgb(226 232 240);
 }
@@ -508,13 +516,14 @@ body {
 
 .page--wrapper .draggable--table th:first-child,
 .page--wrapper .draggable--table td:first-child {
-  width: 430px;
+  width: 520px;
   position: sticky;
   position: -webkit-sticky;
   left: 0;
   background: #ffffff;
   z-index: 1;
-  max-width: 430px
+  max-width: 520px;
+  border-right: 0;
 }
 
 .page--wrapper .draggable--table td.project--title--td {
@@ -540,7 +549,7 @@ body {
 
 .page--wrapper .draggable--table th:first-child span {
   margin-left: auto;
-  min-width: 127px;
+  min-width: 120px;
   text-align: center;
   border-left: 1px solid rgb(226 232 240);
   padding: 1rem 1.5rem;
@@ -560,7 +569,7 @@ body {
 
 .page--wrapper table th abbr,
 .page--wrapper table td abbr {
-  width: 40px;
+  width: auto;
   height: auto;
   padding: .25rem .5rem;
   background: rgb(241 245 249);
@@ -682,7 +691,7 @@ body {
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   border-radius: 1rem;
-  border: 1px solid rgb(226 232 240);
+  /* border: 1px solid rgb(226 232 240); */
 }
 
 table.draggable--table {
@@ -698,6 +707,10 @@ table.draggable--table {
   transition: all .2s ease-in-out;
   -webkit-transition: all .2s ease-in-out;
   cursor: all-scroll;
+}
+
+.attendance--excel--table tr {
+  border: 0;
 }
 
 .show--project .new--project--rows tr td,
@@ -723,8 +736,9 @@ table.draggable--table {
   align-items: center;
   grid-gap: 15px;
   gap: 15px;
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   flex: 1 1;
+  min-height: 75px;
 }
 
 .time-tracking--page .new--project--rows .project--title--td .project--name {
@@ -738,7 +752,7 @@ table.draggable--table {
 }
 
 .time-tracking--page .page--wrapper .draggable--table td.project--title--td {
-  padding: 1rem 1.5rem;
+  padding: 1rem;
 }
 
 .time-tracking--page .page--wrapper table td button {
@@ -750,8 +764,8 @@ table.draggable--table {
   display: flex;
   align-items: center;
   border-left: 1px solid rgb(226 232 240);
-  padding: 1rem 1.5rem;
-  min-width: 115px;
+  padding: 1rem;
+  min-width: 120px;
   justify-content: center;
 }
 
@@ -1193,8 +1207,12 @@ span.open--sidebar {
 }
 
 .wrapper--title .list-group-item:hover {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   border: 1px solid transparent;
+  color: #ffffff;
+}
+
+.wrapper--title .list-group-item:hover svg {
   color: #ffffff;
 }
 
@@ -1237,8 +1255,8 @@ span.open--sidebar {
 .wrapper--title .list-group-item.btn:focus,
 .wrapper--title .list-group-item.btn:focus-visible,
 .wrapper--title .list-group-item.btn:focus-within {
-  color: rgb(15 23 42);
-  background: rgb(100 116 139);
+  color: #ffffff;
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
   border-color: rgb(100 116 139);
   outline: none;
 }
@@ -1247,7 +1265,7 @@ span.open--sidebar {
 .wrapper--title .list-group-item .btn:focus svg,
 .wrapper--title .list-group-item .btn:focus-visible svg,
 .wrapper--title .list-group-item .btn:focus-within svg {
-  color: rgb(15 23 42);
+  color: #ffffff;
 }
 
 .wrapper--title .list-group-horizontal>.list-group-item:first-child:not(:last-child) {
@@ -1297,7 +1315,7 @@ span.open--sidebar {
   font-weight: 600;
 }
 
-.common--project--grid .wrapper--title h3 {
+.wrapper--title h3 {
   font-size: 1.2rem;
   margin: 0;
   font-weight: 600;
@@ -1317,7 +1335,7 @@ span.open--sidebar {
   position: relative;
 }
 
-.common--project--grid .wrapper--title .dropdown-toggle {
+.wrapper--title .dropdown-toggle {
   font-size: 1.2rem;
   margin: 0;
   font-weight: 600;
@@ -1335,7 +1353,7 @@ span.open--sidebar {
   position: relative;
 }
 
-.common--project--grid .wrapper--title .dropdown-toggle::before {
+.wrapper--title .dropdown-toggle::before {
   position: absolute;
   content: "\276E";
   transform: rotate(-90deg);
@@ -1350,12 +1368,12 @@ span.open--sidebar {
   transition: all .4s ease-in-out;
 }
 
-.common--project--grid .wrapper--title .show::before {
+.wrapper--title .show::before {
   transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
 }
 
-.common--project--grid .wrapper--title h3 strong {
+.wrapper--title h3 strong {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   line-clamp: 1;
@@ -1399,8 +1417,8 @@ span.open--sidebar {
 .wrapper--title .btn--view:hover,
 .wrapper--title .btn--view:focus-visible,
 .wrapper--title .btn-primary:not(:disabled):not(.disabled).active {
-  background: #ffffff;
-  color: rgb(100 116 139);
+  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  color: #ffffff;
   box-shadow: none !important;
   -webkit-box-shadow: none;
   border: 0;
@@ -1977,7 +1995,7 @@ table tr.marked-project td {
 .modal .select--dropdown .dropdown-menu,
 .rounded--box .select--dropdown .dropdown-menu,
 .common--form .select--dropdown .dropdown-menu,
-.common--project--grid .wrapper--title .dropdown-menu {
+.wrapper--title .dropdown-menu {
   padding: 0;
   border: 1px solid #eeeeee;
   border-radius: .5rem;
@@ -1993,7 +2011,7 @@ table tr.marked-project td {
   top: 100% !important;
 }
 
-.common--project--grid .wrapper--title .dropdown-menu {
+.wrapper--title .dropdown-menu {
   min-width: max-content;
   width: max-content;
 }
@@ -2001,12 +2019,12 @@ table tr.marked-project td {
 .modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"],
 .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"],
 .select--dropdown .dropdown-menu[data-popper-placement="bottom-end"],
-.common--project--grid .wrapper--title .dropdown-menu[data-popper-placement="bottom-start"] {
+.wrapper--title .dropdown-menu[data-popper-placement="bottom-start"] {
   margin-bottom: 0;
   margin-top: 15px;
 }
 
-.common--project--grid .wrapper--title .dropdown-menu[data-popper-placement="bottom-start"] {
+.wrapper--title .dropdown-menu[data-popper-placement="bottom-start"] {
   margin-top: 10px;
 }
 
@@ -2035,7 +2053,7 @@ table tr.marked-project td {
 }
 
 .select--dropdown .drop--scroll,
-.common--project--grid .wrapper--title .drop--scroll {
+.wrapper--title .drop--scroll {
   min-width: 100%;
   max-height: 240px;
   overflow-y: auto;
@@ -2043,7 +2061,7 @@ table tr.marked-project td {
   scrollbar-color: rgba(0, 0, 0, 0.1) #ffffff;
 }
 
-.common--project--grid .wrapper--title .drop--scroll {
+.wrapper--title .drop--scroll {
   max-height: calc(100dvh - 200px);
 }
 
@@ -2069,7 +2087,7 @@ table tr.marked-project td {
 .modal .select--dropdown .dropdown-menu::before,
 .common--form .select--dropdown .dropdown-menu::before,
 .rounded--box .select--dropdown .dropdown-menu::before,
-.common--project--grid .wrapper--title .dropdown-menu::before {
+.wrapper--title .dropdown-menu::before {
   border: 10px solid;
   border-color: transparent transparent #ffffff;
   content: "";
@@ -2083,7 +2101,7 @@ table tr.marked-project td {
 }
 
 .modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"]:before,
-.common--project--grid .wrapper--title .dropdown-menu[data-popper-placement="bottom-start"]:before {
+.wrapper--title .dropdown-menu[data-popper-placement="bottom-start"]:before {
   border-color: transparent transparent #ffffff;
   top: -20px;
   transform: translateX(-5px);
@@ -2102,7 +2120,7 @@ table tr.marked-project td {
 .modal .select--dropdown .dropdown-item,
 .rounded--box .select--dropdown .dropdown-item,
 .common--form .select--dropdown .dropdown-item,
-.common--project--grid .wrapper--title .dropdown-item {
+.wrapper--title .dropdown-item {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -2123,7 +2141,7 @@ table tr.marked-project td {
   position: relative;
 }
 
-.common--project--grid .wrapper--title .dropdown-item {
+.wrapper--title .dropdown-item {
   text-align: left;
   display: flex;
   align-items: flex-start;
@@ -2131,11 +2149,11 @@ table tr.marked-project td {
   flex-flow: column wrap;
 }
 
-.common--project--grid .wrapper--title .dropdown-item+.dropdown-item {
+.wrapper--title .dropdown-item+.dropdown-item {
   border-top: 1px solid rgb(0 0 0 / .05);
 }
 
-.common--project--grid .wrapper--title .dropdown-item strong {
+.wrapper--title .dropdown-item strong {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   line-clamp: 1;
@@ -2183,7 +2201,7 @@ table tr.marked-project td {
 .modal .select--dropdown .dropdown-item:hover,
 .rounded--box .select--dropdown .dropdown-item:hover,
 .common--form .select--dropdown .dropdown-item:hover,
-.common--project--grid .wrapper--title .dropdown-item:hover {
+.wrapper--title .dropdown-item:hover {
   color: rgb(100 116 139);
   background: rgba(226, 232, 240, .4);
 }
@@ -2197,8 +2215,8 @@ table tr.marked-project td {
   padding: .55rem 2rem .55rem 1.2rem;
 }
 
-/* .common--project--grid .wrapper--title .btn.active,
-.common--project--grid .wrapper--title .btn.show {
+/* .wrapper--title .btn.active,
+.wrapper--title .btn.show {
   color: rgb(15 23 42);
   background-color: transparent;
   border-color: transparent;
@@ -2960,8 +2978,8 @@ Project Task View CSS=-=-=
 
 .wrapper--title .members--list .list-group-item .btn:hover,
 .wrapper--title .members--list .list-group-item .btn:focus {
-  color: rgb(15 23 42);
-  background: rgba(15, 23, 42, .25);
+  color: #ffffff;
+  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
 }
 
 .wrapper--title .members--list .more--member,
@@ -3570,7 +3588,7 @@ pre {
 .timeSheetModal button.list-group-item:focus,
 .timeSheetModal .list-group-horizontal>.list-group-item+.list-group-item.active {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   border: 0;
 }
 
@@ -4473,7 +4491,7 @@ pre {
   -webkit-transform: translateX(5rem) translateY(-5rem);
 }
 
-.dashboard--page .open--comment {
+.dashboard--page .open--comment, .dashboard--page .icon--heart {
   cursor: pointer;
 }
 
@@ -4551,7 +4569,7 @@ ul#icon-tabs .nav-item.show .nav-link,
 ul#icon-tabs .nav-link.active,
 ul#icon-tabs .nav-link:hover {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   border-color: transparent;
 }
 
@@ -4773,7 +4791,6 @@ ul#icon-tabs .nav-link span svg {
   background: rgb(255 255 255);
   background-size: cover;
   border-radius: 1.5rem;
-  margin-top: 2rem;
   box-shadow: 0 25px 50px -12px rgb(0 0 0 / .25);
   padding: 0;
   padding-bottom: 1.2rem;
@@ -5682,6 +5699,15 @@ ul#icon-tabs .nav-link span svg {
   -webkit-border-radius: .5rem;
 }
 
+.attendance--stats .date--change span {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .attendance--excel--table {
   border: 0;
   border-radius: 0;
@@ -5715,6 +5741,16 @@ ul#icon-tabs .nav-link span svg {
 .attendance--stats h3 svg,
 .attendance--table h3 svg {
   color: rgb(37 99 235);
+}
+
+.card--stack .card {
+    flex: 1 1;
+}
+
+.card--stack {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1rem;
 }
 
 .attendance--stats .card {
@@ -6431,6 +6467,12 @@ Media CSS-=-==
   .activity--table tr th {
     min-width: 110px;
   }
+
+  .holidays--page .card--stack .card, .card--stack .card {
+    flex: 1 1 100%;
+    max-width: calc(50% - .5rem);
+    height: auto;
+  }
 }
 
 @media screen and (max-width:1299px) {
@@ -6571,12 +6613,6 @@ Media CSS-=-==
     margin: 0;
   }
 
-  .page--wrapper .draggable--table th:nth-child(2),
-  .page--wrapper .draggable--table td:nth-child(2) {
-    flex: none;
-    min-width: 150px;
-  }
-
   .holiday--table tbody,
   .activity--table tbody,
   .invoice--table tbody {
@@ -6598,13 +6634,17 @@ Media CSS-=-==
   .holiday--table tbody tr,
   .activity--table tbody tr,
   .invoice--table tbody tr {
-    max-width: calc(33.333% - 10px);
+    max-width: calc(50% - 5px);
     flex: 1 1 100%;
     flex-flow: column wrap;
     text-align: left;
     gap: 5px;
     align-items: flex-start;
     justify-content: flex-start;
+  }
+
+  .holiday--table tr+tr {
+    margin-top: 0;
   }
 
   .show--details .holiday--table tbody tr,
@@ -6617,16 +6657,11 @@ Media CSS-=-==
   .holiday--table tbody td,
   .activity--table tbody td,
   .invoice--table tbody td {
-    display: block !important;
+    /* display: block !important; */
     background: none;
     padding: 0;
+    width: 100%;
     text-align: left !important;
-  }
-
-  .holiday--table thead,
-  .activity--table thead,
-  .invoice--table thead {
-    display: none;
   }
 
   .holiday--table tr,
@@ -6660,7 +6695,7 @@ Media CSS-=-==
   }
 
   .page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
-    min-width: 430px;
+    min-width: 520px;
   }
 
   .page--wrapper .draggable--table th {
@@ -6681,19 +6716,31 @@ Media CSS-=-==
     max-width: calc(50% - .5rem);
   }
 
-  .attendance--table--list table tr td:last-child .d-flex {
-    flex-flow: column wrap;
-    align-items: flex-start !important;
-
-  }
-
   .attendance--table--list table tr td {
     flex: 1 1 100%;
     width: 100%;
   }
 
+  .attendance--table--list table tr td .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .attendance--table--list table tr+tr {
     margin-top: 0;
+  }
+
+  .holidays--page .card--blue .card-title {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  .holidays--page .holidays--list {
+    margin-top: 2rem;
+  }
+
+  .holidays--page .card .card-title span {
+    font-size: .75rem;
   }
 }
 
@@ -6837,7 +6884,7 @@ Media CSS-=-==
   .project--table tbody tr,
   .activity--table tbody tr,
   .invoice--table tbody tr {
-    max-width: calc(50% - 10px);
+    max-width: calc(50% - 5px);
     flex: 1 1 100%;
   }
 
@@ -6932,12 +6979,8 @@ Media CSS-=-==
     outline: none !important;
   }
 
-  .holiday--table thead,
-  .holiday--table td:first-child,
   .project--table thead,
-  .project--table td:first-child abbr,
-  .activity--table thead,
-  .invoice--table thead {
+  .project--table td:first-child abbr {
     display: none;
   }
 
@@ -6985,12 +7028,6 @@ Media CSS-=-==
     text-transform: capitalize;
     display: none;
     line-height: 1.3;
-  }
-
-  .page--wrapper .holiday--table td .dropdown {
-    position: absolute;
-    right: .5rem;
-    top: .5rem;
   }
 
   .page--wrapper .clients--table td span.onHide {
@@ -7146,6 +7183,39 @@ Media CSS-=-==
   .attendance--table--list table tr {
     padding: 1rem;
   }
+
+  .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
+    min-width: 0;
+  }
+
+  .page--wrapper .attendance--excel--table th {
+    min-width: 0;
+  }
+
+  .page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table td {
+    border: 0;
+    padding: 1rem 1.5rem;
+    border-right: 1px solid rgb(226 232 240);
+    min-width: 0;
+    border-bottom: 1px solid rgb(226 232 240);
+  }
+
+  .page--wrapper .attendance--excel--table td.project--title--td {
+    padding: 1rem 1.5rem;
+  }
+
+  .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
+    width: 250px;
+    min-width: 250px;
+  }
+
+  .team--page .page--title h2 {
+    font-size: 1.2rem;
+  }
+
+  .daily--welcome .card--icon h6 {
+    font-size: 28px;
+  }
 }
 
 @media screen and (max-width:767px) {
@@ -7249,7 +7319,7 @@ Media CSS-=-==
   .project--table tbody tr,
   .activity--table tbody tr,
   .invoice--table tbody tr {
-    max-width: calc(50% - 8px);
+    max-width: calc(50% - 5px);
   }
 
   .wrapper--title h3 {
@@ -7284,10 +7354,6 @@ Media CSS-=-==
     margin-bottom: 2px;
   }
 
-  /* .wrapper--title .live--tabs {
-    flex: 1 1;
-  } */
-
   .wrapper--title .screens--shots,
   .wrapper--title .screens--shots+.list-group-item {
     margin-top: .5rem;
@@ -7306,8 +7372,8 @@ Media CSS-=-==
     padding: 0;
   }
 
-  .time-tracking--page .team--page .page--title .activity--tabs {
-    margin-top: 1rem;
+  .team--page .page--title h2 {
+    font-size: 1.2rem;
   }
 
   .page--title .rmdp-input {
@@ -7319,6 +7385,10 @@ Media CSS-=-==
     flex-flow: column wrap;
     gap: 1rem;
     align-items: flex-start;
+  }
+
+  .attendance--table--list table tr {
+    max-width: calc(100% - 0rem);
   }
 }
 
@@ -7471,16 +7541,20 @@ Media CSS-=-==
   .wrapper--title {
     gap: 0;
   }
+
+  .holidays--page .card--stack .card, .card--stack .card {
+    flex: 1 1 100%;
+    max-width: calc(100% - 0rem);
+    height: auto;
+  }
+
+  .holidays--page .card {
+    margin-bottom: 0;
+  }
 }
 
 @media screen and (max-width:414px) {
   .team--page .page--title h2 {
     flex-flow: row wrap;
-  }
-
-  .page--title .activity--tabs {
-    justify-content: flex-end;
-    margin-top: 20px;
-    flex: 1 1 100%;
   }
 }

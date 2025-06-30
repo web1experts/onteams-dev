@@ -788,7 +788,7 @@ function ProjectsPage() {
                                             </th>
                                             {/* <th scope="col" key="project-action-header" className="onHide sticky">Actions</th> */}
                                             <th scope="col" key="project-status-header" className="onHide">Status <small><TbArrowsSort /></small></th>
-                                            <th scope="col" key="project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th>
+                                            {/* <th scope="col" key="project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th> */}
                                             {/* <th scope="col" key="project-client-header" className="onHide">Client</th> */}
                                             <th scope="col" key="project-member-header" className="onHide">Assigned Members <small><TbArrowsSort /></small></th>
                                             <th scope="col" key="project-start-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
@@ -837,7 +837,7 @@ function ProjectsPage() {
                                                                             <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
                                                                                 <div className="d-flex justify-content-between border-end flex-wrap">
                                                                                     <div className="project--name">
-                                                                                        <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr><MdDragIndicator /></div>
+                                                                                        <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
                                                                                         <div className="title--initial">{project.title.charAt(0)}</div>
                                                                                         <div className="title--span flex-column align-items-start gap-0">
                                                                                             <span>{project.title}</span>
@@ -938,13 +938,13 @@ function ProjectsPage() {
                         <Table responsive="xl" className={isActiveView === 1 ? 'project--grid--table project--grid--new--table' : isActiveView === 2 ? 'project--table draggable--table new--project--rows' : 'project--table new--project--rows'}>
                              <thead className="onHide">
                                 <tr key="project-table-header">
-                                    <th scope="col" className="sticky" key="project-name-header">
+                                    <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
                                         <div className="d-flex align-items-center justify-content-between border-end">
                                             Project <span key="project-action-header" className="onHide">Actions</span>
                                         </div>
                                     </th>
                                     <th scope="col" key="th-project-status-header" className="onHide">Status <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="th-project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th>
+                                    {/* <th scope="col" key="th-project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th> */}
                                     <th scope="col" key="th-project-member-header" className="onHide">Assigned Members <small><TbArrowsSort /></small></th>
                                     <th scope="col" key="th-project-client-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
                                     <th scope="col" key="th-project-enddata-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
@@ -965,13 +965,13 @@ function ProjectsPage() {
                                                     key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                         }`}>
                                                     <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                        <div className="d-flex justify-content-between border-end">
+                                                        <div className="d-flex justify-content-between border-end flex-wrap">
                                                             <div className="project--name">
-                                                                <div className="drag--indicator"><abbr key={`index-${index}`}>#{index + 1}</abbr><MdDragIndicator /></div>
+                                                                <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
                                                                 <div className="title--initial">{project.title.charAt(0)}</div>
                                                                 <div className="title--span flex-column align-items-start gap-0">
                                                                     <span>{project.title}</span>
-                                                                    <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'>__</span>}</strong>
+                                                                    <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'></span>}</strong>
                                                                 </div>
                                                             </div>
                                                             <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons sticky">

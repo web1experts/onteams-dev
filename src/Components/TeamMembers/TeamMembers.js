@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Stack, FormGroup } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup } from "react-bootstrap";
 import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiPhone, FiCalendar, FiVideo } from "react-icons/fi";
 import { BsEye, BsGrid } from "react-icons/bs";
@@ -898,17 +898,10 @@ function TeamMembersPage() {
                   <Table>
                     <thead className="onHide">
                         <tr key="project-table-header">
-                            <th scope="col" className="sticky p-0" key="project-name-header">
-                              <div className="d-flex justify-content-between flex-wrap">
-                                <div className="project--name">
-                                    <div className="title--span flex-column align-items-start gap-0">
-                                        <span>Members</span>
-                                    </div>
+                            <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
+                                <div className="d-flex align-items-center justify-content-between border-end">
+                                    Project <span key="project-action-header" className="onHide">Actions</span>
                                 </div>
-                                <div className="onHide task--buttons">
-                                  <span key="project-action-header" className="onHide">Actions</span>
-                                </div>
-                              </div>
                             </th>
                             <th scope="col" key="project-status-header" className="onHide">Email <small><TbArrowsSort /></small></th>
                             <th scope="col" key="project-status-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
@@ -920,9 +913,9 @@ function TeamMembersPage() {
                         memberFeeds.map((member, idx) => (
                           <tr key={`member-table-row-${idx}`} className={member._id === selectedMember?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(member) : () => { return false; }}>
                             <td className="project--title--td sticky" data-label="Member Name">
-                              <div className="d-flex justify-content-between flex-wrap">
+                              <div className="d-flex justify-content-between border-end flex-wrap">
                                   <div className="project--name">
-                                      <div className="drag--indicator"><abbr>#{idx + 1}</abbr></div>
+                                      <div className="drag--indicator"><abbr>{idx + 1}</abbr></div>
                                       <div className="title--initial">{member.name.charAt(0)}</div>
                                       <div className="title--span flex-column align-items-start gap-0">
                                         <span>{member.name}</span>
@@ -977,9 +970,22 @@ function TeamMembersPage() {
       { isActive &&
       <div className="details--member--view">
         <div className="wrapper--title py-2 bg-white border-bottom">
-          <div className="projecttitle">
-            <h3><strong>Member Details</strong></h3>
-          </div>
+          <Dropdown>
+            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                <h3>
+                    <strong>{selectedMember?.name}</strong>
+                    <span>{editedMember.rolename}</span>
+                </h3>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+                <div className="drop--scroll">
+                    <Dropdown.Item>
+                      <strong>{selectedMember?.name}</strong>
+                      <span>{editedMember.rolename}</span>
+                    </Dropdown.Item>
+                </div>
+            </Dropdown.Menu>
+          </Dropdown>
           <ListGroup horizontal>
             <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
             <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);}}><MdOutlineClose /></ListGroup.Item>
@@ -1064,26 +1070,6 @@ function TeamMembersPage() {
                         <span className="info--icon"><FiCalendar /></span>
                         <p><small>Address</small>123, Main Street, Heaven Park, Mohali 160082</p>
                       </ListGroup.Item>
-                      {/* <ListGroup.Item>
-                        <span className="info--icon"><FiVideo /></span>
-                        <p><small>Recording Type</small>
-                          {
-                            (memberProfile?.permissions?.members?.create_edit_delete === true &&
-                            selectedMember?._id !== currentMember?._id || memberProfile?.role?.slug === "owner") ? 
-
-                              <Form.Select className="form-control" id="member-meta" onChange={(event) => handleFieldChange("memberMeta", event)}
-                              value={editedMember?.memberMeta?.recording} name="recording">
-                              <option key={`both`} value='both'>Screenshot And Video</option>
-                              <option key={`screenshot_only`} value='screenshot_only'>Screenshot Only</option>
-                              <option key={`video_only`} value='video_only'>Video Only</option>
-                            </Form.Select>
-                            :
-                            <span>{editedMember?.memberMeta?.recording
-                              ?.replace(/_/g, ' ')
-                              .replace(/^./, (char) => char.toUpperCase())}</span>
-                          }
-                        </p>
-                      </ListGroup.Item> */}
                     </ListGroup>
                   </Card.Text>
                 </Card.Body>
@@ -1524,8 +1510,7 @@ function TeamMembersPage() {
 
                                   </div>
                                     </Accordion.Body>
-                                  </Accordion.Item>
-                              
+                                </Accordion.Item>
                             );
                           })}
                           </Accordion>

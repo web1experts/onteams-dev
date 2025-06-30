@@ -107,7 +107,7 @@ function ManualTime() {
                       <Table responsive="xl">
                         <thead>
                             <tr key="manaul-time-table-header">
-                                <th scope="col" width='40%' key="project-name-header"><abbr>#</abbr> Member Name</th>
+                                <th scope="col" width='40%' key="project-name-header"><abbr></abbr> Member Name</th>
                                 <th scope="col" width='20%' key="project-client-header" className="onHide">Time Added</th>
                                 <th scope="col" width='20%' key="project-action-header" className="onHide">Actions</th>
                             </tr>

@@ -301,34 +301,30 @@ function DashboardPage() {
             <Row className="justify-content-center">
               <Col sm={12}>
                 <DateTimeCard />
-              </Col>
-              <Col xl={8}>
                 <ListGroup className="invitation--list">
                   {invitationsFeeds && invitationsFeeds.length > 0 &&
-                        invitationsFeeds.map((invitation, index) => {
-                          return (
-                            <>
-                            <ListGroup.Item>
-                                <p className="mb-0">You got an invitation from <strong>{invitation.company?.name}</strong> to join their team as a &nbsp;<strong>{invitation.role?.name?.replace(/\b\w/g,
-                                  function (char) {
-                                    return char.toUpperCase();
-                                  }
-                                )}
-                                </strong></p>
-                                <div className="ms-lg-auto mt-3 mt-lg-0">
-                                  <Button onClick={() => rejectInvite(invitation._id)} className="me-2" variant="outline-primary">
-                                  Decline
-                                  </Button>
-                                  <Button onClick={() => acceptInvite(invitation.inviteToken)} variant="primary">
-                                    Accept
-                                  </Button>
-                                </div>
-                            </ListGroup.Item>
+                    invitationsFeeds.map((invitation, index) => {
+                      return (
+                        <>
+                          <ListGroup.Item>
+                            <p className="mb-0">You got an invitation from <strong>{invitation.company?.name}</strong> to join their team as a &nbsp;<strong>{invitation.role?.name?.replace(/\b\w/g,
+                              function (char) {
+                                return char.toUpperCase();
+                              }
+                            )}
+                            </strong></p>
+                            <div className="ms-lg-auto mt-3 mt-lg-0">
+                              <Button onClick={() => rejectInvite(invitation._id)} className="me-2" variant="secondary">Decline</Button>
+                              <Button onClick={() => acceptInvite(invitation.inviteToken)} variant="primary">Accept</Button>
+                            </div>
+                          </ListGroup.Item>
                         </>
-                          )
+                      )
                     })
                   }
                 </ListGroup>
+              </Col>
+              <Col xl={8}>
                 <Card className="daily--star">
                   <div className="card--icon">
                     <div className="star--icon"><FaRegStar color="white" /></div>
@@ -455,7 +451,7 @@ function DashboardPage() {
 
                           {/* Likes / Comments */}
                           <div className="d-flex gap-3 text-muted mt-3 align-items-center">
-                            <span>
+                            <span className="icon--heart">
                               <BsHeart onClick={() => handleLike(post._id)} className="me-1" />{' '}
                               {post.likes?.length || 0}
                             </span>

@@ -1012,8 +1012,8 @@ const TaskList = ({ report }) => {
                           Reports
                           <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
                             <ListGroup horizontal>
-                              <ListGroup.Item action onClick={() => setActiveViewTab('members')} className={`${activeMemberTab === 'members'? 'd-lg-flex gap-2 active': 'd-lg-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
-                              <ListGroup.Item action onClick={() => setActiveViewTab('projects')} className={`${activeMemberTab === 'projects'? 'd-lg-flex gap-2 active': 'd-lg-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                              <ListGroup.Item action onClick={() => setActiveViewTab('members')} className={`${activeMemberTab === 'members'? 'd-lg-flex gap-2 active d-none': 'd-none d-lg-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
+                              <ListGroup.Item action onClick={() => setActiveViewTab('projects')} className={`${activeMemberTab === 'projects'? 'd-lg-flex gap-2 active d-none': 'd-none d-lg-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
                             </ListGroup>
                             {
                               filters['sort_by'] === 'members' ?
@@ -1145,6 +1145,10 @@ const TaskList = ({ report }) => {
                             </ListGroup>
                           </ListGroup>
                       </h2>
+                      <ListGroup horizontal>
+                        <ListGroup.Item action onClick={() => setActiveViewTab('members')} className={`${activeMemberTab === 'members'? 'd-lg-none d-flex gap-2 active': 'd-lg-none d-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
+                        <ListGroup.Item action onClick={() => setActiveViewTab('projects')} className={`${activeMemberTab === 'projects'? 'd-lg-none d-flex gap-2 active': 'd-lg-none d-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                      </ListGroup>
                   </Col>
               </Row>
           </Container>
@@ -1166,7 +1170,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">O</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>On Teams</span>
@@ -1176,14 +1180,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Total Hours: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Members: </strong> 2
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1191,7 +1195,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#2</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>2</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">O</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>On Teams</span>
@@ -1201,14 +1205,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Total Hours: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Members: </strong> 2
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1216,7 +1220,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#3</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>3</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">O</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>On Teams</span>
@@ -1226,14 +1230,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Total Hours: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Members: </strong> 2
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1253,7 +1257,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">GS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Gagandeep Singh</span>
@@ -1263,14 +1267,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1278,7 +1282,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">TG</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Tarun Giri</span>
@@ -1288,14 +1292,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1303,7 +1307,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">PS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Paramjeet Singh</span>
@@ -1313,14 +1317,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1328,7 +1332,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">AJ</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Abhishek Jaiswal</span>
@@ -1338,14 +1342,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1353,7 +1357,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">RS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Ritika Sharma</span>
@@ -1363,14 +1367,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1378,7 +1382,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">NC</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Nidhi Chandna</span>
@@ -1388,14 +1392,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1403,7 +1407,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">G</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Hitesh Kumar</span>
@@ -1413,14 +1417,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1428,7 +1432,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">RS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Ram Singh</span>
@@ -1438,14 +1442,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1453,7 +1457,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">GS</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Gaurav Sharma</span>
@@ -1463,14 +1467,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1478,7 +1482,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">ND</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Neha Dutt</span>
@@ -1488,14 +1492,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1503,7 +1507,7 @@ const TaskList = ({ report }) => {
                           <td>
                             <div className="d-flex justify-content-between">
                               <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>#1</abbr><MdDragIndicator /></div>
+                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                   <div className="title--initial">DE</div>
                                   <div className="title--span flex-column d-flex align-items-start gap-0">
                                       <span>Deepak</span>
@@ -1513,14 +1517,14 @@ const TaskList = ({ report }) => {
                             </div>
                           </td>
                           <td className="ms-xl-auto">
-                            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-center">
+                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                              <div className="text-left text-xl-center">
                                 <strong>Project Time: </strong> 4h 47m
                               </div>
-                              <div className="text-center">
+                              <div className="text-left text-xl-center">
                                 <strong>Projects: </strong> 4
                               </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
+                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
                             </div>
                           </td>
                         </tr>
@@ -1536,10 +1540,22 @@ const TaskList = ({ report }) => {
       <div className="details--projects--grid projects--grid common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
             <div className="projecttitle">
-              <h3>
-                  <strong>Gagandeep Singh</strong>
-                  <span>UI/UX Designer</span>
-              </h3>
+              <Dropdown>
+                <Dropdown.Toggle variant="link" id="dropdown-basic">
+                  <h3>
+                    <strong>Gagandeep Singh</strong>
+                    <span>UI/UX Designer</span>
+                  </h3>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <div className="drop--scroll">
+                        <Dropdown.Item>
+                          <strong>Gagandeep Singh</strong>
+                          <span>UI/UX Designer</span>
+                        </Dropdown.Item>
+                    </div>
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
             <ListGroup horizontal>
               <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
@@ -1549,7 +1565,7 @@ const TaskList = ({ report }) => {
         <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
             <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects (3)</h3>
-            <div class="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+            <div class="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
               <div class="text-center">
                   <div class="text-lg font-bold text--blue">113h 15m</div>
                   <div class="text-slate-600">Total Hours</div>
@@ -1601,10 +1617,7 @@ const TaskList = ({ report }) => {
                                 remarksActive === true ? 
                                 <>
                                   <Form.Group className="mb-0 form-group">
-                                    
-                                    <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
-                                      
-                                    </textarea>
+                                    <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}></textarea>
                                   </Form.Group>
                                   <Button variant="primary" onClick={() => {
                                     saveRemarks(report?.project?._id)
@@ -1689,10 +1702,7 @@ const TaskList = ({ report }) => {
                               remarksActive === true ? 
                               <>
                                 <Form.Group className="mb-0 form-group">
-                                  
-                                  <textarea class="form-control mt-4" rows={7} data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
-                                    
-                                  </textarea>
+                                  <textarea class="form-control mt-4" rows={7} data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}></textarea>
                                 </Form.Group>
                                 <Button variant="primary" onClick={() => {
                                   saveRemarks(report?.project?._id)
@@ -1729,7 +1739,7 @@ const TaskList = ({ report }) => {
         <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
             <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members (3)</h3>
-            <div class="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+            <div class="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
               <div class="text-center">
                   <div class="text-lg font-bold text--blue">113h 15m</div>
                   <div class="text-slate-600">Total Hours</div>
