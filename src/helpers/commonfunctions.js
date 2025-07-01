@@ -3,6 +3,9 @@ import { decryptJsonData } from "./auth";
 import CustomDropdown from "../Components/dropdowns/customdropdown";
 import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
+import { FiCheckCircle, FiClock, FiCoffee } from 'react-icons/fi';
+import { AiOutlineCloseCircle } from 'react-icons/ai';
+import { LuTimer } from 'react-icons/lu';
 
 const secretKey = process.env.REACT_APP_SECRET_KEY
 const roots = new Map();
@@ -399,3 +402,57 @@ export function mergePermissions(rolePerms = {}, memberPerms = {}) {
     return merged;
   }
   
+
+  export function convertYouTubeToEmbed(url) {
+  if (!url) return null;
+
+  try {
+    const parsedUrl = new URL(url);
+    let videoId = '';
+
+    // Standard YouTube link (e.g. https://www.youtube.com/watch?v=VIDEO_ID)
+    if (parsedUrl.hostname.includes('youtube.com')) {
+      if (parsedUrl.pathname === '/watch') {
+        videoId = parsedUrl.searchParams.get('v');
+      } else if (parsedUrl.pathname.startsWith('/embed/')) {
+        videoId = parsedUrl.pathname.split('/embed/')[1];
+      } else if (parsedUrl.pathname.startsWith('/shorts/')) {
+        videoId = parsedUrl.pathname.split('/shorts/')[1];
+      }
+    }
+
+    // Shortened link (e.g. https://youtu.be/VIDEO_ID)
+    if (parsedUrl.hostname === 'youtu.be') {
+      videoId = parsedUrl.pathname.slice(1); // remove leading slash
+    }
+
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    return null;
+  } catch (err) {
+    console.error('Invalid YouTube URL:', err);
+    return null;
+  }
+}
+
+export function getAttendanceBadges (status) {
+  switch (status) {
+    case 'Full Day':
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiCheckCircle className="text--green" /><span className="status--badge bg--green">Present</span></span>)
+      break;
+    case 'Absent':
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><AiOutlineCloseCircle className="text--red" /><span className="status--badge bg--red">Absent</span></span>)
+      break;
+    case 'Half Day':
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiClock className="text--blue"/><span className="status--badge bg--blue">Half Day</span></span>)
+      break;
+    case 'Short Leave':
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><LuTimer className="text--purple" /><span className="status--badge bg--purple">Short Leave (6h)</span></span>)
+      break;
+    default:
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiCoffee className="text--orange" /><span className="status--badge bg--orange">Short (2h)</span></span>)
+      break;
+  }
+}

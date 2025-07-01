@@ -12,7 +12,7 @@ export const  CustomFieldModal =  (props) => {
   const commonState = useSelector( state => state.common);
   const apiCustomfields = useSelector( state => state.customfields)
   useEffect(() => {
-    dispatch(fetchCustomFields({module: 'projects'}))
+    dispatch(fetchCustomFields({module: props.module}))
   }, [])
   const [showdialog, setShowDialog] = useState(false);
 

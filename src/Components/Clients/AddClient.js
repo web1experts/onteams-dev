@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { useToast } from "../../context/ToastContext";
-
+import { renderDynamicField } from "../common/dynamicFields";
 
 
 function AddClient(props) {
 
   const inputs = document.querySelectorAll('.form-floating .form-control');
-
+  const customFields = props.customFields
   inputs.forEach(input => {
     input.addEventListener('input', function () {
       if (this.value) {
@@ -165,7 +165,27 @@ const showError = (index, name) => {
                          
                         </div>
                      ))} 
-                        
+                      {/* {customFields.length > 0 &&
+                          <>
+                          <hr />
+                              <ListGroup>
+                                  <p className="m-0"> Other Fields</p>
+                              </ListGroup>
+                          
+                          {customFields.map((field, index) =>
+                              renderDynamicField({
+                              name: `custom_field[${field.name}]`,
+                              type: field.type,
+                              label: field.label,
+                              value: fields[`custom_field[${field.name}]`] || '',
+                              options: field?.options || [],
+                              onChange: (e) => handleChange(e, field.name),
+                              fieldId: `new-${field.name}-${index}`,
+                              range_options: field?.range_options || {}
+                              })
+                          )}
+                          </>
+                      }   */}
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>

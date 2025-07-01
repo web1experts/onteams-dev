@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Dropdown } from "react-bootstrap";
-import { FaEye, FaList, FaPlus, FaTrashAlt } from "react-icons/fa";
+import { FaEye, FaList, FaPlus, FaTrashAlt, FaCog } from "react-icons/fa";
 import { FiEdit, FiMail, FiPhone, FiSidebar } from "react-icons/fi";
 import { BsGrid, BsEye } from "react-icons/bs";
 import { TbArrowsSort } from "react-icons/tb";
@@ -14,8 +14,10 @@ import { getFieldRules, validateField } from '../../helpers/rules';
 import { jwtDecode } from "jwt-decode"
 import AddClient from "./AddClient";
 import { AlertDialog } from "../modals";
-import Spinner from 'react-bootstrap/Spinner';
+import { renderDynamicField } from "../common/dynamicFields";
+import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { currentMemberProfile } from "../../helpers/auth";
+import { CustomFieldModal } from "../modals/customFields";
 
 function EditableField({ field, label, value, onChange, isEditing, onEditClick, error }) {
   const inputRef = useRef(null);
@@ -94,6 +96,8 @@ function ClientsPage() {
   const [rows, setRows] = useState([{ name: '' }]);
   const [errors, setErrors] = useState([]);
   const [fieldserrors, setFieldErrors] = useState({ name: '' });
+  const [customFields, setCustomFields] = useState([]);
+  const apiCustomfields = useSelector( state => state.customfields)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isActive, setIsActive] = useState(false);
@@ -135,7 +139,8 @@ function ClientsPage() {
   const [editedClient, setEditedClient] = useState({});
   const [fields, setFields] = useState({ name: '' });
   const [avatarPreview, setAvatarPreview] = useState(null);
-
+  const [ showCustomFields, setShowCustomFields] = useState( false )
+  
 
   const [showSearch, setSearchShow] = useState(false);
   const handleSearchClose = () => setSearchShow(false);
@@ -192,6 +197,9 @@ function ClientsPage() {
     // }
   };
 
+  const toggleCustomFields = () => {
+    setShowCustomFields(prev => !prev);
+  }
 
   const deleteSuccess = useSelector(state => state.client.deletedClient);
 
@@ -222,8 +230,6 @@ function ClientsPage() {
     setClientFeed([])
     await dispatch(ListClients(currentPage, search))
     setSpinner(false)
-    // await dispatch(ListClients(currentPage, search));
-    // setShowloader(false)
   }
 
   useEffect(() => {
@@ -240,8 +246,7 @@ function ClientsPage() {
     let token = localStorage.getItem('accessToken')
     let DecodedToken = jwtDecode(token)
     setuserId(DecodedToken.aud)
-
-
+    dispatch(fetchCustomFields({module: 'clients'}))
   }, [])
 
   useEffect(() => {
@@ -249,9 +254,6 @@ function ClientsPage() {
     if (apiResult.success) {
       handleClose();
       setShowDialog(false)
-      //setTimeout(function () {
-      // handleListClients();
-      // }, 1000)
     }
 
     if (apiResult.success || apiResult.error) {
@@ -259,6 +261,27 @@ function ClientsPage() {
       
     }
   }, [apiResult])
+
+  useEffect(() => { 
+      if( apiCustomfields.customFields){
+        setCustomFields( apiCustomfields.customFields)
+      }
+  
+      if( apiCustomfields.newField){
+        setCustomFields((prevCustomFields) => [apiCustomfields.newField, ...prevCustomFields]);
+      }
+  
+        if (apiCustomfields.updatedField) {
+        setCustomFields((prevCustomFields) =>
+          prevCustomFields.map((field) =>
+            field._id === apiCustomfields.updatedField._id
+              ? apiCustomfields.updatedField
+              : field
+          )
+        );
+      }
+  
+  }, [apiCustomfields]);
 
   const handleChange = (index, event, fieldname = '') => {
     const { name, value, type, files } = event.target;
@@ -436,6 +459,7 @@ function ClientsPage() {
                     </ListGroup>
                   </ListGroup>
                   <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex bg-white expand--icon ms-3'}>
+                    <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
                       <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
                       {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                         <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
@@ -463,8 +487,15 @@ function ClientsPage() {
                                 Clients <span key="project-action-header" className="onHide">Actions</span>
                             </div>
                         </th>
-                        <th scope="col" key="project-status-header" className="onHide">Email <small><TbArrowsSort /></small></th>
-                        <th scope="col" key="project-status-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
+                        <th scope="col" key="client-email-header" className="onHide">Email <small><TbArrowsSort /></small></th>
+                        {Array.isArray(customFields) && customFields
+                            .filter(field => field?.showInTable !== false)
+                            .map((field, idx) => (
+                                <th scope="col" key={`client-${field.name || idx}-header`} className="onHide">
+                                {field.label}
+                                </th>
+                            ))
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -650,7 +681,7 @@ function ClientsPage() {
         />
       </div>
       }
-      {show && <AddClient show={show} toggleshow={setShow} /> }
+      {show && <AddClient show={show} toggleshow={setShow} customFields={customFields} /> }
       {/*--=-=Search Modal**/}
       <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
         <Modal.Header closeButton>
@@ -668,6 +699,7 @@ function ClientsPage() {
           </ListGroup>
         </Modal.Body>
       </Modal>
+      { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module='clients' />}
     </>
   );
 }

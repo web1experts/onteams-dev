@@ -15,6 +15,7 @@ import { LuQuote } from "react-icons/lu";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import DateTimeCard from "../common/DateTimeCard";
+import { convertYouTubeToEmbed } from "../../helpers/commonfunctions";
 dayjs.extend(relativeTime);
 function DashboardPage() {
   const dispatch = useDispatch()
@@ -417,7 +418,7 @@ function DashboardPage() {
                                 {post.videoType === 'youtube' && (
                                   <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
                                     <iframe
-                                      src={post.content}
+                                      src={convertYouTubeToEmbed(post.content)}
                                       title="YouTube Video"
                                       allowFullScreen
                                     ></iframe>

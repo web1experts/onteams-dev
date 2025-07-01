@@ -2,6 +2,7 @@ import {
     ATTENDANCE_ERROR,
     ATTENDANCE_LIST_SUCCESS,
     CLEAR_MESSAGES,
+    MEMBER_ATTENDANCE_SUCCESS
  } from "../actions/types";
 
 const initialState = {
@@ -18,6 +19,11 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 attendances: action.payload.attendanceData
+            }
+        case MEMBER_ATTENDANCE_SUCCESS: 
+            return {
+                ...state,
+                memberAttendance: action.payload.attendanceData
             }
         case ATTENDANCE_ERROR: 
             return {

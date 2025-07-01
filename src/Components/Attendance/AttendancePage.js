@@ -8,22 +8,39 @@ import { GrExpand } from "react-icons/gr";
 import { LuTimer } from "react-icons/lu";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
-import { formatDateinString, selectboxObserver } from "../../helpers/commonfunctions";
+import { formatDateinString, selectboxObserver, getAttendanceBadges } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { ListAttendance } from "../../redux/actions/attendance.action";
+import { ListAttendance,getAttendanceByMember } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import DatePicker from "react-multi-date-picker";
 import { currentMemberProfile } from "../../helpers/auth";
+
+function getMonthLabel(monthYear) {
+  const [mm, yyyy] = monthYear.split('/');
+  const date = new Date(Number(yyyy), Number(mm) - 1); // month is 0-based
+  const monthName = date.toLocaleString('default', { month: 'long' });
+  return `${monthName} ${yyyy}`;
+}
+
 function AttendancePage() {
+  const getCurrentMonthValue = () => {
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const yyyy = now.getFullYear();
+    return `${mm}/${yyyy}`;
+  };
+
+
   const dispatch = useDispatch()
   const memberProfile = currentMemberProfile()
   const attendanceFeed = useSelector(state => state.attendance.attendances)
   const apiResult = useSelector(state => state.attendance)
+  const [memberAttendance, setMemberAttendance] = useState([])
   const [ attendances, setAttendances] = useState([])
   const memberFeed = useSelector((state) => state.member.members)
   const [members, setMembers] = useState([])
-  const [isActive, setIsActive] = useState(false);
-  const [ filters, setFilters] = useState({member: memberProfile?._id});
+  const [isActive, setIsActive] = useState(0);
+  const [ filters, setFilters] = useState({month: getCurrentMonthValue()});
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -31,6 +48,17 @@ function AttendancePage() {
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const commonState = useSelector(state => state.common)
   const [activeTab, setActiveTab] = useState('team'); 
+
+const currentYear = new Date().getFullYear();
+
+const monthsArray = Array.from({ length: 12 }, (_, i) => {
+  const date = new Date(currentYear, i); // month index 0–11
+  const month = date.toLocaleString('default', { month: 'long' }); // e.g., "June"
+  const value = `${String(i + 1).padStart(2, '0')}/${currentYear}`; // mm/yyyy
+  const label = `${month} ${currentYear}`; // "June 2025"
+  return { label, value };
+});
+
 
   const handlefilterchange = (name, value) => {
     // if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
@@ -60,6 +88,13 @@ function AttendancePage() {
         setMembers(memberFeed.memberData);
     }
 }, [memberFeed, dispatch]);
+
+useEffect(() => {
+  if( apiResult.memberAttendance){
+    
+    setMemberAttendance(apiResult.memberAttendance)
+  }
+}, [apiResult])
 
   useEffect(() => {
     if (attendanceFeed) {
@@ -95,6 +130,11 @@ function AttendancePage() {
     });
   };
 
+  const handleMemberAttendance = async (memberID) => {
+    
+    dispatch(getAttendanceByMember(memberID, filters));
+  }
+
   return (
     <>
       <div className={ `${isActive === 1 ? 'show--details team--page project-collapse holidays--page' : isActive === 2 ? 'view--project team--page project-collapse holidays--page' :  'team--page holidays--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
@@ -107,29 +147,26 @@ function AttendancePage() {
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup.Item>
                       <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> June 2025</Dropdown.Toggle>
+                        <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
                         <Dropdown.Menu>
-                            <div class="drop--scroll">
-                              <a href="#" class="dropdown-item" role="button">January 2024</a>
-                              <a href="#" class="dropdown-item" role="button">February 2024</a>
-                              <a href="#" class="dropdown-item" role="button">March 2024</a>
-                              <a href="#" class="dropdown-item" role="button">April 2024</a>
-                              <a href="#" class="dropdown-item" role="button">May 2024</a>
-                              <a href="#" class="dropdown-item" role="button">June 2024</a>
-                              <a href="#" class="dropdown-item" role="button">July 2024</a>
-                              <a href="#" class="dropdown-item" role="button">August 2024</a>
-                              <a href="#" class="dropdown-item" role="button">September 2024</a>
-                              <a href="#" class="dropdown-item" role="button">October 2024</a>
-                              <a href="#" class="dropdown-item" role="button">November 2024</a>
-                              <a href="#" class="dropdown-item" role="button">December 2024</a>
-                              <a href="#" class="dropdown-item" role="button">January 2025</a>
-                              <a href="#" class="dropdown-item" role="button">February 2025</a>
-                              <a href="#" class="dropdown-item" role="button">March 2025</a>
-                              <a href="#" class="dropdown-item" role="button">April 2025</a>
-                              <a href="#" class="dropdown-item" role="button">May 2025</a>
-                              <a href="#" class="selected--option dropdown-item" role="button">June 2025 <MdOutlineCheck /></a>
-                            </div>
+                          <div className="drop--scroll">
+                            {monthsArray.map((month) => (
+                              <Dropdown.Item
+                                key={month.value}
+                                className={`dropdown-item ${filters.month === month.value ? 'selected--option' : ''}`}
+                                as="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setFilters((prev) => ({ ...prev, month: month.value }));
+                                }}
+                              >
+                                {month.label}
+                                {filters.month === month.value && <MdOutlineCheck />}
+                              </Dropdown.Item>
+                            ))}
+                          </div>
                         </Dropdown.Menu>
+
                     </Dropdown>
                     </ListGroup.Item>
                     <ListGroup horizontal className="d-none d-lg-flex">
@@ -1056,7 +1093,7 @@ function AttendancePage() {
               </div>
             )}
 
-            {activeTab === 'team' && (
+            {activeTab === 'team' && isActive === 0 && (
               <>
                 <div className="attendance--stats">
                   <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
@@ -1117,369 +1154,44 @@ function AttendancePage() {
                   <div className='attendance--table--list'>
                     <Table responsive="lg">
                       <tbody className="bg-white">
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">GS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Gagandeep Singh</span>
-                                      <strong>UI/UX Designer</strong>
+                        {attendances &&
+                        attendances.map((attendanceData, dateIndex) => (
+                            <tr>
+                              <td>
+                                <div className="d-flex justify-content-between">
+                                  <div className="project--name d-flex gap-3 align-items-center">
+                                      <div className="title--initial">{attendanceData?.name?.substring(0, 2)}</div>
+                                      <div className="title--span flex-column d-flex align-items-start gap-0">
+                                          <span>{attendanceData?.name}</span>
+                                          <strong>{attendanceData?.role}</strong>
+                                      </div>
                                   </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">TG</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Tarun Giri</span>
-                                      <strong>Project Manager</strong>
+                                </div>
+                              </td>
+                              <td className="ms-lg-auto">
+                                <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
+                                  <div className="text-center">
+                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">{attendanceData?.attendance?.present || 0} <small>Present</small></h4>
                                   </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">PS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Paramjeet Singh</span>
-                                      <strong>Managing Director</strong>
+                                  <div className="text-center">
+                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">{attendanceData?.attendance?.other || 0} <small>Short (2h)</small></h4>
                                   </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">AJ</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Abhishek Jaiswal</span>
-                                      <strong>Sr. Web Designer</strong>
+                                  <div className="text-center">
+                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">{attendanceData?.attendance?.short_leave || 0} <small>Short Leave (6h)</small></h4>
                                   </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">RS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Ritika Sharma</span>
-                                      <strong>Sr. Human Resources</strong>
+                                  <div className="text-center">
+                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">{attendanceData?.attendance?.half_day || 0} <small>Half Day</small></h4>
                                   </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">NC</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Nidhi Chandna</span>
-                                      <strong>Sr. Human Resources</strong>
+                                  <div className="text-center">
+                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">{attendanceData?.attendance?.absent || 0} <small>Absent</small></h4>
                                   </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">G</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Hitesh Kumar</span>
-                                      <strong>Software Engineer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">RS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Ram Singh</span>
-                                      <strong>Sr. Software Engineer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">GS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Gaurav Sharma</span>
-                                      <strong>Sr. Software Engineer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">ND</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Neha Dutt</span>
-                                      <strong>Sr. Business Developer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="title--initial">DE</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Deepak</span>
-                                      <strong>Office Assistant</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-lg-auto">
-                            <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">3 <small>Present</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">1 <small>Short (2h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">2 <small>Short Leave (6h)</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">1 <small>Half Day</small></h4>
-                              </div>
-                              <div className="text-center">
-                                <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">1 <small>Absent</small></h4>
-                              </div>
-                              <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {setIsActive(2);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
+                                  <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {handleMemberAttendance(attendanceData?._id);setIsActive(1)}}><FaEye/> Details</Button>
+                                </div>
+                              </td>
+                            </tr>
+                        ))
+                      }
+                        
                       </tbody>
                     </Table>
                   </div>
@@ -1490,86 +1202,84 @@ function AttendancePage() {
           </Container>
         </div>
       </div>
-      <div className="details--projects--grid projects--grid common--project--grid">
-        <div className="wrapper--title py-2 bg-white border-bottom">
-            <div className="projecttitle">
-              <Dropdown>
-                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                  <h3>
-                    <strong>Gagandeep Singh</strong>
-                    <span>UI/UX Designer</span>
-                  </h3>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    <div className="drop--scroll">
-                        <Dropdown.Item>
-                          <strong>Gagandeep Singh</strong>
-                          <span>UI/UX Designer</span>
-                        </Dropdown.Item>
-                    </div>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-            <ListGroup horizontal>
-                <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
-                <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
-            </ListGroup>
-        </div>
-        <div className="bg-white attendance--table">
-          <h3 class="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - June 2025</h3>
-          <div className="overflow-x-auto">
-              <Table responsive="lg">
-                <thead>
-                  <tr>
-                    <th className="px-3 text-capitalize py-3" scope="col">Date</th>
-                    <th className="px-3 text-capitalize py-3 text-center" scope="col">Time In</th>
-                    <th className="px-3 text-capitalize py-3 text-center" scope="col">Time Out</th>
-                    <th className="px-3 text-capitalize py-3 text-center" scope="col">Logged Time</th>
-                    <th className="px-3 text-capitalize py-3 text-center" scope="col">Manual Time</th>
-                    <th className="px-3 text-capitalize py-3 text-center" scope="col">Total Time</th>
-                    <th className="px-3 text-capitalize py-3 text-center" scope="col">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white">
-                  {attendances &&
-                    attendances.map((attendanceDate, dateIndex) => (
-                      attendanceDate.dailyAttendance.length === 0 ? (
-                        <tr key={dateIndex}>
-                          <td className="px-3 py-3"><strong>{formatDateinString(attendanceDate.date)}</strong></td>
-                          <td className="px-3 py-3 text-center">--</td>
-                          <td className="px-3 py-3 text-center">--</td>
-                          <td className="px-3 py-3 text-center">--</td>
-                          <td className="px-3 py-3 text-center">--</td>
-                          <td className="px-3 py-3 text-center">--</td>
-                          <td className="px-3 py-3 text-center">--</td>
-                        </tr>
-                      ) : (
-                        attendanceDate.dailyAttendance.map((attendance, attendanceIndex) => (
-                          <tr key={`${dateIndex}-${attendanceIndex}`}>
-                            <td className="px-3 py-3"><strong>{attendanceIndex === 0 ? formatDateinString(attendanceDate.date) : ''}</strong></td>
-                            <td className="px-3 py-3 text-center">{attendance.time_in}</td>
-                            <td className="px-3 py-3 text-center">{attendance.time_out}</td>
-                            <td className="px-3 py-3 text-center">{attendance.tracked_time}</td>
-                            <td className="px-3 py-3 text-center">{attendance.manual_time}</td>
-                            <td className="px-3 py-3 text-center"><strong className="text--blue">{attendance.total_time}</strong></td>
-                            <td className="px-3 py-3 text-center">
-                              <span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiCheckCircle className="text--green" /><span className="status--badge bg--green">Present</span></span>
-                              {/* <span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><LuTimer className="text--purple" /><span className="status--badge bg--purple">Short Leave (6h)</span></span>
-                              <span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiCoffee className="text--orange" /><span className="status--badge bg--orange">Short (2h)</span></span>
-                              <span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiClock className="text--blue"/><span className="status--badge bg--blue">Half Day</span></span>
-                              <span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><AiOutlineCloseCircle className="text--red" /><span className="status--badge bg--red">Absent</span></span> */}
-                              {/* {attendance.status} */}
-                            </td>
+      {isActive === 1 &&
+        <div className="details--projects--grid projects--grid common--project--grid">
+          <div className="wrapper--title py-2 bg-white border-bottom">
+              <div className="projecttitle">
+                <Dropdown>
+                  <Dropdown.Toggle variant="link" id="dropdown-basic">
+                    <h3>
+                      <strong>Gagandeep Singh</strong>
+                      <span>UI/UX Designer</span>
+                    </h3>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                      <div className="drop--scroll">
+                          <Dropdown.Item>
+                            <strong>Gagandeep Singh</strong>
+                            <span>UI/UX Designer</span>
+                          </Dropdown.Item>
+                      </div>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+              <ListGroup horizontal>
+                  <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+                  <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
+              </ListGroup>
+          </div>
+          <div className="bg-white attendance--table">
+            <h3 class="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - June 2025</h3>
+            <div className="overflow-x-auto">
+                <Table responsive="lg">
+                  <thead>
+                    <tr>
+                      <th className="px-3 text-capitalize py-3" scope="col">Date</th>
+                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Time In</th>
+                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Time Out</th>
+                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Logged Time</th>
+                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Manual Time</th>
+                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Total Time</th>
+                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white">
+                    {memberAttendance &&
+                      memberAttendance.map((attendanceDate, dateIndex) => (
+                        attendanceDate.dailyAttendance.length === 0 ? (
+                          <tr key={dateIndex}>
+                            <td className="px-3 py-3"><strong>{formatDateinString(attendanceDate.date)}</strong></td>
+                            <td className="px-3 py-3 text-center">--</td>
+                            <td className="px-3 py-3 text-center">--</td>
+                            <td className="px-3 py-3 text-center">--</td>
+                            <td className="px-3 py-3 text-center">--</td>
+                            <td className="px-3 py-3 text-center">--</td>
+                            <td className="px-3 py-3 text-center">--</td>
                           </tr>
-                        ))
-                      )
-                    ))
-                  }
-                </tbody>
-            </Table>
+                        ) : (
+                          attendanceDate.dailyAttendance.map((attendance, attendanceIndex) => (
+                            <tr key={`${dateIndex}-${attendanceIndex}`}>
+                              <td className="px-3 py-3"><strong>{attendanceIndex === 0 ? formatDateinString(attendanceDate.date) : ''}</strong></td>
+                              <td className="px-3 py-3 text-center">{attendance.time_in}</td>
+                              <td className="px-3 py-3 text-center">{attendance.time_out}</td>
+                              <td className="px-3 py-3 text-center">{attendance.tracked_time}</td>
+                              <td className="px-3 py-3 text-center">{attendance.manual_time}</td>
+                              <td className="px-3 py-3 text-center"><strong className="text--blue">{attendance.total_time}</strong></td>
+                              <td className="px-3 py-3 text-center">
+                                {getAttendanceBadges(attendance?.status)}
+                                
+                              </td>
+                            </tr>
+                          ))
+                        )
+                      ))
+                    }
+                  </tbody>
+              </Table>
+            </div>
           </div>
         </div>
-      </div>
+      }
       {/*--=-=Filter Modal**/}
       <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal">
         <Modal.Header closeButton>
