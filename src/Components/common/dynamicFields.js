@@ -57,6 +57,10 @@ export function renderDynamicField(config) {
         <Form.Control type={type} {...sharedProps} key={fieldId} />
       )}
 
+      {['phone'].includes(type) && (
+        <Form.Control type='text' {...sharedProps} key={fieldId} />
+      )}
+
       
       {/* Single Checkbox */}
       {type === 'checkbox' && (

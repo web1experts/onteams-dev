@@ -10,7 +10,7 @@ import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
 import { formatDateinString, selectboxObserver, getAttendanceBadges } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { ListAttendance,getAttendanceByMember } from "../../redux/actions/attendance.action";
+import { ListAttendance,getAttendanceByMember, getAttendanceSummary } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import DatePicker from "react-multi-date-picker";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -40,6 +40,7 @@ function AttendancePage() {
   const memberFeed = useSelector((state) => state.member.members)
   const [members, setMembers] = useState([])
   const [isActive, setIsActive] = useState(0);
+  const [attendanceSummary, setAttendanceSummary] = useState({})
   const [ filters, setFilters] = useState({month: getCurrentMonthValue()});
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
@@ -48,7 +49,7 @@ function AttendancePage() {
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const commonState = useSelector(state => state.common)
   const [activeTab, setActiveTab] = useState('team'); 
-
+  const [date, setDate] = useState(new Date());
 const currentYear = new Date().getFullYear();
 
 const monthsArray = Array.from({ length: 12 }, (_, i) => {
@@ -79,6 +80,10 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
     selectboxObserver()
   },[])
 
+  useEffect(() => { 
+    dispatch(getAttendanceSummary({date}))
+  },[date])
+
   useEffect(() => {
     handleAttendanceList()
   },[filters])
@@ -91,8 +96,11 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
 
 useEffect(() => {
   if( apiResult.memberAttendance){
-    
     setMemberAttendance(apiResult.memberAttendance)
+  }
+
+  if( apiResult.attendanceSummary){
+    setAttendanceSummary(apiResult.attendanceSummary)
   }
 }, [apiResult])
 
@@ -104,7 +112,7 @@ useEffect(() => {
 
   const [projectToggle, setProjectToggle ] = useState(false)
   const handleToggles = () => {
-      if(commonState.sidebar_small === false ){ console.log('1')
+      if(commonState.sidebar_small === false ){ 
           handleSidebarSmall()
       }else{
           setProjectToggle(false)
@@ -113,7 +121,7 @@ useEffect(() => {
       }
   }
 
-  const [date, setDate] = useState(new Date('2025-06-25'));
+  
 
   const changeDate = (days) => {
     const newDate = new Date(date);
@@ -1098,7 +1106,7 @@ useEffect(() => {
                 <div className="attendance--stats">
                   <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
                     <h3 class="d-flex align-items-center gap-3 mb-0">
-                      <span><AiOutlineTeam /></span>Team Daily Totals - June 2025
+                      
                     </h3>
                     <Col md="auto" className="d-flex align-items-center change--date mt-2 mt-md-0">
                       <Button variant="light" className="me-2 shadow-sm" onClick={() => changeDate(-1)}>
@@ -1118,31 +1126,31 @@ useEffect(() => {
                     <Col className="card--stack">
                       <Card className="card--green">
                         <Card.Body>
-                          <Card.Title><span>Present</span>10</Card.Title>
+                          <Card.Title><span>Present</span>{attendanceSummary?.present}</Card.Title>
                           <Card.Text><FiCheckCircle /></Card.Text>
                         </Card.Body>
                       </Card>
                       <Card className="card--red">
                         <Card.Body>
-                          <Card.Title><span>Absent</span>2</Card.Title>
+                          <Card.Title><span>Absent</span>{attendanceSummary?.absent}</Card.Title>
                           <Card.Text><AiOutlineCloseCircle /></Card.Text>
                         </Card.Body>
                       </Card>
                       <Card className="card--orange">
                         <Card.Body>
-                          <Card.Title><span>Short (2h)</span>2</Card.Title>
+                          <Card.Title><span>Short (2h)</span>{attendanceSummary?.other}</Card.Title>
                           <Card.Text><FiCoffee /></Card.Text>
                         </Card.Body>
                       </Card>
                       <Card className="card--blue">
                         <Card.Body>
-                          <Card.Title><span>Half Day</span>5</Card.Title>
+                          <Card.Title><span>Half Day</span>{attendanceSummary?.half_day}</Card.Title>
                           <Card.Text><FiClock /></Card.Text>
                         </Card.Body>
                       </Card>
                       <Card className="card--purple">
                         <Card.Body>
-                          <Card.Title><span>Short Leave (6h)</span>2</Card.Title>
+                          <Card.Title><span>Short Leave (6h)</span>{attendanceSummary?.short_leave}</Card.Title>
                           <Card.Text><LuTimer /></Card.Text>
                         </Card.Body>
                       </Card>

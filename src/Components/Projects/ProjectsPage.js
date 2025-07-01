@@ -495,7 +495,7 @@ function ProjectsPage() {
             setCurrentPage({})
         }
 
-        if (apiResult?.success === true) {
+        if (apiResult?.success === true && !apiResult.updatedProject) {
             setIsDescEditor(false)
             setFields({ title: '', status: 'in-progress', members: [] })
             handleClose()
@@ -511,7 +511,7 @@ function ProjectsPage() {
             }
         });
 
-        if( apiResult.success === 'success' && apiResult.updatedProject){
+        if( apiResult.success === true && apiResult.updatedProject){
             // if( apiResult.updatedProject?.status !== currentProject?.status || isNotPresent){ console.log('here now')
             //     handleListProjects()
             // }else{

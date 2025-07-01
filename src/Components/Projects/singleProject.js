@@ -156,9 +156,9 @@ function SingleProject(props) {
                 fieldsSetup.members = [];
             }
 
-            if( currentProject.customFields && currentProject.customFields.length > 0){ 
-                currentProject.customFields.forEach(field => {
-                    fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value
+            if (currentProject.customFields && Object.keys(currentProject.customFields).length > 0) {
+                Object.values(currentProject.customFields).forEach(field => {
+                    fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
                 });
             }else{
                 projectCustomFields.forEach(field => {
