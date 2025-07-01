@@ -84,7 +84,7 @@ export function renderDynamicField(config) {
 
       {/* Select */}
       {(type === 'select' || type === 'dropdown' || type === 'badge') && (
-        <Form.Select {...sharedProps} key={fieldId}>
+        <Form.Select {...sharedProps} key={fieldId} className='custom-selectbox'>
           <option value="">-- Select --</option>
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>

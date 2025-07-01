@@ -794,15 +794,14 @@ function ProjectsPage() {
                                             <th scope="col" key="project-start-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
                                             <th scope="col" key="project-end-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
                                             <th scope="col" key="project-due-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
-                                            {/* {Array.isArray(customFields) && customFields
+                                            {Array.isArray(customFields) && customFields
                                                 .filter(field => field?.showInTable !== false)
                                                 .map((field, idx) => (
                                                     <th scope="col" key={`project-${field.name || idx}-header`} className="onHide">
                                                     {field.label}
                                                     </th>
                                                 ))
-                                            } */}
-
+                                            }
                                         </tr>
                                     </thead>
                                     <Droppable droppableId={`droppable-project-table`} type="PROJECTS" direction={isActiveView === 1 ? "horizontal" : "vertical"}>
@@ -912,6 +911,36 @@ function ProjectsPage() {
                                                                                     </div>
                                                                                 </div>
                                                                             </td>
+                                                                            {Array.isArray(customFields) && customFields
+                                                                            .filter(field => field?.showInTable !== false)
+                                                                            .map((field, idx) => {
+                                                                                const fieldname = field.name;
+                                                                                let mvalue = project?.customFields?.[fieldname]?.meta_value;
+                                                                                if (field.type === 'badge' && Array.isArray(field.options)) {
+                                                                                    const matchedOption = field.options.find(opt => opt.value === mvalue);
+                                                                                    if (matchedOption) {
+                                                                                    mvalue = (
+                                                                                        <span
+                                                                                        style={{
+                                                                                            backgroundColor: matchedOption.color,
+                                                                                            padding: '4px 8px',
+                                                                                            borderRadius: '8px',
+                                                                                            color: '#fff',
+                                                                                            display: 'inline-block'
+                                                                                        }}
+                                                                                        >
+                                                                                        {project?.customFields?.[fieldname]?.meta_value}
+                                                                                        </span>
+                                                                                    );
+                                                                                    }
+                                                                                }
+                                                                                return (
+                                                                                    <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide">
+                                                                                        {mvalue}
+                                                                                    </td>
+                                                                                );
+                                                                            })}
+
                                                                         </tr>
                                                                     )}
                                                                 </Draggable>
@@ -1092,13 +1121,13 @@ function ProjectsPage() {
                         <Button variant="secondary" className="btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>Details</Button>
                         <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
                     </ListGroup>
-                    {/* <ListGroup>
+                    <ListGroup>
                         {
                         (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
                             <ListGroup.Item className="d-lg-flex me-2" key={`work-settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
                         )
                         }
-                    </ListGroup> */}
+                    </ListGroup>
                     <ListGroup horizontal className="bg-white expand--icon gap-2 p-0 b-0 rounded-0 align-items-center">
                         <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
                         <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>

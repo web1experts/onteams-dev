@@ -37,6 +37,8 @@ function HolidaysPage() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [spinner, setSpinner] = useState(false)
+  const [nextHoliday, setNextHoliday] = useState(null);
+  const [currentMonthHolidayCount, setCurrentMonthHolidayCount] = useState(0);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true)
@@ -86,7 +88,34 @@ const handleListHolidays = async () => {
 
 useEffect(() => {
   if (holidaysFeed && holidaysFeed.length > 0) {
-      setHolidays(holidaysFeed)
+    const today = new Date();
+    let nextHoliday = null;
+    let minDiff = Infinity;
+    let currentMonthCount = 0;
+
+    holidaysFeed.forEach(holiday => {
+      const holidayDate = new Date(holiday.date);
+
+      // Count holidays in the current month and year
+      if (
+        holidayDate.getMonth() === today.getMonth() &&
+        holidayDate.getFullYear() === today.getFullYear()
+      ) {
+        currentMonthCount++;
+      }
+
+      // Check for next upcoming holiday
+      const diffInTime = holidayDate.getTime() - today.getTime();
+      const diffInDays = Math.ceil(diffInTime / (1000 * 60 * 60 * 24));
+
+      if (diffInDays >= 0 && diffInDays < minDiff) {
+        minDiff = diffInDays;
+        nextHoliday = holiday.occasion;
+      }
+    });
+    setNextHoliday(nextHoliday); 
+    setCurrentMonthHolidayCount(currentMonthCount); 
+    setHolidays(holidaysFeed)
   }
 }, [holidaysFeed])
 
@@ -149,7 +178,7 @@ const getDaysLeft = (date) => {
   const today = dayjs();
   const target = dayjs(date);
   const diff = target.diff(today, 'day');
-  return diff >= 0 ? `${diff} days left` : '';
+  return diff >= 0 ? `${diff} days left` : 'Past Holiday';
 };
 
   return (
@@ -209,7 +238,7 @@ const getDaysLeft = (date) => {
               <Col lg={4}>
                 <Card className="card--blue">
                   <Card.Body>
-                    <Card.Title><span>Next Holiday</span>Independence Day</Card.Title>
+                    <Card.Title><span>Next Holiday</span>{nextHoliday}</Card.Title>
                     <Card.Text><FiCalendar /></Card.Text>
                   </Card.Body>
                 </Card>
@@ -217,7 +246,7 @@ const getDaysLeft = (date) => {
               <Col lg={4}>
                 <Card className="card--pink">
                   <Card.Body>
-                    <Card.Title><span>This Month</span>1</Card.Title>
+                    <Card.Title><span>This Month</span>{currentMonthHolidayCount}</Card.Title>
                     <Card.Text><HiOutlineLocationMarker /></Card.Text>
                   </Card.Body>
                 </Card>
@@ -225,7 +254,7 @@ const getDaysLeft = (date) => {
               <Col lg={4}>
                 <Card className="card--green">
                   <Card.Body>
-                    <Card.Title><span>Total Holidays</span>19</Card.Title>
+                    <Card.Title><span>Total Holidays</span>{holidays?.length}</Card.Title>
                     <Card.Text><FiGift /></Card.Text>
                   </Card.Body>
                 </Card>

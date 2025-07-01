@@ -524,6 +524,7 @@ body {
   z-index: 1;
   max-width: 520px;
   border-right: 0;
+  min-width: 420px;
 }
 
 .page--wrapper .draggable--table td.project--title--td {
@@ -647,6 +648,9 @@ body {
 
 .table {
   margin-bottom: 0;
+}
+.form-control-color {
+    padding: .375rem !important;
 }
 
 .page--wrapper table td.project--title--td span,

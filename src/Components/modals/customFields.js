@@ -110,6 +110,7 @@ const typeColorMap = {
   const [fieldName, setFieldName] = useState('');
   const [options, setOptions] = useState([]);
   const [newOption, setNewOption] = useState('');
+  const [badgeColor, setBadgeColor] = useState('#28a745')
   const [errors, setErrors] = useState({});
   const [customFields, setCustomFields] = useState([]);
   const [includeColumn, setIncludeColumn] = useState(false)
@@ -220,6 +221,7 @@ const typeColorMap = {
       // setShowAddedFields(true);
       setFields({name: '', type: '', showInTable: false, options: []})
       setNewOption('');
+      setBadgeColor('#28a745')
       setIsEditing( false );
       setSelectedField( {} )
     } catch (err) {
@@ -260,6 +262,7 @@ const typeColorMap = {
       // setFieldType('');
       setOptions([]);
       setNewOption('');
+      setBadgeColor('#28a745')
     } catch (err) {
       console.error('Failed to add custom field:', err);
     }
@@ -302,7 +305,9 @@ const typeColorMap = {
         .replace(/[^a-z0-9\-]/g, ''); // remove special characters
 
       const newFieldOption = { label, value };
-
+      if(fields?.type === 'badge'){
+        newFieldOption['color'] = badgeColor
+      }
       setFields({
         ...fields,
         options: [...(fields.options || []), newFieldOption]
@@ -447,6 +452,17 @@ const typeColorMap = {
                           value={newOption}
                           onChange={(e) => setNewOption(e.target.value)}
                         />
+                         {fields?.type === 'badge' &&
+                            <>
+                              <Form.Control
+                                type="color"
+                                placeholder="#000DDD"
+                                value={badgeColor}
+                                onChange={(e) => setBadgeColor(e.target.value)}
+                              />
+                              <p className='selected-badge-color'>Selected Color: <span style={{ badgeColor }}>{badgeColor}</span></p>
+                            </>
+                         }
                         <Button type="button" onClick={handleAddOption} style={{ marginLeft: '10px' }}>Add</Button>
                       </div>
                       {errors.options && <div className="text-danger mt-1">{errors.options}</div>}
