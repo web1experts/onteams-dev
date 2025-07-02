@@ -49,7 +49,9 @@ function AttendancePage() {
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const commonState = useSelector(state => state.common)
   const [activeTab, setActiveTab] = useState('team'); 
-  const [date, setDate] = useState(new Date());
+  const yDate = new Date();
+  yDate.setDate(yDate.getDate() - 1);
+  const [date, setDate] = useState(yDate);
 const currentYear = new Date().getFullYear();
 
 const monthsArray = Array.from({ length: 12 }, (_, i) => {
@@ -1223,10 +1225,15 @@ useEffect(() => {
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                       <div className="drop--scroll">
-                          <Dropdown.Item>
-                            <strong>Gagandeep Singh</strong>
-                            <span>UI/UX Designer</span>
-                          </Dropdown.Item>
+                          {members.map((member, index) => {
+                              return (<>
+                                  <Dropdown.Item value={member._id} onClick={() => { handleMemberAttendance(member._id) }}>
+                                      <strong>{member.name}</strong>
+                                      {/* <span>{project.client?.name || <span className='text-muted'>__</span>}</span> */}
+                                  </Dropdown.Item>
+                              </>
+                              )
+                          })}
                       </div>
                   </Dropdown.Menu>
                 </Dropdown>
