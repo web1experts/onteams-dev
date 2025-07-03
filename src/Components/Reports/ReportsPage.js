@@ -202,7 +202,7 @@ const handleReportClose = () => setViewReport(false);
             <p className="mb-0">
               <FaAngleRight /> {taskData.title}
             </p>
-            <strong>{taskData.duration}</strong>
+            {/* <strong>{taskData.duration}</strong> */}
             {/* {
               gettaskTab(task.tab)
             } */}

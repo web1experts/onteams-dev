@@ -222,13 +222,13 @@ strong.activity-type-text {
 
 .btn-outline-primary:hover, .btn-outline-primary.focus, .btn-outline-primary:focus, .btn-check:checked+.btn, .btn.active, .btn.show, :not(.btn-check)+.btn:active {
   color: rgb(15 23 42);
-  background-color: rgb(226 232 240);
+  background-color: transparent;
   border-color: transparent;
   box-shadow: none
 }
 
 .btn:focus-visible {
-  background-color: rgb(226 232 240);
+  background-color: transparent;
   color: rgb(15 23 42);
   border-color: transparent;
 }
