@@ -1054,29 +1054,12 @@ const handleToggles = () => {
                           Reports
                           <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
                             <ListGroup horizontal>
-                              <ListGroup.Item action onClick={() => setActiveViewTab('members')} className={`${activeMemberTab === 'members'? 'd-lg-flex gap-2 active d-none': 'd-none d-lg-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
-                              <ListGroup.Item action onClick={() => setActiveViewTab('projects')} className={`${activeMemberTab === 'projects'? 'd-lg-flex gap-2 active d-none': 'd-none d-lg-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                              <ListGroup.Item action onClick={() => {setFilters({...filters, ['sort_by']:'members'});setActiveViewTab('members')}} className={`${activeMemberTab === 'members'? 'd-lg-flex gap-2 active d-none': 'd-none d-lg-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
+                              <ListGroup.Item action onClick={() => {setFilters({...filters, ['sort_by']:'projects'});setActiveViewTab('projects')}} className={`${activeMemberTab === 'projects'? 'd-lg-flex gap-2 active d-none': 'd-none d-lg-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
                             </ListGroup>
                             {
-                              filters['sort_by'] === 'members' ?
-                                <ListGroup.Item className="d-none d-xl-block">
-                                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || memberdata?._id}>
-                                    <option value={memberdata?._id}>My Reports</option>
-                                    {
-                                      (memberProfile?.permissions?.reports?.view_others === true && memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') &&
-                                      <>
-                                      {
-                                        members.map((member, index) => 
-                                          (memberProfile?.permissions?.reports?.selected_members?.includes(member._id)  || memberProfile?.role?.slug === 'owner') ? (
-                                            <option key={`member-${index}`} value={member._id}>{member.name}</option>
-                                          ) : null
-                                        )
-                                      }
-                                      </>
-                                    }
-                                  </Form.Select>
-                                </ListGroup.Item>
-                              :
+                              filters['sort_by'] === 'projects' &&
+                                
                               <>
                                 <ListGroup.Item key="status-filter-list">
                                   <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project_status', event.target.value)} value={filters['project_status'] || 'in-progress'}>
@@ -1101,73 +1084,78 @@ const handleToggles = () => {
                                 </ListGroup.Item>
                                 {
                               view === 'group' ? 
-                              <ListGroup.Item className="d-none d-xl-block">
-                              <Form>
-                                <Form.Group className="mb-0 form-group">
-                                <DatePicker 
-                                  ref={datePickerRef}
-                                  key={'date-filter'}
-                                  name="date"
-                                  weekStartDayIndex={1}
-                                  id='datepicker-filter'
-                                  value={filtereddate} 
-                                  format="YYYY-MM-DD"
-                                  range
-                                  numberOfMonths={2}
-                                  dateSeparator=" - " 
-                                  onChange={async (value) => {
-                                      setFilteredDate(value)
-                                    }
-                                  } 
-                                  editable={false}         
-                                  className="form-control"
-                                  placeholder="dd/mm/yyyy"
-                                  open={isPickerOpen} // Control visibility with state
-                                  onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                                  onClose={() => setIsPickerOpen(false)} // Update state when closed
-                                  plugins={
-                                    [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
-                                  } 
-                              />
-                                </Form.Group>
-                              </Form>
-                            </ListGroup.Item>
+                              <></>
+                            //   <ListGroup.Item className="d-none d-xl-block">
+                            //   <Form>
+                            //     <Form.Group className="mb-0 form-group">
+                            //     <DatePicker 
+                            //       ref={datePickerRef}
+                            //       key={'date-filter'}
+                            //       name="date"
+                            //       weekStartDayIndex={1}
+                            //       id='datepicker-filter'
+                            //       value={filtereddate} 
+                            //       format="YYYY-MM-DD"
+                            //       range
+                            //       numberOfMonths={2}
+                            //       dateSeparator=" - " 
+                            //       onChange={async (value) => {
+                            //           setFilteredDate(value)
+                            //         }
+                            //       } 
+                            //       editable={false}         
+                            //       className="form-control"
+                            //       placeholder="dd/mm/yyyy"
+                            //       open={isPickerOpen} // Control visibility with state
+                            //       onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                            //       onClose={() => setIsPickerOpen(false)} // Update state when closed
+                            //       plugins={
+                            //         [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
+                            //       } 
+                            //   />
+                            //     </Form.Group>
+                            //   </Form>
+                            // </ListGroup.Item>
                             :
-                              <ListGroup.Item className="d-none d-xl-block">
-                                <Form>
-                                  <Form.Group className="mb-0 form-group">
-                                    <DatePicker 
-                                      ref={datePickerRef}
-                                      key={'date-filter'}
-                                      name="date"
-                                      weekStartDayIndex={1}
-                                      id='datepicker-filter'
-                                      editable={false}
-                                      value={filtereddate} 
-                                      format="YYYY-MM-DD"
-                                      dateSeparator=" - " 
-                                      onChange={async (value) => {
-                                          setFilteredDate(value)
-                                          datePickerRef.current.closeCalendar()
-                                          datePickerRef.current.openCalendar()
-                                        }
-                                      }          
-                                      className="form-control"
-                                      placeholder="dd/mm/yyyy"
-                                      open={isPickerOpen} // Control visibility with state
-                                      onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                                      onClose={() => setIsPickerOpen(false)} // Update state when closed
-                                      plugins={
-                                        [<FilterButton position="bottom" />]
-                                      } 
-                                      range={false}
-                                      multiple={false}
-                                    />
-                                  </Form.Group>
-                                </Form>
-                              </ListGroup.Item>
+                            <></>
+                              // <ListGroup.Item className="d-none d-xl-block">
+                              //   <Form>
+                              //     <Form.Group className="mb-0 form-group">
+                              //       <DatePicker 
+                              //         ref={datePickerRef}
+                              //         key={'date-filter'}
+                              //         name="date"
+                              //         weekStartDayIndex={1}
+                              //         id='datepicker-filter'
+                              //         editable={false}
+                              //         value={filtereddate} 
+                              //         format="YYYY-MM-DD"
+                              //         dateSeparator=" - " 
+                              //         onChange={async (value) => {
+                              //             setFilteredDate(value)
+                              //             datePickerRef.current.closeCalendar()
+                              //             datePickerRef.current.openCalendar()
+                              //           }
+                              //         }          
+                              //         className="form-control"
+                              //         placeholder="dd/mm/yyyy"
+                              //         open={isPickerOpen} // Control visibility with state
+                              //         onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                              //         onClose={() => setIsPickerOpen(false)} // Update state when closed
+                              //         plugins={
+                              //           [<FilterButton position="bottom" />]
+                              //         } 
+                              //         range={false}
+                              //         multiple={false}
+                              //       />
+                              //     </Form.Group>
+                              //   </Form>
+                              // </ListGroup.Item>
                               }
-                              { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                              
+                              </>
+                            }
+                            { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                                 <Dropdown className="select--dropdown">
                                   <Dropdown.Toggle variant="success" id="dropdown-basic">Manual Time</Dropdown.Toggle>
                                   <Dropdown.Menu>
@@ -1180,8 +1168,6 @@ const handleToggles = () => {
                                   </Dropdown.Menu>
                                 </Dropdown>
                               )}
-                              </>
-                            }
                             <ListGroup horizontal className="bg-white expand--icon ms-3">
                                 <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                             </ListGroup>
