@@ -497,13 +497,19 @@ body {
   font-weight: 400;
 }
 
-.page--wrapper .draggable--table thead,
-.page--wrapper .draggable--table tbody {
+.page--wrapper .draggable--table thead, .page--wrapper .draggable--table tbody {
   width: 100%;
 }
 
-.page--wrapper .draggable--table th,
-.page--wrapper .draggable--table td {
+.page--wrapper .draggable--table thead {
+    position: sticky;
+    position: -webkit-sticky;
+    top: -3px;
+    z-index: 2;
+    background: linear-gradient(to right, #f8fafc, #f1f5f9);
+}
+
+.page--wrapper .draggable--table th, .page--wrapper .draggable--table td {
   border: 0;
   padding: 1rem;
   border-right: 1px solid rgb(226 232 240);
@@ -512,10 +518,10 @@ body {
 
 .page--wrapper .draggable--table th {
   min-width: 170px;
+  white-space: nowrap;
 }
 
-.page--wrapper .draggable--table th:first-child,
-.page--wrapper .draggable--table td:first-child {
+.page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
   width: 520px;
   position: sticky;
   position: -webkit-sticky;
@@ -562,16 +568,17 @@ body {
 
 .page--wrapper .draggable--table td.member--circles {
   min-height: 0;
+  min-width: 240px;
 }
 
 .page--wrapper table td {
   font-weight: 500;
 }
 
-.page--wrapper table th abbr,
-.page--wrapper table td abbr {
+.page--wrapper table th abbr, .page--wrapper table td abbr {
   width: auto;
   height: auto;
+  min-width: 30px;
   padding: .25rem .5rem;
   background: rgb(241 245 249);
   color: rgb(100 116 139);
@@ -695,6 +702,7 @@ body {
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   border-radius: 1rem;
+  height: calc(100dvh - 140px);
   /* border: 1px solid rgb(226 232 240); */
 }
 
@@ -3507,11 +3515,6 @@ pre {
   transform: translate(0, 0);
 }
 
-.timeSheetModal .modal-content {
-  height: 100%;
-  border-radius: 0;
-}
-
 .timeSheetModal .card-group {
   background: #ffffff;
   padding: 0;
@@ -5684,6 +5687,14 @@ ul#icon-tabs .nav-link span svg {
   margin-bottom: 2rem;
 }
 
+.activity--table--list, .members--view, .projects--view {
+  box-shadow: none;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+}
+
 .attendance--stats .change--date .btn {
     padding: 0;
     width: 40px;
@@ -5809,7 +5820,7 @@ ul#icon-tabs .nav-link span svg {
   transition-duration: .3s;
   transition-property: all;
   transition-timing-function: cubic-bezier(.4, 0, .2, 1);
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   background-image: linear-gradient(to right, #f8fafc, #eff6ff);
   border-color: rgb(226 232 240);
   border-width: 1px;
@@ -5825,6 +5836,15 @@ ul#icon-tabs .nav-link span svg {
 .attendance--table--list table tr td {
   border: 0;
   background: none;
+}
+
+.activity--table--list table tr, .members--view table tr, .projects--view table tr {
+  background: #fff;
+  border-color: rgb(226 232 240);
+}
+
+.activity--table--list table tr:hover, .members--view table tr:hover, .projects--view table tr:hover {
+  background: linear-gradient(to right, #f8fafc, #eff6ff);
 }
 
 .page--wrapper .attendance--table--list table td .title--initial {
