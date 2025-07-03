@@ -267,7 +267,7 @@ const handleReportClose = () => setViewReport(false);
                           ((currentVideoPage[`single-${report?.project?._id}`] || 1) - 1) * videosPerPage,
                           (currentVideoPage[`single-${report?.project?._id}`] || 1) * videosPerPage
                         )
-                        .map((videoData, j) => {
+                        .map((videoData, j) => { console.log(`${videoData.task} !== ${taskId}`)
                           if(videoData.task !== taskId){return null}else{
                                 const currentIdx = idx;
                                 idx++;
@@ -1069,19 +1069,7 @@ const handleToggles = () => {
                                       <option value="completed">Completed</option>
                                   </Form.Select>
                                 </ListGroup.Item>
-                                <ListGroup.Item className="d-none d-xl-block">
-                                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('project', event.target.value)} value={filters['project'] || ''}>
-                                  {projects
-                                    .filter(project =>
-                                      filters['project_status'] === 'all' || project.status === filters['project_status']
-                                    )
-                                    .map((project, index) => (
-                                      <option key={`project-${index}`} value={project._id}>
-                                        {project.title}
-                                      </option>
-                                    ))}
-                                  </Form.Select>
-                                </ListGroup.Item>
+                                
                                 {
                               view === 'group' ? 
                               <></>
@@ -1194,81 +1182,41 @@ const handleToggles = () => {
                 <div className='attendance--table--list'>
                     <Table>
                       <tbody className="bg-white">
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">O</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>On Teams</span>
-                                      <strong>Layout Design changes</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Total Hours: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Members: </strong> 2
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>2</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">O</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>On Teams</span>
-                                      <strong>Layout Design changes</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Total Hours: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Members: </strong> 2
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>3</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">O</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>On Teams</span>
-                                      <strong>Layout Design changes</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Total Hours: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Members: </strong> 2
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
+                        {
+                          (projectReports?.reports && projectReports?.reports?.length > 0) && (
+                            projectReports?.reports?.map((reportData, i) => {
+                              return (
+                                <tr>
+                                  <td>
+                                    <div className="d-flex justify-content-between">
+                                      <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                          <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
+                                          <div className="title--initial">{reportData?.title?.substring(0,2)}</div>
+                                          <div className="title--span flex-column d-flex align-items-start gap-0">
+                                              <span>{reportData?.title}</span>
+                                              <strong>{reportData?.client?.name}</strong>
+                                          </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="ms-xl-auto">
+                                    <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                                      {/* <div className="text-left text-xl-center">
+                                        <strong>Total Hours: </strong> 4h 47m
+                                      </div> */}
+                                      <div className="text-left text-xl-center">
+                                        <strong>Members: </strong> {reportData?.members?.length || 0}
+                                      </div>
+                                      <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(reportData);setIsActive(1);}}><FaEye/> Details</Button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )
+                            })
+                          )
+                        }
+                        
+                        
                       </tbody>
                     </Table>
                 </div>
@@ -1353,200 +1301,134 @@ const handleToggles = () => {
             </ListGroup>
         </div>
         {
-          (isActive === 1) && (
+          (isActive === 1 && activeMemberTab === 'members') ?
         
-        <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
-          <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
-            <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects ({singleMemberReport?.reports?.length || 0})</h3>
-            <div class="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
-              <div class="text-center">
-                  <div class="text-lg font-bold text--blue">{getProjectSummary(singleMemberReport?.reports, 'time')}</div>
-                  <div class="text-slate-600">Total Hours</div>
-              </div>
-              <div class="text-center">
-                  <div class="text-lg font-bold text--green">{singleMemberReport?.reports?.length || 0}</div>
-                  <div class="text-slate-600">Projects</div>
+          <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
+            <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
+              <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects ({singleMemberReport?.reports?.length || 0})</h3>
+              <div class="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+                <div class="text-center">
+                    <div class="text-lg font-bold text--blue">{getProjectSummary(singleMemberReport?.reports, 'time')}</div>
+                    <div class="text-slate-600">Total Hours</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-bold text--green">{singleMemberReport?.reports?.length || 0}</div>
+                    <div class="text-slate-600">Projects</div>
+                </div>
               </div>
             </div>
+            
+            {
+            
+            
+            singleMemberReport?.reports?.map((report, index) => {
+              return (
+                      <>
+                      <div className="single--project--stack">
+                        <div eventKey={`single-member-accord-item-${singleMemberReport?.member?._id}`} key={`single-member-accord-item-${singleMemberReport?.member?._id}`} onClick={() => {setSelectedReport(report)}}>
+                          <div className="d-flex align-items-center justify-content-between gap-4">
+                            <h4 className="font-bold text-slate-800 text-lg mb-2">{report?.project?.name} 
+                              <span>{report?.project?.client?.name}</span>
+                              </h4>
+                            <Badge bg="warning">{report?.project?.status}</Badge>
+                          </div>
+                          <Row>
+                            <Col sm={12}>
+                          <div className="report--info">
+                            <p className="p--card">
+                              <label>Tracked Time</label>
+                              <p>{calculateTotalTime(report?.activities,'tracker')}</p>
+                            </p>
+                            <p className="p--card">
+                              <label>Manual Time</label>
+                              <p>{calculateTotalTime(report?.activities, 'manual')}</p>
+                            </p>
+                            <p className="p--card">
+                              <label>Total Time</label>
+                              <p>{calculateTotalTime(report?.activities, 'all')}</p>
+                            </p>
+                          </div>
+                          </Col>
+                          </Row>
+                          <Row>
+                            <Col sm={12}>
+                              <label>Tasks</label>
+                              <TaskList report={report} />
+                            </Col>
+                          </Row>
+                        </div>
+                        </div>
+                      </>
+                      )
+                    
+                    })}
+                  
+                {/* :
+                <p className="text-center mt-5">No activity available.</p> */}
+              {/* }  */}
           </div>
+          :
           
-          {/* {
-            filters['sort_by'] === 'members' ?
-              memberReports && memberReports.length > 0 ? 
-              view === 'single' ?
-              <></>
-              :
-                <div className="single--project--stack">
-                  {memberReports.map((report, index) => {
-                    return (
-                    <>
-                    <div key={`single-accord-item-${report?.project?._id}`} eventKey={`single-accord-item-${report?.project?._id}`} onClick={() => {setSelectedReport(report?.project)}}>
-                      <div className="d-flex align-items-center justify-content-between gap-4">
-                        <h4>{report?.project?.title} <span>{report?.project?.client?.name}</span></h4>
-                        <Badge bg="warning">Progress</Badge>
-                      </div>
-                      <div className="report--info">
-                        <p className="p--card">
-                          <label>Tracked Time</label>
-                          <p>{calculateTotalTime(report?.activities, 'tracker')}</p>
-                        </p>
-                        <p className="p--card">
-                          <label>Manual Time</label>
-                          <p>{calculateTotalTime(report?.activities, 'manual')}</p>
-                        </p>
-                        <p className="p--card">
-                          <label>Total Time</label>
-                          <p>{calculateTotalTime(report?.activities, 'all')}</p>
-                        </p>
-                      </div>
-                      <Row>
-                          <Col sm={12}>
-                            <label>Tasks</label>
-                            <TaskList report={report} />
-                          </Col>
-                          { memberdata?._id === filters?.member ?
-                            <Col sm={12} className="mt-4">
-                              <label>Remarks</label>
-                              {
-                                remarksActive === true ? 
-                                <>
-                                  <Form.Group className="mb-0 form-group">
-                                    <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}></textarea>
-                                  </Form.Group>
-                                  <Button variant="primary" onClick={() => {
-                                    saveRemarks(report?.project?._id)
-                                  }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
-                                  <Button variant="secondary" className="ms-3" onClick={handleRemarks}>Cancel</Button>
-                                </>
-                                :
-                                <>
-                                  <FaRegEdit onClick={handleRemarks} />
-                                  {
-                                  report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                  report?.project?.projectmeta.map((meta) => {
-                                    if(meta.meta_key === 'remarks'){
-                                      return <pre>{meta.meta_value}</pre>
-                                    }else{
-                                      return null
-                                    }
-                                  })
-                                }
-                                </>
-                              }
-                            </Col>
-                            :
-                            <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
-                              <label>Remarks</label>
-                                  {
-                                  report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                  report?.project?.projectmeta.map((meta) => {
-                                    if(meta.meta_key === 'remarks'){
-                                      return <pre>{meta.meta_value}</pre>
-                                    }else{
-                                      return null
-                                    }
-                                  })
-                                }
-                            </Col>
-                          }
-                        </Row>
-                      </div>
-                    </>
-                    )
-                  })}
-                </div>
-              :
-              <p className="text-center mt-5">No activity available.</p>
-              :
-              projectReports && projectReports.length > 0 ? 
-              view === 'single' ?
-              <></>
-              :*/}
-                
-                  {singleMemberReport?.reports?.map((report, index) => {
-                    return (
-                    <>
-                    <div className="single--project--stack">
-                      <div eventKey={`single-member-accord-item-${singleMemberReport?.member?._id}`} key={`single-member-accord-item-${singleMemberReport?.member?._id}`} onClick={() => {setSelectedReport(report)}}>
-                        <div className="d-flex align-items-center justify-content-between gap-4">
-                          <h4 className="font-bold text-slate-800 text-lg mb-2">{report?.project?.name} 
-                            <span>{report?.project?.client?.name}</span>
-                            </h4>
-                          <Badge bg="warning">{report?.project?.status}</Badge>
-                        </div>
-                        <div className="report--info">
-                          <p className="p--card">
-                            <label>Tracked Time</label>
-                            <p>{calculateTotalTime(report?.activities,'tracker')}</p>
-                          </p>
-                          <p className="p--card">
-                            <label>Manual Time</label>
-                            <p>{calculateTotalTime(report?.activities, 'manual')}</p>
-                          </p>
-                          <p className="p--card">
-                            <label>Total Time</label>
-                            <p>{calculateTotalTime(report?.activities, 'all')}</p>
-                          </p>
-                        </div>
-                        <Row>
-                          <Col sm={12}>
-                            <label>Tasks</label>
-                            <TaskList report={report} />
-                          </Col>
-                        </Row>
-                      </div>
-                      </div>
-                    </>
-                    )
-                  })}
-                
-              {/* :
-              <p className="text-center mt-5">No activity available.</p> */}
-            {/* }  */}
-        </div>
-        )}
         <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
-            <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members (3)</h3>
+            <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members ({singleMemberReport?.members?.length || 0})</h3>
             <div class="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
               <div class="text-center">
                   <div class="text-lg font-bold text--blue">113h 15m</div>
                   <div class="text-slate-600">Total Hours</div>
               </div>
               <div class="text-center">
-                  <div class="text-lg font-bold text--green">3</div>
+                  <div class="text-lg font-bold text--green">{singleMemberReport?.members?.length || 0}</div>
                   <div class="text-slate-600">Members</div>
               </div>
             </div>
           </div>
-          <div className="single--project--stack">
-            <div className="d-flex justify-content-between mb-4">
-              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                  <div className="title--initial">GS</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                      <span>Gagandeep Singh</span>
-                      <strong>UI/UX Designer</strong>
-                  </div>
-              </div>
-            </div>
-            <div className="report--info">
-              <p className="p--card">
-                <label>Tracked Time</label>
-                <p>6h 50m</p>
-              </p>
-              <p className="p--card">
-                <label>Manual Time</label>
-                <p>1h 30m</p>
-              </p>
-              <p className="p--card">
-                <label>Total Time</label>
-                <p>9h 00m</p>
-              </p>
-            </div>
-            <Button variant="primary" className="mt-3"><FaEye/> View Report</Button>
-            <Button variant="info" className="mt-3 ms-3"><TbReport /> View Remarks</Button>
-          </div>
+          {
+            
+            singleMemberReport?.members?.map((member, index) => {
+              return (
+                      <>
+                    <div className={`single--project--stack-${member?._id}`}>
+                      <div className="d-flex justify-content-between mb-4" key={`single-member-accord-item-${member?._id}`}>
+                        <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                            <div className="title--initial">{member?.name?.substring(0,2)}</div>
+                            <div className="title--span flex-column d-flex align-items-start gap-0">
+                                <span>{member?.name} </span>
+                                <strong>{member?.role}</strong>
+                            </div>
+                        </div>
+                      </div>
+                      <Row>
+                        <Col>
+                      <div className="report--info">
+                        <p className="p--card">
+                          <label>Tracked Time</label>
+                          <p>{calculateTotalTime(member?.activities,'tracker')}</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Manual Time</label>
+                          <p>{calculateTotalTime(member?.activities, 'manual')}</p>
+                        </p>
+                        <p className="p--card">
+                          <label>Total Time</label>
+                          <p>{calculateTotalTime(member?.activities, 'all')}</p>
+                        </p>
+                      </div>
+                      </Col>
+                      </Row>
+                      <Col sm={12}>
+                        <label>Tasks</label>
+                        <TaskList report={member} />
+                      </Col>
+                     
+                      {/* <Button variant="info" className="mt-3 ms-3"><TbReport /> View Remarks</Button> */}
+                      </div>
+                    </>
+              )
+            })
+          }
         </div>
+      }
       </div>
       <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal" onShow={() => {selectboxObserver();}}>
         <Modal.Header closeButton>
