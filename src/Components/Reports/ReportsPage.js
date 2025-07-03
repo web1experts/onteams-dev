@@ -24,6 +24,383 @@ import { Link } from "react-router-dom";
 import "media-chrome";
 import "media-chrome/dist/menu"
 import ManualTime from "./ManualTime";
+
+const TaskList = ({report} ) => {
+  const [ViewReport, setViewReport] = useState(false);
+  const [showRemarks, setShowRemarks] = useState(false);
+  const [activeTab, setActiveTab] = useState("screenshots");
+  const [reportopen, setReportOpen] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [lightboxMedia, setLightboxMedia] = useState([]);
+   const fullscreenrefrence = React.useRef(null);
+  const [taskId, setTaskId] = useState('')
+  const [currentVideoPage, setCurrentVideoPage] = useState({});
+  const videosPerPage = 12; // Adjust as needed
+
+const groupTasksById = (activities) => {
+  
+  const groupedTasks = activities.reduce((acc, activity) => {
+    (activity.tasks || []).forEach((t) => {
+      if (!t.task || !t.task._id) return; // skip if task is missing
+
+      const taskId = t.task._id;
+
+      if (!acc[taskId]) {
+        acc[taskId] = {
+          taskId: taskId,
+          title: t.task.title,
+          tab: t.task.tab,
+          duration: 0
+        };
+      }
+
+      if (t.duration) {
+        acc[taskId].duration += t.duration;
+      }
+    });
+
+    return acc;
+  }, {});
+
+  // Format durations into "Xh Ym" or "Z secs"
+  return Object.values(groupedTasks).map((task) => {
+    const totalSeconds = task.duration;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    task.duration =
+      totalSeconds < 60
+        ? `${seconds} secs`
+        : `${hours}h ${minutes.toString().padStart(2, "0")}m`;
+
+    return task;
+  });
+};
+
+const handleReportClose = () => setViewReport(false);
+ 
+  const handleViewReport = (taskId) => { 
+    setTaskId( taskId)
+    setViewReport(true);
+  }
+
+  // Group tasks by title and calculate total durations
+  const groupedTasks = groupTasksById(report?.activities);
+  const handleRemarksClose = () => setShowRemarks(false);
+  const handleShowRemarks = () => setShowRemarks(true);
+  
+
+
+  const triggerLightBox = (type, mediaItems, index) => {
+    setSlideIndex(index);
+    const slides =
+    Array.isArray(mediaItems) && mediaItems.length > 0
+      ? mediaItems.map((item) => {
+          if (type === "video" && item.task === taskId) {
+            return {
+              type: "video",
+              src: item.url,
+              poster: null, // Optional, for a thumbnail or video preview
+              videoProps: {
+                controls: true,
+                autoPlay: false, // Set to true if you want videos to start automatically
+                style: { maxHeight: "90vh", maxWidth: "100%" },
+              },
+            };
+          }else if(type === "screenshot" && item.task === taskId){
+            return { type: "image", src: item.url }; // Default case for images
+          }
+          return null;
+        }).filter(Boolean)
+      : [];
+
+    // const data = slides;
+    setLightboxMedia(slides)
+    setReportOpen(true)
+  }
+
+  const gettaskTab = (tabid) => { 
+    if( report?.project?.workflow?.tabs?.length > 0){
+      const matchedTabTitle = report.project.workflow.tabs.find(tab => tab._id === tabid)?.title;
+      return <Badge bg="warning">{matchedTabTitle}</Badge>
+    }
+    return null;
+  }
+
+  return (
+    <>
+      <Lightbox
+        open={reportopen}
+        close={() => setReportOpen(false)}
+        slides={lightboxMedia}
+        plugins={[Fullscreen]}
+        fullscreen={{ ref: fullscreenrefrence }}
+        carousel={{ finite: lightboxMedia.length === 1 }}
+        index={slideIndex}
+        on={{
+          click: () => fullscreenrefrence.current?.enter(),
+        }}
+        render={{
+          slide: ({slide}) => {
+            if (slide?.type === "video") {
+              return (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <media-controller>
+                      <video
+                        slot="media"
+                        src={slide.src}
+                        style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                      >
+                        
+                      </video>
+                      <media-settings-menu hidden anchor="auto">
+                        <media-settings-menu-item>
+                          Speed
+                          <media-playback-rate-menu slot="submenu" hidden rates="1 1.25 1.5 1.75 2 2.50 3 3.50 4 4.50 5 6 7 8 9 10">
+                            <div slot="title">Speed</div>
+                          </media-playback-rate-menu>
+                        </media-settings-menu-item>
+                        <media-settings-menu-item>
+                          Quality
+                          <media-rendition-menu slot="submenu" hidden>
+                            <div slot="title">Quality</div>
+                          </media-rendition-menu>
+                        </media-settings-menu-item>
+                        
+                      </media-settings-menu>
+                      <media-control-bar>
+                      <media-play-button></media-play-button>
+                        <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
+                        
+                        <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
+                        <media-time-display></media-time-display>
+                        <media-time-range slot="center-controls"></media-time-range>
+                        <media-duration-display></media-duration-display><media-pip-button></media-pip-button>
+                        <media-fullscreen-button></media-fullscreen-button>
+                        <media-settings-menu-button></media-settings-menu-button>
+                      </media-control-bar>
+                    </media-controller>
+                  {/* <video
+                    controls
+                    autoPlay={false}
+                    style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                  >
+                    <source src={slide.src} type="video/webm" />
+                    Your browser does not support the video tag.
+                  </video> */}
+                </div>
+              );
+            }
+            return null; // Default render for images will be used
+          },
+        }}
+      />
+      <ul>
+        {groupedTasks?.map((taskData, index) => (
+          <li key={`grouped-task-${index}`}>
+            <p className="mb-0">
+              <FaAngleRight /> {taskData.title}
+            </p>
+            <strong>{taskData.duration}</strong>
+            {/* {
+              gettaskTab(task.tab)
+            } */}
+            <Button variant="primary" className="mt-3" onClick={() => {handleViewReport(taskData?.taskId)}}><FaEye/> View Report</Button>
+            {/* <Button variant="info" className="mt-3 ms-3" onClick={() => {handleShowRemarks()}}><TbReport /> View Remarks</Button> */}
+          </li>
+        ))}
+      </ul>
+      {ViewReport && 
+        <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" key={`reports-${taskId}`} className="timeSheetModal">
+          <Modal.Header closeButton>
+            <ListGroup horizontal>
+              <ListGroup.Item action active={activeTab === "screenshots"} onClick={() => setActiveTab("screenshots")}>
+                Screenshots
+              </ListGroup.Item>
+              <ListGroup.Item action active={activeTab === "videos"} onClick={() => setActiveTab("videos")}>
+                Videos
+              </ListGroup.Item>
+            </ListGroup>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="shots--list">
+              <CardGroup key={`card-group-${taskId}`}>
+            {
+              report?.activityMetas && report.activityMetas.length > 0 ? (
+              report.activityMetas.map((meta, i) => {
+                // Handle screenshots tab
+                if (activeTab === "screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
+                  let idx = 0
+                  return meta.meta_value.map((screenshotData, j) => {
+                    if(screenshotData?.task !== taskId){ return <></>}else{
+                      const currentIdx = idx;
+                      idx++;
+                    return (
+                      <>
+                        <Card key={`task-card-${taskId}-${j}`}>
+                              <Card.Body>
+                                <img
+                                  className="card-img-top"
+                                  src={screenshotData?.url}
+                                  alt="screenshot"
+                                  onClick={() => triggerLightBox('screenshot', meta.meta_value, currentIdx)}
+                                />
+                                <p>
+                                  <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
+                                  <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
+                                </p>
+                              </Card.Body>
+                            </Card>
+                            
+                      </>
+                    )}
+                  });
+                }
+                if (activeTab === "videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
+                  let idx = 0
+                  
+                  return (
+                    <>
+                      {meta.meta_value
+                        .slice(
+                          ((currentVideoPage[`single-${report?.project?._id}`] || 1) - 1) * videosPerPage,
+                          (currentVideoPage[`single-${report?.project?._id}`] || 1) * videosPerPage
+                        )
+                        .map((videoData, j) => {
+                          if(videoData.task !== taskId){return null}else{
+                                const currentIdx = idx;
+                                idx++;
+                                return (
+                              <Card key={`video-card-${report?.project?._id}-${currentVideoPage[`single-${report?.project?._id}`] || 1}-${j}`}>
+                                <Card.Body onClick={() => triggerLightBox("video", meta.meta_value, currentIdx)}>
+                                  <video
+                                    height="175px"
+                                    preload="metadata"
+                                    muted
+                                    onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
+                                    controls={false}
+                                  >
+                                    <source src={videoData?.url} type="video/webm" />
+                                    Your browser does not support the video tag.
+                                  </video>
+                                  <p>
+                                    <strong>Task Name:</strong> {videoData.task_data?.title} <br />
+                                    <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                  </p>
+                                </Card.Body>
+                              </Card>
+                            )
+                          }
+                      })}
+                
+                      {/* Pagination Controls */}
+                      <div style={{ marginTop: "10px", textAlign: "center" }}>
+                        <Button variant="outline-primary"
+                          disabled={(currentVideoPage[`single-${report?.project?._id}`] || 1) === 1}
+                          onClick={() =>
+                            setCurrentVideoPage((prev) => ({
+                              ...prev,
+                              [`single-${report?.project?._id}`]: (prev[`single-${report?.project?._id}`] || 1) - 1,
+                            }))
+                          }
+                        >
+                          <BsArrowLeftCircleFill />
+                        </Button>
+                
+                        <span style={{ margin: "0 10px" }}>
+                          Page {currentVideoPage[`single-${report?.project?._id}`] || 1} of {Math.ceil(meta.meta_value.length / videosPerPage)}
+                        </span>
+                
+                        <Button variant="outline-primary"
+                          disabled={(currentVideoPage[`single-${report?.project?._id}`] || 1) >= Math.ceil(meta.meta_value.length / videosPerPage)}
+                          onClick={() =>
+                            setCurrentVideoPage((prev) => ({
+                              ...prev,
+                              [`single-${report?.project?._id}`]: (prev[`single-${report?.project?._id}`] || 1) + 1,
+                            }))
+                          }
+                        >
+                          <BsArrowRightCircleFill />
+                        </Button>
+                      </div>
+                    </>
+                  );
+                  
+                }
+                return null; // Return null if no condition is met
+              })
+            ) : (
+              <div>No data available</div> // Display if no data is available
+            )
+          }
+          </CardGroup>
+          </div>
+          </Modal.Body>
+        </Modal>
+      }
+
+      { showRemarks &&
+        <Modal show={showRemarks} onHide={handleRemarksClose} centered size="lg" className="theme--modal">
+          <Modal.Header closeButton className="py-3">
+            <Modal.Title>
+                <span className="nav--item--icon"><TbReport /></span>
+                <strong>Project Remarks <small>E-commerce Platform</small></strong>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="p-4">
+            <div className="single--project--stack">
+              <div class="d-flex justify-content-between mb-2 align-items-start">
+                <div class="project--name d-flex justify-content-between gap-3 align-items-center">
+                  <div class="title--initial">1</div>
+                  <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+                </div>
+                <Badge bg="secondary">Day 1</Badge>
+              </div>
+              <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
+            </div>
+            <div className="single--project--stack">
+              <div class="d-flex justify-content-between mb-2 align-items-start">
+                <div class="project--name d-flex justify-content-between gap-3 align-items-center">
+                  <div class="title--initial">2</div>
+                  <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+                </div>
+                <Badge bg="secondary">Day 2</Badge>
+              </div>
+              <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
+            </div>
+            <div className="single--project--stack">
+              <div class="d-flex justify-content-between mb-2 align-items-start">
+                <div class="project--name d-flex justify-content-between gap-3 align-items-center">
+                  <div class="title--initial">3</div>
+                  <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+                </div>
+                <Badge bg="secondary">Day 3</Badge>
+              </div>
+              <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
+            </div>
+            <div className="single--project--stack">
+              <div class="d-flex justify-content-between mb-2 align-items-start">
+                <div class="project--name d-flex justify-content-between gap-3 align-items-center">
+                  <div class="title--initial">4</div>
+                  <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+                </div>
+                <Badge bg="secondary">Day 4</Badge>
+              </div>
+              <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
+            </div>
+          </Modal.Body>
+        </Modal>
+      }
+    </>
+  );
+};
+
+
+
+
+
+
 function ReportsPage() {
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const [isActive, setIsActive] = useState(false);
@@ -42,8 +419,7 @@ function ReportsPage() {
   const [show, setShow] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [spinner, setSpinner] = useState(false)
-  const [currentVideoPage, setCurrentVideoPage] = useState({});
-  const videosPerPage = 12; // Adjust as needed
+  
   const handleClose = () => {
     setShow(false);
     setFields({})
@@ -72,6 +448,7 @@ function ReportsPage() {
   const [ projects, setProjects ] = useState([])
   const MemberprojectFeed = useSelector(state => state.project.memberProjects);
   const [ memberprojects, setMemberProjects ] = useState([])
+  const [singleMemberReport, setSingleMemberReport] = useState({})
   const taskFeed = useSelector(state => state.task.tasks);
   const [taskslists, setTasksLists] = useState([])
   const [members, setMembers] = useState([])
@@ -133,6 +510,37 @@ function ReportsPage() {
       },10)
     }
   }
+
+  function getProjectSummary(memberReport, arg) {
+    const projectCount = memberReport?.length;
+
+    let totalDuration = 0;
+    if(memberReport?.length > 0){
+      memberReport.forEach(report => {
+        report.activities.forEach(activity => {
+            totalDuration += activity.duration || 0;
+        });
+    });
+    }
+    
+
+    const hours = Math.floor(totalDuration / 3600);
+    const minutes = Math.floor((totalDuration % 3600) / 60);
+
+    const formattedTime = `${hours}h ${minutes}m`;
+    if( arg === 'both'){
+      return {
+        totalProjects: projectCount,
+        totalTime: formattedTime
+      };
+    }else if(arg === 'project_count'){
+      return projectCount
+    }else if(arg === 'time'){
+      return formattedTime
+    }
+    
+}
+
 
   const handleListProjects = async () => {
     if( memberProfile?.role?.slug === "owner"){
@@ -589,55 +997,8 @@ const handlechange = ({ target: { name, value } }) => {
   setFields({...fields, [name]: value})
 };
 
-const groupTasksById = (activities) => {
-  const groupedTasks = activities.reduce((acc, activity) => {
-      activity.tasks.forEach((t) => {
-          const taskId = t.task._id;
 
-          if (!acc[taskId]) {
-              acc[taskId] = {
-                  taskId: t.task._id,
-                  title: t.task.title,
-                  duration: 0, // Store duration in milliseconds
-                  tab: t.task.tab
-                  // statuses: [],
-              };
-          }
 
-          // Calculate duration using `createdAt` and `duration`
-          if ( t.duration) {
-              // const createdAtTime = new Date(t.createdAt).getTime();
-              // const durationTime = new Date(t.duration).getTime();
-
-              // if (!isNaN(createdAtTime) && !isNaN(durationTime)) {
-              //     const timeDifferenceInMs = durationTime - createdAtTime;
-              //     if (timeDifferenceInMs > 0) {
-                      acc[taskId].duration += t.duration;
-              //     }
-              // }
-          }
-
-          // Combine statuses from subtasks
-          // acc[taskId].statuses.push(...t.task.subtasks.map((subtask) => subtask.status));
-      });
-
-      return acc;
-  }, {});
-
-  // Format durations into "hh:mm:ss"
-  return Object.values(groupedTasks).map((task) => {
-      const totalSeconds = task.duration //Math.round(task.duration / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-
-      task.duration =
-          totalSeconds < 60
-              ? `${totalSeconds} secs`
-              : `${hours}:${minutes.toString().padStart(2, "0")}`;
-      return task;
-  });
-};
 
 const [projectToggle, setProjectToggle ] = useState(false)
 const handleToggles = () => {
@@ -649,325 +1010,6 @@ const handleToggles = () => {
           console.log('3')
     }
 }
-
-const TaskList = ({ report }) => {
-  // Group tasks by title and calculate total durations
-  const groupedTasks = groupTasksById(report?.activities);
-  const [ViewReport, setViewReport] = useState(false);
-  const [showRemarks, setShowRemarks] = useState(false);
-  const handleRemarksClose = () => setShowRemarks(false);
-  const handleShowRemarks = () => setShowRemarks(true);
-  const handleReportClose = () => setViewReport(false);
-  const fullscreenrefrence = React.useRef(null);
-  const [taskId, setTaskId] = useState('')
-  const handleViewReport = (taskId) => {
-    setTaskId( taskId)
-    setViewReport(true);
-  }
-  const [activeTab, setActiveTab] = useState("screenshots");
-  const [reportopen, setReportOpen] = useState(false);
-  const [slideIndex, setSlideIndex] = useState(0);
-  const [lightboxMedia, setLightboxMedia] = useState([]);
-
-  const triggerLightBox = (type, mediaItems, index) => {
-    setSlideIndex(index);
-    const slides =
-    Array.isArray(mediaItems) && mediaItems.length > 0
-      ? mediaItems.map((item) => {
-          if (type === "video" && item.task === taskId) {
-            return {
-              type: "video",
-              src: item.url,
-              poster: null, // Optional, for a thumbnail or video preview
-              videoProps: {
-                controls: true,
-                autoPlay: false, // Set to true if you want videos to start automatically
-                style: { maxHeight: "90vh", maxWidth: "100%" },
-              },
-            };
-          }else if(type === "screenshot" && item.task === taskId){
-            return { type: "image", src: item.url }; // Default case for images
-          }
-          return null;
-        }).filter(Boolean)
-      : [];
-
-    // const data = slides;
-    setLightboxMedia(slides)
-    setReportOpen(true)
-  }
-
-  const gettaskTab = (tabid) => { 
-    if( report?.project?.workflow?.tabs?.length > 0){
-      const matchedTabTitle = report.project.workflow.tabs.find(tab => tab._id === tabid)?.title;
-      return <Badge bg="warning">{matchedTabTitle}</Badge>
-    }
-    return null;
-  }
-
-  return (
-    <>
-      <Lightbox
-        open={reportopen}
-        close={() => setReportOpen(false)}
-        slides={lightboxMedia}
-        plugins={[Fullscreen]}
-        fullscreen={{ ref: fullscreenrefrence }}
-        carousel={{ finite: lightboxMedia.length === 1 }}
-        index={slideIndex}
-        on={{
-          click: () => fullscreenrefrence.current?.enter(),
-        }}
-        render={{
-          slide: ({slide}) => {
-            if (slide?.type === "video") {
-              return (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <media-controller>
-                      <video
-                        slot="media"
-                        src={slide.src}
-                        style={{ maxHeight: "90vh", maxWidth: "100%" }}
-                      >
-                        
-                      </video>
-                      <media-settings-menu hidden anchor="auto">
-                        <media-settings-menu-item>
-                          Speed
-                          <media-playback-rate-menu slot="submenu" hidden rates="1 1.25 1.5 1.75 2 2.50 3 3.50 4 4.50 5 6 7 8 9 10">
-                            <div slot="title">Speed</div>
-                          </media-playback-rate-menu>
-                        </media-settings-menu-item>
-                        <media-settings-menu-item>
-                          Quality
-                          <media-rendition-menu slot="submenu" hidden>
-                            <div slot="title">Quality</div>
-                          </media-rendition-menu>
-                        </media-settings-menu-item>
-                        
-                      </media-settings-menu>
-                      <media-control-bar>
-                      <media-play-button></media-play-button>
-                        <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
-                        
-                        <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
-                        <media-time-display></media-time-display>
-                        <media-time-range slot="center-controls"></media-time-range>
-                        <media-duration-display></media-duration-display><media-pip-button></media-pip-button>
-                        <media-fullscreen-button></media-fullscreen-button>
-                        <media-settings-menu-button></media-settings-menu-button>
-                      </media-control-bar>
-                    </media-controller>
-                  {/* <video
-                    controls
-                    autoPlay={false}
-                    style={{ maxHeight: "90vh", maxWidth: "100%" }}
-                  >
-                    <source src={slide.src} type="video/webm" />
-                    Your browser does not support the video tag.
-                  </video> */}
-                </div>
-              );
-            }
-            return null; // Default render for images will be used
-          },
-        }}
-      />
-      <ul>
-        {groupedTasks.map((task, index) => (
-          <li key={`grouped-task-${index}`}>
-            <p className="mb-0">
-              <FaAngleRight /> {task.title}
-            </p>
-            {/* <strong>{task.duration}</strong> */}
-            {/* {
-              gettaskTab(task.tab)
-            } */}
-            <Button variant="primary" className="mt-3" onClick={() => {handleViewReport(task.taskId)}}><FaEye/> View Report</Button>
-            <Button variant="info" className="mt-3 ms-3" onClick={() => {handleShowRemarks()}}><TbReport /> View Remarks</Button>
-          </li>
-        ))}
-      </ul>
-      <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" key={`reports-${taskId}`} className="timeSheetModal">
-        <Modal.Header closeButton>
-          <ListGroup horizontal>
-            <ListGroup.Item action active={activeTab === "screenshots"} onClick={() => setActiveTab("screenshots")}>
-              Screenshots
-            </ListGroup.Item>
-            <ListGroup.Item action active={activeTab === "videos"} onClick={() => setActiveTab("videos")}>
-              Videos
-            </ListGroup.Item>
-          </ListGroup>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="shots--list">
-            <CardGroup key={`card-group-${taskId}`}>
-          {
-            report?.activityMetas && report.activityMetas.length > 0 ? (
-            report.activityMetas.map((meta, i) => {
-              // Handle screenshots tab
-              if (activeTab === "screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
-                let idx = 0
-                return meta.meta_value.map((screenshotData, j) => {
-                  if(screenshotData?.task !== taskId){ return <></>}else{
-                    const currentIdx = idx;
-                    idx++;
-                  return (
-                    <>
-                      <Card key={`task-card-${taskId}-${j}`}>
-                            <Card.Body>
-                              <img
-                                className="card-img-top"
-                                src={screenshotData?.url}
-                                alt="screenshot"
-                                onClick={() => triggerLightBox('screenshot', meta.meta_value, currentIdx)}
-                              />
-                              <p>
-                                <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
-                                <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
-                              </p>
-                            </Card.Body>
-                          </Card>
-                          
-                    </>
-                  )}
-                });
-              }
-              if (activeTab === "videos" && meta.meta_key === 'videos' && meta.meta_value.length > 0) {
-                let idx = 0
-                
-                return (
-                  <>
-                    {meta.meta_value
-                      .slice(
-                        ((currentVideoPage[`single-${report?.project?._id}`] || 1) - 1) * videosPerPage,
-                        (currentVideoPage[`single-${report?.project?._id}`] || 1) * videosPerPage
-                      )
-                      .map((videoData, j) => {
-                        if(videoData.task !== taskId){return null}else{
-                              const currentIdx = idx;
-                              idx++;
-                              return (
-                            <Card key={`video-card-${report?.project?._id}-${currentVideoPage[`single-${report?.project?._id}`] || 1}-${j}`}>
-                              <Card.Body onClick={() => triggerLightBox("video", meta.meta_value, currentIdx)}>
-                                <video
-                                  height="175px"
-                                  preload="metadata"
-                                  muted
-                                  onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
-                                  controls={false}
-                                >
-                                  <source src={videoData?.url} type="video/webm" />
-                                  Your browser does not support the video tag.
-                                </video>
-                                <p>
-                                  <strong>Task Name:</strong> {videoData.task_data?.title} <br />
-                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                </p>
-                              </Card.Body>
-                            </Card>
-                          )
-                        }
-                    })}
-              
-                    {/* Pagination Controls */}
-                    <div style={{ marginTop: "10px", textAlign: "center" }}>
-                      <Button variant="outline-primary"
-                        disabled={(currentVideoPage[`single-${report?.project?._id}`] || 1) === 1}
-                        onClick={() =>
-                          setCurrentVideoPage((prev) => ({
-                            ...prev,
-                            [`single-${report?.project?._id}`]: (prev[`single-${report?.project?._id}`] || 1) - 1,
-                          }))
-                        }
-                      >
-                        <BsArrowLeftCircleFill />
-                      </Button>
-              
-                      <span style={{ margin: "0 10px" }}>
-                        Page {currentVideoPage[`single-${report?.project?._id}`] || 1} of {Math.ceil(meta.meta_value.length / videosPerPage)}
-                      </span>
-              
-                      <Button variant="outline-primary"
-                        disabled={(currentVideoPage[`single-${report?.project?._id}`] || 1) >= Math.ceil(meta.meta_value.length / videosPerPage)}
-                        onClick={() =>
-                          setCurrentVideoPage((prev) => ({
-                            ...prev,
-                            [`single-${report?.project?._id}`]: (prev[`single-${report?.project?._id}`] || 1) + 1,
-                          }))
-                        }
-                      >
-                        <BsArrowRightCircleFill />
-                      </Button>
-                    </div>
-                  </>
-                );
-                
-              }
-              return null; // Return null if no condition is met
-            })
-          ) : (
-            <div>No data available</div> // Display if no data is available
-          )
-        }
-        </CardGroup>
-        </div>
-        </Modal.Body>
-      </Modal>
-      <Modal show={showRemarks} onHide={handleRemarksClose} centered size="lg" className="theme--modal">
-        <Modal.Header closeButton className="py-3">
-           <Modal.Title>
-              <span className="nav--item--icon"><TbReport /></span>
-              <strong>Project Remarks <small>E-commerce Platform</small></strong>
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="p-4">
-          <div className="single--project--stack">
-            <div class="d-flex justify-content-between mb-2 align-items-start">
-              <div class="project--name d-flex justify-content-between gap-3 align-items-center">
-                <div class="title--initial">1</div>
-                <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
-              </div>
-              <Badge bg="secondary">Day 1</Badge>
-            </div>
-            <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
-          </div>
-          <div className="single--project--stack">
-            <div class="d-flex justify-content-between mb-2 align-items-start">
-              <div class="project--name d-flex justify-content-between gap-3 align-items-center">
-                <div class="title--initial">2</div>
-                <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
-              </div>
-              <Badge bg="secondary">Day 2</Badge>
-            </div>
-            <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
-          </div>
-          <div className="single--project--stack">
-            <div class="d-flex justify-content-between mb-2 align-items-start">
-              <div class="project--name d-flex justify-content-between gap-3 align-items-center">
-                <div class="title--initial">3</div>
-                <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
-              </div>
-              <Badge bg="secondary">Day 3</Badge>
-            </div>
-            <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
-          </div>
-          <div className="single--project--stack">
-            <div class="d-flex justify-content-between mb-2 align-items-start">
-              <div class="project--name d-flex justify-content-between gap-3 align-items-center">
-                <div class="title--initial">4</div>
-                <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
-              </div>
-              <Badge bg="secondary">Day 4</Badge>
-            </div>
-            <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
-          </div>
-        </Modal.Body>
-      </Modal>
-    </>
-  );
-};
-
 
   return (
     <>
@@ -1253,281 +1295,43 @@ const TaskList = ({ report }) => {
                   <div className='attendance--table--list'>
                     <Table responsive="lg">
                       <tbody className="bg-white">
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">GS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Gagandeep Singh</span>
-                                      <strong>UI/UX Designer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">TG</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Tarun Giri</span>
-                                      <strong>Project Manager</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">PS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Paramjeet Singh</span>
-                                      <strong>Managing Director</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">AJ</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Abhishek Jaiswal</span>
-                                      <strong>Sr. Web Designer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">RS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Ritika Sharma</span>
-                                      <strong>Sr. Human Resources</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">NC</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Nidhi Chandna</span>
-                                      <strong>Sr. Human Resources</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">G</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Hitesh Kumar</span>
-                                      <strong>Software Engineer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">RS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Ram Singh</span>
-                                      <strong>Sr. Software Engineer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">GS</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Gaurav Sharma</span>
-                                      <strong>Sr. Software Engineer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">ND</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Neha Dutt</span>
-                                      <strong>Sr. Business Developer</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex justify-content-between gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">DE</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>Deepak</span>
-                                      <strong>Office Assistant</strong>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="ms-xl-auto">
-                            <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                              <div className="text-left text-xl-center">
-                                <strong>Project Time: </strong> 4h 47m
-                              </div>
-                              <div className="text-left text-xl-center">
-                                <strong>Projects: </strong> 4
-                              </div>
-                              <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => {setIsActive(1);}}><FaEye/> Details</Button>
-                            </div>
-                          </td>
-                        </tr>
+                        {
+                          memberReports && memberReports.length > 0 ? 
+                            memberReports.map((report, index) => {
+                              const result = getProjectSummary(report.reports, 'both'); 
+                              return (
+                                <tr>
+                                  <td>
+                                    <div className="d-flex justify-content-between">
+                                      <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                          <div className="title--initial">{report?.member?.name.substring(0, 2)}</div>
+                                          <div className="title--span flex-column d-flex align-items-start gap-0">
+                                              <span>{report?.member?.name}</span>
+                                              <strong>{report?.member?.role}</strong>
+                                          </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="ms-xl-auto">
+                                    <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
+                                      <div className="text-left text-xl-center">
+                                        <strong>Project Time: </strong> {result?.totalProjects || 0}
+                                      </div>
+                                      <div className="text-left text-xl-center">
+                                        <strong>Projects: </strong> {result?.totalTime || 0}
+                                      </div>
+                                      <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(report); setIsActive(1);}}><FaEye/> Details</Button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )
+                            })
+                          
+                          :
+                          <></>
+                        }
+                        
+                        
                       </tbody>
                     </Table>
                   </div>
@@ -1562,21 +1366,25 @@ const TaskList = ({ report }) => {
               <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
             </ListGroup>
         </div>
+        {
+          (isActive === 1) && (
+        
         <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
-            <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects (3)</h3>
+            <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects ({singleMemberReport?.reports?.length || 0})</h3>
             <div class="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
               <div class="text-center">
-                  <div class="text-lg font-bold text--blue">113h 15m</div>
+                  <div class="text-lg font-bold text--blue">{getProjectSummary(singleMemberReport?.reports, 'time')}</div>
                   <div class="text-slate-600">Total Hours</div>
               </div>
               <div class="text-center">
-                  <div class="text-lg font-bold text--green">3</div>
+                  <div class="text-lg font-bold text--green">{singleMemberReport?.reports?.length || 0}</div>
                   <div class="text-slate-600">Projects</div>
               </div>
             </div>
           </div>
-          {
+          
+          {/* {
             filters['sort_by'] === 'members' ?
               memberReports && memberReports.length > 0 ? 
               view === 'single' ?
@@ -1667,15 +1475,18 @@ const TaskList = ({ report }) => {
               projectReports && projectReports.length > 0 ? 
               view === 'single' ?
               <></>
-              :
-                <div className="single--project--stack">
-                  {projectReports.map((report, index) => {
+              :*/}
+                
+                  {singleMemberReport?.reports?.map((report, index) => {
                     return (
                     <>
-                      <div eventKey={`single-member-accord-item-${report?.member?._id}`} key={`single-member-accord-item-${report?.member?._id}`} onClick={() => {setSelectedReport(report?.project)}}>
+                    <div className="single--project--stack">
+                      <div eventKey={`single-member-accord-item-${singleMemberReport?.member?._id}`} key={`single-member-accord-item-${singleMemberReport?.member?._id}`} onClick={() => {setSelectedReport(report)}}>
                         <div className="d-flex align-items-center justify-content-between gap-4">
-                          <h4>{report?.member?.name} <span>{report?.member?.client?.name}</span></h4>
-                          <Badge bg="warning">Progress</Badge>
+                          <h4 className="font-bold text-slate-800 text-lg mb-2">{report?.project?.name} 
+                            <span>{report?.project?.client?.name}</span>
+                            </h4>
+                          <Badge bg="warning">{report?.project?.status}</Badge>
                         </div>
                         <div className="report--info">
                           <p className="p--card">
@@ -1696,46 +1507,18 @@ const TaskList = ({ report }) => {
                             <label>Tasks</label>
                             <TaskList report={report} />
                           </Col>
-                          <Col sm={12} className="mt-4">
-                            <label>Remarks</label>
-                            {
-                              remarksActive === true ? 
-                              <>
-                                <Form.Group className="mb-0 form-group">
-                                  <textarea class="form-control mt-4" rows={7} data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}></textarea>
-                                </Form.Group>
-                                <Button variant="primary" onClick={() => {
-                                  saveRemarks(report?.project?._id)
-                                }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
-                                <Button variant="secondary" className="ms-3" onClick={handleRemarks}>Cancel</Button>
-                              </>
-                            :
-                            <>
-                              <FaRegEdit onClick={handleRemarks} />
-                              {
-                                report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                report?.project?.projectmeta.map((meta) => {
-                                  if(meta.meta_key === 'remarks'){
-                                    return <pre>{meta.meta_value}</pre>
-                                  }else{
-                                    return null
-                                  }
-                                })
-                              }
-                              </>
-                            }
-                            
-                          </Col>
                         </Row>
+                      </div>
                       </div>
                     </>
                     )
                   })}
-                </div>
-              :
-              <p className="text-center mt-5">No activity available.</p>
-            }
+                
+              {/* :
+              <p className="text-center mt-5">No activity available.</p> */}
+            {/* }  */}
         </div>
+        )}
         <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
             <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members (3)</h3>

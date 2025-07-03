@@ -3,7 +3,8 @@ import {
     ATTENDANCE_LIST_SUCCESS,
     CLEAR_MESSAGES,
     MEMBER_ATTENDANCE_SUCCESS,
-    ATTENDANCE_SUMMARY_SUCCESS
+    ATTENDANCE_SUMMARY_SUCCESS,
+    ATTENDANCE_EXCEL_SUCCESS
  } from "../actions/types";
 
 const initialState = {
@@ -25,6 +26,11 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 memberAttendance: action.payload.attendanceData
+            }
+        case ATTENDANCE_EXCEL_SUCCESS: 
+            return {
+                ...state,
+                exceldata: action.payload.attendanceData
             }
         case ATTENDANCE_SUMMARY_SUCCESS: 
             return {

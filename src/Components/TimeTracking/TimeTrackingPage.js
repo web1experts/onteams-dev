@@ -856,7 +856,7 @@ function TimeTrackingPage() {
                                     </td>
                                     <td className="ms-auto">
                                       <div className="d-flex align-items-center gap-3 mt-3 mt-xl-0 gap-xl-5 flex-wrap">
-                                        <div key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></div>
+                                        {/* <div key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></div> */}
                                         <div key={`task-time-${activity?._id}`} className="onHide"><strong>Project Time: </strong>{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
                                         <div key={`total-time-${activity?._id}`} className="onHide"><strong>Total Time: </strong>{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</div>
                                         <div key={`status-title-${activity?._id}`} className="onHide">

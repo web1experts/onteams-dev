@@ -10,10 +10,14 @@ import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
 import { formatDateinString, selectboxObserver, getAttendanceBadges } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { ListAttendance,getAttendanceByMember, getAttendanceSummary } from "../../redux/actions/attendance.action";
+import { ListAttendance,getAttendanceByMember, getAttendanceSummary, getMonthlyAttendanceExcelView } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import DatePicker from "react-multi-date-picker";
 import { currentMemberProfile } from "../../helpers/auth";
+import MonthHeader from "./monthheader";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 function getMonthLabel(monthYear) {
   const [mm, yyyy] = monthYear.split('/');
@@ -30,6 +34,16 @@ function AttendancePage() {
     return `${mm}/${yyyy}`;
   };
 
+  const bgColors = {
+    'Present': 'bg--green',
+    'Absent': 'bg--red',
+    'Short Leave': 'bg--purple',
+    'Half Day': 'bg--blue'
+  }
+
+  function getBadgeColor(status){
+    return (bgColors[status]) ? bgColors[status] : 'bg--orange'
+  }
 
   const dispatch = useDispatch()
   const memberProfile = currentMemberProfile()
@@ -41,6 +55,7 @@ function AttendancePage() {
   const [members, setMembers] = useState([])
   const [isActive, setIsActive] = useState(0);
   const [attendanceSummary, setAttendanceSummary] = useState({})
+  const [ excelData, setExcelData] = useState([])
   const [ filters, setFilters] = useState({month: getCurrentMonthValue()});
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
@@ -72,6 +87,7 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
   const handleAttendanceList = async () => {
     setSpinner(true)
    await dispatch(ListAttendance(filters))
+   dispatch(getMonthlyAttendanceExcelView(filters))
    setSpinner(false)
   }
 
@@ -103,6 +119,10 @@ useEffect(() => {
 
   if( apiResult.attendanceSummary){
     setAttendanceSummary(apiResult.attendanceSummary)
+  }
+
+  if( apiResult.exceldata){
+    setExcelData(apiResult.exceldata)
   }
 }, [apiResult])
 
@@ -144,6 +164,68 @@ useEffect(() => {
     
     dispatch(getAttendanceByMember(memberID, filters));
   }
+
+  const downloadExcel = (excelData) => {
+  if (!excelData || excelData.length === 0) return;
+
+  const wsData = [];
+
+  // Header row
+  const header = ['Name', 'Role'];
+
+  const dates = [];
+  const startDate = new Date(filters?.month?.split("/")[1], filters?.month?.split("/")[0] - 1, 1); // month is 1-based
+  const endDate = new Date(filters?.month?.split("/")[1], filters?.month?.split("/")[0], 0); // last day of month
+
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    dates.push(new Date(d));
+  }
+
+  // Add day numbers or short day labels
+  dates.forEach(date => {
+    const d = new Date(date);
+    const label = `${d.toLocaleString('default', { weekday: 'short' })} ${d.getDate()}`;
+    header.push(label);
+  });
+
+  // Append count headers
+  header.push('Present', 'Absent', 'Short Leave', 'Half Day', 'No Record');
+
+  wsData.push(header);
+
+  // Rows
+  excelData.forEach(member => {
+    const row = [member.name, member.role];
+    const attData = member.attendanceData || [];
+
+    attData.forEach(att => {
+      if (att.count !== undefined) {
+        // Skip count cells — they are added after all dates
+        return;
+      } else {
+        row.push(att?.status || '--');
+      }
+    });
+
+    // Now add the last 5 count objects
+    const summaryCounts = attData.slice(-5);
+    summaryCounts.forEach(countObj => {
+      row.push(countObj.count ?? 0);
+    });
+
+    wsData.push(row);
+  });
+
+  // Create worksheet and workbook
+  const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+
+  // Create and trigger download
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const fileBlob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  saveAs(fileBlob, `Attendance_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+};
 
   return (
     <>
@@ -207,8 +289,8 @@ useEffect(() => {
             {activeTab === 'excel' && (
               <div className="attendance--table excel--view" id="excel--view">
                 <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
-                  <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - June 2025</h3>
-                  <Button variant="primary"><FiDownload /> Download Excel Excel</Button>
+                  <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - {getMonthLabel(filters?.month)}</h3>
+                  <Button variant="primary" onClick={() => downloadExcel(excelData)}><FiDownload /> Download Excel Excel</Button>
                 </div>
                 <div className='attendance--excel--table draggable--table new--project--rows table-responsive-xl'>
                     <Table>
@@ -217,107 +299,12 @@ useEffect(() => {
                                 <th scope="col" className="sticky" key="project-name-header">
                                     <div className="d-flex align-items-center justify-content-between">Team Member</div>
                                 </th>
-                                <th className="text-center">
-                                  <small>Sun</small><strong>1</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Mon</small><strong>2</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Tue</small><strong>3</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Wed</small><strong>4</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Thu</small><strong>5</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Fri</small><strong>6</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Sat</small><strong>7</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Sun</small><strong>8</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Mon</small><strong>9</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Tue</small><strong>10</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Wed</small><strong>11</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Thu</small><strong>12</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Fri</small><strong>13</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Sat</small><strong>14</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Sun</small><strong>15</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Mon</small><strong>16</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Tue</small><strong>17</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Wed</small><strong>18</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Thu</small><strong>19</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Fri</small><strong>20</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Sat</small><strong>21</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Sun</small><strong>22</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Mon</small><strong>23</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Tue</small><strong>24</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Wed</small><strong>25</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Thu</small><strong>26</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Fri</small><strong>27</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Sat</small><strong>28</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Sun</small><strong>29</strong>
-                                </th>
-                                <th className="text-center">
-                                  <small>Mon</small><strong>30</strong>
-                                </th>
-                                <th className="hidden text-center">
-                                  <small>Tue</small><strong>31</strong>
-                                </th>
+                                <MonthHeader month={filters?.month?.split("/")[0]} year={filters?.month?.split("/")[1]} />
                                 <th className="bg--green text-center">
                                   <strong>Present</strong>
                                 </th>
                                 <th className="bg--red text-center">
                                   <strong>Absent</strong>
-                                </th>
-                                <th className="bg--orange text-center">
-                                  <strong>Short (2h)</strong>
                                 </th>
                                 <th className="bg--blue text-center">
                                   <strong>Half Day</strong>
@@ -325,769 +312,61 @@ useEffect(() => {
                                 <th className="bg--purple text-center">
                                   <strong>Short Leave (6h)</strong>
                                 </th>
+                                <th className="bg--orange text-center">
+                                  <strong>Short (2h)</strong>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td className="project--title--td sticky">
-                              <div className="d-flex justify-content-between">
-                                <div className="project--name d-flex justify-content-start gap-3 align-items-center">
-                                    <div className="title--initial">GS</div>
-                                    <div className="title--span flex-column d-flex align-items-start gap-0">
-                                        <span>Gagandeep Singh</span>
-                                        <strong>UI/UX Designer</strong>
-                                    </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="hidden text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="bg--green text-center">
-                              <strong>22</strong>
-                            </td>
-                            <td className="bg--red text-center">
-                              <strong>4</strong>
-                            </td>
-                            <td className="bg--orange text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--blue text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--purple text-center">
-                              <strong>3</strong>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="project--title--td sticky">
-                              <div className="d-flex justify-content-between">
-                                <div className="project--name d-flex justify-content-start gap-3 align-items-center">
-                                    <div className="title--initial">GS</div>
-                                    <div className="title--span flex-column d-flex align-items-start gap-0">
-                                        <span>Gagandeep Singh</span>
-                                        <strong>UI/UX Designer</strong>
-                                    </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="hidden text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="bg--green text-center">
-                              <strong>22</strong>
-                            </td>
-                            <td className="bg--red text-center">
-                              <strong>4</strong>
-                            </td>
-                            <td className="bg--orange text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--blue text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--purple text-center">
-                              <strong>3</strong>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="project--title--td sticky">
-                              <div className="d-flex justify-content-between">
-                                <div className="project--name d-flex justify-content-start gap-3 align-items-center">
-                                    <div className="title--initial">GS</div>
-                                    <div className="title--span flex-column d-flex align-items-start gap-0">
-                                        <span>Gagandeep Singh</span>
-                                        <strong>UI/UX Designer</strong>
-                                    </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="hidden text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="bg--green text-center">
-                              <strong>22</strong>
-                            </td>
-                            <td className="bg--red text-center">
-                              <strong>4</strong>
-                            </td>
-                            <td className="bg--orange text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--blue text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--purple text-center">
-                              <strong>3</strong>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="project--title--td sticky">
-                              <div className="d-flex justify-content-between">
-                                <div className="project--name d-flex justify-content-start gap-3 align-items-center">
-                                    <div className="title--initial">GS</div>
-                                    <div className="title--span flex-column d-flex align-items-start gap-0">
-                                        <span>Gagandeep Singh</span>
-                                        <strong>UI/UX Designer</strong>
-                                    </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="hidden text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="bg--green text-center">
-                              <strong>22</strong>
-                            </td>
-                            <td className="bg--red text-center">
-                              <strong>4</strong>
-                            </td>
-                            <td className="bg--orange text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--blue text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--purple text-center">
-                              <strong>3</strong>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="project--title--td sticky">
-                              <div className="d-flex justify-content-between">
-                                <div className="project--name d-flex justify-content-start gap-3 align-items-center">
-                                    <div className="title--initial">GS</div>
-                                    <div className="title--span flex-column d-flex align-items-start gap-0">
-                                        <span>Gagandeep Singh</span>
-                                        <strong>UI/UX Designer</strong>
-                                    </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--red">A</span>
-                              <strong>0h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--green">P</span>
-                              <strong>9h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--purple">SL</span>
-                              <strong>6h 00m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--blue">H</span>
-                              <strong>4h 30m</strong>
-                            </td>
-                            <td className="text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="hidden text-center">
-                              <span className="att--badge bg--orange">S</span>
-                              <strong>2h 00m</strong>
-                            </td>
-                            <td className="bg--green text-center">
-                              <strong>22</strong>
-                            </td>
-                            <td className="bg--red text-center">
-                              <strong>4</strong>
-                            </td>
-                            <td className="bg--orange text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--blue text-center">
-                              <strong>2</strong>
-                            </td>
-                            <td className="bg--purple text-center">
-                              <strong>3</strong>
-                            </td>
-                          </tr>
+                          {
+                            (excelData && excelData.length > 0) && 
+                              excelData.map((data, i) => {
+                                return (
+                                  <tr>
+                                    <td className="project--title--td sticky">
+                                      <div className="d-flex justify-content-between">
+                                        <div className="project--name d-flex justify-content-start gap-3 align-items-center">
+                                            <div className="title--initial">{data?.name?.substring(0, 2)}</div>
+                                            <div className="title--span flex-column d-flex align-items-start gap-0">
+                                                <span>{data?.name}</span>
+                                                <strong>{data?.role}</strong>
+                                            </div>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    {
+                                        data.attendanceData && data.attendanceData.length > 0 && 
+                                        data.attendanceData.map((atten, ind) => {
+                                          if (atten.count !== undefined) {
+                                            return (
+                                              <td className={`${atten?.bg} text-center`} key={ind}>
+                                                <strong>{atten?.count}</strong>
+                                              </td>
+                                            );
+                                          } else {
+                                            return (
+                                              <td className="text-center" key={ind}>
+                                                <span className={`att--badge ${getBadgeColor(atten?.status)}`}>
+                                                  {
+                                                    atten?.status && atten?.status !== "--"
+                                                      ? (atten.status.split(" ").length === 2
+                                                          ? atten.status.substring(0, 2)
+                                                          : atten.status.charAt(0))
+                                                      : '--'
+                                                  }
+
+                                                </span>
+                                                <strong>{atten?.total_time}</strong>
+                                              </td>
+                                            );
+                                          }
+                                        })
+                                      }
+
+                                    </tr>
+                                )
+                              })
+                          }
                         </tbody>
                     </Table>
                 </div>

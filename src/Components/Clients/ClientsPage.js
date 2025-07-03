@@ -488,10 +488,11 @@ function ClientsPage() {
                             </div>
                         </th>
                         <th scope="col" key="client-email-header" className="onHide">Email <small><TbArrowsSort /></small></th>
+                        <th scope="col" key="client-phone-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
                         {Array.isArray(customFields) && customFields
                             .filter(field => field?.showInTable !== false)
                             .map((field, idx) => (
-                                <th scope="col" key={`client-${field.name || idx}-header`} className="onHide">
+                                <th scope="col" key={`client-field-${idx}-header`} className="onHide">
                                 {field.label}
                                 </th>
                             ))
@@ -519,9 +520,9 @@ function ClientsPage() {
                                   </div>
                               </div>
                             </td>
-                            <td className="onHide new__td">john@gmail.com</td>
-                            <td className="onHide new__td">+1 (555) 123-4567</td>
-                            <td className="task--last--buttons">
+                            <td className="onHide new__td" key={`client-td1-${index}`}>john@gmail.com</td>
+                            <td className="onHide new__td" key={`client-td2-${index}`}>+1 (555) 123-4567</td>
+                            <td className="task--last--buttons" key={`client-td3-${index}`}>
                               <div className="d-flex justify-content-between">
                                   <div className="onHide">
                                       <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client);}}><BsEye /> View</Button>
@@ -559,16 +560,21 @@ function ClientsPage() {
             <Dropdown>
               <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <h3>
-                      <strong>M H, LU</strong>
-                      <span>E-commerce Platform</span>
+                      <strong>{selectedClient?.name}</strong>
                   </h3>
               </Dropdown.Toggle>
               <Dropdown.Menu>
                   <div className="drop--scroll">
-                      <Dropdown.Item>
-                        <strong>Alex Chen</strong>
-                        <span>E-commerce Platform</span>
-                      </Dropdown.Item>
+                    {
+                      clientFeeds.map((client, index) => {
+                        return (
+                          <Dropdown.Item onClick={() => {handleClick(client)}} key={`client-item-${index}`}>
+                            <strong>{client?.name}</strong>
+                          </Dropdown.Item>
+                        )
+                      })
+                    }
+                      
                   </div>
               </Dropdown.Menu>
           </Dropdown>
@@ -584,7 +590,7 @@ function ClientsPage() {
               <Form.Control type="file" id="upload--img" hidden onChange={(e) => handleFieldChange('avatar', e)} accept=".jpg, .jpeg, .png, .gif" />
               {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ? (
                 <>
-                <Form.Label for="upload--img">
+                <Form.Label htmlFor="upload--img">
                   {
                     avatarPreview ? 
                       <Card.Img variant="top" src={avatarPreview} />
@@ -609,7 +615,7 @@ function ClientsPage() {
                 </>
                 )
                 :
-                <Form.Label for="upload--img">
+                <Form.Label htmlFor="upload--img">
                   {
                     avatarPreview ? 
                       <Card.Img variant="top" src={avatarPreview} />
@@ -629,7 +635,7 @@ function ClientsPage() {
                 <ListGroup>
                   <ListGroup.Item>
                     <span className="info--icon"><FiMail /></span>
-                    <p>
+                    
                       <small>Client Name</small>
                       {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ?
                       <>
@@ -652,7 +658,7 @@ function ClientsPage() {
                           {editedClient?.name}
                         </>
                         }
-                    </p>
+                    
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <span className="info--icon"><FiPhone /></span>

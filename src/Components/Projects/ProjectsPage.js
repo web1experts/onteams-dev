@@ -787,13 +787,13 @@ function ProjectsPage() {
                                                 </div>
                                             </th>
                                             {/* <th scope="col" key="project-action-header" className="onHide sticky">Actions</th> */}
-                                            <th scope="col" key="project-status-header" className="onHide">Status <small><TbArrowsSort /></small></th>
+                                            <th scope="col" key="project-status-header" className="onHide">Status </th>
                                             {/* <th scope="col" key="project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th> */}
                                             {/* <th scope="col" key="project-client-header" className="onHide">Client</th> */}
-                                            <th scope="col" key="project-member-header" className="onHide">Assigned Members <small><TbArrowsSort /></small></th>
-                                            <th scope="col" key="project-start-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
-                                            <th scope="col" key="project-end-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
-                                            <th scope="col" key="project-due-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
+                                            <th scope="col" key="project-member-header" className="onHide">Assigned Members</th>
+                                            <th scope="col" key="project-start-header" className="onHide">Start Date</th>
+                                            <th scope="col" key="project-end-header" className="onHide">End Date </th>
+                                            <th scope="col" key="project-due-header" className="onHide">Due Date </th>
                                             {Array.isArray(customFields) && customFields
                                                 .filter(field => field?.showInTable !== false)
                                                 .map((field, idx) => (
