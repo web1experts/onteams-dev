@@ -128,21 +128,21 @@ function SidebarPanel() {
     },[commonState ])
 
     const themes = [
-        { name: 'OceanBlue', color: 'linear-gradient(135deg, rgb(30,144,255), rgb(0,191,255))', primaryColor: 'rgb(30,144,255)', secondaryColor: 'rgb(0,191,255)' },
-        { name: 'PurpleDream', color: 'linear-gradient(135deg, rgb(218,112,214), rgb(186,85,211))', primaryColor: 'rgb(218,112,214)', secondaryColor: 'rgb(186,85,211)' },
-        { name: 'ForestGreen', color: 'linear-gradient(135deg, rgb(46,139,87), rgb(60,179,113))', primaryColor: 'rgb(46,139,87)', secondaryColor: 'rgb(60,179,113)' },
-        { name: 'SunsetOrange', color: 'linear-gradient(135deg, rgb(255,69,0), rgb(255,140,0))', primaryColor: 'rgb(255,69,0)', secondaryColor: 'rgb(255,140,0)' },
-        { name: 'RoyalPurple', color: 'linear-gradient(135deg, rgb(138,43,226), rgb(147,112,219))', primaryColor: 'rgb(138,43,226)', secondaryColor: 'rgb(147,112,219)' },
-        { name: 'GoldenRose', color: 'linear-gradient(135deg, rgb(255,165,0), rgb(255,99,71))', primaryColor: 'rgb(255,165,0)', secondaryColor: 'rgb(255,99,71)' },
-        { name: 'FreshLime', color: 'linear-gradient(135deg, rgb(50,205,50), rgb(173,255,47))', primaryColor: 'rgb(50,205,50)', secondaryColor: 'rgb(173,255,47)' },
-        { name: 'SkyBlue', color: 'linear-gradient(135deg, rgb(0,191,255), rgb(135,206,250))', primaryColor: 'rgb(0,191,255)', secondaryColor: 'rgb(135,206,250)' },
-        { name: 'ElectricFuchsia', color: 'linear-gradient(135deg, rgb(255,0,255), rgb(255,105,180))', primaryColor: 'rgb(255,0,255)', secondaryColor: 'rgb(255,105,180)' },
-        { name: 'SunnyYellow', color: 'linear-gradient(135deg, rgb(255,215,0), rgb(255,165,0))', primaryColor: 'rgb(255,215,0)', secondaryColor: 'rgb(255,165,0)' },
-        { name: 'CrimsonCoral', color: 'linear-gradient(135deg, rgb(220,20,60), rgb(255,99,71))', primaryColor: 'rgb(220,20,60)', secondaryColor: 'rgb(255,99,71)' },
-        { name: 'MidnightBlue', color: 'linear-gradient(135deg, rgb(25,25,112), rgb(65,105,225))', primaryColor: 'rgb(25,25,112)', secondaryColor: 'rgb(65,105,225)' },
-        { name: 'EmeraldMint', color: 'linear-gradient(135deg, rgb(46,229,157), rgb(31,191,164))', primaryColor: 'rgb(46,229,157)', secondaryColor: 'rgb(31,191,164)' },
-        { name: 'MagentaViolet', color: 'linear-gradient(135deg, rgb(199,21,133), rgb(255,0,255))', primaryColor: 'rgb(199,21,133)', secondaryColor: 'rgb(255,0,255)' },
-        { name: 'CopperBronze', color: 'linear-gradient(135deg, rgb(184,115,51), rgb(205,127,50))', primaryColor: 'rgb(184,115,51)', secondaryColor: 'rgb(205,127,50)' },
+        { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: 'rgb(59 130 246)', secondaryColor: 'rgb(6 182 212)' },
+        { name: 'Purple Dream', color: 'linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))', primaryColor: 'rgb(168 85 247)', secondaryColor: 'rgb(236 72 153)' },
+        { name: 'Forest Green', color: 'linear-gradient(135deg, rgb(16 185 129), rgb(20 184 166))', primaryColor: 'rgb(16 185 129)', secondaryColor: 'rgb(20 184 166)' },
+        { name: 'Sunset Orange', color: 'linear-gradient(135deg, rgb(249 115 22), rgb(239 68 68))', primaryColor: 'rgb(249 115 22)', secondaryColor: 'rgb(239 68 68)' },
+        { name: 'Royal Purple', color: 'linear-gradient(135deg, rgb(99 102 241), rgb(139 92 246))', primaryColor: 'rgb(99 102 241)', secondaryColor: 'rgb(139 92 246)' },
+        { name: 'Golden Rose', color: 'linear-gradient(135deg, rgb(244 63 94), rgb(245 158 11))', primaryColor: 'rgb(244 63 94)', secondaryColor: 'rgb(245 158 11)' },
+        { name: 'Fresh Lime', color: 'linear-gradient(135deg, rgb(132 204 22), rgb(34 197 94))', primaryColor: 'rgb(132 204 22)', secondaryColor: 'rgb(34 197 94)' },
+        { name: 'Sky Blue', color: 'linear-gradient(135deg, rgb(14 165 233), rgb(59 130 246))', primaryColor: 'rgb(14 165 233)', secondaryColor: 'rgb(59 130 246)' },
+        { name: 'Electric Fuchsia', color: 'linear-gradient(135deg, rgb(217 70 239), rgb(168 85 247))', primaryColor: 'rgb(217 70 239)', secondaryColor: 'rgb(168 85 247)' },
+        { name: 'Sunny Yellow', color: 'linear-gradient(135deg, rgb(234 179 8), rgb(249 115 22))', primaryColor: 'rgb(234 179 8)', secondaryColor: 'rgb(249 115 22)' },
+        { name: 'Crimson Coral', color: 'linear-gradient(135deg, rgb(220 38 38), rgb(249 115 22))', primaryColor: 'rgb(220 38 38)', secondaryColor: 'rgb(249 115 22)' },
+        { name: 'Midnight Blue', color: 'linear-gradient(135deg, rgb(30 64 175), rgb(109 40 217))', primaryColor: 'rgb(30 64 175)', secondaryColor: 'rgb(109 40 217)' },
+        { name: 'Emerald Mint', color: 'linear-gradient(135deg, rgb(5 150 105), rgb(6 182 212))', primaryColor: 'rgb(5 150 105)', secondaryColor: 'rgb(6 182 212)' },
+        { name: 'Magenta Violet', color: 'linear-gradient(135deg, rgb(192 38 211), rgb(124 58 237))', primaryColor: 'rgb(192 38 211)', secondaryColor: 'rgb(124 58 237)' },
+        { name: 'Copper Bronze', color: 'linear-gradient(135deg, rgb(234 88 12), rgb(202 138 4))', primaryColor: 'rgb(234 88 12)', secondaryColor: 'rgb(202 138 4)' },
     ];
 
     const [selectedTheme, setSelectedTheme] = useState('Ocean Blue');
@@ -277,14 +277,14 @@ function SidebarPanel() {
                             {themes.map((theme, index) => (
                                 <Col key={index} md={4} className="mb-4">
                                     <Card className={`theme--card ${selectedTheme === theme.name ? 'active--theme' : ''}`} onClick={() => {setSelectedTheme(theme.name); saveTheme(theme);dispatch(toggleTheme(theme))}} style={{ cursor: 'pointer', borderRadius: '12px', overflow: 'hidden', position: 'relative' }}>
-                                        <div className="themg--bg" style={{ background: theme.color, height: '60px', }}>
+                                        <div className="themg--bg" style={{ background: theme.color, height: '62px', }}>
                                             {selectedTheme === theme.name && (
                                                 <span
                                                     style={{
                                                         position: 'absolute',
                                                         top: 8,
                                                         right: 8,
-                                                        background: '#fff',
+                                                        background: 'rgb(34 197 94',
                                                         borderRadius: '50%',
                                                         padding: '4px',
                                                         display: 'flex',
@@ -293,7 +293,7 @@ function SidebarPanel() {
                                                         boxShadow: '0 0 5px rgb(0,0,0,0.2)',
                                                     }}
                                                 >
-                                                    <MdCheck color="#0d6efd" size={16} />
+                                                    <MdCheck color="#ffffff" size={16} />
                                                 </span>
                                             )}
                                         </div>

@@ -483,20 +483,18 @@ function ClientsPage() {
                 <thead className="onHide">
                     <tr key="project-table-header">
                       <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
-                            <div className="d-flex align-items-center justify-content-between border-end">
-                                Clients <span key="project-action-header" className="onHide">Actions</span>
-                            </div>
-                        </th>
-                        <th scope="col" key="client-email-header" className="onHide">Email <small><TbArrowsSort /></small></th>
-                        <th scope="col" key="client-phone-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
-                        {Array.isArray(customFields) && customFields
-                            .filter(field => field?.showInTable !== false)
-                            .map((field, idx) => (
-                                <th scope="col" key={`client-field-${idx}-header`} className="onHide">
-                                {field.label}
-                                </th>
-                            ))
-                        }
+                          <div className="d-flex align-items-center justify-content-between border-end">
+                              Clients <span key="project-action-header" className="onHide">Actions</span>
+                          </div>
+                      </th>
+                      <th scope="col" key="client-email-header" className="onHide">Email <small><TbArrowsSort /></small></th>
+                      <th scope="col" key="client-phone-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
+                      {Array.isArray(customFields) && customFields
+                        .filter(field => field?.showInTable !== false)
+                        .map((field, idx) => (
+                          <th scope="col" key={`client-field-${idx}-header`} className="onHide">{field.label}</th>
+                        ))
+                      }
                     </tr>
                 </thead>
                 <tbody>
@@ -522,6 +520,12 @@ function ClientsPage() {
                             </td>
                             <td className="onHide new__td" key={`client-td1-${index}`}>john@gmail.com</td>
                             <td className="onHide new__td" key={`client-td2-${index}`}>+1 (555) 123-4567</td>
+                            {Array.isArray(customFields) && customFields
+                              .filter(field => field?.showInTable !== false)
+                              .map((field, idx) => (
+                                <td className="onHide new__td">{field.label}</td>
+                              ))
+                            }
                             <td className="task--last--buttons" key={`client-td3-${index}`}>
                               <div className="d-flex justify-content-between">
                                   <div className="onHide">

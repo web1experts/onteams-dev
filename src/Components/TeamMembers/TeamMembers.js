@@ -24,8 +24,8 @@ import {
   FiShield,
   FiPhone,
   FiCalendar,
-  FiVideo,
-} from "react-icons/fi";
+  FiVideo } from "react-icons/fi";
+import { AiOutlineTeam } from 'react-icons/ai';
 import { BsEye, BsGrid } from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { TbArrowsSort } from "react-icons/tb";
@@ -894,8 +894,7 @@ function TeamMembersPage() {
                         setsearchTerm("");
                         setActiveTab("Members");
                       }}
-                    >
-                      Team Members
+                    ><AiOutlineTeam /> Team Members
                     </ListGroup.Item>
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
@@ -908,8 +907,7 @@ function TeamMembersPage() {
                           setsearchTerm("");
                           setActiveTab("Invitees");
                         }}
-                      >
-                        Invitations
+                      ><FiMail /> Invitations
                       </ListGroup.Item>
                     )}
                   </ListGroup>
@@ -995,8 +993,7 @@ function TeamMembersPage() {
                       setsearchTerm("");
                       setActiveTab("Members");
                     }}
-                  >
-                    Team Members
+                  ><AiOutlineTeam /> Team Members
                   </ListGroup.Item>
                   {(memberProfile?.permissions?.members?.create_edit_delete ===
                     true ||
@@ -1008,8 +1005,7 @@ function TeamMembersPage() {
                         setsearchTerm("");
                         setActiveTab("Invitees");
                       }}
-                    >
-                      Invitations
+                    ><FiMail /> Invitations
                     </ListGroup.Item>
                   )}
                 </ListGroup>

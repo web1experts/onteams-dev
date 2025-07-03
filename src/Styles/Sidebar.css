@@ -310,6 +310,7 @@ Sidebar CSS-=-=
   max-height: calc(100% - 290px);
   overflow-y: auto;
   overflow-x: hidden;
+  padding-bottom: 2rem;
   /* min-height: 100%; */
 }
 
@@ -639,8 +640,12 @@ Sidebar CSS-=-=
   padding: 1.5rem;
   color: #ffffff;
   background: linear-gradient(to right,#1e293b,#334155);
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   border-radius: 12px 12px 0 0;
+}
+
+.theme--modal .modal-body {
+  padding: 1.5rem;
 }
 
 .theme--modal .modal-title span.nav--item--icon {
@@ -749,6 +754,11 @@ Sidebar CSS-=-=
   -webkit-transform: scale(1.05);
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+}
+
+.theme--card .card-body {
+  padding: 0;
+  padding-top: 1rem;
 }
 
 .themg--bg {

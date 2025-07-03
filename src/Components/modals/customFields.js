@@ -50,11 +50,8 @@ const typeColorMap = {
     return(
     <Card className="mb-3">
       <Card.Body>
-        <Row className="align-items-center mb-2">
-          <Col xs="auto">
-            <Badge pill bg="light" text="dark">#{idx}</Badge>
-          </Col>
-          
+        <Row className="align-items-center">
+          <Col xs="auto"><Badge pill bg="light" text="dark">#{idx}</Badge></Col>
           <Col><h5 className="mb-0 fw-bold">{label}</h5></Col>
           {
             showInTable &&
@@ -66,14 +63,17 @@ const typeColorMap = {
             <Badge bg={typeColorMap[type] || 'secondary'}>
                 {typeLabelMap[type] || type}
             </Badge>
-
+          </Col>
+          <Col xs="auto">
+            <Button variant="outline-primary" className="me-2 border-0 p-0 text-info" onClick={() => {handleFieldEdit(field)}}><FaRegEdit /></Button>
+            <Button variant="outline-danger" className="border-0 p-0" onClick={() => handleFieldDelete(field._id)}><FaRegTrashAlt /></Button>
           </Col>
         </Row>
 
         {['radio', 'dropdown','badge'].includes(type) && (
           <>
-            <Badge bg="info" className="mb-2">{options.length} options</Badge>
-            <Row className="mb-3">
+            <Badge bg="info" className="mt-2">{options.length} options</Badge>
+            <Row>
                <div className="mt-2">
                   <div className="d-flex flex-wrap gap-1">
                     {options.map((opt, i) => (
@@ -90,14 +90,6 @@ const typeColorMap = {
             </Row>
           </>
         )}
-
-        <Row>
-          
-          <Col xs="auto">
-            <Button variant="outline-primary" className="me-2 border-0 p-0 text-info" onClick={() => {handleFieldEdit(field)}}><FaRegEdit /></Button>
-            <Button variant="outline-danger" className="border-0 p-0" onClick={() => handleFieldDelete(field._id)}><FaRegTrashAlt /></Button>
-          </Col>
-        </Row>
       </Card.Body>
     </Card>
   );
@@ -522,14 +514,13 @@ const typeColorMap = {
                 <p className="text-muted">No custom fields added yet.</p>
                 ) : (
                 customFields.map((field, index) => (
-                    <FieldCard
+                  <FieldCard
                     key={index}
                     idx={index + 1}
                     field={field}
-                    />
+                  />
                 ))
-                )}
-
+              )}
             </div>
           </div>
         {/* )} */}

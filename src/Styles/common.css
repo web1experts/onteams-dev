@@ -122,13 +122,13 @@ fieldset:disabled .btn {
 .btn-primary {
   color: #ffffff;
   background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
-  border-color: transparent;
+  border: 0;
 }
 
 .btn-outline-primary {
-  color: rgb(15 23 42);
+  color: var(--theme-primary);
   background-color: transparent;
-  border-color: rgb(15 23 42);
+  border-color: var(--theme-primary);
 }
 
 .btn-secondary:not(:disabled):not(.disabled).active:focus,
@@ -1031,6 +1031,7 @@ Add Project Modal CSS-=-=-
   padding: 1rem;
   border-radius: .75rem;
   border: 1px solid rgb(199 210 254);
+  margin-bottom: 1rem;
 }
 
 .added--fields .card {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { FiClock, FiCalendar } from "react-icons/fi";
+import { FiClock, FiCalendar, FiTrendingUp, FiUsers, FiTarget, FiAward, FiStar } from "react-icons/fi";
+import { LuSparkles } from 'react-icons/lu';
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { getMemberdata } from "../../helpers/commonfunctions";
 import { Card } from "react-bootstrap";
@@ -43,6 +44,14 @@ const DateTimeCard = () => {
 
   return (
     <Card className="daily--star daily--welcome">
+      <div className="absolute inset-0 opacity-5">
+        <FiTrendingUp className="FiTrendingUp" />
+        <FiUsers className="FiUsers"/>
+        <FiTarget className="FiTarget"/>
+        <FiAward className="FiAward" />
+        <LuSparkles className="LuSparkles" />
+        <FiStar className="FiStar" />
+      </div>
       <div className="card--icon">
         <div className="star--icon">
           <svg
@@ -88,7 +97,7 @@ const DateTimeCard = () => {
               <path d="M3 5h4"></path>
               <path d="M17 19h4"></path>
             </svg>{" "}
-            Ready to make today extraordinary?
+            Have a productive day!
           </small>
         </h6>
       </div>

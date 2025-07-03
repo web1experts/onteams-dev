@@ -6,10 +6,10 @@ import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, 
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck, FaEye } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock } from "react-icons/fi";
+import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
-import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill, BsEye} from "react-icons/bs";
-import { MdOutlineClose, MdOutlineSearch } from "react-icons/md";
+import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill, BsDashLg } from "react-icons/bs";
+import { MdOutlineClose, MdOutlineSearch, MdDragIndicator } from "react-icons/md";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { getliveActivity, getRecoredActivity, deleteRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
@@ -733,9 +733,9 @@ function TimeTrackingPage() {
                             leaveRoom(currentActivity?._id)
                             setCurrentActivity(cact);
                           }
-                          setActiveTab("Live")}}>Live
+                          setActiveTab("Live")}}><FiMonitor className="me-1" /> Live
                         </ListGroup.Item>
-                        <ListGroup.Item action active={activeTab === "Recordings"} onClick={() => {setActiveTab("Recordings")}}>Recorded</ListGroup.Item>
+                        <ListGroup.Item action active={activeTab === "Recordings"} onClick={() => {setActiveTab("Recordings")}}><FiVideo className="me-1" /> Recorded</ListGroup.Item>
                     </ListGroup>
                     {showTabs()}
                     <ListGroup.Item key="filter-key-6" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
@@ -812,6 +812,16 @@ function TimeTrackingPage() {
                 <div className="attendance--table activity--table--list">
                   <div className='attendance--table--list'>
                     <Table>
+                      <thead className="onHide">
+                        <tr key="project-table-header">
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Member</th>
+                          <th scope="col" key="client-time-header" className="onHide text-start">Project Name</th>
+                          <th scope="col" key="client-project-header" className="onHide ms-auto">Project Time</th>
+                          <th scope="col" key="client-time-header" className="onHide">Total Time</th>
+                          <th scope="col" key="client-status-header" className="onHide">Status</th>
+                          <th scope="col" key="client-action-header" className="onHide">Action</th>
+                        </tr>
+                      </thead>
                       <tbody>
                         {
                           liveactivities.length > 0 ?
@@ -834,7 +844,8 @@ function TimeTrackingPage() {
                                         }
                                       }} >
                                         <div className="d-flex justify-content-between">
-                                          <div className="project--name d-flex justify-content-md-between gap-3 align-items-center">
+                                          <div className="project--name d-flex gap-3 align-items-center">
+                                              <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
                                               <div className="title--initial">{activity.name.charAt(0)}</div>
                                               <div className="title--span flex-column d-flex align-items-start gap-0">
                                                 <span>
@@ -849,30 +860,28 @@ function TimeTrackingPage() {
                                                     <small className="status--circle inactive--color"></small>
                                                   }
                                                 </span>
-                                                  <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || '--' }</strong>
                                               </div>
                                           </div>
                                         </div>
                                     </td>
+                                    <td className="text-start"><span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <BsDashLg /> }</span></td>
                                     <td className="ms-auto">
-                                      <div className="d-flex align-items-center gap-3 mt-3 mt-xl-0 gap-xl-5 flex-wrap">
                                         {/* <div key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></div> */}
-                                        <div key={`task-time-${activity?._id}`} className="onHide"><strong>Project Time: </strong>{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
-                                        <div key={`total-time-${activity?._id}`} className="onHide"><strong>Total Time: </strong>{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</div>
-                                        <div key={`status-title-${activity?._id}`} className="onHide">
-                                          { 
-                                            (activity?.latestActivity?.status) ? 
-                                            <Badge bg="success">Active</Badge> : 
-                                            (activity?.latestActivity?.status === false ) ?
-                                            <Badge bg="warning">Break</Badge>
-                                            :
-                                            <Badge bg="secondary">Inactive</Badge>
-                                            }
-                                        </div>
-                                        <div key={`view-act-${activity?._id}`} className="onHide text-lg-end">
-                                          <Button variant="primary" onClick={() => {handleClick(activity);}}><FaEye/> View Activity</Button>
-                                        </div>
-                                      </div>
+                                        <div key={`task-time-${activity?._id}`} className="onHide">{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
+                                    </td>
+                                    <td key={`total-time-${activity?._id}`} className="onHide">{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</td>
+                                    <td key={`status-title-${activity?._id}`} className="onHide">
+                                      { 
+                                        (activity?.latestActivity?.status) ? 
+                                        <Badge bg="success">Active</Badge> : 
+                                        (activity?.latestActivity?.status === false ) ?
+                                        <Badge bg="warning">Break</Badge>
+                                        :
+                                        <Badge bg="secondary">Inactive</Badge>
+                                        }
+                                    </td>
+                                    <td key={`view-act-${activity?._id}`} className="onHide text-lg-end">
+                                      <Button variant="dark" onClick={() => {handleClick(activity);}}><FaEye/> Details</Button>
                                     </td>
                                   </tr>
                                 </>
@@ -910,6 +919,14 @@ function TimeTrackingPage() {
                 <div className="attendance--table activity--table--list">
                   <div className='attendance--table--list'>
                     <Table>
+                      <thead className="onHide">
+                        <tr key="project-table-header">
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Member</th>
+                          <th scope="col" key="client-time-header" className="onHide text-start">Project Name</th>
+                          <th scope="col" key="client-time-header" className="onHide ms-auto">Total Time</th>
+                          <th scope="col" key="client-action-header" className="onHide">Action</th>
+                        </tr>
+                      </thead>
                       <tbody>
                       {
                           liveactivities.length > 0 ?
@@ -934,33 +951,30 @@ function TimeTrackingPage() {
                                           }
                                       }} >
                                         <div className="d-flex justify-content-between">
-                                          <div className="project--name d-flex justify-content-md-between gap-3 align-items-center">
-                                              <div className="title--initial">{activity.name.charAt(0)}</div>
-                                              <div className="title--span flex-column d-flex align-items-start gap-0">
-                                                <span>
-                                                  {activity.name}
-                                                  {
-                                                    activity?.latestActivity?.status ? 
-                                                    <small className="status--circle active--color"></small>
-                                                    :
-                                                    activity?.latestActivity?.status === false  ?
-                                                    <small className="status--circle idle--color"></small>
-                                                    :
-                                                    <small className="status--circle inactive--color"></small>
-                                                  }
-                                                </span>
-                                                  <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || '--' }</strong>
-                                              </div>
+                                          <div className="project--name d-flex gap-3 align-items-center">
+                                            <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
+                                            <div className="title--initial">{activity.name.charAt(0)}</div>
+                                            <div className="title--span flex-column d-flex align-items-start gap-0">
+                                              <span>
+                                                {activity.name}
+                                                {
+                                                  activity?.latestActivity?.status ? 
+                                                  <small className="status--circle active--color"></small>
+                                                  :
+                                                  activity?.latestActivity?.status === false  ?
+                                                  <small className="status--circle idle--color"></small>
+                                                  :
+                                                  <small className="status--circle inactive--color"></small>
+                                                }
+                                              </span>
+                                            </div>
                                           </div>
                                         </div>
                                     </td>
-                                    <td className="ms-auto">
-                                      <div className="d-flex align-items-center gap-5">
-                                        <div className="onHide"><strong>Total Time: </strong>{ convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</div>
-                                        <div className="onHide text-lg-end">
-                                          <Button variant="primary" onClick={() => {handleClick(activity);}}><FaEye/> View Activity</Button>
-                                        </div>
-                                      </div>
+                                    <td className="text-start"><span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <BsDashLg /> }</span></td>
+                                    <td className="ms-auto"><div className="onHide">{ convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</div></td>
+                                    <td className="onHide text-lg-end">
+                                      <Button variant="dark" onClick={() => {handleClick(activity);}}><FaEye/> Details</Button>
                                     </td>
                                   </tr>
                                 </>
@@ -1014,15 +1028,13 @@ function TimeTrackingPage() {
                   leaveRoom(currentActivity?._id)
                   startsharing(currentActivity?._id, currentActivity?.latestActivity?.status)
                 }
-                }}>
-                Live
+                }}><FiMonitor className="me-1" /> Live
               </Button>
               <Button variant="primary" className="btn--view" key={'recored-key'} active={activeInnerTab === "InnerRecorded"} onClick={() => {setActiveInnerTab("InnerRecorded")
                 if( currentActivity && Object.keys(currentActivity)){
                   leaveRoom(currentActivity?._id)
                 }
-              }}>
-                Recorded
+              }}><FiVideo className="me-1" /> Recorded
               </Button>
             </ListGroup>
             

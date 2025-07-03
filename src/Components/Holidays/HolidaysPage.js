@@ -178,7 +178,7 @@ const getDaysLeft = (date) => {
   const today = dayjs();
   const target = dayjs(date);
   const diff = target.diff(today, 'day');
-  return diff >= 0 ? `${diff} days left` : 'Past Holiday';
+  return diff >= 0 ? `${diff} days left` : <span className="text-muted">Past Holiday</span>;
 };
 
   return (
@@ -290,7 +290,7 @@ const getDaysLeft = (date) => {
                               <span className="days--left">{getDaysLeft(holiday.date)}</span>
                               <div key={`action-td-${index}`} className="ms-3">
                                 <Dropdown>
-                                  <Dropdown.Toggle variant="primary"><FaEllipsisV /></Dropdown.Toggle>
+                                  <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
                                   <Dropdown.Menu>
                                     <Dropdown.Item
                                       key={`edit-item-${index}`}

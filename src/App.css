@@ -40,8 +40,8 @@ body {
 
 .team--page .page--title h2 .btn {
   padding: 0;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,10 +203,13 @@ body {
 }
 
 .page--title .list-group .list-group {
-  background: rgb(241 245 249);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  background: #ffffff;
   border-radius: .5rem;
   padding: .25rem;
   gap: 5px;
+  border: 1px solid rgb(226 232 240);
 }
 
 .page--title .list-group-item {
@@ -215,6 +218,10 @@ body {
   flex: none;
   width: fit-content;
   font-size: 20px;
+}
+
+.page--title .list-group .list-group .list-group-item {
+  box-shadow: none;
 }
 
 .page--title .expand--icon {
@@ -228,13 +235,18 @@ body {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   padding: 0;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: none;
   border-radius: .5rem;
+}
+
+.wrapper--title .expand--icon .list-group-item {
+  width: 40px;
+  height: 40px;
 }
 
 .page--title .expand--icon svg, .wrapper--title .expand--icon svg {
@@ -267,7 +279,7 @@ body {
   display: flex;
   height: auto;
   justify-content: center;
-  padding: .5rem 1rem;
+  padding: .35rem 1rem;
   text-transform: capitalize;
   width: auto;
   font-size: 1rem;
@@ -321,8 +333,11 @@ body {
 }
 
 .page--title .search-filter-list .form-group .form-control {
-  padding-left: 2.5rem;
-  min-width: 280px;
+    padding-left: 2.5rem;
+    min-width: 280px;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    background: #ffffff;
 }
 
 .page--title .view--icon {
@@ -514,23 +529,20 @@ body {
   padding: 1rem;
   border-right: 1px solid rgb(226 232 240);
   border-bottom: 1px solid rgb(226 232 240);
-}
-
-.page--wrapper .draggable--table th {
   min-width: 170px;
   white-space: nowrap;
 }
 
 .page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
   width: 520px;
+  max-width: 520px;
+  min-width: 520px;
   position: sticky;
   position: -webkit-sticky;
   left: 0;
   background: #ffffff;
   z-index: 1;
-  max-width: 520px;
   border-right: 0;
-  min-width: 420px;
 }
 
 .page--wrapper .draggable--table td.project--title--td {
@@ -541,6 +553,8 @@ body {
 .page--wrapper .draggable--table th {
   font-weight: 600;
   text-transform: uppercase;
+  padding: .75rem 1rem;
+  font-size: 14px;
 }
 
 .page--wrapper .draggable--table th small {
@@ -559,7 +573,7 @@ body {
   min-width: 120px;
   text-align: center;
   border-left: 1px solid rgb(226 232 240);
-  padding: 1rem 1.5rem;
+  padding: .75rem 1.5rem;
 }
 
 .page--wrapper .draggable--table th {
@@ -578,7 +592,7 @@ body {
 .page--wrapper table th abbr, .page--wrapper table td abbr {
   width: auto;
   height: auto;
-  min-width: 30px;
+  min-width: 40px;
   padding: .25rem .5rem;
   background: rgb(241 245 249);
   color: rgb(100 116 139);
@@ -703,7 +717,6 @@ body {
   -webkit-box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   border-radius: 1rem;
   height: calc(100dvh - 140px);
-  /* border: 1px solid rgb(226 232 240); */
 }
 
 table.draggable--table {
@@ -1843,6 +1856,7 @@ table tr.marked-project td {
   /* margin-bottom: -1px; */
   border-bottom-width: var(--bs-border-width);
   box-shadow: none;
+  background: none;
 }
 
 .project--grid--table>:not(caption)>*>* {
@@ -1965,6 +1979,8 @@ table tr.marked-project td {
   color: var(--bs-body-color);
   appearance: none;
   background: var(--bs-body-bg);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   background-clip: padding-box;
   border: var(--bs-border-width) solid var(--bs-border-color);
   transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
@@ -2492,10 +2508,11 @@ table tr.marked-project td {
 .projects--page .table .list-group-item .team--initial,
 .projects--page .table .list-group-item .team--image,
 .project--form--actions .list-group-item .team--initial,
-.tasks-form-action .list-group-item .team--initial {
-  width: 35px;
+.tasks-form-action .list-group-item .team--initial,
+.projects--page .table .list-group-item .btn {
+  width: 32px;
   text-decoration: none;
-  height: 35px;
+  height: 32px;
   font-weight: 600;
   border-radius: 100px;
   -webkit-border-radius: 100px;
@@ -2511,19 +2528,6 @@ table tr.marked-project td {
 
 .projects--page .table .list-group-item .btn {
   font-weight: normal;
-  width: 35px;
-  text-decoration: none;
-  height: 35px;
-  border-radius: 100px;
-  -webkit-border-radius: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  padding: 0;
-  border: 0;
-  background: rgb(224 229 236);
-  color: #000000;
 }
 
 .tasks-form-action .list-group-item .team--initial {
@@ -3659,6 +3663,8 @@ pre {
 
 .activity--table table .active--color {
   background: green;
+  animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
+  -webkit-animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
 }
 
 .activity--table table .idle--color {
@@ -4413,7 +4419,7 @@ pre {
 .dashboard--page .daily--star {
   border-radius: 1rem;
   -webkit-border-radius: 1rem;
-  padding: 2.5rem;
+  padding: 2rem;
   border: 0;
   background: linear-gradient(to bottom right, #1e293b, #334155, #1e293b);
   position: relative;
@@ -4424,6 +4430,7 @@ pre {
 .dashboard--page .daily--welcome {
   background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
   flex-flow: row wrap;
+  position: relative
 }
 
 .dashboard--page .daily--star::before,
@@ -4447,12 +4454,14 @@ pre {
 }
 
 .daily--welcome .card--icon h6 {
-  display: flex;
-  flex-flow: column wrap;
-  font-size: 35px;
-  font-weight: 600;
-  gap: 1rem;
-  align-items: flex-start;
+    display: flex;
+    flex-flow: column wrap;
+    font-size: 35px;
+    font-weight: 600;
+    grid-gap: 1rem;
+    gap: 0.5rem;
+    align-items: flex-start;
+    font-size: 1.875rem;
 }
 
 .daily--welcome .card--icon h6 strong {
@@ -4464,8 +4473,9 @@ pre {
 }
 
 .daily--welcome .card--icon h6 small {
-  font-size: 25px;
-  font-weight: normal;
+    font-weight: normal;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
 }
 
 .daily--welcome .card--icon h6 small svg {
@@ -4666,6 +4676,8 @@ ul#icon-tabs .nav-link span svg {
   display: flex;
   align-items: center;
   gap: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .card--icon h6 {
@@ -4677,7 +4689,7 @@ ul#icon-tabs .nav-link span svg {
 .daily--star .blockquote {
   text-align: left;
   margin-top: 2rem;
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   font-weight: 700;
 }
 
@@ -4714,17 +4726,67 @@ ul#icon-tabs .nav-link span svg {
   height: auto;
 }
 
+.daily--welcome .absolute svg {
+  width: 2rem;
+  height: 2rem;
+  color: #ffffff;
+  position: absolute;
+}
+
+.daily--welcome .absolute {
+    opacity: .1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+   position: absolute;
+}
+
+.daily--welcome .absolute .FiTrendingUp {
+  top: 1rem;
+  left: 2rem;
+}
+
+.daily--welcome .absolute .FiUsers {
+  top: 2.5rem;
+  right: 4rem;
+}
+
+.daily--welcome .absolute .FiTarget {
+  left: 5em;
+  bottom: 1.5rem;
+}
+
+.daily--welcome .absolute .FiAward {
+  right: 2rem;
+  bottom: 1rem;
+}
+
+.daily--welcome .absolute .LuSparkles {
+  top: 50%;
+  left: 28%;
+}
+
+.daily--welcome .absolute .FiStar {
+  top: 30%;
+  right: 30%;
+}
+
 .daily--welcome .card-body {
   flex: none;
   margin-left: auto;
   text-align: left;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   background: #ffffff26;
-  padding: 2rem;
+  padding: 1.5rem;
   border: 1px solid #fff3;
   border-radius: .75rem;
   -webkit-border-radius: .75rem;
+  position: relative;
+  z-index: 1;
 }
 
 .daily--welcome .card-body h3,
@@ -5809,8 +5871,15 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .attendance--table--list table,
-.attendance--table--list tbody {
+.attendance--table--list tbody, .attendance--table--list thead {
   display: block;
+}
+
+.attendance--table--list thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    border: 0;
+    background: none;
 }
 
 .attendance--table--list table tr {
@@ -5845,6 +5914,34 @@ ul#icon-tabs .nav-link span svg {
 
 .activity--table--list table tr:hover, .members--view table tr:hover, .projects--view table tr:hover {
   background: linear-gradient(to right, #f8fafc, #eff6ff);
+}
+
+.attendance--table--list thead {
+  margin-bottom: 1rem;
+}
+
+.attendance--table--list thead th, .attendance--table--list tbody td {
+    min-width: 180px;
+    text-align: center;
+}
+
+.attendance--table--list thead th:first-child, .attendance--table--list tbody td:first-child {
+    text-align: left;
+    min-width: 350px;
+}
+
+.attendance--table--list thead th:last-child, .attendance--table--list tbody td:last-child {
+    text-align: right;
+}
+
+.attendance--table--list tbody td .badge {
+  margin: auto;
+}
+
+.attendance--table--list thead tr {
+    background: #d5d9db;
+    padding: .75rem 1.5rem;
+    font-size: 14px;
 }
 
 .page--wrapper .attendance--table--list table td .title--initial {
@@ -5937,7 +6034,13 @@ ul#icon-tabs .nav-link span svg {
   font-weight: 500;
 }
 
-.page--wrapper .attendance--excel--table th {
+.page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
+    width: auto;
+    max-width: fit-content;
+    min-width: 150px;
+}
+
+.page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table td {
     min-width: 100px;
 }
 
@@ -6419,10 +6522,6 @@ Media CSS-=-==
     max-width: 110px;
   }
 
-  /* .common--project--grid .projecttitle {
-    max-width: 25%;
-  } */
-
   .details--projects--view .project--form--actions {
     max-width: 25%;
   }
@@ -6440,6 +6539,23 @@ Media CSS-=-==
   .activity--table .draggable--table td:nth-child(3) {
     flex: 1 1;
     min-width: 0;
+  }
+
+  .attendance--table--list thead th:first-child, .attendance--table--list tbody td:first-child {
+    min-width: 280px;
+  }
+
+  .attendance--table--list thead th, .attendance--table--list tbody td {
+    min-width: 160px;
+  }
+  .attendance--table--list tbody td span {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 160px;
+    text-overflow: ellipsis;
   }
 }
 
@@ -6662,7 +6778,7 @@ Media CSS-=-==
     flex: 1 1 100%;
     flex-flow: column wrap;
     text-align: left;
-    gap: 5px;
+    gap: .5rem;
     align-items: flex-start;
     justify-content: flex-start;
   }
@@ -6733,11 +6849,25 @@ Media CSS-=-==
     align-items: flex-start;
   }
 
+  .attendance--table--list thead {
+    display: none;
+  }
+
+  .attendance--table--list tbody td .badge {
+    margin: 0;
+  }
+
   .attendance--table--list table tr {
     align-items: flex-start;
     flex-flow: column wrap;
     flex: 1 1 100%;
+    gap: .5rem;
     max-width: calc(50% - .5rem);
+  }
+
+  .attendance--table--list table tr td .fs-small {
+    font-size: 11px;
+    font-weight: 600;
   }
 
   .attendance--table--list table tr td {

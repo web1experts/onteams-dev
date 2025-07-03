@@ -481,9 +481,9 @@ function DashboardPage() {
                     <div className="app--title">
                       <div className="image--title">
                         <span><BsClock /></span>
-                        <h3>OnTeams.ai Time Tracker <small>Professional Edition</small></h3>
+                        <h3>Time Tracker Apps <small>Professional time tracking suite</small></h3>
                       </div>
-                      <p className="heading--text">Experience the future of productivity with our advanced desktop application. Track time seamlessly, monitor team performance, and collaborate in real-time with enterprise-grade security and beautiful analytics.</p>
+                      <p className="heading--text">Download our award-winning desktop app and install it on your computer to track your work.</p>
                       <CardGroup>
                         <Card className="track--features">
                           <CardTitle>
@@ -513,7 +513,7 @@ function DashboardPage() {
                         <Card.Link href='/downloads/onteams-win32-ia32.zip' download>
                           <CardTitle>
                             <span><FaDesktop /></span>
-                            <h4>Windows App <small>Windows 10 or later • 64-bit • Intel & AMD</small></h4>
+                            <h4>Windows App <small>Windows 10/11</small></h4>
                           </CardTitle>
                           <CardBody><FiDownload /></CardBody>
                         </Card.Link>
@@ -522,7 +522,7 @@ function DashboardPage() {
                         <Card.Link href='/downloads/onteams-win32-ia32.zip' download>
                           <CardTitle>
                             <span><MdLaptopMac /></span>
-                            <h4>IOS App <small>macOS 11 or later • Intel & Apple Silicon</small></h4>
+                            <h4>macOS App <small>macOS Monterey and later</small></h4>
                           </CardTitle>
                           <CardBody><FiDownload /></CardBody>
                         </Card.Link>

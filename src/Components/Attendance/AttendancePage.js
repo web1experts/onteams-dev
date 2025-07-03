@@ -474,7 +474,7 @@ useEffect(() => {
                                   <div className="text-center">
                                     <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">{attendanceData?.attendance?.absent || 0} <small>Absent</small></h4>
                                   </div>
-                                  <Button variant="primary" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {handleMemberAttendance(attendanceData?._id);setIsActive(1)}}><FaEye/> Details</Button>
+                                  <Button variant="dark" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {handleMemberAttendance(attendanceData?._id);setIsActive(1)}}><FaEye/> Details</Button>
                                 </div>
                               </td>
                             </tr>

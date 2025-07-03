@@ -158,11 +158,9 @@ const showError = (index, name) => {
                                 {showError(index, 'name')}
                             </Form.Group>
                             {
-                                rows.length > 1 && 
-                                <Button onClick={() => removeRow(index)} variant="link"><FaRegTrashAlt /></Button>
-                                
+                              rows.length > 1 && 
+                              <Button onClick={() => removeRow(index)} variant="link"><FaRegTrashAlt /></Button>
                             }
-                         
                         </div>
                      ))} 
                       {/* {customFields.length > 0 &&
