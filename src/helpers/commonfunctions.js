@@ -440,19 +440,19 @@ export function mergePermissions(rolePerms = {}, memberPerms = {}) {
 export function getAttendanceBadges (status) {
   switch (status) {
     case 'Full Day':
-      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiCheckCircle className="text--green" /><span className="status--badge bg--green">Present</span></span>)
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><span className="status--badge bg--green"><FiCheckCircle className="text--green me-2" /> Present</span></span>)
       break;
     case 'Absent':
-      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><AiOutlineCloseCircle className="text--red" /><span className="status--badge bg--red">Absent</span></span>)
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><span className="status--badge bg--red"><AiOutlineCloseCircle className="text--red me-2" /> Absent</span></span>)
       break;
     case 'Half Day':
-      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiClock className="text--blue"/><span className="status--badge bg--blue">Half Day</span></span>)
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><span className="status--badge bg--blue"><FiClock className="text--blue me-2"/> Half Day</span></span>)
       break;
     case 'Short Leave':
-      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><LuTimer className="text--purple" /><span className="status--badge bg--purple">Short Leave (6h)</span></span>)
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><span className="status--badge bg--purple"><LuTimer className="text--purple me-2" /> Short Leave (6h)</span></span>)
       break;
     default:
-      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><FiCoffee className="text--orange" /><span className="status--badge bg--orange">Short (2h)</span></span>)
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><span className="status--badge bg--orange"><FiCoffee className="text--orange me-2" /> Short (2h)</span></span>)
       break;
   }
 }

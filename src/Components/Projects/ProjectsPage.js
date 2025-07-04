@@ -747,7 +747,7 @@ function ProjectsPage() {
                                                 </Form.Group>
                                             </Form>
                                         </ListGroup.Item>
-                                        <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'd-none d-lg-flex'}>
+                                        <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'd-none d-lg-flex ms-3'}>
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                                         </ListGroup>
@@ -889,12 +889,12 @@ function ProjectsPage() {
                                                                             <td className="task--last--buttons">
                                                                                 <div className="d-flex justify-content-between">
                                                                                     <div key={`actions-index-${index}`} data-label="Actions" className="onHide">
-                                                                                        <Button variant="primary" className="me-2 px-3 py-2" 
+                                                                                        <Button variant="dark" className="me-2 px-3 py-2" 
                                                                                             onClick={() => {
                                                                                                 setIsActive(2);
                                                                                             }}>
                                                                                             <BsEye/> Details</Button>
-                                                                                        <Button variant="primary" className="px-3 py-2" onClick={() => {
+                                                                                        <Button variant="dark" className="px-3 py-2" onClick={() => {
                                                                                             
                                                                                             if (
                                                                                                 memberProfile?.permissions?.projects?.view === true ||
@@ -1113,15 +1113,15 @@ function ProjectsPage() {
                     </div>
                     <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
-                        {
-                            <MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} members={currentProject?.members || []}  postId={currentProject?._id} type="project"/>
-                        }
+                        {<MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} members={currentProject?.members || []}  postId={currentProject?._id} type="project"/>}
                     </ListGroup>
-                    <ListGroup horizontal className="bg-light ms-auto ms-xl-0 mt-0 mt-md-0 d-none d-sm-flex">
-                        <Button variant="secondary" className="btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>Details</Button>
-                        <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}>Tasks</Button>
+                    <ListGroup horizontal className="ms-auto ms-xl-0 p-0 mt-0 mt-md-0 d-none d-sm-flex">
+                        <ListGroup horizontal className="bx--shadow">
+                            <Button variant="secondary" className="btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}><BsEye className="me-1"/> Details</Button>
+                            <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}><BiEdit className="me-1"/> Tasks</Button>
+                        </ListGroup>
                     </ListGroup>
-                    <ListGroup horizontal className="bg-white expand--icon gap-2 p-0 b-0 rounded-0 align-items-center">
+                    <ListGroup horizontal className="expand--icon gap-2 p-0 b-0 rounded-0 align-items-center">
                         {
                         (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
                             <ListGroup.Item className="d-lg-flex me-2" key={`work-settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>

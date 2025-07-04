@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Dropdown, ListGroup, Table, Card, Badge } from "react-bootstrap";
 import dayjs from 'dayjs';
-import { FaEllipsisV, FaPlus, FaCheck, FaList } from "react-icons/fa";
+import { FaPlus, FaCheck, FaList } from "react-icons/fa";
 import { GrExpand } from "react-icons/gr";
 import { BsGrid } from "react-icons/bs";
 import { HiOutlineLocationMarker } from "react-icons/hi";
@@ -10,7 +10,7 @@ import { MdOutlineCheck } from "react-icons/md";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import DatePicker from "react-multi-date-picker";
 import { formatDateinString } from "../../helpers/commonfunctions";
-import { FiCalendar, FiGift, FiSidebar } from 'react-icons/fi';
+import { FiCalendar, FiGift, FiSidebar, FiEdit } from 'react-icons/fi';
 import { createHoliday, ListHolidays, deleteHoliday, updateHoliday } from "../../redux/actions/holiday.action";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -290,7 +290,7 @@ const getDaysLeft = (date) => {
                               <span className="days--left">{getDaysLeft(holiday.date)}</span>
                               <div key={`action-td-${index}`} className="ms-3">
                                 <Dropdown>
-                                  <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
+                                  <Dropdown.Toggle variant="dark"><FiEdit /></Dropdown.Toggle>
                                   <Dropdown.Menu>
                                     <Dropdown.Item
                                       key={`edit-item-${index}`}
@@ -302,8 +302,7 @@ const getDaysLeft = (date) => {
                                           console.log('action not allowed');
                                         }
                                       }}
-                                    >
-                                      Edit
+                                    >Edit
                                     </Dropdown.Item>
                                     <Dropdown.Item
                                       key={`delete-item-${index}`}

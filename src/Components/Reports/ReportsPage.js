@@ -1217,7 +1217,7 @@ const handleToggles = () => {
                                   </td>
                                   <td>{reportData?.members?.length || 0}</td>
                                   <td>
-                                    <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(reportData);setIsActive(1);}}><FaEye/> Details</Button>
+                                    <Button variant="dark" className="ms-auto px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(reportData);setIsActive(1);}}><FaEye/> Details</Button>
                                   </td>
                                 </tr>
                               )

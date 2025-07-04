@@ -445,26 +445,28 @@ function ClientsPage() {
                   <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                   Clients
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
-                    <ListGroup.Item className='d-none d-lg-block'>
-                      <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
-                          <Form.Group className="mb-0 form-group">
-                              <MdOutlineSearch />
-                              <Form.Control type="text" placeholder="Search Client.." onChange={(e) => setSearch(e.target.value)} />
-                          </Form.Group>
-                      </Form>
-                    </ListGroup.Item>
-                    <ListGroup horizontal>
-                        <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
-                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                      <ListGroup.Item className='d-none d-lg-block'>
+                        <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
+                            <Form.Group className="mb-0 form-group">
+                                <MdOutlineSearch />
+                                <Form.Control type="text" placeholder="Search Client.." onChange={(e) => setSearch(e.target.value)} />
+                            </Form.Group>
+                        </Form>
+                      </ListGroup.Item>
+                      <ListGroup horizontal>
+                          <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                          <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                      </ListGroup>
                     </ListGroup>
-                  </ListGroup>
-                  <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex bg-white expand--icon ms-3'}>
-                    <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
-                      <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
-                      {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                        <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
-                      )}
-                  </ListGroup>
+                   <ListGroup horizontal>
+                    <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex bg-white expand--icon ms-3'}>
+                      <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                        <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
+                        {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                          <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                        )}
+                    </ListGroup>
+                   </ListGroup>
                 </h2>
               </Col>
             </Row>

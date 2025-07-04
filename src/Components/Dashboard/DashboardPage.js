@@ -477,6 +477,7 @@ function DashboardPage() {
                 </Card> 
               </Col>
               <Col xl={4}>
+                <div className="sticky--right">
                   <div className="download--wrapper">
                     <div className="app--title">
                       <div className="image--title">
@@ -507,7 +508,6 @@ function DashboardPage() {
                         </Card>
                       </CardGroup>
                     </div>
-                    
                     <CardGroup className="card--download">
                       <Card className="win--download app--download">
                         <Card.Link href='/downloads/onteams-win32-ia32.zip' download>
@@ -528,48 +528,6 @@ function DashboardPage() {
                         </Card.Link>
                       </Card>
                     </CardGroup>
-                    {/* <div className="latest--version">
-                      <Container>
-                        <Card className="mb-3 version--card">
-                          <Card.Body className="p-2">
-                            <Row>
-                              <Col>
-                                <h5 className="mb-1 fw-bold d-flex align-items-center gap-2"><FaDotCircle className="text-success" /> Latest Version</h5>
-                                <div className="text-muted">Released: Jan 15, 2024</div>
-                                <div className="mt-2">
-                                  {[...Array(5)].map((_, i) => (
-                                    <FaStar key={i} color="gold" />
-                                  ))}
-                                  <span className="ms-2 fw-bold">4.9/5</span>
-                                  <span className="text-muted fw-bold"> (2.1k reviews)</span>
-                                </div>
-                              </Col>
-                              <Col xs="auto" className="text-end">
-                                <div className="fw-bold fs-5">v2.1.0</div>
-                                <div className="text-muted">Size: 45.2 MB</div>
-                              </Col>
-                            </Row>
-                          </Card.Body>
-                        </Card>
-
-                        <Card className="new--card">
-                          <Card.Body className="p-2">
-                            <h5 className="fw-bold mb-3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-4 h-4"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg> What's New</h5>
-                            <ListGroup variant="flush">
-                              <ListGroup.Item className="border-0 ps-0">
-                                • Enhanced screenshot quality
-                              </ListGroup.Item>
-                              <ListGroup.Item className="border-0 ps-0">
-                                • Improved offline sync
-                              </ListGroup.Item>
-                              <ListGroup.Item className="border-0 ps-0">
-                                • New productivity insights
-                              </ListGroup.Item>
-                            </ListGroup>
-                          </Card.Body>
-                        </Card>
-                      </Container>
-                    </div> */}
                   </div>
                   <div className="download--wrapper mt-5">
                     <div className="image--title help--card">
@@ -592,26 +550,7 @@ function DashboardPage() {
                       </Container>
                     </div>
                   </div>
-                  {/* <div className="download--wrapper mt-5 mb-5">
-                    <div className="help--card today--card">
-                      <span><FaRegEye /></span>
-                      <h3>Today's Overview <small>Quick insights</small></h3>
-                    </div>
-                    <div className="latest--version">
-                      <Container>
-                        <Card className="overview--card">
-                          <Card.Body className="p-2">
-                            <ListGroup variant="flush">
-                              <ListGroup.Item className="from--blue">Active Projects<strong>8</strong></ListGroup.Item>
-                              <ListGroup.Item className="from--green">Team Members Online<strong>12/15</strong></ListGroup.Item>
-                              <ListGroup.Item className="from--slate">Hours Tracked Today<strong>94.5h</strong></ListGroup.Item>
-                              <ListGroup.Item className="from--orange">Completed Tasks<strong>23</strong></ListGroup.Item>
-                            </ListGroup>
-                          </Card.Body>
-                        </Card>
-                      </Container>
-                    </div>
-                  </div> */}
+                </div>
               </Col>
             </Row>
           </Container>

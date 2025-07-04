@@ -4,12 +4,16 @@ import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown, Accordion } from "react-bootstrap";
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaCheck, FaEye } from "react-icons/fa";
+import { FaCheck, FaEye, FaPlay } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo } from "react-icons/fi";
+import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
+import { TbScreenshot } from "react-icons/tb";
+import { BsDash } from 'react-icons/bs';
+import { LuTimer } from 'react-icons/lu';
+import { GoPulse } from 'react-icons/go';
 import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill, BsDashLg } from "react-icons/bs";
-import { MdOutlineClose, MdOutlineSearch, MdDragIndicator } from "react-icons/md";
+import { MdOutlineClose, MdOutlineSearch, MdDragIndicator, MdOutlineVideoLibrary } from "react-icons/md";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { getliveActivity, getRecoredActivity, deleteRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
@@ -620,7 +624,7 @@ function TimeTrackingPage() {
       return (
         <>
             <ListGroup horizontal className="screens--shots">
-              <ListGroup horizontal className="bg-light">
+              <ListGroup horizontal>
                 {
                   selectedScreenshots &&
                   Object.keys(selectedScreenshots).length > 0 &&
@@ -630,12 +634,8 @@ function TimeTrackingPage() {
                     </Button>
                   )
                 }
-                <Button variant="secondary" className="btn--view" key={'screenshots1-tab-key'} active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}>
-                  Screenshots
-                </Button>
-                <Button variant="primary" className="btn--view" key={'videos1-tab-key'} active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}>
-                  Videos
-                </Button>
+                <Button variant="secondary" className="btn--view" key={'screenshots1-tab-key'} active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}><TbScreenshot className="me-1"/> Screenshots</Button>
+                <Button variant="primary" className="btn--view" key={'videos1-tab-key'} active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}><MdOutlineVideoLibrary className="me-1"/> Videos</Button>
               </ListGroup>
             </ListGroup>
         </>
@@ -814,12 +814,12 @@ function TimeTrackingPage() {
                     <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">
-                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Member</th>
-                          <th scope="col" key="client-time-header" className="onHide text-start">Project Name</th>
-                          <th scope="col" key="client-project-header" className="onHide ms-auto">Project Time</th>
-                          <th scope="col" key="client-time-header" className="onHide">Total Time</th>
-                          <th scope="col" key="client-status-header" className="onHide">Status</th>
-                          <th scope="col" key="client-action-header" className="onHide">Action</th>
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
+                          <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th>
+                          <th scope="col" key="client-project-header" className="onHide ms-auto"><LuTimer className="me-1" /> Project Time</th>
+                          <th scope="col" key="client-time-header" className="onHide"><FiClock className="me-1" /> Total Time</th>
+                          <th scope="col" key="client-status-header" className="onHide"><GoPulse className="me-1" /> Status</th>
+                          <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1"/> Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -846,38 +846,41 @@ function TimeTrackingPage() {
                                         <div className="d-flex justify-content-between">
                                           <div className="project--name d-flex gap-3 align-items-center">
                                               <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
-                                              <div className="title--initial">{activity.name.charAt(0)}</div>
+                                              <div className="title--initial">
+                                                {activity.name.charAt(0)}
+                                                {
+                                                  activity?.latestActivity?.status ? 
+                                                  <small className="status--circle active--color"></small>
+                                                  :
+                                                  activity?.latestActivity?.status === false  ?
+                                                  <small className="status--circle idle--color"></small>
+                                                  :
+                                                  <small className="status--circle inactive--color"></small>
+                                                }
+                                              </div>
                                               <div className="title--span flex-column d-flex align-items-start gap-0">
                                                 <span>
                                                   {activity.name}
-                                                  {
-                                                    activity?.latestActivity?.status ? 
-                                                    <small className="status--circle active--color"></small>
-                                                    :
-                                                    activity?.latestActivity?.status === false  ?
-                                                    <small className="status--circle idle--color"></small>
-                                                    :
-                                                    <small className="status--circle inactive--color"></small>
-                                                  }
                                                 </span>
                                               </div>
                                           </div>
                                         </div>
                                     </td>
-                                    <td className="text-start"><span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <BsDashLg /> }</span></td>
+                                    <td className="text-start"><span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</span></td>
                                     <td className="ms-auto">
-                                        {/* <div key={`task-name-${activity?._id}`} className="onHide project--title--td"><span>{ activity?.latestActivity?.task?.title?.substring(0, 25) || '--' }</span></div> */}
-                                        <div key={`task-time-${activity?._id}`} className="onHide">{ convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
+                                        <div key={`task-time-${activity?._id}`} className="onHide project--time--badge px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><LuTimer className="me-1" /> { convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
                                     </td>
-                                    <td key={`total-time-${activity?._id}`} className="onHide">{ convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</td>
+                                    <td key={`total-time-${activity?._id}`} className="onHide">
+                                      <span className="total--time--badge bg--blue px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> { convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</span>
+                                    </td>
                                     <td key={`status-title-${activity?._id}`} className="onHide">
                                       { 
                                         (activity?.latestActivity?.status) ? 
-                                        <Badge bg="success">Active</Badge> : 
+                                        <Badge bg="success"><FaPlay /> Active</Badge> : 
                                         (activity?.latestActivity?.status === false ) ?
-                                        <Badge bg="warning">Break</Badge>
+                                        <Badge bg="warning"><FiCoffee /> Break</Badge>
                                         :
-                                        <Badge bg="secondary">Inactive</Badge>
+                                        <Badge bg="secondary"><FiPause /> Inactive</Badge>
                                         }
                                     </td>
                                     <td key={`view-act-${activity?._id}`} className="onHide text-lg-end">
@@ -921,10 +924,10 @@ function TimeTrackingPage() {
                     <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">
-                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Member</th>
-                          <th scope="col" key="client-time-header" className="onHide text-start">Project Name</th>
-                          <th scope="col" key="client-time-header" className="onHide ms-auto">Total Time</th>
-                          <th scope="col" key="client-action-header" className="onHide">Action</th>
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
+                          <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th>
+                          <th scope="col" key="client-time-header" className="onHide ms-auto"><FiClock className="me-1" /> Total Time</th>
+                          <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1" /> Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -953,11 +956,9 @@ function TimeTrackingPage() {
                                         <div className="d-flex justify-content-between">
                                           <div className="project--name d-flex gap-3 align-items-center">
                                             <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
-                                            <div className="title--initial">{activity.name.charAt(0)}</div>
-                                            <div className="title--span flex-column d-flex align-items-start gap-0">
-                                              <span>
-                                                {activity.name}
-                                                {
+                                            <div className="title--initial">
+                                              {activity.name.charAt(0)}
+                                              {
                                                   activity?.latestActivity?.status ? 
                                                   <small className="status--circle active--color"></small>
                                                   :
@@ -966,16 +967,20 @@ function TimeTrackingPage() {
                                                   :
                                                   <small className="status--circle inactive--color"></small>
                                                 }
+                                              </div>
+                                            <div className="title--span flex-column d-flex align-items-start gap-0">
+                                              <span>
+                                                {activity.name}
                                               </span>
                                             </div>
                                           </div>
                                         </div>
                                     </td>
-                                    <td className="text-start"><span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <BsDashLg /> }</span></td>
-                                    <td className="ms-auto"><div className="onHide">{ convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</div></td>
-                                    <td className="onHide text-lg-end">
-                                      <Button variant="dark" onClick={() => {handleClick(activity);}}><FaEye/> Details</Button>
+                                    <td className="text-start"><span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</span></td>
+                                    <td key={`total-time-${activity?._id}`} className="onHide ms-auto">
+                                      <span className="total--time--badge bg--blue px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</span>
                                     </td>
+                                    <td className="onHide text-lg-end"><Button variant="dark" onClick={() => {handleClick(activity);}}><FaEye/> Details</Button></td>
                                   </tr>
                                 </>
                               )
@@ -1021,7 +1026,7 @@ function TimeTrackingPage() {
               </Dropdown>
           </div>
           <ListGroup horizontal className="live--tabs me-auto">
-            <ListGroup horizontal className="bg-light me-3">
+            <ListGroup horizontal className="me-3">
               <Button variant="secondary" className="btn--view" key={'live-key'} active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
                 if( currentActivity && Object.keys(currentActivity)){
                   const cact = currentActivity
@@ -1067,7 +1072,7 @@ function TimeTrackingPage() {
               <div className="current--player p-3" key={`activity-${currentActivity?._id}`}>
                 <div className="timer--task">
                   
-                  <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || '--' } [{currentActivity?.latestActivity?.project?.client?.name}] - <small>{ currentActivity?.latestActivity?.task?.title || '--' }</small></h5>
+                  <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || <BsDash /> } [{currentActivity?.latestActivity?.project?.client?.name}] - <small>{ currentActivity?.latestActivity?.task?.title || <BsDash /> }</small></h5>
                   <span className="ms-md-3">{ currentActivity?.latestActivity?.app_version}</span>
                   <p className="task--timer">
                     <span><strong>{ convertSecondstoTime(currentActivity?.totalTaskDuration) || '00:00'}</strong></span>
@@ -1273,8 +1278,6 @@ function TimeTrackingPage() {
                             )
                           }
                         </CardGroup>
-
-
                       </div>
                       </Accordion.Body>
                       </Accordion.Item>

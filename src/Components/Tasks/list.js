@@ -355,7 +355,7 @@ const TasksList = React.memo((props) => {
                                         {tab.title}
                                         {( memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) && (
                                             <Button
-                                                variant="primary"
+                                                variant="dark"
                                                 onClick={() => {
                                                     if( !showtaskform[tab._id] || showtaskform[tab._id] === false ){
                                                         setFields({ title: '', tab: tab._id, project_id: currentProject?._id, order: 0 })

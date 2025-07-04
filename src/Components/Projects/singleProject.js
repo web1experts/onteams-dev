@@ -21,6 +21,8 @@ import AutoLinks from "quill-auto-links";
 import 'react-quill/dist/quill.snow.css';
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
 import { renderDynamicField } from "../common/dynamicFields";
+import { BiEdit } from "react-icons/bi";
+import { BsEye } from "react-icons/bs";
 Quill.register("modules/autoLinks", AutoLinks);
 function SingleProject(props) {
     const dispatch = useDispatch();
@@ -570,12 +572,14 @@ useEffect(() => {
                             <MemberInitials showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} members={fields?.members || []} directUpdate={true} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={currentProject?._id} type = "project" 
                             />
                     </ListGroup>
-                    <ListGroup horizontal className="ms-auto bg-light d-none d-sm-flex">
-                        <Button variant="secondary" className="active btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}>Details</Button>
-                        <Button variant="primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}>Tasks</Button>
+                    <ListGroup horizontal className="ms-auto ms-xl-0 p-0 mt-0 mt-md-0 d-none d-sm-flex">
+                        <ListGroup horizontal className="bx--shadow">
+                            <Button variant="secondary" className="active btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}><BsEye className="me-1" /> Details</Button>
+                            <Button variant="primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}><BiEdit className="me-1"/> Tasks</Button>
+                        </ListGroup>
                     </ListGroup>
+                   
                     <ListGroup horizontal className="bg-white expand--icon gap-2 p-0 b-0 rounded-0 align-items-center">
-                        
                         <ListGroup.Item onClick={props.toggleSidebars} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
                         <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {props.closeview(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
                     </ListGroup>
@@ -811,7 +815,7 @@ useEffect(() => {
                     </div>
                 </div>
                 {/*--=-=Upload Files Modal**/}
-                    <Modal show={showUpload} onHide={handleUploadClose} centered size="md" className="upload--status">
+                <Modal show={showUpload} onHide={handleUploadClose} centered size="md" className="upload--status">
                     <Modal.Header closeButton>
                         <Modal.Title>Attach Files</Modal.Title>
                     </Modal.Header>

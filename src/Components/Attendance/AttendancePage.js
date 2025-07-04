@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Form, Dropdown, ListGroup, Table, Modal, Button, Card, ListGroupItem } from "react-bootstrap";
 import { FaCheck, FaEye } from "react-icons/fa";
-import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload } from "react-icons/fi";
+import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload, FiLogIn, FiLogOut, FiEdit3 } from "react-icons/fi";
 import { MdOutlineCheck, MdOutlineClose } from 'react-icons/md';
 import { GrExpand } from "react-icons/gr";
-import { LuTimer } from "react-icons/lu";
+import { LuTimer, LuCircleDot } from "react-icons/lu";
+import { BsDash } from "react-icons/bs";
+import { GoDotFill } from "react-icons/go";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
 import { formatDateinString, selectboxObserver, getAttendanceBadges } from "../../helpers/commonfunctions";
@@ -203,7 +205,7 @@ useEffect(() => {
         // Skip count cells — they are added after all dates
         return;
       } else {
-        row.push(att?.status || '--');
+        row.push(att?.status || <BsDash />);
       }
     });
 
@@ -296,8 +298,12 @@ useEffect(() => {
                     <Table>
                         <thead>
                             <tr key="project-table-header">
-                                <th scope="col" className="sticky" key="project-name-header">
-                                    <div className="d-flex align-items-center justify-content-between">Team Member</div>
+                                <th scope="col" className="sticky p-0" key="project-name-header">
+                                  <div className="d-flex p-3 border-end">
+                                    <div className="project--name py-2">
+                                        Team Member
+                                    </div>
+                                  </div>
                                 </th>
                                 <MonthHeader month={filters?.month?.split("/")[0]} year={filters?.month?.split("/")[1]} />
                                 <th className="bg--green text-center">
@@ -325,7 +331,7 @@ useEffect(() => {
                                   <tr>
                                     <td className="project--title--td sticky">
                                       <div className="d-flex justify-content-between">
-                                        <div className="project--name d-flex justify-content-start gap-3 align-items-center">
+                                        <div className="project--name d-flex justify-content-start gap-3 align-items-center border-end">
                                             <div className="title--initial">{data?.name?.substring(0, 2)}</div>
                                             <div className="title--span flex-column d-flex align-items-start gap-0">
                                                 <span>{data?.name}</span>
@@ -348,21 +354,20 @@ useEffect(() => {
                                               <td className="text-center" key={ind}>
                                                 <span className={`att--badge ${getBadgeColor(atten?.status)}`}>
                                                   {
-                                                    atten?.status && atten?.status !== "--"
+                                                    atten?.status && atten?.status !== <BsDash />
                                                       ? (atten.status.split(" ").length === 2
                                                           ? atten.status.substring(0, 2)
                                                           : atten.status.charAt(0))
-                                                      : '--'
+                                                      : <BsDash />
                                                   }
-
                                                 </span>
                                                 <strong>{atten?.total_time}</strong>
+                                                {/* <strong><BsDash /></strong> Replace '--' with this icon */}
                                               </td>
                                             );
                                           }
                                         })
                                       }
-
                                     </tr>
                                 )
                               })
@@ -444,7 +449,7 @@ useEffect(() => {
                     <Table responsive="lg">
                       <tbody className="bg-white">
                         {attendances &&
-                        attendances.map((attendanceData, dateIndex) => (
+                          attendances.map((attendanceData, dateIndex) => (
                             <tr>
                               <td>
                                 <div className="d-flex justify-content-between">
@@ -478,16 +483,14 @@ useEffect(() => {
                                 </div>
                               </td>
                             </tr>
-                        ))
-                      }
-                        
+                          ))
+                        }
                       </tbody>
                     </Table>
                   </div>
                 </div>
               </>
             )}
-            
           </Container>
         </div>
       </div>
@@ -522,19 +525,19 @@ useEffect(() => {
                   <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
               </ListGroup>
           </div>
-          <div className="bg-white attendance--table">
+          <div className="bg-white attendance--table daily--attendance--table">
             <h3 class="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - June 2025</h3>
             <div className="overflow-x-auto">
                 <Table responsive="lg">
                   <thead>
                     <tr>
-                      <th className="px-3 text-capitalize py-3" scope="col">Date</th>
-                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Time In</th>
-                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Time Out</th>
-                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Logged Time</th>
-                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Manual Time</th>
-                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Total Time</th>
-                      <th className="px-3 text-capitalize py-3 text-center" scope="col">Status</th>
+                      <th className="px-3 text-uppercase py-3" scope="col"><FiCalendar className="me-1" /> Date & Day</th>
+                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiLogIn className="me-1 color--green" /> Check In</th>
+                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiLogOut className="me-1 color--red" /> Check Out</th>
+                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiClock className="me-1 color--blue" /> Logged Hours</th>
+                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiEdit3 className="me-1 color--purple" /> Manual Entry</th>
+                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiClock className="me-1 color--moove" /> Total Hours</th>
+                      <th className="px-3 text-uppercase py-3 text-center" scope="col">Status</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white">
@@ -543,26 +546,23 @@ useEffect(() => {
                         attendanceDate.dailyAttendance.length === 0 ? (
                           <tr key={dateIndex}>
                             <td className="px-3 py-3"><strong>{formatDateinString(attendanceDate.date)}</strong></td>
-                            <td className="px-3 py-3 text-center">--</td>
-                            <td className="px-3 py-3 text-center">--</td>
-                            <td className="px-3 py-3 text-center">--</td>
-                            <td className="px-3 py-3 text-center">--</td>
-                            <td className="px-3 py-3 text-center">--</td>
-                            <td className="px-3 py-3 text-center">--</td>
+                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><LuCircleDot /></span></td>
+                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
                           </tr>
                         ) : (
                           attendanceDate.dailyAttendance.map((attendance, attendanceIndex) => (
                             <tr key={`${dateIndex}-${attendanceIndex}`}>
                               <td className="px-3 py-3"><strong>{attendanceIndex === 0 ? formatDateinString(attendanceDate.date) : ''}</strong></td>
-                              <td className="px-3 py-3 text-center">{attendance.time_in}</td>
-                              <td className="px-3 py-3 text-center">{attendance.time_out}</td>
-                              <td className="px-3 py-3 text-center">{attendance.tracked_time}</td>
-                              <td className="px-3 py-3 text-center">{attendance.manual_time}</td>
-                              <td className="px-3 py-3 text-center"><strong className="text--blue">{attendance.total_time}</strong></td>
-                              <td className="px-3 py-3 text-center">
-                                {getAttendanceBadges(attendance?.status)}
-                                
-                              </td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--green" title="check In"><GoDotFill /> {attendance.time_in}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--red" title="check Out"><GoDotFill /> {attendance.time_out}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--blue" title="Logged Hours"><GoDotFill /> {attendance.tracked_time}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--purple" title="Manual Entry"><FiEdit3 /> {attendance.manual_time}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--moove" title="Total Hours"><GoDotFill /> {attendance.total_time}</span></td>
+                              <td className="px-3 py-3 text-center">{getAttendanceBadges(attendance?.status)}</td>
                             </tr>
                           ))
                         )
