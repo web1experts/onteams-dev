@@ -1207,16 +1207,17 @@ const handleToggles = () => {
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="ms-xl-auto">
+                                  <td className="ms-auto">
                                     <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
                                       {/* <div className="text-left text-xl-center">
                                         <strong>Total Hours: </strong> 4h 47m
                                       </div> */}
-                                      <div className="text-left text-xl-center">
-                                        <strong>Members: </strong> {reportData?.members?.length || 0}
-                                      </div>
-                                      <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(reportData);setIsActive(1);}}><FaEye/> Details</Button>
+                                      
                                     </div>
+                                  </td>
+                                  <td>{reportData?.members?.length || 0}</td>
+                                  <td>
+                                    <Button variant="primary" className="mt-2 mt-xl-0 px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(reportData);setIsActive(1);}}><FaEye/> Details</Button>
                                   </td>
                                 </tr>
                               )
