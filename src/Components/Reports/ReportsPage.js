@@ -37,6 +37,57 @@ const TaskList = ({report} ) => {
   const [currentVideoPage, setCurrentVideoPage] = useState({});
   const videosPerPage = 12; // Adjust as needed
 
+    let screenshotsByTask = {};
+let videosByTask = {};
+
+
+  if(Array.isArray(report?.activityMetas) && report.activityMetas.length > 0 ){
+    const screenshots = {};
+  const videos = {};
+    report.activityMetas.forEach((meta) => {
+    if (meta.meta_key === "screenshots" && Array.isArray(meta.meta_value)) {
+      meta.meta_value.forEach((screenshot) => {
+        if (!screenshot.task) return;
+        if (!screenshots[screenshot.task]) screenshots[screenshot.task] = [];
+        screenshots[screenshot.task].push(screenshot);
+      });
+    }
+
+    if (meta.meta_key === "videos" && Array.isArray(meta.meta_value)) {
+      meta.meta_value.forEach((video) => {
+        if (!video.task) return;
+        if (!videos[video.task]) videos[video.task] = [];
+        videos[video.task].push(video);
+      });
+    }
+  });
+
+  // Sort screenshots by taken_time (ISO timestamp string)
+  Object.values(screenshots).forEach(arr =>
+    arr.sort((a, b) => new Date(a.taken_time) - new Date(b.taken_time))
+  );
+
+  // Sort videos by parsing start_time (like "7:01 AM") into Date objects for sorting
+  Object.values(videos).forEach(arr =>
+    arr.sort((a, b) => {
+      const parseTime = (timeStr) => {
+        const today = new Date();
+        const [hourMinute, ampm] = timeStr.split(" ");
+        let [h, m] = hourMinute.split(":").map(Number);
+        if (ampm === "PM" && h !== 12) h += 12;
+        if (ampm === "AM" && h === 12) h = 0;
+        return new Date(today.setHours(h, m, 0, 0));
+      };
+      return parseTime(a.start_time) - parseTime(b.start_time);
+    })
+  );
+
+  videosByTask = videos
+  screenshotsByTask = screenshots
+
+}
+
+
 const groupTasksById = (activities) => {
   
   const groupedTasks = activities.reduce((acc, activity) => {
@@ -62,6 +113,8 @@ const groupTasksById = (activities) => {
     return acc;
   }, {});
 
+  
+
   // Format durations into "Xh Ym" or "Z secs"
   return Object.values(groupedTasks).map((task) => {
     const totalSeconds = task.duration;
@@ -76,6 +129,11 @@ const groupTasksById = (activities) => {
 
     return task;
   });
+
+
+
+
+
 };
 
 const handleReportClose = () => setViewReport(false);
@@ -87,6 +145,7 @@ const handleReportClose = () => setViewReport(false);
 
   // Group tasks by title and calculate total durations
   const groupedTasks = groupTasksById(report?.activities);
+  
   const handleRemarksClose = () => setShowRemarks(false);
   const handleShowRemarks = () => setShowRemarks(true);
   
@@ -226,7 +285,7 @@ const handleReportClose = () => setViewReport(false);
           <Modal.Body>
             <div className="shots--list">
               <CardGroup key={`card-group-${taskId}`}>
-            {
+            {/* {
               report?.activityMetas && report.activityMetas.length > 0 ? (
               report.activityMetas.map((meta, i) => {
                 // Handle screenshots tab
@@ -294,7 +353,6 @@ const handleReportClose = () => setViewReport(false);
                           }
                       })}
                 
-                      {/* Pagination Controls */}
                       <div style={{ marginTop: "10px", textAlign: "center" }}>
                         <Button variant="outline-primary"
                           disabled={(currentVideoPage[`single-${report?.project?._id}`] || 1) === 1}
@@ -333,7 +391,102 @@ const handleReportClose = () => setViewReport(false);
             ) : (
               <div>No data available</div> // Display if no data is available
             )
-          }
+          } */}
+          
+          {activeTab === "screenshots" && screenshotsByTask[taskId]?.length > 0 && (
+  <>
+    {screenshotsByTask[taskId].map((screenshotData, idx) => (
+      <Card key={`screenshot-${taskId}-${idx}`}>
+        <Card.Body>
+          <img
+            className="card-img-top"
+            src={screenshotData?.url}
+            alt="screenshot"
+            onClick={() => triggerLightBox("screenshot", screenshotsByTask[taskId], idx)}
+          />
+          <p>
+            <strong>Task Name:</strong> {screenshotData?.task_data?.title}
+            <br />
+            <strong>Time:</strong> {showAmPmtime(screenshotData?.taken_time)}
+          </p>
+        </Card.Body>
+      </Card>
+    ))}
+  </>
+)}
+{activeTab === "videos" && videosByTask[taskId]?.length > 0 && (() => {
+  const taskVideos = videosByTask[taskId];
+  const page = currentVideoPage[`single-${report?.project?._id}`] || 1;
+  const start = (page - 1) * videosPerPage;
+  const end = page * videosPerPage;
+  const paginatedVideos = taskVideos.slice(start, end);
+
+  return (
+    <>
+      {paginatedVideos.map((videoData, idx) => {
+        const realIndex = start + idx;
+        return (
+          <Card key={`video-card-${report?.project?._id}-${page}-${idx}`}>
+            <Card.Body onClick={() => triggerLightBox("video", taskVideos, realIndex)}>
+              <video
+                height="175px"
+                style={{ width: "100%" }}
+                preload="metadata"
+                muted
+                onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
+                controls={false}
+              >
+                <source src={videoData?.url} type="video/webm" />
+                Your browser does not support the video tag.
+              </video>
+              <p>
+                <strong>Task Name:</strong> {videoData.task_data?.title}
+                <br />
+                <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+              </p>
+            </Card.Body>
+          </Card>
+        );
+      })}
+
+      {/* Pagination */}
+      {taskVideos.length > videosPerPage && (
+        <div style={{ marginTop: "10px", textAlign: "center" }}>
+          <Button
+            variant="outline-primary"
+            disabled={page === 1}
+            onClick={() =>
+              setCurrentVideoPage((prev) => ({
+                ...prev,
+                [`single-${report?.project?._id}`]: page - 1,
+              }))
+            }
+          >
+            <BsArrowLeftCircleFill />
+          </Button>
+
+          <span style={{ margin: "0 10px" }}>
+            Page {page} of {Math.ceil(taskVideos.length / videosPerPage)}
+          </span>
+
+          <Button
+            variant="outline-primary"
+            disabled={page >= Math.ceil(taskVideos.length / videosPerPage)}
+            onClick={() =>
+              setCurrentVideoPage((prev) => ({
+                ...prev,
+                [`single-${report?.project?._id}`]: page + 1,
+              }))
+            }
+          >
+            <BsArrowRightCircleFill />
+          </Button>
+        </div>
+      )}
+    </>
+  );
+})()}
+
           </CardGroup>
           </div>
           </Modal.Body>
@@ -1145,6 +1298,37 @@ const handleToggles = () => {
                               
                               </>
                             }
+                            <ListGroup.Item className="d-none d-xl-block">
+                            <Form>
+                             <Form.Group className="mb-0 form-group">
+                              <DatePicker 
+                                  ref={datePickerRef}
+                                  key={'date-filter'}
+                                  name="date"
+                                  weekStartDayIndex={1}
+                                  id='datepicker-filter'
+                                  value={filtereddate} 
+                                  format="YYYY-MM-DD"
+                                  range
+                                  numberOfMonths={2}
+                                  dateSeparator=" - " 
+                                  onChange={async (value) => {
+                                      setFilteredDate(value)
+                                    }
+                                  } 
+                                  editable={false}         
+                                  className="form-control"
+                                  placeholder="dd/mm/yyyy"
+                                  open={isPickerOpen} // Control visibility with state
+                                  onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                                  onClose={() => setIsPickerOpen(false)} // Update state when closed
+                                  plugins={
+                                    [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
+                                  } 
+                              />
+                                </Form.Group>
+                              </Form>
+                            </ListGroup.Item>
                             { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                                 <Dropdown className="select--dropdown">
                                   <Dropdown.Toggle variant="success" id="dropdown-basic">Manual Time</Dropdown.Toggle>
@@ -1188,7 +1372,7 @@ const handleToggles = () => {
                       <thead className="onHide">
                         <tr key="project-table-header">
                           <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Member</th>
-                          <th scope="col" key="client-time-header" className="onHide ms-auto">Total Hours</th>
+                          <th scope="col" key="client-ttime-header" className="onHide ms-auto">Total Hours</th>
                           <th scope="col" key="client-time-header" className="onHide">Members</th>
                           <th scope="col" key="client-action-header" className="onHide">Action</th>
                         </tr>
@@ -1297,16 +1481,23 @@ const handleToggles = () => {
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <h3>
-                    <strong>Gagandeep Singh</strong>
-                    <span>UI/UX Designer</span>
+                    <strong>{singleMemberReport?.member?.name}</strong>
+                    <span>{singleMemberReport?.member?.role}</span>
                   </h3>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <div className="drop--scroll">
-                        <Dropdown.Item>
-                          <strong>Gagandeep Singh</strong>
-                          <span>UI/UX Designer</span>
-                        </Dropdown.Item>
+                      {
+                          (memberReports && memberReports.length > 0) && 
+                            memberReports.map((report, index) => {
+                              return (
+                              <Dropdown.Item onClick={() => { setSingleMemberReport(report); setIsActive(1);}}>
+                                <strong>{report?.member?.name}</strong>
+                                <span>{report?.member?.role}</span>
+                              </Dropdown.Item>
+                              )
+                            })
+                          }
                     </div>
                 </Dropdown.Menu>
               </Dropdown>

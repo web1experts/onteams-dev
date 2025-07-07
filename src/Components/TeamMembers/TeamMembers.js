@@ -1,10 +1,38 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+<<<<<<< HEAD
 import {Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup } from "react-bootstrap";
 import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import {FiEdit,FiMail,FiSidebar,FiBriefcase,FiShield,FiPhone,FiCalendar,FiVideo } from "react-icons/fi";
+=======
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Modal,
+  Form,
+  FloatingLabel,
+  Card,
+  ListGroup,
+  Table,
+  Accordion,
+  Dropdown,
+  FormGroup,
+} from "react-bootstrap";
+import { FaList, FaPlus, FaRegTrashAlt, FaCog } from "react-icons/fa";
+import {
+  FiEdit,
+  FiMail,
+  FiSidebar,
+  FiBriefcase,
+  FiShield,
+  FiPhone,
+  FiCalendar,
+  FiVideo } from "react-icons/fi";
+>>>>>>> refs/remotes/origin/master
 import { AiOutlineTeam } from 'react-icons/ai';
-import { BsEye, BsGrid } from "react-icons/bs";
+import { BsBriefcase, BsEye, BsGrid } from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { TbArrowsSort } from "react-icons/tb";
 import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
@@ -22,7 +50,9 @@ import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, currentMemberProfile } from "../../helpers/auth";
 import { updatePermissions } from "../../redux/actions/permission.action";
 import { permissionModules } from "../../helpers/permissionsModules";
-
+import { CustomFieldModal } from "../modals/customFields";
+import { fetchCustomFields } from "../../redux/actions/customfield.action";
+import { renderDynamicField } from "../common/dynamicFields";
 function EditableField({
   selectedMember,
   field,
@@ -168,6 +198,7 @@ function TeamMembersPage() {
     }
   };
   const apiPermission = useSelector((state) => state.permissions);
+  const apiCustomfields = useSelector( state => state.customfields)
   const [isActiveView, setIsActiveView] = useState(2);
   const [adjustPermissions, setAdjustPermissions] = useState( false )
   const [rows, setRows] = useState([{ email: "", role: "" }]);
@@ -183,6 +214,8 @@ function TeamMembersPage() {
   const [memberIndex, setMemberIndex] = useState("");
   // const [memberMeta, setMemberMeta] = useState({})
   // const [disable, setDisable] = useState(true);
+  const [ showCustomFields, setShowCustomFields] = useState( false )
+  const [customFields, setCustomFields] = useState([]);
   const workspaceState = useSelector((state) => state.workspace);
   const [show, setShow] = useState(false);
   const handleClose = () => {
@@ -245,6 +278,10 @@ function TeamMembersPage() {
     console.log("transfer ownership");
   };
 
+  const toggleCustomFields = () => {
+    setShowCustomFields(prev => !prev);
+  }
+
   useEffect(() => {
     dispatch(getAvailableRolesByWorkspace({ fields: "_id name permissions" }));
     let prm = {};
@@ -263,14 +300,14 @@ function TeamMembersPage() {
       setShowloader(true);
       handleListMember();
     }
+    dispatch(fetchCustomFields({module: 'members'}))
   }, [currentPage, searchTerm]);
 
-  const [isEditing, setIsEditing] = useState({
-    name: false,
-    role: false,
-    email: false,
-    avatar: false,
-  });
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+   if(isEditing === true){selectboxObserver()}
+  },[isEditing])
 
   useEffect(() => {
     if (apiResult.success) {
@@ -331,6 +368,27 @@ function TeamMembersPage() {
     }
   }, [workspaceState]);
 
+  useEffect(() => { 
+        if( apiCustomfields.customFields){
+          setCustomFields( apiCustomfields.customFields)
+        }
+    
+        if( apiCustomfields.newField){
+          setCustomFields((prevCustomFields) => [apiCustomfields.newField, ...prevCustomFields]);
+        }
+    
+          if (apiCustomfields.updatedField) {
+          setCustomFields((prevCustomFields) =>
+            prevCustomFields.map((field) =>
+              field._id === apiCustomfields.updatedField._id
+                ? apiCustomfields.updatedField
+                : field
+            )
+          );
+        }
+    
+    }, [apiCustomfields]);
+
   useEffect(() => {
     if (memberFeed && memberFeed.memberData) {
       setMemberFeed(memberFeed.memberData);
@@ -339,26 +397,40 @@ function TeamMembersPage() {
 
   useEffect(() => {
     if (selectedMember !== null) {
-      // Check if data is available
-      setIsEditing({
-        role: false,
-      });
-
+      
       const cleanedMeta = { ...selectedMember?.memberMeta };
 
-      if (cleanedMeta?.permissions) {
-        delete cleanedMeta.permissions;
-      }
+      // if (cleanedMeta?.permissions) {
+      //   delete cleanedMeta.permissions;
+      // }
       // Add 'recordings' key with value 'both' if not present
-      if (!("recordings" in cleanedMeta)) {
-        cleanedMeta.recordings = "both";
+      if (!("recording" in cleanedMeta)) {
+        cleanedMeta.recording = {meta_key: 'recording',meta_value: "both"};
       }
-      setEditedMember({
-        name: selectedMember.name,
-        role: selectedMember.role?._id,
-        rolename: selectedMember.role?.name,
-        memberMeta: cleanedMeta, //selectedMember?.memberMeta
-      });
+      // setEditedMember({
+      //   name: selectedMember.name,
+      //   role: selectedMember.role?._id,
+      //   rolename: selectedMember.role?.name,
+      //   memberMeta: cleanedMeta, //selectedMember?.memberMeta
+      // });
+      let fieldsSetup = {
+        name: selectedMember?.name,
+        role: selectedMember?.role?._id
+      }
+      console.log("cleanedMeta", cleanedMeta)
+      if (cleanedMeta && Object.keys(cleanedMeta).length > 0) {
+          Object.values(cleanedMeta).forEach(field => { 
+            fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
+          });
+      }else{
+          customFields.forEach(field => { 
+              fieldsSetup[`custom_field[${field.name}]`] = ''
+          });
+          
+      }
+      setFields(
+        fieldsSetup
+      )
       const merged = {};
 
       // Step 1: Initialize merged with empty string values
@@ -368,9 +440,10 @@ function TeamMembersPage() {
           merged[mod.slug][p] = "";
         });
       });
+      
 
       setPermissions((prev) => {
-        const newPerms = selectedMember?.memberMeta?.permissions || {};
+        const newPerms = cleanedMeta?.permissions?.meta_value || {};
 
         // Clone merged to avoid mutating the original reference
         const updated = { ...merged };
@@ -403,6 +476,10 @@ function TeamMembersPage() {
       });
     }
   }, [selectedMember]);
+
+  useEffect(() => {
+    console.log(fields);
+  },[fields])
 
   const handleEditClick = (fieldName) => {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
@@ -457,93 +534,103 @@ function TeamMembersPage() {
     }
   };
 
-  const handleChange = (index, event, fieldname = "") => {
-    const { name, value, type, files } = event.target;
-    const updatedRows = [...rows];
-    updatedRows[index] = { ...updatedRows[index], [name]: value };
-    setRows(updatedRows);
-    const updatedErrors = [...errors];
+  const handleChange = ({ target: { name, value, type, files, checked } }) => { 
+    const finalValue =
+    type === 'checkbox' ? checked : type === 'file' ? files : value;
 
-    // Check if there is an error message for the specified field at the given index
-    if (updatedErrors[index] && updatedErrors[index][name]) {
-      // If an error message exists, update it to an empty string to remove the error
-      updatedErrors[index][name] = "";
+    if( name === 'role'){
+      const matchingRole = roles.find((role) => role._id === value);
+      setFields((prevState) => ({
+        ...prevState,
+        ["role"]: matchingRole._id,
+        custom_field: {
+          ...prevState.custom_field,
+          ["permissions"]: matchingRole.permissions,
+        },
+      }));
+    }else{
+      setFields({ ...fields, [name]: finalValue });
     }
-    // Update the errors state with the updated array
-    setErrors(updatedErrors);
+    
+    
+    setErrors({ ...errors, [name]: '' })
   };
-  const showError = (index, name) => {
-    if (errors[index] && errors[index][name])
-      return <span className="error">{errors[index][name]}</span>;
+
+  const handleChangeOld = (event, fieldname = "") => {
+    
+    // const { name, value, type, files } = event.target;
+    // const updatedRows = [...rows];
+    // updatedRows[index] = { ...updatedRows[index], [name]: value };
+    // setRows(updatedRows);
+    // const updatedErrors = [...errors];
+
+    // // Check if there is an error message for the specified field at the given index
+    // if (updatedErrors[index] && updatedErrors[index][name]) {
+    //   // If an error message exists, update it to an empty string to remove the error
+    //   updatedErrors[index][name] = "";
+    // }
+    // // Update the errors state with the updated array
+    // setErrors(updatedErrors);
+  };
+  const showError = ( name) => {
+    if (errors && errors[name])
+      return <span className="error">{errors[name]}</span>;
     return null;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoader(true);
-    const updatedErrorsPromises = rows.map(async (row, rowIndex, allRows) => {
-      let rowError = {};
-      const emailSet = new Set();
+    let updatedErrors = {};
 
-      for (const [fieldName, value] of Object.entries(row)) {
+    for (const [fieldName, value] of Object.entries(fields)) {
         // Get rules for the current field
-        const rules = getFieldRules("add_member", fieldName);
-        // Validate the field
-        const error = await validateField(
-          "add_member",
-          fieldName,
-          value,
-          rules
-        );
-        // If error exists, store it in rowError
-        if (error) {
-          rowError = { ...rowError, [fieldName]: error };
-        }
-      }
-      return rowError;
-    });
+        const rules = getFieldRules('add_member', fieldName);
 
+        // Validate the field
+        const error = await validateField('add_member', fieldName, value, rules);
+       
+        // If error exists, store it
+        if (error) {
+            updatedErrors[fieldName] = error;
+        }
+    }
+
+    
+
+    
     // Check for unique email values across all rows
     const emailSet = new Set();
-    rows.forEach((row, rowIndex) => {
-      const email = row.email;
+    
+      const email = fields.email;
       if (email === "") return;
 
       if (emailSet.has(email)) {
-        // Add an error to the current row if email is not unique
-        updatedErrorsPromises[rowIndex] = updatedErrorsPromises[rowIndex].then(
-          (rowError) => {
-            return { ...rowError, email: "Email must be unique" };
-          }
-        );
-      } else {
-        emailSet.add(email);
+        updatedErrors["email"] =  "Email must be unique";
       }
-    });
+    
+// Check if there are any errors
+    const hasError = Object.keys(updatedErrors).length > 0;
 
-    // const updatedErrors = await Promise.all(updatedErrorsPromises);
-    // setErrors(updatedErrors);
-
-    // Wait for all promises to resolve
-    const updatedErrors = await Promise.all(updatedErrorsPromises);
-    // Check if there are any errors
-    const hasError = updatedErrors.some(
-      (rowError) => Object.keys(rowError).length > 0
-    );
     // If there are errors, update the errors state
     if (hasError) {
       setLoader(false);
       setErrors(updatedErrors);
     } else {
       const formData = new FormData();
-      rows.forEach((row, index) => {
-        formData.append(`members[${index}][email]`, row.email);
-        formData.append(`members[${index}][role]`, row.role);
-        if (row.permissions) {
-          formData.append(
-            `members[${index}][permissions]`,
-            JSON.stringify(row.permissions)
-          );
+      Object.entries(fields).forEach(([fieldName, value]) => {
+         if (Array.isArray(value)) { // Check if the value is an array
+            if (value.length === 0) {
+                formData.append(`${fieldName}[]`, []); // Append an empty array
+            } else {
+                value.forEach(item => {
+                    formData.append(`${fieldName}[]`, item); // Append with the same key for non-empty arrays
+                });
+            }
+        } else if (typeof value === 'object') {
+            formData.append(fieldName, JSON.stringify(value))
+        }else{
+          formData.append(`${fieldName}`, value);
         }
       });
 
@@ -754,10 +841,10 @@ function TeamMembersPage() {
 
   const handleUpdateSubmit = async (event) => {
     event.preventDefault();
-    const changes = compareMembers(selectedMember, editedMember);
+    // const changes = compareMembers(selectedMember, editedMember);
 
-    if (Object.keys(changes).length > 0) {
-      const updatedErrorsPromises = Object.entries(changes).map(
+    if (Object.keys(fields).length > 0) {
+      const updatedErrorsPromises = Object.entries(fields).map(
         async ([fieldName, value]) => {
           // Get rules for the current field
           const rules = getFieldRules("add_member", fieldName);
@@ -789,23 +876,27 @@ function TeamMembersPage() {
         setErrors(fieldErrors);
         selectboxObserver();
       } else {
-        setIsEditing({
-          name: false,
-          role: false,
-          email: false,
-          avatar: false,
-          // Add other usermeta fields
-        });
-
-        if (Object.keys(changes).length > 0) {
+        
+        if (Object.keys(fields).length > 0) {
           setUpdateLoader(true);
           const formData = new FormData();
-          for (const [key, value] of Object.entries(changes)) {
-            if (typeof value === "object") {
-              formData.append(key, JSON.stringify(value)); // Convert objects to JSON string
-            } else {
-              formData.append(key, value);
-            }
+          for (const [key, value] of Object.entries(fields)) {
+             if (key === 'avatar' && value instanceof File) {
+                formData.append('files[]', value);
+              }
+              else if (Array.isArray(value)) { // Check if the value is an array
+                if (value.length === 0) {
+                    formData.append(`${key}[]`, []); // Append an empty array
+                } else {
+                    value.forEach(item => {
+                        formData.append(`${key}[]`, item); // Append with the same key for non-empty arrays
+                    });
+                }
+              }else if (typeof value === 'object'){
+                  formData.append(key, JSON.stringify(value))
+              } else {
+                  formData.append(key, value)
+              }
           }
           await dispatch(updateMember(selectedMember?._id, formData));
           //  setLoader(false)
@@ -815,21 +906,22 @@ function TeamMembersPage() {
     }
   };
 
-  const showPermissionsModal = (index) => {
-    setMemberIndex(index);
-    if (rows[index] && rows[index]?.permissions) {
-      setPermissions(rows[index]?.permissions);
+  const showPermissionsModal = () => {
+    //setMemberIndex(index);
+    if (fields?.permissions) {
+      setPermissions(fields?.permissions);
     }
     setShowPermissions(true);
   };
 
   const handleSavePermissions = () => {
-    const updatedRows = [...rows];
-    updatedRows[memberIndex] = {
-      ...updatedRows[memberIndex],
-      ["permissions"]: permissions,
-    };
-    setRows(updatedRows);
+    // const updatedRows = [...rows];
+    // updatedRows[memberIndex] = {
+    //   ...updatedRows[memberIndex],
+    //   ["permissions"]: permissions,
+    // };
+    // setRows(updatedRows);
+    setFields({...fields, ['permissions']: permissions})
     setShowPermissions(false);
   };
 
@@ -903,12 +995,14 @@ function TeamMembersPage() {
                       </Form.Group>
                     </Form>
                   </ListGroup.Item>
+                  <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
                 </ListGroup>
                 <ListGroup
                   horizontal
                   className={isActive ? "d-none" : "d-flex ms-auto ms-md-0"}
                 >
                   <ListGroup horizontal>
+                    
                     <ListGroup.Item
                       action
                       className="view--icon d-none d-lg-flex"
@@ -1012,13 +1106,15 @@ function TeamMembersPage() {
                     <thead className="onHide">
                       <tr key="project-table-header">
                         <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
-                            <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">
-                                Project{" "} <span key="client-action-header" className="onHide">Actions</span>
-                            </div>
+                          <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">Member{" "} <span key="client-action-header" className="onHide">Actions</span></div>
                         </th>
                         <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email{" "} <small><TbArrowsSort /></small></div> </th>
-                        <th scope="col" key="client-phone-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Phone{" "} <small><TbArrowsSort /></small></div></th>
-                        <th scope="col" key="project-status-header" className="onHide">Joining Date</th>
+                        {Array.isArray(customFields) && customFields
+                            .filter(field => field?.showInTable !== false)
+                            .map((field, idx) => (
+                              <th scope="col" key={`member-field-${idx}-header`} className="onHide">{field.label}</th>
+                            ))
+                          }
                       </tr>
                     </thead>
                     <tbody>
@@ -1071,12 +1167,35 @@ function TeamMembersPage() {
                                 </div>
                               </td>
                               <td className="onHide new__td">{member.email}</td>
-                              <td className="onHide new__td">
-                                +1 (555) 123-4567
-                              </td>
-                              <td className="onHide new__td">
-                                19 February 2019
-                              </td>
+                              {Array.isArray(customFields) && customFields
+                              .filter(field => field?.showInTable !== false)
+                              .map((field, idx) => {
+                                  const fieldname = field.name;
+                                  let mvalue = member?.memberMeta?.[fieldname]?.meta_value;
+                                  if (field.type === 'badge' && Array.isArray(field.options)) {
+                                      const matchedOption = field.options.find(opt => opt.value === mvalue);
+                                      if (matchedOption) {
+                                      mvalue = (
+                                          <span
+                                          style={{
+                                              backgroundColor: matchedOption.color,
+                                              padding: '4px 8px',
+                                              borderRadius: '8px',
+                                              color: '#fff',
+                                              display: 'inline-block'
+                                          }}
+                                          >
+                                          {member?.memberMeta?.[fieldname]?.meta_value}
+                                          </span>
+                                      );
+                                      }
+                                  }
+                                  return (
+                                      <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide">
+                                          {mvalue}
+                                      </td>
+                                  );
+                              })}
                               <td className="task--last--buttons">
                                 <div className="d-flex justify-content-between flex-wrap">
                                   <div className="onHide">
@@ -1183,29 +1302,126 @@ function TeamMembersPage() {
                   />
                 </div>
                 <Card.Body className="p-0 ps-4">
-                  <Card.Title>{selectedMember?.name}</Card.Title>
-                  <Card.Text>
-                    <ListGroup>
-                      <ListGroup.Item>
-                        <span className="info--icon">
-                          <FiMail />
-                        </span>
-                        <p>
-                          <small>Email</small>
-                          {selectedMember?.email}
-                        </p>
-                      </ListGroup.Item>
-                      <ListGroup.Item>
-                        <span className="info--icon">
-                          <FiPhone />
-                        </span>
-                        <p>
-                          <small>Phone</small>+1 (555) 123-4567
-                        </p>
-                      </ListGroup.Item>
-                    </ListGroup>
-                  </Card.Text>
-                  <Card.Text>
+                  <Card.Title>{selectedMember?.name}
+                    {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") &&
+                      <FiEdit onClick={() => setIsEditing(true)} />
+                    }
+                  </Card.Title>
+                  
+                    {
+                    (isEditing === false) ? 
+                    <>
+                      <Card.Text>
+                        <ListGroup>
+                          <ListGroup.Item>
+                            <span className="info--icon">
+                              <FiMail />
+                            </span>
+                            <p>
+                              <small>Email</small>
+                              {selectedMember?.email}
+                            </p>
+                          </ListGroup.Item>
+                          <ListGroup.Item>
+                            <span className="info--icon">
+                              <BsBriefcase />
+                            </span>
+                            <p>
+                              <small>Role</small>
+                              {selectedMember?.role?.name}
+                            </p>
+                          </ListGroup.Item>
+                        </ListGroup>
+                      </Card.Text>
+                      <Card.Text>
+                        <ListGroup>
+                          {customFields?.length > 0 && (
+                            <>
+                              {customFields.map((field, index) => (
+                                <ListGroup.Item key={index}>
+                                  <small>{field.label}</small>
+                                  {selectedMember?.memberMeta?.[field.name]?.meta_value || ''}
+                                  
+                                </ListGroup.Item>
+                              ))}
+                            </>
+                          )}
+                        </ListGroup>
+                      </Card.Text>
+                      </>
+                    :
+                    <>
+                    <Card.Text>
+                      <ListGroup>
+                        <ListGroup.Item>
+                          <span className="info--icon">
+                            <FiMail />
+                          </span>
+                          <p>
+                            <small>Email</small>
+                            {selectedMember?.email}
+                          </p>
+                        </ListGroup.Item>
+                        {(memberProfile?.permissions?.members?.create_edit_delete === true  || memberProfile?.role?.slug === "owner")?
+                          <ListGroup.Item>
+                            <Form.Group className="mb-0 form-group pb-0">
+                              <Form.Label>Role</Form.Label>
+                              <Form.Select
+                                className={
+                                  errors['role']
+                                    ? "input-error form-control custom-selectbox conditional-box"
+                                    : "form-control custom-selectbox conditional-box"
+                                }
+                                value={fields?.role || ""}
+                                onChange={handleChange}
+                                name="role"
+                              >
+                                <option value="">None</option>
+                                {roles.map((role, index) => (
+                                  <option key={index} value={role._id}>
+                                    {role.name}
+                                  </option>
+                                ))}
+                              </Form.Select>
+                            </Form.Group>
+                          </ListGroup.Item>
+                          :
+                          <ListGroup.Item>
+                            <span className="info--icon">
+                              <BsBriefcase />
+                            </span>
+                            <p>
+                              <small>Role</small>
+                              {selectedMember?.role?.name}
+                            </p>
+                          </ListGroup.Item>
+                        }
+                      </ListGroup>
+                    </Card.Text>
+                    <Card.Text>
+                      <ListGroup>
+                      {customFields?.length > 0 && (
+                          <>
+                            {customFields.map((field, index) => (
+                              <ListGroup.Item key={index}>
+                                {renderDynamicField({
+                                  name: `custom_field[${field.name}]`,
+                                  type: field.type,
+                                  label: field.label,
+                                  value: fields[`custom_field[${field.name}]`] || '',
+                                  options: field?.options || [],
+                                  onChange: (e) => handleChange(e, field.name),
+                                  range_options: field?.range_options || {}
+                                })}
+                              </ListGroup.Item>
+                            ))}
+                          </>
+                        )}
+                        </ListGroup>
+                      </Card.Text>
+                      </>
+                    }
+                  {/* <Card.Text>
                     <ListGroup>
                       {memberProfile?.permissions?.members
                         ?.create_edit_delete === true ||
@@ -1228,27 +1444,12 @@ function TeamMembersPage() {
                         </>
                       ) : (
                         <>
-                          <ListGroup.Item>
-                            <span className="info--icon">
-                              <FiBriefcase />
-                            </span>
-                            <p>
-                              <small>Role</small>
-                              {editedMember.rolename}
-                            </p>
-                          </ListGroup.Item>
+                          
                         </>
                       )}
-                      <ListGroup.Item>
-                        <span className="info--icon">
-                          <FiCalendar />
-                        </span>
-                        <p>
-                          <small>Joined</small>January 2017
-                        </p>
-                      </ListGroup.Item>
+                     
                     </ListGroup>
-                  </Card.Text>
+                  </Card.Text> */}
                   <div className="text-end mt-3">
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true &&
@@ -1281,7 +1482,7 @@ function TeamMembersPage() {
                   </div>
                 </Card.Body>
               </Card>
-              <Card className="work--card">
+              {/* <Card className="work--card">
                 <Card.Body>
                   <Card.Title>
                     <FiBriefcase /> Work Information
@@ -1300,7 +1501,7 @@ function TeamMembersPage() {
                     </ListGroup>
                   </Card.Text>
                 </Card.Body>
-              </Card>
+              </Card> */}
               <Card className="permission--card">
                 <Card.Body>
                   <Card.Title>
@@ -1677,29 +1878,28 @@ function TeamMembersPage() {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            {rows.map((row, index) => (
-              <div className="form-row" key={`row-${index}`}>
+            {/* {rows.map((row, index) => ( */}
+              <div className="form-row" key={`row-0`}>
                 <Form.Group className="mb-0 form-group">
                   <FloatingLabel
                     label="Email address *"
-                    controlId={`floatingInput-${index}`}
+                    controlId={`floatingInput-0`}
                   >
                     <Form.Control
                       type="text"
                       className={
-                        errors[index] &&
-                        errors[index]["email"] &&
-                        errors[index]["email"] !== ""
+                        errors["email"] &&
+                        errors["email"] !== ""
                           ? "input-error"
                           : "form-control"
                       }
                       placeholder="Email address"
                       name="email"
-                      value={row.email}
-                      onChange={(e) => handleChange(index, e)}
+                      value={fields?.email}
+                      onChange={handleChange}
                     />
                   </FloatingLabel>
-                  {showError([index], "email")}
+                  {showError("email")}
                 </Form.Group>
                 {/* {rows.length > 1 && (
                   <Button variant="link" className="d-md-none" onClick={() => removeRow(index)}>
@@ -1710,55 +1910,19 @@ function TeamMembersPage() {
                 <Button
                   variant="primary"
                   onClick={() => {
-                    showPermissionsModal(index);
+                    showPermissionsModal();
                   }}
                 >
                   Select Role
                 </Button>
-                {showError([index], "role")}
-                {/* <Form.Group className="mb-0 form-group">
-                  <Form.Select
-                    placeholder="Select role"
-                    area-label="Role"
-                    name="role"
-                    controlId="floatingSelect"
-                    className={
-                      errors[index] &&
-                        errors[index]["role"] &&
-                        errors[index]["role"] !== ""
-                        ? "input-error custom-selectbox"
-                        : "form-control custom-selectbox"
-                    }
-                    value={row.role}
-                    onChange={(e) => handleChange(index, e, "role")}
-                  >
-                    <option value="role">Select role</option>
-                    {roles.map((role, roleIndex) => (
-                      <option key={`role-${roleIndex}`} value={role._id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </Form.Select>
-                  {showError([index], 'role')}
-                </Form.Group>
-                {
-                  (row.role !== "") && (
-                    <Button variant="link" className="view-perm-btn" onClick={() => {showPermissionsModal(row.role, index)}}><FaUserLock /></Button>
-                  )
-                } */}
-                {rows.length > 1 && (
-                  <Button variant="link" onClick={() => removeRow(index)}>
-                    <FaRegTrashAlt />
-                  </Button>
-                )}
+                {showError("role")}
+                
+               
               </div>
-            ))}
+            {/* ))} */}
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-primary" onClick={addRow}>
-            Add More
-          </Button>
           <Button variant="primary" onClick={handleSubmit} disabled={loader}>
             {loader ? "Please Wait..." : "Save"}
           </Button>
@@ -1785,15 +1949,11 @@ function TeamMembersPage() {
                   name="role"
                   controlId="floatingSelect"
                   className={
-                    // errors[index] &&
-                    //   errors[index]["role"] &&
-                    //   errors[index]["role"] !== ""
-                    //   ? "input-error custom-selectbox"
                     "form-control custom-selectbox"
                   }
-                  value={rows[memberIndex]?.role}
+                  value={fields?.role}
                   onChange={(e) => {
-                    handleChange(memberIndex, e, "role");
+                    handleChange(e);
                     const matchedRole = roles.find(
                       (role) => role._id === e.target.value
                     );
@@ -1813,14 +1973,14 @@ function TeamMembersPage() {
               </Form.Group>
             </div>
             {/* ))} */}
-            {rows[memberIndex]?.role !== null &&
-              rows[memberIndex]?.role !== "role" && (
+            {fields?.role !== null &&
+              fields?.role !== "role" && (
                 <Card>
                   <Card.Body>
                     <>
                       <div
                         className="card--header"
-                        data-roleid={rows[memberIndex]?.role}
+                        data-roleid={fields?.role}
                       >
                         <FormGroup className="form-group mb-0 pb-0">
                           <Form.Check
@@ -2124,6 +2284,7 @@ function TeamMembersPage() {
           </ListGroup>
         </Modal.Body>
       </Modal>
+      { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module='members' />}
     </>
   );
 }

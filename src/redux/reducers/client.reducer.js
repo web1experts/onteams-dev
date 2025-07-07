@@ -64,7 +64,7 @@ export default (state = initialState, action) => {
     
     case PUT_CLIENT_SUCCESS:
         return {
-            updatedClient: action.payload.message,
+            updatedClient: action.payload.updatedClient,
             message: action.payload.message,
             message_variant: 'success',
             success: true

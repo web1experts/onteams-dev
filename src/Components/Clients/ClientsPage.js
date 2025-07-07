@@ -19,7 +19,7 @@ import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { currentMemberProfile } from "../../helpers/auth";
 import { CustomFieldModal } from "../modals/customFields";
 
-function EditableField({ field, label, value, onChange, isEditing, onEditClick, error }) {
+/*function EditableField({ field, label, value, onChange, isEditing, onEditClick, error }) {
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
   const [originalValue, setOriginalValue] = useState(value);
@@ -67,7 +67,7 @@ function EditableField({ field, label, value, onChange, isEditing, onEditClick, 
     </>
   );
 
-}
+}*/
 
 
 function ClientsPage() {
@@ -76,6 +76,7 @@ function ClientsPage() {
    const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
    const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
    const commonState = useSelector(state => state.common)
+   const [ isEditing, setIsEditing] = useState( false )
   const memberProfile = currentMemberProfile()
   inputs.forEach(input => {
     input.addEventListener('input', function () {
@@ -94,7 +95,7 @@ function ClientsPage() {
 
   const [isActiveView, setIsActiveView] = useState(2);
   const [rows, setRows] = useState([{ name: '' }]);
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState({});
   const [fieldserrors, setFieldErrors] = useState({ name: '' });
   const [customFields, setCustomFields] = useState([]);
   const apiCustomfields = useSelector( state => state.customfields)
@@ -137,7 +138,7 @@ function ClientsPage() {
   const [showloader, setShowloader] = useState(true)
   const apiResult = useSelector(state => state.client);
   const [editedClient, setEditedClient] = useState({});
-  const [fields, setFields] = useState({ name: '' });
+  const [fields, setFields] = useState({ name: '', remove_avatar: false });
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [ showCustomFields, setShowCustomFields] = useState( false )
   
@@ -163,18 +164,22 @@ function ClientsPage() {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
 
+  useEffect(() => {
+    console.log(fields);
+  },[fields])
+
   const handleFieldChange = (field, value) => {
    
     // if (field in editedClient) {
     if (field === "avatar") {
-      setEditedClient((prevState) => ({
+      setFields((prevState) => ({
         ...prevState,
         [field]: value.target.files[0],
         ['remove_avatar']: true
       }));
       setAvatarPreview(URL.createObjectURL(value.target.files[0]));
     } else {
-      setEditedClient((prevState) => ({
+      setFields((prevState) => ({
         ...prevState,
         [field]: value,
       }));
@@ -205,13 +210,30 @@ function ClientsPage() {
 
   useEffect(() => {
     if (selectedClient) { // Check if data is available
-      setIsEditing({
-        name: false,
-        avatar: false,
-        remove_avatar: false
-      });
-      setEditedClient({ ...selectedClient });
+      // setIsEditing({
+      //   name: false,
+      //   avatar: false,
+      //   remove_avatar: false
+      // });
+      // setEditedClient({ ...selectedClient });
     }
+    let fieldsSetup = {
+      name: selectedClient?.name,
+      remove_avatar: false
+    }
+    if (selectedClient?.customFields && Object.keys(selectedClient?.customFields).length > 0) {
+        Object.values(selectedClient?.customFields).forEach(field => {
+            fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
+        });
+    }else{
+        customFields.forEach(field => {
+            fieldsSetup[`custom_field[${field.name}]`] = ''
+        });
+        
+    }
+    setFields(
+      fieldsSetup
+    )
   }, [selectedClient]);
 
   useEffect(() => {
@@ -221,10 +243,10 @@ function ClientsPage() {
     }
   }, [deleteSuccess])
 
-  const [isEditing, setIsEditing] = useState({
-    name: false,
-    avatar: false
-  });
+  // const [isEditing, setIsEditing] = useState({
+  //   name: false,
+  //   avatar: false
+  // });
 
   const handleListClients = async () => {
     setClientFeed([])
@@ -256,6 +278,17 @@ function ClientsPage() {
       setShowDialog(false)
     }
 
+    if( apiResult.success === true && apiResult.updatedClient){
+       
+            setClientFeed((prevClients) =>
+                prevClients.map((client) =>
+                  client._id === apiResult.updatedClient._id ? apiResult.updatedClient : client
+                )
+            );  
+            setSelectedClient(apiResult.updatedClient )
+       
+    }
+
     if (apiResult.success || apiResult.error) {
       setLoader(false)
       
@@ -283,23 +316,31 @@ function ClientsPage() {
   
   }, [apiCustomfields]);
 
-  const handleChange = (index, event, fieldname = '') => {
-    const { name, value, type, files } = event.target;
-    const updatedRows = [...rows];
-
-
-    updatedRows[index] = { ...updatedRows[index], [name]: value };
-    setRows(updatedRows);
-    const updatedErrors = [...errors];
-    // Check if there is an error message for the specified field at the given index
-    if (updatedErrors[index] && updatedErrors[index][name]) {
-      // If an error message exists, update it to an empty string to remove the error
-      updatedErrors[index][name] = '';
-    }
-    // Update the errors state with the updated array
-    setErrors(updatedErrors);
-
+  const handleChange = ({ target: { name, value, type, files, checked } }) => { 
+    const finalValue =
+    type === 'checkbox' ? checked : type === 'file' ? files : value;
+    
+    setFields({ ...fields, [name]: finalValue });
+    setErrors({ ...errors, [name]: '' })
   };
+
+  // const handleChange = ( event, fieldname = '') => {
+  //   const { name, value, type, files } = event.target;
+  //   const updatedRows = [...rows];
+
+
+  //   // updatedRows[index] = { ...updatedRows[index], [name]: value };
+  //   // setRows(updatedRows);
+  //   // const updatedErrors = [...errors];
+  //   // // Check if there is an error message for the specified field at the given index
+  //   // if (updatedErrors[index] && updatedErrors[index][name]) {
+  //   //   // If an error message exists, update it to an empty string to remove the error
+  //   //   updatedErrors[index][name] = '';
+  //   // }
+  //   // // Update the errors state with the updated array
+  //   // setErrors(updatedErrors);
+
+  // };
 
   useEffect(() => {
     const check = ['undefined', undefined, 'null', null, '']
@@ -325,6 +366,7 @@ function ClientsPage() {
 
     }
   }, [clientFeeds]);
+  
 
   const showError = (index, name) => {
     if (errors[index] && errors[index][name]) return (<span className="error">{errors[index][name]}</span>);
@@ -333,13 +375,13 @@ function ClientsPage() {
   const handleUpdateSubmit = async (event) => {
     event.preventDefault();
 
-    const changes = compareClient(selectedClient, editedClient);
+    // const changes = compareClient(selectedClient, editedClient);
     
-    if (Object.keys(changes).length > 0) {
+    if (Object.keys(fields).length > 0) {
       setLoader(true)
 
 
-      const updatedErrorsPromises = Object.entries(changes).map(async ([fieldName, value]) => {
+      const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
         // Get rules for the current field
         const rules = getFieldRules('clients', fieldName);
         // Validate the field
@@ -366,26 +408,42 @@ function ClientsPage() {
         setFieldErrors(fieldErrors);
         setLoader(false)
       } else {
-
-
-        if (Object.keys(changes).length > 0) {
+        if (Object.keys(fields).length > 0) {
 
           const formData = new FormData();
-          for (const [key, value] of Object.entries(changes)) {
-            formData.append(key, value);
+          for (const [key, value] of Object.entries(fields)) {
+             if (key === 'avatar' && value instanceof File) {
+                formData.append('files[]', value);
+              }
+            else if (Array.isArray(value)) { // Check if the value is an array
+              if (value.length === 0) {
+                  formData.append(`${key}[]`, []); // Append an empty array
+              } else {
+                  value.forEach(item => {
+                      formData.append(`${key}[]`, item); // Append with the same key for non-empty arrays
+                  });
+              }
+            }else if (typeof value === 'object'){
+                formData.append(key, JSON.stringify(value))
+            } else {
+                formData.append(key, value)
+            }
           }
-          if (isEditing.remove_avatar === true) {
-            formData.append('remove_avatar', true);
-          }
+
+          // if (isEditing.remove_avatar === true) {
+          //   formData.append('remove_avatar', true);
+          // }
           await dispatch(updateClient(selectedClient?._id, formData))
 
         }
-        setIsEditing({
-          name: false,
-          avatar: false,
-          remove_avatar: false
-        });
-        setLoader(false)
+        // setIsEditing({
+        //   name: false,
+        //   avatar: false,
+        //   remove_avatar: false
+        // });
+        setFields({name: '', remove_avatar: false})
+        setLoader(false);
+        setIsEditing( false)
       }
     } else {
       setLoader(false)
@@ -406,8 +464,9 @@ function ClientsPage() {
 
   const removeAvatar = () => {
     setAvatarPreview(null);
-    setIsEditing({ ...isEditing, ['remove_avatar']: true })
-    setEditedClient({ ...editedClient, ['avatar']: false })
+    setFields({...fields, ['remove_avatar']: true })
+    // setIsEditing({ ...isEditing, ['remove_avatar']: true })
+    // setEditedClient({ ...editedClient, ['avatar']: false })
     // setSelectedClient({...selectedClient, avatar: null})
   }
 
@@ -489,8 +548,11 @@ function ClientsPage() {
                               Clients <span key="client-action-header" className="onHide">Actions</span>
                           </div>
                       </th>
+<<<<<<< HEAD
                       <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email <small><TbArrowsSort /></small></div> </th>
                       <th scope="col" key="client-phone-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Phone <small><TbArrowsSort /></small></div></th>
+=======
+>>>>>>> refs/remotes/origin/master
                       {Array.isArray(customFields) && customFields
                         .filter(field => field?.showInTable !== false)
                         .map((field, idx) => (
@@ -520,14 +582,35 @@ function ClientsPage() {
                                   </div>
                               </div>
                             </td>
-                            <td className="onHide new__td" key={`client-td1-${index}`}>john@gmail.com</td>
-                            <td className="onHide new__td" key={`client-td2-${index}`}>+1 (555) 123-4567</td>
                             {Array.isArray(customFields) && customFields
                               .filter(field => field?.showInTable !== false)
-                              .map((field, idx) => (
-                                <td className="onHide new__td">{field.label}</td>
-                              ))
-                            }
+                              .map((field, idx) => {
+                                  const fieldname = field.name;
+                                  let mvalue = client?.customFields?.[fieldname]?.meta_value;
+                                  if (field.type === 'badge' && Array.isArray(field.options)) {
+                                      const matchedOption = field.options.find(opt => opt.value === mvalue);
+                                      if (matchedOption) {
+                                      mvalue = (
+                                          <span
+                                          style={{
+                                              backgroundColor: matchedOption.color,
+                                              padding: '4px 8px',
+                                              borderRadius: '8px',
+                                              color: '#fff',
+                                              display: 'inline-block'
+                                          }}
+                                          >
+                                          {client?.customFields?.[fieldname]?.meta_value}
+                                          </span>
+                                      );
+                                      }
+                                  }
+                                  return (
+                                      <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide">
+                                          {mvalue}
+                                      </td>
+                                  );
+                              })}
                             <td className="task--last--buttons" key={`client-td3-${index}`}>
                               <div className="d-flex justify-content-between">
                                   <div className="onHide">
@@ -601,21 +684,21 @@ function ClientsPage() {
                     avatarPreview ? 
                       <Card.Img variant="top" src={avatarPreview} />
                     :
-                    isEditing.remove_avatar === false && editedClient?.avatar ?
-                    <Card.Img variant="top" src={editedClient?.avatar ?? "./images/default.jpg"} />
+                    fields?.remove_avatar === false && selectedClient?.avatar ?
+                    <Card.Img variant="top" src={selectedClient?.avatar ?? "./images/default.jpg"} />
                     :
                       <Card.Img variant="top" src={"./images/default.jpg"} />
                   }
                   
-                  {!editedClient?.avatar &&
+                  {!selectedClient?.avatar &&
                     <span>Add Photo</span>
                   }
-                  {editedClient?.avatar &&
+                  {selectedClient?.avatar &&
                     <span>Edit Photo</span>
                   }
 
                 </Form.Label>
-                {editedClient?.avatar && isEditing.remove_avatar === false &&
+                {selectedClient?.avatar && fields?.remove_avatar === false &&
                   <span className="remove--photo" onClick={removeAvatar}><FaTrashAlt /></span>
                 }
                 </>
@@ -636,9 +719,15 @@ function ClientsPage() {
               }
             </div>
             <Card.Body>
-              <Card.Title><FiMail /> Client Information</Card.Title>
+              <Card.Title>
+                <FiMail /> Client Information
+                {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") &&
+                        <FiEdit onClick={() => setIsEditing(true)} />
+                      }
+              </Card.Title>
               <Card.Text>
                 <ListGroup>
+<<<<<<< HEAD
                   <ListGroup.Item>
                     <span className="info--icon"><FiMail /></span>
                     <p>
@@ -668,8 +757,62 @@ function ClientsPage() {
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <span className="info--icon"><FiPhone /></span>
+=======
+                  {
+                    (isEditing === false) ? 
+                    <>
+                      <ListGroup.Item>
+                          <span className="info--icon"><FiMail /></span>
+                          <small>Client Name</small>
+                            {selectedClient?.name}
+                            
+                        </ListGroup.Item>
+                          {customFields?.length > 0 && (
+                          <>
+                            {customFields.map((field, index) => (
+                              <ListGroup.Item key={index}>
+                                <small>{field.label}</small>
+                                {selectedClient?.customFields[field.name]?.meta_value || ''}
+                                
+                              </ListGroup.Item>
+                            ))}
+                          </>
+                        )}
+                        </>
+                        :
+                        <>
+                        <ListGroup.Item>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Cliet Name</Form.Label>
+                            <Form.Control type="text" placeholder={'Name'} name={`name`}  value={fields?.name} onChange={handleChange} />
+                           </Form.Group>
+                          </ListGroup.Item>
+                            {customFields?.length > 0 && (
+                            <>
+                              {customFields.map((field, index) => (
+                                <ListGroup.Item key={index}>
+                                  {renderDynamicField({
+                                    name: `custom_field[${field.name}]`,
+                                    type: field.type,
+                                    label: field.label,
+                                    value: fields[`custom_field[${field.name}]`] || '',
+                                    options: field?.options || [],
+                                    onChange: (e) => handleChange(e, field.name),
+                                    range_options: field?.range_options || {}
+                                  })}
+                                </ListGroup.Item>
+                              ))}
+                            </>
+                          )}
+                          </>
+                  }
+                  
+
+                  
+                    {/* <span className="info--icon"><FiPhone /></span>
+>>>>>>> refs/remotes/origin/master
                     <p><small>Phone</small>+1 (555) 123-4567</p>
-                  </ListGroup.Item>
+                  </ListGroup.Item> */}
                 </ListGroup>
               </Card.Text>
               <div className="text-end mt-3">

@@ -1173,11 +1173,11 @@ function ProjectsPage() {
                                             :
                                             <Form.Label><small>None</small></Form.Label>
                                             }
-                                            { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
+                                            {/* { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
                                                 <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
-                                            )}
+                                            )} */}
                                         </div>
-                                        <AddClient show={showClient} toggleshow={handleClientClose} />
+                                        {/* <AddClient show={showClient} toggleshow={handleClientClose} /> */}
                                     </Form.Group>
                                     <Form.Group className="mb-0 form-group">
                                         <Form.Label>

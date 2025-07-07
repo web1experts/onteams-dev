@@ -29,8 +29,8 @@ function AddClient(props) {
   });
   
     const addToast = useToast();
-    const [rows, setRows] = useState([{ name: '' }]);
-    const [errors, setErrors] = useState([]);
+    const [rows, setRows] = useState({ name: '' });
+    const [errors, setErrors] = useState({});
     const [ fieldserrors, setFieldErrors ] = useState({ name: '' });
     const apiResult = useSelector(state => state.client);
     const navigate = useNavigate();
@@ -43,8 +43,8 @@ function AddClient(props) {
     const handleClose = () => {
         requestAnimationFrame(() => {
             
-            setRows([{ name: '' }]);
-            setErrors([]);
+            setRows({ name: '' });
+            setErrors({});
             props.toggleshow(false);
           });
         
@@ -59,28 +59,19 @@ function AddClient(props) {
   
     }, [apiResult])
 
-const handleChange = (index, event, fieldname = '') => {
+const handleChange = (event, fieldname = '') => {
     const { name, value, type, files } = event.target;
-    const updatedRows = [...rows];
-
     
-      updatedRows[index] = { ...updatedRows[index], [name]: value };
-      setRows(updatedRows);
-      const updatedErrors = [...errors]; 
-      // Check if there is an error message for the specified field at the given index
-      if (updatedErrors[index] && updatedErrors[index][name]) {
-        // If an error message exists, update it to an empty string to remove the error
-        updatedErrors[index][name] = '';
-      }
+      setRows({...rows, [name]: value});
       // Update the errors state with the updated array
-      setErrors(updatedErrors);
+      setErrors({...errors, [name]: ''});
     
   };
 
 
 
-const showError = (index, name) => {
-    if (errors[index] && errors[index][name]) return (<span className="error">{errors[index][name]}</span>);
+const showError = (name) => {
+    if (errors && errors[name]) return (<span className="error">{errors[name]}</span>);
     return null;
   };
   
@@ -88,58 +79,56 @@ const showError = (index, name) => {
   const handleSubmit = async (e) => {
       e.preventDefault();
       setLoader(true)
-      const updatedErrorsPromises = rows.map(async (row) => {
-        let rowError = {};
-        for (const [fieldName, value] of Object.entries(row)) {
+      let updatedErrors = {};
+
+        for (const [fieldName, value] of Object.entries(rows)) {
             // Get rules for the current field
             const rules = getFieldRules('clients', fieldName);
+
             // Validate the field
             const error = await validateField('clients', fieldName, value, rules);
             console.log('error:', error);
-            // If error exists, store it in rowError
+
+            // If error exists, store it
             if (error) {
-                rowError = { ...rowError, [fieldName]: error };
+                updatedErrors[fieldName] = error;
             }
         }
-        return rowError;
-    });
 
-    // Wait for all promises to resolve
-    const updatedErrors = await Promise.all(updatedErrorsPromises);
+        // Check if there are any errors
+        const hasError = Object.keys(updatedErrors).length > 0;
 
-    // Check if there are any errors
-    const hasError = updatedErrors.some(rowError => Object.keys(rowError).length > 0);
 
     // If there are errors, update the errors state
     if (hasError) {
       setLoader(false);
       setErrors(updatedErrors);
     } else {
-      
       const formData = new FormData();
 
-      rows.forEach((row, index) => {
-        formData.append(`clients[${index}][name]`, row.name);
+      Object.entries(rows).forEach(([fieldName, value]) => {
+        if (Array.isArray(value)) { // Check if the value is an array
+              if (value.length === 0) {
+                  formData.append(`${fieldName}[]`, []); // Append an empty array
+              } else {
+                  value.forEach(item => {
+                      formData.append(`${fieldName}[]`, item); // Append with the same key for non-empty arrays
+                  });
+              }
+          } else if (typeof value === 'object') {
+              formData.append(fieldName, JSON.stringify(value))
+          }else{
+            formData.append(`${fieldName}`, value);
+          }
+        
       });
-      
+
       await dispatch(createClient(formData))   
       setLoader(false);
     }
 
     
   }
-
-  const addRow = () => {
-    setRows([...rows, { name: '' }]);
-    setErrors([...errors, { name: '' }]);
-  };
-
-  const removeRow = (index) => {
-    const updatedRows = rows.filter((_, i) => i !== index);
-    const updatedErrors = errors.filter((_, i) => i !== index);
-    setRows(updatedRows);
-    setErrors(updatedErrors);
-  };
 
     return (
         <>
@@ -149,21 +138,17 @@ const showError = (index, name) => {
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleSubmit}>
-                    {rows.map((row, index) => (
-                        <div key={`row-${index}`} className="form-row">
-                            <Form.Group className="mb-0 form-group">
-                                <FloatingLabel label="Client Name *">
-                                    <Form.Control type="text" name="name" placeholder="Enter client name" className={errors[index] && errors[index]['name'] && errors[index]['name'] !== "" ? "input-error" : ''} onChange={(e) => handleChange(index, e)} />
-                                </FloatingLabel>
-                                {showError(index, 'name')}
-                            </Form.Group>
-                            {
-                              rows.length > 1 && 
-                              <Button onClick={() => removeRow(index)} variant="link"><FaRegTrashAlt /></Button>
-                            }
-                        </div>
-                     ))} 
-                      {/* {customFields.length > 0 &&
+                    
+                      <div key={`row-0`} className="form-row">
+                          <Form.Group className="mb-0 form-group">
+                              <FloatingLabel label="Client Name *">
+                                  <Form.Control type="text" name="name" placeholder="Enter client name" className={errors['name'] && errors['name'] && errors['name'] !== "" ? "input-error" : ''} onChange={(e) => handleChange(e)} />
+                              </FloatingLabel>
+                              {showError('name')}
+                          </Form.Group>
+                      </div>
+                     
+                      {customFields.length > 0 &&
                           <>
                           <hr />
                               <ListGroup>
@@ -175,7 +160,7 @@ const showError = (index, name) => {
                               name: `custom_field[${field.name}]`,
                               type: field.type,
                               label: field.label,
-                              value: fields[`custom_field[${field.name}]`] || '',
+                              value: rows[`custom_field[${field.name}]`] || '',
                               options: field?.options || [],
                               onChange: (e) => handleChange(e, field.name),
                               fieldId: `new-${field.name}-${index}`,
@@ -183,11 +168,10 @@ const showError = (index, name) => {
                               })
                           )}
                           </>
-                      }   */}
+                      }  
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="outline-primary" onClick={addRow}>Add More</Button>
                     <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please Wait...' : 'Save'}</Button>
                 </Modal.Footer>
             </Modal>

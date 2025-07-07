@@ -118,15 +118,11 @@ const typeColorMap = {
     }
 
     if (apiCustomfields.newField) {
-      console.log("Before update:", customFields);
-      console.log("Adding new field:", apiCustomfields.newField);
-
       setCustomFields((prevCustomFields) => {
         const updated = [
           apiCustomfields.newField,
           ...prevCustomFields.filter(field => field._id !== apiCustomfields.newField._id),
         ];
-        console.log("After update:", updated);
         return updated;
       });
     }
