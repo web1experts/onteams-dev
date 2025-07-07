@@ -1,45 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Modal,
-  Form,
-  FloatingLabel,
-  Card,
-  ListGroup,
-  Table,
-  Accordion,
-  Dropdown,
-  FormGroup,
-} from "react-bootstrap";
+import {Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup } from "react-bootstrap";
 import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
-import {
-  FiEdit,
-  FiMail,
-  FiSidebar,
-  FiBriefcase,
-  FiShield,
-  FiPhone,
-  FiCalendar,
-  FiVideo } from "react-icons/fi";
+import {FiEdit,FiMail,FiSidebar,FiBriefcase,FiShield,FiPhone,FiCalendar,FiVideo } from "react-icons/fi";
 import { AiOutlineTeam } from 'react-icons/ai';
 import { BsEye, BsGrid } from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { TbArrowsSort } from "react-icons/tb";
 import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
 import { getMemberdata } from "../../helpers/commonfunctions";
-import {
-  Listmembers,
-  deleteMember,
-  updateMember,
-} from "../../redux/actions/members.action";
-import {
-  toggleSidebar,
-  toggleSidebarSmall,
-} from "../../redux/actions/common.action";
+import {Listmembers,deleteMember,updateMember } from "../../redux/actions/members.action";
+import {toggleSidebar,toggleSidebarSmall} from "../../redux/actions/common.action";
 import { leaveCompany } from "../../redux/actions/workspace.action";
 import { useNavigate } from "react-router-dom";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
@@ -1036,60 +1007,18 @@ function TeamMembersPage() {
             )}
             <Container fluid className="pb-5 pt-2">
               <>
-                <div
-                  className={
-                    isActiveView === 1
-                      ? "project--grid--table project--grid--new--table table-responsive-xl"
-                      : isActiveView === 2
-                      ? "project--table draggable--table new--project--rows table-responsive-xl"
-                      : "project--table new--project--rows table-responsive-xl"
-                  }
-                >
+                <div className={ isActiveView === 1 ? "project--grid--table project--grid--new--table table-responsive-xl" : isActiveView === 2 ? "project--table draggable--table new--project--rows table-responsive-xl" : "project--table new--project--rows table-responsive-xl"}>
                   <Table>
                     <thead className="onHide">
                       <tr key="project-table-header">
-                        <th
-                          scope="col"
-                          className="sticky pe-0 py-0"
-                          key="project-name-header"
-                        >
-                          <div className="d-flex align-items-center justify-content-between border-end">
-                            Project{" "}
-                            <span
-                              key="project-action-header"
-                              className="onHide"
-                            >
-                              Actions
-                            </span>
-                          </div>
+                        <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
+                            <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">
+                                Project{" "} <span key="client-action-header" className="onHide">Actions</span>
+                            </div>
                         </th>
-                        <th
-                          scope="col"
-                          key="project-status-header"
-                          className="onHide"
-                        >
-                          Email{" "}
-                          <small>
-                            <TbArrowsSort />
-                          </small>
-                        </th>
-                        <th
-                          scope="col"
-                          key="project-status-header"
-                          className="onHide"
-                        >
-                          Phone{" "}
-                          <small>
-                            <TbArrowsSort />
-                          </small>
-                        </th>
-                        <th
-                          scope="col"
-                          key="project-status-header"
-                          className="onHide"
-                        >
-                          Joining Date
-                        </th>
+                        <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email{" "} <small><TbArrowsSort /></small></div> </th>
+                        <th scope="col" key="client-phone-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Phone{" "} <small><TbArrowsSort /></small></div></th>
+                        <th scope="col" key="project-status-header" className="onHide">Joining Date</th>
                       </tr>
                     </thead>
                     <tbody>

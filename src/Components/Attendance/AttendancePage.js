@@ -263,19 +263,19 @@ useEffect(() => {
 
                     </Dropdown>
                     </ListGroup.Item>
-                    <ListGroup horizontal className="d-none d-lg-flex">
-                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-flex d-none view--icon active': 'd-lg-flex d-none view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
-                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-flex d-none view--icon active': 'd-lg-flex d-none view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                    <ListGroup horizontal className="d-none d-md-flex">
+                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
+                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>
-                <ListGroup horizontal>
-                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-none d-flex view--icon active mt-3 mt-lg-0': 'mt-3 mt-lg-0 d-lg-none d-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
-                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-none d-flex mt-3 mt-lg-0 view--icon active': 'd-lg-none d-flex mt-3 mt-lg-0 view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
-                    </ListGroup>
+                <ListGroup horizontal className="d-md-none d-flex">
+                    <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-none d-flex view--icon active mt-3 mt-lg-0': 'mt-3 mt-lg-0 d-lg-none d-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
+                    <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-none d-flex mt-3 mt-lg-0 view--icon active': 'd-lg-none d-flex mt-3 mt-lg-0 view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                </ListGroup>
               </Col>
             </Row>
           </Container>
@@ -528,7 +528,7 @@ useEffect(() => {
           <div className="bg-white attendance--table daily--attendance--table">
             <h3 class="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - June 2025</h3>
             <div className="overflow-x-auto">
-                <Table responsive="lg">
+                <Table>
                   <thead>
                     <tr>
                       <th className="px-3 text-uppercase py-3" scope="col"><FiCalendar className="me-1" /> Date & Day</th>

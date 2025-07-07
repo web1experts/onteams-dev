@@ -166,6 +166,7 @@ function SidebarPanel() {
     return (
         <>
             <div className={`${!isActive ? 'open--panel--sidebar panel--sidebar' : 'panel--sidebar'} ${collapseSidebar ? 'collapse-sidebar' : ''} ${sidebarSmall ? 'open--panel--sidebar' : ''}`}>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" className="d-flex d-sm-none" onClick={() => {handleSidebarSmall(true);}} />
                 <Navbar expand="lg">
                     <Navbar.Brand>
                         <span><img src="images/OnTeam-white-icon.png" alt="" /></span>
@@ -198,7 +199,6 @@ function SidebarPanel() {
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
-                    {/* <Navbar.Toggle aria-controls="basic-navbar-nav" className="d-flex" onClick={() => {handleSidebarSmall(true);}} /> */}
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav>
                             <Link key="dashboard-menu" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} to="/dashboard"><span className="nav--item--icon"><FiHome /></span> <strong>Dashboard</strong></Link>
@@ -208,12 +208,10 @@ function SidebarPanel() {
                                         <span className="nav--item--icon"><LuFolderOpen /></span> <strong>Projects</strong>
                                     </Link>
                                 )
-                                }
-
-                            
+                            }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.clients?.view === true  || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="client-menu"  className={`nav-link ${location.pathname === '/clients' ? 'active' : ''}`} to="/clients"><span className="nav--item--icon"><FiUserCheck /></span> <strong>Clients</strong></Link>
+                                    <Link  key="client-menu"  className={`nav-link ${location.pathname === '/clients' ? 'active' : ''}`} to="/clients"><span className="nav--item--icon"><FiUserCheck /></span> <strong>Clients</strong></Link>
                                 )
                             }
                             {

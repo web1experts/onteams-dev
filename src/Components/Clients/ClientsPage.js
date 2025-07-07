@@ -484,17 +484,17 @@ function ClientsPage() {
               <Table>
                 <thead className="onHide">
                     <tr key="project-table-header">
-                      <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
-                          <div className="d-flex align-items-center justify-content-between border-end">
-                              Clients <span key="project-action-header" className="onHide">Actions</span>
+                      <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
+                          <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">
+                              Clients <span key="client-action-header" className="onHide">Actions</span>
                           </div>
                       </th>
-                      <th scope="col" key="client-email-header" className="onHide">Email <small><TbArrowsSort /></small></th>
-                      <th scope="col" key="client-phone-header" className="onHide">Phone <small><TbArrowsSort /></small></th>
+                      <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email <small><TbArrowsSort /></small></div> </th>
+                      <th scope="col" key="client-phone-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Phone <small><TbArrowsSort /></small></div></th>
                       {Array.isArray(customFields) && customFields
                         .filter(field => field?.showInTable !== false)
                         .map((field, idx) => (
-                          <th scope="col" key={`client-field-${idx}-header`} className="onHide">{field.label}</th>
+                          <th scope="col" key={`client-field-${idx}-header`} className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">{field.label}</div></th>
                         ))
                       }
                     </tr>
@@ -641,7 +641,7 @@ function ClientsPage() {
                 <ListGroup>
                   <ListGroup.Item>
                     <span className="info--icon"><FiMail /></span>
-                    
+                    <p>
                       <small>Client Name</small>
                       {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ?
                       <>
@@ -664,7 +664,7 @@ function ClientsPage() {
                           {editedClient?.name}
                         </>
                         }
-                    
+                    </p>
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <span className="info--icon"><FiPhone /></span>

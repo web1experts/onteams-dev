@@ -891,11 +891,6 @@ Sidebar CSS-=-=
     margin-left: 16rem;
   }
 
-  .open--panel--sidebar~.team--page {
-    max-width: calc(100% - 0rem);
-    margin-left: 0rem;
-  }
-
   .view--project .open--sidebar,
   .show--project .open--sidebar,
   .open--panel--sidebar~.team--page .open--sidebar {
@@ -905,48 +900,6 @@ Sidebar CSS-=-=
   span.open--sidebar {
     display: inline-flex;
   }
-
-  /* .panel--sidebar {
-    transform: translateX(0%);
-    -webkit-transform: translateX(0%);
-    max-width: 4.5rem;
-    width: 4.5rem;
-    min-width: 4.5rem;
-    z-index: 1;
-  }
-
-  .open--panel--sidebar {
-    transform: translateX(-100%);
-    -webkit-transform: translateX(-100%);
-  }
-
-  .open--panel--sidebar~.team--page {
-    max-width: calc(100% - 0rem);
-    margin-left: 0rem;
-  } */
-
-  /* .panel--sidebar .navbar-light .navbar-nav .nav-link {
-    text-align: center;
-    color: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  } */
-
-  /* .panel--sidebar .dropdown {
-    bottom: 20px;
-    padding: 0;
-  } */
-
-  /* .panel--sidebar .navbar-light .navbar-nav .nav-link strong {
-    height: 0;
-    display: none;
-  }
-
-  .panel--sidebar .navbar-light .navbar-nav .nav-link .nav--item--icon {
-    display: block;
-    margin: 0;
-  } */
 }
 @media screen and (max-width:992px) {
   .panel--sidebar {
@@ -970,7 +923,110 @@ Sidebar CSS-=-=
 }
 
 @media screen and (max-width:767px) {
-  .panel--sidebar .dropdown {
-    display: none;
+  .panel--sidebar {
+    transform: translateX(0) translateY(100%);
+    -webkit-transform: translateX(0) translateY(100%);
+    max-width: 100%;
+    width: 100%;
+    min-width: 100%;
+    border: 0;
+    transition: all .5s ease-in-out;
+    -webkit-transition: all .5s ease-in-out;
+  }
+
+  .team--page {
+    max-width: calc(100% - 0rem);
+    margin-left: 0rem;
+  }
+
+  .open--panel--sidebar {
+    max-width: 100%;
+    width: 100%;
+    min-width: auto;
+    z-index: 222;
+    transform: translateX(0) translateY(0%);
+    -webkit-transform: translateX(0) translateY(0%);
+  }
+
+  .open--panel--sidebar~.team--page {
+    max-width: calc(100% - 0rem);
+    margin-left: 0;
+  }
+
+  .open--sidebar,
+  .show--project .open--sidebar,
+  .open--panel--sidebar~.team--page .open--sidebar,
+  span.open--sidebar {
+    display: none !important;
+  }
+
+  .panel--sidebar .navbar {
+    height: auto;
+  }
+
+  .navbar-toggler {
+    display: block !important;
+    position: fixed;
+    top: -70px;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background: linear-gradient(to bottom right, #0f172a, #1e293b);
+    border-radius: 100px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .panel--sidebar .dropdown-menu {
+    width: calc(100% - 25px);
+  }
+
+  .navbar-toggler-icon {
+    background: url('../images/hamburger_icon.png') no-repeat center center;
+    background-size: 20px;
+  }
+
+  .navbar-toggler.collapsed  {
+    background: linear-gradient(to bottom right, #0f172a, #1e293b);
+  }
+
+  .open--panel--sidebar .navbar-toggler.collapsed  {
+    background: rgba(255, 255, 255, 0.03);
+    position: absolute;
+    left: auto;
+    top: 15px;
+    right: 1rem;
+  }
+
+  .open--panel--sidebar .navbar-toggler.collapsed .navbar-toggler-icon {
+    background: url('../images/close_icon.png') no-repeat center center;
+    background-size: 25px;
+  }
+
+  .navbar-expand-lg .navbar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .navbar-light .navbar-nav .nav-link {
+    flex: 1 1 100%;
+    max-width: calc(50% - 0.5rem);
+    flex-flow: column wrap;
+    gap: 1rem;
+    padding: 2rem 1rem;
+    justify-content: center;
+  }
+
+  .panel--sidebar .navbar-expand-lg .navbar-collapse {
+    max-height: calc(100dvh - 306px);
+    padding-bottom: 2rem;
+  }
+
+  .navbar-light .navbar-nav .nav-link .nav--item--icon, .panel--sidebar .dropdown .dropdown-item .nav--item--icon {
+    margin-right: 0;
+  }
+
+  .navbar-light .navbar-nav .active>.nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.show, .navbar-light .navbar-nav .show>.nav-link, .navbar-light .navbar-nav .nav-link:focus {
+    padding: 2rem 1rem;
   }
 }
