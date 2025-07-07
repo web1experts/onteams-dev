@@ -1203,12 +1203,14 @@ const handleToggles = () => {
               <Row>
                   <Col sm={12} lg={12}>
                       <h2>
-                          <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
-                          Reports
+                          <p className="mb-0 d-flex align-items-center">
+                            <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                            Reports
+                          </p>
                           <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
-                            <ListGroup horizontal>
-                              <ListGroup.Item action onClick={() => {setFilters({...filters, ['sort_by']:'members'});setActiveViewTab('members')}} className={`${activeMemberTab === 'members'? 'd-lg-flex gap-2 active d-none': 'd-none d-lg-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
-                              <ListGroup.Item action onClick={() => {setFilters({...filters, ['sort_by']:'projects'});setActiveViewTab('projects')}} className={`${activeMemberTab === 'projects'? 'd-lg-flex gap-2 active d-none': 'd-none d-lg-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                            <ListGroup horizontal className={isActive ? "d-none" : "d-none d-md-flex"}>
+                              <ListGroup.Item action onClick={() => {setFilters({...filters, ['sort_by']:'members'});setActiveViewTab('members')}} className={`${activeMemberTab === 'members'? 'd-md-flex gap-2 active d-none': 'd-none d-md-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
+                              <ListGroup.Item action onClick={() => {setFilters({...filters, ['sort_by']:'projects'});setActiveViewTab('projects')}} className={`${activeMemberTab === 'projects'? 'd-md-flex gap-2 active d-none': 'd-none d-md-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
                             </ListGroup>
                             {
                               filters['sort_by'] === 'projects' &&
@@ -1340,14 +1342,16 @@ const handleToggles = () => {
                                   </Dropdown.Menu>
                                 </Dropdown>
                               )}
-                            <ListGroup horizontal className="bg-white expand--icon ms-3">
+                            <ListGroup horizontal className="bg-white expand--icon">
                                 <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                             </ListGroup>
                           </ListGroup>
                       </h2>
-                      <ListGroup horizontal>
-                        <ListGroup.Item action onClick={() => setActiveViewTab('members')} className={`${activeMemberTab === 'members'? 'd-md-none d-flex gap-2 active': 'd-md-none d-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
-                        <ListGroup.Item action onClick={() => setActiveViewTab('projects')} className={`${activeMemberTab === 'projects'? 'd-md-none d-flex gap-2 active': 'd-md-none d-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                      <ListGroup horizontal className="justify-content-start mt-3 mt-md-0 d-md-none d-flex">
+                        <ListGroup horizontal className="justify-content-start d-md-none d-flex">
+                          <ListGroup.Item action onClick={() => setActiveViewTab('members')} className={`${activeMemberTab === 'members'? 'd-md-none d-flex gap-2 active': 'd-md-none d-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
+                          <ListGroup.Item action onClick={() => setActiveViewTab('projects')} className={`${activeMemberTab === 'projects'? 'd-md-none d-flex gap-2 active': 'd-md-none d-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                        </ListGroup>
                       </ListGroup>
                   </Col>
               </Row>
@@ -1381,7 +1385,7 @@ const handleToggles = () => {
                                 <tr>
                                   <td>
                                     <div className="d-flex justify-content-between">
-                                      <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                                      <div className="project--name d-flex gap-3 align-items-center">
                                           <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
                                           <div className="title--initial">{reportData?.title?.substring(0,2)}</div>
                                           <div className="title--span flex-column d-flex align-items-start gap-0">
@@ -1391,15 +1395,16 @@ const handleToggles = () => {
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="ms-auto">
-                                    <div className="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0">
-                                      {/* <div className="text-left text-xl-center">
-                                        <strong>Total Hours: </strong> 4h 47m
-                                      </div> */}
-                                      
-                                    </div>
+                                  <td className="ms-auto text-start text-xl-center">
+                                    {/* <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
+                                    <br className="d-xl-none"/>
+                                    {reportData?.members?.length || 0} */}
                                   </td>
-                                  <td>{reportData?.members?.length || 0}</td>
+                                  <td className="ms-auto text-start text-xl-center">
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Members</strong>
+                                    <br className="d-xl-none"/>
+                                    {reportData?.members?.length || 0}
+                                  </td>
                                   <td>
                                     <Button variant="dark" className="ms-auto px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(reportData);setIsActive(1);}}><FaEye/> Details</Button>
                                   </td>
@@ -1448,7 +1453,11 @@ const handleToggles = () => {
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="ms-auto text-start text-xl-center"><strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong><br className="d-xl-none"/>{result?.totalTime || 0}</td>
+                                  <td className="ms-auto text-start text-xl-center">
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
+                                    <br className="d-xl-none"/>
+                                    {result?.totalTime || 0}
+                                  </td>
                                   <td className="text-start text-xl-center"><strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Projects</strong><br className="d-xl-none"/>{result?.totalProjects || 0}</td>
                                   <td><Button variant="dark" className="mt-0 mt-xl-0 px-3 py-2 d-inline-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(report); setIsActive(1);}}><FaEye/> Details</Button></td>
                                 </tr>
@@ -1468,7 +1477,8 @@ const handleToggles = () => {
       </div>
       <div className="details--projects--grid projects--grid common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-            <div className="projecttitle">
+            <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+            <div className="projecttitle me-auto">
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <h3>
@@ -1504,7 +1514,7 @@ const handleToggles = () => {
           <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
             <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
               <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects ({singleMemberReport?.reports?.length || 0})</h3>
-              <div class="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+              <div class="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
                 <div class="text-center">
                     <div class="text-lg font-bold text--blue">{getProjectSummary(singleMemberReport?.reports, 'time')}</div>
                     <div class="text-slate-600">Total Hours</div>
@@ -1570,7 +1580,7 @@ const handleToggles = () => {
         <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
             <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members ({singleMemberReport?.members?.length || 0})</h3>
-            <div class="d-xl-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+            <div class="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
               <div class="text-center">
                   <div class="text-lg font-bold text--blue">113h 15m</div>
                   <div class="text-slate-600">Total Hours</div>
@@ -1588,7 +1598,7 @@ const handleToggles = () => {
                       <>
                     <div className={`single--project--stack-${member?._id}`}>
                       <div className="d-flex justify-content-between mb-4" key={`single-member-accord-item-${member?._id}`}>
-                        <div className="project--name d-flex justify-content-between gap-3 align-items-center">
+                        <div className="project--name d-flex gap-3 align-items-center">
                             <div className="title--initial">{member?.name?.substring(0,2)}</div>
                             <div className="title--span flex-column d-flex align-items-start gap-0">
                                 <span>{member?.name} </span>

@@ -303,6 +303,7 @@ Login Forms CSS-=-=
   -webkit-border-radius: .5rem;
   min-height: 40px;
   padding: .5rem 1.2rem;
+  font-size: 15px;
 }
 
 .form-select {
@@ -670,10 +671,13 @@ Add Project Modal CSS-=-=-
   line-height: 1.5;
   color: var(--bs-body-color);
   appearance: none;
-  background-color: var(--bs-body-bg);
+  background: var(--bs-body-bg);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   background-clip: padding-box;
   border: var(--bs-border-width) solid var(--bs-border-color);
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
+  -webkit-transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
 }
 
 .project--form--inputs form .text--editor {

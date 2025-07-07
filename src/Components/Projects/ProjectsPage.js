@@ -696,11 +696,9 @@ function ProjectsPage() {
                         <Row>
                             <Col sm={12} lg={12}>
                                 <h2>
-                                    <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                                    <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                                     Projects
-                                    {/* <Button variant="primary" className={isActive !== 0 ? 'd-flex ms-auto' : 'd-lg-none ms-auto'} onClick={handleSearchShow}><MdSearch /></Button> */}
-                                    <Button variant="primary" className={isActive !== 0 ? 'd-flex d-xl-none' : 'd-xl-none onHide'} onClick={handleFilterShow}><MdFilterList /></Button>
-                                    <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-md-flex'}>
+                                    <ListGroup horizontal className={isActive !== 0 ? '' : 'ms-auto d-flex'}>
                                         <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-xl-flex'} key="member-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
                                                 <option value={memberdata?._id} key="my-projects-option">My Projects</option>
@@ -751,9 +749,9 @@ function ProjectsPage() {
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                                         </ListGroup>
-                                        <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'bg-white expand--icon ms-3 d-none d-md-flex'}>
-                                        <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
-                                            
+                                        <ListGroup horizontal className={isActive !== 0 ? '' : 'bg-white expand--icon ms-3 d-flex'}>
+                                            <ListGroup.Item className={isActive !== 0 ? 'd-flex d-xl-none me-1' : 'd-xl-none onHide me-1'} onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
+                                            <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
                                             <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                                             {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
                                                 <ListGroup.Item className="btn btn-primary" onClick={() => handleShow('new') }><FaPlus /></ListGroup.Item>
@@ -781,25 +779,23 @@ function ProjectsPage() {
                                 <Table>
                                     <thead className="onHide">
                                         <tr key="project-table-header">
-                                            <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
-                                                <div className="d-flex align-items-center justify-content-between border-end">
+                                            <th scope="col" className="sticky p-0 border-bottom-0" key="project-name-header">
+                                                <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">
                                                     Project <span key="project-action-header" className="onHide">Actions</span>
                                                 </div>
                                             </th>
                                             {/* <th scope="col" key="project-action-header" className="onHide sticky">Actions</th> */}
-                                            <th scope="col" key="project-status-header" className="onHide">Status </th>
+                                            <th scope="col" key="project-status-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Status <small><TbArrowsSort /></small></div> </th>
                                             {/* <th scope="col" key="project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th> */}
                                             {/* <th scope="col" key="project-client-header" className="onHide">Client</th> */}
-                                            <th scope="col" key="project-member-header" className="onHide">Assigned Members</th>
-                                            <th scope="col" key="project-start-header" className="onHide">Start Date</th>
-                                            <th scope="col" key="project-end-header" className="onHide">End Date </th>
-                                            <th scope="col" key="project-due-header" className="onHide">Due Date </th>
+                                            <th scope="col" key="project-member-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Assigned Members <small><TbArrowsSort /></small></div></th>
+                                            <th scope="col" key="project-start-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Start Date <small><TbArrowsSort /></small></div></th>
+                                            <th scope="col" key="project-end-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">End Date <small><TbArrowsSort /></small></div></th>
+                                            <th scope="col" key="project-due-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Due Date <small><TbArrowsSort /></small></div></th>
                                             {Array.isArray(customFields) && customFields
                                                 .filter(field => field?.showInTable !== false)
                                                 .map((field, idx) => (
-                                                    <th scope="col" key={`project-${field.name || idx}-header`} className="onHide">
-                                                    {field.label}
-                                                    </th>
+                                                    <th scope="col" key={`project-${field.name || idx}-header`} className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">{field.label}</div></th>
                                                 ))
                                             }
                                         </tr>
@@ -1087,8 +1083,8 @@ function ProjectsPage() {
             </div>
             <div className="details--projects--grid projects--grid common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
-                    {/* <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span> */}
-                    <div className="projecttitle">
+                    <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                    <div className="projecttitle me-auto">
                         <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
                                 <h3>

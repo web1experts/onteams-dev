@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Form, Dropdown, ListGroup, Table, Modal, Button, Card, ListGroupItem } from "react-bootstrap";
 import { FaCheck, FaEye } from "react-icons/fa";
-import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload, FiLogIn, FiLogOut, FiEdit3 } from "react-icons/fi";
+import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload, FiLogIn, FiLogOut, FiEdit3, FiSidebar } from "react-icons/fi";
 import { MdOutlineCheck, MdOutlineClose } from 'react-icons/md';
 import { GrExpand } from "react-icons/gr";
 import { LuTimer, LuCircleDot } from "react-icons/lu";
@@ -239,6 +239,7 @@ useEffect(() => {
             <Row>
               <Col sm={12}>
                 <h2>
+                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => { handleSidebarSmall(false); setIsActive(0); }}><FiSidebar /></span>
                   Attendance
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup.Item>
@@ -265,19 +266,19 @@ useEffect(() => {
 
                     </Dropdown>
                     </ListGroup.Item>
-                    <ListGroup horizontal className="d-none d-lg-flex">
-                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-flex d-none view--icon active': 'd-lg-flex d-none view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
-                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-flex d-none view--icon active': 'd-lg-flex d-none view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                    <ListGroup horizontal className="d-none d-md-flex">
+                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
+                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>
-                <ListGroup horizontal>
-                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-none d-flex view--icon active mt-3 mt-lg-0': 'mt-3 mt-lg-0 d-lg-none d-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
-                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-none d-flex mt-3 mt-lg-0 view--icon active': 'd-lg-none d-flex mt-3 mt-lg-0 view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
-                    </ListGroup>
+                <ListGroup horizontal className="d-md-none d-flex">
+                    <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-none d-flex view--icon active mt-3 mt-lg-0': 'mt-3 mt-lg-0 d-lg-none d-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
+                    <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-none d-flex mt-3 mt-lg-0 view--icon active': 'd-lg-none d-flex mt-3 mt-lg-0 view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                </ListGroup>
               </Col>
             </Row>
           </Container>
@@ -499,7 +500,8 @@ useEffect(() => {
       {isActive === 1 &&
         <div className="details--projects--grid projects--grid common--project--grid">
           <div className="wrapper--title py-2 bg-white border-bottom">
-              <div className="projecttitle">
+              <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+              <div className="projecttitle me-auto">
                 <Dropdown key={'member-filter'}>
                   <Dropdown.Toggle variant="link" id="dropdown-basic" key={'member-filter-toggle'}>
                     <h3>
@@ -530,7 +532,7 @@ useEffect(() => {
           <div className="bg-white attendance--table daily--attendance--table">
             <h3 className="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - June 2025</h3>
             <div className="overflow-x-auto">
-                <Table responsive="lg">
+                <Table>
                   <thead>
                     <tr>
                       <th className="px-3 text-uppercase py-3" scope="col"><FiCalendar className="me-1" /> Date & Day</th>

@@ -84,7 +84,7 @@ function Workspace(props) {
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);}}><FiSidebar /></span>
+                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => { handleSidebarSmall(false); }}><FiSidebar /></span>
                   Workspace{" "}
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup horizontal className="bg-white expand--icon ms-3">

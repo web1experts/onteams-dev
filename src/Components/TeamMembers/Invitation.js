@@ -7,8 +7,9 @@ import { permissionModules } from "../../helpers/permissionsModules";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { GrExpand } from "react-icons/gr";
+import { BsEye } from "react-icons/bs";
 import { TbArrowsSort } from "react-icons/tb";
-import { FiMail, FiBriefcase, FiShield, FiPhone, FiCalendar } from "react-icons/fi";
+import { FiMail, FiBriefcase, FiShield, FiPhone, FiCalendar, FiSidebar } from "react-icons/fi";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite, resendInvite, Listmembers} from "../../redux/actions/members.action";
 import { MdOutlineClose, MdSearch } from "react-icons/md";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
@@ -439,12 +440,9 @@ function Invitation(props) {
                   <Table>
                     <thead className="onHide">
                         <tr key="project-table-header">
-                            <th scope="col" className="sticky" key="project-name-header">
-                                <div className="d-flex align-items-center justify-content-between">
-                                    Member
-                                </div>
-                            </th>
-                            <th width='10%' scope="col" key="project-status-header" className="onHide text-end">Actions</th>
+                          <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
+                            <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">Member <span key="client-action-header" className="onHide">Actions</span></div>
+                          </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -453,26 +451,28 @@ function Invitation(props) {
                           return (
                             <>
                               <tr key={`member-table-row-${index}`} className={invitation._id === selectedInvitation?._id ? 'project--active' : ''} onClick={isActive ? () => handleTableToggle(invitation) : () => { return false; }}>
-                                <td className="project--title--td sticky" data-label="Member Name">
+                                <td className="project--title--td sticky" data-label="Member Name" >
                                   <div className="d-flex justify-content-between border-end flex-wrap">
-                                      <div className="project--name">
-                                          <div className="drag--indicator"><abbr>{index + 1}</abbr></div>
-                                          <div className="title--initial">{invitation.email.charAt(0)}</div>
-                                          <div className="title--span flex-column align-items-start gap-0">
-                                            <span>{invitation.email}</span>
-                                            <strong>
-                                              {invitation.role?.name?.replace(
-                                                /\b\w/g,
-                                                function (char) {
-                                                  return char.toUpperCase();
-                                                }
-                                              )}
-                                            </strong>
-                                          </div>
+                                    <div className="project--name">
+                                      <div className="drag--indicator"><abbr>{index + 1}</abbr></div>
+                                      <div className="title--initial">{invitation.email.charAt(0)}</div>
+                                      <div className="title--span flex-column align-items-start gap-0">
+                                        <span>{invitation.email}</span>
+                                        <strong>
+                                          {invitation.role?.name?.replace(
+                                            /\b\w/g,
+                                            function (char) {
+                                              return char.toUpperCase();
+                                            }
+                                          )}
+                                        </strong>
                                       </div>
+                                    </div>
+                                    <div className="onHide task--buttons">
+                                      <Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(invitation); setIsActive(true); }}><BsEye /></Button>
+                                    </div>
                                   </div>
                                 </td>
-                                <td className="onHide text-end"><Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(invitation); setIsActive(true); }}>View</Button></td>
                               </tr>
                             </>
                           );

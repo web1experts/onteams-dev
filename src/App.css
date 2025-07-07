@@ -272,7 +272,7 @@ body {
 }
 
 .page--title .expand--icon svg, .wrapper--title .expand--icon svg {
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   width: 22px;
   height: auto;
   cursor: pointer;
@@ -296,7 +296,7 @@ body {
   border: 0;
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   cursor: pointer;
   display: flex;
   height: auto;
@@ -304,7 +304,7 @@ body {
   padding: .35rem .65rem;
   text-transform: capitalize;
   width: auto;
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -356,7 +356,7 @@ body {
 
 .page--title .search-filter-list .form-group .form-control {
     padding-left: 2.5rem;
-    min-width: 280px;
+    min-width: 200px;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
     -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
     background: #ffffff;
@@ -395,8 +395,8 @@ body {
 .page--wrapper .nav-tabs button {
   align-items: center;
   background: none;
-  border: 2px solid rgb(100 116 139);
-  color: rgb(100 116 139);
+  border: 2px solid rgb(17 24 39);
+  color: rgb(17 24 39);
   cursor: pointer;
   display: flex;
   font-size: 16px;
@@ -415,14 +415,14 @@ body {
   background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   color: #ffffff;
   box-shadow: none;
-  border: 2px solid rgb(100 116 139);
+  border: 2px solid rgb(17 24 39);
 }
 
 .page--wrapper .nav-tabs button:hover {
   background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
   color: #ffffff;
   box-shadow: none;
-  border: 2px solid rgb(100 116 139);
+  border: 2px solid rgb(17 24 39);
 }
 
 .page--wrapper .nav-tabs {
@@ -466,7 +466,7 @@ body {
 .team--Cards .dropdown-menu:before,
 .page--wrapper table td .dropdown-menu::before {
   border: 10px solid;
-  border-color: transparent transparent rgb(100 116 139);
+  border-color: transparent transparent rgb(17 24 39);
   content: "";
   height: 0;
   left: 20px;
@@ -484,7 +484,7 @@ body {
 
 .team--Cards .dropdown .dropdown-item,
 .page--wrapper table td .dropdown-item {
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   border: 0;
   border-bottom: 1px solid #00000014;
   box-shadow: none;
@@ -499,7 +499,7 @@ body {
 
 .team--Cards .dropdown .dropdown-item:hover,
 .page--wrapper table td .dropdown-item:hover {
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   color: #fff;
 }
 
@@ -541,7 +541,7 @@ body {
 .page--wrapper .draggable--table thead {
     position: sticky;
     position: -webkit-sticky;
-    top: -1px;
+    top: 0;
     z-index: 2;
     background: linear-gradient(to right, #f8fafc, #f1f5f9);
 }
@@ -550,15 +550,15 @@ body {
   border: 0;
   padding: 1rem;
   border-right: 1px solid rgb(226 232 240);
-  border-bottom: 1px solid rgb(226 232 240);
+  border-bottom: 0;
   min-width: 170px;
-  white-space: nowrap;
+  /* white-space: nowrap; */
 }
 
 .page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
-  width: 520px;
-  max-width: 520px;
-  min-width: 520px;
+  width: 430px;
+  max-width: 430px;
+  min-width: 430px;
   position: sticky;
   position: -webkit-sticky;
   left: 0;
@@ -602,6 +602,14 @@ body {
   padding: .75rem 1.5rem;
 }
 
+.border-bottom {
+    border-bottom: 1px solid rgb(226 232 240) !important;
+}
+
+.page--wrapper .draggable--table th .padd--x {
+  padding: .75rem 1rem;
+}
+
 .page--wrapper .draggable--table th {
   background: none
 }
@@ -621,7 +629,7 @@ body {
   min-width: 40px;
   padding: .25rem .5rem;
   background: rgb(241 245 249);
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   font-weight: 700;
   font-size: .75rem;
   line-height: 1rem;
@@ -719,8 +727,8 @@ body {
   margin: 0;
   position: relative;
   line-height: 1.7;
-  /* font-size: 16px;
-  font-weight: 500; */
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .new--project--rows .project--name strong {
@@ -743,7 +751,7 @@ body {
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   border-radius: 1rem;
-  height: calc(100dvh - 140px);
+  max-height: calc(100dvh - 140px);
   border: 1px solid rgb(226 232 240);
 }
 
@@ -1030,7 +1038,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .details--projects--view .project--form {
   background: #ffffff;
   padding: 1rem 1.2rem;
-  height: calc(100dvh - 100px);
+  height: calc(100dvh - 80px);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
 }
@@ -1267,7 +1275,7 @@ span.open--sidebar {
 
 .wrapper--title .list-group-item,
 .wrapper--title .active {
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   font-size: 20px;
@@ -1281,7 +1289,7 @@ span.open--sidebar {
   color: #ffffff;
   cursor: pointer;
   margin-left: 0.25rem;
-  border: 1px solid rgb(100 116 139);
+  border: 1px solid rgb(17 24 39);
 }
 
 .wrapper--title .list-group-item:hover {
@@ -1335,7 +1343,7 @@ span.open--sidebar {
 .wrapper--title .list-group-item.btn:focus-within {
   color: #ffffff;
   background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
-  border-color: rgb(100 116 139);
+  border-color: rgb(17 24 39);
   outline: none;
 }
 
@@ -1364,22 +1372,22 @@ span.open--sidebar {
 .wrapper--title .ListView,
 .wrapper--title .gridView {
   background: #ffffff;
-  color: rgb(100 116 139);
-  border: 1px solid rgb(100 116 139);
+  color: rgb(17 24 39);
+  border: 1px solid rgb(17 24 39);
 }
 
 .wrapper--title .active,
 .wrapper--title .gridView.active {
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   color: #ffffff;
-  border: 1px solid rgb(100 116 139);
+  border: 1px solid rgb(17 24 39);
 }
 
 .wrapper--title .ListView:hover,
 .wrapper--title .gridView:hover,
 .wrapper--title .active:hover {
   border: 1px solid transparent;
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
 }
 
 /* .common--project--grid .projecttitle {
@@ -1391,14 +1399,8 @@ span.open--sidebar {
   font-size: 1.2rem;
   margin: 0;
   font-weight: 600;
-}
-
-.wrapper--title h3 {
-  font-size: 1.2rem;
-  margin: 0;
-  font-weight: 600;
   min-height: 50px;
-  max-width: 340px;
+  max-width: 250px;
   width: 100%;
   line-height: 1.2;
   display: flex;
@@ -1458,17 +1460,22 @@ span.open--sidebar {
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   overflow: hidden;
+  width: 100%;
 }
 
 .wrapper--title h3 span {
   display: block;
   font-size: .9rem;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   font-weight: 500;
   min-height: 20px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.wrapper--title h3 span:empty {
+  display: none;
 }
 
 .wrapper--title .btn--view {
@@ -1483,7 +1490,7 @@ span.open--sidebar {
   margin-left: 0;
   margin-right: 0;
   background: transparent;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   --bs-btn-bg: transparent;
   --bs-btn-border-color: transparent;
   --bs-btn-color: transparent;
@@ -1755,7 +1762,7 @@ span.open--sidebar {
 }
 
 .permission--card .accordion .accordion-button {
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   background: #ffffff;
   border: 1px solid transparent;
 }
@@ -1770,6 +1777,11 @@ span.open--sidebar {
 
 .rounded--box .card .card-body {
   flex: 1 1;
+  padding: 0;
+  padding-left: 1.5rem;
+}
+
+.rounded--box .permission--card .card-body {
   padding: 1.5rem;
 }
 
@@ -1847,7 +1859,7 @@ span.open--sidebar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   color: #ffffff;
   padding: 0.5rem 1rem;
   border-radius: .5rem;
@@ -1863,7 +1875,8 @@ span.open--sidebar {
 
 .rounded--box .contact--card .card-body .list-group-item,
 .rounded--box .work--card .card-body .list-group-item {
-  flex: 1 1;
+  flex: 1 1 100%;
+  max-width: calc(50% - .5rem);
   padding: .75rem;
   margin: 0;
   border: 0;
@@ -1893,7 +1906,7 @@ span.open--sidebar {
   display: block;
   text-transform: uppercase;
   font-size: 12px;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   letter-spacing: .025rem;
   line-height: 1rem;
 }
@@ -2213,7 +2226,7 @@ table tr.marked-project td {
   border-radius: 0;
   -webkit-border-radius: 0;
   box-shadow: none;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   cursor: pointer;
   font-size: 1rem;
   padding: .65rem 1rem .65rem 1rem;
@@ -2247,7 +2260,7 @@ table tr.marked-project td {
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 280px;
+  max-width: 100%;
 }
 
 .page--wrapper table td .select--dropdown .dropdown-item svg, .team--page .page--title .select--dropdown .dropdown-item svg, .wrapper--title .select--dropdown .dropdown-item svg, .modal .select--dropdown .dropdown-item svg, .rounded--box .select--dropdown .dropdown-item svg, .common--form .select--dropdown .dropdown-item svg {
@@ -2278,7 +2291,7 @@ table tr.marked-project td {
 .modal .select--dropdown .selected--option,
 .rounded--box .select--dropdown .selected--option,
 .common--form .select--dropdown .selected--option {
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   background: rgba(226, 232, 240, .4);
 }
 
@@ -2289,7 +2302,7 @@ table tr.marked-project td {
 .rounded--box .select--dropdown .dropdown-item:hover,
 .common--form .select--dropdown .dropdown-item:hover,
 .wrapper--title .dropdown-item:hover {
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   background: rgba(226, 232, 240, .4);
 }
 
@@ -2352,7 +2365,7 @@ table tr.marked-project td {
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
-  background-color: rgb(100 116 139);
+  background-color: rgb(17 24 39);
   color: white;
 }
 
@@ -2519,7 +2532,7 @@ table tr.marked-project td {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   font-size: 12px;
   letter-spacing: -1px;
   color: #ffffff;
@@ -2992,7 +3005,7 @@ Project Task View CSS=-=-=
 }
 
 .projects--grid .task--list ul li.active--task .timer--task {
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   color: #ffffff;
   opacity: 1;
 }
@@ -3047,7 +3060,7 @@ Project Task View CSS=-=-=
   background: none;
   margin-left: 0;
   margin-right: -5px;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   width: auto;
   height: auto;
   font-weight: 500;
@@ -3233,34 +3246,123 @@ Project Task View CSS=-=-=
 }
 
 .accordion-item+.accordion-item {
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.accordion .accordion-item {
+  background: #ffffff;
+  border: 1px solid rgb(229 231 235);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);
+  border-radius: .75rem;
+  -webkit-border-radius: .75rem;
+  transition-duration: .2s;
+  transition-property: box-shadow;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+
+.accordion .accordion-item:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
 }
 
 .accordion .accordion-button {
   display: flex;
   width: 100%;
   text-align: left;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   font-weight: 500;
-  background: rgba(226, 232, 240, .1);
   text-decoration: none;
-  padding: 0.75rem 1rem;
+  padding: 1.5rem;
   position: relative;
-  border: 1px solid rgb(15 23 42);
-  box-shadow: none;
-  border-bottom: 0;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding-right: 3.5rem;
-  border-radius: .5rem .5rem 0 0;
-  -webkit-border-radius: .5rem .5rem 0 0;
+  flex-flow: column wrap;
+  padding-right: 7rem;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.accordion .accordion-button h4 {
+  flex: 1 1 100%;
+  width: 100%;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+.accordion .accordion-button h4 strong span {
+  padding: .5rem;
+  background-color: rgb(239 246 255);
+  border-radius: .5rem;
+  color: rgb(37 99 235);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  min-width: 35px;
+  margin-right: 1rem;
+}
+
+.accordion .accordion-button h4 .activity-type-text {
+  padding: .375rem .75rem;
+  background-color: rgb(239 246 255);
+  border-radius: .5rem;
+  color: rgb(37 99 235);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0;
+  font-weight: 600;
+  font-size: .75rem;
+  line-height: 1rem;
+  border: 1px solid rgb(191 219 254);
+}
+
+.screens--tabs .accordion-button .list-group {
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.screens--tabs .accordion-button .list-group .list-group-item {
+  border-radius: .5rem;
+  -webkit-border-radius: .5rem;
+  padding: .5rem .75rem;
+  background: rgb(249 250 251);
+  color: rgb(75 85 99);
+  margin-right: 0;
+  margin-left: 0;
+  margin-bottom: 0;
+  border: 1px solid rgb(229 231 235);
+  box-shadow: none;
 }
 
 .accordion-button::after {
   display: inline-block;
   position: absolute;
-  right: 15px;
-  top: 12px;
+  right: 35px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: rgb(249 250 251);
+  border-radius: .5rem;
+  -webkit-border-radius: .5rem;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-duration: .15s;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  background-position: center center;
+}
+
+.accordion-button::after:hover {
+  background-color: rgb(243 244 246);
 }
 
 .accordion span.btn-primary {
@@ -3273,7 +3375,7 @@ Project Task View CSS=-=-=
   text-align: center;
   width: 30px;
   height: 30px;
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   color: #ffffff;
   z-index: 111;
   display: flex;
@@ -3281,25 +3383,19 @@ Project Task View CSS=-=-=
   justify-content: center;
 }
 
-.accordion .accordion-button.collapsed {
-  color: rgb(100 116 139);
-  background: #f7f7f7;
-  font-weight: 500;
-  border: 1px solid transparent;
-}
-
 .accordion .accordion-body {
   margin-top: 0;
-  padding: 1rem;
-  border: 1px solid rgb(15 23 42);
+  padding: 1.5rem;
+  padding-top: 0;
+  border: 0;
   border-top: 0;
-  border-radius: 0 0 .5rem .5rem;
-  -webkit-border-radius: 0 0 .5rem .5rem;
+  border-radius: 0;
+  -webkit-border-radius: 0;
 }
 
 .form-check-input:checked {
-  background-color: rgb(100 116 139);
-  border-color: rgb(100 116 139);
+  background-color: var(--theme-primary);
+  border-color: var(--theme-primary);
 }
 
 .accordion .accordion-body .form-check+.form-check {
@@ -3336,7 +3432,7 @@ Project Task View CSS=-=-=
 
 .accordion .list-group .list-group-item .play--timer,
 .accordion .list-group .list-group-item .pause--timer {
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   color: #ffffff;
   vertical-align: middle;
   width: 25px;
@@ -3370,7 +3466,7 @@ Project Task View CSS=-=-=
 }
 
 .accordion .list-group .active--task .time--span {
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   color: #ffffff;
   opacity: 1;
 }
@@ -3405,7 +3501,7 @@ Project Task View CSS=-=-=
   display: block;
   width: 100%;
   text-align: left;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   font-weight: 500;
   background: rgba(226, 232, 240, .1);
   text-decoration: none;
@@ -3424,7 +3520,7 @@ Project Task View CSS=-=-=
 }
 
 .daily--reports .accordion .accordion-header button.collapsed {
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   background: #ffffff;
   font-weight: 500;
 }
@@ -3501,7 +3597,7 @@ Project Task View CSS=-=-=
   min-height: 25px;
   border-radius: 0.25rem;
   color: #ffffff;
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   font-weight: 500;
   cursor: pointer;
 }
@@ -3660,7 +3756,7 @@ pre {
     border: 0;
     border-radius: .5rem;
     -webkit-border-radius: .5rem;
-    color: rgb(100 116 139);
+    color: rgb(17 24 39);
     cursor: pointer;
     display: flex;
     height: auto;
@@ -3895,7 +3991,7 @@ pre {
 
 .current--player .task--timer strong {
   display: block;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   font-size: 1.75rem;
   font-weight: 500;
 }
@@ -3912,7 +4008,7 @@ pre {
   width: auto;
   height: auto;
   padding: 0;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   border: 1px solid transparent;
   background: #ffffff;
   padding: .45rem .75rem;
@@ -3925,7 +4021,7 @@ pre {
   -webkit-border-radius: .5rem;
   margin-right: 0;
   margin-left: 0.5rem;
-  border: 1px solid rgb(100 116 139);
+  border: 1px solid rgb(17 24 39);
 }
 
 .accordion .screens--shots .list-group-item:last-child:not(:first-child) {
@@ -3977,8 +4073,8 @@ pre {
 .screens--shots .active,
 .accordion .screens--shots .active {
   color: #ffffff;
-  background-color: rgb(100 116 139);
-  border-color: rgb(100 116 139);
+  background-color: rgb(17 24 39);
+  border-color: rgb(17 24 39);
   box-shadow: none;
   outline: none;
 }
@@ -3986,7 +4082,7 @@ pre {
 .screens--tabs .list-group .list-group-item+.list-group-item-action.active,
 .screens--shots .list-group-item+.list-group-item-action.active,
 .accordion .screens--shots .list-group-item+.list-group-item-action.active {
-  border: 1px solid rgb(100 116 139);
+  border: 1px solid rgb(17 24 39);
 }
 
 .screens--tabs .list-group .list-group-item+.list-group-item-action.active {
@@ -4031,7 +4127,7 @@ pre {
   width: auto;
   height: auto;
   padding: 0;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   border: 1px solid transparent;
   background: #ffffff;
   padding: .45rem .75rem;
@@ -4041,8 +4137,8 @@ pre {
 
 .page--title .date-filters .active {
   color: #ffffff;
-  background-color: rgb(100 116 139);
-  border-color: rgb(100 116 139);
+  background-color: rgb(17 24 39);
+  border-color: rgb(17 24 39);
   box-shadow: none;
   outline: none;
 }
@@ -4208,7 +4304,7 @@ pre {
 
 .screens--tabs p span {
   display: block;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   font-size: 1rem;
 }
 
@@ -4254,6 +4350,17 @@ pre {
   cursor: pointer;
   position: relative;
   max-width: 100%;
+}
+
+.activity--box .card .card-body .card--checkbox {
+  position: absolute;
+  right: .75rem;
+  top: .75rem;
+}
+
+.activity--box .card .card-body .card--checkbox input {
+  width: 22px;
+  height: 22px;
 }
 
 .activity--box .card .card-body video,
@@ -4344,7 +4451,7 @@ pre {
 .setting--tabs .list-group .list-group-item:hover,
 .setting--tabs .list-group .list-group-item.active,
 .setting--tabs .list-group .list-group-item:focus {
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   background: rgba(226, 232, 240, .4);
 }
 
@@ -4365,7 +4472,7 @@ pre {
 
 .setting--tabs .role--list .list-group-item:hover,
 .setting--tabs .role--list .list-group-item:focus {
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   background: rgba(226, 232, 240, .4);
 }
 
@@ -4419,7 +4526,7 @@ pre {
   flex-flow: row wrap;
   gap: 10px;
   padding: .75rem 0;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   margin: 0;
 }
 
@@ -5255,7 +5362,7 @@ ul#icon-tabs .nav-link span svg {
 .app--download .card-body small {
   display: flex;
   font-size: .75rem;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
 }
 
 .app--download .card-title h4 {
@@ -5517,7 +5624,7 @@ ul#icon-tabs .nav-link span svg {
 
 .onteamsio--page .dropdown .dropdown-item .initial--name {
   align-items: center;
-  background: rgb(100 116 139);
+  background: rgb(17 24 39);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   color: #ffffff;
@@ -5549,7 +5656,7 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .onteamsio--page .timer--task h5 small {
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   display: block;
 }
 
@@ -5557,14 +5664,14 @@ ul#icon-tabs .nav-link span svg {
   background: rgba(226, 232, 240, .1);
   padding: 1rem 2rem;
   margin-top: 1.5rem;
-  border: 2px solid rgb(100 116 139);
+  border: 2px solid rgb(17 24 39);
   -webkit-border-radius: 0.5rem;
   border-radius: 0.5rem;
 }
 
 .onteamsio--page .task--timer strong {
   display: block;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   font-size: 2.2rem;
 }
 
@@ -5601,7 +5708,7 @@ ul#icon-tabs .nav-link span svg {
 
 .onteamsio--page .total--timer strong {
   display: block;
-  color: rgb(100 116 139);
+  color: rgb(17 24 39);
   font-size: 1.8rem;
 }
 
@@ -6063,7 +6170,7 @@ ul#icon-tabs .nav-link span svg {
 
 .attendance--table--list .title--span span,
 .attendance--table--list table td h4 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -6153,14 +6260,23 @@ ul#icon-tabs .nav-link span svg {
   vertical-align: middle;
 }
 
+.daily--attendance--table th {
+    font-size: 15px;
+    min-width: 180px;
+}
+
+.daily--attendance--table th:first-child {
+    min-width: 220px;
+}
+
 .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
     width: auto;
     max-width: fit-content;
-    min-width: 150px;
+    min-width: 270px;
 }
 
 .page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table td {
-    min-width: 100px;
+    min-width: 120px;
 }
 
 .page--wrapper .attendance--excel--table th {
@@ -6661,6 +6777,10 @@ Media CSS-=-==
     max-width: calc(33.333% - 15px);
   }
 
+  .holiday--table--grid tr {
+    max-width: calc(33.333% - 22px);
+  }
+
   .activity--table .draggable--table th:nth-child(1),
   .activity--table .draggable--table td:nth-child(1),
   .activity--table .draggable--table th:nth-child(2),
@@ -6672,13 +6792,14 @@ Media CSS-=-==
   }
 
   .attendance--table--list thead th:first-child, .attendance--table--list tbody td:first-child {
-    min-width: 280px;
+    min-width: 260px;
   }
 
   .attendance--table--list thead th, .attendance--table--list tbody td {
-    min-width: 160px;
+    min-width: 150px;
   }
-  .attendance--table--list tbody td span {
+
+  .attendance--table--list tbody td span, .attendance--table--list tbody td strong {
     display: -webkit-box;
     -webkit-line-clamp: 1;
     line-clamp: 1;
@@ -6686,6 +6807,17 @@ Media CSS-=-==
     overflow: hidden;
     max-width: 160px;
     text-overflow: ellipsis;
+  }
+
+  .page--wrapper table td.project--title--td span, .new--project--rows .project--name strong {
+    max-width: 140px;
+  }
+
+  .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
+    width: auto;
+    max-width: -moz-fit-content;
+    max-width: fit-content;
+    min-width: 250px;
   }
 }
 
@@ -6716,28 +6848,6 @@ Media CSS-=-==
     opacity: 1;
   }
 
-  /* .common--project--grid .projecttitle {
-    max-width: 45%;
-    flex: 1 1;
-  } */
-
-  .project--grid--table tr,
-  .activity--box .card-group .card {
-    max-width: calc(33.333% - 15px);
-  }
-
-  .activity--table tr th:last-child {
-    min-width: 148px;
-  }
-
-  .activity--table tr th:first-child {
-    min-width: 160px;
-  }
-
-  .activity--table tr th {
-    min-width: 110px;
-  }
-
   .holidays--page .card--stack .card, .card--stack .card {
     flex: 1 1 100%;
     max-width: calc(50% - .5rem);
@@ -6746,7 +6856,6 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:1299px) {
-
   .view--project .open--sidebar,
   .show--project .open--sidebar,
   .open--panel--sidebar~.team--page .open--sidebar {
@@ -6771,27 +6880,11 @@ Media CSS-=-==
     text-align: center;
   }
 
-  .page--title .list-group {
-    flex-wrap: wrap;
-  }
-
   .page--wrapper table th:first-child,
   .page--wrapper table td:first-child {
     min-width: fit-content
   }
-
-  .activity--table tr th:last-child {
-    min-width: 135px;
-  }
-
-  .activity--table tr th:first-child {
-    min-width: 155px;
-  }
-
-  .activity--table tr th {
-    min-width: 118px;
-  }
-
+  
   .wrapper--title {
     gap: 10px;
   }
@@ -6815,7 +6908,7 @@ Media CSS-=-==
 
   .project--grid--table tr,
   .activity--box .card-group .card {
-    max-width: calc(50% - 14px);
+    max-width: calc(50% - 16px);
   }
 
   .team--page .page--title .select--dropdown .btn,
@@ -6861,11 +6954,6 @@ Media CSS-=-==
 
   .wrapper--title {
     flex-flow: row wrap;
-  }
-
-  .details--projects--view .project--form--actions .btn+.btn {
-    margin-top: 0;
-    margin-left: 1rem;
   }
 
   .wrapper--title .members--list {
@@ -6953,7 +7041,7 @@ Media CSS-=-==
   .daily--welcome .card-body {
     margin-left: 0;
     margin-top: 1.5rem;
-    flex: 1 1;
+    flex: 1 1 100%;
   }
 
   .dashboard--page .daily--star {
@@ -6964,12 +7052,16 @@ Media CSS-=-==
     font-size: 30px;
   }
 
-  .page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
-    min-width: 520px;
+  .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
+    width: 250px;
   }
 
   .page--wrapper .draggable--table th {
     min-width: 250px;
+  }
+
+  .page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table td {
+    min-width: 120px;
   }
 
   .attendance--table--list tbody {
@@ -7026,6 +7118,10 @@ Media CSS-=-==
   .holidays--page .card .card-title span {
     font-size: .75rem;
   }
+
+  .team--page .page--title h2 {
+    font-size: 1.4rem;
+  }
 }
 
 @media screen and (max-width:992px) {
@@ -7060,10 +7156,9 @@ Media CSS-=-==
   }
 
   .projects--page .page--wrapper table th:first-child, .projects--page .page--wrapper table td:first-child {
-    min-width: -moz-fit-content;
-    min-width: fit-content;
+    min-width: 100%;
     width: auto;
-    max-width: fit-content;
+    max-width: 100%;
     background: none;
   }
 
@@ -7468,19 +7563,15 @@ Media CSS-=-==
     padding: 1rem;
   }
 
-  .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
-    min-width: 0;
-  }
-
   .page--wrapper .attendance--excel--table th {
-    min-width: 0;
+    min-width: 110px;
   }
 
   .page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table td {
     border: 0;
     padding: 1rem 1.5rem;
     border-right: 1px solid rgb(226 232 240);
-    min-width: 0;
+    /* min-width: 0; */
     border-bottom: 1px solid rgb(226 232 240);
   }
 
@@ -7503,84 +7594,6 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:767px) {
-  .panel--sidebar {
-    transform: translateX(0) translateY(0);
-    -webkit-transform: translateX(0) translateY(0);
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .team--page {
-    max-width: calc(100% - 0rem);
-    margin-left: 0rem;
-  }
-
-  .open--panel--sidebar {
-    max-width: 100%;
-    width: 100%;
-    min-width: auto;
-    z-index: 1;
-  }
-
-  .open--sidebar,
-  .show--project .open--sidebar,
-  .open--panel--sidebar~.team--page .open--sidebar,
-  span.open--sidebar {
-    display: none !important;
-  }
-
-  .navbar-brand,
-  .navbar-toggler,
-  .open--panel--sidebar .navbar-toggler,
-  .navbar-light .navbar-nav .nav-link strong {
-    display: none !important;
-  }
-
-  .navbar-light .navbar-nav .active>.nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.show, .navbar-light .navbar-nav .show>.nav-link, .navbar-light .navbar-nav .nav-link:focus {
-    color: #ffffff;
-    padding: 0;
-    border: 0;
-    background: none;
-  }
-
-  .panel--sidebar .navbar {
-    height: auto;
-  }
-
-  .panel--sidebar .navbar-expand-lg .navbar-collapse {
-    max-height: max-content;
-    overflow-y: hidden;
-    overflow-x: auto;
-    min-height: -moz-fit-content;
-    min-height: fit-content;
-    max-width: 100%;
-    scrollbar-width: thin;
-    scroll-behavior: smooth;
-    display: block;
-  }
-
-  .navbar-light .navbar-nav .nav-link {
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .navbar-light .navbar-nav .nav-link .nav--item--icon {
-    margin-right: 0;
-    margin: 0;
-  }
-
-  .navbar-expand-lg .navbar-nav {
-    flex-direction: row;
-    padding: 1rem .75rem;
-    grid-gap: .5rem;
-    gap: .5rem;
-  }
-
   .project--form--actions .list-group+.list-group .list-group-item {
     position: relative;
     bottom: 0;
@@ -7593,10 +7606,6 @@ Media CSS-=-==
     gap: 10px;
     flex-flow: row wrap;
     justify-content: flex-end;
-  }
-
-  .wrapper--title h3 span {
-    display: none;
   }
 
   .holiday--table tbody tr,

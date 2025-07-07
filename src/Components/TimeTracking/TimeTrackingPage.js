@@ -6,9 +6,10 @@ import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, 
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck, FaEye, FaPlay } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers } from "react-icons/fi";
+import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
+import { HiOutlineLightningBolt } from 'react-icons/hi';
 import { BsDash } from 'react-icons/bs';
 import { LuTimer } from 'react-icons/lu';
 import { GoPulse } from 'react-icons/go';
@@ -625,15 +626,6 @@ function TimeTrackingPage() {
         <>
             <ListGroup horizontal className="screens--shots">
               <ListGroup horizontal>
-                {
-                  selectedScreenshots &&
-                  Object.keys(selectedScreenshots).length > 0 &&
-                  Object.values(selectedScreenshots).some(arr => arr.length > 0) && (
-                    <Button variant="secondary" className="btn--view" key={'delete-group'} active={true} onClick={() => deleteRecordedData()}>
-                      Delete Selected
-                    </Button>
-                  )
-                }
                 <Button variant="secondary" className="btn--view" key={'screenshots1-tab-key'} active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}><TbScreenshot className="me-1"/> Screenshots</Button>
                 <Button variant="primary" className="btn--view" key={'videos1-tab-key'} active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}><MdOutlineVideoLibrary className="me-1"/> Videos</Button>
               </ListGroup>
@@ -722,7 +714,7 @@ function TimeTrackingPage() {
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
+                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
                   {/* <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
                   <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button> */}
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
@@ -815,7 +807,7 @@ function TimeTrackingPage() {
                       <thead className="onHide">
                         <tr key="project-table-header">
                           <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
-                          <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th>
+                          {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
                           <th scope="col" key="client-project-header" className="onHide ms-auto"><LuTimer className="me-1" /> Project Time</th>
                           <th scope="col" key="client-time-header" className="onHide"><FiClock className="me-1" /> Total Time</th>
                           <th scope="col" key="client-status-header" className="onHide"><GoPulse className="me-1" /> Status</th>
@@ -862,15 +854,24 @@ function TimeTrackingPage() {
                                                 <span>
                                                   {activity.name}
                                                 </span>
+                                                <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</strong>
                                               </div>
                                           </div>
                                         </div>
                                     </td>
-                                    <td className="text-start"><span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</span></td>
-                                    <td className="ms-auto">
-                                        <div key={`task-time-${activity?._id}`} className="onHide project--time--badge px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><LuTimer className="me-1" /> { convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
+                                    {/* <td className="text-start">
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Name</strong>
+                                      <br className="d-xl-none"/>
+                                      
+                                    </td> */}
+                                    <td className="ms-auto text-start text-xl-center">
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Time</strong>
+                                      <br className="d-xl-none"/>
+                                      <div key={`task-time-${activity?._id}`} className="onHide project--time--badge px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><LuTimer className="me-1" /> { convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
                                     </td>
-                                    <td key={`total-time-${activity?._id}`} className="onHide">
+                                    <td className="text-start text-xl-center" key={`total-time-${activity?._id}`}>
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Total Time</strong>
+                                      <br className="d-xl-none"/>
                                       <span className="total--time--badge bg--blue px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> { convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</span>
                                     </td>
                                     <td key={`status-title-${activity?._id}`} className="onHide">
@@ -925,7 +926,7 @@ function TimeTrackingPage() {
                       <thead className="onHide">
                         <tr key="project-table-header">
                           <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
-                          <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th>
+                          {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
                           <th scope="col" key="client-time-header" className="onHide ms-auto"><FiClock className="me-1" /> Total Time</th>
                           <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1" /> Action</th>
                         </tr>
@@ -972,12 +973,19 @@ function TimeTrackingPage() {
                                               <span>
                                                 {activity.name}
                                               </span>
+                                              <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</strong>
                                             </div>
                                           </div>
                                         </div>
                                     </td>
-                                    <td className="text-start"><span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</span></td>
-                                    <td key={`total-time-${activity?._id}`} className="onHide ms-auto">
+                                    {/* <td className="text-start">
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Name</strong>
+                                      <br className="d-xl-none"/>
+                                      
+                                    </td> */}
+                                    <td className="text-start text-xl-center ms-auto" key={`total-time-${activity?._id}`}>
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Total Time</strong>
+                                      <br className="d-xl-none"/>
                                       <span className="total--time--badge bg--blue px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</span>
                                     </td>
                                     <td className="onHide text-lg-end"><Button variant="dark" onClick={() => {handleClick(activity);}}><FaEye/> Details</Button></td>
@@ -1003,27 +1011,24 @@ function TimeTrackingPage() {
       </div>
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-            <div className="projecttitle">
-              {/* <h3>
-                  <strong>Alex Chen</strong>
-                  <span>E-commerce Platform</span>
-              </h3> */}
-              <Dropdown>
-                  <Dropdown.Toggle variant="link" id="dropdown-basic">
-                      <h3>
+          <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+          <div className="projecttitle me-auto">
+            <Dropdown>
+                <Dropdown.Toggle variant="link" id="dropdown-basic">
+                    <h3>
+                        <strong>Alex Chen</strong>
+                        <span>E-commerce Platform</span>
+                    </h3>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <div className="drop--scroll">
+                        <Dropdown.Item>
                           <strong>Alex Chen</strong>
                           <span>E-commerce Platform</span>
-                      </h3>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                      <div className="drop--scroll">
-                          <Dropdown.Item>
-                            <strong>Alex Chen</strong>
-                            <span>E-commerce Platform</span>
-                          </Dropdown.Item>
-                      </div>
-                  </Dropdown.Menu>
-              </Dropdown>
+                        </Dropdown.Item>
+                    </div>
+                </Dropdown.Menu>
+            </Dropdown>
           </div>
           <ListGroup horizontal className="live--tabs me-auto">
             <ListGroup horizontal className="me-3">
@@ -1121,166 +1126,177 @@ function TimeTrackingPage() {
                     
                     <Accordion.Item eventKey={`screenshot-${recording?._id}-${index}`}>
                       <div className="screens--tabs">
-                      
                         <Accordion.Header>
-                          <p>
-                            <span>{recording?.project?.title} [{recording?.project?.client?.name}]</span>
-                            <strong>{new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</strong>
-                            <strong>{ generateTimeRange(recording?.createdAt, recording?.duration)}</strong>
-                            <strong className="activity-type-text">Activity Type: {recording?.type }</strong>
-                          </p>
+                          <h4 className="d-flex align-items-center gap-3 justify-content-between">
+                            <strong><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building2 w-4 h-4 text-blue-600"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg></span>{recording?.project?.title}</strong>
+                            <strong className="activity-type-text d-flex align-items-center gap-2"><HiOutlineLightningBolt /> {recording?.type }</strong>
+                          </h4>
+                          <p><small className="d-flex align-items-center gap-2"><FiUser /> {recording?.project?.client?.name}</small></p>
+                          <ListGroup horizontal>
+                            <ListGroup.Item><FiCalendar className="me-2" /> {new Date(recording?.createdAt).toLocaleDateString('en-GB', options)}</ListGroup.Item>
+                            <ListGroup.Item><FiClock className="me-2" /> {generateTimeRange(recording?.createdAt, recording?.duration)}</ListGroup.Item>
+                          </ListGroup>
                         </Accordion.Header>
                       </div>
                       <Accordion.Body>
-                      <div className="shots--list pt-3">
-                      <CardGroup>
-                          {
-                            recording?.activityMeta && recording.activityMeta.length > 0 ? (
-                              recording.activityMeta.map((meta, i) => {
-                                // Handle screenshots tab
-                                if (screenshotTab === "Screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
-                                  return meta.meta_value.map((screenshotData, j) => (
-                                    <Card key={`screenshot-card-${i}-${j}`}>
-                                      <Card.Body>
-                                        { (screenshotData?.is_deleted !== true && memberProfile?.permissions?.tracking?.delete_recordings === true && memberProfile?._id === recording?.member) && 
-                                          <div className="d-flex justify-content-between align-items-start">
-                                            <Form.Check
-                                              type="checkbox"
-                                              checked={selectedScreenshots[recording?._id]?.includes(j) || false}
-                                              onChange={() => handleSelectRecording(recording?._id, j)}
-                                            />
-                                          </div>
-                                        }
-                                        <img
-                                          className="card-img-top"
-                                          src={screenshotData?.url}
-                                          alt="screenshot"
-                                          onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
-                                        />
-                                        <p>
-                                          <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
-                                          <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
-                                        </p>
-                                      </Card.Body>
-                                    </Card>
-                                  ));
-                                }
+                        <div className="shots--list">
+                          <div className="text-end">
+                            {
+                              selectedScreenshots &&
+                              Object.keys(selectedScreenshots).length > 0 &&
+                              Object.values(selectedScreenshots).some(arr => arr.length > 0) && (
+                                <Button variant="secondary" className="btn--view mb-3" key={'delete-group'} active={true} onClick={() => deleteRecordedData()}>Delete Selected</Button>
+                              )
+                            }
+                          </div>
+                          <CardGroup>
+                            {
+                              recording?.activityMeta && recording.activityMeta.length > 0 ? (
+                                recording.activityMeta.map((meta, i) => {
+                                  // Handle screenshots tab
+                                  if (screenshotTab === "Screenshots" && meta.meta_key === 'screenshots' && meta.meta_value.length > 0) {
+                                    return meta.meta_value.map((screenshotData, j) => (
+                                      <Card key={`screenshot-card-${i}-${j}`}>
+                                        <Card.Body>
+                                          { (screenshotData?.is_deleted !== true && memberProfile?.permissions?.tracking?.delete_recordings === true && memberProfile?._id === recording?.member) && 
+                                            <div className="card--checkbox">
+                                              <Form.Check
+                                                type="checkbox"
+                                                checked={selectedScreenshots[recording?._id]?.includes(j) || false}
+                                                onChange={() => handleSelectRecording(recording?._id, j)}
+                                              />
+                                            </div>
+                                          }
+                                          <img
+                                            className="card-img-top"
+                                            src={screenshotData?.url}
+                                            alt="screenshot"
+                                            onClick={() => handleLightBox('screenshot', meta.meta_value, j)}
+                                          />
+                                          <p>
+                                            <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
+                                            <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
+                                          </p>
+                                        </Card.Body>
+                                      </Card>
+                                    ));
+                                  }
 
-                                // Handle videos tab
-                                if (screenshotTab === "Videos" && meta.meta_key === "videos" && meta.meta_value.length > 0) {
-                                  return (
-                                    <>
-                                      {meta.meta_value
-                                        .slice(
-                                          ((currentVideoPage[recording?._id] || 1) - 1) * videosPerPage,
-                                          (currentVideoPage[recording?._id] || 1) * videosPerPage
-                                        )
-                                        .map((videoData, j) =>
-                                          videoData?.is_deleted === true ? (
-                                            <Card key={`blank-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
-                                              <Card.Body>
-                                                <img
-                                                  className="card-img-top"
-                                                  src={videoData.url}
-                                                  alt="screenshot"
-                                                />
-                                                <p>
-                                                  <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
-                                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                </p>
-                                              </Card.Body>
-                                            </Card>
-                                          ) :
-                                          videoData?.url === 'video_disabled' ? (
-                                            <Card key={`blank-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
-                                              <Card.Body>
-                                                <img
-                                                  className="card-img-top"
-                                                  src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
-                                                  alt="screenshot"
-                                                />
-                                                <p>
-                                                  <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
-                                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                </p>
-                                              </Card.Body>
-                                            </Card>
-                                          ) : (
-                                            <Card key={`video-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
-                                              <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
-                                              { videoData?.is_deleted !== true && memberProfile?.permissions?.tracking?.delete_recordings === true && memberProfile?._id === recording?.member && 
-                                                <div className="d-flex justify-content-between align-items-start">
-                                                  <Form.Check
-                                                    type="checkbox"
-                                                    checked={selectedScreenshots[recording?._id]?.includes(j) || false}
-                                                    onChange={() => handleSelectRecording(recording?._id, j)}
-                                                  />
-                                                </div>
-                                              }
-                                                <video
-                                                  height="175px"
-                                                  preload="metadata"
-                                                  muted
-                                                  onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
-                                                  controls={false}
-                                                >
-                                                  <source src={videoData?.url} type="video/webm" />
-                                                  Your browser does not support the video tag.
-                                                </video>
-                                                <p>
-                                                  <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
-                                                  <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                </p>
-                                              </Card.Body>
-                                            </Card>
+                                  // Handle videos tab
+                                  if (screenshotTab === "Videos" && meta.meta_key === "videos" && meta.meta_value.length > 0) {
+                                    return (
+                                      <>
+                                        {meta.meta_value
+                                          .slice(
+                                            ((currentVideoPage[recording?._id] || 1) - 1) * videosPerPage,
+                                            (currentVideoPage[recording?._id] || 1) * videosPerPage
                                           )
-                                        )}
+                                          .map((videoData, j) =>
+                                            videoData?.is_deleted === true ? (
+                                              <Card key={`blank-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
+                                                <Card.Body>
+                                                  <img
+                                                    className="card-img-top"
+                                                    src={videoData.url}
+                                                    alt="screenshot"
+                                                  />
+                                                  <p>
+                                                    <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
+                                                    <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                  </p>
+                                                </Card.Body>
+                                              </Card>
+                                            ) :
+                                            videoData?.url === 'video_disabled' ? (
+                                              <Card key={`blank-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
+                                                <Card.Body>
+                                                  <img
+                                                    className="card-img-top"
+                                                    src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
+                                                    alt="screenshot"
+                                                  />
+                                                  <p>
+                                                    <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
+                                                    <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                  </p>
+                                                </Card.Body>
+                                              </Card>
+                                            ) : (
+                                              <Card key={`video-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
+                                                <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
+                                                { videoData?.is_deleted !== true && memberProfile?.permissions?.tracking?.delete_recordings === true && memberProfile?._id === recording?.member && 
+                                                  <div className="d-flex justify-content-between align-items-start">
+                                                    <Form.Check
+                                                      type="checkbox"
+                                                      checked={selectedScreenshots[recording?._id]?.includes(j) || false}
+                                                      onChange={() => handleSelectRecording(recording?._id, j)}
+                                                    />
+                                                  </div>
+                                                }
+                                                  <video
+                                                    height="175px"
+                                                    preload="metadata"
+                                                    muted
+                                                    onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
+                                                    controls={false}
+                                                  >
+                                                    <source src={videoData?.url} type="video/webm" />
+                                                    Your browser does not support the video tag.
+                                                  </video>
+                                                  <p>
+                                                    <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
+                                                    <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                  </p>
+                                                </Card.Body>
+                                              </Card>
+                                            )
+                                          )}
 
-                                
-                                      {/* Pagination Controls */}
-                                      <div style={{ marginTop: "10px", textAlign: "center" }}>
-                                        <Button variant="outline-primary"
-                                          disabled={(currentVideoPage[recording?._id] || 1) === 1}
-                                          onClick={() =>
-                                            setCurrentVideoPage((prev) => ({
-                                              ...prev,
-                                              [recording?._id]: (prev[recording?._id] || 1) - 1,
-                                            }))
-                                          }
-                                        >
-                                          <BsArrowLeftCircleFill />
-                                        </Button>
-                                
-                                        <span style={{ margin: "0 10px" }}>
-                                          Page {currentVideoPage[recording?._id] || 1} of {Math.ceil(meta.meta_value.length / videosPerPage)}
-                                        </span>
-                                
-                                        <Button variant="outline-primary"
-                                          disabled={(currentVideoPage[recording?._id] || 1) >= Math.ceil(meta.meta_value.length / videosPerPage)}
-                                          onClick={() =>
-                                            setCurrentVideoPage((prev) => ({
-                                              ...prev,
-                                              [recording?._id]: (prev[recording?._id] || 1) + 1,
-                                            }))
-                                          }
-                                        >
-                                          <BsArrowRightCircleFill />
-                                        </Button>
-                                      </div>
-                                    </>
-                                  );
-                                }
+                                  
+                                        {/* Pagination Controls */}
+                                        <div style={{ marginTop: "10px", textAlign: "center" }}>
+                                          <Button variant="outline-primary"
+                                            disabled={(currentVideoPage[recording?._id] || 1) === 1}
+                                            onClick={() =>
+                                              setCurrentVideoPage((prev) => ({
+                                                ...prev,
+                                                [recording?._id]: (prev[recording?._id] || 1) - 1,
+                                              }))
+                                            }
+                                          >
+                                            <BsArrowLeftCircleFill />
+                                          </Button>
+                                  
+                                          <span style={{ margin: "0 10px" }}>
+                                            Page {currentVideoPage[recording?._id] || 1} of {Math.ceil(meta.meta_value.length / videosPerPage)}
+                                          </span>
+                                  
+                                          <Button variant="outline-primary"
+                                            disabled={(currentVideoPage[recording?._id] || 1) >= Math.ceil(meta.meta_value.length / videosPerPage)}
+                                            onClick={() =>
+                                              setCurrentVideoPage((prev) => ({
+                                                ...prev,
+                                                [recording?._id]: (prev[recording?._id] || 1) + 1,
+                                              }))
+                                            }
+                                          >
+                                            <BsArrowRightCircleFill />
+                                          </Button>
+                                        </div>
+                                      </>
+                                    );
+                                  }
 
-                                return null; // Return null if no condition is met
-                              })
-                            ) : (
-                              <div>No data available</div> // Display if no data is available
-                            )
-                          }
-                        </CardGroup>
-                      </div>
+                                  return null; // Return null if no condition is met
+                                })
+                              ) : (
+                                <div>No data available</div> // Display if no data is available
+                              )
+                            }
+                          </CardGroup>
+                        </div>
                       </Accordion.Body>
-                      </Accordion.Item>
+                    </Accordion.Item>
                   
                     </>
                     )
