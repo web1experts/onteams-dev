@@ -406,7 +406,7 @@ function TeamMembersPage() {
       // }
       // Add 'recordings' key with value 'both' if not present
       if (!("recording" in cleanedMeta)) {
-        cleanedMeta.recording = {meta_key: 'recording',meta_value: "both"};
+        cleanedMeta.recording = {meta_key: 'recording',meta_value: "screenshot_only"};
       }
       // setEditedMember({
       //   name: selectedMember.name,
@@ -418,7 +418,7 @@ function TeamMembersPage() {
         name: selectedMember?.name,
         role: selectedMember?.role?._id
       }
-      console.log("cleanedMeta", cleanedMeta)
+   
       if (cleanedMeta && Object.keys(cleanedMeta).length > 0) {
           Object.values(cleanedMeta).forEach(field => { 
             fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
@@ -543,12 +543,10 @@ function TeamMembersPage() {
       const matchingRole = roles.find((role) => role._id === value);
       setFields((prevState) => ({
         ...prevState,
-        ["role"]: matchingRole._id,
-        custom_field: {
-          ...prevState.custom_field,
-          ["permissions"]: matchingRole.permissions,
-        },
+        role: matchingRole._id,
+        ["custom_field[permissions]"]: matchingRole.permissions
       }));
+
     }else{
       setFields({ ...fields, [name]: finalValue });
     }
@@ -908,12 +906,15 @@ function TeamMembersPage() {
   };
 
   const showPermissionsModal = () => {
-    //setMemberIndex(index);
-    if (fields?.permissions) {
-      setPermissions(fields?.permissions);
+    const permissionsField = fields[`custom_field[permissions]`];
+
+    if (permissionsField) {
+      setPermissions(permissionsField);
     }
+
     setShowPermissions(true);
   };
+
 
   const handleSavePermissions = () => {
     // const updatedRows = [...rows];
@@ -922,7 +923,11 @@ function TeamMembersPage() {
     //   ["permissions"]: permissions,
     // };
     // setRows(updatedRows);
-    setFields({...fields, ['permissions']: permissions})
+    setFields({
+      ...fields,
+      [`custom_field[permissions]`]: permissions
+    });
+
     setShowPermissions(false);
   };
 
@@ -942,7 +947,9 @@ function TeamMembersPage() {
                 >
                   <FiSidebar />
                 </span>
-                Members
+                {
+                  activeTab
+                }
                 <ListGroup
                   horizontal
                   className={
@@ -966,10 +973,10 @@ function TeamMembersPage() {
                       <ListGroup.Item
                         className="d-none d-md-block"
                         action
-                        active={activeTab === "Invitees"}
+                        active={activeTab === "Invitations"}
                         onClick={() => {
                           setsearchTerm("");
-                          setActiveTab("Invitees");
+                          setActiveTab("Invitations");
                         }}
                       ><FiMail /> Invitations
                       </ListGroup.Item>
@@ -1066,10 +1073,10 @@ function TeamMembersPage() {
                     memberProfile?.role?.slug === "owner") && (
                     <ListGroup.Item
                       action
-                      active={activeTab === "Invitees"}
+                      active={activeTab === "Invitations"}
                       onClick={() => {
                         setsearchTerm("");
-                        setActiveTab("Invitees");
+                        setActiveTab("Invitations");
                       }}
                     ><FiMail /> Invitations
                     </ListGroup.Item>
@@ -1264,7 +1271,7 @@ function TeamMembersPage() {
           </div>
         </div>
       )}
-      {activeTab === "Invitees" && (
+      {activeTab === "Invitations" && (
         <Invitation
           activeTab={activeTab}
           topbar={pagetopbar}
@@ -1316,6 +1323,7 @@ function TeamMembersPage() {
                 key={`closekey`}
                 onClick={() => {
                   setIsActive(0);
+                  setSelectedMember({})
                 }}
               >
                 <MdOutlineClose />
@@ -1366,6 +1374,17 @@ function TeamMembersPage() {
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>
+                          <ListGroup.Item>
+                          <p>
+                              <small>Recording Type</small>
+                          
+                            <span>{selectedMember?.memberMeta?.recording ? selectedMember?.memberMeta?.recording?.meta_value
+                              ?.replace(/_/g, ' ')
+                              .replace(/^./, (char) => char.toUpperCase())
+                            : 'Screenshot only  '}</span>
+                          </p>
+                        
+                        </ListGroup.Item>
                           {customFields?.length > 0 && (
                             <>
                               {customFields.map((field, index) => (
@@ -1393,7 +1412,7 @@ function TeamMembersPage() {
                             {selectedMember?.email}
                           </p>
                         </ListGroup.Item>
-                        {(memberProfile?.permissions?.members?.create_edit_delete === true  || memberProfile?.role?.slug === "owner")?
+                        {(memberProfile?.permissions?.members?.create_edit_delete === true && selectedMember?._id !== memberProfile?._id  || memberProfile?.role?.slug === "owner" && selectedMember?._id !== memberProfile?._id)?
                           <ListGroup.Item>
                             <Form.Group className="mb-0 form-group pb-0">
                               <Form.Label>Role</Form.Label>
@@ -1431,6 +1450,25 @@ function TeamMembersPage() {
                     </Card.Text>
                     <Card.Text>
                       <ListGroup>
+                        <ListGroup.Item>
+                          <Form.Label>Recording Type</Form.Label>
+                          {
+                            (memberProfile?.permissions?.members?.create_edit_delete === true &&
+                            selectedMember?._id !== currentMember?._id || memberProfile?.role?.slug === "owner") ? 
+
+                              <Form.Select className="form-control custom-selectbox" id="member-meta" name={`custom_field[recording]`} onChange={(event) => handleChange(event)}
+                              value={fields[`custom_field[recording]`] || 'screenshot_only'}>
+                              <option key={`both`} value='both'>Screenshot And Video</option>
+                              <option key={`screenshot_only`} value='screenshot_only'>Screenshot Only</option>
+                              <option key={`video_only`} value='video_only'>Video Only</option>
+                            </Form.Select>
+                            :
+                            <span>{editedMember?.memberMeta?.recording
+                              ?.replace(/_/g, ' ')
+                              .replace(/^./, (char) => char.toUpperCase())}</span>
+                          }
+                        
+                        </ListGroup.Item>
                       {customFields?.length > 0 && (
                           <>
                             {customFields.map((field, index) => (
@@ -1932,12 +1970,7 @@ function TeamMembersPage() {
                   </FloatingLabel>
                   {showError("email")}
                 </Form.Group>
-                {/* {rows.length > 1 && (
-                  <Button variant="link" className="d-md-none" onClick={() => removeRow(index)}>
-                    <FaRegTrashAlt />
-                  </Button>
-                )} */}
-
+                
                 <Button
                   variant="primary"
                   onClick={() => {
@@ -1948,8 +1981,27 @@ function TeamMembersPage() {
                 </Button>
                 {showError("role")}
                 
-               
               </div>
+              <div className="form-row" key={`row-1`}>
+                <Form.Group>
+                  {customFields.length > 0 &&
+                   <>
+                    {customFields.map((field, index) =>
+                        renderDynamicField({
+                        name: `custom_field[${field.name}]`,
+                        type: field.type,
+                        label: field.label,
+                        value: fields[`custom_field[${field.name}]`] || '',
+                        options: field?.options || [],
+                        onChange: (e) => handleChange(e, field.name),
+                        fieldId: `new-${field.name}-${index}`,
+                        range_options: field?.range_options || {}
+                        })
+                    )}
+                    </>
+                } 
+                </Form.Group>
+                </div>
             {/* ))} */}
           </Form>
         </Modal.Body>
