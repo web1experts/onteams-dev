@@ -542,8 +542,8 @@ useEffect(() => {
         <>
             <div className="details--projects--view common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
-                    <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
-                    <div className="projecttitle">
+                    <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                    <div className="projecttitle me-auto">
                         <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
                                 <h3 key={`project-title-${currentProject?._id}`}>
@@ -671,7 +671,7 @@ useEffect(() => {
                                         <Button variant="light" onClick={handleClientShow}><FaPlus /> Clients</Button>
                                     )}
                                 </div>
-                                <AddClient show={showClient} toggleshow={handleClientClose} />
+                                {/* <AddClient show={showClient} toggleshow={handleClientClose} /> */}
                             </Form.Group>
                             <Form.Group className="mb-0 form-group">
                                 <Form.Label>
@@ -756,10 +756,9 @@ useEffect(() => {
                                 {projectCustomFields?.length > 0 &&
                                     <>
                                     <hr />
-                                        <ListGroup>
-                                            <p className="m-0"> Other Fields</p>
-                                        </ListGroup>
-                                    
+                                    <Form.Label>
+                                        <small>Other Fields</small>
+                                    </Form.Label>
                                     {projectCustomFields?.map((field, index) =>
                                         renderDynamicField({
                                             name: `custom_field[${field.name}]`,

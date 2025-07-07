@@ -166,7 +166,7 @@ function SidebarPanel() {
     return (
         <>
             <div className={`${!isActive ? 'open--panel--sidebar panel--sidebar' : 'panel--sidebar'} ${collapseSidebar ? 'collapse-sidebar' : ''} ${sidebarSmall ? 'open--panel--sidebar' : ''}`}>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" className="d-flex d-sm-none" onClick={() => {handleSidebarSmall(true);}} />
+                <Navbar.Toggle aria-controls="basic-navbar-nav" className="d-flex d-lg-none" onClick={() => {handleSidebarSmall(true);}} />
                 <Navbar expand="lg">
                     <Navbar.Brand>
                         <span><img src="images/OnTeam-white-icon.png" alt="" /></span>

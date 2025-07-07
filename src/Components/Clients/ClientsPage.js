@@ -501,7 +501,7 @@ function ClientsPage() {
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                   Clients
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
                       <ListGroup.Item className='d-none d-lg-block'>
@@ -517,9 +517,9 @@ function ClientsPage() {
                           <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                       </ListGroup>
                     </ListGroup>
-                   <ListGroup horizontal>
-                    <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-lg-flex bg-white expand--icon ms-3'}>
-                      <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                   <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-md-flex ms-auto ms-lg-0'}>
+                    <ListGroup horizontal className="bg-white expand--icon ms-3">
+                      <ListGroup.Item className="d-none d-md-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
                         <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
                         {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                           <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
@@ -548,11 +548,7 @@ function ClientsPage() {
                               Clients <span key="client-action-header" className="onHide">Actions</span>
                           </div>
                       </th>
-<<<<<<< HEAD
-                      <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email <small><TbArrowsSort /></small></div> </th>
-                      <th scope="col" key="client-phone-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Phone <small><TbArrowsSort /></small></div></th>
-=======
->>>>>>> refs/remotes/origin/master
+                      
                       {Array.isArray(customFields) && customFields
                         .filter(field => field?.showInTable !== false)
                         .map((field, idx) => (
@@ -645,7 +641,8 @@ function ClientsPage() {
       {selectedClient &&
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-          <div className="projecttitle">
+          <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+          <div className="projecttitle me-auto">
             <Dropdown>
               <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <h3>
@@ -666,7 +663,7 @@ function ClientsPage() {
                       
                   </div>
               </Dropdown.Menu>
-          </Dropdown>
+            </Dropdown>
           </div>
           <ListGroup horizontal className="ms-auto">
             <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
@@ -727,53 +724,18 @@ function ClientsPage() {
               </Card.Title>
               <Card.Text>
                 <ListGroup>
-<<<<<<< HEAD
-                  <ListGroup.Item>
-                    <span className="info--icon"><FiMail /></span>
-                    <p>
-                      <small>Client Name</small>
-                      {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ?
-                      <>
-                        <EditableField
-                          field="name"
-                          // label="Client Name"
-                          value={editedClient?.name}
-                          onChange={(value) => handleFieldChange('name', value)}
-                          isEditing={isEditing.name}
-                          onEditClick={() => handleEditClick('name')}
-                          error={fieldserrors['name'] && fieldserrors['name']}
-                        />
-                        {
-                          fieldserrors['name'] &&
-                          <span className="error">{fieldserrors.name}</span>
-                        }
-                        </>
-                        :
-                        <>
-                          {editedClient?.name}
-                        </>
-                        }
-                    </p>
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <span className="info--icon"><FiPhone /></span>
-=======
                   {
                     (isEditing === false) ? 
                     <>
                       <ListGroup.Item>
-                          <span className="info--icon"><FiMail /></span>
-                          <small>Client Name</small>
-                            {selectedClient?.name}
-                            
+                        <span className="info--icon"><FiMail /></span>
+                        <p><small>Client Name</small>{selectedClient?.name}</p>
                         </ListGroup.Item>
                           {customFields?.length > 0 && (
                           <>
                             {customFields.map((field, index) => (
                               <ListGroup.Item key={index}>
-                                <small>{field.label}</small>
-                                {selectedClient?.customFields[field.name]?.meta_value || ''}
-                                
+                                <p><small>{field.label}</small>{selectedClient?.customFields[field.name]?.meta_value || ''}</p>
                               </ListGroup.Item>
                             ))}
                           </>
@@ -810,7 +772,6 @@ function ClientsPage() {
 
                   
                     {/* <span className="info--icon"><FiPhone /></span>
->>>>>>> refs/remotes/origin/master
                     <p><small>Phone</small>+1 (555) 123-4567</p>
                   </ListGroup.Item> */}
                 </ListGroup>

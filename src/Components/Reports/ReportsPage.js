@@ -1477,7 +1477,8 @@ const handleToggles = () => {
       </div>
       <div className="details--projects--grid projects--grid common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-            <div className="projecttitle">
+            <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+            <div className="projecttitle me-auto">
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <h3>

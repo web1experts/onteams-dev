@@ -304,7 +304,7 @@ body {
   padding: .35rem .65rem;
   text-transform: capitalize;
   width: auto;
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -356,7 +356,7 @@ body {
 
 .page--title .search-filter-list .form-group .form-control {
     padding-left: 2.5rem;
-    min-width: 280px;
+    min-width: 200px;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
     -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
     background: #ffffff;
@@ -1474,6 +1474,10 @@ span.open--sidebar {
   white-space: nowrap;
 }
 
+.wrapper--title h3 span:empty {
+  display: none;
+}
+
 .wrapper--title .btn--view {
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
@@ -1777,6 +1781,10 @@ span.open--sidebar {
   padding-left: 1.5rem;
 }
 
+.rounded--box .permission--card .card-body {
+  padding: 1.5rem;
+}
+
 .rounded--box .card .card-title {
   font-size: 1.3rem;
   margin-bottom: 1rem;
@@ -1867,7 +1875,8 @@ span.open--sidebar {
 
 .rounded--box .contact--card .card-body .list-group-item,
 .rounded--box .work--card .card-body .list-group-item {
-  flex: 1 1;
+  flex: 1 1 100%;
+  max-width: calc(50% - .5rem);
   padding: .75rem;
   margin: 0;
   border: 0;
@@ -6263,7 +6272,7 @@ ul#icon-tabs .nav-link span svg {
 .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
     width: auto;
     max-width: fit-content;
-    min-width: 150px;
+    min-width: 270px;
 }
 
 .page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table td {
@@ -6847,7 +6856,6 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:1299px) {
-
   .view--project .open--sidebar,
   .show--project .open--sidebar,
   .open--panel--sidebar~.team--page .open--sidebar {
@@ -7046,7 +7054,6 @@ Media CSS-=-==
 
   .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
     width: 250px;
-    min-width: 250px;
   }
 
   .page--wrapper .draggable--table th {
@@ -7556,10 +7563,6 @@ Media CSS-=-==
     padding: 1rem;
   }
 
-  .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
-    min-width: 0;
-  }
-
   .page--wrapper .attendance--excel--table th {
     min-width: 110px;
   }
@@ -7577,8 +7580,8 @@ Media CSS-=-==
   }
 
   .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
-    width: 200px;
-    min-width: 200px;
+    width: 250px;
+    min-width: 250px;
   }
 
   .team--page .page--title h2 {
@@ -7603,10 +7606,6 @@ Media CSS-=-==
     gap: 10px;
     flex-flow: row wrap;
     justify-content: flex-end;
-  }
-
-  .wrapper--title h3 span {
-    display: none;
   }
 
   .holiday--table tbody tr,

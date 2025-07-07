@@ -714,7 +714,7 @@ function TimeTrackingPage() {
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
+                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
                   {/* <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
                   <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button> */}
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
@@ -807,7 +807,7 @@ function TimeTrackingPage() {
                       <thead className="onHide">
                         <tr key="project-table-header">
                           <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
-                          <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th>
+                          {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
                           <th scope="col" key="client-project-header" className="onHide ms-auto"><LuTimer className="me-1" /> Project Time</th>
                           <th scope="col" key="client-time-header" className="onHide"><FiClock className="me-1" /> Total Time</th>
                           <th scope="col" key="client-status-header" className="onHide"><GoPulse className="me-1" /> Status</th>
@@ -854,21 +854,22 @@ function TimeTrackingPage() {
                                                 <span>
                                                   {activity.name}
                                                 </span>
+                                                <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</strong>
                                               </div>
                                           </div>
                                         </div>
                                     </td>
-                                    <td className="text-start">
+                                    {/* <td className="text-start">
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Name</strong>
                                       <br className="d-xl-none"/>
-                                      <span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</span>
-                                    </td>
-                                    <td className="ms-auto text-start">
+                                      
+                                    </td> */}
+                                    <td className="ms-auto text-start text-xl-center">
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Time</strong>
                                       <br className="d-xl-none"/>
                                       <div key={`task-time-${activity?._id}`} className="onHide project--time--badge px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><LuTimer className="me-1" /> { convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
                                     </td>
-                                    <td className="text-start" key={`total-time-${activity?._id}`}>
+                                    <td className="text-start text-xl-center" key={`total-time-${activity?._id}`}>
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Total Time</strong>
                                       <br className="d-xl-none"/>
                                       <span className="total--time--badge bg--blue px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> { convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</span>
@@ -925,7 +926,7 @@ function TimeTrackingPage() {
                       <thead className="onHide">
                         <tr key="project-table-header">
                           <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
-                          <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th>
+                          {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
                           <th scope="col" key="client-time-header" className="onHide ms-auto"><FiClock className="me-1" /> Total Time</th>
                           <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1" /> Action</th>
                         </tr>
@@ -972,16 +973,17 @@ function TimeTrackingPage() {
                                               <span>
                                                 {activity.name}
                                               </span>
+                                              <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</strong>
                                             </div>
                                           </div>
                                         </div>
                                     </td>
-                                    <td className="ms-auto text-start">
+                                    {/* <td className="text-start">
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Name</strong>
                                       <br className="d-xl-none"/>
-                                      <span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</span>
-                                    </td>
-                                    <td className="text-start" key={`total-time-${activity?._id}`}>
+                                      
+                                    </td> */}
+                                    <td className="text-start text-xl-center ms-auto" key={`total-time-${activity?._id}`}>
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Total Time</strong>
                                       <br className="d-xl-none"/>
                                       <span className="total--time--badge bg--blue px-3 py-2 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</span>
@@ -1009,27 +1011,24 @@ function TimeTrackingPage() {
       </div>
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-            <div className="projecttitle">
-              {/* <h3>
-                  <strong>Alex Chen</strong>
-                  <span>E-commerce Platform</span>
-              </h3> */}
-              <Dropdown>
-                  <Dropdown.Toggle variant="link" id="dropdown-basic">
-                      <h3>
+          <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+          <div className="projecttitle me-auto">
+            <Dropdown>
+                <Dropdown.Toggle variant="link" id="dropdown-basic">
+                    <h3>
+                        <strong>Alex Chen</strong>
+                        <span>E-commerce Platform</span>
+                    </h3>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <div className="drop--scroll">
+                        <Dropdown.Item>
                           <strong>Alex Chen</strong>
                           <span>E-commerce Platform</span>
-                      </h3>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                      <div className="drop--scroll">
-                          <Dropdown.Item>
-                            <strong>Alex Chen</strong>
-                            <span>E-commerce Platform</span>
-                          </Dropdown.Item>
-                      </div>
-                  </Dropdown.Menu>
-              </Dropdown>
+                        </Dropdown.Item>
+                    </div>
+                </Dropdown.Menu>
+            </Dropdown>
           </div>
           <ListGroup horizontal className="live--tabs me-auto">
             <ListGroup horizontal className="me-3">

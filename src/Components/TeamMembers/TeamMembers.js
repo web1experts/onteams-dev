@@ -1,36 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-<<<<<<< HEAD
 import {Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup } from "react-bootstrap";
-import { FaList, FaPlus, FaRegTrashAlt } from "react-icons/fa";
-import {FiEdit,FiMail,FiSidebar,FiBriefcase,FiShield,FiPhone,FiCalendar,FiVideo } from "react-icons/fi";
-=======
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Modal,
-  Form,
-  FloatingLabel,
-  Card,
-  ListGroup,
-  Table,
-  Accordion,
-  Dropdown,
-  FormGroup,
-} from "react-bootstrap";
 import { FaList, FaPlus, FaRegTrashAlt, FaCog } from "react-icons/fa";
-import {
-  FiEdit,
-  FiMail,
-  FiSidebar,
-  FiBriefcase,
-  FiShield,
-  FiPhone,
-  FiCalendar,
-  FiVideo } from "react-icons/fi";
->>>>>>> refs/remotes/origin/master
+import {FiEdit,FiMail,FiSidebar,FiBriefcase,FiShield,FiPhone,FiCalendar,FiVideo } from "react-icons/fi";
 import { AiOutlineTeam } from 'react-icons/ai';
 import { BsBriefcase, BsEye, BsGrid } from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
@@ -932,55 +904,19 @@ function TeamMembersPage() {
           <Row>
             <Col sm={12}>
               <h2>
-                <span
-                  className="open--sidebar me-3 d-flex d-xl-none"
-                  onClick={() => {
-                    handleSidebarSmall(false);
-                    setIsActive(0);
-                  }}
-                >
-                  <FiSidebar />
-                </span>
+                <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => { handleSidebarSmall(false); setIsActive(0); }}><FiSidebar /></span>
                 Members
-                <ListGroup
-                  horizontal
-                  className={
-                    isActive ? "d-none" : "me-3 ms-auto d-none d-md-flex"
-                  }
-                >
+                <ListGroup horizontal className={ isActive ? "d-none" : "me-3 ms-auto d-none d-md-flex" }>
                   <ListGroup horizontal>
-                    <ListGroup.Item
-                      className="d-none d-md-block"
-                      action
-                      active={activeTab === "Members"}
-                      onClick={() => {
-                        setsearchTerm("");
-                        setActiveTab("Members");
-                      }}
-                    ><AiOutlineTeam /> Team Members
-                    </ListGroup.Item>
+                    <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Members"} onClick={() => { setsearchTerm("");setActiveTab("Members"); }}><AiOutlineTeam /> Team Members</ListGroup.Item>
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item
-                        className="d-none d-md-block"
-                        action
-                        active={activeTab === "Invitees"}
-                        onClick={() => {
-                          setsearchTerm("");
-                          setActiveTab("Invitees");
-                        }}
-                      ><FiMail /> Invitations
-                      </ListGroup.Item>
+                      <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Invitees"} onClick={() => {setsearchTerm("");setActiveTab("Invitees"); }}><FiMail /> Invitations</ListGroup.Item>
                     )}
                   </ListGroup>
                   <ListGroup.Item className="d-none d-xl-block ms-3">
-                    <Form
-                      className="search-filter-list"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                      }}
-                    >
+                    <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault(); }}>
                       <Form.Group className="mb-0 form-group">
                         <MdOutlineSearch />
                         <Form.Control
@@ -995,83 +931,31 @@ function TeamMembersPage() {
                       </Form.Group>
                     </Form>
                   </ListGroup.Item>
-                  <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                  
                 </ListGroup>
-                <ListGroup
-                  horizontal
-                  className={isActive ? "d-none" : "d-flex ms-auto ms-md-0"}
-                >
+                <ListGroup horizontal className={isActive ? "d-none" : "d-flex ms-auto ms-md-0"}>
                   <ListGroup horizontal>
-                    
-                    <ListGroup.Item
-                      action
-                      className="view--icon d-none d-lg-flex"
-                      active={isActiveView === 1}
-                      onClick={() => setIsActiveView(1)}
-                    >
-                      <BsGrid />
-                    </ListGroup.Item>
-                    <ListGroup.Item
-                      action
-                      className="d-none d-lg-flex view--icon"
-                      active={isActiveView === 2}
-                      onClick={() => setIsActiveView(2)}
-                    >
-                      <FaList />
-                    </ListGroup.Item>
+                    <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                    <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
-                  <ListGroup
-                    horizontal
-                    className={
-                      isActive ? "d-none" : "d-flex bg-white expand--icon"
-                    }
-                  >
-                    <ListGroup.Item onClick={handleToggles}>
-                      <GrExpand />
-                    </ListGroup.Item>
+                  <ListGroup horizontal className={ isActive ? "d-none" : "d-flex bg-white expand--icon" }>
+                    <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                    <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item
-                        className="btn btn-primary"
-                        onClick={handleShow}
-                      >
-                        <FaPlus />
-                      </ListGroup.Item>
+                      <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
                     )}
                   </ListGroup>
                 </ListGroup>
               </h2>
-              <ListGroup
-                horizontal
-                className={
-                  isActive
-                    ? "d-none"
-                    : "me-auto mt-3 ms-0 d-flex d-md-none justify-content-start"
-                }
-              >
+              <ListGroup horizontal className={ isActive ? "d-none" : "me-auto mt-3 ms-0 d-flex d-md-none justify-content-start" }>
                 <ListGroup horizontal>
-                  <ListGroup.Item
-                    action
-                    active={activeTab === "Members"}
-                    onClick={() => {
-                      setsearchTerm("");
-                      setActiveTab("Members");
-                    }}
-                  ><AiOutlineTeam /> Team Members
-                  </ListGroup.Item>
+                  <ListGroup.Item action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members"); }}><AiOutlineTeam /> Team Members</ListGroup.Item>
                   {(memberProfile?.permissions?.members?.create_edit_delete ===
                     true ||
                     memberProfile?.role?.slug === "owner") && (
-                    <ListGroup.Item
-                      action
-                      active={activeTab === "Invitees"}
-                      onClick={() => {
-                        setsearchTerm("");
-                        setActiveTab("Invitees");
-                      }}
-                    ><FiMail /> Invitations
-                    </ListGroup.Item>
+                    <ListGroup.Item action active={activeTab === "Invitees"} onClick={() => {setsearchTerm("");setActiveTab("Invitees"); }}><FiMail /> Invitations</ListGroup.Item>
                   )}
                 </ListGroup>
               </ListGroup>
@@ -1120,49 +1004,17 @@ function TeamMembersPage() {
                     <tbody>
                       {!showloader && memberFeeds && memberFeeds.length > 0
                         ? memberFeeds.map((member, idx) => (
-                            <tr
-                              key={`member-table-row-${idx}`}
-                              className={
-                                member._id === selectedMember?._id
-                                  ? "project--active"
-                                  : ""
-                              }
-                              onClick={
-                                isActive
-                                  ? () => handleTableToggle(member)
-                                  : () => {
-                                      return false;
-                                    }
-                              }
-                            >
-                              <td
-                                className="project--title--td sticky"
-                                data-label="Member Name"
-                              >
+                            <tr key={`member-table-row-${idx}`} className={ member._id === selectedMember?._id ? "project--active" : "" } onClick={ isActive ? () => handleTableToggle(member) : () => { return false;}}>
+                              <td className="project--title--td sticky" data-label="Member Name" >
                                 <div className="d-flex justify-content-between border-end flex-wrap">
                                   <div className="project--name">
-                                    <div className="drag--indicator">
-                                      <abbr>{idx + 1}</abbr>
-                                    </div>
-                                    <div className="title--initial">
-                                      {member.name.charAt(0)}
-                                    </div>
-                                    <div className="title--span flex-column align-items-start gap-0">
-                                      <span>{member.name}</span>
-                                      <strong>{member.role?.name}</strong>
+                                    <div className="drag--indicator"><abbr>{idx + 1}</abbr></div>
+                                    <div className="title--initial">{member.name.charAt(0)}</div>
+                                    <div className="title--span flex-column align-items-start gap-0"><span>{member.name}</span><strong>{member.role?.name}</strong>
                                     </div>
                                   </div>
                                   <div className="onHide task--buttons">
-                                    <Button
-                                      variant="primary"
-                                      className="px-3 py-2"
-                                      onClick={() => {
-                                        handleTableToggle(member);
-                                        setIsActive(true);
-                                      }}
-                                    >
-                                      <BsEye />
-                                    </Button>
+                                    <Button variant="primary" className="px-3 py-2" onClick={() => { handleTableToggle(member); setIsActive(true); }}><BsEye /></Button>
                                   </div>
                                 </div>
                               </td>
@@ -1247,32 +1099,35 @@ function TeamMembersPage() {
       {isActive && (
         <div className="details--member--view">
           <div className="wrapper--title py-2 bg-white border-bottom">
-            <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
-                <h3>
-                  <strong>{selectedMember?.name}</strong>
-                  <span>{editedMember.rolename}</span>
-                </h3>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <div className="drop--scroll">
-                  {memberFeeds &&
-                    memberFeeds.length > 0 &&
-                    memberFeeds.map((member, idx) => (
-                      <Dropdown.Item
-                        onClick={() => {
-                          handleTableToggle(member);
-                          setIsActive(true);
-                        }}
-                        key={`item-${idx}`}
-                      >
-                        <strong>{member?.name}</strong>
-                        <span>{member.role?.name}</span>
-                      </Dropdown.Item>
-                    ))}
-                </div>
-              </Dropdown.Menu>
-            </Dropdown>
+            <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+            <div className="projecttitle me-auto">
+              <Dropdown>
+                <Dropdown.Toggle variant="link" id="dropdown-basic">
+                  <h3>
+                    <strong>{selectedMember?.name}</strong>
+                    <span>{selectedMember?.role?.name}</span>
+                  </h3>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    {memberFeeds &&
+                      memberFeeds.length > 0 &&
+                      memberFeeds.map((member, idx) => (
+                        <Dropdown.Item
+                          onClick={() => {
+                            handleTableToggle(member);
+                            setIsActive(true);
+                          }}
+                          key={`item-${idx}`}
+                        >
+                          <strong>{member?.name}</strong>
+                          <span>{member.role?.name}</span>
+                        </Dropdown.Item>
+                      ))}
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
             <ListGroup horizontal>
               <ListGroup.Item
                 onClick={handleToggles}

@@ -696,7 +696,7 @@ function ProjectsPage() {
                         <Row>
                             <Col sm={12} lg={12}>
                                 <h2>
-                                    <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                                    <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                                     Projects
                                     <ListGroup horizontal className={isActive !== 0 ? '' : 'ms-auto d-flex'}>
                                         <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-xl-flex'} key="member-filter-list">
@@ -1083,8 +1083,8 @@ function ProjectsPage() {
             </div>
             <div className="details--projects--grid projects--grid common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
-                     <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
-                    <div className="projecttitle">
+                    <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                    <div className="projecttitle me-auto">
                         <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
                                 <h3>

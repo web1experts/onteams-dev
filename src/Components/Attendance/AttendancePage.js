@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Form, Dropdown, ListGroup, Table, Modal, Button, Card, ListGroupItem } from "react-bootstrap";
 import { FaCheck, FaEye } from "react-icons/fa";
-import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload, FiLogIn, FiLogOut, FiEdit3 } from "react-icons/fi";
+import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload, FiLogIn, FiLogOut, FiEdit3, FiSidebar } from "react-icons/fi";
 import { MdOutlineCheck, MdOutlineClose } from 'react-icons/md';
 import { GrExpand } from "react-icons/gr";
 import { LuTimer, LuCircleDot } from "react-icons/lu";
@@ -239,6 +239,7 @@ useEffect(() => {
             <Row>
               <Col sm={12}>
                 <h2>
+                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => { handleSidebarSmall(false); setIsActive(0); }}><FiSidebar /></span>
                   Attendance
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup.Item>
@@ -499,7 +500,8 @@ useEffect(() => {
       {isActive === 1 &&
         <div className="details--projects--grid projects--grid common--project--grid">
           <div className="wrapper--title py-2 bg-white border-bottom">
-              <div className="projecttitle">
+              <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+              <div className="projecttitle me-auto">
                 <Dropdown key={'member-filter'}>
                   <Dropdown.Toggle variant="link" id="dropdown-basic" key={'member-filter-toggle'}>
                     <h3>
