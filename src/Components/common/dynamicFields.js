@@ -50,7 +50,7 @@ export function renderDynamicField(config) {
 
   return (
     <Form.Group className="mb-3" controlId={fieldId}>
-      {label && <Form.Label>{label}</Form.Label>}
+      {label && <Form.Label label={label}>{label}</Form.Label>}
 
       {/* Basic Inputs */}
       {['text', 'email', 'password'].includes(type) && (

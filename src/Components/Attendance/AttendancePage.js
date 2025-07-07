@@ -55,6 +55,7 @@ function AttendancePage() {
   const [ attendances, setAttendances] = useState([])
   const memberFeed = useSelector((state) => state.member.members)
   const [members, setMembers] = useState([])
+  const [selectedMember, setSelectedMember] = useState({})
   const [isActive, setIsActive] = useState(0);
   const [attendanceSummary, setAttendanceSummary] = useState({})
   const [ excelData, setExcelData] = useState([])
@@ -162,9 +163,10 @@ useEffect(() => {
     });
   };
 
-  const handleMemberAttendance = async (memberID) => {
+  const handleMemberAttendance = async (member) => {
     
-    dispatch(getAttendanceByMember(memberID, filters));
+    dispatch(getAttendanceByMember(member._id, filters));
+    setSelectedMember(member)
   }
 
   const downloadExcel = (excelData) => {
@@ -291,7 +293,7 @@ useEffect(() => {
             {activeTab === 'excel' && (
               <div className="attendance--table excel--view" id="excel--view">
                 <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
-                  <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - {getMonthLabel(filters?.month)}</h3>
+                  <h3 className="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - {getMonthLabel(filters?.month)}</h3>
                   <Button variant="primary" onClick={() => downloadExcel(excelData)}><FiDownload /> Download Excel Excel</Button>
                 </div>
                 <div className='attendance--excel--table draggable--table new--project--rows table-responsive-xl'>
@@ -391,7 +393,7 @@ useEffect(() => {
               <>
                 <div className="attendance--stats">
                   <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
-                    <h3 class="d-flex align-items-center gap-3 mb-0">
+                    <h3 className="d-flex align-items-center gap-3 mb-0">
                       
                     </h3>
                     <Col md="auto" className="d-flex align-items-center change--date mt-2 mt-md-0">
@@ -444,13 +446,13 @@ useEffect(() => {
                   </Row>
                 </div>
                 <div className="attendance--table team--view" id="team--view">
-                  <h3 class="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Attendance Overview - June 2025</h3>
+                  <h3 className="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Attendance Overview - June 2025</h3>
                   <div className='attendance--table--list'>
                     <Table responsive="lg">
                       <tbody className="bg-white">
                         {attendances &&
                           attendances.map((attendanceData, dateIndex) => (
-                            <tr>
+                            <tr key={`attendance-row-${dateIndex}`}>
                               <td>
                                 <div className="d-flex justify-content-between">
                                   <div className="project--name d-flex gap-3 align-items-center">
@@ -479,7 +481,7 @@ useEffect(() => {
                                   <div className="text-center">
                                     <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">{attendanceData?.attendance?.absent || 0} <small>Absent</small></h4>
                                   </div>
-                                  <Button variant="dark" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {handleMemberAttendance(attendanceData?._id);setIsActive(1)}}><FaEye/> Details</Button>
+                                  <Button variant="dark" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {handleMemberAttendance(attendanceData);setIsActive(1)}}><FaEye/> Details</Button>
                                 </div>
                               </td>
                             </tr>
@@ -498,22 +500,22 @@ useEffect(() => {
         <div className="details--projects--grid projects--grid common--project--grid">
           <div className="wrapper--title py-2 bg-white border-bottom">
               <div className="projecttitle">
-                <Dropdown>
-                  <Dropdown.Toggle variant="link" id="dropdown-basic">
+                <Dropdown key={'member-filter'}>
+                  <Dropdown.Toggle variant="link" id="dropdown-basic" key={'member-filter-toggle'}>
                     <h3>
-                      <strong>Gagandeep Singh</strong>
-                      <span>UI/UX Designer</span>
+                      <strong>{selectedMember?.name}</strong>
+                      <span>{ selectedMember?.role?.name || selectedMember?.role || ''}</span>
                     </h3>
                   </Dropdown.Toggle>
-                  <Dropdown.Menu>
+                  <Dropdown.Menu key={`member-drop`}>
                       <div className="drop--scroll">
                           {members.map((member, index) => {
-                              return (<>
-                                  <Dropdown.Item value={member._id} onClick={() => { handleMemberAttendance(member._id) }}>
+                              return (
+                                  <Dropdown.Item key={`drop-item-${member._id}`} value={member._id} onClick={() => { handleMemberAttendance(member) }}>
                                       <strong>{member.name}</strong>
-                                      {/* <span>{project.client?.name || <span className='text-muted'>__</span>}</span> */}
+                                      
                                   </Dropdown.Item>
-                              </>
+                              
                               )
                           })}
                       </div>
@@ -521,12 +523,12 @@ useEffect(() => {
                 </Dropdown>
               </div>
               <ListGroup horizontal>
-                  <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+                  <ListGroup.Item key={'toggle-handle'} onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
                   <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
               </ListGroup>
           </div>
           <div className="bg-white attendance--table daily--attendance--table">
-            <h3 class="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - June 2025</h3>
+            <h3 className="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - June 2025</h3>
             <div className="overflow-x-auto">
                 <Table responsive="lg">
                   <thead>
