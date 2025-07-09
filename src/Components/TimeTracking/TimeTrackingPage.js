@@ -31,6 +31,12 @@ function TimeTrackingPage() {
   const currentMember = getMemberdata();
   const [spinner, setSpinner] = useState(false)
   const [activityspinner, setActSpinner] = useState(false)
+  const [cardNumbers, setCardNumbers] = useState({
+      activeCount: 0,
+      pauseCount: 0,
+      inactiveCount: 0,
+      totalHours: 0
+    })
   const [isActive, setIsActive] = useState(false);
    const [isActiveView, setIsActiveView] = useState(2);
   const [isScreenActive, setIsScreenActive] = useState(false);
@@ -305,14 +311,6 @@ function TimeTrackingPage() {
   useEffect(() => {
     if (activitystate?.liveactivities?.memberData) { 
       setLiveactivities(activitystate.liveactivities.memberData)
-      // if (currentActivity && Object.keys(currentActivity).length > 0) {
-      //   activitystate.liveactivities.memberData.forEach((a, inx) => {
-      //       if (a._id === currentActivity._id) {
-      //           setCurrentActivity(a);
-      //           return;
-      //       }
-      //   })
-      // }
     }
 
     if( activitystate?.recordedActivity ){
@@ -324,6 +322,31 @@ function TimeTrackingPage() {
       handleRecordedActivity()
     }
   }, [activitystate])
+
+  useEffect(() => {
+    let activeCount = 0;
+    let pauseCount = 0;
+    let inactiveCount = 0;
+    let totalHours = 0;
+    // If liveactivities contains all members and some may have no activity
+    liveactivities.forEach(activity => {
+      if (activity?.latestActivity?.status === true) {
+        activeCount++;
+      } else if (activity?.latestActivity?.status === false) {
+        pauseCount++;
+      }else{
+        inactiveCount++;
+      }
+      totalHours += activity.totalDuration || 0;
+      
+    });
+    setCardNumbers({
+      activeCount,
+      pauseCount,
+      inactiveCount,
+      totalHours
+    })
+  }, [liveactivities])
 
   const handlefilterchange = (name, value) => {
     if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
@@ -775,25 +798,25 @@ function TimeTrackingPage() {
                     <Col className="card--stack">
                       <Card className="text--green">
                         <Card.Body>
-                          <Card.Title><span>Active</span>2</Card.Title>
+                          <Card.Title><span>Active</span>{cardNumbers?.activeCount}</Card.Title>
                           <Card.Text><FiMonitor /></Card.Text>
                         </Card.Body>
                       </Card>
                       <Card className="text--orange">
                         <Card.Body>
-                          <Card.Title><span>On Break</span>2</Card.Title>
+                          <Card.Title><span>On Break</span>{cardNumbers?.pauseCount}</Card.Title>
                           <Card.Text><FiCoffee /></Card.Text>
                         </Card.Body>
                       </Card>
                       <Card className="text--gray">
                         <Card.Body>
-                          <Card.Title><span>Inactive</span>1</Card.Title>
+                          <Card.Title><span>Inactive</span>{cardNumbers?.inactiveCount}</Card.Title>
                           <Card.Text><FiUserX /></Card.Text>
                         </Card.Body>
                       </Card>
                       <Card className="text--blue">
                         <Card.Body>
-                          <Card.Title><span>Total Hours</span>24.0h</Card.Title>
+                          <Card.Title><span>Total Hours</span>{convertSecondstoTime(cardNumbers?.totalHours)}</Card.Title>
                           <Card.Text><FiClock /></Card.Text>
                         </Card.Body>
                       </Card>
@@ -1016,16 +1039,24 @@ function TimeTrackingPage() {
             <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                     <h3>
-                        <strong>Alex Chen</strong>
-                        <span>E-commerce Platform</span>
+                        <strong>{currentActivity?.name}</strong>
+                        <span>{currentActivity?.latestActivity?.project?.title || ''}</span>
                     </h3>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <div className="drop--scroll">
-                        <Dropdown.Item>
-                          <strong>Alex Chen</strong>
-                          <span>E-commerce Platform</span>
-                        </Dropdown.Item>
+                      {
+                         liveactivities.length > 0 &&
+                            liveactivities.map((activity, index) => {
+                              return (
+                                <Dropdown.Item onClick={() => {handleClick(activity)}}>
+                                  <strong>{activity?.name}</strong>
+                                  <span>{activity?.latestActivity?.project?.title || ''}</span>
+                                </Dropdown.Item>
+                              )
+                            })
+                      }
+                        
                     </div>
                 </Dropdown.Menu>
             </Dropdown>
