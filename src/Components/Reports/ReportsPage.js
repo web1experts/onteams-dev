@@ -1295,7 +1295,7 @@ const handleToggles = () => {
                                   </Dropdown.Menu>
                                 </Dropdown>
                               )}
-                            <ListGroup horizontal className="bg-white expand--icon">
+                            <ListGroup horizontal className="bg-white expand--icon d-none d-lg-flex">
                                 <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                             </ListGroup>
                           </ListGroup>
@@ -1485,7 +1485,7 @@ const handleToggles = () => {
               }
             </div>
             <ListGroup horizontal>
-              <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+              <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
               <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
             </ListGroup>
         </div>

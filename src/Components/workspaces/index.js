@@ -88,7 +88,7 @@ function Workspace(props) {
                   Workspace{" "}
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
-                        <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                        <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                         <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>

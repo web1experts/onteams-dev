@@ -127,22 +127,40 @@ function SidebarPanel() {
         setSidebarSmall(commonState.sidebar_small )
     },[commonState ])
 
+    // const themes = [
+    //     { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: 'rgb(59 130 246)', secondaryColor: 'rgb(6 182 212)' },
+    //     { name: 'Purple Dream', color: 'linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))', primaryColor: 'rgb(168 85 247)', secondaryColor: 'rgb(236 72 153)' },
+    //     { name: 'Forest Green', color: 'linear-gradient(135deg, rgb(16 185 129), rgb(20 184 166))', primaryColor: 'rgb(16 185 129)', secondaryColor: 'rgb(20 184 166)' },
+    //     { name: 'Sunset Orange', color: 'linear-gradient(135deg, rgb(249 115 22), rgb(239 68 68))', primaryColor: 'rgb(249 115 22)', secondaryColor: 'rgb(239 68 68)' },
+    //     { name: 'Royal Purple', color: 'linear-gradient(135deg, rgb(99 102 241), rgb(139 92 246))', primaryColor: 'rgb(99 102 241)', secondaryColor: 'rgb(139 92 246)' },
+    //     { name: 'Golden Rose', color: 'linear-gradient(135deg, rgb(244 63 94), rgb(245 158 11))', primaryColor: 'rgb(244 63 94)', secondaryColor: 'rgb(245 158 11)' },
+    //     { name: 'Fresh Lime', color: 'linear-gradient(135deg, rgb(132 204 22), rgb(34 197 94))', primaryColor: 'rgb(132 204 22)', secondaryColor: 'rgb(34 197 94)' },
+    //     { name: 'Sky Blue', color: 'linear-gradient(135deg, rgb(14 165 233), rgb(59 130 246))', primaryColor: 'rgb(14 165 233)', secondaryColor: 'rgb(59 130 246)' },
+    //     { name: 'Electric Fuchsia', color: 'linear-gradient(135deg, rgb(217 70 239), rgb(168 85 247))', primaryColor: 'rgb(217 70 239)', secondaryColor: 'rgb(168 85 247)' },
+    //     { name: 'Sunny Yellow', color: 'linear-gradient(135deg, rgb(234 179 8), rgb(249 115 22))', primaryColor: 'rgb(234 179 8)', secondaryColor: 'rgb(249 115 22)' },
+    //     { name: 'Crimson Coral', color: 'linear-gradient(135deg, rgb(220 38 38), rgb(249 115 22))', primaryColor: 'rgb(220 38 38)', secondaryColor: 'rgb(249 115 22)' },
+    //     { name: 'Midnight Blue', color: 'linear-gradient(135deg, rgb(30 64 175), rgb(109 40 217))', primaryColor: 'rgb(30 64 175)', secondaryColor: 'rgb(109 40 217)' },
+    //     { name: 'Emerald Mint', color: 'linear-gradient(135deg, rgb(5 150 105), rgb(6 182 212))', primaryColor: 'rgb(5 150 105)', secondaryColor: 'rgb(6 182 212)' },
+    //     { name: 'Magenta Violet', color: 'linear-gradient(135deg, rgb(192 38 211), rgb(124 58 237))', primaryColor: 'rgb(192 38 211)', secondaryColor: 'rgb(124 58 237)' },
+    //     { name: 'Copper Bronze', color: 'linear-gradient(135deg, rgb(234 88 12), rgb(202 138 4))', primaryColor: 'rgb(234 88 12)', secondaryColor: 'rgb(202 138 4)' },
+    // ];
+
     const themes = [
-        { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: 'rgb(59 130 246)', secondaryColor: 'rgb(6 182 212)' },
-        { name: 'Purple Dream', color: 'linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))', primaryColor: 'rgb(168 85 247)', secondaryColor: 'rgb(236 72 153)' },
-        { name: 'Forest Green', color: 'linear-gradient(135deg, rgb(16 185 129), rgb(20 184 166))', primaryColor: 'rgb(16 185 129)', secondaryColor: 'rgb(20 184 166)' },
-        { name: 'Sunset Orange', color: 'linear-gradient(135deg, rgb(249 115 22), rgb(239 68 68))', primaryColor: 'rgb(249 115 22)', secondaryColor: 'rgb(239 68 68)' },
-        { name: 'Royal Purple', color: 'linear-gradient(135deg, rgb(99 102 241), rgb(139 92 246))', primaryColor: 'rgb(99 102 241)', secondaryColor: 'rgb(139 92 246)' },
-        { name: 'Golden Rose', color: 'linear-gradient(135deg, rgb(244 63 94), rgb(245 158 11))', primaryColor: 'rgb(244 63 94)', secondaryColor: 'rgb(245 158 11)' },
-        { name: 'Fresh Lime', color: 'linear-gradient(135deg, rgb(132 204 22), rgb(34 197 94))', primaryColor: 'rgb(132 204 22)', secondaryColor: 'rgb(34 197 94)' },
-        { name: 'Sky Blue', color: 'linear-gradient(135deg, rgb(14 165 233), rgb(59 130 246))', primaryColor: 'rgb(14 165 233)', secondaryColor: 'rgb(59 130 246)' },
-        { name: 'Electric Fuchsia', color: 'linear-gradient(135deg, rgb(217 70 239), rgb(168 85 247))', primaryColor: 'rgb(217 70 239)', secondaryColor: 'rgb(168 85 247)' },
-        { name: 'Sunny Yellow', color: 'linear-gradient(135deg, rgb(234 179 8), rgb(249 115 22))', primaryColor: 'rgb(234 179 8)', secondaryColor: 'rgb(249 115 22)' },
-        { name: 'Crimson Coral', color: 'linear-gradient(135deg, rgb(220 38 38), rgb(249 115 22))', primaryColor: 'rgb(220 38 38)', secondaryColor: 'rgb(249 115 22)' },
-        { name: 'Midnight Blue', color: 'linear-gradient(135deg, rgb(30 64 175), rgb(109 40 217))', primaryColor: 'rgb(30 64 175)', secondaryColor: 'rgb(109 40 217)' },
-        { name: 'Emerald Mint', color: 'linear-gradient(135deg, rgb(5 150 105), rgb(6 182 212))', primaryColor: 'rgb(5 150 105)', secondaryColor: 'rgb(6 182 212)' },
-        { name: 'Magenta Violet', color: 'linear-gradient(135deg, rgb(192 38 211), rgb(124 58 237))', primaryColor: 'rgb(192 38 211)', secondaryColor: 'rgb(124 58 237)' },
-        { name: 'Copper Bronze', color: 'linear-gradient(135deg, rgb(234 88 12), rgb(202 138 4))', primaryColor: 'rgb(234 88 12)', secondaryColor: 'rgb(202 138 4)' },
+        { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' },
+        { name: 'Purple Dream', color: 'linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))', primaryColor: '168, 85, 247', secondaryColor: '236, 72, 153' },
+        { name: 'Forest Green', color: 'linear-gradient(135deg, rgb(16 185 129), rgb(20 184 166))', primaryColor: '16, 185, 129', secondaryColor: '20, 184, 166' },
+        { name: 'Sunset Orange', color: 'linear-gradient(135deg, rgb(249 115 22), rgb(239 68 68))', primaryColor: '249, 115, 22', secondaryColor: '239, 68, 68' },
+        { name: 'Royal Purple', color: 'linear-gradient(135deg, rgb(99 102 241), rgb(139 92 246))', primaryColor: '99, 102, 241', secondaryColor: '139, 92, 246' },
+        { name: 'Golden Rose', color: 'linear-gradient(135deg, rgb(244 63 94), rgb(245 158 11))', primaryColor: '244, 63, 94', secondaryColor: '245, 158, 11' },
+        { name: 'Fresh Lime', color: 'linear-gradient(135deg, rgb(132 204 22), rgb(34 197 94))', primaryColor: '132, 204, 22', secondaryColor: '34, 197, 94' },
+        { name: 'Sky Blue', color: 'linear-gradient(135deg, rgb(14 165 233), rgb(59 130 246))', primaryColor: '14, 165, 233', secondaryColor: '59, 130, 246' },
+        { name: 'Electric Fuchsia', color: 'linear-gradient(135deg, rgb(217 70 239), rgb(168 85 247))', primaryColor: '217, 70, 239', secondaryColor: '168, 85, 247' },
+        { name: 'Sunny Yellow', color: 'linear-gradient(135deg, rgb(234 179 8), rgb(249 115 22))', primaryColor: '234, 179, 8', secondaryColor: '249, 115, 22' },
+        { name: 'Crimson Coral', color: 'linear-gradient(135deg, rgb(220 38 38), rgb(249 115 22))', primaryColor: '220, 38, 38', secondaryColor: '249, 115, 22' },
+        { name: 'Midnight Blue', color: 'linear-gradient(135deg, rgb(30 64 175), rgb(109 40 217))', primaryColor: '30, 64, 175', secondaryColor: '109, 40, 217' },
+        { name: 'Emerald Mint', color: 'linear-gradient(135deg, rgb(5 150 105), rgb(6 182 212))', primaryColor: '5, 150, 105', secondaryColor: '6, 182, 212' },
+        { name: 'Magenta Violet', color: 'linear-gradient(135deg, rgb(192 38 211), rgb(124 58 237))', primaryColor: '192, 38, 211', secondaryColor: '124, 58, 237' },
+        { name: 'Copper Bronze', color: 'linear-gradient(135deg, rgb(234 88 12), rgb(202 138 4))', primaryColor: '234, 88, 12', secondaryColor: '202, 138, 4' },
     ];
 
     const [selectedTheme, setSelectedTheme] = useState('Ocean Blue');

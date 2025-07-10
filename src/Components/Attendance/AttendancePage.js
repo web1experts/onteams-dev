@@ -270,7 +270,7 @@ useEffect(() => {
                         <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
                         <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
                     </ListGroup>
-                    <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
+                    <ListGroup horizontal className='bg-white expand--icon d-none d-lg-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
@@ -525,7 +525,7 @@ useEffect(() => {
                 </Dropdown>
               </div>
               <ListGroup horizontal>
-                  <ListGroup.Item key={'toggle-handle'} onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+                  <ListGroup.Item key={'toggle-handle'} onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
                   <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
               </ListGroup>
           </div>

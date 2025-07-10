@@ -786,7 +786,7 @@ function TimeTrackingPage() {
                     </ListGroup.Item>
                     
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
-                        <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                        <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                         <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
                           <BsArrowClockwise onClick={handleLiveActivityList}/>
                         </ListGroup.Item>
@@ -1101,7 +1101,7 @@ function TimeTrackingPage() {
           <ListGroup horizontal className="ms-auto p-0">
             {showRecordedTabs()}
             <ListGroup horizontal className="bg-white expand--icon ms-3 p-0 b-0 rounded-0 align-items-center">
-              <ListGroup.Item onClick={handleSidebar} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+              <ListGroup.Item onClick={handleSidebar} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
               <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
                 <BsArrowClockwise onClick={handleRecordedActivity}/>
               </ListGroup.Item>

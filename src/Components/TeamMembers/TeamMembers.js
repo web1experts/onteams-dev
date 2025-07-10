@@ -1034,7 +1034,7 @@ function TeamMembersPage() {
                     >
                       <FaCog />
                     </ListGroup.Item>
-                    <ListGroup.Item onClick={handleToggles}>
+                    <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}>
                       <GrExpand />
                     </ListGroup.Item>
                     {(memberProfile?.permissions?.members
@@ -1350,7 +1350,7 @@ function TeamMembersPage() {
             <ListGroup horizontal>
               <ListGroup.Item
                 onClick={handleToggles}
-                className="d-none d-sm-flex"
+                className="d-none d-lg-flex"
               >
                 <GrExpand />
               </ListGroup.Item>

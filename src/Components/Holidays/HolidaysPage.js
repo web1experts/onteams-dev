@@ -211,7 +211,7 @@ const getDaysLeft = (date) => {
                         <ListGroup.Item action className="d-none d-xl-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
-                      <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                      <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                       <ListGroup.Item>
                         {
                           (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && ( 
