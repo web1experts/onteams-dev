@@ -752,7 +752,7 @@ function ProjectsPage() {
                                         <ListGroup horizontal className={isActive !== 0 ? '' : 'bg-white expand--icon ms-3 d-flex'}>
                                             <ListGroup.Item className={isActive !== 0 ? 'd-flex d-xl-none me-1' : 'd-xl-none onHide me-1'} onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
                                             <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
-                                            <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                                            <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                                             {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
                                                 <ListGroup.Item className="btn btn-primary" onClick={() => handleShow('new') }><FaPlus /></ListGroup.Item>
                                             )}
@@ -784,14 +784,8 @@ function ProjectsPage() {
                                                     Project <span key="project-action-header" className="onHide">Actions</span>
                                                 </div>
                                             </th>
-                                            {/* <th scope="col" key="project-action-header" className="onHide sticky">Actions</th> */}
-                                            <th scope="col" key="project-status-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Status <small><TbArrowsSort /></small></div> </th>
-                                            {/* <th scope="col" key="project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th> */}
-                                            {/* <th scope="col" key="project-client-header" className="onHide">Client</th> */}
-                                            <th scope="col" key="project-member-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Assigned Members <small><TbArrowsSort /></small></div></th>
-                                            <th scope="col" key="project-start-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Start Date <small><TbArrowsSort /></small></div></th>
-                                            <th scope="col" key="project-end-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">End Date <small><TbArrowsSort /></small></div></th>
-                                            <th scope="col" key="project-due-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Due Date <small><TbArrowsSort /></small></div></th>
+                                            <th scope="col" key="project-status-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Status</div> </th>
+                                            <th scope="col" width='12%' key="project-member-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Assigned Members</div></th>
                                             {Array.isArray(customFields) && customFields
                                                 .filter(field => field?.showInTable !== false)
                                                 .map((field, idx) => (
@@ -829,7 +823,7 @@ function ProjectsPage() {
                                                                             }}
                                                                             key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                                                 }`}>
-                                                                            <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
+                                                                            <td className="project--title--td sticky border-bottom" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
                                                                                 <div className="d-flex justify-content-between border-end flex-wrap">
                                                                                     <div className="project--name">
                                                                                         <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
@@ -879,9 +873,6 @@ function ProjectsPage() {
                                                                             <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles min__width">
                                                                                 <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
                                                                             </td>
-                                                                            <td className="onHide new__td">15/02/2025</td>
-                                                                            <td className="onHide new__td">15/02/2025</td>
-                                                                            <td className="onHide new__td">15/02/2025</td>
                                                                             <td className="task--last--buttons">
                                                                                 <div className="d-flex justify-content-between">
                                                                                     <div key={`actions-index-${index}`} data-label="Actions" className="onHide">
@@ -917,12 +908,14 @@ function ProjectsPage() {
                                                                                     if (matchedOption) {
                                                                                     mvalue = (
                                                                                         <span
+                                                                                            className="priority--badge"
                                                                                         style={{
                                                                                             backgroundColor: matchedOption.color,
-                                                                                            padding: '4px 8px',
-                                                                                            borderRadius: '8px',
                                                                                             color: '#fff',
-                                                                                            display: 'inline-block'
+                                                                                            display: 'inline-block',
+                                                                                            borderColor: matchedOption.color,
+                                                                                            borderStyle: 'solid',
+                                                                                            borderWidth: '1px'
                                                                                         }}
                                                                                         >
                                                                                         {project?.customFields?.[fieldname]?.meta_value}
@@ -968,12 +961,9 @@ function ProjectsPage() {
                                             Project <span key="project-action-header" className="onHide">Actions</span>
                                         </div>
                                     </th>
-                                    <th scope="col" key="th-project-status-header" className="onHide">Status <small><TbArrowsSort /></small></th>
-                                    {/* <th scope="col" key="th-project-priority-header" className="onHide">Priority <small><TbArrowsSort /></small></th> */}
-                                    <th scope="col" key="th-project-member-header" className="onHide">Assigned Members <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="th-project-client-header" className="onHide">Start Date <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="th-project-enddata-header" className="onHide">End Date <small><TbArrowsSort /></small></th>
-                                    <th scope="col" key="th-project-due-header" className="onHide">Due Date <small><TbArrowsSort /></small></th>
+                                    <th scope="col" key="th-project-status-header" className="onHide">Status</th>
+                                    {/* <th scope="col" key="th-project-priority-header" className="onHide">Priority</th> */}
+                                    <th scope="col" key="th-project-member-header" className="onHide">Assigned Members</th>
                                 </tr>
                             </thead>
                             <tbody id={`projectable-body`} className="projects--list">
@@ -989,7 +979,7 @@ function ProjectsPage() {
                                                     }}
                                                     key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
                                                         }`}>
-                                                    <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
+                                                    <td className="project--title--td sticky border-bottom" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
                                                         <div className="d-flex justify-content-between border-end flex-wrap">
                                                             <div className="project--name">
                                                                 <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
@@ -1051,9 +1041,6 @@ function ProjectsPage() {
                                                     <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles min__width">
                                                         <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
                                                     </td>
-                                                    <td className="onHide new__td">15/02/2025</td>
-                                                    <td className="onHide new__td">15/02/2025</td>
-                                                    <td className="onHide new__td">15/02/2025</td>
                                                 </tr>
                                             </>)
                                         })
@@ -1123,7 +1110,7 @@ function ProjectsPage() {
                             <ListGroup.Item className="d-lg-flex me-2" key={`work-settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
                         )
                         }
-                        <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+                        <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
                         <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
                     </ListGroup>
                 </div>

@@ -520,7 +520,7 @@ function ClientsPage() {
                    <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-md-flex ms-auto ms-lg-0'}>
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
                       <ListGroup.Item className="d-none d-md-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
-                        <ListGroup.Item onClick={handleToggles}><GrExpand /></ListGroup.Item>
+                        <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
                         {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                           <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
                         )}
@@ -666,7 +666,7 @@ function ClientsPage() {
             </Dropdown>
           </div>
           <ListGroup horizontal className="ms-auto">
-            <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+            <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
             <ListGroup.Item className="btn btn-primary" onClick={() => {handleClosePannel(0);}}><MdOutlineClose /></ListGroup.Item>
           </ListGroup>
         </div>

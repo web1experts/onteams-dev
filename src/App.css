@@ -47,7 +47,7 @@ body {
   justify-content: center;
   border: 0;
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   margin-left: .5rem;
 }
 
@@ -182,7 +182,7 @@ body {
 .team--page .page--title h2 .list-group .expand--icon .btn:focus-visible,
 .team--page .page--title h2 .list-group .expand--icon .btn:focus-within {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
+  background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
   border-color: #0f172a;
   outline: none;
 }
@@ -283,7 +283,7 @@ body {
 }
 
 .page--title .expand--icon .list-group-item:hover, .wrapper--title .expand--icon .list-group-item:hover {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
 }
 
 .page--title .expand--icon .list-group-item:hover svg, .wrapper--title .expand--icon .list-group-item:hover svg {
@@ -316,7 +316,7 @@ body {
 .page--title .list-group-item-action.active,
 .page--title .refresh--btn {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   border: 0;
 }
 
@@ -345,7 +345,7 @@ body {
 
 .page--title .list-group-item-action:hover {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
+  background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
   border: 0;
 }
 
@@ -412,14 +412,14 @@ body {
 }
 
 .page--wrapper .nav-tabs button.active {
-  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
+  background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
   color: #ffffff;
   box-shadow: none;
   border: 2px solid rgb(17 24 39);
 }
 
 .page--wrapper .nav-tabs button:hover {
-  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
+  background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
   color: #ffffff;
   box-shadow: none;
   border: 2px solid rgb(17 24 39);
@@ -538,12 +538,20 @@ body {
   width: 100%;
 }
 
+.table {
+  margin-bottom: 0;
+  table-layout: auto;
+  width: auto;
+  min-width: 100%;
+}
+
 .page--wrapper .draggable--table thead {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
     z-index: 2;
     background: linear-gradient(to right, #f8fafc, #f1f5f9);
+    margin-bottom: -1px;
 }
 
 .page--wrapper .draggable--table th, .page--wrapper .draggable--table td {
@@ -551,8 +559,10 @@ body {
   padding: 1rem;
   border-right: 1px solid rgb(226 232 240);
   border-bottom: 0;
-  min-width: 170px;
-  /* white-space: nowrap; */
+  max-width: 220px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
@@ -606,6 +616,10 @@ body {
     border-bottom: 1px solid rgb(226 232 240) !important;
 }
 
+.border-end {
+  border-right: 1px solid rgb(226 232 240) !important;
+}
+
 .page--wrapper .draggable--table th .padd--x {
   padding: .75rem 1rem;
 }
@@ -621,6 +635,19 @@ body {
 
 .page--wrapper table td {
   font-weight: 500;
+}
+
+.page--wrapper table td span.priority--badge {
+  min-width: 80px;
+  text-align: center;
+  text-transform: capitalize;
+  width: auto;
+    height: auto;
+    border-radius: .5rem;
+    padding: .35rem .75rem;
+    line-height: 1.2;
+    font-size: .8rem;
+    font-weight: 700;
 }
 
 .page--wrapper table th abbr, .page--wrapper table td abbr {
@@ -663,7 +690,7 @@ body {
 
 .page--wrapper table td .title--initial, .team--members--list .title--initial {
   align-items: center;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   border-radius: 100px;
   -webkit-border-radius: 100px;
   color: #ffffff;
@@ -684,7 +711,7 @@ body {
 .show--details .new--project--rows tr.project--active .title--initial,
 .view--project .new--project--rows tr.project--active .title--initial,
 .view--invitee .new--project--rows tr.project--active .title--initial {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   color: #ffffff;
 }
 
@@ -712,13 +739,19 @@ body {
 .page--wrapper table td.project--title--td span,
 .new--project--rows .project--name strong {
   cursor: pointer;
-  display: -webkit-box;
+  /* display: -webkit-box;
   -webkit-line-clamp: 1;
   line-clamp: 1;
-  -webkit-box-orient: vertical;
+  -webkit-box-orient: vertical; */
+  display: block;
+  white-space: nowrap;
   overflow: hidden;
-  max-width: 230px;
+  max-width: 100%;
   text-overflow: ellipsis;
+}
+
+.page--wrapper table td.project--title--td .title--span {
+    max-width: 165px;
 }
 
 .page--wrapper table td.project--title--td span {
@@ -751,7 +784,7 @@ body {
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
   border-radius: 1rem;
-  max-height: calc(100dvh - 140px);
+  max-height: calc(100dvh - 125px);
   border: 1px solid rgb(226 232 240);
 }
 
@@ -800,6 +833,7 @@ table.draggable--table {
   padding: 1rem;
   flex: 1 1;
   min-height: 75px;
+  width: calc(100% - 120px);
 }
 
 .time-tracking--page .new--project--rows .project--title--td .project--name {
@@ -1293,7 +1327,7 @@ span.open--sidebar {
 }
 
 .wrapper--title .list-group-item:hover {
-  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
+  background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
   border: 1px solid transparent;
   color: #ffffff;
 }
@@ -1329,7 +1363,7 @@ span.open--sidebar {
   justify-content: center;
   border: 0;
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   margin-left: .5rem;
 }
 
@@ -1342,7 +1376,7 @@ span.open--sidebar {
 .wrapper--title .list-group-item.btn:focus-visible,
 .wrapper--title .list-group-item.btn:focus-within {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   border-color: rgb(17 24 39);
   outline: none;
 }
@@ -1502,7 +1536,7 @@ span.open--sidebar {
 .wrapper--title .btn--view:hover,
 .wrapper--title .btn--view:focus-visible,
 .wrapper--title .btn-primary:not(:disabled):not(.disabled).active {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   color: #ffffff;
   box-shadow: none !important;
   -webkit-box-shadow: none;
@@ -1919,7 +1953,7 @@ table tr.marked-project td {
 
 .table>:not(caption)>*>* {
   border-top-width: var(--bs-border-width);
-  /* margin-bottom: -1px; */
+  margin-bottom: -1px;
   border-bottom-width: var(--bs-border-width);
   box-shadow: none;
   background: none;
@@ -2402,7 +2436,7 @@ table tr.marked-project td {
   width: auto;
   position: relative;
   background: none;
-  margin-right: -13px;
+  margin-right: -10px;
 }
 
 .projects--page .table .more--member .dropdown-menu,
@@ -2550,7 +2584,7 @@ table tr.marked-project td {
   display: inline-block;
   background: none;
   margin-bottom: 5px;
-  margin-right: -5px;
+  margin-right: 0;
   border: 0;
 }
 
@@ -2606,13 +2640,13 @@ table tr.marked-project td {
 
 .projects--page .table .list-group-item:nth-child(odd) .team--initial, .project--form--actions .list-group-item:nth-child(odd) .team--initial,
 .tasks-form-action .list-group-item:nth-child(odd) .team--initial {
-  background: var(--theme-primary);
+  background: rgba(var(--theme-primary), .7);
   color: #ffffff;
 }
 
 .projects--page .table .list-group-item:nth-child(even) .team--initial, .project--form--actions .list-group-item:nth-child(even) .team--initial,
 .tasks-form-action .list-group-item:nth-child(even) .team--initial {
-  background: var(--theme-secondary);
+  background: rgba(var(--theme-secondary), .7);
   color: #ffffff;
 }
 
@@ -3085,12 +3119,12 @@ Project Task View CSS=-=-=
 }
 
 .wrapper--title .members--list .list-group-item:nth-child(odd) .team--initial {
-  background: var(--theme-primary);
+  background: rgba(var(--theme-primary), .7);
   color: #ffffff;
 }
 
 .wrapper--title .members--list .list-group-item:nth-child(even) .team--initial {
-  background: var(--theme-secondary);
+  background: rgba(var(--theme-secondary), .7);
   color: #ffffff;
 }
 
@@ -3216,7 +3250,7 @@ Project Task View CSS=-=-=
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   color: #ffffff;
   border-radius: 1rem;
   width: 2.5rem;
@@ -3394,8 +3428,8 @@ Project Task View CSS=-=-=
 }
 
 .form-check-input:checked {
-  background-color: var(--theme-primary);
-  border-color: var(--theme-primary);
+  background-color: rgba(var(--theme-primary), 1);
+  border-color: rgba(var(--theme-primary), 1);
 }
 
 .accordion .accordion-body .form-check+.form-check {
@@ -3783,7 +3817,7 @@ pre {
 .timeSheetModal button.list-group-item:focus,
 .timeSheetModal .list-group-horizontal>.list-group-item+.list-group-item.active {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
+  background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
   border: 0;
 }
 
@@ -4626,7 +4660,7 @@ pre {
 }
 
 .dashboard--page .daily--welcome {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   flex-flow: row wrap;
   position: relative
 }
@@ -4784,7 +4818,7 @@ ul#icon-tabs .nav-item.show .nav-link,
 ul#icon-tabs .nav-link.active,
 ul#icon-tabs .nav-link:hover {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-secondary),var(--theme-primary));
+  background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
   border-color: transparent;
 }
 
@@ -5112,7 +5146,7 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .today--card span {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
 }
 
 .heading--text {
@@ -5837,7 +5871,6 @@ ul#icon-tabs .nav-link span svg {
 .page--wrapper .draggable--table tr.marked-project td:first-child,
 .new--project--rows tr.marked-project {
   background: #ecf1fa;
-  border: 1px solid #e3eaf7;
 }
 
 .page--wrapper .draggable--table tr.marked-project td:first-child {
@@ -6364,7 +6397,7 @@ ul#icon-tabs .nav-link span svg {
 
 .modal .single--project--stack .title--initial {
     align-items: center;
-    background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+    background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
     border-radius: .5rem;
     -webkit-border-radius: .5rem;
     color: #ffffff;
@@ -6547,7 +6580,7 @@ ul#icon-tabs .nav-link span svg {
 .show--details .project--grid--table tr.project--active,
 .view--project .project--grid--table tr.project--active,
 .view--invitee .project--grid--table tr.project--active {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   color: #ffffff;
   max-width: 100%;
   padding: 1rem;
@@ -6810,7 +6843,7 @@ Media CSS-=-==
   }
 
   .page--wrapper table td.project--title--td span, .new--project--rows .project--name strong {
-    max-width: 140px;
+    max-width: 100%;
   }
 
   .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {

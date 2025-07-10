@@ -524,7 +524,7 @@ function Invitation(props) {
               </Dropdown.Menu>
             </Dropdown>
           <ListGroup horizontal>
-            <ListGroup.Item nClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
+            <ListGroup.Item nClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
             <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {if (props.toggleActive) {
                 props.toggleActive(false)
               } setIsActive(0);}}><MdOutlineClose /></ListGroup.Item>

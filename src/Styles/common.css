@@ -3,7 +3,7 @@
 }
 
 :root {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
 }
 
 ::-webkit-scrollbar {
@@ -135,14 +135,14 @@ fieldset:disabled .btn {
 
 .btn-primary {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   border: 0;
 }
 
 .btn-outline-primary {
-  color: var(--theme-primary);
+  color: rgba(var(--theme-primary), 1);
   background-color: transparent;
-  border-color: var(--theme-primary);
+  border-color: rgba(var(--theme-primary), 1);
 }
 
 .btn-secondary:not(:disabled):not(.disabled).active:focus,
@@ -170,7 +170,7 @@ fieldset:disabled .btn {
 .btn-primary:not(:disabled):not(.disabled):active,
 .show>.btn-primary.dropdown-toggle {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   border-color: transparent;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;

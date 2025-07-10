@@ -46,7 +46,7 @@ Sidebar CSS-=-=
 }
 
 .navbar-brand span {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -292,7 +292,7 @@ Sidebar CSS-=-=
 }
 
 .panel--sidebar .dropdown a.active-workspace .initial--name {
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   color: #ffffff;
 }
 
@@ -407,7 +407,7 @@ Sidebar CSS-=-=
 .navbar-light .navbar-nav .nav-link:focus .nav--item--icon, 
 .panel--sidebar .dropdown .dropdown-item .theme--item--icon {
   color: #ffffff;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
 }
 
 .navbar-light .navbar-nav .nav-link:hover {
@@ -429,7 +429,7 @@ Sidebar CSS-=-=
   height: .5rem;
   content: '';
   position: absolute;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   top: 0;
   bottom: 0;
   margin: auto 0;
@@ -501,9 +501,6 @@ Sidebar CSS-=-=
 .open--panel--sidebar~.team--page {
   max-width: calc(100% - 0rem);
   margin-left: 0rem;
-  opacity: .8;
-  filter: blur(1.5px);
-  -webkit-filter: blur(1.5px);
 }
 
 .show--details.project-collapse, .view--project.project-collapse, .view--invitee.project-collapse {
@@ -573,7 +570,7 @@ Sidebar CSS-=-=
 
 .current--workspace .dropdown .initial--name {
   align-items: center;
-  background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   color: #ffffff;
@@ -916,6 +913,14 @@ Sidebar CSS-=-=
   .team--page {
     max-width: calc(100% - 0rem);
     margin-left: 0rem;
+  }
+
+  .open--panel--sidebar~.team--page {
+    max-width: calc(100% - 0rem);
+    margin-left: 0rem;
+    opacity: .8;
+    filter: blur(1.5px);
+    -webkit-filter: blur(1.5px);
   }
 }
 
