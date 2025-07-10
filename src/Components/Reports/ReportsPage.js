@@ -41,6 +41,7 @@ const TaskList = ({report} ) => {
 let videosByTask = {};
 
 
+
   if(Array.isArray(report?.activityMetas) && report.activityMetas.length > 0 ){
     const screenshots = {};
   const videos = {};
@@ -503,40 +504,40 @@ const handleReportClose = () => setViewReport(false);
           </Modal.Header>
           <Modal.Body className="p-4">
             <div className="single--project--stack">
-              <div class="d-flex justify-content-between mb-2 align-items-start">
-                <div class="project--name d-flex gap-3 align-items-center">
-                  <div class="title--initial">1</div>
-                  <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+              <div className="d-flex justify-content-between mb-2 align-items-start">
+                <div className="project--name d-flex gap-3 align-items-center">
+                  <div className="title--initial">1</div>
+                  <div className="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
                 </div>
                 <Badge bg="secondary">Day 1</Badge>
               </div>
               <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
             </div>
             <div className="single--project--stack">
-              <div class="d-flex justify-content-between mb-2 align-items-start">
-                <div class="project--name d-flex gap-3 align-items-center">
-                  <div class="title--initial">2</div>
-                  <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+              <div className="d-flex justify-content-between mb-2 align-items-start">
+                <div className="project--name d-flex gap-3 align-items-center">
+                  <div className="title--initial">2</div>
+                  <div className="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
                 </div>
                 <Badge bg="secondary">Day 2</Badge>
               </div>
               <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
             </div>
             <div className="single--project--stack">
-              <div class="d-flex justify-content-between mb-2 align-items-start">
-                <div class="project--name d-flex gap-3 align-items-center">
-                  <div class="title--initial">3</div>
-                  <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+              <div className="d-flex justify-content-between mb-2 align-items-start">
+                <div className="project--name d-flex gap-3 align-items-center">
+                  <div className="title--initial">3</div>
+                  <div className="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
                 </div>
                 <Badge bg="secondary">Day 3</Badge>
               </div>
               <p className="mb-0">Started authentication module development. Initial setup completed successfully.</p>
             </div>
             <div className="single--project--stack">
-              <div class="d-flex justify-content-between mb-2 align-items-start">
-                <div class="project--name d-flex gap-3 align-items-center">
-                  <div class="title--initial">4</div>
-                  <div class="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
+              <div className="d-flex justify-content-between mb-2 align-items-start">
+                <div className="project--name d-flex gap-3 align-items-center">
+                  <div className="title--initial">4</div>
+                  <div className="title--span flex-column d-flex align-items-start gap-0"><span>Progress Update</span><strong>Monday, January 15, 2024</strong></div>
                 </div>
                 <Badge bg="secondary">Day 4</Badge>
               </div>
@@ -572,6 +573,18 @@ function ReportsPage() {
   const [show, setShow] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [spinner, setSpinner] = useState(false)
+
+
+  const filterDisplayLabels = {
+    today: 'Today',
+    yesterday: 'Yesterday',
+    '7days': 'Last 7 days',
+    'last-week': 'Last week',
+    'last2-weeks': 'Last 2 weeks',
+    'this-month': 'This month',
+    'last-month': 'Last month',
+    'custom': 'Custom'
+  };
   
   const handleClose = () => {
     setShow(false);
@@ -764,7 +777,6 @@ function ReportsPage() {
     });
   };
   useEffect(() => {
-    
     handleReports()
   }, [filters])
 
@@ -801,9 +813,11 @@ function ReportsPage() {
     }
 }, [MemberprojectFeed])
 
-  // useEffect(() => { 
-  //   // handlefilterchange('date_range', filtereddate)
-  // }, [filtereddate])
+  useEffect(() => { 
+    if( selectedFilter !== "custom"){
+      handlefilterchange('date_range', filtereddate)
+    }
+  }, [filtereddate])
 
   useEffect(() => {
       if (reportState?.memberReports) { 
@@ -916,8 +930,8 @@ function ReportsPage() {
           } else {
               setFilteredDate([formatDate(start)]);
           }
-          datePickerRef.current.closeCalendar()
-          datePickerRef.current.openCalendar()
+          // datePickerRef.current.closeCalendar()
+          // datePickerRef.current.openCalendar()
       };
   
       const today = new Date();
@@ -954,17 +968,22 @@ function ReportsPage() {
   
   
       return (
-          <>
-              <ListGroup vertical="true" className="date-filters">
-                  <ListGroup.Item className={ selectedFilter === 'today'? 'active': ''} key={'date-today'} onClick={(e) => {handleDateFilter(e, today); setSelectedFilter('today')}}>Today</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'yesterday'? 'active': ''} key={'date-yesterday'} onClick={(e) =>{ handleDateFilter(e, yesterday); setSelectedFilter('yesterday')}}>Yesterday</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === '7days'? 'active': ''} key={'date-7days'} onClick={(e) => {handleDateFilter(e, last7Days, today); setSelectedFilter('7days')}}>Last 7 days</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'last-week'? 'active': ''} key={'date-last-week'} onClick={(e) => {handleDateFilter(e, lastWeekStart, lastWeekEnd); setSelectedFilter('last-week')}}>Last week</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'last2-weeks'? 'active': ''} key={'date-last2-weeks'} onClick={(e) => {handleDateFilter(e, last2WeeksStart, lastWeekEnd); setSelectedFilter('last2-weeks')}}>Last 2 weeks</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'this-month'? 'active': ''} key={'date-this-month'} onClick={(e) => {handleDateFilter(e, thisMonthStart, thisMonthEnd); setSelectedFilter('this-month')}}>This month</ListGroup.Item>
-                  <ListGroup.Item className={ selectedFilter === 'last-month'? 'active': ''} key={'date-last-month'} onClick={(e) => {handleDateFilter(e, lastMonthStart, lastMonthEnd); setSelectedFilter('last-month')}}>Last month</ListGroup.Item>
-              </ListGroup>
-          </>
+          <Dropdown className="select--dropdown">
+            <Dropdown.Toggle variant="success">{filterDisplayLabels[selectedFilter]}</Dropdown.Toggle>
+            <Dropdown.Menu>
+              <div className="drop--scroll">
+                  
+              <Dropdown.Item className={ selectedFilter === 'today'? 'selected--option': ''} key={'date-today'} onClick={(e) => {setSelectedFilter('today');handleDateFilter(e, today); }}>Today</Dropdown.Item>
+              <Dropdown.Item className={ selectedFilter === 'yesterday'? 'selected--option': ''} key={'date-yesterday'} onClick={(e) =>{  setSelectedFilter('yesterday');handleDateFilter(e, yesterday);}}>Yesterday</Dropdown.Item>
+              <Dropdown.Item className={ selectedFilter === '7days'? 'selected--option': ''} key={'date-7days'} onClick={(e) => { setSelectedFilter('7days');handleDateFilter(e, last7Days, today);}}>Last 7 days</Dropdown.Item>
+              <Dropdown.Item className={ selectedFilter === 'last-week'? 'selected--option': ''} key={'date-last-week'} onClick={(e) => { setSelectedFilter('last-week');handleDateFilter(e, lastWeekStart, lastWeekEnd);}}>Last week</Dropdown.Item>
+              <Dropdown.Item className={ selectedFilter === 'last2-weeks'? 'selected--option': ''} key={'date-last2-weeks'} onClick={(e) => {setSelectedFilter('last2-weeks');handleDateFilter(e, last2WeeksStart, lastWeekEnd); }}>Last 2 weeks</Dropdown.Item>
+              <Dropdown.Item className={ selectedFilter === 'this-month'? 'selected--option': ''} key={'date-this-month'} onClick={(e) => { setSelectedFilter('this-month');handleDateFilter(e, thisMonthStart, thisMonthEnd);}}>This month</Dropdown.Item>
+              <Dropdown.Item className={ selectedFilter === 'last-month'? 'selected--option': ''} key={'date-last-month'} onClick={(e) => { setSelectedFilter('last-month');handleDateFilter(e, lastMonthStart, lastMonthEnd);}}>Last month</Dropdown.Item>
+              <Dropdown.Item className={ selectedFilter === 'custom'? 'selected--option': ''} key={'date-custom'} onClick={(e) => { setSelectedFilter('custom');}}>Custom</Dropdown.Item>
+            </div>
+          </Dropdown.Menu>
+        </Dropdown>
       );
   };
 
@@ -1224,109 +1243,43 @@ const handleToggles = () => {
                                       <option value="completed">Completed</option>
                                   </Form.Select>
                                 </ListGroup.Item>
-                                
-                                {
-                              view === 'group' ? 
-                              <></>
-                            //   <ListGroup.Item className="d-none d-xl-block">
-                            //   <Form>
-                            //     <Form.Group className="mb-0 form-group">
-                            //     <DatePicker 
-                            //       ref={datePickerRef}
-                            //       key={'date-filter'}
-                            //       name="date"
-                            //       weekStartDayIndex={1}
-                            //       id='datepicker-filter'
-                            //       value={filtereddate} 
-                            //       format="YYYY-MM-DD"
-                            //       range
-                            //       numberOfMonths={2}
-                            //       dateSeparator=" - " 
-                            //       onChange={async (value) => {
-                            //           setFilteredDate(value)
-                            //         }
-                            //       } 
-                            //       editable={false}         
-                            //       className="form-control"
-                            //       placeholder="dd/mm/yyyy"
-                            //       open={isPickerOpen} // Control visibility with state
-                            //       onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                            //       onClose={() => setIsPickerOpen(false)} // Update state when closed
-                            //       plugins={
-                            //         [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
-                            //       } 
-                            //   />
-                            //     </Form.Group>
-                            //   </Form>
-                            // </ListGroup.Item>
-                            :
-                            <></>
-                              // <ListGroup.Item className="d-none d-xl-block">
-                              //   <Form>
-                              //     <Form.Group className="mb-0 form-group">
-                              //       <DatePicker 
-                              //         ref={datePickerRef}
-                              //         key={'date-filter'}
-                              //         name="date"
-                              //         weekStartDayIndex={1}
-                              //         id='datepicker-filter'
-                              //         editable={false}
-                              //         value={filtereddate} 
-                              //         format="YYYY-MM-DD"
-                              //         dateSeparator=" - " 
-                              //         onChange={async (value) => {
-                              //             setFilteredDate(value)
-                              //             datePickerRef.current.closeCalendar()
-                              //             datePickerRef.current.openCalendar()
-                              //           }
-                              //         }          
-                              //         className="form-control"
-                              //         placeholder="dd/mm/yyyy"
-                              //         open={isPickerOpen} // Control visibility with state
-                              //         onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                              //         onClose={() => setIsPickerOpen(false)} // Update state when closed
-                              //         plugins={
-                              //           [<FilterButton position="bottom" />]
-                              //         } 
-                              //         range={false}
-                              //         multiple={false}
-                              //       />
-                              //     </Form.Group>
-                              //   </Form>
-                              // </ListGroup.Item>
-                              }
-                              
                               </>
                             }
                             <ListGroup.Item className="d-none d-xl-block">
                             <Form>
-                             <Form.Group className="mb-0 form-group">
-                              <DatePicker 
-                                  ref={datePickerRef}
-                                  key={'date-filter'}
-                                  name="date"
-                                  weekStartDayIndex={1}
-                                  id='datepicker-filter'
-                                  value={filtereddate} 
-                                  format="YYYY-MM-DD"
-                                  range
-                                  numberOfMonths={2}
-                                  dateSeparator=" - " 
-                                  onChange={async (value) => {
-                                      setFilteredDate(value)
-                                    }
-                                  } 
-                                  editable={false}         
-                                  className="form-control"
-                                  placeholder="dd/mm/yyyy"
-                                  open={isPickerOpen} // Control visibility with state
-                                  onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                                  onClose={() => setIsPickerOpen(false)} // Update state when closed
-                                  plugins={
-                                    [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
-                                  } 
-                              />
-                                </Form.Group>
+                              <Form.Group className="mb-0 form-group me-2">
+                              <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />
+                              </Form.Group>
+                              {
+                              (selectedFilter === 'custom') && (
+                              <Form.Group className="mb-0 form-group">
+                                <DatePicker 
+                                    ref={datePickerRef}
+                                    key={'date-filter'}
+                                    name="date"
+                                    weekStartDayIndex={1}
+                                    id='datepicker-filter'
+                                    value={filtereddate} 
+                                    format="YYYY-MM-DD"
+                                    range
+                                    numberOfMonths={2}
+                                    dateSeparator=" - " 
+                                    onChange={async (value) => {
+                                        setFilteredDate(value)
+                                      }
+                                    } 
+                                    editable={false}         
+                                    className="form-control"
+                                    placeholder="dd/mm/yyyy"
+                                    open={isPickerOpen} // Control visibility with state
+                                    onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                                    onClose={() => setIsPickerOpen(false)} // Update state when closed
+                                    plugins={
+                                      [<FilterButton position="bottom" />]
+                                    } 
+                                />
+                                  </Form.Group>
+                              )}
                               </Form>
                             </ListGroup.Item>
                             { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
@@ -1371,7 +1324,7 @@ const handleToggles = () => {
                     <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">
-                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Member</th>
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Project</th>
                           <th scope="col" key="client-ttime-header" className="onHide ms-auto">Total Hours</th>
                           <th scope="col" key="client-time-header" className="onHide">Members</th>
                           <th scope="col" key="client-action-header" className="onHide">Action</th>
@@ -1427,11 +1380,11 @@ const handleToggles = () => {
                   <div className='attendance--table--list'>
                     <Table responsive="lg">
                       <thead className="onHide">
-                        <tr key="project-table-header">
-                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Member</th>
-                          <th scope="col" key="client-time-header" className="onHide ms-auto">Total Hours</th>
-                          <th scope="col" key="client-time-header" className="onHide">Projects</th>
-                          <th scope="col" key="client-action-header" className="onHide">Action</th>
+                        <tr key="project-table-header-member">
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header-member">Member</th>
+                          <th scope="col" key="client-time-header-member" className="onHide ms-auto">Total Hours</th>
+                          <th scope="col" key="client-projects-header-member" className="onHide">Projects</th>
+                          <th scope="col" key="client-action-header-member" className="onHide">Action</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white">
@@ -1440,7 +1393,7 @@ const handleToggles = () => {
                             memberReports.map((report, index) => {
                               const result = getProjectSummary(report.reports, 'both'); 
                               return (
-                                <tr>
+                                <tr key={`report-key-${index}`}>
                                   <td>
                                     <div className="d-flex justify-content-between">
                                       <div className="project--name d-flex gap-3 align-items-center">
@@ -1479,29 +1432,57 @@ const handleToggles = () => {
         <div className="wrapper--title py-2 bg-white border-bottom">
             <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
             <div className="projecttitle me-auto">
-              <Dropdown>
-                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                  <h3>
-                    <strong>{singleMemberReport?.member?.name}</strong>
-                    <span>{singleMemberReport?.member?.role}</span>
-                  </h3>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    <div className="drop--scroll">
-                      {
-                          (memberReports && memberReports.length > 0) && 
-                            memberReports.map((report, index) => {
+              {
+                (isActive === 1 && activeMemberTab === 'members') ?
+                <Dropdown>
+                  <Dropdown.Toggle variant="link" id="dropdown-basic">
+                    <h3>
+                      <strong>{singleMemberReport?.member?.name}</strong>
+                      <span>{singleMemberReport?.member?.role}</span>
+                    </h3>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                      <div className="drop--scroll">
+                        {
+                            (memberReports && memberReports.length > 0) && 
+                              memberReports.map((report, index) => {
+                                return (
+                                <Dropdown.Item onClick={() => { setSingleMemberReport(report); setIsActive(1);}}>
+                                  <strong>{report?.member?.name}</strong>
+                                  <span>{report?.member?.role}</span>
+                                </Dropdown.Item>
+                                )
+                              })
+                            }
+                      </div>
+                  </Dropdown.Menu>
+                </Dropdown>
+                :
+                  <Dropdown>
+                    <Dropdown.Toggle variant="link" id="dropdown-basic">
+                      <h3>
+                        <strong>{singleMemberReport?.title}</strong>
+                        <span>{singleMemberReport?.client?.name}</span>
+                      </h3>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        <div className="drop--scroll">
+                          {
+                            (projectReports?.reports && projectReports?.reports?.length > 0) && (
+                            projectReports?.reports?.map((reportData, i) => {
                               return (
-                              <Dropdown.Item onClick={() => { setSingleMemberReport(report); setIsActive(1);}}>
-                                <strong>{report?.member?.name}</strong>
-                                <span>{report?.member?.role}</span>
-                              </Dropdown.Item>
+                                <Dropdown.Item onClick={() => { setSingleMemberReport(reportData); }}>
+                                  <strong>{reportData?.title}</strong>
+                                  <span>{reportData?.client?.name}</span>
+                                </Dropdown.Item>
                               )
-                            })
+                              
+                            }))
                           }
-                    </div>
-                </Dropdown.Menu>
-              </Dropdown>
+                        </div>
+                    </Dropdown.Menu>
+                  </Dropdown>
+              }
             </div>
             <ListGroup horizontal>
               <ListGroup.Item onClick={handleToggles} className="d-none d-sm-flex"><GrExpand /></ListGroup.Item>
@@ -1513,15 +1494,15 @@ const handleToggles = () => {
         
           <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
             <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
-              <h3 class="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects ({singleMemberReport?.reports?.length || 0})</h3>
-              <div class="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
-                <div class="text-center">
-                    <div class="text-lg font-bold text--blue">{getProjectSummary(singleMemberReport?.reports, 'time')}</div>
-                    <div class="text-slate-600">Total Hours</div>
+              <h3 className="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects ({singleMemberReport?.reports?.length || 0})</h3>
+              <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+                <div className="text-center">
+                    <div className="text-lg font-bold text--blue">{getProjectSummary(singleMemberReport?.reports, 'time')}</div>
+                    <div className="text-slate-600">Total Hours</div>
                 </div>
-                <div class="text-center">
-                    <div class="text-lg font-bold text--green">{singleMemberReport?.reports?.length || 0}</div>
-                    <div class="text-slate-600">Projects</div>
+                <div className="text-center">
+                    <div className="text-lg font-bold text--green">{singleMemberReport?.reports?.length || 0}</div>
+                    <div className="text-slate-600">Projects</div>
                 </div>
               </div>
             </div>
@@ -1579,16 +1560,16 @@ const handleToggles = () => {
           
         <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
           <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
-            <h3 class="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members ({singleMemberReport?.members?.length || 0})</h3>
-            <div class="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
-              <div class="text-center">
-                  <div class="text-lg font-bold text--blue">113h 15m</div>
-                  <div class="text-slate-600">Total Hours</div>
+            <h3 className="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members ({singleMemberReport?.members?.length || 0})</h3>
+            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+              {/* <div className="text-center">
+                  <div className="text-lg font-bold text--blue">113h 15m</div>
+                  <div className="text-slate-600">Total Hours</div>
               </div>
-              <div class="text-center">
-                  <div class="text-lg font-bold text--green">{singleMemberReport?.members?.length || 0}</div>
-                  <div class="text-slate-600">Members</div>
-              </div>
+              <div className="text-center">
+                  <div className="text-lg font-bold text--green">{singleMemberReport?.members?.length || 0}</div>
+                  <div className="text-slate-600">Members</div>
+              </div> */}
             </div>
           </div>
           {
@@ -1675,10 +1656,10 @@ const handleToggles = () => {
                     <div className="drop--scroll">
                       <Form.Select className="form-control custom-selectbox" id="projects"
                         value={selectedproject._id} onChange={handleProjectSelect} name="project">
-                          <option value={''}>Select Project</option>
+                          <option key="blank" value={''}>Select Project</option>
                         {
                           memberprojects.map(project => (
-                            <option data-project={JSON.stringify(project)} value={project._id}>{project.title}</option>
+                            <option key={`${project._id}-opt`} data-project={JSON.stringify(project)} value={project._id}>{project.title}</option>
                           ))
                         }
                       </Form.Select>

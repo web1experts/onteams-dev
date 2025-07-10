@@ -25,6 +25,17 @@ import "media-chrome";
 import "media-chrome/dist/menu";
 
 function TimeTrackingPage() {
+  const filterDisplayLabels = {
+    today: 'Today',
+    yesterday: 'Yesterday',
+    '7days': 'Last 7 days',
+    'last-week': 'Last week',
+    'last2-weeks': 'Last 2 weeks',
+    'this-month': 'This month',
+    'last-month': 'Last month',
+    'custom': 'Custom'
+  };
+
   const memberProfile = currentMemberProfile()
   let totalhours = 0;
   let totalProjecthours = 0
@@ -43,19 +54,6 @@ function TimeTrackingPage() {
   const [ recordedRefresh, setRecordedRefresh ] = useState(true)
   const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
-  const commonState = useSelector(state => state.common)
-  const handleClick = (activity) => {
-    setIsActive(current => !current);
-    setRecordedRefresh( true )
-
-    socket.emit('get-tracker-status-update', {userID: activity._id})
-    setCurrentActivity( activity)
-    if(activeTab === "Recordings"){
-      setActiveInnerTab("InnerRecorded")
-    }else{
-      setActiveInnerTab("InnerLive")
-    }
-  };
   const options = { day: '2-digit', month: 'long', year: 'numeric' };
   const [currentActivity, setCurrentActivity] = useState(false);
   const dispatch = useDispatch()
@@ -67,30 +65,49 @@ function TimeTrackingPage() {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
-  const activitystate = useSelector((state) => state.activity)
   const [liveactivities, setLiveactivities] = useState([])
   const [ recordedactivities, setRecordedActivities] = useState([])
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setsearchTerm] = useState("");
   const [ filters, setFilters] = useState({});
+  const filtersRef = useRef(filters); 
+  const [ date, setDate ] = useState('')
   const [showFilter, setFilterShow] = useState(false);
+  const [selectedFilter, setSelectedFilter ] = useState('today')
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [showSearch, setSearchShow] = useState(false);
+  const [selectedScreenshots, setSelectedScreenshots] = useState({});
+  const activitystate = useSelector((state) => state.activity)
+  
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
-  const [ date, setDate ] = useState('')
+  
   const [ filtereddate, setFilteredDate ] = useState([new Date().toISOString().split('T')[0]])
   const [currentVideoPage, setCurrentVideoPage] = useState({});
   const videosPerPage = 12; // Adjust as needed
   
-  const [selectedFilter, setSelectedFilter ] = useState('today')
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [showSearch, setSearchShow] = useState(false);
+  
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
 
+  const commonState = useSelector(state => state.common)
+  const handleClick = (activity) => {
+    setIsActive(true);
+    setRecordedRefresh( true )
+
+    socket.emit('get-tracker-status-update', {userID: activity._id})
+    setCurrentActivity( activity)
+    if(activeTab === "Recordings"){
+      setActiveInnerTab("InnerRecorded")
+    }else{
+      setActiveInnerTab("InnerLive")
+    }
+  };
+  
   const videoRef = useRef(null);
   const videoPlyrRef = useRef(null)
 
-  const [selectedScreenshots, setSelectedScreenshots] = useState({});
+  
 
   const handleSelectRecording = (activityId, index) => {
     setSelectedScreenshots(prev => {
@@ -128,11 +145,13 @@ function TimeTrackingPage() {
      socket.emit('leaveRoom', socket.id, room )
    }
   const handleLiveActivityList = async () => {
+    const currentFilters = filtersRef.current;
     let selectedfilters = { currentPage: currentPage, status: activeTab.toLowerCase(), date_range: filtereddate }
-    if (Object.keys(filters).length > 0) {
-        selectedfilters = { ...selectedfilters, ...filters }
+    
+    if (Object.keys(currentFilters).length > 0) {
+        selectedfilters = { ...selectedfilters, ...currentFilters }
     }
-
+    
     if( memberProfile?.permissions?.tracking?.view_others === true && memberProfile?.permissions?.tracking?.selected_members?.length > 0){
       selectedfilters = { ...selectedfilters, ['selected_members']: memberProfile?.permissions?.tracking?.selected_members  }
     }else{
@@ -142,7 +161,6 @@ function TimeTrackingPage() {
     await dispatch(getliveActivity(selectedfilters))
     setSpinner(false)
   }
-  
 
   const handleRecordedActivity = async () => {
     setActSpinner(true)
@@ -150,6 +168,12 @@ function TimeTrackingPage() {
     setActSpinner(false)
   }
 
+  useEffect(() => {
+    if(selectedFilter !== "custom"){
+      handleRecordedActivity()
+    }
+    
+  }, [filtereddate])
   
   const handleToggler = event => {
     setIsScreenActive(current => !current);
@@ -169,12 +193,14 @@ function TimeTrackingPage() {
 
   useEffect(() => {
     setActSpinner( false )
+    
     if(currentActivity !== false && activeTab === "Live" || currentActivity !== false && activeInnerTab === "InnerLive"){ 
         setSpinner( false )
         startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
     }
     if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true || currentActivity !== false && activeTab === "Recordings" && recordedRefresh === true){
       // setActiveInnerTab("InnerRecorded")
+   
       handleRecordedActivity()
     }
     if(currentActivity?.latestActivity?.status === false){
@@ -184,7 +210,8 @@ function TimeTrackingPage() {
 
    useEffect(() => {
     if (Object.keys(filters).length > 0 && !showFilter) {
-        handleLiveActivityList()
+      filtersRef.current = filters;
+      handleLiveActivityList()
     }
   }, [filters])
 
@@ -504,8 +531,13 @@ function TimeTrackingPage() {
         } else {
             setFilteredDate([formatDate(start)]);
         }
-        datePickerRef.current.closeCalendar()
-        datePickerRef.current.openCalendar()
+        
+        // setTimeout(() => {
+        //   handleRecordedActivity()
+        // },1000)
+      // datePickerRef.current.closeCalendar()
+      //   datePickerRef.current.openCalendar()
+        
     };
 
     const today = new Date();
@@ -542,105 +574,92 @@ function TimeTrackingPage() {
 
 
     return (
-        <>
-            <ListGroup vertical="true" className="date-filters">
-                <ListGroup.Item className={ selectedFilter === 'today'? 'active': ''} key={'date-today'} onClick={(e) => {handleDateFilter(e, today); setSelectedFilter('today')}}>Today</ListGroup.Item>
-                <ListGroup.Item className={ selectedFilter === 'yesterday'? 'active': ''} key={'date-yesterday'} onClick={(e) =>{ handleDateFilter(e, yesterday); setSelectedFilter('yesterday')}}>Yesterday</ListGroup.Item>
-                <ListGroup.Item className={ selectedFilter === '7days'? 'active': ''} key={'date-7days'} onClick={(e) => {handleDateFilter(e, last7Days, today); setSelectedFilter('7days')}}>Last 7 days</ListGroup.Item>
-                <ListGroup.Item className={ selectedFilter === 'last-week'? 'active': ''} key={'date-last-week'} onClick={(e) => {handleDateFilter(e, lastWeekStart, lastWeekEnd); setSelectedFilter('last-week')}}>Last week</ListGroup.Item>
-                <ListGroup.Item className={ selectedFilter === 'last2-weeks'? 'active': ''} key={'date-last2-weeks'} onClick={(e) => {handleDateFilter(e, last2WeeksStart, lastWeekEnd); setSelectedFilter('last2-weeks')}}>Last 2 weeks</ListGroup.Item>
-                <ListGroup.Item className={ selectedFilter === 'this-month'? 'active': ''} key={'date-this-month'} onClick={(e) => {handleDateFilter(e, thisMonthStart, thisMonthEnd); setSelectedFilter('this-month')}}>This month</ListGroup.Item>
-                <ListGroup.Item className={ selectedFilter === 'last-month'? 'active': ''} key={'date-last-month'} onClick={(e) => {handleDateFilter(e, lastMonthStart, lastMonthEnd); setSelectedFilter('last-month')}}>Last month</ListGroup.Item>
-            </ListGroup>
-        </>
+        <Dropdown className="select--dropdown">
+                  <Dropdown.Toggle variant="success">{filterDisplayLabels[selectedFilter]}</Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <div className="drop--scroll">
+             
+          <Dropdown.Item className={ selectedFilter === 'today'? 'selected--option': ''} key={'date-today'} onClick={(e) => {setSelectedFilter('today');handleDateFilter(e, today); }}>Today</Dropdown.Item>
+          <Dropdown.Item className={ selectedFilter === 'yesterday'? 'selected--option': ''} key={'date-yesterday'} onClick={(e) =>{  setSelectedFilter('yesterday');handleDateFilter(e, yesterday);}}>Yesterday</Dropdown.Item>
+          <Dropdown.Item className={ selectedFilter === '7days'? 'selected--option': ''} key={'date-7days'} onClick={(e) => { setSelectedFilter('7days');handleDateFilter(e, last7Days, today);}}>Last 7 days</Dropdown.Item>
+          <Dropdown.Item className={ selectedFilter === 'last-week'? 'selected--option': ''} key={'date-last-week'} onClick={(e) => { setSelectedFilter('last-week');handleDateFilter(e, lastWeekStart, lastWeekEnd);}}>Last week</Dropdown.Item>
+          <Dropdown.Item className={ selectedFilter === 'last2-weeks'? 'selected--option': ''} key={'date-last2-weeks'} onClick={(e) => {setSelectedFilter('last2-weeks');handleDateFilter(e, last2WeeksStart, lastWeekEnd); }}>Last 2 weeks</Dropdown.Item>
+          <Dropdown.Item className={ selectedFilter === 'this-month'? 'selected--option': ''} key={'date-this-month'} onClick={(e) => { setSelectedFilter('this-month');handleDateFilter(e, thisMonthStart, thisMonthEnd);}}>This month</Dropdown.Item>
+          <Dropdown.Item className={ selectedFilter === 'last-month'? 'selected--option': ''} key={'date-last-month'} onClick={(e) => { setSelectedFilter('last-month');handleDateFilter(e, lastMonthStart, lastMonthEnd);}}>Last month</Dropdown.Item>
+          <Dropdown.Item className={ selectedFilter === 'custom'? 'selected--option': ''} key={'date-custom'} onClick={(e) => { setSelectedFilter('custom');}}>Custom</Dropdown.Item>
+       </div>
+      </Dropdown.Menu>
+    </Dropdown>
     );
 };
 
   const showDate = () => {
-    // if (activeInnerTab === 'InnerRecorded') {
+    if (activeInnerTab === 'InnerRecorded') {
       return (
         <>
           <ListGroup.Item className="no--style">
             <Form className="d-flex align-items-center">
               <Form.Group className="mb-0 form-group me-2">
-                <Dropdown className="select--dropdown">
-                  <Dropdown.Toggle variant="success">Today</Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <div className="drop--scroll">
-                      <Dropdown.Item className="selected--option" href="#/action-1">Today</Dropdown.Item>
-                      <Dropdown.Item href="#/action-1">Yesterday</Dropdown.Item>
-                      <Dropdown.Item href="#/action-1">Last 7 days</Dropdown.Item>
-                      <Dropdown.Item href="#/action-1">Last week</Dropdown.Item>
-                      <Dropdown.Item href="#/action-1">Last 2 weeks</Dropdown.Item>
-                      <Dropdown.Item href="#/action-1">This month</Dropdown.Item>
-                      <Dropdown.Item href="#/action-1">Last month</Dropdown.Item>
-                      <Dropdown.Item href="#/action-1">Custom</Dropdown.Item>
-                    </div>
-                  </Dropdown.Menu>
-                </Dropdown>
-                {/* <Form.Select className="custom-selectbox">
-                  <option selected>Today</option>
-                  <option value="Yesterday">Yesterday</option>
-                  <option value="Last 7 days">Last 7 days</option>
-                  <option value="Last week">Last week</option>
-                  <option value="Last 2 weeks">Last 2 weeks</option>
-                  <option value="This month">This month</option>
-                  <option value="Last month">Last month</option>
-                  <option value="custom">Custom</option>
-                </Form.Select> */}
+                
+              <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />
+                   
               </Form.Group>
-              {/* <Form.Group className="mb-0 form-group">
-                <DatePicker 
-                    key={'date-filter'}
-                    ref={datePickerRef}
-                    name="date"
-                    weekStartDayIndex={1}
-                    id='datepicker-filter'
-                    value={filtereddate} 
-                    format="YYYY-MM-DD"
-                    range
-                    multiple={false}
-                    numberOfMonths={2}
-                    dateSeparator=" - " 
-                    onChange={async (value) => {
-                        // setFilteredDate(value)
-                        const formatDate = (date) => {
-                          const d = new Date(date);
-                          const year = d.getFullYear();
-                          const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-                          const day = String(d.getDate()).padStart(2, '0');
-                          return `${year}-${month}-${day}`;
-                        };
+              {
+                (selectedFilter === 'custom') && (
+                  <Form.Group className="mb-0 form-group">
+                    <DatePicker 
+                        key={'date-filter'}
+                        ref={datePickerRef}
+                        name="date"
+                        weekStartDayIndex={1}
+                        id='datepicker-filter'
+                        value={filtereddate} 
+                        format="YYYY-MM-DD"
+                        range
+                        multiple={false}
+                        numberOfMonths={2}
+                        dateSeparator=" - " 
+                        onChange={async (value) => {
+                            const formatDate = (date) => {
+                              const d = new Date(date);
+                              const year = d.getFullYear();
+                              const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+                              const day = String(d.getDate()).padStart(2, '0');
+                              return `${year}-${month}-${day}`;
+                            };
 
-                        if (Array.isArray(value)) {
-                          const formatted = value.map(formatDate);
-                          setFilteredDate(formatted);
-                        } else {
-                          const formatted = formatDate(value);
-                          setFilteredDate(formatted);
-                        }
-                      }
-                    }          
-                    className="form-control"
-                    placeholder="dd/mm/yyyy"
-                    open={isPickerOpen} // Control visibility with state
-                    onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                    onClose={() => setIsPickerOpen(false)} // Update state when closed
-                    plugins={
-                      [<FilterButton position="bottom" />, <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />]
-                    } 
-                />
-              </Form.Group> */}
+                            if (Array.isArray(value)) {
+                              const formatted = value.map(formatDate);
+                              setFilteredDate(formatted);
+                            } else {
+                              const formatted = formatDate(value);
+                              setFilteredDate(formatted);
+                            }
+                          }
+                        }          
+                        className="form-control"
+                        placeholder="dd/mm/yyyy"
+                        open={isPickerOpen} // Control visibility with state
+                        onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                        onClose={() => setIsPickerOpen(false)} // Update state when closed
+                        plugins={
+                          [<FilterButton position="bottom" />]
+                        } 
+                    />
+                  </Form.Group>
+                )
+              }
+               
             </Form>
           </ListGroup.Item>
         </>
       )
-    // } else {
-    //   return (
-    //     <>
-    //     </>
-    //   )
-    // }
+    } else {
+      return (
+        <>
+        </>
+      )
+    }
   }
 
   const showRecordedTabs = () => {
@@ -662,11 +681,6 @@ function TimeTrackingPage() {
       )
     }
   }
-  
-
-  const getActiveTab = (recordingId) => screenshotTab[recordingId] || "Screenshots";
-
-  
 
   return (
     <>
@@ -730,7 +744,7 @@ function TimeTrackingPage() {
           },
         }}
       />
-
+      
       <div className={isActive ? "show--details team--page" : "team--page"}>
         <div className='page--title px-md-2 py-3 bg-white border-bottom'>
           <Container fluid>
@@ -754,10 +768,10 @@ function TimeTrackingPage() {
                     </ListGroup>
                     {showTabs()}
                     <ListGroup.Item key="filter-key-6" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-                      <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('tracker_status', event.target.value)} value={filters['status'] || 'all'}>
+                      <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('tracker_status', event.target.value)} value={filters['tracker_status'] || 'all'}>
                           <option value="all">View All</option>
                           <option value="active">Active</option>
-                          <option value="pause">Paused</option>
+                          <option value="pause">On Break</option>
                           <option value="inactive">Inactive</option>
                       </Form.Select>
                       
@@ -1032,6 +1046,7 @@ function TimeTrackingPage() {
           </Container>
         </div>
       </div>
+      {(isActive === true) &&
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
           <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
@@ -1159,7 +1174,7 @@ function TimeTrackingPage() {
                       <div className="screens--tabs">
                         <Accordion.Header>
                           <h4 className="d-flex align-items-center gap-3 justify-content-between">
-                            <strong><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building2 w-4 h-4 text-blue-600"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg></span>{recording?.project?.title}</strong>
+                            <strong><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-building2 w-4 h-4 text-blue-600"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg></span>{recording?.project?.title}</strong>
                             <strong className="activity-type-text d-flex align-items-center gap-2"><HiOutlineLightningBolt /> {recording?.type }</strong>
                           </h4>
                           <p><small className="d-flex align-items-center gap-2"><FiUser /> {recording?.project?.client?.name}</small></p>
@@ -1341,6 +1356,7 @@ function TimeTrackingPage() {
           
         </div>
       </div>
+      }
       {/*--=-=Filter Modal**/}
       <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal">
         <Modal.Header closeButton>
