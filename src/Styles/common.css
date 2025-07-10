@@ -119,6 +119,20 @@ fieldset:disabled .btn {
   border-color: transparent;
 }
 
+.dropdown .dropdown-item .active--color {
+  background: green;
+  animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
+  -webkit-animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
+}
+
+.dropdown .dropdown-item .idle--color {
+  background: goldenrod;
+}
+
+.dropdown .dropdown-item .inactive--color {
+  background: darkgray;
+}
+
 .btn-primary {
   color: #ffffff;
   background: linear-gradient(to right,var(--theme-primary),var(--theme-secondary));

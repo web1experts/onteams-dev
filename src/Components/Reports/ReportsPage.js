@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, ButtonGroup } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaRegEdit, FaCheck, FaAngleRight, FaPlus, FaTrash, FaEye } from "react-icons/fa";
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
@@ -573,7 +573,7 @@ function ReportsPage() {
   const [show, setShow] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [spinner, setSpinner] = useState(false)
-
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filterDisplayLabels = {
     today: 'Today',
@@ -635,7 +635,7 @@ function ReportsPage() {
   const [ searchEntries, setSearchEntries] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
-  const [ filters, setFilters] = useState({member: memberdata?._id, sort_by: 'members','project_status': 'in-progress'});
+  const [ filters, setFilters] = useState({member: memberdata?._id, sort_by: 'members','project_status': 'in-progress', page: 1});
   const [ selectedproject, setSelectedProject] = useState('')
   const [ selectedTask, setSelectedTask] = useState('');
   const [showFilter, setFilterShow] = useState(false);
@@ -670,7 +670,7 @@ function ReportsPage() {
 
   const handlefilterchange = (name, value) => {
     setFilters({ ...filters, [name]: value })
-    if( name === 'sort_by'){
+    if( name === 'sort_by'){ 
       setTimeout(function(){
         selectboxObserver()
       },10)
@@ -706,6 +706,37 @@ function ReportsPage() {
     }
     
 }
+
+function getProjectTabSummary(projectReport) {
+    const membersCount = projectReport?.members?.length;
+
+    let totalDuration = 0;
+    if(projectReport?.members?.length > 0){
+      projectReport.members.forEach(report => {
+        report.activities.forEach(activity => {
+            totalDuration += activity.duration || 0;
+        });
+    });
+    }
+    
+    const hours = Math.floor(totalDuration / 3600);
+    const minutes = Math.floor((totalDuration % 3600) / 60);
+
+    const formattedTime = `${hours}h ${minutes}m`;
+    //if( arg === 'both'){
+      return {
+        totalMembers: membersCount,
+        totalTime: formattedTime
+      };
+   // }
+    // else if(arg === 'project_count'){
+    //   return projectCount
+    // }else if(arg === 'time'){
+    //   return formattedTime
+    // }
+    
+}
+
 
 
   const handleListProjects = async () => {
@@ -833,6 +864,21 @@ function ReportsPage() {
         setOccupiedRanges(calculateOccupiedRanges(reportState.singleProjectReport))
       }
     }, [reportState])
+
+    const goToPrevious = () => {
+      if (filters?.page > 1) {
+        const newPage = filters?.page - 1;
+        setFilters({...filters, ['page']: newPage})
+      }
+    };
+
+    const goToNext = () => {
+      if (filters?.page < projectReports?.totalPages) {
+        const newPage = filters?.page + 1;
+        setFilters({...filters, ['page']: newPage})
+      }
+    };
+
 
     const showRecordedTabs = () => {
         
@@ -1228,8 +1274,8 @@ const handleToggles = () => {
                           </p>
                           <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
                             <ListGroup horizontal className={isActive ? "d-none" : "d-none d-md-flex"}>
-                              <ListGroup.Item action onClick={() => {setFilters({...filters, ['sort_by']:'members'});setActiveViewTab('members')}} className={`${activeMemberTab === 'members'? 'd-md-flex gap-2 active d-none': 'd-none d-md-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
-                              <ListGroup.Item action onClick={() => {setFilters({...filters, ['sort_by']:'projects'});setActiveViewTab('projects')}} className={`${activeMemberTab === 'projects'? 'd-md-flex gap-2 active d-none': 'd-none d-md-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                              <ListGroup.Item action onClick={() => {handlefilterchange('sort_by', 'members');setActiveViewTab('members')}} className={`${activeMemberTab === 'members'? 'd-md-flex gap-2 active d-none': 'd-none d-md-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
+                              <ListGroup.Item action onClick={() => {handlefilterchange('sort_by', 'projects');setActiveViewTab('projects')}} className={`${activeMemberTab === 'projects'? 'd-md-flex gap-2 active d-none': 'd-none d-md-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
                             </ListGroup>
                             {
                               filters['sort_by'] === 'projects' &&
@@ -1334,12 +1380,13 @@ const handleToggles = () => {
                         {
                           (projectReports?.reports && projectReports?.reports?.length > 0) && (
                             projectReports?.reports?.map((reportData, i) => {
+                              const result = getProjectTabSummary(reportData); 
                               return (
                                 <tr>
                                   <td>
                                     <div className="d-flex justify-content-between">
                                       <div className="project--name d-flex gap-3 align-items-center">
-                                          <div className="drag--indicator"><abbr>1</abbr><MdDragIndicator /></div>
+                                          <div className="drag--indicator"><abbr>{i+1}</abbr><MdDragIndicator /></div>
                                           <div className="title--initial">{reportData?.title?.substring(0,2)}</div>
                                           <div className="title--span flex-column d-flex align-items-start gap-0">
                                               <span>{reportData?.title}</span>
@@ -1349,12 +1396,11 @@ const handleToggles = () => {
                                     </div>
                                   </td>
                                   <td className="ms-auto text-start text-xl-center">
-                                    {/* <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
                                     <br className="d-xl-none"/>
-                                    {reportData?.members?.length || 0} */}
+                                    {result?.totalTime || 0}
                                   </td>
-                                  <td className="ms-auto text-start text-xl-center">
-                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Members</strong>
+                                  <td className="text-start text-xl-center"><strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Members</strong>
                                     <br className="d-xl-none"/>
                                     {reportData?.members?.length || 0}
                                   </td>
@@ -1370,6 +1416,18 @@ const handleToggles = () => {
                         
                       </tbody>
                     </Table>
+                    {
+                      (projectReports?.totalPages > 1) && (
+                        <ButtonGroup>
+                          <Button variant="light" onClick={goToPrevious} disabled={filters?.page === 1}>
+                            ◀
+                          </Button>
+                          <Button variant="light" onClick={goToNext} disabled={filters?.page === projectReports?.totalPages}>
+                            ▶
+                          </Button>
+                        </ButtonGroup>
+                      )
+                    }
                 </div>
               </div>
             )}

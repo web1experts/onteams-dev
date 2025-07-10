@@ -1054,7 +1054,17 @@ function TimeTrackingPage() {
             <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                     <h3>
-                        <strong>{currentActivity?.name}</strong>
+                        <strong>{currentActivity?.name}
+                          {
+                            currentActivity?.latestActivity?.status ? 
+                            <small className="status--circle active--color"></small>
+                            :
+                            currentActivity?.latestActivity?.status === false  ?
+                            <small className="status--circle idle--color"></small>
+                            :
+                            <small className="status--circle inactive--color"></small>
+                          }
+                        </strong>
                         <span>{currentActivity?.latestActivity?.project?.title || ''}</span>
                     </h3>
                 </Dropdown.Toggle>
@@ -1065,7 +1075,17 @@ function TimeTrackingPage() {
                             liveactivities.map((activity, index) => {
                               return (
                                 <Dropdown.Item onClick={() => {handleClick(activity)}}>
-                                  <strong>{activity?.name}</strong>
+                                  <strong>{activity?.name}
+                                    {
+                                      activity?.latestActivity?.status ? 
+                                      <small className="status--circle active--color"></small>
+                                      :
+                                      activity?.latestActivity?.status === false  ?
+                                      <small className="status--circle idle--color"></small>
+                                      :
+                                      <small className="status--circle inactive--color"></small>
+                                    }
+                                  </strong>
                                   <span>{activity?.latestActivity?.project?.title || ''}</span>
                                 </Dropdown.Item>
                               )
