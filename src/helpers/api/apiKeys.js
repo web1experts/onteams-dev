@@ -33,7 +33,8 @@ const apiKeys = {
     subscription: 'subscription',
     payment: 'payment',
     post: 'post',
-    custom_field: 'custom_field'
+    custom_field: 'custom_field',
+    quote: '/workspace/getQuote'
 };
   
 export default apiKeys;

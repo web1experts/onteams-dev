@@ -213,8 +213,8 @@ export function logout() {
   return true;
 }
 
-export const SendComment = (text, postId, userId,parentCommentId) => {
-  socket.emit('comment', { text, postId, userId,parentCommentId });
+export const SendComment = (type = 'task', text, postId, userId,parentCommentId) => {
+  socket.emit('comment', { text, postId, userId,parentCommentId, type });
 };
 
 export const createTask = (payload) => { 

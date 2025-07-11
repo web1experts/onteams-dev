@@ -3,7 +3,9 @@ import {
     POST_LIST_SUCCESS,
     POST_SUCCESS,
     CLEAR_MESSAGES,
-    LIKE_POST_SUCCESS
+    LIKE_POST_SUCCESS,
+    COMMENT_POST_SUCCESS,
+    CREATE_POST_LIST_COMMENT
 
 } from "../actions/types";
     
@@ -53,6 +55,13 @@ import {
                 ...state,
                 singlePost: action.payload.post
             }
+        case CREATE_POST_LIST_COMMENT: {
+            if(action.payload.type !== 'post'){return {...state}}
+            return {
+                ...state,
+                singlePost: action.payload.updatedPost
+            }
+        }
         default: return state;
       }
     };
