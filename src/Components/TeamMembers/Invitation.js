@@ -473,6 +473,13 @@ function Invitation(props) {
                                     </div>
                                   </div>
                                 </td>
+                                <td className="task--last--buttons mt-auto">
+                                  <div className="d-flex justify-content-between flex-wrap">
+                                    <div className="onHide">
+                                      <Button variant="dark" className="px-3 py-1" onClick={() => { handleTableToggle(invitation); setIsActive(true); }}><BsEye /> View</Button>
+                                    </div>
+                                  </div>
+                                </td>
                               </tr>
                             </>
                           );

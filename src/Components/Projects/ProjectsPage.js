@@ -876,12 +876,12 @@ function ProjectsPage() {
                                                                             <td className="task--last--buttons">
                                                                                 <div className="d-flex justify-content-between">
                                                                                     <div key={`actions-index-${index}`} data-label="Actions" className="onHide">
-                                                                                        <Button variant="dark" className="me-2 px-3 py-2" 
+                                                                                        <Button variant="dark" className="me-2 px-3 py-1" 
                                                                                             onClick={() => {
                                                                                                 setIsActive(2);
                                                                                             }}>
                                                                                             <BsEye/> Details</Button>
-                                                                                        <Button variant="dark" className="px-3 py-2" onClick={() => {
+                                                                                        <Button variant="dark" className="px-3 py-1" onClick={() => {
                                                                                             
                                                                                             if (
                                                                                                 memberProfile?.permissions?.projects?.view === true ||

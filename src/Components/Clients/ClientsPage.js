@@ -604,15 +604,15 @@ function ClientsPage() {
                                       }
                                   }
                                   return (
-                                      <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide">
+                                      <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide new--td">
                                           {mvalue}
                                       </td>
                                   );
                               })}
-                            <td className="task--last--buttons" key={`client-td3-${index}`}>
+                            <td className="task--last--buttons mt-auto" key={`client-td3-${index}`}>
                               <div className="d-flex justify-content-between">
                                   <div className="onHide">
-                                      <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client);}}><BsEye /> View</Button>
+                                      <Button variant="dark" className="me-2 px-3 py-1" onClick={() => {handleClick(client);}}><BsEye /> View</Button>
                                   </div>
                               </div>
                             </td>

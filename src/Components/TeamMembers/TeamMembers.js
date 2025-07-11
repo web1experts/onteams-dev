@@ -1089,29 +1089,15 @@ function TeamMembersPage() {
                                       }
                                     }
                                     return (
-                                      <td
-                                        key={`client-${
-                                          fieldname || idx
-                                        }-${mvalue}`}
-                                        className="onHide"
-                                      >
+                                      <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
                                         {mvalue}
                                       </td>
                                     );
                                   })}
-                              <td className="task--last--buttons">
+                              <td className="task--last--buttons mt-auto">
                                 <div className="d-flex justify-content-between flex-wrap">
                                   <div className="onHide">
-                                    <Button
-                                      variant="primary"
-                                      className="px-3 py-2"
-                                      onClick={() => {
-                                        handleTableToggle(member);
-                                        setIsActive(true);
-                                      }}
-                                    >
-                                      <BsEye /> View
-                                    </Button>
+                                    <Button variant="dark" className="px-3 py-1" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /> View</Button>
                                   </div>
                                 </div>
                               </td>
