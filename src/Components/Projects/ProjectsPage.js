@@ -130,6 +130,11 @@ function ProjectsPage() {
             )
           );
         }
+        if (apiCustomfields.deletedField) {
+            setCustomFields((prevCustomFields) =>
+                prevCustomFields.filter((field) => field._id !== apiCustomfields.deletedField)
+            );
+        }
     
     }, [apiCustomfields]);
 

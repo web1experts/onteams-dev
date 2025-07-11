@@ -16,7 +16,7 @@ import './Styles/common.css';
 import './Styles/Sidebar.css';
 import './Styles/ModalStyle.css';
 import './App.css';
-import {CREATE_POST_LIST_COMMENT, CREATE_LIST_COMMENT, DELETE_COMMENT } from "./redux/actions/types";
+import {CREATE_POST_LIST_COMMENT, CREATE_LIST_COMMENT, DELETE_COMMENT, DELETE_POST } from "./redux/actions/types";
 
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function App(props) {
@@ -112,6 +112,23 @@ function App(props) {
   }, [props.createComment]);
 
   useEffect(() => {
+    const handlePostDelete = (data) => {
+      if (data.success) {
+        props.deletePost(data);
+      }
+    };
+
+    socket.on('post_deleted', handlePostDelete);
+
+    // Cleanup function to remove the socket listener when the component unmounts
+    return () => {
+      socket.off('post_deleted', handlePostDelete);
+    };
+
+    
+  }, [dispatch, props.deletePost]);
+
+  useEffect(() => {
     const handleCommentDeleted = (data) => {
       if (data.success) {
         props.deleteComment(data); // You can dispatch or use props function
@@ -152,7 +169,7 @@ function App(props) {
 }, []);
 
  useEffect(() => {
-  if( commonState.current_theme){ console.log('here ',commonState.current_theme)
+  if( commonState.current_theme){
     document.documentElement.style.setProperty(
       '--theme-gradient',
       commonState.current_theme.color
@@ -166,8 +183,6 @@ function App(props) {
       '--theme-secondary',
       commonState.current_theme.secondaryColor
     );
-
-  
   }
   
 }, [commonState]);
@@ -248,6 +263,7 @@ function App(props) {
 const mapDispatchToProps = (dispatch) => ({
   createComment: async payload => { await dispatch({ type: CREATE_POST_LIST_COMMENT, payload }) },
   deleteComment: async payload => { await dispatch({ type: DELETE_COMMENT, payload }) },
+  deletePost: async payload => { await dispatch({type: DELETE_POST, payload})}
   //trackingStatus: async payload => { await dispatch({ type: TIME_TRACKING_STATUS, payload }) }
 });
 

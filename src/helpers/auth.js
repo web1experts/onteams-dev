@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import {jwtDecode} from 'jwt-decode';
 import axios from './api/instance'
 import { parseIfValidJSON, mergePermissions } from './commonfunctions';
+
 const secretKey = process.env.REACT_APP_SECRET_KEY
 let socket;
 
@@ -119,6 +120,7 @@ export async function login(token,  current_loggedin_user = false, companies = [
 }
 
 export function setupDashboards( companies ){
+  const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' }
   if( companies.length > 0){ 
     localStorage.setItem('mt_dashboards', JSON.stringify(companies));
     const current_dashboard = localStorage.getItem('current_dashboard');
@@ -135,25 +137,29 @@ export function setupDashboards( companies ){
       }
 
       if (!companyExists) { 
-        localStorage.setItem('current_dashboard', JSON.stringify({ name: companies[0].company.name, id: companies[0].company._id }));
+        localStorage.setItem('current_dashboard', JSON.stringify({ name: companies[0].company.name, id: companies[0].company._id, theme: companies[0].company?.theme || false }));
         axios.defaults.headers.common.companyId =  companies[0].company._id || ''
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
+        saveTheme(companies[0].company?.theme || defaultTheme );
         axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
       }else{
-        localStorage.setItem('current_dashboard', JSON.stringify({ name: companyExists.company.name, id: companyExists.company._id }));
+        localStorage.setItem('current_dashboard', JSON.stringify({ name: companyExists.company.name, id: companyExists.company._id, theme: companyExists.company?.theme || false  }));
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companyExists?.memberData || null))
+        saveTheme(companyExists.company?.theme || defaultTheme );
         axios.defaults.headers.common.memberkey =  companyExists?.memberData?._id || ''
       }
     }else{
-      localStorage.setItem('current_dashboard', JSON.stringify({name: companies[0].company.name, id: companies[0].company._id}));
+      localStorage.setItem('current_dashboard', JSON.stringify({name: companies[0].company.name, id: companies[0].company._id, theme: companies[0].company?.theme || false}));
       axios.defaults.headers.common.companyId =  companies[0].company._id || ''
       localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
       axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
+      saveTheme(companies[0].company?.theme || defaultTheme );
     } 
   }else{ 
     localStorage.removeItem('current_dashboard');
     localStorage.removeItem('mt_dashboards');
     localStorage.removeItem('mt_featureSwitches');
+    localStorage.removeItem('theme');
   }
 }
 
@@ -231,10 +237,14 @@ export const SendReplyComment = (text, postId, userId, parentCommentId) => {
   socket.emit('new_reply', { text, postId, userId,parentCommentId });
 };
 
-export const DeleteComment = (commentId,feedId) => {
+export const DeleteComment = (commentId,feedId, type = 'task') => {
   // console.log('commentId',commentId)
-  socket.emit('delete_comment', { commentId,feedId });
+  socket.emit('delete_comment', { commentId,feedId, type });
 };
+
+export const DeletePost = (post) => {
+  socket.emit('delete_post', post);
+}
 
 export const DeleteNestedComment = (commentId) => {
   socket.emit('delete_nested_comment', { commentId });

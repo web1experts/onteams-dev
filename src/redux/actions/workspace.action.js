@@ -134,4 +134,22 @@ export const deleteWorkspace = (workspaceid) => {
         errorRequest(err, dispatch);
     }
   }
+
+
+}
+
+export const updateWorkSpaceTheme = (theme) => {
+  return async (dispatch) => {
+    try {
+        const response = await API.apiPostUrl('workspace', `/update-theme`, theme);
+        if (response.data && response.data.success) {
+            await dispatch({ type: WORKSPACE_UPDATE_SUCCESS, payload: response.data });
+            dispatch(refreshUserWorkspace())
+        } else {
+            await dispatch({ type: WORKSPACE_COMMON_ERROR, payload: response.data.message });
+        }
+    } catch (err) {
+        errorRequest(err, dispatch);
+    }
+  }
 }

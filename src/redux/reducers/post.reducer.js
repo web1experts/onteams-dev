@@ -5,7 +5,9 @@ import {
     CLEAR_MESSAGES,
     LIKE_POST_SUCCESS,
     COMMENT_POST_SUCCESS,
-    CREATE_POST_LIST_COMMENT
+    CREATE_POST_LIST_COMMENT,
+    DELETE_COMMENT,
+    DELETE_POST
 
 } from "../actions/types";
     
@@ -60,6 +62,19 @@ import {
             return {
                 ...state,
                 singlePost: action.payload.updatedPost
+            }
+        }
+        case DELETE_COMMENT: {
+            if(action.payload.type !== 'post'){return {...state}}
+            return {
+                ...state,
+                singlePost: action.payload.updatedPost
+            }
+        }
+        case DELETE_POST: {
+            return {
+                ...state,
+                deletePost: action.payload.deletedPost
             }
         }
         default: return state;

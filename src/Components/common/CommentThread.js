@@ -1,16 +1,23 @@
 // CommentThread.js
 import React, {useState} from 'react';
 import { Card, Button, Form, ButtonGroup } from 'react-bootstrap';
+import { BsTrash } from 'react-icons/bs'
 import { getMemberdata } from '../../helpers/commonfunctions';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
 const Comment = ({ comment, memberdata, parentId }) => {
-   
+   const handleDelete = (comment_id, post) => {
+    DeleteComment(comment_id, post, 'post')
+   }
   return (              
     <Card className="mb-2">
         <Card.Body>
             <Card.Title>{comment.author?.name}</Card.Title>
             <Card.Text>{comment.text}</Card.Text>
-            
+            <BsTrash
+              className="position-absolute top-0 end-0 m-2 text-danger cursor-pointer"
+              role="button"
+              onClick={() => handleDelete(comment._id, comment?.post)}
+            />
         </Card.Body>
     </Card>
   );

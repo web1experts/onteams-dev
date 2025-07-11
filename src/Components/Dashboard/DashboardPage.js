@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form } from "react-bootstrap";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
+import { BsTrash } from 'react-icons/bs'
 import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye, FaPlus } from 'react-icons/fa';
 import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiClock, FiCalendar, FiSend, FiYoutube } from "react-icons/fi";
-import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
+import { socket, SendComment, DeleteComment, UpdateComment, DeletePost } from '../../helpers/auth';
 import { LuVideo } from "react-icons/lu";
 import { MdLaptopMac, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { BsChat, BsHeart, BsClock } from "react-icons/bs";
@@ -71,7 +72,9 @@ function DashboardPage() {
 
   }
 
-
+  const handleDelete = (post) => {
+    DeletePost(post)
+  }
  
 
   const handleTextChange = ({ target: { name, value, type } }) => {
@@ -265,6 +268,12 @@ const isPostLikedByMember = (likes = [], memberId) => {
     if (postApi.createPost) {
       setPosts((prevPosts) => [postApi.createPost, ...prevPosts]);
     }
+    if (postApi.deletePost) { console.log("deletePost:: ", postApi.deletePost)
+      setPosts((prevPosts) =>
+        prevPosts.filter((post) => post._id !== postApi.deletePost)
+      );
+    }
+
 
     
   }, [postApi])
@@ -397,7 +406,11 @@ const isPostLikedByMember = (likes = [], memberId) => {
                           <span className="text-muted" style={{ fontSize: '0.875rem' }}>
                             • {dayjs(post.createdAt).fromNow()}
                           </span>
-
+                          <BsTrash
+                            className="position-absolute top-0 end-0 m-2 text-danger cursor-pointer"
+                            role="button"
+                            onClick={() => handleDelete(post?._id)}
+                          />
                           <div className="mt-3">
                             {/* Text Post */}
                             {post.post_type === 'text' && (

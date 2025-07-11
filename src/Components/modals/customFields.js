@@ -287,10 +287,10 @@ const typeColorMap = {
   const handleAddOption = () => {
     if (newOption.trim()) {
       const label = newOption.trim();
-      const value = label
-        .toLowerCase()
-        .replace(/\s+/g, '-')         // replace spaces with dashes
-        .replace(/[^a-z0-9\-]/g, ''); // remove special characters
+      const value = label;
+        // .toLowerCase()
+        // .replace(/\s+/g, '-')         // replace spaces with dashes
+        // .replace(/[^a-z0-9\-]/g, ''); // remove special characters
 
       const newFieldOption = { label, value };
       if(fields?.type === 'badge'){
