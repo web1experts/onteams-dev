@@ -215,7 +215,7 @@ export const TaskForm = (props) => {
 
     const handleCommentSubmit = async () => {
         const newComment = { text: comments };
-        SendComment(comments, currentTask?._id, memberdata?._id);
+        SendComment( 'task', comments, currentTask?._id, memberdata?._id);
         setComments('');
     };
 

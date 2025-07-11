@@ -4,7 +4,7 @@ import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye, FaPlus } from 'react-icons/fa';
 import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiClock, FiCalendar, FiSend, FiYoutube } from "react-icons/fi";
-import { GrExpand } from "react-icons/gr";
+import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
 import { LuVideo } from "react-icons/lu";
 import { MdLaptopMac, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { BsChat, BsHeart, BsClock } from "react-icons/bs";
@@ -15,16 +15,22 @@ import { LuQuote } from "react-icons/lu";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import DateTimeCard from "../common/DateTimeCard";
-import { convertYouTubeToEmbed } from "../../helpers/commonfunctions";
+import { convertYouTubeToEmbed, getMemberdata } from "../../helpers/commonfunctions";
+import CommentThread from "../common/CommentThread";
+import API from "../../helpers/api";
+
 dayjs.extend(relativeTime);
 function DashboardPage() {
   const dispatch = useDispatch()
+  const memberdata = getMemberdata()
   const [showCommentBox, setShowCommentBox] = useState(false);
+  const [commentPostId, setCommentPostId] = useState('')
   const memberstate = useSelector((state) => state.member);
   const invitationsFeed = useSelector((state) => state.member.invitations);
   const postFeed = useSelector((state) => state.post.posts);
   const postApi = useSelector( (state) => state.post);
   const [invitationsFeeds, setInvitationsFeed] = useState([]);
+  const [quote, setQuote] = useState('')
   const [isActive, setIsActive] = useState(0);
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const commonState = useSelector(state => state.common)
@@ -32,6 +38,7 @@ function DashboardPage() {
   const [ posts, setPosts] = useState([])
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  
   const [ loading, setLoading] = useState( false);
   const [ fields, setFields ] = useState(
     { 
@@ -63,6 +70,9 @@ function DashboardPage() {
     });
 
   }
+
+
+ 
 
   const handleTextChange = ({ target: { name, value, type } }) => {
     setFields({ ...fields, [name]: value });
@@ -200,6 +210,10 @@ function DashboardPage() {
   }
 };
 
+const isPostLikedByMember = (likes = [], memberId) => {
+  return likes.some(like => like.member === memberId);
+};
+
 
   const handleFileChange = (e) => {
     const fileList = Array.from(e.target.files);
@@ -217,6 +231,13 @@ function DashboardPage() {
       listCompanyinvite()
     );
   };
+
+  const getQuote = async () => {
+    const response = await API.apiGet('quote');
+    if(response.data && response.data.success){
+      setQuote(response.data.quote)
+    }
+  }
 
   useEffect(() => {
     const check = ["undefined", undefined, "null", null, ""];
@@ -244,6 +265,8 @@ function DashboardPage() {
     if (postApi.createPost) {
       setPosts((prevPosts) => [postApi.createPost, ...prevPosts]);
     }
+
+    
   }, [postApi])
 
   const acceptInvite = (token) => {
@@ -263,7 +286,8 @@ function DashboardPage() {
 
   useEffect(() => {
     handleInvitationList()
-    handlePosts()
+    handlePosts();
+    getQuote()
   },[ ])
 
   const handleLike = async (postId) => {
@@ -332,8 +356,7 @@ function DashboardPage() {
                     <h6 className="mb-0">Daily Inspiration</h6>
                   </div>
                   <blockquote className="blockquote mb-0">
-                    <p>"Success is not final, failure is not fatal: it is the courage to continue that counts."</p>
-                    <p><strong>- Winston Churchill</strong></p>
+                    <div dangerouslySetInnerHTML={{ __html: quote }} />
                   </blockquote>
                 </Card>
 
@@ -356,7 +379,9 @@ function DashboardPage() {
                     </div>
 
                   :
-                  posts.map((post) => (
+                  posts.map((post) => {
+                    const isLiked = isPostLikedByMember(post.likes, memberdata?._id);
+                    return (
                     <Card key={post._id} className="mb-4 p-3 rounded-4 inner--card">
                       <Row className="mb-2">
                         <Col xs="auto">
@@ -453,27 +478,21 @@ function DashboardPage() {
                           {/* Likes / Comments */}
                           <div className="d-flex gap-3 text-muted mt-3 align-items-center">
                             <span className="icon--heart">
-                              <BsHeart onClick={() => handleLike(post._id)} className="me-1" />{' '}
+                              <BsHeart onClick={() => handleLike(post._id)} className={`me-1 ${isLiked ? 'filled-heart' : ''}`} />{' '}
                               {post.likes?.length || 0}
                             </span>
-                            <span className="open--comment" onClick={() => setShowCommentBox((prev) => !prev)}>
-                              <BsChat className="me-1" /> 0
+                            <span className="open--comment" onClick={() => {setShowCommentBox((prev) => !prev); setCommentPostId(post._id)}}>
+                              <BsChat className="me-1" /> {post?.comments?.length || 0}
                             </span>
                           </div>
                           {showCommentBox && (
-                            <div className="bg-light p-3 rounded-4 mt-3 d-flex flex-column align-items-end gap-3 border-light">
-                              <textarea
-                                className="form-control"
-                                placeholder="Write a comment..."
-                                rows={3}
-                              />
-                              <Button variant="primary">Post</Button>
-                            </div>
+                            <CommentThread comments={post?.comments} post={commentPostId} toggle={setShowCommentBox} />
                           )}
                         </Col>
                       </Row>
                     </Card>
-                  ))}
+                  
+                  )})}
                 </Card> 
               </Col>
               <Col xl={4}>
@@ -545,7 +564,9 @@ function DashboardPage() {
                             </ListGroup>
                           </Card.Body>
                         </Card>
-                        <Button variant="primary" className="w-100 my-3"><MdOutlineChatBubbleOutline /> Start Live Chat</Button>
+                        <Button variant="primary" className="w-100 my-3" onClick={() => {if (window.Tawk_API?.toggle) {
+            window.Tawk_API.toggle();
+          }}}><MdOutlineChatBubbleOutline /> Start Live Chat</Button>
                         <p>Average response time: <strong>2 minutes</strong></p>
                       </Container>
                     </div>

@@ -120,7 +120,7 @@ import {
                 currentTask: action.payload
             }
             case CREATE_POST_LIST_COMMENT: {
-               
+                if(action.payload.type !== 'task'){return {...state}}
                 return {
                     ...state,
                     UpdatedTask: action.payload.updatedTask

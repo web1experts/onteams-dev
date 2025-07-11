@@ -5,7 +5,8 @@ import {
     POST_SUCCESS,
     POST_LIST_SUCCESS,
     POST_FAILED,
-    LIKE_POST_SUCCESS
+    LIKE_POST_SUCCESS,
+    COMMENT_POST_SUCCESS
 } from "./types";
 
 const config = {
@@ -73,6 +74,21 @@ export const likePost = (postId) => {
             const response = await API.apiPostUrl('post', `/like/${postId}`,{} ); 
             if(response.data && response.data.success){
                 await dispatch({ type: LIKE_POST_SUCCESS, payload:response.data});
+            }else{
+                await dispatch({ type: POST_FAILED, payload:response.data.message });
+            }
+        }catch (err){
+            errorRequest(err, dispatch);
+        }
+    }
+}
+
+export const saveComment = (payload) => {
+    return async (dispatch)=>{
+        try{
+            const response = await API.apiPostUrl('post', `/comment`,payload ); 
+            if(response.data && response.data.success){
+                await dispatch({ type: COMMENT_POST_SUCCESS, payload:response.data});
             }else{
                 await dispatch({ type: POST_FAILED, payload:response.data.message });
             }
