@@ -233,13 +233,12 @@ fieldset:disabled .btn {
 .btn-dark {
     --bs-btn-color: rgb(51 65 85);
     --bs-btn-bg: rgb(203 213 225);
-    --bs-btn-border-color: rgb(203 213 225);
+    border: 0;
     --bs-btn-hover-color: #ffffff;
     --bs-btn-hover-bg: rgb(148 163 184);
     --bs-btn-focus-shadow-rgb: 66,70,73;
     --bs-btn-active-color: rgb(51 65 85);
     --bs-btn-active-bg: rgb(148 163 184);
-    --bs-btn-hover-border-color: rgb(148 163 184);
 }
 
 strong.activity-type-text {

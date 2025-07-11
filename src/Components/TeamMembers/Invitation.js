@@ -473,6 +473,13 @@ function Invitation(props) {
                                     </div>
                                   </div>
                                 </td>
+                                <td className="task--last--buttons mt-auto">
+                                  <div className="d-flex justify-content-between flex-wrap">
+                                    <div className="onHide">
+                                      <Button variant="dark" className="px-3 py-1" onClick={() => { handleTableToggle(invitation); setIsActive(true); }}><BsEye /> View</Button>
+                                    </div>
+                                  </div>
+                                </td>
                               </tr>
                             </>
                           );
@@ -498,31 +505,31 @@ function Invitation(props) {
       <div className="details--invitee--view">
         <div className="wrapper--title py-2 bg-white border-bottom">
           <Dropdown>
-              <Dropdown.Toggle variant="link" id="dropdown-basic">
-                <h3>
-                  <strong>{selectedInvitation?.email}</strong>
-                  <span>{selectedInvitation?.role?.name}</span>
-                </h3>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
+            <Dropdown.Toggle variant="link" id="dropdown-basic">
+                <div className="title--initial">{selectedInvitation?.email?.charAt(0)}</div>
+                <div className="title--span flex-column align-items-start gap-0">
+                    <h3>
+                      <strong>{selectedInvitation?.email}</strong>
+                      <span>{selectedInvitation?.role?.name}</span>
+                    </h3>
+                </div>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
                 <div className="drop--scroll">
                   {invitationsFeeds &&
                     invitationsFeeds.length > 0 &&
                     invitationsFeeds.map((invite, idx) => (
-                      <Dropdown.Item
-                        onClick={() => {
-                          handleTableToggle(invite);
-                          
-                        }}
-                        key={`item-${idx}`}
-                      >
-                        <strong>{invite?.email}</strong>
-                        <span>{invite.role?.name}</span>
+                      <Dropdown.Item onClick={() => { handleTableToggle(invite);}} key={`item-${idx}`} className={(selectedInvitation?._id === invite?._id) ? 'active-project': ''}>
+                        <div className="title--initial">{invite?.email.charAt(0)}</div>
+                        <div className="title--span flex-column align-items-start gap-0">
+                          <strong>{invite?.email}</strong>
+                          <span>{invite.role?.name}</span>
+                        </div>
                       </Dropdown.Item>
                     ))}
                 </div>
-              </Dropdown.Menu>
-            </Dropdown>
+            </Dropdown.Menu>
+          </Dropdown>
           <ListGroup horizontal>
             <ListGroup.Item nClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
             <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {if (props.toggleActive) {

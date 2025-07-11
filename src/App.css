@@ -538,6 +538,11 @@ body {
   width: 100%;
 }
 
+.page--wrapper .draggable--table tbody {
+  position: relative;
+  top: -1px;
+}
+
 .table {
   margin-bottom: 0;
   table-layout: auto;
@@ -688,14 +693,14 @@ body {
   -webkit-transition: all .15s ease-in-out;
 }
 
-.page--wrapper table td .title--initial, .team--members--list .title--initial {
+.page--wrapper table td .title--initial, .team--members--list .title--initial, .wrapper--title .dropdown-toggle .title--initial, .wrapper--title .dropdown-item .title--initial {
   align-items: center;
   background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   border-radius: 100px;
   -webkit-border-radius: 100px;
   color: #ffffff;
   display: inline-flex;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 500;
   height: 40px;
   width: 40px;
@@ -706,6 +711,13 @@ body {
   text-align: center;
   position: relative;
   text-transform: uppercase;
+}
+
+.wrapper--title .dropdown-item .title--initial {
+  font-size: 1rem;
+  height: 35px;
+  width: 35px;
+  min-width: 35px;
 }
 
 .show--details .new--project--rows tr.project--active .title--initial,
@@ -737,7 +749,8 @@ body {
 }
 
 .page--wrapper table td.project--title--td span,
-.new--project--rows .project--name strong {
+.new--project--rows .project--name strong,
+.project--grid--new--table td.project--title--td strong {
   cursor: pointer;
   /* display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -748,6 +761,25 @@ body {
   overflow: hidden;
   max-width: 100%;
   text-overflow: ellipsis;
+}
+
+.project--grid--new--table td.new--td {
+  color: rgb(71 85 105);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background: rgb(248 250 252);
+  border-radius: .5rem;
+  -webkit-border-radius: .5rem;
+  padding: .5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 630px;
+  width: 100%;
+}
+
+.project--grid--new--table td.new--td:empty {
+  display: none;
 }
 
 .page--wrapper table td.project--title--td .title--span {
@@ -1455,8 +1487,10 @@ span.open--sidebar {
   font-weight: 600;
   line-height: 1.2;
   display: flex;
-  flex-flow: column wrap;
-  justify-content: center;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
   text-decoration: none;
   color: inherit;
   text-align: left;
@@ -2146,8 +2180,11 @@ table tr.marked-project td {
 }
 
 .wrapper--title .dropdown-menu {
-  min-width: max-content;
-  width: max-content;
+  min-width: 330px;
+  width: 100%;
+  padding: .75rem;
+  box-shadow: none;
+  max-width: 100%;
 }
 
 .modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"],
@@ -2196,7 +2233,7 @@ table tr.marked-project td {
 }
 
 .wrapper--title .drop--scroll {
-  max-height: calc(100dvh - 200px);
+  max-height: calc(100dvh - 120px);
 }
 
 .modal .select--dropdown .dropdown-menu,
@@ -2223,7 +2260,7 @@ table tr.marked-project td {
 .rounded--box .select--dropdown .dropdown-menu::before,
 .wrapper--title .dropdown-menu::before {
   border: 10px solid;
-  border-color: transparent transparent #ffffff;
+  border-color: transparent transparent #ececec;
   content: "";
   height: 0;
   left: 30px;
@@ -2236,8 +2273,9 @@ table tr.marked-project td {
 
 .modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"]:before,
 .wrapper--title .dropdown-menu[data-popper-placement="bottom-start"]:before {
-  border-color: transparent transparent #ffffff;
   top: -20px;
+  left: auto;
+  right: 5px;
   transform: translateX(-5px);
 }
 
@@ -2278,22 +2316,53 @@ table tr.marked-project td {
 .wrapper--title .dropdown-item {
   text-align: left;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
-  flex-flow: column wrap;
+  flex-flow: row wrap;
+  gap: .5rem;
+  padding: 0.75rem;
+  border: 1px solid rgb(226 232 240);
+  border-radius: .75rem;
+  -webkit-border-radius: .75rem;
+  background: linear-gradient(to right,rgba(var(--theme-primary), .02),rgba(var(--theme-secondary), .02));
+}
+
+.wrapper--title .dropdown-item.active-project {
+  background: linear-gradient(to right,rgba(var(--theme-primary), .07),rgba(var(--theme-secondary), .07));
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+}
+
+.wrapper--title .dropdown-item:hover {
+  background: linear-gradient(to right,rgba(var(--theme-primary), .03),rgba(var(--theme-secondary), .03));
 }
 
 .wrapper--title .dropdown-item+.dropdown-item {
-  border-top: 1px solid rgb(0 0 0 / .05);
+  margin-top: .75rem;
 }
 
 .wrapper--title .dropdown-item strong {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
+  display: block;
   text-overflow: ellipsis;
   overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.wrapper--title .dropdown-item .title--span {
+    flex: 1 1 100%;
+    max-width: calc(100% - 43px);
+    line-height: 22px;
+}
+
+.wrapper--title .dropdown-item span {
+  font-size: 14px;
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   max-width: 100%;
 }
 
@@ -2334,8 +2403,7 @@ table tr.marked-project td {
 .wrapper--title .select--dropdown .dropdown-item:hover,
 .modal .select--dropdown .dropdown-item:hover,
 .rounded--box .select--dropdown .dropdown-item:hover,
-.common--form .select--dropdown .dropdown-item:hover,
-.wrapper--title .dropdown-item:hover {
+.common--form .select--dropdown .dropdown-item:hover {
   color: rgb(17 24 39);
   background: rgba(226, 232, 240, .4);
 }
@@ -2348,14 +2416,6 @@ table tr.marked-project td {
   color: #454545;
   padding: .55rem 2rem .55rem 1.2rem;
 }
-
-/* .wrapper--title .btn.active,
-.wrapper--title .btn.show {
-  color: rgb(15 23 42);
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;
-} */
 
 .details--projects--view .project--form--inputs form .client--input .custom-dropdown-container {
   flex: none;
@@ -3867,7 +3927,7 @@ pre {
   border-top-right-radius: .5rem;
 }
 
-.page--wrapper.activity--table table .status--circle {
+.page--wrapper.activity--table table .status--circle, .wrapper--title .title--initial .status--circle {
     width: 12px;
     height: 12px;
     margin: auto;
@@ -3882,18 +3942,28 @@ pre {
     border: 2px solid #ffffff;
 }
 
-.activity--table table .active--color {
+.activity--table table .active--color, .wrapper--title .title--initial .active--color {
   background: green;
   animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
   -webkit-animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
 }
 
-.activity--table table .idle--color {
-  background: goldenrod;
+.pagination {
+    justify-content: center;
+    margin-top: 2rem;
 }
 
-.activity--table table .inactive--color {
+.page-link {
+    font-size: 1.2rem;
+    color: rgba(var(--theme-primary), 1);
+}
+
+.activity--table table .inactive--color, .wrapper--title .title--initial .inactive--color {
   background: darkgray;
+}
+
+.activity--table table .idle--color, .wrapper--title .title--initial .idle--color {
+  background: goldenrod;
 }
 
 .activity--stats {
@@ -5069,8 +5139,9 @@ ul#icon-tabs .nav-link span svg {
   border-left: 4px solid rgba(148, 163, 184, .7);
 }
 
-.dashboard--page .inner--card img {
+.dashboard--page .inner--card img, .dashboard--page .inner--card video, .dashboard--page .inner--card iframe {
   max-width: 100%;
+  width: 100%;
 }
 
 .team--updates .mb-4:last-child {
@@ -5771,6 +5842,7 @@ ul#icon-tabs .nav-link span svg {
   border: 0;
   border-radius: 0;
   overflow: visible;
+  max-height: 100%;
 }
 
 .page--wrapper .project--grid--table th .project--name,
@@ -5779,10 +5851,14 @@ ul#icon-tabs .nav-link span svg {
   flex-flow: row wrap;
   align-items: center;
   gap: .5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
-.page--wrapper .project--grid--table td .title--span {
+.page--wrapper .project--grid--table td .title--span, .page--wrapper .project--grid--table td.project--title--td .title--span {
   flex: 1 1 100%;
+  max-width: 100%;
+  min-height: 42px;
 }
 
 .project--grid--table tbody {
@@ -5801,18 +5877,14 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .project--grid--table tr {
-  border: 1px solid #eeeeee;
-  padding: 1rem;
-  border-radius: .25rem;
-  -webkit-border-radius: .25rem;
-  position: relative;
-  flex: 1 1 100%;
-  max-width: calc(25% - 8px);
+    padding: 1rem;
+    position: relative;
 }
 
 .project--grid--new--table tr {
   border-radius: 1rem;
   flex: 1 1 100%;
+  gap: .75rem;
   max-width: calc(33.333% - 16px);
   background: #ffffff;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
@@ -5820,13 +5892,16 @@ ul#icon-tabs .nav-link span svg {
   border: 1px solid rgb(241 245 249);
   display: flex;
   flex-flow: column wrap;
-    transition-duration: 0.3s;
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.3s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.project--grid--new--table tr .border-end {
+.project--grid--new--table tr .border-end, .project--grid--new--table tr .border-bottom {
     border-right: 0!important;
+    border-bottom: 0!important;
+    width: 100%;
+    max-width: 100%;
 }
 
 .page--wrapper table tr:hover abbr {
@@ -5847,7 +5922,7 @@ ul#icon-tabs .nav-link span svg {
 
 .project--grid--new--table .status__key {
   position: absolute;
-  top: 0;
+  top: 15px;
   right: 10px;
 }
 
@@ -5859,6 +5934,9 @@ ul#icon-tabs .nav-link span svg {
   flex-flow: row wrap;
   gap: 20px;
   order: 2;
+  border-top: 1px solid rgb(241 245 249);
+  padding-top: 1rem;
+  margin-top: auto;
 }
 
 .project--grid--new--table .task--buttons {
@@ -5870,7 +5948,7 @@ ul#icon-tabs .nav-link span svg {
 .project--grid--table tr.marked-project, 
 .page--wrapper .draggable--table tr.marked-project td:first-child,
 .new--project--rows tr.marked-project {
-  background: #ecf1fa;
+  background: rgb(244, 248, 255);
 }
 
 .page--wrapper .draggable--table tr.marked-project td:first-child {
@@ -6528,22 +6606,14 @@ ul#icon-tabs .nav-link span svg {
   font-size: 16px;
 }
 
-.project--grid--table tr.project--active,
-.clients--grid--table .project--active {
-  background: #ecf1fa50;
-  border: 1px solid #e3eaf7;
-}
-
 .project--grid--table tr.project--active td,
 .clients--grid--table .project--active td {
   background: none;
 }
 
-.project--grid--table tr.project--active td.new__td {
-  background: rgb(15 23 42 / 5%);
-  padding: .5rem .75rem;
-  border-radius: .5rem;
-  -webkit-border-radius: .5rem;
+.project--grid--table tr.project--active td.new__td, .project--grid--table tr.project--active td.new--td,
+.clients--grid--table .project--active td.new--td {
+  background: rgb(248 250 252);
   order: 1;
 }
 
@@ -6555,7 +6625,6 @@ ul#icon-tabs .nav-link span svg {
 .project--grid--new--table td {
   padding: 0;
   border: 0;
-  margin-top: 1rem;
 }
 
 .show--details .project--grid--table tbody,
@@ -6575,15 +6644,6 @@ ul#icon-tabs .nav-link span svg {
 .view--project .project--grid--table tr+tr,
 .view--invitee .project--grid--table tr+tr {
   margin-top: .5rem;
-}
-
-.show--details .project--grid--table tr.project--active,
-.view--project .project--grid--table tr.project--active,
-.view--invitee .project--grid--table tr.project--active {
-  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
-  color: #ffffff;
-  max-width: 100%;
-  padding: 1rem;
 }
 
 .show--details .project--grid--table td::before,
@@ -7197,6 +7257,7 @@ Media CSS-=-==
 
   .new--project--rows .project--title--td .project--name {
     padding: 0;
+    flex-flow: row wrap;
   }
 
   .project--grid--table tr.marked-project, .page--wrapper .draggable--table tr.marked-project td:first-child, .new--project--rows tr.marked-project {
@@ -7212,6 +7273,21 @@ Media CSS-=-==
     padding: 0;
     border-right: 0;
     border-bottom: 0;
+    min-width: 100%;
+  }
+
+  .page--wrapper .draggable--table td.new--td {
+    color: rgb(71 85 105);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    background: rgb(248 250 252);
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    padding: .5rem;
+  }
+
+  .page--wrapper .draggable--table td.new--td:empty {
+    display: none;
   }
 
   .new--project--rows .project--title--td .task--buttons {
@@ -7246,7 +7322,14 @@ Media CSS-=-==
   }
 
   .page--wrapper .draggable--table tr {
-    display: block;
+    display: flex;
+    flex-flow: column wrap;
+    gap: 1rem;
+  }
+
+  .page--wrapper .draggable--table .border-bottom, .page--wrapper .draggable--table .border-end {
+    border-bottom: 0 !important;
+    border-right: 0 !important;
   }
 
   .setting--page .rounded--box .table tr th:empty {
@@ -7365,21 +7448,34 @@ Media CSS-=-==
     flex-flow: column wrap;
     align-items: flex-start;
     gap: 12px;
+    min-width: 100%;
+    order: 3;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(241 245 249);
   }
 
   .page--wrapper .draggable--table .task--buttons {
     width: 100%;
-    display: flex;
+    display: none;
+  }
+
+  .new--project--rows .task--last--buttons, .project--grid--new--table .project--title--td .task--buttons {
+    display: block;
+    max-width: 100% !important;
+    order: 4;
   }
 
   .page--wrapper .draggable--table .task--buttons .btn {
     flex: 1 1;
   }
 
-  .project--grid--new--table .status__key,
-  .project--table .status__key {
-    position: relative;
-    top: 0;
+  .page--wrapper .draggable--table .status__key {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    min-width: max-content;
+    margin: 0;
   }
 
   table tr:focus,
@@ -7391,9 +7487,13 @@ Media CSS-=-==
     outline: none !important;
   }
 
-  .project--table thead,
-  .project--table td:first-child abbr {
+  .project--table thead {
     display: none;
+  }
+
+  .page--wrapper table td.project--title--td .title--span {
+    max-width: 100%;
+    flex: 1 1 100%;
   }
 
   .holiday--table, .holiday--table td, .holiday--table tr, .project--table, .project--table td, .project--table tr, .activity--table, .activity--table td, .activity--table tr, .invoice--table, .invoice--table td, .invoice--table tr {
@@ -7485,10 +7585,6 @@ Media CSS-=-==
     padding: .5rem .75rem;
     border-radius: .5rem;
     -webkit-border-radius: .5rem;
-  }
-
-  .page--wrapper .draggable--table td+td {
-    margin-top: .5rem;
   }
 
   .loading-bar {

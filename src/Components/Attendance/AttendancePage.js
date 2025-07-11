@@ -501,7 +501,7 @@ useEffect(() => {
         <div className="details--projects--grid projects--grid common--project--grid">
           <div className="wrapper--title py-2 bg-white border-bottom">
               <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
-              <div className="projecttitle me-auto">
+              <div className="projecttitle">
                 <Dropdown key={'member-filter'}>
                   <Dropdown.Toggle variant="link" id="dropdown-basic" key={'member-filter-toggle'}>
                     <h3>

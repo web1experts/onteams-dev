@@ -593,13 +593,15 @@ function ClientsPage() {
                                       if (matchedOption) {
                                       mvalue = (
                                           <span
-                                          style={{
+                                            className="priority--badge"
+                                            style={{
                                               backgroundColor: matchedOption.color,
-                                              padding: '4px 8px',
-                                              borderRadius: '8px',
-                                              color: '#fff',
-                                              display: 'inline-block'
-                                          }}
+                                              color: "#fff",
+                                              display: "inline-block",
+                                              borderColor: matchedOption.color,
+                                              borderWidth: '1px',
+                                              borderStyle: 'solid'
+                                            }}
                                           >
                                           {client?.customFields?.[fieldname]?.meta_value}
                                           </span>
@@ -607,15 +609,15 @@ function ClientsPage() {
                                       }
                                   }
                                   return (
-                                      <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide">
+                                      <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide new--td">
                                           {mvalue}
                                       </td>
                                   );
                               })}
-                            <td className="task--last--buttons" key={`client-td3-${index}`}>
+                            <td className="task--last--buttons mt-auto" key={`client-td3-${index}`}>
                               <div className="d-flex justify-content-between">
                                   <div className="onHide">
-                                      <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client);}}><BsEye /> View</Button>
+                                      <Button variant="dark" className="me-2 px-3 py-1" onClick={() => {handleClick(client);}}><BsEye /> View</Button>
                                   </div>
                               </div>
                             </td>
@@ -647,25 +649,30 @@ function ClientsPage() {
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
           <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
-          <div className="projecttitle me-auto">
+          <div className="projecttitle">
             <Dropdown>
               <Dropdown.Toggle variant="link" id="dropdown-basic">
-                  <h3>
-                      <strong>{selectedClient?.name}</strong>
-                  </h3>
+                  <div className="title--initial">{selectedClient?.name?.charAt(0)}</div>
+                  <div className="title--span flex-column align-items-start gap-0">
+                      <h3>
+                        <strong>{selectedClient?.name}</strong>
+                    </h3>
+                  </div>
               </Dropdown.Toggle>
               <Dropdown.Menu>
                   <div className="drop--scroll">
                     {
                       clientFeeds.map((client, index) => {
                         return (
-                          <Dropdown.Item onClick={() => {handleClick(client)}} key={`client-item-${index}`}>
-                            <strong>{client?.name}</strong>
+                          <Dropdown.Item onClick={() => {handleClick(client)}} key={`client-item-${index}`} className={(selectedClient?._id === client?._id) ? 'active-project': ''}>
+                            <div className="title--initial">{client?.name.charAt(0)}</div>
+                            <div className="title--span flex-column align-items-start gap-0">
+                                <strong>{client?.name}</strong>
+                            </div>
                           </Dropdown.Item>
                         )
                       })
                     }
-                      
                   </div>
               </Dropdown.Menu>
             </Dropdown>
