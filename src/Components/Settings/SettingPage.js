@@ -762,7 +762,7 @@ function SettingPage() {
           {activeTab === "Permissions" && (
             <div className="rounded--box permission__page">
               <div className="wrapper--title">
-                <div className="projecttitle me-auto">
+                <div className="projecttitle">
                   <h3>
                     <strong>Role & Permissions</strong>
                   </h3>

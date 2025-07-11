@@ -1050,50 +1050,46 @@ function TimeTrackingPage() {
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
           <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
-          <div className="projecttitle me-auto">
+          <div className="projecttitle">
             <Dropdown>
-                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                    <h3>
-                        <strong>{currentActivity?.name}
-                          {
-                            currentActivity?.latestActivity?.status ? 
-                            <small className="status--circle active--color"></small>
-                            :
-                            currentActivity?.latestActivity?.status === false  ?
-                            <small className="status--circle idle--color"></small>
-                            :
-                            <small className="status--circle inactive--color"></small>
-                          }
-                        </strong>
+              <Dropdown.Toggle variant="link" id="dropdown-basic">
+                  <div className="title--initial">
+                    {currentActivity?.name?.charAt(0)} 
+                    {
+                      currentActivity?.latestActivity?.status ? 
+                      <small className="status--circle active--color"></small>
+                      :
+                      currentActivity?.latestActivity?.status === false  ?
+                      <small className="status--circle idle--color"></small>
+                      :
+                      <small className="status--circle inactive--color"></small>
+                    }
+                  </div>
+                  <div className="title--span flex-column align-items-start gap-0">
+                      <h3>
+                        <strong>{currentActivity?.name}</strong>
                         <span>{currentActivity?.latestActivity?.project?.title || ''}</span>
                     </h3>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    <div className="drop--scroll">
-                      {
-                         liveactivities.length > 0 &&
-                            liveactivities.map((activity, index) => {
-                              return (
-                                <Dropdown.Item onClick={() => {handleClick(activity)}}>
-                                  <strong>{activity?.name}
-                                    {
-                                      activity?.latestActivity?.status ? 
-                                      <small className="status--circle active--color"></small>
-                                      :
-                                      activity?.latestActivity?.status === false  ?
-                                      <small className="status--circle idle--color"></small>
-                                      :
-                                      <small className="status--circle inactive--color"></small>
-                                    }
-                                  </strong>
-                                  <span>{activity?.latestActivity?.project?.title || ''}</span>
-                                </Dropdown.Item>
-                              )
-                            })
-                      }
-                        
-                    </div>
-                </Dropdown.Menu>
+                  </div>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    {
+                      liveactivities.length > 0 &&
+                        liveactivities.map((activity, index) => {
+                          return (
+                            <Dropdown.Item onClick={() => {handleClick(activity)}} className={(currentActivity?._id === activity?._id) ? 'active-project': ''}>
+                              <div className="title--initial">{activity?.name.charAt(0)}</div>
+                              <div className="title--span flex-column align-items-start gap-0">
+                                <strong>{activity?.name}</strong>
+                                <span>{activity?.latestActivity?.project?.title || ''}</span>
+                              </div>
+                            </Dropdown.Item>
+                          )
+                        })
+                    }
+                  </div>
+              </Dropdown.Menu>
             </Dropdown>
           </div>
           <ListGroup horizontal className="live--tabs me-auto">

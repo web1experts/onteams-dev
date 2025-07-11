@@ -402,7 +402,7 @@ function PermissionsPage() {
 
           <div className="rounded--box">
             <div className="wrapper--title">
-              <div className="projecttitle me-auto">
+              <div className="projecttitle">
                 <h3>
                   <strong>Permissions</strong>
                 </h3>

@@ -933,153 +933,50 @@ function TeamMembersPage() {
           <Row>
             <Col sm={12}>
               <h2>
-                <span
-                  className="open--sidebar me-3 d-flex d-xl-none"
-                  onClick={() => {
-                    handleSidebarSmall(false);
-                    setIsActive(0);
-                  }}
-                >
-                  <FiSidebar />
-                </span>
+                <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0); }}><FiSidebar /></span>
                 {activeTab}
-                <ListGroup
-                  horizontal
-                  className={
-                    isActive ? "d-none" : "me-3 ms-auto d-none d-md-flex"
-                  }
-                >
+                <ListGroup horizontal className={isActive ? "d-none" : "me-3 ms-auto d-none d-md-flex" }>
                   <ListGroup horizontal>
-                    <ListGroup.Item
-                      className="d-none d-md-block"
-                      action
-                      active={activeTab === "Members"}
-                      onClick={() => {
-                        setsearchTerm("");
-                        setActiveTab("Members");
-                      }}
-                    >
-                      <AiOutlineTeam /> Team Members
-                    </ListGroup.Item>
+                    <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item
-                        className="d-none d-md-block"
-                        action
-                        active={activeTab === "Invitations"}
-                        onClick={() => {
-                          setsearchTerm("");
-                          setActiveTab("Invitations");
-                        }}
-                      >
-                        <FiMail /> Invitations
-                      </ListGroup.Item>
+                      <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
                     )}
                   </ListGroup>
                   <ListGroup.Item className="d-none d-xl-block ms-3">
-                    <Form
-                      className="search-filter-list"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                      }}
-                    >
+                    <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                       <Form.Group className="mb-0 form-group">
                         <MdOutlineSearch />
-                        <Form.Control
-                          type="text"
-                          placeholder={
-                            activeTab === "Members"
-                              ? "Search Member.."
-                              : "Search Invitations.."
-                          }
-                          onChange={(e) => setsearchTerm(e.target.value)}
-                        />
+                        <Form.Control type="text" placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)}/>
                       </Form.Group>
                     </Form>
                   </ListGroup.Item>
                 </ListGroup>
-                <ListGroup
-                  horizontal
-                  className={isActive ? "d-none" : "d-flex ms-auto ms-md-0"}
-                >
+                <ListGroup horizontal className={isActive ? "d-none" : "d-flex ms-auto ms-md-0"}>
                   <ListGroup horizontal>
-                    <ListGroup.Item
-                      action
-                      className="view--icon d-none d-lg-flex"
-                      active={isActiveView === 1}
-                      onClick={() => setIsActiveView(1)}
-                    >
-                      <BsGrid />
-                    </ListGroup.Item>
-                    <ListGroup.Item
-                      action
-                      className="d-none d-lg-flex view--icon"
-                      active={isActiveView === 2}
-                      onClick={() => setIsActiveView(2)}
-                    >
-                      <FaList />
-                    </ListGroup.Item>
+                    <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                    <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
-                  <ListGroup
-                    horizontal
-                    className={
-                      isActive ? "d-none" : "d-flex bg-white expand--icon"
-                    }
-                  >
-                    <ListGroup.Item
-                      className="d-none d-lg-flex me-2"
-                      key={`settingskey`}
-                      onClick={toggleCustomFields}
-                    >
-                      <FaCog />
-                    </ListGroup.Item>
-                    <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}>
-                      <GrExpand />
-                    </ListGroup.Item>
+                  <ListGroup horizontal className={isActive ? "d-none" : "d-flex bg-white expand--icon"}>
+                    <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields}><FaCog /></ListGroup.Item>
+                    <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item
-                        className="btn btn-primary"
-                        onClick={handleShow}
-                      >
-                        <FaPlus />
-                      </ListGroup.Item>
+                      <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
                     )}
                   </ListGroup>
                 </ListGroup>
               </h2>
-              <ListGroup
-                horizontal
-                className={
-                  isActive
-                    ? "d-none"
-                    : "me-auto mt-3 ms-0 d-flex d-md-none justify-content-start"
-                }
-              >
+              <ListGroup horizontal className={isActive ? "d-none" : "me-auto mt-3 ms-0 d-flex d-md-none justify-content-start"}>
                 <ListGroup horizontal>
-                  <ListGroup.Item
-                    action
-                    active={activeTab === "Members"}
-                    onClick={() => {
-                      setsearchTerm("");
-                      setActiveTab("Members");
-                    }}
-                  >
+                  <ListGroup.Item action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}>
                     <AiOutlineTeam /> Team Members
                   </ListGroup.Item>
-                  {(memberProfile?.permissions?.members?.create_edit_delete ===
-                    true ||
+                  {(memberProfile?.permissions?.members?.create_edit_delete === true ||
                     memberProfile?.role?.slug === "owner") && (
-                    <ListGroup.Item
-                      action
-                      active={activeTab === "Invitations"}
-                      onClick={() => {
-                        setsearchTerm("");
-                        setActiveTab("Invitations");
-                      }}
-                    >
+                    <ListGroup.Item action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}>
                       <FiMail /> Invitations
                     </ListGroup.Item>
                   )}
@@ -1095,69 +992,27 @@ function TeamMembersPage() {
   return (
     <>
       {activeTab === "Members" && (
-        <div
-          className={`${
-            isActive
-              ? "show--details team--page project-collapse"
-              : "team--page"
-          } ${projectToggle === true ? "project-collapse" : ""}`}
-        >
+        <div className={`${ isActive ? "show--details team--page project-collapse" : "team--page" } ${projectToggle === true ? "project-collapse" : ""}`}>
           {pagetopbar()}
           <div className="page--wrapper px-md-2 py-3">
             {showloader && (
-              <div className="loading-bar">
-                <img src="images/OnTeam-icon.png" className="flipchar" />
-              </div>
+              <div className="loading-bar"><img src="images/OnTeam-icon.png" className="flipchar" /></div>
             )}
             <Container fluid className="pb-5 pt-2">
               <>
-                <div
-                  className={
-                    isActiveView === 1
-                      ? "project--grid--table project--grid--new--table table-responsive-xl"
-                      : isActiveView === 2
-                      ? "project--table draggable--table new--project--rows table-responsive-xl"
-                      : "project--table new--project--rows table-responsive-xl"
-                  }
-                >
+                <div className={ isActiveView === 1 ? "project--grid--table project--grid--new--table table-responsive-xl" : isActiveView === 2 ? "project--table draggable--table new--project--rows table-responsive-xl" : "project--table new--project--rows table-responsive-xl"}>
                   <Table>
                     <thead className="onHide">
                       <tr key="project-table-header">
-                        <th
-                          scope="col"
-                          className="sticky p-0 border-bottom-0"
-                          key="client-name-header"
-                        >
-                          <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">
-                            Member{" "}
-                            <span key="client-action-header" className="onHide">
-                              Actions
-                            </span>
-                          </div>
+                        <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
+                          <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">Member{" "}<span key="client-action-header" className="onHide">Actions</span></div>
                         </th>
-                        <th
-                          scope="col"
-                          key="client-email-header"
-                          className="onHide p-0 border-bottom-0"
-                        >
-                          <div className="border-bottom padd--x">
-                            Email{" "}
-                            <small>
-                              <TbArrowsSort />
-                            </small>
-                          </div>{" "}
-                        </th>
+                        <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email{" "}</div>{" "}</th>
                         {Array.isArray(customFields) &&
                           customFields
                             .filter((field) => field?.showInTable !== false)
                             .map((field, idx) => (
-                              <th
-                                scope="col"
-                                key={`member-field-${idx}-header`}
-                                className="onHide"
-                              >
-                                {field.label}
-                              </th>
+                              <th scope="col" key={`member-field-${idx}-header`} className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">{field.label}</div></th>
                             ))}
                       </tr>
                     </thead>
@@ -1179,34 +1034,18 @@ function TeamMembersPage() {
                                     }
                               }
                             >
-                              <td
-                                className="project--title--td sticky"
-                                data-label="Member Name"
-                              >
+                              <td className="project--title--td sticky" data-label="Member Name">
                                 <div className="d-flex justify-content-between border-end flex-wrap">
                                   <div className="project--name">
-                                    <div className="drag--indicator">
-                                      <abbr>{idx + 1}</abbr>
-                                    </div>
-                                    <div className="title--initial">
-                                      {member.name.charAt(0)}
-                                    </div>
+                                    <div className="drag--indicator"><abbr>{idx + 1}</abbr></div>
+                                    <div className="title--initial">{member.name.charAt(0)}</div>
                                     <div className="title--span flex-column align-items-start gap-0">
                                       <span>{member.name}</span>
                                       <strong>{member.role?.name}</strong>
                                     </div>
                                   </div>
                                   <div className="onHide task--buttons">
-                                    <Button
-                                      variant="primary"
-                                      className="px-3 py-2"
-                                      onClick={() => {
-                                        handleTableToggle(member);
-                                        setIsActive(true);
-                                      }}
-                                    >
-                                      <BsEye />
-                                    </Button>
+                                    <Button variant="primary" className="px-3 py-2" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /></Button>
                                   </div>
                                 </div>
                               </td>
@@ -1231,13 +1070,14 @@ function TeamMembersPage() {
                                       if (matchedOption) {
                                         mvalue = (
                                           <span
+                                            className="priority--badge"
                                             style={{
-                                              backgroundColor:
-                                                matchedOption.color,
-                                              padding: "4px 8px",
-                                              borderRadius: "8px",
+                                              backgroundColor: matchedOption.color,
                                               color: "#fff",
                                               display: "inline-block",
+                                              borderColor: matchedOption.color,
+                                              borderWidth: '1px',
+                                              borderStyle: 'solid'
                                             }}
                                           >
                                             {
@@ -1297,53 +1137,37 @@ function TeamMembersPage() {
         </div>
       )}
       {activeTab === "Invitations" && (
-        <Invitation
-          activeTab={activeTab}
-          topbar={pagetopbar}
-          activeSubTab={isActiveView}
-          searchTerm={searchTerm}
-          listfor="company"
-          handleIsActive={setIsActive}
-          toggleActive={setIsActive}
-        />
+        <Invitation activeTab={activeTab} topbar={pagetopbar} activeSubTab={isActiveView} searchTerm={searchTerm} listfor="company" handleIsActive={setIsActive} toggleActive={setIsActive}/>
       )}
       {isActive && (
         <div className="details--member--view">
           <div className="wrapper--title py-2 bg-white border-bottom">
-            <span
-              className="open--sidebar me-2 d-flex d-xl-none"
-              onClick={() => {
-                handleSidebarSmall(false);
-                setIsActive(0);
-              }}
-            >
-              <FiSidebar />
-            </span>
-            <div className="projecttitle me-auto">
+            <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+            <div className="projecttitle">
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
-                  <h3>
-                    <strong>{selectedMember?.name}</strong>
-                    <span>{selectedMember?.role?.name}</span>
-                  </h3>
+                    <div className="title--initial">{selectedMember?.name?.charAt(0)}</div>
+                    <div className="title--span flex-column align-items-start gap-0">
+                        <h3>
+                          <strong>{selectedMember?.name}</strong>
+                          <span>{selectedMember?.role?.name}</span>
+                        </h3>
+                    </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <div className="drop--scroll">
-                    {memberFeeds &&
-                      memberFeeds.length > 0 &&
-                      memberFeeds.map((member, idx) => (
-                        <Dropdown.Item
-                          onClick={() => {
-                            handleTableToggle(member);
-                            setIsActive(true);
-                          }}
-                          key={`item-${idx}`}
-                        >
-                          <strong>{member?.name}</strong>
-                          <span>{member.role?.name}</span>
-                        </Dropdown.Item>
-                      ))}
-                  </div>
+                    <div className="drop--scroll">
+                      {memberFeeds &&
+                        memberFeeds.length > 0 &&
+                        memberFeeds.map((member, idx) => (
+                          <Dropdown.Item onClick={() => {handleTableToggle(member);setIsActive(true); }} key={`item-${idx}`} className={(selectedMember?._id === member?._id) ? 'active-project': ''}>
+                            <div className="title--initial">{member?.name.charAt(0)}</div>
+                            <div className="title--span flex-column align-items-start gap-0">
+                              <strong>{member?.name}</strong>
+                              <span>{member.role?.name}</span>
+                            </div>
+                          </Dropdown.Item>
+                        ))}
+                    </div>
                 </Dropdown.Menu>
               </Dropdown>
             </div>
@@ -1371,19 +1195,12 @@ function TeamMembersPage() {
             <div className="rounded--box">
               <Card className="contact--card">
                 <div className="card--img">
-                  <Card.Img
-                    variant="top"
-                    src={selectedMember?.avatar ?? "./images/default.jpg"}
-                  />
+                  <Card.Img variant="top" src={selectedMember?.avatar ?? "./images/default.jpg"}/>
                 </div>
                 <Card.Body className="p-0 ps-4">
                   <Card.Title>
                     {selectedMember?.name}
-                    {(memberProfile?.permissions?.members
-                      ?.create_edit_delete === true ||
-                      memberProfile?.role?.slug === "owner") && (
-                      <FiEdit onClick={() => setIsEditing(true)} />
-                    )}
+                    {(memberProfile?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( <FiEdit onClick={() => setIsEditing(true)} />)}
                   </Card.Title>
 
                   {isEditing === false ? (
@@ -1391,18 +1208,14 @@ function TeamMembersPage() {
                       <Card.Text>
                         <ListGroup>
                           <ListGroup.Item>
-                            <span className="info--icon">
-                              <FiMail />
-                            </span>
+                            <span className="info--icon"><FiMail /></span>
                             <p>
                               <small>Email</small>
                               {selectedMember?.email}
                             </p>
                           </ListGroup.Item>
                           <ListGroup.Item>
-                            <span className="info--icon">
-                              <BsBriefcase />
-                            </span>
+                            <span className="info--icon"><BsBriefcase /></span>
                             <p>
                               <small>Role</small>
                               {selectedMember?.role?.name}
@@ -1415,7 +1228,6 @@ function TeamMembersPage() {
                           <ListGroup.Item>
                             <p>
                               <small>Recording Type</small>
-
                               <span>
                                 {selectedMember?.memberMeta?.recording
                                   ? selectedMember?.memberMeta?.recording?.meta_value
@@ -1431,9 +1243,10 @@ function TeamMembersPage() {
                             <>
                               {customFields.map((field, index) => (
                                 <ListGroup.Item key={index}>
-                                  <small>{field.label}</small>
-                                  {selectedMember?.memberMeta?.[field.name]
-                                    ?.meta_value || ""}
+                                  <p>
+                                    <small>{field.label}</small>
+                                    <span>{selectedMember?.memberMeta?.[field.name] ?.meta_value || ""}</span>
+                                  </p>
                                 </ListGroup.Item>
                               ))}
                             </>

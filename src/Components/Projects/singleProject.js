@@ -543,21 +543,27 @@ useEffect(() => {
             <div className="details--projects--view common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
                     <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
-                    <div className="projecttitle me-auto">
+                    <div className="projecttitle">
                         <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
-                                <h3 key={`project-title-${currentProject?._id}`}>
-                                    <strong>{currentProject?.title}</strong>
-                                    <span>{currentProject?.client?.name}</span>
-                                </h3>
+                                <div className="title--initial">{currentProject?.title?.charAt(0)}</div>
+                                <div className="title--span flex-column align-items-start gap-0">
+                                    <h3 key={`project-title-${currentProject?._id}`}>
+                                        <strong>{currentProject?.title}</strong>
+                                        <span>{currentProject?.client?.name}</span>
+                                    </h3>
+                                </div>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <div className="drop--scroll">
                                     {projects.map((project, index) => {
                                         return (<>
-                                            <Dropdown.Item value={project._id} onClick={() => props?.projectChange(project)}>
-                                                <strong>{project.title}</strong>
-                                                <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
+                                            <Dropdown.Item value={project._id} onClick={() => props?.projectChange(project)} className={(currentProject?._id === project?._id) ? 'active-project': ''}>
+                                                <div className="title--initial">{project.title.charAt(0)}</div>
+                                                <div className="title--span flex-column align-items-start gap-0">
+                                                    <strong>{project.title}</strong>
+                                                    <span>{project.client?.name || <span className='text-muted'>__</span>}</span>
+                                                </div>
                                             </Dropdown.Item>
                                         </>
                                         )

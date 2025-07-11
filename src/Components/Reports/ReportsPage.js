@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, ButtonGroup } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaRegEdit, FaCheck, FaAngleRight, FaPlus, FaTrash, FaEye } from "react-icons/fa";
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
@@ -1418,14 +1418,18 @@ const handleToggles = () => {
                     </Table>
                     {
                       (projectReports?.totalPages > 1) && (
-                        <ButtonGroup>
-                          <Button variant="light" onClick={goToPrevious} disabled={filters?.page === 1}>
-                            ◀
-                          </Button>
-                          <Button variant="light" onClick={goToNext} disabled={filters?.page === projectReports?.totalPages}>
-                            ▶
-                          </Button>
-                        </ButtonGroup>
+                        <Pagination>
+                          <Pagination.Prev onClick={goToPrevious} disabled={filters?.page === 1} />
+                          <Pagination.Next onClick={goToNext} disabled={filters?.page === projectReports?.totalPages} />
+                        </Pagination>
+                        // <ButtonGroup>
+                        //   <Button variant="light" onClick={goToPrevious} disabled={filters?.page === 1}>
+                        //     ◀
+                        //   </Button>
+                        //   <Button variant="light" onClick={goToNext} disabled={filters?.page === projectReports?.totalPages}>
+                        //     ▶
+                        //   </Button>
+                        // </ButtonGroup>
                       )
                     }
                 </div>
@@ -1489,39 +1493,48 @@ const handleToggles = () => {
       <div className="details--projects--grid projects--grid common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
             <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
-            <div className="projecttitle me-auto">
+            <div className="projecttitle">
               {
                 (isActive === 1 && activeMemberTab === 'members') ?
                 <Dropdown>
                   <Dropdown.Toggle variant="link" id="dropdown-basic">
-                    <h3>
-                      <strong>{singleMemberReport?.member?.name}</strong>
-                      <span>{singleMemberReport?.member?.role}</span>
-                    </h3>
+                      <div className="title--initial">{singleMemberReport?.member?.name?.charAt(0)}</div>
+                      <div className="title--span flex-column align-items-start gap-0">
+                          <h3>
+                            <strong>{singleMemberReport?.member?.name}</strong>
+                            <span>{singleMemberReport?.member?.role}</span>
+                          </h3>
+                      </div>
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                       <div className="drop--scroll">
                         {
-                            (memberReports && memberReports.length > 0) && 
-                              memberReports.map((report, index) => {
-                                return (
-                                <Dropdown.Item onClick={() => { setSingleMemberReport(report); setIsActive(1);}}>
-                                  <strong>{report?.member?.name}</strong>
-                                  <span>{report?.member?.role}</span>
-                                </Dropdown.Item>
-                                )
-                              })
-                            }
+                          (memberReports && memberReports.length > 0) && 
+                          memberReports.map((report, index) => {
+                            return (
+                            <Dropdown.Item onClick={() => { setSingleMemberReport(report); setIsActive(1);}} className={(singleMemberReport?.member?._id === report.member?._id) ? 'active-project': ''}>
+                              <div className="title--initial">{report?.member?.name.charAt(0)}</div>
+                              <div className="title--span flex-column align-items-start gap-0">
+                                <strong>{report?.member?.name}</strong>
+                                <span>{report?.member?.role}</span>
+                              </div>
+                            </Dropdown.Item>
+                            )
+                          })
+                        }
                       </div>
                   </Dropdown.Menu>
                 </Dropdown>
                 :
                   <Dropdown>
                     <Dropdown.Toggle variant="link" id="dropdown-basic">
-                      <h3>
-                        <strong>{singleMemberReport?.title}</strong>
-                        <span>{singleMemberReport?.client?.name}</span>
-                      </h3>
+                      <div className="title--initial">{singleMemberReport?.title?.charAt(0)}</div>
+                      <div className="title--span flex-column align-items-start gap-0">
+                        <h3>
+                          <strong>{singleMemberReport?.title}</strong>
+                          <span>{singleMemberReport?.client?.name}</span>
+                        </h3>
+                      </div>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <div className="drop--scroll">
@@ -1529,9 +1542,12 @@ const handleToggles = () => {
                             (projectReports?.reports && projectReports?.reports?.length > 0) && (
                             projectReports?.reports?.map((reportData, i) => {
                               return (
-                                <Dropdown.Item onClick={() => { setSingleMemberReport(reportData); }}>
-                                  <strong>{reportData?.title}</strong>
-                                  <span>{reportData?.client?.name}</span>
+                                <Dropdown.Item onClick={() => { setSingleMemberReport(reportData); }} className={(singleMemberReport?._id === reportData?._id) ? 'active-project': ''}>
+                                  <div className="title--initial">{reportData?.title.charAt(0)}</div>
+                                  <div className="title--span flex-column align-items-start gap-0">
+                                    <strong>{reportData?.title}</strong>
+                                    <span>{reportData?.client?.name}</span>
+                                  </div>
                                 </Dropdown.Item>
                               )
                               
