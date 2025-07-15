@@ -6,7 +6,8 @@ import {
     CUSTOM_FIELDS_LIST,
     FIELD_COMMON_ERROR,
     UPDATE_FIELD_SUCCESS,
-    DELETE_FIELD_SUCCESS
+    DELETE_FIELD_SUCCESS,
+    FIELDS_REORDER
 } from "./types";
 
 const config = {
@@ -67,7 +68,7 @@ export const fetchCustomFields = (payload) =>{
 export const updateCustomField = (id, payload) =>{
     return async (dispatch)=>{
         try{
-            const response = await API.apiPutUrl('custom_field', `/${id}`,payload);
+            const response = await API.apiPutUrl('custom_field', `/update/${id}`,payload);
             if(response.data && response.data.success){
                 await dispatch({ type: UPDATE_FIELD_SUCCESS, payload:response.data});
             }else{
@@ -93,4 +94,17 @@ export const deleteField = (id) =>{
         }
     }
 }
-
+export const reorderedCustomFields = (payload) => {
+    return async (dispatch)=>{
+        try{
+            const response = await API.apiPutUrl('custom_field', `/reorder`, payload);
+            if(response.data && response.data.success){
+                await dispatch({ type: FIELDS_REORDER, payload: response.data});
+            }else{
+                console.log('Reorder failed')
+            }
+        }catch (err){
+            errorRequest(err, dispatch);
+        }
+    }
+}

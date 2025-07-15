@@ -4,9 +4,10 @@ import { Button, Modal, Form, Card, Badge, Row, Col } from 'react-bootstrap';
 import {  FaRegTrashAlt,FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { LuSettings } from "react-icons/lu";
-import { createCustomField, fetchCustomFields, updateCustomField, deleteField } from '../../redux/actions/customfield.action';
+import { createCustomField, fetchCustomFields, updateCustomField, deleteField, reorderedCustomFields } from '../../redux/actions/customfield.action';
 import { AlertDialog } from '.';
 import { selectboxObserver } from '../../helpers/commonfunctions';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 export const  CustomFieldModal =  (props) => {
   const formRef = useRef();
   const dispatch = useDispatch()
@@ -338,6 +339,36 @@ const typeColorMap = {
     setIncludeColumn( checked)
     };
 
+    const handleDragEnd = (result) => {
+        const { source, destination, draggableId } = result;
+        // If there's no destination (i.e., the item was dropped outside), do nothing
+        if (!destination) return;
+        const fieldId = draggableId.split('-')[1]; // Extract task ID from draggableId
+        const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
+        const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
+
+        // Clone the projects array to avoid mutating the state directly
+        let reorderedFields = [...customFields];
+        if (sourceTabId === destinationTabId) {
+            // If the task was moved within the same tab, reorder the tasks
+            const [removed] = reorderedFields.splice(source.index, 1); // Remove task from the source position
+            reorderedFields.splice(destination.index, 0, removed); // Insert task to the destination position
+        } else {
+            // Task was moved to a different tab (if needed, handle cross-tab logic here)
+            const [removed] = reorderedFields.splice(source.index, 1); // Remove from source tab
+            reorderedFields.splice(destination.index, 0, removed); // Add to destination tab
+        }
+        // Generate a list of newly ordered projects
+        const newOrder = reorderedFields.map((field, index) => ({
+            field_id: field._id, // Adjust this if your project ID key is different
+            order: index
+        }));
+
+        // Dispatch the action with the new order
+        dispatch(reorderedCustomFields({ fields: newOrder }));
+        // Update the state with reordered projects
+        setCustomFields(reorderedFields);
+    }
 
   const shouldShowOptions = ['dropdown', 'badge', 'radio', 'checkbox'].includes(fields?.type);
   const shouldshowRangeOptions = ['range'].includes(fields?.type)
@@ -512,6 +543,7 @@ const typeColorMap = {
 
 
         {/* {showAddedFields && ( */}
+        <DragDropContext onDragEnd={handleDragEnd}>
           <div className='added--fields'>
             {
               !isEditing && 
@@ -520,20 +552,40 @@ const typeColorMap = {
               </h4>
           }
             <h5>Added Custom Fields</h5>
-            <div>
-              {customFields.length === 0 ? (
-                <p className="text-muted">No custom fields added yet.</p>
-                ) : (
-                customFields.map((field, index) => (
-                  <FieldCard
-                    key={index}
-                    idx={index + 1}
-                    field={field}
-                  />
-                ))
-              )}
-            </div>
+            <Droppable droppableId="droppable-custom-field-table" direction="vertical">
+  {(provided) => (
+    <div ref={provided.innerRef} {...provided.droppableProps}>
+      {customFields.length === 0 ? (
+        <p className="text-muted">No custom fields added yet.</p>
+      ) : (
+        customFields.map((field, index) => (
+          <Draggable
+            key={field?._id}
+            draggableId={`field-${field?._id}`}
+            index={index}
+          >
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+              >
+                <FieldCard
+                  idx={index + 1}
+                  field={field}
+                />
+              </div>
+            )}
+          </Draggable>
+        ))
+      )}
+      {provided.placeholder}
+    </div>
+  )}
+</Droppable>
+
           </div>
+          </DragDropContext>
         {/* )} */}
       </Modal.Body>
     </Modal>

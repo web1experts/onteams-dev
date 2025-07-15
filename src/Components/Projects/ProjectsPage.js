@@ -164,7 +164,7 @@ function ProjectsPage() {
         if (commonState.selectedMembers) {
             setselectedMembers(commonState.selectedMembers)
         }
-    }, [commonState.selectedMembers])
+    }, [commonState.selectedMembers]);
 
     useEffect(() => {
         if (commonState.projectForm) {
@@ -177,6 +177,12 @@ function ProjectsPage() {
             });
         }
     }, [projectform]);
+
+     useEffect(() => {
+    if( commonState.editProjectForm){
+        setFields(commonState.editProjectForm)
+    }
+    },[ commonState.editProjectForm])
 
     const [isdescEditor, setIsDescEditor] = useState(false);
     const [isTaskEditor, setIsTaskEditor] = useState(false);
@@ -289,6 +295,16 @@ function ProjectsPage() {
                 fieldsSetup.members = membersdrop;
             } else {
                 fieldsSetup.members = [];
+            }
+            if (currentProject.customFields && Object.keys(currentProject.customFields).length > 0) {
+                Object.values(currentProject.customFields).forEach(field => {
+                    fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
+                });
+            }else{
+                customFields.forEach(field => {
+                    fieldsSetup[`custom_field[${field.name}]`] = ''
+                });
+                
             }
             dispatch ( updateStateData( EDIT_PROJECT_FORM, fieldsSetup))
         }

@@ -33,6 +33,15 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
               role="button"
               onClick={() => handleDelete(comment._id, comment?.post)}
             />
+            
+
+            {comment.replies && comment.replies.length > 0 && (
+              <div className="mt-3 ps-4 border-start border-2">
+                {comment.replies.map((reply) => (
+                  <Comment key={reply.id} comment={reply} parentId={comment._id} allowReply={false} />
+                ))}
+              </div>
+            )}
             {allowReply === true && 
               <Button
                 variant="link"
@@ -58,14 +67,6 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
                   Submit
                 </Button>
               </Form>
-            )}
-
-            {comment.replies && comment.replies.length > 0 && (
-              <div className="mt-3 ps-4 border-start border-2">
-                {comment.replies.map((reply) => (
-                  <Comment key={reply.id} comment={reply} parentId={comment._id} allowReply={false} />
-                ))}
-              </div>
             )}
         </Card.Body>
     </Card>

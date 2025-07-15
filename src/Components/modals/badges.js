@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {  Modal, Form, ListGroup, Card} from 'react-bootstrap';
 import { FaCheck, FaCircle } from "react-icons/fa";
 export function BadgesModal({badgesData: {name, options, label}, toggleBadges,showBadges , handleSelect, value}){
-  
   const [search, setSearch] = useState('');
   const dispatch = useDispatch()
     const [statusModalState, setStatusModalState] = useState(showBadges !== null ? true : false)

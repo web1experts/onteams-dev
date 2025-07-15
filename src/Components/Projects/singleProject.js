@@ -341,39 +341,6 @@ function SingleProject(props) {
         return null
     }
 
-    // const handleKeyDown = (e) => {
-    //     if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
-    //         pasteOccurred.current = true; // Mark that a paste action is expected
-    //         console.log('Paste keyboard shortcut detected');
-    //     }
-    // };
-
-    // const handlePaste = (e) => {
-    //     const pastedData = e.clipboardData.getData('text');
-    //     console.log('Pasted content:', pastedData);
-    //     pasteOccurred.current = true; // Set the paste flag to true
-
-    //     setTimeout(function(){
-    //         pasteOccurred.current = false;
-    //     },500)
-    // };
-
-    // useEffect(() => {
-    //     // Add the paste listener to the editor
-    //     if (quillRef.current) {
-    //       const editor = quillRef.current.getEditor();
-    //       editor.root.addEventListener('paste', handlePaste);
-    //     }
-    
-    //     // Cleanup the event listener on unmount
-    //     return () => {
-    //       if (quillRef.current) {
-    //         const editor = quillRef.current.getEditor();
-    //         editor.root.removeEventListener('paste', handlePaste);
-    //       }
-    //     };
-    //   }, []);
-
     const handleKeyDown = (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
         pasteOccurred.current = true;
