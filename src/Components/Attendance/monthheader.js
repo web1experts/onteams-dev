@@ -16,9 +16,11 @@ const daysInMonth = new Date(currentYear, currentMonth, 0).getDate(); // current
     const dayName = date.toLocaleString('default', { weekday: 'short' }); // "Sun", "Mon", etc.
 
     headers.push(
-      <th key={day} className="text-center">
-        <small>{dayName}</small>
-        <strong>{day}</strong>
+      <th key={day} className="text-center p-0">
+        <div className="border-bottom padd--x border-top">
+          <small>{dayName}</small>
+          <strong>{day}</strong>
+        </div>
       </th>
     );
   }

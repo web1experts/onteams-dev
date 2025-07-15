@@ -1,47 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Modal,
-  Form,
-  FloatingLabel,
-  Card,
-  ListGroup,
-  Table,
-  Accordion,
-  Dropdown,
-  FormGroup,
-} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
-import { FaList, FaPlus, FaRegTrashAlt, FaCog } from "react-icons/fa";
-import {
-  FiEdit,
-  FiMail,
-  FiSidebar,
-  FiBriefcase,
-  FiShield,
-  FiPhone,
-  FiCalendar,
-  FiVideo,
-} from "react-icons/fi";
+import { FaList, FaPlus, FaCog } from "react-icons/fa";
+import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiVideo, FiCamera, FiMonitor, FiUserCheck, FiCalendar, FiCheck} from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
-import { BsBriefcase, BsEye, BsGrid, BsEyeSlash  } from "react-icons/bs";
+import { LuFolderOpen, LuUsers, LuTimer, LuChartLine } from "react-icons/lu";
+import { CgCalendarDates } from "react-icons/cg";
+import { TbArrowsDownUp } from "react-icons/tb";
+import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
-import { TbArrowsSort } from "react-icons/tb";
 import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
 import { getMemberdata } from "../../helpers/commonfunctions";
-import {
-  Listmembers,
-  deleteMember,
-  updateMember,
-} from "../../redux/actions/members.action";
-import {
-  toggleSidebar,
-  toggleSidebarSmall,
-} from "../../redux/actions/common.action";
+import { Listmembers, deleteMember, updateMember} from "../../redux/actions/members.action";
+import { toggleSidebar, toggleSidebarSmall} from "../../redux/actions/common.action";
 import { leaveCompany } from "../../redux/actions/workspace.action";
 import { useNavigate } from "react-router-dom";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
@@ -193,6 +165,10 @@ function TeamMembersPage() {
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
+
+  const [screenshots, setScreenshots] = useState(true);
+  const [screenRecording, setScreenRecording] = useState(false);
+  const [liveScreen, setLiveScreen] = useState(false);
 
   const handleTableToggle = (member) => {
     setSelectedMember(member);
@@ -960,6 +936,16 @@ function TeamMembersPage() {
     setShowPermissions(false);
   };
 
+  const [showTeamGrid, setShowTeamGrid] = useState(false);
+  const [selectedCardIndex, setSelectedCardIndex] = useState(null);
+
+  const teamMembers = [
+    { name: 'Gagandeep Singh', role: 'UI/UX Designer', initial: 'G' },
+    { name: 'Tarun Giri', role: 'Project Manager', initial: 'T' },
+    { name: 'Gagandeep Singh', role: 'UI/UX Designer', initial: 'G' },
+    { name: 'Tarun Giri', role: 'Project Manager', initial: 'T' },
+  ];
+  
   const pagetopbar = () => {
     return (
       <div className="page--title px-md-2 py-3 bg-white border-bottom">
@@ -1258,7 +1244,7 @@ function TeamMembersPage() {
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>
-                          <ListGroup.Item>
+                          {/* <ListGroup.Item>
                             <p>
                               <small>Recording Type</small>
                               <span>
@@ -1271,7 +1257,7 @@ function TeamMembersPage() {
                                   : "Screenshot only  "}
                               </span>
                             </p>
-                          </ListGroup.Item>
+                          </ListGroup.Item> */}
                           {customFields?.length > 0 && (
                             <>
                               {customFields.map((field, index) => (
@@ -1342,7 +1328,7 @@ function TeamMembersPage() {
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>
-                          <ListGroup.Item>
+                          {/* <ListGroup.Item>
                             <Form.Label>Recording Type</Form.Label>
                             {(memberProfile?.permissions?.members
                               ?.create_edit_delete === true &&
@@ -1378,7 +1364,7 @@ function TeamMembersPage() {
                                   .replace(/^./, (char) => char.toUpperCase())}
                               </span>
                             )}
-                          </ListGroup.Item>
+                          </ListGroup.Item> */}
                           {customFields?.length > 0 && (
                             <>
                               {customFields.map((field, index) => (
@@ -1475,42 +1461,59 @@ function TeamMembersPage() {
                   </div>
                 </Card.Body>
               </Card>
-              {/* <Card className="work--card">
+              <Card className="work--card">
                 <Card.Body>
                   <Card.Title>
-                    <FiBriefcase /> Work Information
+                    <FiMonitor /> Desktop App Recording Settings
                   </Card.Title>
-                  <Card.Text>
-                    <ListGroup>
-                      <ListGroup.Item>
-                        <span className="info--icon">
-                          <FiCalendar />
-                        </span>
-                        <p>
-                          <small>Address</small>123, Main Street, Heaven Park,
-                          Mohali 160082
-                        </p>
-                      </ListGroup.Item>
-                    </ListGroup>
-                  </Card.Text>
+                  <Card className="mb-3 screenshot--card">
+                    <Card.Body className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex gap-3 align-items-center">
+                        <FiCamera />
+                        <h6 className="mb-1"> Screenshots <small className="d-block">Capture periodic screenshots (every 10 minutes)</small></h6>
+                      </div>
+                      <Form.Check type="switch" checked={screenshots} onChange={() => setScreenshots(!screenshots)} />
+                    </Card.Body>
+                  </Card>
+
+                  {/* Screen Recording */}
+                  <Card className="mb-3 recording--card">
+                    <Card.Body className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex gap-3 align-items-center">
+                        <FiVideo />
+                        <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording during work hours</small></h6>
+                      </div>
+                      <Form.Check type="switch" checked={screenRecording} onChange={() => setScreenRecording(!screenRecording)} />
+                    </Card.Body>
+                  </Card>
+
+                  {/* Live Screen */}
+                  <Card className="mb-3 live--card">
+                    <Card.Body className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex gap-3 align-items-center">
+                        <FiMonitor />
+                        <h6 className="mb-1">Live Screen <small className="d-block">Real-time screen monitoring and sharing</small></h6>
+                      </div>
+                      <Form.Check type="switch" checked={liveScreen} onChange={() => setLiveScreen(!liveScreen)} />
+                    </Card.Body>
+                  </Card>
+
+                  {/* Privacy Notice */}
+                  <div className="mt-3">
+                    <small>
+                      <strong>Privacy Notice:</strong> All recordings are encrypted and stored securely. Data is only accessible to authorized personnel and is used for productivity and security purposes.
+                    </small>
+                  </div>
                 </Card.Body>
-              </Card> */}
+              </Card>
               <Card className="permission--card">
                 <Card.Body>
                   <Card.Title>
-                    <FiShield /> Access Permissions{" "}
-                    <Button
-                      variant="primary"
-                      className="ms-auto"
-                      onClick={() => {
-                        setAdjustPermissions(true);
-                      }}
-                    >
-                      <FiShield /> Manage Permissions
-                    </Button>
+                    <FiShield /> Permissions & Access{" "}
+                    <Button variant="primary" className="ms-auto d-flex align-items-center gap-1" onClick={() => {setAdjustPermissions(true);}}><FaCog /> Manage Permissions</Button>
                   </Card.Title>
                   <Card.Text>
-                    <Accordion
+                    {/* <Accordion
                       activeKey={Object.entries(expanded)
                         .filter(([_, v]) => v)
                         .map(([k]) => k)}
@@ -1563,7 +1566,6 @@ function TeamMembersPage() {
                                         className="parent-item"
                                       />
 
-                                      {/* Show sub-members if view_others is true and selected_members exist */}
                                       {[
                                         "tracking",
                                         "projects",
@@ -1576,22 +1578,7 @@ function TeamMembersPage() {
                                         ) &&
                                         modPerms["selected_members"].length >
                                           0 && (
-                                          <>
-                                            {/* <Form.Check
-                                              type="checkbox"
-                                              id={`${modSlug}-${perm}-select-all`}
-                                              label="Select all"
-                                              checked={
-                                                memberFeeds.length > 0 &&
-                                                memberFeeds.every((member) =>
-                                                  modPerms[
-                                                    "selected_members"
-                                                  ].includes(String(member._id))
-                                                )
-                                              }
-                                              disabled
-                                              className="sub-items"
-                                            /> */}
+                                         
                                             {memberFeeds.map((member) => {
                                               if (
                                                 !modPerms[
@@ -1637,6 +1624,397 @@ function TeamMembersPage() {
                           </Accordion.Item>
                         );
                       })}
+                    </Accordion> */}
+
+                    {/* /*New Accordion Design*/}
+                    <Accordion className="new--accordion--block">
+                      <Accordion.Item eventKey="0" className="bg--blue--accordion">
+                        <Accordion.Header>
+                          <div className="d-flex gap-3 align-items-center">
+                            <LuFolderOpen />
+                            <h6 className="mb-0">Project Management <small className="d-block">Project access and management permissions</small></h6>
+                          </div>
+                        </Accordion.Header>
+                        <Accordion.Body>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--green"><BsEye /></span>
+                            <Card.Body>
+                              <Card.Title>Project Viewing</Card.Title>
+                              <Card.Text>Can view assigned projects and tasks</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--blue"><LuUsers /></span>
+                            <Card.Body>
+                              <Card.Title>Team Visibility</Card.Title>
+                              <Card.Text>Can view other team members' work</Card.Text>
+                              <div className="team--card--grid">
+                                <Card className="team--card">
+                                  <span className="team--initial">G</span>
+                                  <Card.Body>
+                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">T</span>
+                                  <Card.Body>
+                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">G</span>
+                                  <Card.Body>
+                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">T</span>
+                                  <Card.Body>
+                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                                  </Card.Body>
+                                </Card>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
+                            <Card.Body>
+                              <Card.Title>Project Management</Card.Title>
+                              <Card.Text>Create, edit, and delete projects</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--orange"><FiEdit /></span>
+                            <Card.Body>
+                              <Card.Title>Task Management</Card.Title>
+                              <Card.Text>Create, edit, and delete tasks</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--indigo"><TbArrowsDownUp /></span>
+                            <Card.Body>
+                              <Card.Title>Project Ordering</Card.Title>
+                              <Card.Text>Reorder and organize projects</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card>
+                            <span className="card--icon icon--teal"><TbArrowsDownUp /></span>
+                            <Card.Body>
+                              <Card.Title>Task Ordering</Card.Title>
+                              <Card.Text>Reorder and organize tasks</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="1" className="bg--blue--accordion">
+                        <Accordion.Header>
+                          <div className="d-flex gap-3 align-items-center">
+                            <FiUserCheck />
+                            <h6 className="mb-0">Team Management <small className="d-block">Manage team operations and member roles</small></h6>
+                          </div>
+                        </Accordion.Header>
+                        <Accordion.Body>
+                          <div className="team--card--grid">
+                            <Card className="team--card">
+                              <span className="team--initial">G</span>
+                              <Card.Body>
+                                <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                              </Card.Body>
+                            </Card>
+                            <Card className="team--card">
+                              <span className="team--initial">T</span>
+                              <Card.Body>
+                                <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                              </Card.Body>
+                            </Card>
+                            <Card className="team--card">
+                              <span className="team--initial">G</span>
+                              <Card.Body>
+                                <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                              </Card.Body>
+                            </Card>
+                            <Card className="team--card">
+                              <span className="team--initial">T</span>
+                              <Card.Body>
+                                <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                              </Card.Body>
+                            </Card>
+                          </div>
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="2" className="bg--blue--accordion">
+                        <Accordion.Header>
+                          <div className="d-flex gap-3 align-items-center">
+                            <LuUsers />
+                            <h6 className="mb-0">Client Management <small className="d-block">Clients access and management permissions</small></h6>
+                          </div>
+                        </Accordion.Header>
+                        <Accordion.Body>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--green"><BsEye /></span>
+                            <Card.Body>
+                              <Card.Title>Client Viewing</Card.Title>
+                              <Card.Text>Can view assigned projects and tasks</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--blue"><LuUsers /></span>
+                            <Card.Body>
+                              <Card.Title>Client Visibility</Card.Title>
+                              <Card.Text>Can view other team members' work</Card.Text>
+                              <div className="team--card--grid">
+                                <Card className="team--card">
+                                  <span className="team--initial">E</span>
+                                  <Card.Body>
+                                    <h4>Erik Christian <small className="d-block">Paramjeet</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">F</span>
+                                  <Card.Body>
+                                    <h4>Fatah Mokdad <small className="d-block">Akshay</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">S</span>
+                                  <Card.Body>
+                                    <h4>Steve Legaux <small className="d-block">Karman</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">S</span>
+                                  <Card.Body>
+                                    <h4>Sabrina Kouwenhoven <small className="d-block">Paramjeet</small></h4>
+                                  </Card.Body>
+                                </Card>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
+                            <Card.Body>
+                              <Card.Title>Client Management</Card.Title>
+                              <Card.Text>Create, edit, and delete clients</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          {/* <Card className="mb-3">
+                            <span className="card--icon icon--orange"><FiEdit /></span>
+                            <Card.Body>
+                              <Card.Title>Task Management</Card.Title>
+                              <Card.Text>Create, edit, and delete tasks</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--indigo"><TbArrowsDownUp /></span>
+                            <Card.Body>
+                              <Card.Title>Project Ordering</Card.Title>
+                              <Card.Text>Reorder and organize projects</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card>
+                            <span className="card--icon icon--teal"><TbArrowsDownUp /></span>
+                            <Card.Body>
+                              <Card.Title>Task Ordering</Card.Title>
+                              <Card.Text>Reorder and organize tasks</Card.Text>
+                            </Card.Body>
+                          </Card> */}
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="3" className="bg--blue--accordion">
+                        <Accordion.Header>
+                          <div className="d-flex gap-3 align-items-center">
+                            <LuTimer />
+                            <h6 className="mb-0">Time Tracking Management <small className="d-block">Manage time tracking permissions</small></h6>
+                          </div>
+                        </Accordion.Header>
+                        <Accordion.Body>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--green"><BsEye /></span>
+                            <Card.Body>
+                              <Card.Title>Time Tracking Viewing</Card.Title>
+                              <Card.Text>Can view assigned projects and tasks</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--blue"><LuUsers /></span>
+                            <Card.Body>
+                              <Card.Title>Team Visibility</Card.Title>
+                              <Card.Text>Can view other team members' work</Card.Text>
+                              <div className="team--card--grid">
+                                <Card className="team--card">
+                                  <span className="team--initial">G</span>
+                                  <Card.Body>
+                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">T</span>
+                                  <Card.Body>
+                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">G</span>
+                                  <Card.Body>
+                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">T</span>
+                                  <Card.Body>
+                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                                  </Card.Body>
+                                </Card>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
+                            <Card.Body>
+                              <Card.Title>Recording Management</Card.Title>
+                              <Card.Text>can delete recordings</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="4" className="bg--blue--accordion">
+                        <Accordion.Header>
+                          <div className="d-flex gap-3 align-items-center">
+                            <LuChartLine />
+                            <h6 className="mb-0">Reports Management <small className="d-block">Reports access and management permissions</small></h6>
+                          </div>
+                        </Accordion.Header>
+                        <Accordion.Body>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--green"><BsEye /></span>
+                            <Card.Body>
+                              <Card.Title>Reports Viewing</Card.Title>
+                              <Card.Text>Can view team reports, manual time and tasks</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--blue"><LuUsers /></span>
+                            <Card.Body>
+                              <Card.Title>Team Visibility</Card.Title>
+                              <Card.Text>Can view other team members' work</Card.Text>
+                              <div className="team--card--grid">
+                                <Card className="team--card">
+                                  <span className="team--initial">G</span>
+                                  <Card.Body>
+                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">T</span>
+                                  <Card.Body>
+                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">G</span>
+                                  <Card.Body>
+                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">T</span>
+                                  <Card.Body>
+                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                                  </Card.Body>
+                                </Card>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
+                            <Card.Body>
+                              <Card.Title>Reports Management</Card.Title>
+                              <Card.Text>Create, edit, and delete reports</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--orange"><FiEdit /></span>
+                            <Card.Body>
+                              <Card.Title>Time Management</Card.Title>
+                              <Card.Text>Manual time update</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="5" className="bg--blue--accordion">
+                        <Accordion.Header>
+                          <div className="d-flex gap-3 align-items-center">
+                            <FiCalendar />
+                            <h6 className="mb-0">Holidays Management <small className="d-block">Manage upcoming and past holidays</small></h6>
+                          </div>
+                        </Accordion.Header>
+                        <Accordion.Body>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--green"><BsEye /></span>
+                            <Card.Body>
+                              <Card.Title>Holidays Viewing</Card.Title>
+                              <Card.Text>Can view past and upcoming holidays</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card>
+                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
+                            <Card.Body>
+                              <Card.Title>Holiday Management</Card.Title>
+                              <Card.Text>Create, edit, and delete holidays</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </Accordion.Body>
+                      </Accordion.Item>
+                      <Accordion.Item eventKey="6" className="bg--blue--accordion">
+                        <Accordion.Header>
+                          <div className="d-flex gap-3 align-items-center">
+                            <CgCalendarDates />
+                            <h6 className="mb-0">Attendance Management <small className="d-block">Manage members daily attendance</small></h6>
+                          </div>
+                        </Accordion.Header>
+                        <Accordion.Body>
+                          <Card className="mb-3">
+                            <span className="card--icon icon--green"><BsEye /></span>
+                            <Card.Body>
+                              <Card.Title>Attendance Viewing</Card.Title>
+                              <Card.Text>View mambers daily attendance</Card.Text>
+                            </Card.Body>
+                          </Card>
+                          <Card>
+                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
+                            <Card.Body>
+                              <Card.Title>Attendance Management</Card.Title>
+                              <Card.Text>Create, edit, and delete member attendance</Card.Text>
+                              <div className="team--card--grid">
+                                <Card className="team--card">
+                                  <span className="team--initial">G</span>
+                                  <Card.Body>
+                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">T</span>
+                                  <Card.Body>
+                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">G</span>
+                                  <Card.Body>
+                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                                  </Card.Body>
+                                </Card>
+                                <Card className="team--card">
+                                  <span className="team--initial">T</span>
+                                  <Card.Body>
+                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
+                                  </Card.Body>
+                                </Card>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Accordion.Body>
+                      </Accordion.Item>
                     </Accordion>
                   </Card.Text>
                   {/* <div className="text-end mt-3">
@@ -1662,7 +2040,7 @@ function TeamMembersPage() {
         </div>
       )}
 
-      {adjustPermissions && (
+      {/* {adjustPermissions && (
         <Modal
           show={adjustPermissions}
           onHide={() => setAdjustPermissions(false)}
@@ -1725,12 +2103,7 @@ function TeamMembersPage() {
                         }
                       />
                     </FormGroup>
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="p-0"
-                      onClick={handleToggleExpandAll}
-                    >
+                    <Button type="button" variant="link" className="p-0 border-0" onClick={handleToggleExpandAll}>
                       {permissionModules.every((mod) => expanded[mod.slug])
                         ? "Collapse All"
                         : "Expand All"}
@@ -1902,20 +2275,14 @@ function TeamMembersPage() {
                     })}
                   </Accordion>
                   <div className="mt-4 text-end">
-                    <Button
-                      variant="primary"
-                      onClick={handleSave}
-                      disabled={loader}
-                    >
-                      {loader ? "Please wait..." : "Save Permissions"}
-                    </Button>
+                    <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save Permissions"}</Button>
                   </div>
                 </>
               </Card.Body>
             </Card>
           </Modal.Body>
         </Modal>
-      )}
+      )} */}
 
       <Modal
         show={show}
@@ -2278,6 +2645,225 @@ function TeamMembersPage() {
           </Modal.Footer>
         </Modal>
       )}
+
+      {/* /Permissions New Modal/ */}
+      <Modal className="theme--modal" show={adjustPermissions} onHide={() => setAdjustPermissions(false)} size="lg" centered>
+        <Modal.Header closeButton>
+            <Modal.Title>
+                <strong>Edit Permissions <small>Manage access permissions</small></strong>
+            </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="new--accordion--block">
+            <div className="bg--blue--accordion">
+              <div className="d-flex gap-3 align-items-center">
+                <LuFolderOpen />
+                <h6 className="mb-0">Project Management <small className="d-block">Project access and management permissions</small></h6>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View Other Members</p>
+                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
+              </div>
+              {showTeamGrid && (
+                <div className="team--card--grid">
+                  {teamMembers.map((member, index) => (
+                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
+                      <span className="team--initial">G</span>
+                      <Card.Body>
+                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                      </Card.Body>
+                      <FiCheck className="ms-auto" />
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Create Edit Delete Project</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Create Edit Delete Task</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Update Projects Order</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Update Tasks Order</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+            </div>
+            <div className="bg--blue--accordion">
+              <div className="d-flex gap-3 align-items-center">
+                <FiUserCheck />
+                <h6 className="mb-0">Team Management <small className="d-block">Manage team operations and member roles</small></h6>
+                <Form.Check type="switch" className="ms-auto switch--big" onChange={(e) => setShowTeamGrid(e.target.checked)} />
+              </div>
+              {showTeamGrid && (
+                <div className="team--card--grid">
+                  {teamMembers.map((member, index) => (
+                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
+                      <span className="team--initial">G</span>
+                      <Card.Body>
+                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                      </Card.Body>
+                      <FiCheck className="ms-auto" />
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="bg--blue--accordion">
+              <div className="d-flex gap-3 align-items-center">
+                <LuUsers />
+                <h6 className="mb-0">Client Management <small className="d-block">Clients access and managementpermissions</small></h6>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View Other Members</p>
+                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
+              </div>
+              {showTeamGrid && (
+                <div className="team--card--grid">
+                  {teamMembers.map((member, index) => (
+                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
+                      <span className="team--initial">G</span>
+                      <Card.Body>
+                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                      </Card.Body>
+                      <FiCheck className="ms-auto" />
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Create Edit Delete Client</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+            </div>
+            <div className="bg--blue--accordion">
+              <div className="d-flex gap-3 align-items-center">
+                <LuTimer />
+                <h6 className="mb-0">Time Tracking Management <small className="d-block">Manage time tracking permissions</small></h6>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View Other Members</p>
+                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
+              </div>
+              {showTeamGrid && (
+                <div className="team--card--grid">
+                  {teamMembers.map((member, index) => (
+                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
+                      <span className="team--initial">G</span>
+                      <Card.Body>
+                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                      </Card.Body>
+                      <FiCheck className="ms-auto" />
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Delete Recordings</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+            </div>
+            <div className="bg--blue--accordion">
+              <div className="d-flex gap-3 align-items-center">
+                <LuChartLine />
+                <h6 className="mb-0">Reports Management <small className="d-block">Reports access and managementpermissions</small></h6>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View Other Members</p>
+                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
+              </div>
+              {showTeamGrid && (
+                <div className="team--card--grid">
+                  {teamMembers.map((member, index) => (
+                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
+                      <span className="team--initial">G</span>
+                      <Card.Body>
+                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                      </Card.Body>
+                      <FiCheck className="ms-auto" />
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Create Edit Delete Reports</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+            </div>
+            <div className="bg--blue--accordion">
+              <div className="d-flex gap-3 align-items-center">
+                <FiCalendar />
+                <h6 className="mb-0">Holidays Management <small className="d-block">Manage upcoming and past holidays</small></h6>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Create Edit Delete Project</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+            </div>
+            <div className="bg--blue--accordion">
+              <div className="d-flex gap-3 align-items-center">
+                <CgCalendarDates />
+                <h6 className="mb-0">Attendance Management <small className="d-block">Manage members daily attendance</small></h6>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">View Other Members</p>
+                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
+              </div>
+              {showTeamGrid && (
+                <div className="team--card--grid">
+                  {teamMembers.map((member, index) => (
+                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
+                      <span className="team--initial">G</span>
+                      <Card.Body>
+                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
+                      </Card.Body>
+                      <FiCheck className="ms-auto" />
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <div className="d-flex gap-3 align-items-center mt-3">
+                <p className="mb-0">Create Edit Delete Attendance</p>
+                <Form.Check type="switch" className="ms-auto switch--small"/>
+              </div>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="mt-4 text-end">
+            <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save Permissions"}</Button>
+          </div>
+        </Modal.Footer>
+    </Modal>
 
       {(memberProfile &&
         memberProfile.role?.slug === "owner" &&

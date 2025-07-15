@@ -302,27 +302,37 @@ useEffect(() => {
                         <thead>
                             <tr key="project-table-header">
                                 <th scope="col" className="sticky p-0" key="project-name-header">
-                                  <div className="d-flex p-3 border-end">
+                                  <div className="d-flex p-3 border-end border-bottom border-top">
                                     <div className="project--name py-2">
                                         Team Member
                                     </div>
                                   </div>
                                 </th>
                                 <MonthHeader month={filters?.month?.split("/")[0]} year={filters?.month?.split("/")[1]} />
-                                <th className="bg--green text-center">
-                                  <strong>Present</strong>
+                                <th className="bg--green text-center p-0">
+                                  <div className="border-bottom padd--x border-top">
+                                    <strong>Present</strong>
+                                  </div>
                                 </th>
-                                <th className="bg--red text-center">
-                                  <strong>Absent</strong>
+                                <th className="bg--red text-center p-0">
+                                  <div className="border-bottom padd--x border-top">
+                                    <strong>Absent</strong>
+                                  </div>
                                 </th>
-                                <th className="bg--blue text-center">
-                                  <strong>Half Day</strong>
+                                <th className="bg--purple text-center p-0">
+                                  <div className="border-bottom padd--x border-top">
+                                    <strong>Half Day</strong>
+                                  </div>
                                 </th>
-                                <th className="bg--purple text-center">
-                                  <strong>Short Leave (6h)</strong>
+                                <th className="bg--blue text-center p-0">
+                                  <div className="border-bottom padd--x border-top">
+                                    <strong>Short Leave (6h)</strong>
+                                  </div>
                                 </th>
-                                <th className="bg--orange text-center">
-                                  <strong>Short (2h)</strong>
+                                <th className="bg--orange text-center p-0">
+                                  <div className="border-bottom padd--x border-top">
+                                    <strong>Short (2h)</strong>
+                                  </div>
                                 </th>
                             </tr>
                         </thead>
@@ -332,7 +342,7 @@ useEffect(() => {
                               excelData.map((data, i) => {
                                 return (
                                   <tr>
-                                    <td className="project--title--td sticky">
+                                    <td className="project--title--td sticky border-bottom">
                                       <div className="d-flex justify-content-between">
                                         <div className="project--name d-flex justify-content-start gap-3 align-items-center border-end">
                                             <div className="title--initial">{data?.name?.substring(0, 2)}</div>
@@ -348,13 +358,13 @@ useEffect(() => {
                                         data.attendanceData.map((atten, ind) => {
                                           if (atten.count !== undefined) {
                                             return (
-                                              <td className={`${atten?.bg} text-center`} key={ind}>
+                                              <td className={`${atten?.bg} text-center border-bottom`} key={ind}>
                                                 <strong>{atten?.count}</strong>
                                               </td>
                                             );
                                           } else {
                                             return (
-                                              <td className="text-center" key={ind}>
+                                              <td className="text-center border-bottom" key={ind}>
                                                 <span className={`att--badge ${getBadgeColor(atten?.status)}`}>
                                                   {
                                                     atten?.status && atten?.status !== <BsDash />
@@ -387,7 +397,7 @@ useEffect(() => {
                       <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--green">P</span><span className="text-slate-600">Present</span></div>
                       <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--purple">SL</span><span className="text-slate-600">Short Leave</span></div>
                       <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--red">A</span><span className="text-slate-600">Absent</span></div>
-                      <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--orange">SL</span><span className="text-slate-600">Short</span></div>
+                      <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--orange">S</span><span className="text-slate-600">Short</span></div>
                       <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--blue">H</span><span className="text-slate-600">Half Day</span></div>
                   </div>
                 </div>

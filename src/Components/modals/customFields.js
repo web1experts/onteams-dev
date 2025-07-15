@@ -38,7 +38,7 @@ const typeColorMap = {
   textarea: 'warning',
   dropdown: 'success',
   badge: 'dark',
-  date: 'light',
+  date: 'secondary',
   password: 'danger',
   range: 'info',
   checkbox: 'secondary',

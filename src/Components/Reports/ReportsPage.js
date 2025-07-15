@@ -4,12 +4,13 @@ import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaRegEdit, FaCheck, FaAngleRight, FaPlus, FaTrash, FaEye } from "react-icons/fa";
+import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
-import { LuFolderOpen } from 'react-icons/lu';
+import { LuFolderOpen, LuUsers } from 'react-icons/lu';
 import { MdDragIndicator, MdOutlineClose } from "react-icons/md";
-import { FiSidebar } from "react-icons/fi";
+import { FiSidebar, FiClock, FiTarget, FiUsers } from "react-icons/fi";
+import { GoPulse } from 'react-icons/go';
 import { AiOutlineTeam } from 'react-icons/ai';
 import { GrExpand } from "react-icons/gr";
 import { TbReport } from 'react-icons/tb';
@@ -1149,10 +1150,10 @@ const handleToggles = () => {
                     <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">
-                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">Project</th>
-                          <th scope="col" key="client-ttime-header" className="onHide ms-auto">Total Hours</th>
-                          <th scope="col" key="client-time-header" className="onHide">Members</th>
-                          <th scope="col" key="client-action-header" className="onHide">Action</th>
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><LuFolderOpen className="me-1" /> Project</th>
+                          <th scope="col" key="client-time-header" className="onHide ms-auto"><FiClock className="me-1" /> Total Hours</th>
+                          <th scope="col" key="client-status-header" className="onHide"><FiUsers className="me-1" /> Members</th>
+                          <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1"/> Action</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white">
@@ -1166,7 +1167,7 @@ const handleToggles = () => {
                                     <div className="d-flex justify-content-between">
                                       <div className="project--name d-flex gap-3 align-items-center">
                                           <div className="drag--indicator"><abbr>{i+1}</abbr><MdDragIndicator /></div>
-                                          <div className="title--initial">{reportData?.title?.substring(0,2)}</div>
+                                          <div className="title--initial">{reportData?.title?.substring(0,1)}</div>
                                           <div className="title--span flex-column d-flex align-items-start gap-0">
                                               <span>{reportData?.title}</span>
                                               <strong>{reportData?.client?.name}</strong>
@@ -1177,11 +1178,11 @@ const handleToggles = () => {
                                   <td className="ms-auto text-start text-xl-center">
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
                                     <br className="d-xl-none"/>
-                                    {result?.totalTime || 0}
+                                    <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {result?.totalTime || 0}</span>
                                   </td>
                                   <td className="text-start text-xl-center"><strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Members</strong>
                                     <br className="d-xl-none"/>
-                                    {reportData?.members?.length || 0}
+                                    <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><LuUsers className="me-1" /> {reportData?.members?.length || 0}</div>
                                   </td>
                                   <td>
                                     <Button variant="dark" className="ms-auto px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(reportData);setIsActive(1);}}><FaEye/> Details</Button>
@@ -1221,11 +1222,11 @@ const handleToggles = () => {
                   <div className='attendance--table--list'>
                     <Table responsive="lg">
                       <thead className="onHide">
-                        <tr key="project-table-header-member">
-                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header-member">Member</th>
-                          <th scope="col" key="client-time-header-member" className="onHide ms-auto">Total Hours</th>
-                          <th scope="col" key="client-projects-header-member" className="onHide">Projects</th>
-                          <th scope="col" key="client-action-header-member" className="onHide">Action</th>
+                        <tr key="project-table-header">
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
+                          <th scope="col" key="client-time-header" className="onHide ms-auto"><FiClock className="me-1" /> Total Hours</th>
+                          <th scope="col" key="client-status-header" className="onHide"><LuFolderOpen className="me-1" /> Projects</th>
+                          <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1"/> Action</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white">
@@ -1239,7 +1240,7 @@ const handleToggles = () => {
                                     <div className="d-flex justify-content-between">
                                       <div className="project--name d-flex gap-3 align-items-center">
                                         <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
-                                        <div className="title--initial">{report?.member?.name.substring(0, 2)}</div>
+                                        <div className="title--initial">{report?.member?.name.substring(0, 1)}</div>
                                         <div className="title--span flex-column d-flex align-items-start gap-0">
                                             <span>{report?.member?.name}</span>
                                             <strong>{report?.member?.role}</strong>
@@ -1250,9 +1251,14 @@ const handleToggles = () => {
                                   <td className="ms-auto text-start text-xl-center">
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
                                     <br className="d-xl-none"/>
-                                    {result?.totalTime || 0}
+                                    <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {result?.totalTime || 0}</span>
                                   </td>
-                                  <td className="text-start text-xl-center"><strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Projects</strong><br className="d-xl-none"/>{result?.totalProjects || 0}</td>
+
+                                  <td className="text-start text-xl-center">
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Projects</strong>
+                                    <br className="d-xl-none"/>
+                                    <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><LuFolderOpen className="me-1" /> {result?.totalProjects || 0}</div>
+                                  </td>
                                   <td><Button variant="dark" className="mt-0 mt-xl-0 px-3 py-2 d-inline-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(report); setIsActive(1);}}><FaEye/> Details</Button></td>
                                 </tr>
                               )
@@ -1361,53 +1367,47 @@ const handleToggles = () => {
             </div>
             
             {
-            
-            
-            singleMemberReport?.reports?.map((report, index) => {
-              return (
-                      <>
-                      <div className="single--project--stack">
-                        <div eventKey={`single-member-accord-item-${singleMemberReport?.member?._id}`} key={`single-member-accord-item-${singleMemberReport?.member?._id}`} onClick={() => {setSelectedReport(report)}}>
-                          <div className="d-flex align-items-center justify-content-between gap-4">
-                            <h4 className="font-bold text-slate-800 text-lg mb-2">{report?.project?.name} 
-                              <span>{report?.project?.client?.name}</span>
-                              </h4>
-                            <Badge bg="warning">{report?.project?.status}</Badge>
-                          </div>
-                          <Row>
-                            <Col sm={12}>
-                          <div className="report--info">
-                            <p className="p--card">
-                              <label>Tracked Time</label>
-                              <p>{calculateTotalTime(report?.activities,'tracker')}</p>
-                            </p>
-                            <p className="p--card">
-                              <label>Manual Time</label>
-                              <p>{calculateTotalTime(report?.activities, 'manual')}</p>
-                            </p>
-                            <p className="p--card">
-                              <label>Total Time</label>
-                              <p>{calculateTotalTime(report?.activities, 'all')}</p>
-                            </p>
-                          </div>
+              singleMemberReport?.reports?.map((report, index) => {
+                return (
+                  <>
+                    <div className="single--project--stack">
+                      <div eventKey={`single-member-accord-item-${singleMemberReport?.member?._id}`} key={`single-member-accord-item-${singleMemberReport?.member?._id}`} onClick={() => {setSelectedReport(report)}}>
+                        <div className="d-flex align-items-center justify-content-between gap-4">
+                          <h4 className="font-bold text-slate-800 text-lg mb-2">{report?.project?.name} 
+                            <span>{report?.project?.client?.name}</span>
+                          </h4>
+                          <Badge bg="warning">{report?.project?.status}</Badge>
+                        </div>
+                        <Row>
+                          <Col sm={12}>
+                        <div className="report--info">
+                          <p className="p--card">
+                            <label>Tracked Time</label>
+                            <p>{calculateTotalTime(report?.activities,'tracker')}</p>
+                          </p>
+                          <p className="p--card">
+                            <label>Manual Time</label>
+                            <p>{calculateTotalTime(report?.activities, 'manual')}</p>
+                          </p>
+                          <p className="p--card">
+                            <label>Total Time</label>
+                            <p>{calculateTotalTime(report?.activities, 'all')}</p>
+                          </p>
+                        </div>
+                        </Col>
+                        </Row>
+                        <Row>
+                          <Col sm={12}>
+                            <label>Tasks</label>
+                            <TaskList report={report} />
                           </Col>
-                          </Row>
-                          <Row>
-                            <Col sm={12}>
-                              <label>Tasks</label>
-                              <TaskList report={report} />
-                            </Col>
-                          </Row>
-                        </div>
-                        </div>
-                      </>
-                      )
-                    
-                    })}
-                  
-                {/* :
-                <p className="text-center mt-5">No activity available.</p> */}
-              {/* }  */}
+                        </Row>
+                      </div>
+                    </div>
+                  </>
+                )
+              })
+            }
           </div>
           :
           
@@ -1433,7 +1433,7 @@ const handleToggles = () => {
                     <div className={`single--project--stack-${member?._id}`}>
                       <div className="d-flex justify-content-between mb-4" key={`single-member-accord-item-${member?._id}`}>
                         <div className="project--name d-flex gap-3 align-items-center">
-                            <div className="title--initial">{member?.name?.substring(0,2)}</div>
+                            <div className="title--initial">{member?.name?.substring(0,1)}</div>
                             <div className="title--span flex-column d-flex align-items-start gap-0">
                                 <span>{member?.name} </span>
                                 <strong>{member?.role}</strong>

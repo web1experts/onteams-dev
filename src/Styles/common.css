@@ -319,7 +319,7 @@ Login Forms CSS-=-=
   font-size: 15px;
 }
 
-.form-select {
+.wrapper--title .form-select, .page--title .form-select {
   padding: .5rem 2rem .5rem 1.2rem;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
@@ -1077,6 +1077,11 @@ Add Project Modal CSS-=-=-
   border-radius: .75rem;
   border: 1px solid rgb(199 210 254);
   margin-bottom: 1rem;
+}
+
+.add--new--field .dropdown-menu form {
+  max-width: calc(100% - 2rem);
+  margin: 1rem auto 0;
 }
 
 .added--fields .card {
