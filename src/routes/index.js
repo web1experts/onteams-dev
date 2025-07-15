@@ -21,7 +21,7 @@ import TimeTrackingPage from "../Components/TimeTracking/TimeTrackingPage";
 import SettingPage from "../Components/Settings/SettingPage";
 import DashboardPage from "../Components/Dashboard/DashboardPage";
 import DesktopPage from "../Components/Desktop/DesktopPage";
-import ManualTime from "../Components/Reports/ManualTime";
+import ManualTime from "../Components/TimeTracking/ManualTime";
 import PlansPage from "../Components/subscriptions/Plans";
 const commonRouter = [
     {

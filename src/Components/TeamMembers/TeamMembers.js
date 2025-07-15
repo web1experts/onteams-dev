@@ -15,6 +15,7 @@ import {
   Dropdown,
   FormGroup,
 } from "react-bootstrap";
+import { BadgesModal } from "../modals/badges";
 import { FaList, FaPlus, FaRegTrashAlt, FaCog } from "react-icons/fa";
 import {
   FiEdit,
@@ -27,7 +28,7 @@ import {
   FiVideo,
 } from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
-import { BsBriefcase, BsEye, BsGrid } from "react-icons/bs";
+import { BsBriefcase, BsEye, BsGrid, BsEyeSlash  } from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { TbArrowsSort } from "react-icons/tb";
 import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
@@ -48,7 +49,7 @@ import { getFieldRules, validateField } from "../../helpers/rules";
 import { createMember } from "../../redux/actions/members.action";
 import Invitation from "./Invitation";
 import { AlertDialog, TransferOnwerShip } from "../modals";
-import { selectboxObserver } from "../../helpers/commonfunctions";
+import { selectboxObserver, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
 import { socket, currentMemberProfile } from "../../helpers/auth";
 import { updatePermissions } from "../../redux/actions/permission.action";
 import { permissionModules } from "../../helpers/permissionsModules";
@@ -195,9 +196,9 @@ function TeamMembersPage() {
 
   const handleTableToggle = (member) => {
     setSelectedMember(member);
-    if (!isActive) {
-      setIsActive(true);
-    }
+    // if (!isActive) {
+    //   setIsActive(true);
+    // }
   };
   const apiPermission = useSelector((state) => state.permissions);
   const apiCustomfields = useSelector((state) => state.customfields);
@@ -216,6 +217,7 @@ function TeamMembersPage() {
   const [memberIndex, setMemberIndex] = useState("");
   // const [memberMeta, setMemberMeta] = useState({})
   // const [disable, setDisable] = useState(true);
+  const [visiblePasswords, setVisiblePasswords] = useState({});
   const [showCustomFields, setShowCustomFields] = useState(false);
   const [customFields, setCustomFields] = useState([]);
   const workspaceState = useSelector((state) => state.workspace);
@@ -244,9 +246,11 @@ function TeamMembersPage() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [memberFeeds, setMemberFeed] = useState([]);
   const [showloader, setShowloader] = useState(false);
+   const [showPasswordFields, setShowPasswordFields] = useState({});
   const apiResult = useSelector((state) => state.member);
   const [searchTerm, setsearchTerm] = useState("");
   const memberFeed = useSelector((state) => state.member.members);
+  const [showBadges, setShowBadges] = useState(null);
   const [editedMember, setEditedMember] = useState({});
   const [showdialog, setShowDialog] = useState(false);
   const [roles, setRoles] = useState([]);
@@ -283,6 +287,17 @@ function TeamMembersPage() {
   const toggleCustomFields = () => {
     setShowCustomFields((prev) => !prev);
   };
+
+  const toggleShowPassword = (fieldId) => {
+    setShowPasswordFields((prev) => ({
+        ...prev,
+        [fieldId]: !prev[fieldId],
+    }));
+  };
+
+  const toggleBadges = (fieldIndex) => {
+        setShowBadges(fieldIndex);
+    };
 
   useEffect(() => {
     dispatch(getAvailableRolesByWorkspace({ fields: "_id name permissions" }));
@@ -494,6 +509,13 @@ function TeamMembersPage() {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
 
+  const toggleVisibility = (key) => {
+        setVisiblePasswords((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+        }));
+    };
+
   const removeError = (field) => {
     setErrors({ ...fieldErrors, [field]: "" });
   };
@@ -542,7 +564,11 @@ function TeamMembersPage() {
       }
     }
   };
-
+  const handleDateChange = (value, name) =>{ 
+        setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
+        setErrors({ ...errors, [name]: '' })
+    }
+    
   const handleChange = ({ target: { name, value, type, files, checked } }) => {
     const finalValue =
       type === "checkbox" ? checked : type === "file" ? files : value;
@@ -559,22 +585,25 @@ function TeamMembersPage() {
     }
 
     setErrors({ ...errors, [name]: "" });
+
+    if( showBadges !== null && Object.keys(selectedMember).length > 0 && isActive !== true){
+        let payload = {};
+
+        if (name.startsWith('custom_field[')) {
+            const fieldName = name.match(/custom_field\[(.*?)\]/)?.[1]; // extract "badge"
+                payload = {
+                    custom_field: {
+                        [fieldName]: value,
+                    }
+                }
+        } else {
+            payload[name] = value;
+        }
+        dispatch(updateMember(selectedMember._id, payload));
+    }
   };
 
-  const handleChangeOld = (event, fieldname = "") => {
-    // const { name, value, type, files } = event.target;
-    // const updatedRows = [...rows];
-    // updatedRows[index] = { ...updatedRows[index], [name]: value };
-    // setRows(updatedRows);
-    // const updatedErrors = [...errors];
-    // // Check if there is an error message for the specified field at the given index
-    // if (updatedErrors[index] && updatedErrors[index][name]) {
-    //   // If an error message exists, update it to an empty string to remove the error
-    //   updatedErrors[index][name] = "";
-    // }
-    // // Update the errors state with the updated array
-    // setErrors(updatedErrors);
-  };
+
   const showError = (name) => {
     if (errors && errors[name])
       return <span className="error">{errors[name]}</span>;
@@ -1032,11 +1061,8 @@ function TeamMembersPage() {
                                   : ""
                               }
                               onClick={
-                                isActive
-                                  ? () => handleTableToggle(member)
-                                  : () => {
-                                      return false;
-                                    }
+                                  () => handleTableToggle(member)
+                                  
                               }
                             >
                               <td className="project--title--td sticky" data-label="Member Name">
@@ -1065,6 +1091,8 @@ function TeamMembersPage() {
                                     let mvalue =
                                       member?.memberMeta?.[fieldname]
                                         ?.meta_value;
+                                    const fieldType = field.type;
+                                    const uniqueKey = `${fieldname || idx}-${mvalue}`;
                                     if (
                                       field.type === "badge" &&
                                       Array.isArray(field.options)
@@ -1084,6 +1112,7 @@ function TeamMembersPage() {
                                               borderWidth: '1px',
                                               borderStyle: 'solid'
                                             }}
+                                            onClick={() => toggleBadges(field)}
                                           >
                                             {
                                               member?.memberMeta?.[fieldname]
@@ -1092,6 +1121,19 @@ function TeamMembersPage() {
                                           </span>
                                         );
                                       }
+                                    }
+                                    else if(fieldType === 'password'){
+                                        return (
+                                            <span className="d-flex align-items-center gap-2">
+                                                {visiblePasswords[uniqueKey] ? mvalue : '*****'}
+                                                <span
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => toggleVisibility(uniqueKey)}
+                                                >
+                                                    {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
+                                                </span>
+                                            </span>
+                                        )
                                     }
                                     return (
                                       <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
@@ -1345,13 +1387,24 @@ function TeamMembersPage() {
                                     name: `custom_field[${field.name}]`,
                                     type: field.type,
                                     label: field.label,
-                                    value:
-                                      fields[`custom_field[${field.name}]`] ||
-                                      "",
+                                    value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                                                                        ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                                                                        : fields[`custom_field[${field.name}]`] || '',
                                     options: field?.options || [],
+                                    
                                     onChange: (e) =>
-                                      handleChange(e, field.name),
+                                      {
+                                        if(field.type === "date"){
+                                            
+                                            handleDateChange(e, `custom_field[${field.name}]`)
+                                        }else{
+                                            handleChange(e)
+                                        }
+                                    },
                                     range_options: field?.range_options || {},
+                                    showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                                    toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                                    toggleBadges: () => toggleBadges(field),
                                   })}
                                 </ListGroup.Item>
                               ))}
@@ -1919,11 +1972,23 @@ function TeamMembersPage() {
                         name: `custom_field[${field.name}]`,
                         type: field.type,
                         label: field.label,
-                        value: fields[`custom_field[${field.name}]`] || "",
+                        value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                : fields[`custom_field[${field.name}]`] || '',
                         options: field?.options || [],
-                        onChange: (e) => handleChange(e, field.name),
+                        onChange: (e) => {
+                                            if(field.type === "date"){
+                                                
+                                                handleDateChange(e, `custom_field[${field.name}]`)
+                                            }else{
+                                                handleChange(e)
+                                            }
+                                        },
                         fieldId: `new-${field.name}-${index}`,
                         range_options: field?.range_options || {},
+                        showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                        toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                        toggleBadges: () => toggleBadges(field),
                       })
                     )}
                   </>
@@ -2291,6 +2356,10 @@ function TeamMembersPage() {
       {showCustomFields && (
         <CustomFieldModal toggle={setShowCustomFields} module="members" />
       )}
+      {
+          showBadges !== null && 
+              <BadgesModal badgesData={showBadges} toggleBadges={toggleBadges} handleSelect={handleChange} value={fields[`custom_field[${showBadges?.name}]`] || ''}/>
+      }
     </>
   );
 }

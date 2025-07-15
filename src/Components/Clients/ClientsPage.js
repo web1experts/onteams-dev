@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Dropdown } from "react-bootstrap";
 import { FaEye, FaList, FaPlus, FaTrashAlt, FaCog } from "react-icons/fa";
 import { FiEdit, FiMail, FiPhone, FiSidebar } from "react-icons/fi";
-import { BsGrid, BsEye } from "react-icons/bs";
+import { BsGrid, BsEye, BsEyeSlash  } from "react-icons/bs";
 import { TbArrowsSort } from "react-icons/tb";
 import { GrExpand } from "react-icons/gr";
 import { MdOutlineSearch, MdDragIndicator, MdOutlineClose, MdSearch } from "react-icons/md";
@@ -18,7 +18,8 @@ import { renderDynamicField } from "../common/dynamicFields";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { currentMemberProfile } from "../../helpers/auth";
 import { CustomFieldModal } from "../modals/customFields";
-
+import { convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY } from "../../helpers/commonfunctions";
+import { BadgesModal } from "../modals/badges";
 /*function EditableField({ field, label, value, onChange, isEditing, onEditClick, error }) {
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
@@ -76,6 +77,7 @@ function ClientsPage() {
    const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
    const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
    const commonState = useSelector(state => state.common)
+   const [showBadges, setShowBadges] = useState(null);
    const [ isEditing, setIsEditing] = useState( false )
   const memberProfile = currentMemberProfile()
   inputs.forEach(input => {
@@ -106,9 +108,9 @@ function ClientsPage() {
   const handleClick = (client) => {
     setAvatarPreview(null)
     setSelectedClient(client)
-    if (!isActive) {
-      setIsActive(current => !current);
-    }
+    // if (!isActive) {
+    //   setIsActive(current => !current);
+    // }
 
   };
   let fieldErrors = {};
@@ -135,13 +137,14 @@ function ClientsPage() {
   const [selectedClient, setSelectedClient] = useState(null)
   const [userId, setuserId] = useState('');
   const pagesToDisplay = [];
+  const [showPasswordFields, setShowPasswordFields] = useState({});
   const [showloader, setShowloader] = useState(true)
   const apiResult = useSelector(state => state.client);
   const [editedClient, setEditedClient] = useState({});
   const [fields, setFields] = useState({ name: '', remove_avatar: false });
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [ showCustomFields, setShowCustomFields] = useState( false )
-  
+  const [visiblePasswords, setVisiblePasswords] = useState({});
 
   const [showSearch, setSearchShow] = useState(false);
   const handleSearchClose = () => setSearchShow(false);
@@ -156,6 +159,15 @@ function ClientsPage() {
     setIsActive(false)
   }
 
+  
+  
+  const toggleVisibility = (key) => {
+      setVisiblePasswords((prev) => ({
+          ...prev,
+          [key]: !prev[key],
+      }));
+  };
+
   const handledeleteClient = async () => {
     await dispatch(deleteClient(selectedClient._id))
   }
@@ -164,9 +176,16 @@ function ClientsPage() {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
 
-  useEffect(() => {
-    console.log(fields);
-  },[fields])
+  const toggleBadges = (fieldIndex) => {
+        setShowBadges(fieldIndex);
+    };
+
+  const toggleShowPassword = (fieldId) => {
+        setShowPasswordFields((prev) => ({
+            ...prev,
+            [fieldId]: !prev[fieldId],
+        }));
+    };
 
   const handleFieldChange = (field, value) => {
    
@@ -321,31 +340,36 @@ function ClientsPage() {
   
   }, [apiCustomfields]);
 
+  const handleDateChange = (value, name) =>{ console.log(new Date(value))
+          setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
+          setErrors({ ...errors, [name]: '' })
+      }
+
   const handleChange = ({ target: { name, value, type, files, checked } }) => { 
     const finalValue =
     type === 'checkbox' ? checked : type === 'file' ? files : value;
     
     setFields({ ...fields, [name]: finalValue });
     setErrors({ ...errors, [name]: '' })
+
+    if( showBadges !== null && Object.keys(selectedClient).length > 0 && isActive !== true ){
+        let payload = {};
+
+        if (name.startsWith('custom_field[')) {
+            const fieldName = name.match(/custom_field\[(.*?)\]/)?.[1]; // extract "badge"
+                payload = {
+                    custom_field: {
+                        [fieldName]: value,
+                    }
+                }
+        } else {
+            payload[name] = value;
+        }
+        dispatch(updateClient(selectedClient?._id, payload));
+    }
   };
 
-  // const handleChange = ( event, fieldname = '') => {
-  //   const { name, value, type, files } = event.target;
-  //   const updatedRows = [...rows];
-
-
-  //   // updatedRows[index] = { ...updatedRows[index], [name]: value };
-  //   // setRows(updatedRows);
-  //   // const updatedErrors = [...errors];
-  //   // // Check if there is an error message for the specified field at the given index
-  //   // if (updatedErrors[index] && updatedErrors[index][name]) {
-  //   //   // If an error message exists, update it to an empty string to remove the error
-  //   //   updatedErrors[index][name] = '';
-  //   // }
-  //   // // Update the errors state with the updated array
-  //   // setErrors(updatedErrors);
-
-  // };
+  
 
   useEffect(() => {
     const check = ['undefined', undefined, 'null', null, '']
@@ -567,7 +591,7 @@ function ClientsPage() {
                     (!spinner && clientFeeds && clientFeeds.length > 0)
                       ? clientFeeds.map((client, index) => {
                         return (<>
-                          <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={isActive ? () => handleClick(client) : () => { return false; }}>
+                          <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={ () => handleClick(client)}>
                             {/* <td>{index + 1}</td> */}
                             <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Client Name">
                               <div className="d-lg-flex justify-content-between border-end flex-wrap">
@@ -579,7 +603,7 @@ function ClientsPage() {
                                       </div>
                                   </div>
                                    <div className="onHide task--buttons">
-                                      <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client);}}><BsEye /></Button>
+                                      <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client); setIsActive(true)}}><BsEye /></Button>
                                   </div>
                               </div>
                             </td>
@@ -588,6 +612,8 @@ function ClientsPage() {
                               .map((field, idx) => {
                                   const fieldname = field.name;
                                   let mvalue = client?.customFields?.[fieldname]?.meta_value;
+                                  const fieldType = field.type;
+                                  const uniqueKey = `${fieldname || idx}-${mvalue}`;
                                   if (field.type === 'badge' && Array.isArray(field.options)) {
                                       const matchedOption = field.options.find(opt => opt.value === mvalue);
                                       if (matchedOption) {
@@ -602,11 +628,24 @@ function ClientsPage() {
                                               borderWidth: '1px',
                                               borderStyle: 'solid'
                                             }}
+                                            onClick={() => toggleBadges(field)}
                                           >
                                           {client?.customFields?.[fieldname]?.meta_value}
                                           </span>
                                       );
                                       }
+                                  }else if(fieldType === 'password'){
+                                      return (
+                                          <span className="d-flex align-items-center gap-2">
+                                              {visiblePasswords[uniqueKey] ? mvalue : '*****'}
+                                              <span
+                                                  style={{ cursor: 'pointer' }}
+                                                  onClick={() => toggleVisibility(uniqueKey)}
+                                              >
+                                                  {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
+                                              </span>
+                                          </span>
+                                      )
                                   }
                                   return (
                                       <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide new--td">
@@ -769,10 +808,22 @@ function ClientsPage() {
                                     name: `custom_field[${field.name}]`,
                                     type: field.type,
                                     label: field.label,
-                                    value: fields[`custom_field[${field.name}]`] || '',
+                                    value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                            ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                            : fields[`custom_field[${field.name}]`] || '',
                                     options: field?.options || [],
-                                    onChange: (e) => handleChange(e, field.name),
-                                    range_options: field?.range_options || {}
+                                    onChange: (e) => {
+                                        if(field.type === "date"){
+                                            
+                                            handleDateChange(e, `custom_field[${field.name}]`)
+                                        }else{
+                                            handleChange(e)
+                                        }
+                                    },
+                                    range_options: field?.range_options || {},
+                                    showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                                    toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                                    toggleBadges: () => toggleBadges(field),
                                   })}
                                 </ListGroup.Item>
                               ))}
@@ -828,6 +879,10 @@ function ClientsPage() {
         </Modal.Body>
       </Modal>
       { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module='clients' />}
+      {
+          showBadges !== null && 
+              <BadgesModal badgesData={showBadges} toggleBadges={toggleBadges} handleSelect={handleChange} value={fields[`custom_field[${showBadges?.name}]`] || ''}/>
+      }
     </>
   );
 }

@@ -51,6 +51,24 @@ export const getliveActivity = (payload) => {
   };
 }
 
+export const getAllMembersRecordedActivity = (payload) => {
+
+  return async (dispatch) => {
+    try {
+
+      const response = await API.apiPost('activity', payload)
+    
+      if (response.data && response.data.success) {
+        await dispatch({ type: LIVE_ACTIVITY_LIST_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: ACTIVITY_COMMON_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
 export const getRecoredActivity = (id, status, filtereddate) => {
 
   return async (dispatch) => {

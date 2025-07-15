@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, Card, Badge, Row, Col } from 'react-bootstrap';
-import {  FaRegTrashAlt,FaRegEdit } from "react-icons/fa";
+import {  FaRegTrashAlt,FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { LuSettings } from "react-icons/lu";
 import { createCustomField, fetchCustomFields, updateCustomField, deleteField } from '../../redux/actions/customfield.action';
 import { AlertDialog } from '.';
+import { selectboxObserver } from '../../helpers/commonfunctions';
 export const  CustomFieldModal =  (props) => {
   const formRef = useRef();
   const dispatch = useDispatch()
@@ -171,6 +172,9 @@ const typeColorMap = {
     setFieldName('');
     setFieldType('');
     setOptions([]);
+    setTimeout(() => {
+      selectboxObserver()
+    },700)
   };
 
   function createSlug(fieldName) {
@@ -224,7 +228,7 @@ const typeColorMap = {
     if (['radio', 'dropdown','badge'].includes(fields?.type) && fields?.options.length === 0) {
       newErrors.options = 'At least one option is required';
     }
-
+    
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) return;
@@ -273,8 +277,13 @@ const typeColorMap = {
       });
   };
 
-  const handleChange = ({ target: { name, value} }) => {
-      setFields({ ...fields, [name]: value })
+  const handleChange = ({ target: { name, value, type, checked} }) => { console.log(`${type}-- ${checked}`)
+  if( type === "checkbox"){
+    setFields({ ...fields, [name]: checked })
+  }else{
+    setFields({ ...fields, [name]: value })
+  }
+      
   };
 
   const handleRangeChange = ({ target: { name, value} }) => {
@@ -295,6 +304,7 @@ const typeColorMap = {
       const newFieldOption = { label, value };
       if(fields?.type === 'badge'){
         newFieldOption['color'] = badgeColor
+        setBadgeColor('#28a745')
       }
       setFields({
         ...fields,
@@ -377,6 +387,7 @@ const typeColorMap = {
                             name='type'
                             onChange={handleChange}
                             isInvalid={!!errors.fieldType}
+                            className='custom-selectbox'
                           >
                             <option value="">-- Select Type --</option>
                             <option value="text">Text Field</option>
@@ -466,6 +477,10 @@ const typeColorMap = {
                           alignItems: 'center'
                         }}>
                           <span style={{ marginRight: '10px', color: '#3730a3', fontWeight: 500 }}>{opt.label}</span>
+                          {
+                            fields?.type === 'badge' && 
+                            <FaCircle style={{ color: opt.color }}>{opt.color}</FaCircle>
+                          }
                           <span style={{ cursor: 'pointer' }} onClick={() => removeOption(idx)}>×</span>
                         </div>
                       ))}

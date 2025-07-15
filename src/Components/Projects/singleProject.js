@@ -7,12 +7,12 @@ import { FiFileText } from "react-icons/fi";
 import { GrAttachment, GrExpand } from "react-icons/gr";
 import { FiSidebar } from "react-icons/fi";
 import { updateProject, deleteProject } from "../../redux/actions/project.action"
-import AddClient from "../Clients/AddClient";
+import { BadgesModal } from "../modals/badges";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
 import { useDropzone } from 'react-dropzone'
 import fileIcon from './../../images/file-icon-image.jpg'
-import { selectboxObserver } from "../../helpers/commonfunctions";
+import { selectboxObserver, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
 import { togglePopups, updateStateData,toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import {  EDIT_PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, DIRECT_UPDATE } from "../../redux/actions/types";
 import { MemberInitials } from "../common/memberInitials";
@@ -34,6 +34,7 @@ function SingleProject(props) {
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [], client: '' });
     const [errors, setErrors] = useState({ title: '' });
     const [loader, setLoader] = useState(false);
+    const [showPasswordFields, setShowPasswordFields] = useState({});
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
     const[ editormode, setEditorMode] = useState( false )
@@ -52,6 +53,7 @@ function SingleProject(props) {
     const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
     const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
     const handleWorkflowClose = () => dispatch( togglePopups('workflow',false ));
+    const [showBadges, setShowBadges] = useState(null);
     const projects = props.projects;
     const handleWorkflowShow = async () => {
        await dispatch( updateStateData(DIRECT_UPDATE, false))
@@ -275,11 +277,28 @@ function SingleProject(props) {
         setImagePreviews(updatedImagePreviews);
     };
 
+    const toggleShowPassword = (fieldId) => {
+        setShowPasswordFields((prev) => ({
+            ...prev,
+            [fieldId]: !prev[fieldId],
+        }));
+    };
+    const toggleBadges = (fieldIndex) => {
+        setShowBadges(fieldIndex);
+    };
 
     const onDrop = useCallback(acceptedFiles => {
         handleSelectedFiles(acceptedFiles)
     }, [])
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+     
+
+
+    const handleDateChange = (value, name) =>{ console.log(new Date(value))
+        setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
+        dispatch( updateStateData( EDIT_PROJECT_FORM,  {[name]: formatDateToDDMMYYYY(value) }))
+        setErrors({ ...errors, [name]: '' })
+    }
 
     const handleChange = ({ target: { name, value, type, files, checked } }) => { 
     const finalValue =
@@ -770,10 +789,21 @@ useEffect(() => {
                                             name: `custom_field[${field.name}]`,
                                             type: field.type,
                                             label: field.label,
-                                            value: fields[`custom_field[${field.name}]`] || '',
-                                            options: field?.options || [],
-                                            onChange: (e) => handleChange(e, field.name),
-                                            range_options: field?.range_options || {}
+                                            value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                                    ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                                    : fields[`custom_field[${field.name}]`] || '',
+                                            onChange: (e) => {
+                                                if(field.type === "date"){
+                                                    
+                                                    handleDateChange(e, `custom_field[${field.name}]`)
+                                                }else{
+                                                    handleChange(e)
+                                                }
+                                            },
+                                            range_options: field?.range_options || {},
+                                            showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                                            toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                                            toggleBadges: () => toggleBadges(field),
                                         })
                                     )}
                                     </>
@@ -1046,6 +1076,10 @@ useEffect(() => {
                     callback={handledeleteProject}
                 />
             </>
+            {
+                showBadges !== null && 
+                    <BadgesModal badgesData={showBadges} toggleBadges={toggleBadges} handleSelect={handleChange} value={fields[`custom_field[${showBadges?.name}]`] || ''}/>
+            }
         </>
     );
 }

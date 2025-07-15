@@ -38,6 +38,22 @@ body {
   color: rgb(15 23 42);
 }
 
+.bg-slate-200 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(226 232 240 / var(--tw-bg-opacity, 1));
+}
+.to-cyan-500 {
+    --tw-gradient-to: #06b6d4 ;
+}
+.from-blue-500 {
+    --tw-gradient-from: #3b82f6;
+    --tw-gradient-to: rgb(59 130 246 / 0) ;
+    --tw-gradient-stops: #3b82f6, #06b6d4;
+}
+.bg-gradient-to-r {
+    background-image: linear-gradient(to right,#3b82f6 , #06b6d4);
+}
+
 .team--page .page--title h2 .list-group .expand--icon .btn {
   padding: 0;
   width: 40px;

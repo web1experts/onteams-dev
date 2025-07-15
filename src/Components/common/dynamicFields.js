@@ -1,13 +1,15 @@
-import React from 'react';
-import { Form, ProgressBar } from 'react-bootstrap';
+import React, {useState} from 'react';
+import { Form, ProgressBar, Modal , ListGroup} from 'react-bootstrap';
 import DatePicker from "react-multi-date-picker";
-
+import { BsEye, BsEyeSlash } from 'react-icons/bs';
+import { FaChevronDown, FaCircle, FaCheck } from 'react-icons/fa';
 /**
  * Renders a dynamic form field based on config.
  * @param {Object} config - Field config object
  * @returns JSX.Element
  */
 export function renderDynamicField(config) {
+  
   const {
     name,
     type,
@@ -24,7 +26,11 @@ export function renderDynamicField(config) {
     readOnly = false,
     required = false,
     fieldId,
-    range_options =  {}
+    range_options =  {},
+    showPassword,
+    toggleShowPassword,
+    toggleBadges
+
   } = config;
   
   // const fieldId = `field-${name}`;
@@ -43,22 +49,52 @@ export function renderDynamicField(config) {
     required,
   };
 
+  let filteredStatuses = options || []
+
   let percentage = 0;
   if( type === 'range'){
     percentage  = ((value - range_options?.min) / (range_options?.max - range_options?.min)) * 100;
   }
 
+  const handleSearch = ({target: {value}}) => {
+    filteredStatuses = options.filter(status => 
+      status.label.toLowerCase().includes(value.toLowerCase())
+    );
+  }
+
   return (
     <Form.Group className="mb-3" controlId={fieldId}>
-      {label && <Form.Label label={label}>{label}</Form.Label>}
+      {(type !== "badge" && label) && (<Form.Label label={label}>{label}</Form.Label>)}
 
       {/* Basic Inputs */}
-      {['text', 'email', 'password'].includes(type) && (
+      {['text', 'email'].includes(type) && (
         <Form.Control type={type} {...sharedProps} key={fieldId} />
       )}
+      {type === 'password' && (
+        <div className="position-relative">
+            <Form.Control
+                type={showPassword ? 'text' : 'password'}
+                {...sharedProps}
+                key={fieldId}
+            />
+            <span
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    right: '10px',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    color: '#999'
+                }}
+                onClick={toggleShowPassword}
+            >
+                {showPassword ? <BsEyeSlash /> : <BsEye />}
+            </span>
+        </div>
+    )}
 
       {['phone'].includes(type) && (
-        <Form.Control type='text' {...sharedProps} key={fieldId} />
+        <Form.Control type='tel' {...sharedProps} key={fieldId} />
       )}
 
       
@@ -82,12 +118,22 @@ export function renderDynamicField(config) {
       )}
 
       {type ==='date' && (
-        <Form.Control type="date" {...sharedProps} key={fieldId} />
+        <DatePicker 
+          weekStartDayIndex={1}
+          format="YYYY-MM-DD"
+          // range
+          // numberOfMonths={2}
+          dateSeparator=" - " 
+          {...sharedProps} 
+          key={fieldId}
+          editable={false}         
+          className="form-control"
+          placeholder="dd/mm/yyyy"/>
 
       )}
 
       {/* Select */}
-      {(type === 'select' || type === 'dropdown' || type === 'badge') && (
+      {(type === 'select' || type === 'dropdown') && (
         <Form.Select {...sharedProps} key={fieldId} className='custom-selectbox'>
           <option value="">-- Select --</option>
           {options.map((opt) => (
@@ -96,6 +142,17 @@ export function renderDynamicField(config) {
             </option>
           ))}
         </Form.Select>
+      )}
+
+      {(type === 'badge') && (
+        <>
+        <Form.Label>
+            <small>{label}</small>
+            <div className="status--modal" onClick={toggleBadges}>
+                {value || 'Select'} <FaChevronDown />
+            </div>
+        </Form.Label>
+        </>
       )}
 
       {/* Radio */}
@@ -123,6 +180,10 @@ export function renderDynamicField(config) {
               step={range_options?.steps || 1}
               {...sharedProps} key={fieldId}
             />
+            <div className="d-flex justify-content-between">
+                <small>{range_options?.min || 1}</small>
+                <small>{range_options?.max || 100}</small>
+            </div>
             <ProgressBar now={percentage} label={`${value}`} />  
           </>
         }

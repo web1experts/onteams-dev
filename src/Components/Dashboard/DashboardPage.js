@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form } from "react-bootstrap";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { BsTrash } from 'react-icons/bs'
+import { BsTrash, BsPencil } from 'react-icons/bs'
 import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye, FaPlus } from 'react-icons/fa';
 import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiClock, FiCalendar, FiSend, FiYoutube } from "react-icons/fi";
 import { socket, SendComment, DeleteComment, UpdateComment, DeletePost } from '../../helpers/auth';
@@ -31,6 +31,8 @@ function DashboardPage() {
   const postFeed = useSelector((state) => state.post.posts);
   const postApi = useSelector( (state) => state.post);
   const [invitationsFeeds, setInvitationsFeed] = useState([]);
+  const [selectedPost, setSelectedPost] = useState({})
+  const [isEdit, setIseEdit] = useState(false )
   const [quote, setQuote] = useState('')
   const [isActive, setIsActive] = useState(0);
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
@@ -74,6 +76,11 @@ function DashboardPage() {
 
   const handleDelete = (post) => {
     DeletePost(post)
+  }
+
+  const handleEdit = (post) => {
+    setSelectedPost( post);
+    setIseEdit( true )
   }
  
 
@@ -406,6 +413,8 @@ const isPostLikedByMember = (likes = [], memberId) => {
                           <span className="text-muted" style={{ fontSize: '0.875rem' }}>
                             • {dayjs(post.createdAt).fromNow()}
                           </span>
+                          <BsPencil className="position-absolute top-0 end-0 m-2 text-danger cursor-pointer"
+                            role="button" onClick={() => handleEdit(post)}/>
                           <BsTrash
                             className="position-absolute top-0 end-0 m-2 text-danger cursor-pointer"
                             role="button"

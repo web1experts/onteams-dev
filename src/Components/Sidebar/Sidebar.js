@@ -135,6 +135,40 @@ function SidebarPanel() {
         setSidebarSmall(commonState.sidebar_small )
     },[commonState ])
 
+    function hexToRgb(hex) {
+        // Remove the # if present
+        hex = hex.replace(/^#/, '');
+
+        // Handle 3-digit hex like #0af
+        if (hex.length === 3) {
+            hex = hex.split('').map((c) => c + c).join('');
+        }
+
+        const bigint = parseInt(hex, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+
+        return `${r}, ${g}, ${b}`;
+    }
+
+    function hexToRgbString(hex) {
+  // Remove leading "#" if present
+        hex = hex.replace(/^#/, '');
+
+        // Expand short hex like "#abc" to "#aabbcc"
+        if (hex.length === 3) {
+            hex = hex.split('').map((c) => c + c).join('');
+        }
+
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        return `${r}, ${g}, ${b}`;
+        }
+
+
    const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' }
 
     const themes = [
@@ -162,9 +196,19 @@ function SidebarPanel() {
     const [themeName, setThemeName] = useState('Custom Theme');
 
     const onApply = ({ primaryColor, secondaryColor, themeName }) => {
+        const rgb1 = hexToRgb(primaryColor);
+        const rgb2 = hexToRgb(secondaryColor);
+
+         primaryColor = hexToRgbString(primaryColor)
+         secondaryColor = hexToRgbString(secondaryColor)
+
+        const color = `linear-gradient(135deg, rgb(${rgb1}), rgb(${rgb2}))`
         // Example: Save to localStorage or trigger Redux action
-        localStorage.setItem('custom_theme', JSON.stringify({ primaryColor, secondaryColor, themeName }));
-        console.log('Applied theme:', primaryColor, secondaryColor, themeName);
+        localStorage.setItem('custom_theme', JSON.stringify({ primaryColor, secondaryColor, themeName, color }));
+        localStorage.setItem('theme', JSON.stringify({ primaryColor, secondaryColor, themeName, color }));
+        dispatch(updateWorkSpaceTheme({theme: { primaryColor, secondaryColor, themeName , color}}))
+         dispatch(toggleTheme({ primaryColor, secondaryColor, themeName , color}));
+        console.log('Applied theme:', primaryColor, secondaryColor, themeName, color);
     };
 
     const handleApply = () => {

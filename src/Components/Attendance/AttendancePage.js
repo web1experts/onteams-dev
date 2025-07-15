@@ -364,7 +364,11 @@ useEffect(() => {
                                                       : <BsDash />
                                                   }
                                                 </span>
-                                                <strong>{atten?.total_time}</strong>
+                                                {
+                                                  (atten?.total_time !== '--') &&
+                                                  <strong>{ atten?.total_time }</strong>
+                                                }
+                                                
                                                 {/* <strong><BsDash /></strong> Replace '--' with this icon */}
                                               </td>
                                             );
@@ -447,7 +451,7 @@ useEffect(() => {
                   </Row>
                 </div>
                 <div className="attendance--table team--view" id="team--view">
-                  <h3 className="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Attendance Overview - June 2025</h3>
+                  <h3 className="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Attendance Overview - {getMonthLabel(filters?.month)}</h3>
                   <div className='attendance--table--list'>
                     <Table responsive="lg">
                       <tbody className="bg-white">
@@ -561,11 +565,11 @@ useEffect(() => {
                           attendanceDate.dailyAttendance.map((attendance, attendanceIndex) => (
                             <tr key={`${dateIndex}-${attendanceIndex}`}>
                               <td className="px-3 py-3"><strong>{attendanceIndex === 0 ? formatDateinString(attendanceDate.date) : ''}</strong></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--green" title="check In"><GoDotFill /> {attendance.time_in}</span></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--red" title="check Out"><GoDotFill /> {attendance.time_out}</span></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--blue" title="Logged Hours"><GoDotFill /> {attendance.tracked_time}</span></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--purple" title="Manual Entry"><FiEdit3 /> {attendance.manual_time}</span></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--moove" title="Total Hours"><GoDotFill /> {attendance.total_time}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--green" title="check In"> {(attendance.time_in !== "--" ? attendance.time_in : <GoDotFill />)}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--red" title="check Out"> {(attendance.time_out !== "--" ? attendance.time_out : <GoDotFill />)}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--blue" title="Logged Hours"> {(attendance.tracked_time !== '--' ? attendance.tracked_time : <GoDotFill />)}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--purple" title="Manual Entry"> {(attendance.manual_time !== '--') ? attendance.manual_time : <FiEdit3 />}</span></td>
+                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--moove" title="Total Hours"> {(attendance.total_time !== "--") ? attendance.total_time : <GoDotFill />}</span></td>
                               <td className="px-3 py-3 text-center">{getAttendanceBadges(attendance?.status)}</td>
                             </tr>
                           ))

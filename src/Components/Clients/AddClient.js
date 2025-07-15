@@ -7,11 +7,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { useToast } from "../../context/ToastContext";
 import { renderDynamicField } from "../common/dynamicFields";
-
+import { convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY } from "../../helpers/commonfunctions";
+import { BadgesModal } from "../modals/badges";
 
 function AddClient(props) {
 
   const inputs = document.querySelectorAll('.form-floating .form-control');
+  const [showBadges, setShowBadges] = useState(null);
   const customFields = props.customFields
   inputs.forEach(input => {
     input.addEventListener('input', function () {
@@ -37,6 +39,7 @@ function AddClient(props) {
     const dispatch = useDispatch();
     const [ disable, setDisable ] = useState(true);
     let fieldErrors = {};
+    const [showPasswordFields, setShowPasswordFields] = useState({});
     let hasError = false;
     const [ loader, setLoader ] = useState(false);
     const [show, setShow] = useState(props.show ? props.show : false);
@@ -59,6 +62,12 @@ function AddClient(props) {
   
     }, [apiResult])
 
+    const handleDateChange = (value, name) =>{ 
+            setRows({ ...rows, [name]: formatDateToDDMMYYYY(value) });
+            
+            setErrors({ ...errors, [name]: '' })
+        }
+
 const handleChange = (event, fieldname = '') => {
     const { name, value, type, files } = event.target;
     
@@ -67,7 +76,16 @@ const handleChange = (event, fieldname = '') => {
       setErrors({...errors, [name]: ''});
     
   };
+const toggleBadges = (fieldIndex) => {
+        setShowBadges(fieldIndex);
+    };
 
+const toggleShowPassword = (fieldId) => {
+  setShowPasswordFields((prev) => ({
+    ...prev,
+    [fieldId]: !prev[fieldId],
+  }));
+};
 
 
 const showError = (name) => {
@@ -160,11 +178,23 @@ const showError = (name) => {
                               name: `custom_field[${field.name}]`,
                               type: field.type,
                               label: field.label,
-                              value: rows[`custom_field[${field.name}]`] || '',
+                              value: field.type === 'date' && rows[`custom_field[${field.name}]`]
+                                                                                  ? convertDDMMYYYYtoYYYYMMDD(rows[`custom_field[${field.name}]`])
+                                                                                  : rows[`custom_field[${field.name}]`] || '',
                               options: field?.options || [],
-                              onChange: (e) => handleChange(e, field.name),
+                              onChange: (e) => {
+                                  if(field.type === "date"){
+                                      
+                                      handleDateChange(e, `custom_field[${field.name}]`)
+                                  }else{
+                                      handleChange(e)
+                                  }
+                              },
                               fieldId: `new-${field.name}-${index}`,
-                              range_options: field?.range_options || {}
+                              range_options: field?.range_options || {},
+                              showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                              toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                              toggleBadges: () => toggleBadges(index),
                               })
                           )}
                           </>
@@ -175,6 +205,10 @@ const showError = (name) => {
                     <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please Wait...' : 'Save'}</Button>
                 </Modal.Footer>
             </Modal>
+            {
+                showBadges !== null && 
+                    <BadgesModal badgesData={showBadges} toggleBadges={toggleBadges} handleSelect={handleChange} value={rows[`custom_field[${showBadges?.name}]`] || ''}/>
+            }
         </>
     );
 }

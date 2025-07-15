@@ -5,9 +5,24 @@ import { BsTrash } from 'react-icons/bs'
 import { getMemberdata } from '../../helpers/commonfunctions';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
 const Comment = ({ comment, memberdata, parentId }) => {
+  const [selectedComment, setSelectedComment] = useState({})
    const handleDelete = (comment_id, post) => {
     DeleteComment(comment_id, post, 'post')
    }
+   const [showReply, setShowReply] = useState(false);
+    const [replyText, setReplyText] = useState('');
+
+    const handleReplySubmit = (e) => {
+      e.preventDefault();
+      if (!replyText.trim()) return;
+
+      // Here, you'd send the replyText to your backend or state handler
+      SendComment('post', replyText,comment?.post , memberdata?._id, selectedComment?._id)
+
+      // Clear and close reply input
+      setReplyText('');
+      setShowReply(false);
+    };
   return (              
     <Card className="mb-2">
         <Card.Body>
@@ -18,6 +33,38 @@ const Comment = ({ comment, memberdata, parentId }) => {
               role="button"
               onClick={() => handleDelete(comment._id, comment?.post)}
             />
+            <Button
+              variant="link"
+              size="sm"
+              className="p-0"
+              onClick={() => {setShowReply(!showReply);setSelectedComment(comment);}}
+            >
+              {showReply ? 'Cancel' : 'Reply'}
+            </Button>
+
+            {showReply && (
+              <Form onSubmit={handleReplySubmit} className="mt-2">
+                <Form.Group controlId={`reply-${comment.id}`}>
+                  <Form.Control
+                    type="text"
+                    placeholder="Write your reply..."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                  />
+                </Form.Group>
+                <Button type="submit" variant="primary" size="sm" className="mt-1">
+                  Submit
+                </Button>
+              </Form>
+            )}
+
+            {comment.replies && comment.replies.length > 0 && (
+              <div className="mt-3 ps-4 border-start border-2">
+                {comment.replies.map((reply) => (
+                  <Comment key={reply.id} comment={reply} parentId={comment._id} />
+                ))}
+              </div>
+            )}
         </Card.Body>
     </Card>
   );

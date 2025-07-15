@@ -14,7 +14,7 @@ import { AiOutlineTeam } from 'react-icons/ai';
 import { GrExpand } from "react-icons/gr";
 import { TbReport } from 'react-icons/tb';
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { getReportsByMember, gerReportsByProject, addManualTime, getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
+import { getReportsByMember, gerReportsByProject,  getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
@@ -23,7 +23,6 @@ import { currentMemberProfile } from "../../helpers/auth";
 import { Link } from "react-router-dom";
 import "media-chrome";
 import "media-chrome/dist/menu"
-import ManualTime from "./ManualTime";
 
 const TaskList = ({report} ) => {
   const [ViewReport, setViewReport] = useState(false);
@@ -566,11 +565,11 @@ function ReportsPage() {
   const manuldatePickerRef = useRef(null)
   const memberdata = getMemberdata()
   const fullscreenRef = React.useRef(null);
-  const [fields, setFields] = useState({date: new Date()})
+ 
   const [ remarksActive ,setremarksActive] = useState(false)
   const [remarks, setRemarks] = useState('')
   const [ loader, setLoader] = useState(false)
-  const [show, setShow] = useState(false);
+  
   const [showNew, setShowNew] = useState(false);
   const [spinner, setSpinner] = useState(false)
   const [currentPage, setCurrentPage] = useState(1);
@@ -586,14 +585,8 @@ function ReportsPage() {
     'custom': 'Custom'
   };
   
-  const handleClose = () => {
-    setShow(false);
-    setFields({})
-    setEntries([])
-  }
-  const handleCloseNew = () => {
-    setShowNew(false);
-  }
+  
+  
   const handleRemarks = () => {
     setremarksActive(current => !current)
     if (selectedReport?.projectmeta && selectedReport.projectmeta.length > 0) {
@@ -607,13 +600,13 @@ function ReportsPage() {
   const handleRemarksChange = (e) => {
     setRemarks(e.target.value)
   }
-  const handleShow = () => setShow(true);
+  // const handleShow = () => setShow(true);
   const handleNewShow = () => setShowNew(true);
   const memberFeed = useSelector((state) => state.member.members)
   const projectFeed = useSelector(state => state.project.projects);
   const [ projects, setProjects ] = useState([])
-  const MemberprojectFeed = useSelector(state => state.project.memberProjects);
-  const [ memberprojects, setMemberProjects ] = useState([])
+  
+ 
   const [singleMemberReport, setSingleMemberReport] = useState({})
   const taskFeed = useSelector(state => state.task.tasks);
   const [taskslists, setTasksLists] = useState([])
@@ -626,13 +619,12 @@ function ReportsPage() {
   const [screenshotTab, setScreenshotTab] = useState('Screenshots');
   const [ selectedReport, setSelectedReport] = useState({})
   const [view, setView] = useState('group')
-  const [occupiedRanges, setOccupiedRanges] = useState([])
-  const [timeSlots, setTimeslots] = useState([])
+ 
   const [ filtereddate, setFilteredDate ] = useState([new Date().toISOString().split('T')[0]])
   const [selectedFilter, setSelectedFilter ] = useState('today')
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  const [ searchEntries, setSearchEntries] = useState([])
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
   const [ filters, setFilters] = useState({member: memberdata?._id, sort_by: 'members','project_status': 'in-progress', page: 1});
@@ -641,26 +633,8 @@ function ReportsPage() {
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
-  const [entries, setEntries] = useState([]);
-  const [ errors, setErrors] = useState([])
-  const [ selectedWorkflow, setWorkflow] = useState('')
-  const [filteredTasks, setFilteredTasks] = useState([])
-  const handleProjectSelect = async ({ target: { name, value, selectedOptions } }) => {
-    const selectedOption = selectedOptions[0];
   
-  // Retrieve the data-project attribute value
-  const projectData = JSON.parse(selectedOption.getAttribute("data-project"));
-    setSelectedProject(projectData)
-    if(projectData?.workflow?.tabs && projectData.workflow.tabs.length > 0){
-      setWorkflow(projectData.workflow.tabs[0]?._id)
-    }
-    await dispatch(ListTasks(value));
-    await dispatch(getSingleProjectReport(value))
-  }
-
-  const handleTaskSelect = async ({ target: { name, value } }) => {
-    setSelectedTask(value)
-  }
+  
   
   const saveRemarks = (project_id) => {
     setLoader( true )
@@ -772,41 +746,14 @@ function getProjectTabSummary(projectReport) {
     selectboxObserver()
   }, [dispatch])
 
-  useEffect(() => {
-      setEntries([]);
-      if (taskFeed?.taskData && Object.keys(taskFeed.taskData).length > 0) {
-          setTasksLists(taskFeed.taskData)
-          setFilteredTasks(taskFeed?.taskData[selectedWorkflow]?.tasks)
-          
-      }
-  }, [taskFeed, dispatch])
   
-  useEffect(() => {
-    if (filteredTasks?.length > 0 && entries.length === 0) {
-      setEntries([...entries, { task: filteredTasks[0]._id, start_time: "", end_time: "" }]);
-    }  
-  }, [filteredTasks])
 
-  useEffect(() => {
-    setFilteredTasks(taskslists[selectedWorkflow]?.tasks)
-  }, [selectedWorkflow])
 
-  useEffect(() => {
-    if(occupiedRanges){
-      setTimeslots(generateTimeSlots(10))
-    }
-    
-  },[occupiedRanges])
+
+  
 
   // Helper function to calculate time ranges
-  const calculateOccupiedRanges = (data) => {
-    return data.map((item) => {
-      const start = new Date(item.createdAt); // Convert createdAt to a Date object
-      const end = new Date(item.duration); // Convert duration to a Date object (end time)
-      
-      return { start, end };
-    });
-  };
+  
   useEffect(() => {
     handleReports()
   }, [filters])
@@ -837,12 +784,7 @@ function getProjectTabSummary(projectReport) {
       }
   }, [projectFeed])
 
-  useEffect(() => {
-    const check = ['undefined', undefined, 'null', null, '']
-    if (MemberprojectFeed && MemberprojectFeed.projectData) {
-        setMemberProjects(MemberprojectFeed.projectData)
-    }
-}, [MemberprojectFeed])
+
 
   useEffect(() => { 
     if( selectedFilter !== "custom"){
@@ -861,7 +803,7 @@ function getProjectTabSummary(projectReport) {
       if( reportState.singleProjectReport){
         setsingleProjectReport(reportState.singleProjectReport)
         // console.log(calculateOccupiedRanges(reportState.singleProjectReport))
-        setOccupiedRanges(calculateOccupiedRanges(reportState.singleProjectReport))
+        // setOccupiedRanges(calculateOccupiedRanges(reportState.singleProjectReport))
       }
     }, [reportState])
 
@@ -896,55 +838,7 @@ function getProjectTabSummary(projectReport) {
           )
       }
 
-      // Generate time slots for the day
-      const generateTimeSlots = (intervalMinutes = 15) => {
-        const slots = [];
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0); // Set to start of the day
-        const endOfDay = new Date(startOfDay);
-        endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
       
-        let current = new Date(startOfDay);
-        while (current <= endOfDay) {
-          const hours = current.getHours().toString().padStart(2, '0'); // Format hours
-          const minutes = current.getMinutes().toString().padStart(2, '0'); // Format minutes
-          slots.push(`${hours}:${minutes}`); // Add formatted time
-          current.setMinutes(current.getMinutes() + intervalMinutes); // Increment by interval
-        }
-        return slots;
-      };
-
-    // Check if a time slot is occupied
-    const isTimeSlotOccupied = (time, ranges) => {
-      if (!ranges || ranges.length === 0) {
-        // If ranges is null, undefined, or empty, return false (time slot is not occupied)
-        return false;
-      }
-    
-      // Convert time string (HH:mm) to a Date object on the same day
-      const timeDate = new Date();
-      const [hours, minutes] = time.split(':');
-      timeDate.setHours(hours, minutes, 0, 0); // Set time based on HH:mm
-    
-      return ranges.some(({ start, end }) => {
-        // Convert start time from ISO string to Date object
-        const startDate = new Date(start);
-        
-        // If end time exists, convert it to Date; otherwise, set endDate to null
-        const endDate = end ? new Date(end) : null; 
-        
-        // Check if the time falls within the range
-        if (endDate) {
-          // If there is an end time, check if time is between start and end
-          return timeDate >= startDate && timeDate < endDate;
-        }
-        
-        // If there's no end time, check if the time is after the start time
-        return timeDate >= startDate;
-      });
-    };
-    
-    
 
   const FilterButton = ({ position }) => {
       return (
@@ -1062,29 +956,7 @@ function getProjectTabSummary(projectReport) {
 }
 
 
-const handleSearchChange = (name, index, searchvalue) => {
-  setSearchEntries((prevEntries) => {
-    const updatedEntries = [...prevEntries]; // Create a shallow copy of the array
 
-    // If the index is within the bounds of the current array, update the entry
-    if (index < updatedEntries.length) {
-      updatedEntries[index] = {
-        ...updatedEntries[index], // Spread the current entry
-        [name]: searchvalue // Update the specific key with the new value
-      };
-    } else {
-      // If the index is out of bounds, create a new entry
-      const newEntry = {
-        tasksearch: name === "tasksearch" ? searchvalue : "",
-        start_time: name === "start_time" ? searchvalue : "",
-        end_time: name === "end_time" ? searchvalue : ""
-      };
-      updatedEntries.push(newEntry); // Add the new entry to the array
-    }
-
-    return updatedEntries; // Return the updated array
-  });
-}
 
 
   const handleLightBox = (type, mediaItems, index) => {
@@ -1114,106 +986,25 @@ const handleSearchChange = (name, index, searchvalue) => {
   }
   
 
-  const handleAddEntry = () => {
-    setEntries([...entries, { task: "", task_title: "", start_time: "", end_time: "" }]);
-};
-
-const handleReportSubmit = async (e) => {
-  e.preventDefault();
-  const errors = entries.map((entry, index) => {
-    const entryErrors = {};
-
-    // Validation 1: Task is required
-    if (!entry.task) entryErrors.task = "Task is required";
-
-    // Validation 2: Start and End Time are required
-    if (!entry.start_time) {
-        entryErrors.start_time = "Start time is required.";
-    }
-    if (!entry.end_time) {
-        entryErrors.end_time = "End time is required.";
-    }
-
-    // Helper function to convert HH:mm to Date object
-    const parseTime = (time) => {
-        const [hours, minutes] = time.split(":").map(Number);
-        const date = new Date();
-        date.setHours(hours, minutes, 0, 0);
-        return date;
-    };
-
-    if (entry.start_time && entry.end_time) {
-        const currentStart = parseTime(entry.start_time);
-        const currentEnd = parseTime(entry.end_time);
-
-        // Validation 3: End time must be greater than start time
-        if (currentStart >= currentEnd) {
-            entryErrors.end_time = "End time must be greater than start time.";
-        }
-
-        // Validation 4: Start and End times should not overlap with other entries
-        entries.forEach((otherEntry, otherIndex) => {
-            if (index !== otherIndex && otherEntry.start_time && otherEntry.end_time) {
-                const otherStart = parseTime(otherEntry.start_time);
-                const otherEnd = parseTime(otherEntry.end_time);
-
-                if (
-                    currentStart < otherEnd && currentEnd > otherStart // Overlap condition
-                ) {
-                    entryErrors.start_time = "Time range overlaps with another entry.";
-                    entryErrors.end_time = "Time range overlaps with another entry.";
-                }
-            }
-        });
-    }
-
-    return entryErrors;
-});
+  
 
 
-  const hasErrors = errors.some((entryErrors) => Object.keys(entryErrors).length > 0);
-
-  if (hasErrors) {
-    setErrors(errors); // Update the errors state to show errors below each field
-    return false; // Prevent form submission
-  }//return false;
-  setErrors([]);
-  setLoader( true )
-  const payload = { project_id: selectedproject, entries }
-  dispatch(addManualTime({...payload,...fields}))
-
-}
 
 useEffect(() => {
   setLoader(false)
   if (reportState.success) {
-      setFields({date: new Date()})
+      // setFields({date: new Date()})
       handleReports()
-      handleClose()
+      // handleClose()
       setremarksActive( false )
   }
 }, [reportState])
 
-const handleRemoveEntry = (index) => {
-    setEntries(entries.filter((_, i) => i !== index));
-    setErrors(errors.filter((_, i) => i !== index));
-};
 
-const handleEntryChange = (index, field, value) => {
-    const updatedEntries = [...entries];
-    if( field === 'task'){
-      updatedEntries[index][field] = value._id;
-      updatedEntries[index]['task_title'] = value.title;
-    }else{
-      updatedEntries[index][field] = value;
-    }
-    
-    setEntries(updatedEntries);
-};
 
-const handlechange = ({ target: { name, value } }) => {
-  setFields({...fields, [name]: value})
-};
+
+
+
 
 
 
@@ -1328,19 +1119,7 @@ const handleToggles = () => {
                               )}
                               </Form>
                             </ListGroup.Item>
-                            { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                                <Dropdown className="select--dropdown">
-                                  <Dropdown.Toggle variant="success" id="dropdown-basic">Manual Time</Dropdown.Toggle>
-                                  <Dropdown.Menu>
-                                    <Dropdown.Item onClick={handleShow}>Manual Time</Dropdown.Item>
-                                    {
-                                      memberProfile?.permissions?.reports?.update_manual_time && (
-                                        <Dropdown.Item onClick={handleNewShow} to="/manual-time" >Manual Time Approval</Dropdown.Item>
-                                      )
-                                    }
-                                  </Dropdown.Menu>
-                                </Dropdown>
-                              )}
+                            
                             <ListGroup horizontal className="bg-white expand--icon d-none d-lg-flex">
                                 <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                             </ListGroup>
@@ -1693,298 +1472,9 @@ const handleToggles = () => {
         </div>
       }
       </div>
-      <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal" onShow={() => {selectboxObserver();}}>
-        <Modal.Header closeButton>
-          <Modal.Title>Manual Time</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleReportSubmit}>
-            <Row>
-              <Col sm={12} lg={6}>
-                <Form.Group className="mb-0 form-group">
-                  <Form.Label>Select date</Form.Label>
-                  <DatePicker 
-                    ref={manuldatePickerRef}
-                    key={'manual-date-filter'}
-                    name="date"
-                    weekStartDayIndex={1}
-                    id='manual-datepicker'
-                    editable={false}
-                    value={fields['date']} 
-                    format="YYYY-MM-DD"
-                    dateSeparator=" - " 
-                    onChange={async (value) => {
-                      setFields({...fields, ['date']: value})
-                      }
-                    }          
-                    className="form-control"
-                    placeholder="dd/mm/yyyy"
-                    range={false}
-                    multiple={false}
-                  />
-                </Form.Group>
-              </Col>
-              <Col sm={12} lg={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Select your Project</Form.Label>
-                    <div className="drop--scroll">
-                      <Form.Select className="form-control custom-selectbox" id="projects"
-                        value={selectedproject._id} onChange={handleProjectSelect} name="project">
-                          <option key="blank" value={''}>Select Project</option>
-                        {
-                          memberprojects.map(project => (
-                            <option key={`${project._id}-opt`} data-project={JSON.stringify(project)} value={project._id}>{project.title}</option>
-                          ))
-                        }
-                      </Form.Select>
-                    </div>
-                </Form.Group>
-              </Col>
-              <Col sm={12} lg={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Select Workflow</Form.Label>
-                  <Form.Select className="form-control custom-selectbox" id="projects-tab"
-                    value={selectedWorkflow} onChange={(e) => {setWorkflow(e.target.value)}}>
-                      <option value={''}>Select Workflow Tab</option>
-                    { selectedproject && Object.keys(selectedproject).length > 0 &&
-                      selectedproject?.workflow?.tabs.map(tab => (
-                        <option value={tab._id}>{tab.title}</option>
-                      ))
-                    }
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row>
-                {
-                  entries.length > 0 &&
-                  <Col sm={12} lg={12}>
-                    <Form.Group className="mb-0">
-                      <Form.Label>Task List</Form.Label>
-                    </Form.Group>
-                  </Col>
-                }
-              </Row>
-                {
-                  entries.map((entry, index) => (
-                    <Row className="mb-3">
-                      <Col md={4}>
-                        <Dropdown className="select--dropdown">
-                          <Dropdown.Toggle variant="success">
-                            { 
-                              
-                              entry.task_title ?
-                                <>
-                                {entry.task_title}
-                                </>
-                              :
-                              'Select'
-                            }
+      
 
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                              <div className="drop--scroll">
-                                  <Form>
-                                      <Form.Group className="form-group mb-3">
-                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.tasksearch} onChange={(e) => {handleSearchChange('tasksearch', index, e.target.value)}} />
-                                      </Form.Group>
-                                  </Form>
-                                  {
-                                    filteredTasks &&  filteredTasks.length > 0  &&
-                                    filteredTasks.map((task) => {
-                                      if( searchEntries[index]?.tasksearch && searchEntries[index]?.tasksearch !== ""){
-                                        if (task?.title?.toLowerCase().includes(searchEntries[index]?.tasksearch?.toLowerCase())) {
-                                          return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
-                                        }else{
-                                          return null;
-                                        }
-                                        
-                                      }else{
-                                        return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
-                                      }
-                                      
-                                    })
-                                  }
-                              </div>
-                          </Dropdown.Menu>
-                      </Dropdown>
-
-
-                          {/* <Form.Select
-                              value={entry.task}
-                              onChange={(e) =>
-                                  handleEntryChange(index, "task", e.target.value)
-                              }
-                              key={`taskin-${selectedWorkflow}`}
-                              className="custom-selectbox"
-                          >
-                              <option value="">Select Task</option>
-                              {
-                                // Object.values(taskslists).map((tab, index) =>
-                                  filteredTasks &&  filteredTasks.length > 0 ? (
-                                    filteredTasks.map((task) => (
-                                        <option value={task._id}>{task.title}</option>
-                                      ))
-                                  ) : (
-                                    null
-                                  )
-                                // )
-                              }
-                          </Form.Select> */}
-                          {errors[index]?.task && <span className="form-error">{errors[index].task}</span>}
-                      </Col>
-                      <Col md={3}>
-                        {/* <Form.Select
-                          className="custom-selectbox"
-                          value={entry.start_time}
-                          onChange={(e) =>
-                              handleEntryChange(index, "start_time", e.target.value)
-                          }
-                        >
-                          {timeSlots.map((slot) => {
-                            const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                            return (
-                              <option key={slot} value={slot} disabled={isOccupied}>
-                                {slot}
-                              </option>
-                            );
-                          })}
-                        </Form.Select> */}
-
-                      <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="success">
-                          { 
-                            
-                            entry.start_time ?
-                              <>
-                              {entry.start_time}
-                              </>
-                            :
-                            'Select'
-                          }
-                        </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                              <div className="drop--scroll">
-                                  <Form>
-                                      <Form.Group className="form-group mb-3">
-                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.start_time} onChange={(e) => {handleSearchChange('start_time', index, e.target.value)}} />
-                                      </Form.Group>
-                                  </Form>
-                                  {
-                                    
-                                    timeSlots.map((slot) => {
-                                      const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                                      if( searchEntries[index]?.start_time && searchEntries[index]?.start_time !== ""){
-                                        if (slot?.toLowerCase().includes(searchEntries[index]?.start_time?.toLowerCase())) {
-                                          return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                        }else{
-                                          return null;
-                                        }
-                                        
-                                      }else{
-                                        return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                      }
-                                      
-                                    })
-                                  }
-                              </div>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                          
-                          {errors[index]?.start_time && <span className="form-error">{errors[index].start_time}</span>}
-                      </Col>
-                      <Col md={3}>
-                          
-                          {/* <Form.Select
-                          value={entry.end_time}
-                          className="custom-selectbox"
-                          onChange={(e) =>
-                              handleEntryChange(index, "end_time", e.target.value)
-                          }>
-                            {timeSlots.map((slot) => {
-                              const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                              return (
-                                <option key={slot} value={slot} disabled={isOccupied}>
-                                  {slot}
-                                </option>
-                              );
-                            })}
-                          </Form.Select> */}
-                          <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="success">
-                          { 
-                            
-                            entry.end_time ?
-                              <>
-                              {entry.end_time}
-                              </>
-                            :
-                            'Select'
-                          }
-                        </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                              <div className="drop--scroll">
-                                  <Form>
-                                      <Form.Group className="form-group mb-3">
-                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.end_time} onChange={(e) => {handleSearchChange('end_time', index, e.target.value)}} />
-                                      </Form.Group>
-                                  </Form>
-                                  {
-                                    
-                                    timeSlots.map((slot) => {
-                                      const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                                      if( searchEntries[index]?.end_time && searchEntries[index]?.end_time !== ""){
-                                        if (slot?.toLowerCase().includes(searchEntries[index]?.end_time?.toLowerCase())) {
-                                          return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                        }else{
-                                          return null;
-                                        }
-                                        
-                                      }else{
-                                        return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                      }
-                                      
-                                    })
-                                  }
-                              </div>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                          {errors[index]?.end_time && <span className="form-error">{errors[index].end_time}</span>}
-                      </Col>
-                      <Col md={2} className="text-right">
-                        {
-                          index > 0 &&
-                            <Button
-                                variant="danger"
-                                onClick={() => handleRemoveEntry(index)}
-                            >
-                              <FaTrash />
-                            </Button>
-                        }
-                        {index === entries.length - 1 && (
-                            <Button variant="success" className="ms-2" onClick={handleAddEntry}>
-                                <FaPlus />
-                            </Button>
-                        )}
-                      </Col>
-                    </Row>
-                  ))
-                }
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleReportSubmit} disabled={loader}>{loader === true ? 'Please wait...': 'Submit'}</Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal show={showNew} onHide={handleCloseNew} centered size="lg" className="AddReportModal AddTimeModal">
-        <Modal.Header closeButton>
-          <Modal.Title>Manual Time Approval</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ManualTime />
-        </Modal.Body>
-      </Modal>
+      
       {/*--=-=Filter Modal**/}
       <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal">
         <Modal.Header closeButton>
