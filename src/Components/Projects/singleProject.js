@@ -300,14 +300,32 @@ function SingleProject(props) {
         setErrors({ ...errors, [name]: '' })
     }
 
-    const handleChange = ({ target: { name, value, type, files, checked } }) => { 
-    const finalValue =
-    type === 'checkbox' ? checked : type === 'file' ? files : value;
-   
-        setFields({ ...fields, [name]: finalValue });
-        dispatch( updateStateData( EDIT_PROJECT_FORM,  {[name]: finalValue }))
-        setErrors({ ...errors, [name]: '' })
+   const handleChange = ({ target: { name, value, type, files, checked } }) => {
+        let finalValue;
+
+        if (type === 'checkbox' && name.includes('[]')) {
+            const arrayName = name.replace('[]', '');
+            const existing = fields[arrayName] || [];
+            if (checked) {
+            finalValue = [...existing, value];
+            } else {
+            finalValue = existing.filter((v) => v !== value);
+            }
+            name = arrayName;
+        } else if (type === 'checkbox') {
+            // For single checkbox: store value when checked, empty string when unchecked
+            finalValue = checked ? value : '';
+        } else if (type === 'file') {
+            finalValue = files;
+        } else {
+            finalValue = value;
+        }
+
+        setFields((prev) => ({ ...prev, [name]: finalValue }));
+        dispatch(updateStateData(EDIT_PROJECT_FORM, { [name]: finalValue }));
+        setErrors((prev) => ({ ...prev, [name]: '' }));
     };
+
 
     useEffect(() => {
         console.log('All fields: ', fields)
@@ -322,39 +340,6 @@ function SingleProject(props) {
         if (errors[name]) return (<span className="error">{errors[name]}</span>)
         return null
     }
-
-    // const handleKeyDown = (e) => {
-    //     if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
-    //         pasteOccurred.current = true; // Mark that a paste action is expected
-    //         console.log('Paste keyboard shortcut detected');
-    //     }
-    // };
-
-    // const handlePaste = (e) => {
-    //     const pastedData = e.clipboardData.getData('text');
-    //     console.log('Pasted content:', pastedData);
-    //     pasteOccurred.current = true; // Set the paste flag to true
-
-    //     setTimeout(function(){
-    //         pasteOccurred.current = false;
-    //     },500)
-    // };
-
-    // useEffect(() => {
-    //     // Add the paste listener to the editor
-    //     if (quillRef.current) {
-    //       const editor = quillRef.current.getEditor();
-    //       editor.root.addEventListener('paste', handlePaste);
-    //     }
-    
-    //     // Cleanup the event listener on unmount
-    //     return () => {
-    //       if (quillRef.current) {
-    //         const editor = quillRef.current.getEditor();
-    //         editor.root.removeEventListener('paste', handlePaste);
-    //       }
-    //     };
-    //   }, []);
 
     const handleKeyDown = (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
@@ -792,6 +777,7 @@ useEffect(() => {
                                             value: field.type === 'date' && fields[`custom_field[${field.name}]`]
                                                     ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
                                                     : fields[`custom_field[${field.name}]`] || '',
+                                            options: field?.options || [],
                                             onChange: (e) => {
                                                 if(field.type === "date"){
                                                     

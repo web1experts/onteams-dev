@@ -1498,17 +1498,7 @@ const handleToggles = () => {
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
-              {/* <Select2
-                defaultValue={1}
-                data={[
-                  { text: 'Sort By', id: 1 },
-                  { text: 'Screenshots', id: 2 },
-                  { text: 'Projects', id: 3 },
-                ]}
-                options={{
-                  placeholder: 'Sort By',
-                }}
-              /> */}
+              
             </ListGroup.Item>
             <ListGroup.Item>
               <Dropdown className="select--dropdown">
@@ -1526,17 +1516,7 @@ const handleToggles = () => {
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
-              {/* <Select2
-                defaultValue={1}
-                data={[
-                  { text: 'My Reports', id: 1 },
-                  { text: 'Hitesh Kumar', id: 2 },
-                  { text: 'Tarun Giri', id: 3 },
-                ]}
-                options={{
-                  placeholder: 'Select Reports',
-                }}
-              /> */}
+             
             </ListGroup.Item>
             <ListGroup.Item>
               <Form>

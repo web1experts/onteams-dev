@@ -164,7 +164,7 @@ function ProjectsPage() {
         if (commonState.selectedMembers) {
             setselectedMembers(commonState.selectedMembers)
         }
-    }, [commonState.selectedMembers])
+    }, [commonState.selectedMembers]);
 
     useEffect(() => {
         if (commonState.projectForm) {
@@ -177,6 +177,12 @@ function ProjectsPage() {
             });
         }
     }, [projectform]);
+
+     useEffect(() => {
+    if( commonState.editProjectForm){
+        setFields(commonState.editProjectForm)
+    }
+    },[ commonState.editProjectForm])
 
     const [isdescEditor, setIsDescEditor] = useState(false);
     const [isTaskEditor, setIsTaskEditor] = useState(false);
@@ -290,6 +296,16 @@ function ProjectsPage() {
             } else {
                 fieldsSetup.members = [];
             }
+            if (currentProject.customFields && Object.keys(currentProject.customFields).length > 0) {
+                Object.values(currentProject.customFields).forEach(field => {
+                    fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
+                });
+            }else{
+                customFields.forEach(field => {
+                    fieldsSetup[`custom_field[${field.name}]`] = ''
+                });
+                
+            }
             dispatch ( updateStateData( EDIT_PROJECT_FORM, fieldsSetup))
         }
     }, [currentProject, dispatch]);
@@ -378,8 +394,24 @@ function ProjectsPage() {
     }
 
     const handleChange = ({ target: { name, value, type, files, checked } }) => {
-        const finalValue =
-            type === 'checkbox' ? checked : type === 'file' ? files : value;
+        let finalValue;
+        if (type === 'checkbox' && name.includes('[]')) {
+            const arrayName = name.replace('[]', '');
+            const existing = fields[arrayName] || [];
+            if (checked) {
+            finalValue = [...existing, value];
+            } else {
+            finalValue = existing.filter((v) => v !== value);
+            }
+            name = arrayName;
+        } else if (type === 'checkbox') {
+            // For single checkbox: store value when checked, empty string when unchecked
+            finalValue = checked ? value : '';
+        } else if (type === 'file') {
+            finalValue = files;
+        } else {
+            finalValue = value;
+        }
         setFields({ ...fields, [name]: finalValue })
         dispatch(updateStateData(PROJECT_FORM, { [name]: finalValue }))
         setErrors({ ...errors, [name]: '' })
@@ -951,7 +983,9 @@ function ProjectsPage() {
                                                                             .filter(field => field?.showInTable !== false)
                                                                             .map((field, idx) => {
                                                                                 const fieldname = field.name;
-                                                                                let mvalue = project?.customFields?.[fieldname]?.meta_value;
+                                                                                let mvalue = Array.isArray(project?.customFields?.[fieldname]?.meta_value)
+                                                                                                ? project.customFields[fieldname].meta_value.join(', ')
+                                                                                                : project?.customFields?.[fieldname]?.meta_value || '';
                                                                                 const fieldType = field.type;
                                                                                 const uniqueKey = `${fieldname || idx}-${mvalue}`;
                                                                                 if (field.type === 'badge' && Array.isArray(field.options)) {

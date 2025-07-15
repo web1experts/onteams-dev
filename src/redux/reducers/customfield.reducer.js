@@ -4,7 +4,8 @@ import {
     FIELD_COMMON_ERROR,
     CLEAR_MESSAGES,
     UPDATE_FIELD_SUCCESS,
-    DELETE_FIELD_SUCCESS
+    DELETE_FIELD_SUCCESS,
+    FIELDS_REORDER
 } from "../actions/types";
 
 const initialState = {
@@ -54,6 +55,10 @@ export default (state = initialState, action) => {
         return {
             ...state,
             updatedField: action.payload.field
+        }
+    case FIELDS_REORDER:
+        return {
+            successfull: true
         }
     default: return state;
   }

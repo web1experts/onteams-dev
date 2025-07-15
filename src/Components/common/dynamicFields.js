@@ -32,7 +32,7 @@ export function renderDynamicField(config) {
     toggleBadges
 
   } = config;
-  
+
   // const fieldId = `field-${name}`;
 
   const sharedProps = {
@@ -48,7 +48,7 @@ export function renderDynamicField(config) {
     readOnly,
     required,
   };
-
+console.log('Value:: ', value)
   let filteredStatuses = options || []
 
   let percentage = 0;
@@ -99,17 +99,37 @@ export function renderDynamicField(config) {
 
       
       {/* Single Checkbox */}
-      {type === 'checkbox' && (
-        <Form.Check
-          type="checkbox"
-          label={label}
-          name={name}
-          checked={!!value}
-          onChange={onChange}
-          disabled={disabled}
-          inline={inline}
-        />
+      {type === 'checkbox' && Array.isArray(options) && options.length > 0 && (
+        <>
+          {options.length === 1 ? (
+            <Form.Check
+              type="checkbox"
+              label={options[0].label}
+              name={name}
+              value={options[0].value}
+              checked={!!value}
+              onChange={onChange}
+              disabled={disabled}
+              inline={inline}
+            />
+          ) : (
+            options.map((option, index) => (
+              <Form.Check
+                key={index}
+                type="checkbox"
+                label={option.label}
+                name={`${name}[]`}
+                value={option.value}
+                checked={Array.isArray(value) ? value.includes(option.value) : false}
+                onChange={onChange}
+                disabled={disabled}
+                inline={inline}
+              />
+            ))
+          )}
+        </>
       )}
+
 
 
       {/* Textarea */}

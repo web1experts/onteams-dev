@@ -4,7 +4,7 @@ import { Card, Button, Form, ButtonGroup } from 'react-bootstrap';
 import { BsTrash } from 'react-icons/bs'
 import { getMemberdata } from '../../helpers/commonfunctions';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
-const Comment = ({ comment, memberdata, parentId }) => {
+const Comment = ({ comment, memberdata, parentId, allowReply }) => {
   const [selectedComment, setSelectedComment] = useState({})
    const handleDelete = (comment_id, post) => {
     DeleteComment(comment_id, post, 'post')
@@ -33,14 +33,25 @@ const Comment = ({ comment, memberdata, parentId }) => {
               role="button"
               onClick={() => handleDelete(comment._id, comment?.post)}
             />
-            <Button
-              variant="link"
-              size="sm"
-              className="p-0"
-              onClick={() => {setShowReply(!showReply);setSelectedComment(comment);}}
-            >
-              {showReply ? 'Cancel' : 'Reply'}
-            </Button>
+            
+
+            {comment.replies && comment.replies.length > 0 && (
+              <div className="mt-3 ps-4 border-start border-2">
+                {comment.replies.map((reply) => (
+                  <Comment key={reply.id} comment={reply} parentId={comment._id} allowReply={false} />
+                ))}
+              </div>
+            )}
+            {allowReply === true && 
+              <Button
+                variant="link"
+                size="sm"
+                className="p-0"
+                onClick={() => {setShowReply(!showReply);setSelectedComment(comment);}}
+              >
+                {showReply ? 'Cancel' : 'Reply'}
+              </Button>
+            }
 
             {showReply && (
               <Form onSubmit={handleReplySubmit} className="mt-2">
@@ -56,14 +67,6 @@ const Comment = ({ comment, memberdata, parentId }) => {
                   Submit
                 </Button>
               </Form>
-            )}
-
-            {comment.replies && comment.replies.length > 0 && (
-              <div className="mt-3 ps-4 border-start border-2">
-                {comment.replies.map((reply) => (
-                  <Comment key={reply.id} comment={reply} parentId={comment._id} />
-                ))}
-              </div>
             )}
         </Card.Body>
     </Card>
@@ -83,7 +86,7 @@ const [comment, setComment] = useState('')
         {comments?.length > 0 &&
             <div className="bg-light p-3 rounded-4 mt-3 d-flex flex-column align-items-start gap-3 border-light">
             {comments.map(comment => (
-                <Comment key={comment._id} comment={comment} memberdata={memberdata} />
+                <Comment key={comment._id} comment={comment} memberdata={memberdata} allowReply={true} />
             ))}
             </div>
         }

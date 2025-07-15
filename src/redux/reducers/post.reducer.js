@@ -7,7 +7,8 @@ import {
     COMMENT_POST_SUCCESS,
     CREATE_POST_LIST_COMMENT,
     DELETE_COMMENT,
-    DELETE_POST
+    DELETE_POST,
+    POST_UPDATE_SUCCESS
 
 } from "../actions/types";
     
@@ -26,6 +27,15 @@ import {
             return {
                 ...state,
                 createPost: action.payload.post,
+                success: true,
+                message: action.payload.message,
+                message_variant: 'success',
+                error: null
+            };
+        case POST_UPDATE_SUCCESS: 
+            return {
+                ...state,
+                singlePost: action.payload.post,
                 success: true,
                 message: action.payload.message,
                 message_variant: 'success',

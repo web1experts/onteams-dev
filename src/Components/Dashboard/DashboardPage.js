@@ -11,7 +11,7 @@ import { MdLaptopMac, MdOutlineChatBubbleOutline } from "react-icons/md";
 import { BsChat, BsHeart, BsClock } from "react-icons/bs";
 import { HiOutlineLightningBolt, HiOutlineLocationMarker } from "react-icons/hi";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite} from "../../redux/actions/members.action";
-import { createPost, ListPosts, likePost } from "../../redux/actions/post.action";
+import { createPost, ListPosts, likePost, updatePost } from "../../redux/actions/post.action";
 import { LuQuote } from "react-icons/lu";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -39,8 +39,7 @@ function DashboardPage() {
   const commonState = useSelector(state => state.common)
   const [show, setShow] = useState(false);
   const [ posts, setPosts] = useState([])
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  
   
   const [ loading, setLoading] = useState( false);
   const [ fields, setFields ] = useState(
@@ -49,7 +48,35 @@ function DashboardPage() {
       content: '',
       files: [],
     });
+    const handleClose = () => {
+    setFields({
+      type: 'text',
+      title: '',
+      content: '',
+      caption: '',
+      quote: '',
+      quoteAuthor: '',
+      videoType: '',
+      youtubeUrl: '',
+      vimeoUrl: '',
+      description: '',
+      files: [],
+    });
+    setShow(false)
+    setSelectedPost( {});
+    setIseEdit( false )
+  };
+  const handleShow = () => setShow(true);
   const [ error, setError] = useState('');
+
+  const removeExistingFile = () => {
+    setFields(prev => {
+        const updated = { ...prev };
+        delete updated['existing_file'];
+        return updated;
+    });
+  };
+
 
   const handlevideoTypeChange = (type) => {
     setFields({
@@ -57,20 +84,23 @@ function DashboardPage() {
     });
   }
   const handletypeChange = (type) => { 
-    setFields({
-      type: type,
-      title: '',
-      content: '',
-      caption: '',
-      imageUrl: '',
-      quote: '',
-      quoteAuthor: '',
-      videoType: 'youtube',
-      youtubeUrl: '',
-      vimeoUrl: '',
-      videoUrl: '',
-      description: ''
-    });
+    if(!isEdit){
+      setFields({
+        type: type,
+        title: '',
+        content: '',
+        caption: '',
+        imageUrl: '',
+        quote: '',
+        quoteAuthor: '',
+        videoType: 'youtube',
+        youtubeUrl: '',
+        vimeoUrl: '',
+        videoUrl: '',
+        description: ''
+      });
+    }
+    
 
   }
 
@@ -81,7 +111,66 @@ function DashboardPage() {
   const handleEdit = (post) => {
     setSelectedPost( post);
     setIseEdit( true )
+    setShow(true)
   }
+
+  useEffect(() => {
+    if( selectedPost){
+      switch (selectedPost?.post_type) {
+      case 'text':
+        
+          setFields({
+            type: selectedPost?.post_type,
+            title: selectedPost?.title,
+            content: selectedPost?.content
+          })
+        break ;
+      case 'quote':
+      
+        setFields({
+          type: selectedPost?.post_type,
+          quote: selectedPost?.content,
+          quoteAuthor: selectedPost?.quoteAuthor || ''
+        })
+      break ;
+      case 'image':
+        setFields({
+          type: selectedPost?.post_type,
+          caption: selectedPost?.caption,
+          existing_file: selectedPost?.files[0]?.url
+        })
+        break;
+      case 'video':
+        if(selectedPost?.videoType === 'youtube'){
+          setFields({
+            type: selectedPost?.post_type,
+            description: selectedPost?.description,
+            youtubeUrl: selectedPost?.content,
+            videoType: selectedPost?.videoType
+          })
+        }else if(selectedPost?.videoType === 'vimeo'){
+          setFields({
+            type: selectedPost?.post_type,
+            description: selectedPost?.description,
+            vimeoUrl: selectedPost?.content,
+            videoType: selectedPost?.videoType
+          })
+        }else{
+          setFields({
+            type: selectedPost?.post_type,
+            description: selectedPost?.description,
+            existing_file: selectedPost?.files[0]?.url,
+            videoType: selectedPost?.videoType
+          })
+        }
+        
+      break;
+      default:
+        break;
+    }
+      
+    }
+  },[selectedPost])
  
 
   const handleTextChange = ({ target: { name, value, type } }) => {
@@ -92,7 +181,121 @@ function DashboardPage() {
     newFiles.splice(index, 1);
     setFields({ ...fields, files: newFiles });
   };
+  const handleupdate = async () => {
+    const {
+    type,
+    title,
+    content,
+    caption,
+    quote,
+    quoteAuthor,
+    videoType,
+    youtubeUrl,
+    vimeoUrl,
+    description,
+    files,
+  } = fields;
 
+  // Basic validation
+  if (!type) {
+    setError('Please select a post type.');
+    return;
+  }
+
+  if (type === 'text' && !content.trim()) {
+    setError('Text content cannot be empty.');
+    return;
+  }
+
+  if (type === 'quote' && !quote.trim()) {
+    setError('Quote content cannot be empty.');
+    return;
+  }
+
+  if (type === 'image' && !fields.existing_file && (!files || files.length === 0)) {
+    setError('Please upload at least one image.');
+    return;
+  }
+
+  if (type === 'video') {
+    if (!videoType) {
+      setError('Please select a video type.');
+      return;
+    }
+
+    if (videoType === 'youtube'  && !youtubeUrl.trim()) {
+      setError('Please provide a YouTube URL.');
+      return;
+    }
+
+    if (videoType === 'vimeo' && !vimeoUrl.trim()) {
+      setError('Please provide a Vimeo URL.');
+      return;
+    }
+
+    if (videoType === 'upload' && !fields.existing_file && (!files || files.length === 0)) {
+      setError('Please upload at least one video file.');
+      return;
+    }
+  }
+
+  setLoading(true);
+
+  try {
+    const formData = new FormData();
+    formData.append('type', type);
+
+    if (type === 'text') {
+      formData.append('title', title || '');
+      formData.append('content', content);
+    }
+
+    if (type === 'quote') {
+      formData.append('quote', quote);
+      formData.append('quoteAuthor', quoteAuthor || '');
+    }
+
+    if (type === 'image') {
+      formData.append('caption', caption || '');
+    }
+
+    if (type === 'video') {
+      formData.append('videoType', videoType);
+      formData.append('description', description || '');
+
+      if (videoType === 'youtube') {
+        formData.append('youtubeUrl', youtubeUrl);
+      }
+
+      if (videoType === 'vimeo') {
+        formData.append('vimeoUrl', vimeoUrl);
+      }
+    }
+
+    // Attach files if present
+    if (files && files.length > 0) {
+      files.forEach((file) => formData.append('files', file));
+    }
+
+    // Dispatch the post creation
+    const res = await dispatch(updatePost(selectedPost?._id, formData))
+
+    // Add the new post to the top of the list
+    if (res?.post) {
+      setPosts((prevPosts) => [res.post, ...prevPosts]);
+    }
+
+    // Reset and close modal
+    handleClose();
+    
+  } catch (err) {
+    console.error('Error creating post:', err);
+    setError('Something went wrong. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+  }
+  
   const handleSubmit = async () => {
   const {
     type,
@@ -199,19 +402,19 @@ function DashboardPage() {
 
     // Reset and close modal
     handleClose();
-    setFields({
-      type: 'text',
-      title: '',
-      content: '',
-      caption: '',
-      quote: '',
-      quoteAuthor: '',
-      videoType: '',
-      youtubeUrl: '',
-      vimeoUrl: '',
-      description: '',
-      files: [],
-    });
+    // setFields({
+    //   type: 'text',
+    //   title: '',
+    //   content: '',
+    //   caption: '',
+    //   quote: '',
+    //   quoteAuthor: '',
+    //   videoType: '',
+    //   youtubeUrl: '',
+    //   vimeoUrl: '',
+    //   description: '',
+    //   files: [],
+    // });
   } catch (err) {
     console.error('Error creating post:', err);
     setError('Something went wrong. Please try again.');
@@ -231,6 +434,15 @@ const isPostLikedByMember = (likes = [], memberId) => {
       ? fileList.filter(f => f.type.startsWith('image/')) 
       : fileList.filter(f => f.type.startsWith('video/'));
     setFields({ ...fields, files: accepted });
+    setError('');
+
+    if( isEdit ){
+      setFields(prev => {
+          const updated = { ...prev };
+          delete updated['existing_file'];
+          return updated;
+      });
+    }
   };
   const handlePosts = async () => {
     await dispatch(ListPosts());
@@ -413,7 +625,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                           <span className="text-muted" style={{ fontSize: '0.875rem' }}>
                             • {dayjs(post.createdAt).fromNow()}
                           </span>
-                          <BsPencil className="position-absolute top-0 end-0 m-2 text-danger cursor-pointer"
+                          <BsPencil className="position-absolute top-0 m-2 text-danger cursor-pointer"
                             role="button" onClick={() => handleEdit(post)}/>
                           <BsTrash
                             className="position-absolute top-0 end-0 m-2 text-danger cursor-pointer"
@@ -465,6 +677,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                                 {post.videoType === 'youtube' && (
                                   <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
                                     <iframe
+                                      key={`video-post-${post.content}-0`}
                                       src={convertYouTubeToEmbed(post.content)}
                                       title="YouTube Video"
                                       allowFullScreen
@@ -474,6 +687,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                                 {post.videoType === 'vimeo' && (
                                   <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
                                     <iframe
+                                      key={`video-post-${post.content}-0`}
                                       src={post.content}
                                       title="Vimeo Video"
                                       allowFullScreen
@@ -483,11 +697,11 @@ const isPostLikedByMember = (likes = [], memberId) => {
                                 {post.videoType === 'upload' && Array.isArray(post.files) && (
                                   post.files.map((vid, i) => (
                                     <video
-                                      key={i}
+                                      key={`video-post-${vid.url}-${i}`}
                                       controls
                                       className="mb-2 rounded-3 w-100"
                                     >
-                                      <source src={vid.url} type="video/mp4" />
+                                      <source src={`${vid.url}?t=${Date.now()}`} type="video/mp4" />
                                       Your browser does not support the video tag.
                                     </video>
                                   ))
@@ -662,6 +876,26 @@ const isPostLikedByMember = (likes = [], memberId) => {
                       </Button>
                     </div>
                   ))}
+
+                  {(fields?.existing_file && fields?.type === 'image') &&
+                    <div key={`1-file`} className="position-relative">
+                      <img
+                        src={fields?.existing_file}
+                        alt="preview"
+                        width="100"
+                        height="100"
+                        style={{ objectFit: 'cover', borderRadius: 8 }}
+                      />
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => removeExistingFile()}
+                        className="position-absolute top-0 end-0 p-1"
+                      >
+                        <FiX size={14} />
+                      </Button>
+                    </div>
+                  }
                 </div>
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -709,6 +943,30 @@ const isPostLikedByMember = (likes = [], memberId) => {
                               <Button size="sm" variant="outline-danger" onClick={() => removeFile(idx)} ><FiX /></Button>
                             </div>
                           ))}
+                          {fields?.existing_file &&
+                            <div key={`video-file`} className="position-relative">
+                              <video
+                                  key="0"
+                                  className="mb-2 rounded-3 w-100"
+                                  style={{ objectFit: 'cover', borderRadius: 8, pointerEvents: 'none' }}
+                                  preload="metadata"
+                                  muted
+                                  playsInline
+                              >
+                                  <source src={fields?.existing_file} type="video/mp4" />
+                                  Your browser does not support the video tag.
+                              </video>
+                              
+                              <Button
+                                size="sm"
+                                variant="danger"
+                                onClick={() => removeExistingFile()}
+                                className="position-absolute top-0 end-0 p-1"
+                              >
+                                <FiX size={14} />
+                              </Button>
+                            </div>
+                          }
                         </div>
                       </Form.Group>
                       <Form.Group className="mb-3">
@@ -722,7 +980,13 @@ const isPostLikedByMember = (likes = [], memberId) => {
           </Tabs>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleSubmit} disabled={loading}><FiSend /> { loading ? 'Sharing...' : 'Share Update '}</Button>
+          <Button variant="primary" onClick={() => {
+            if(selectedPost && Object.keys(selectedPost).length > 0){
+              handleupdate()
+            }else{
+              handleSubmit()
+            }
+          }} disabled={loading}><FiSend /> { loading ? 'Sharing...' : 'Share Update '}</Button>
           <p>{error}</p>
         </Modal.Footer>
       </Modal>
