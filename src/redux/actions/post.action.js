@@ -6,7 +6,8 @@ import {
     POST_LIST_SUCCESS,
     POST_FAILED,
     LIKE_POST_SUCCESS,
-    COMMENT_POST_SUCCESS
+    COMMENT_POST_SUCCESS,
+    POST_UPDATE_SUCCESS
 } from "./types";
 
 const config = {
@@ -67,6 +68,20 @@ export const createPost = (payload) =>{
     }
 }
 
+export const updatePost = (postId, payload) =>{
+    return async (dispatch)=>{
+        try{
+            const response = await API.apiPutUrl('post',`/update/${postId}`, payload);
+            if(response.data && response.data.success){
+                await dispatch({ type: POST_UPDATE_SUCCESS, payload:response.data});
+            }else{
+                await dispatch({ type: POST_FAILED, payload:response.data.message });
+            }
+        }catch (err){
+            errorRequest(err, dispatch);
+        }
+    }
+}
 
 export const likePost = (postId) => {
     return async (dispatch)=>{
