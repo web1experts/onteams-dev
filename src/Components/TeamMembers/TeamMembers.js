@@ -570,8 +570,24 @@ function TeamMembersPage() {
     }
     
   const handleChange = ({ target: { name, value, type, files, checked } }) => {
-    const finalValue =
-      type === "checkbox" ? checked : type === "file" ? files : value;
+    let finalValue;
+    if (type === 'checkbox' && name.includes('[]')) {
+        const arrayName = name.replace('[]', '');
+        const existing = fields[arrayName] || [];
+        if (checked) {
+        finalValue = [...existing, value];
+        } else {
+        finalValue = existing.filter((v) => v !== value);
+        }
+        name = arrayName;
+    } else if (type === 'checkbox') {
+        // For single checkbox: store value when checked, empty string when unchecked
+        finalValue = checked ? value : '';
+    } else if (type === 'file') {
+        finalValue = files;
+    } else {
+        finalValue = value;
+    }
 
     if (name === "role") {
       const matchingRole = roles.find((role) => role._id === value);

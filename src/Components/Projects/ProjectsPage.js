@@ -378,8 +378,24 @@ function ProjectsPage() {
     }
 
     const handleChange = ({ target: { name, value, type, files, checked } }) => {
-        const finalValue =
-            type === 'checkbox' ? checked : type === 'file' ? files : value;
+        let finalValue;
+        if (type === 'checkbox' && name.includes('[]')) {
+            const arrayName = name.replace('[]', '');
+            const existing = fields[arrayName] || [];
+            if (checked) {
+            finalValue = [...existing, value];
+            } else {
+            finalValue = existing.filter((v) => v !== value);
+            }
+            name = arrayName;
+        } else if (type === 'checkbox') {
+            // For single checkbox: store value when checked, empty string when unchecked
+            finalValue = checked ? value : '';
+        } else if (type === 'file') {
+            finalValue = files;
+        } else {
+            finalValue = value;
+        }
         setFields({ ...fields, [name]: finalValue })
         dispatch(updateStateData(PROJECT_FORM, { [name]: finalValue }))
         setErrors({ ...errors, [name]: '' })
@@ -951,7 +967,9 @@ function ProjectsPage() {
                                                                             .filter(field => field?.showInTable !== false)
                                                                             .map((field, idx) => {
                                                                                 const fieldname = field.name;
-                                                                                let mvalue = project?.customFields?.[fieldname]?.meta_value;
+                                                                                let mvalue = Array.isArray(project?.customFields?.[fieldname]?.meta_value)
+                                                                                                ? project.customFields[fieldname].meta_value.join(', ')
+                                                                                                : project?.customFields?.[fieldname]?.meta_value || '';
                                                                                 const fieldType = field.type;
                                                                                 const uniqueKey = `${fieldname || idx}-${mvalue}`;
                                                                                 if (field.type === 'badge' && Array.isArray(field.options)) {

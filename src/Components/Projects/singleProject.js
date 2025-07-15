@@ -300,14 +300,32 @@ function SingleProject(props) {
         setErrors({ ...errors, [name]: '' })
     }
 
-    const handleChange = ({ target: { name, value, type, files, checked } }) => { 
-    const finalValue =
-    type === 'checkbox' ? checked : type === 'file' ? files : value;
-   
-        setFields({ ...fields, [name]: finalValue });
-        dispatch( updateStateData( EDIT_PROJECT_FORM,  {[name]: finalValue }))
-        setErrors({ ...errors, [name]: '' })
+   const handleChange = ({ target: { name, value, type, files, checked } }) => {
+        let finalValue;
+
+        if (type === 'checkbox' && name.includes('[]')) {
+            const arrayName = name.replace('[]', '');
+            const existing = fields[arrayName] || [];
+            if (checked) {
+            finalValue = [...existing, value];
+            } else {
+            finalValue = existing.filter((v) => v !== value);
+            }
+            name = arrayName;
+        } else if (type === 'checkbox') {
+            // For single checkbox: store value when checked, empty string when unchecked
+            finalValue = checked ? value : '';
+        } else if (type === 'file') {
+            finalValue = files;
+        } else {
+            finalValue = value;
+        }
+
+        setFields((prev) => ({ ...prev, [name]: finalValue }));
+        dispatch(updateStateData(EDIT_PROJECT_FORM, { [name]: finalValue }));
+        setErrors((prev) => ({ ...prev, [name]: '' }));
     };
+
 
     useEffect(() => {
         console.log('All fields: ', fields)
@@ -792,6 +810,7 @@ useEffect(() => {
                                             value: field.type === 'date' && fields[`custom_field[${field.name}]`]
                                                     ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
                                                     : fields[`custom_field[${field.name}]`] || '',
+                                            options: field?.options || [],
                                             onChange: (e) => {
                                                 if(field.type === "date"){
                                                     

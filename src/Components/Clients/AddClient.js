@@ -69,9 +69,27 @@ function AddClient(props) {
         }
 
 const handleChange = (event, fieldname = '') => {
-    const { name, value, type, files } = event.target;
+  let finalValue;
+    const { name, value, type, files, checked } = event.target;
+    if (type === 'checkbox' && name.includes('[]')) {
+        const arrayName = name.replace('[]', '');
+        const existing = rows[arrayName] || [];
+        if (checked) {
+          finalValue = [...existing, value];
+        } else {
+          finalValue = existing.filter((v) => v !== value);
+        }
+        name = arrayName;
+    } else if (type === 'checkbox') {
+        // For single checkbox: store value when checked, empty string when unchecked
+        finalValue = checked ? value : '';
+    } else if (type === 'file') {
+        finalValue = files;
+    } else {
+        finalValue = value;
+    }
     
-      setRows({...rows, [name]: value});
+      setRows({...rows, [name]: finalValue});
       // Update the errors state with the updated array
       setErrors({...errors, [name]: ''});
     

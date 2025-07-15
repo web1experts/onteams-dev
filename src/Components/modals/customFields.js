@@ -71,7 +71,7 @@ const typeColorMap = {
           </Col>
         </Row>
 
-        {['radio', 'dropdown','badge'].includes(type) && (
+        {['radio', 'dropdown','badge', 'checkbox'].includes(type) && (
           <>
             <Badge bg="info" className="mt-2">{options.length} options</Badge>
             <Row>
@@ -189,7 +189,7 @@ const typeColorMap = {
   const handleUpdateField = async () => {
     const newErrors = {};
     if (!fields?.name.trim()) newErrors.fieldName = 'Field name is required';
-    if (['radio', 'dropdown', 'badge'].includes(fields?.type) && fields?.options.length === 0) {
+    if (['radio', 'dropdown', 'badge','checkbox'].includes(fields?.type) && fields?.options.length === 0) {
       newErrors.options = 'At least one option is required';
     }
 
@@ -199,7 +199,7 @@ const typeColorMap = {
 
     const payload = {
       label: fields?.name.trim(),
-      options: ['radio',  'dropdown','badge'].includes(fields?.type) ? fields?.options : [],
+      options: ['radio',  'dropdown','badge','checkbox'].includes(fields?.type) ? fields?.options : [],
       showInTable: fields?.showInTable,
       range_options: fields?.range_options || {}
     };
@@ -225,7 +225,7 @@ const typeColorMap = {
     const newErrors = {};
     if (!fields?.name.trim()) newErrors.fieldName = 'Field name is required';
     if (!fields?.type) newErrors.fieldType = 'Field type is required';
-    if (['radio', 'dropdown','badge'].includes(fields?.type) && fields?.options.length === 0) {
+    if (['radio', 'dropdown','badge','checkbox'].includes(fields?.type) && fields?.options.length === 0) {
       newErrors.options = 'At least one option is required';
     }
     
@@ -237,7 +237,7 @@ const typeColorMap = {
       name: createSlug(fields?.name.trim()),
       label: fields?.name.trim(),
       type: fields?.type,
-      options: ['radio', 'dropdown','badge'].includes(fields?.type) ? fields?.options : [],
+      options: ['radio', 'dropdown','badge','checkbox'].includes(fields?.type) ? fields?.options : [],
       showInTable: fields?.showInTable,
       module: props.module,
       range_options: fields?.range_options || {}
@@ -339,7 +339,7 @@ const typeColorMap = {
     };
 
 
-  const shouldShowOptions = ['dropdown', 'badge', 'radio'].includes(fields?.type);
+  const shouldShowOptions = ['dropdown', 'badge', 'radio', 'checkbox'].includes(fields?.type);
   const shouldshowRangeOptions = ['range'].includes(fields?.type)
 
   return (
