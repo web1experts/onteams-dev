@@ -69,8 +69,14 @@ export const permissionModules = [
 
 export const permissionsLabel = {
   "projects": {
-    "view": "View Projects",
-    "view_others": "View Other Members Projects",
+    "view": {
+      heading: "View Projects",
+      sub_heading: 'an view assigned projects and tasks'
+    },
+    "view_others": {
+      heading: "View Other Members Projects",
+      sub_heading: "Can view other team members' projects"
+    } ,
     "create_edit_delete_project": "Create/Edit/Delete Projects",
     "create_edit_delete_task": "Create/Edit/Delete Tasks",
     "update_projects_order": "Change Projects Order",
