@@ -405,10 +405,22 @@ function TeamMembersPage() {
       //   delete cleanedMeta.permissions;
       // }
       // Add 'recordings' key with value 'both' if not present
-      if (!("recording" in cleanedMeta)) {
+      if (!("screenshot_recording" in cleanedMeta)) {
         cleanedMeta.recording = {
-          meta_key: "recording",
-          meta_value: "screenshot_only",
+          meta_key: "screenshot_recording",
+          meta_value: "disabled",
+        };
+      }
+      if (!("video_recording" in cleanedMeta)) {
+        cleanedMeta.video_recording = {
+          meta_key: "video_recording",
+          meta_value: "disabled",
+        };
+      }
+      if (!("live_streaming" in cleanedMeta)) {
+        cleanedMeta.live_streaming = {
+          meta_key: "live_streaming",
+          meta_value: "disabled",
         };
       }
       // setEditedMember({
@@ -551,9 +563,9 @@ function TeamMembersPage() {
         const arrayName = name.replace('[]', '');
         const existing = fields[arrayName] || [];
         if (checked) {
-        finalValue = [...existing, value];
+          finalValue = [...existing, value];
         } else {
-        finalValue = existing.filter((v) => v !== value);
+          finalValue = existing.filter((v) => v !== value);
         }
         name = arrayName;
     } else if (type === 'checkbox') {
@@ -595,6 +607,9 @@ function TeamMembersPage() {
     }
   };
 
+  const updateRecodingType = async(payload) => {
+    dispatch(updateMember(selectedMember._id, payload));
+  }
 
   const showError = (name) => {
     if (errors && errors[name])
@@ -1488,7 +1503,14 @@ function TeamMembersPage() {
                         <FiCamera />
                         <h6 className="mb-1"> Screenshots <small className="d-block">Capture periodic screenshots (every 10 minutes)</small></h6>
                       </div>
-                      <Form.Check type="switch" checked={screenshots} onChange={() => setScreenshots(!screenshots)} />
+                      <Form.Check type="switch" key={`screenshot-only`} checked={fields?.["custom_field[screenshot_recording]"] === "enable"} value={"enable"} name={`custom_field[screenshot_recording]`}
+                                onChange={(event) => {handleChange(event);
+                                 updateRecodingType({
+                                      custom_field: {
+                                          screenshot_recording: event.target.checked ? "enable" : "disabled"
+                                      }
+                                  });
+                                }} />
                     </Card.Body>
                   </Card>
 
@@ -1499,7 +1521,13 @@ function TeamMembersPage() {
                         <FiVideo />
                         <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording during work hours</small></h6>
                       </div>
-                      <Form.Check type="switch" checked={screenRecording} onChange={() => setScreenRecording(!screenRecording)} />
+                      <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
+                                 updateRecodingType({
+                                      custom_field: {
+                                          video_recording: event.target.checked ? "enable" : "disabled"
+                                      }
+                                  });
+                                }} name={`custom_field[video_recording]`} />
                     </Card.Body>
                   </Card>
 
@@ -1510,7 +1538,13 @@ function TeamMembersPage() {
                         <FiMonitor />
                         <h6 className="mb-1">Live Screen <small className="d-block">Real-time screen monitoring and sharing</small></h6>
                       </div>
-                      <Form.Check type="switch" checked={liveScreen} onChange={() => setLiveScreen(!liveScreen)} />
+                      <Form.Check type="switch" key={`live-only`} checked={fields?.["custom_field[live_streaming]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
+                                 updateRecodingType({
+                                      custom_field: {
+                                          live_streaming: event.target.checked ? "enable" : "disabled"
+                                      }
+                                  });
+                                }}   name={`custom_field[live_streaming]`}/>
                     </Card.Body>
                   </Card>
 

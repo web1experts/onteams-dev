@@ -1216,7 +1216,7 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
                                                 <span>
                                                   {activity.name}
                                                 </span>
-                                                <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.member?.role || <FiClock className="text-muted" /> }</strong>
+                                                <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.role?.name || <FiClock className="text-muted" /> }</strong>
                                               </div>
                                           </div>
                                         </div>
