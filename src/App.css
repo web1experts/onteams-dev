@@ -574,7 +574,7 @@ body {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
-    z-index: 2;
+    z-index: 333;
     background: linear-gradient(to right, #f8fafc, #f1f5f9);
     margin-bottom: -1px;
 }
@@ -7107,6 +7107,11 @@ ul#icon-tabs .nav-link span svg {
 .page--wrapper .attendance--excel--table th small {
   font-size: 12px;
   text-transform: capitalize;
+}
+
+.attendance--table table td .total--time--badge , .att--status--abbr .total--time--badge {
+  min-width: 95px;
+  justify-content: center;
 }
 
 .attendance--table table td .bg--blue, .att--status--abbr .bg--blue {
