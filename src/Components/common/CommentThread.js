@@ -28,13 +28,7 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
         <Card.Body>
             <Card.Title>{comment.author?.name}</Card.Title>
             <Card.Text>{comment.text}</Card.Text>
-            <BsTrash
-              className="position-absolute top-0 end-0 m-2 text-danger cursor-pointer"
-              role="button"
-              onClick={() => handleDelete(comment._id, comment?.post)}
-            />
-            
-
+            <BsTrash className="position-absolute top-0 end-0 mt-3 me-3 text-danger cursor-pointer" role="button" onClick={() => handleDelete(comment._id, comment?.post)} />
             {comment.replies && comment.replies.length > 0 && (
               <div className="mt-3 ps-4 border-start border-2">
                 {comment.replies.map((reply) => (
@@ -43,29 +37,15 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
               </div>
             )}
             {allowReply === true && 
-              <Button
-                variant="link"
-                size="sm"
-                className="p-0"
-                onClick={() => {setShowReply(!showReply);setSelectedComment(comment);}}
-              >
-                {showReply ? 'Cancel' : 'Reply'}
-              </Button>
+              <Button variant="dark" size="sm" className="px-2 py-1" onClick={() => {setShowReply(!showReply);setSelectedComment(comment);}}>{showReply ? 'Cancel' : 'Reply'}</Button>
             }
 
             {showReply && (
-              <Form onSubmit={handleReplySubmit} className="mt-2">
-                <Form.Group controlId={`reply-${comment.id}`}>
-                  <Form.Control
-                    type="text"
-                    placeholder="Write your reply..."
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                  />
+              <Form onSubmit={handleReplySubmit} className="mt-2 d-flex gap-2">
+                <Form.Group className='form-group w-100 pb-0' controlId={`reply-${comment.id}`}>
+                  <Form.Control type="text" placeholder="Write your reply..." value={replyText} onChange={(e) => setReplyText(e.target.value)}/>
                 </Form.Group>
-                <Button type="submit" variant="primary" size="sm" className="mt-1">
-                  Submit
-                </Button>
+                <Button type="submit" variant="primary" size="sm">Submit</Button>
               </Form>
             )}
         </Card.Body>
@@ -84,13 +64,13 @@ const [comment, setComment] = useState('')
   return (
     <div>
         {comments?.length > 0 &&
-            <div className="bg-light p-3 rounded-4 mt-3 d-flex flex-column align-items-start gap-3 border-light">
+          <div className="comments--list p-3 rounded-4 mt-3 d-flex flex-column align-items-start gap-3 border-light">
             {comments.map(comment => (
                 <Comment key={comment._id} comment={comment} memberdata={memberdata} allowReply={true} />
             ))}
-            </div>
+          </div>
         }
-      <div className="bg-light p-3 rounded-4 mt-3 d-flex flex-column align-items-end gap-3 border-light">
+      <div className="comment--box bg-light p-3 rounded-4 mt-3 d-flex flex-column align-items-end gap-3 border-light">
         <textarea
             className="form-control"
             placeholder="Write a comment..."
@@ -100,11 +80,11 @@ const [comment, setComment] = useState('')
             setComment( e.target.value)
             }}
         />
-        <ButtonGroup>
-            <Button variant="primary" className='mr-2' onClick={() => toggle(false)}>Cancel</Button>
+        <div className='d-flex gap-3 align-items-center justify-content-end'>
+            <Button variant="secondary" className='mr-2' onClick={() => toggle(false)}>Cancel</Button>
             <Button variant="primary" onClick={postComment}>Post</Button>
-        </ButtonGroup>
         </div>
+      </div>
     </div>
   );
 };

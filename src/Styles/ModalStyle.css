@@ -124,8 +124,8 @@
     color: #de0606;
     font-size: 12px;
     position: absolute;
-    left: 20px;
-    bottom: -2px;
+    left: 0;
+    bottom: 3px;
 }
 
 .add--team--member--modal form .form-row, .add--member--modal form .form-row {

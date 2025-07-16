@@ -105,13 +105,13 @@ function WorkspaceForm(props) {
         <h2>Create a Workspace</h2>
       }
 
-      <Form.Group className="mb-3 form-group">
+      <Form.Group className="mb-0 form-group">
         <FloatingLabel label="Workspace Name" controlId="floatingInputGrid">
           <Form.Control type="text" className={errors['name'] && errors['name'] !== "" ? "input-error" : ''} placeholder="Workspace Name" onChange={handleChange} value={fields['name'] || ""} name="name" />
         </FloatingLabel>
         {showError('name')}
       </Form.Group>
-      <Form.Group className="mb-3 form-group">
+      <Form.Group className="mb-0 form-group">
         <Form.Select aria-label="Select Industry Type" placeholder="Select Industry Type" 
           className={errors['industry'] && errors['industry'] !== "" ? "form-control input-error filled custom-selectbox" : 'form-control filled custom-selectbox'} 
           onChange={handleChange} value={fields['industry'] || ""} name="industry">

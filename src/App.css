@@ -64,7 +64,7 @@ body {
   border: 0;
   color: #ffffff;
   background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
-  margin-left: .5rem;
+  margin-left: 0;
 }
 
 .team--page .page--title h2 .list-group .expand--icon .btn svg {
@@ -124,6 +124,10 @@ body {
 
 .holidays--list tr {
   position: relative;
+}
+
+.holidays--list tr.upcoming-holiday {
+  background: linear-gradient(to right, #eff6ff, #ecfeff);
 }
 
 .page--wrapper .holidays--list .dropdown {
@@ -244,7 +248,7 @@ body {
   background: #ffffff;
   border-radius: .5rem;
   padding: .25rem;
-  gap: 5px;
+  gap: .5rem;
   border: 1px solid rgb(226 232 240);
 }
 
@@ -594,6 +598,18 @@ body {
   position: -webkit-sticky;
   left: 0;
   background: #ffffff;
+  z-index: 222;
+  border-right: 0;
+}
+
+.page--wrapper .draggable--table .new--td td:first-child {
+  width: a;
+  max-width: fit-content;
+  min-width: fit-content;
+  position: relative;
+  padding: 0;
+  left: 0;
+  background: transparent;
   z-index: 1;
   border-right: 0;
 }
@@ -792,6 +808,21 @@ body {
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   padding: .5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 630px;
+  width: 100%;
+}
+
+.project--grid--new--table td.new--td td.new--td {
+  color: rgb(71 85 105);
+  font-size: 100%;
+  line-height: normal;
+  background: transparent;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  padding: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1925,9 +1956,10 @@ span.open--sidebar {
   border-radius: .75rem
 }
 
-.permission--card {
-  background: #F8FAFC;
-  border-radius: .75rem
+.rounded--box .permission--card {
+    background: #ffffff;
+    border-radius: .75rem;
+    border: 1px solid #e5e7eb;
 }
 
 .permission--card .accordion .accordion-body {
@@ -3150,8 +3182,8 @@ Project Task View CSS=-=-=
 
 .projects--grid .task--list ul .task--button .form-floating>.form-control:focus~label,
 .projects--grid .task--list ul .task--button .form-floating>.form-control:not(:placeholder-shown)~label {
-  transform: scale(.85) translateY(-.8rem) translateX(1rem);
-  -webkit-transform: scale(.85) translateY(-.8rem) translateX(1rem);
+  transform: scale(.85) translateY(-.85rem) translateX(1rem);
+  -webkit-transform: scale(.85) translateY(-.85rem) translateX(1rem);
 }
 
 
@@ -5262,11 +5294,25 @@ pre {
   cursor: pointer;
 }
 
+.dashboard--page .icon--heart .filled--heart {
+  fill: crimson;
+}
+
 .team--updates .inner--card video,
 .team--updates .inner--card iframe {
   object-fit: cover;
   height: 100%;
   border-radius: var(--bs-border-radius) !important;
+}
+
+.comments--list {
+  background: rgb(241 245 249);
+}
+
+.comments--list .card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgb(241 245 249);
 }
 
 .app--title {
@@ -5600,6 +5646,26 @@ ul#icon-tabs .nav-link span svg {
   color: rgb(148 163 184);
   width: 1.5rem;
   height: auto;
+}
+
+.inner--card .edit--dropdown {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.inner--card .edit--dropdown .btn {
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  opacity: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inner--card:hover .edit--dropdown .btn {
+  opacity: 1;
 }
 
 .team--chat {
@@ -6312,11 +6378,7 @@ ul#icon-tabs .nav-link span svg {
 .project--grid--table tbody {
   display: flex;
   flex-flow: row wrap;
-  gap: 10px;
-}
-
-.project--grid--new--table tbody {
-  gap: 20px;
+  gap: 1rem;
 }
 
 .project--grid--table tr,
@@ -6333,7 +6395,7 @@ ul#icon-tabs .nav-link span svg {
   border-radius: 1rem;
   flex: 1 1 100%;
   gap: .75rem;
-  max-width: calc(33.333% - 16px);
+  max-width: calc(33.333% - 1rem);
   background: #ffffff;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
@@ -6862,18 +6924,18 @@ ul#icon-tabs .nav-link span svg {
     line-height: 1.25rem;
 }
 
-.member--projects .text--blue {
+.reports--heading .text--blue {
     color: rgb(37 99 235);
     font-weight: 700;
     font-size: 1.125rem;
     line-height: 1.75rem;
 }
 
-.member--projects .text-slate-600 {
+.reports--heading .text-slate-600 {
     color: rgb(71 85 105);
 }
 
-.member--projects .text--green {
+.reports--heading .text--green {
     color: rgb(22 163 74);
     font-weight: 700;
    font-size: 1.125rem;
@@ -6881,11 +6943,32 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .member--projects {
-  border-radius: 1.5rem;
-  -webkit-border-radius: 1.5rem;
+  box-shadow: none;
+  padding: 0;
+    background-color: transparent;
+    border-color: transparent;
+    border-width: 0;
+    border-style: solid;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    margin-bottom: 2rem;
 }
 
-.single--project--stack {
+.reports--heading {
+  background: #ffffff;
+  margin-bottom: 1rem;
+  border: 1px solid rgb(229 231 235);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);
+  -webkit-box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);
+  border-radius: .75rem;
+  -webkit-border-radius: .75rem;
+  transition-duration: .2s;
+  transition-property: box-shadow;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  padding: 1rem 1.5rem;
+}
+
+/* .single--project--stack {
   padding: 1.5rem;
   background-image: linear-gradient(to right, #f8fafc, #eff6ff);
   border-color: rgb(226 232 240);
@@ -6893,6 +6976,42 @@ ul#icon-tabs .nav-link span svg {
   border-style: solid;
   -webkit-border-radius: 1rem;
   border-radius: 1rem;
+} */
+
+.report--task--list ul {
+  padding: .75rem 1rem;
+  background: linear-gradient(to right, #f8fafc, #eff6ff);
+  border-color: rgb(226 232 240);
+  border-width: 1px;
+  border-style: solid;
+  -webkit-border-radius: .75rem;
+  border-radius: .75rem;
+}
+
+.report--task--list ul li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.report--task--list ul li+li {
+  margin-top: .5rem;
+  border-top: 1px solid rgba(0, 0, 0, .07);
+  padding-top: .5rem;
+}
+
+.single--project--stack {
+  background: #ffffff;
+  margin-bottom: 1rem;
+  border: 1px solid rgb(229 231 235);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);
+  -webkit-box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);
+  border-radius: .75rem;
+  -webkit-border-radius: .75rem;
+  transition-duration: .2s;
+  transition-property: box-shadow;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  padding: 1.5rem;
 }
 
 .single--project--stack .badge {
@@ -6904,16 +7023,31 @@ ul#icon-tabs .nav-link span svg {
 .single--project--stack .report--info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 3rem;
+  margin-bottom: 1rem;
 }
 
 .single--project--stack .p--card {
-  flex: 1 1;
+  /* flex: 1 1; */
   margin: 0;
 }
 
 .single--project--stack .p--card p {
-  font-weight: 700;
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    padding: .5rem .75rem;
+    background: rgb(249 250 251);
+    color: rgb(75 85 99);
+    margin-right: 0;
+    margin-left: 0;
+    margin-top: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 0;
+    font-weight: 600;
+    border: 1px solid rgb(229 231 235);
+    box-shadow: none;
 }
 
 .single--project--stack+.single--project--stack {
@@ -6921,14 +7055,23 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .single--project--stack h4 {
-  font-size: 20px;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 600;
 }
 
 .single--project--stack h4 span {
-  font-size: 14px;
-  margin-top: .25rem;
-  display: block;
-  font-weight: normal;
+    padding: .5rem;
+    background-color: rgb(239 246 255);
+    border-radius: .5rem;
+    color: rgb(37 99 235);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    margin-right: 1rem;
 }
 
 .modal .single--project--stack .title--initial {
@@ -7434,11 +7577,6 @@ Media CSS-=-==
     margin: auto;
     text-align: center;
   }
-
-  .page--wrapper table th:first-child,
-  .page--wrapper table td:first-child {
-    min-width: fit-content
-  }
   
   .wrapper--title {
     gap: 10px;
@@ -7463,7 +7601,7 @@ Media CSS-=-==
 
   .project--grid--table tr,
   .activity--box .card-group .card {
-    max-width: calc(50% - 16px);
+    max-width: calc(50% - 8px);
   }
 
   .holiday--table--grid tr {
@@ -7777,9 +7915,9 @@ Media CSS-=-==
     border-right: 0!important;
   }
 
-  .projects--page .page--wrapper table th:last-child,
-  .projects--page .page--wrapper table td:last-child {
-    min-width: 180px;
+  .table-responsive-xl {
+    overflow: visible;
+    max-height: 100%;
   }
 
   .wrapper--title {

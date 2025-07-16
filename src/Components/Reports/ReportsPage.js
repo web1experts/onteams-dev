@@ -5,11 +5,11 @@ import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination } from "react-bootstrap";
 import Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
-import { BsArrowLeftCircleFill, BsArrowRightCircleFill} from "react-icons/bs";
+import { BsArrowLeftCircleFill, BsArrowRightCircleFill, BsClockHistory } from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
-import { LuFolderOpen, LuUsers } from 'react-icons/lu';
+import { LuFolderOpen, LuUsers, LuTimer, LuClock } from 'react-icons/lu';
 import { MdDragIndicator, MdOutlineClose } from "react-icons/md";
-import { FiSidebar, FiClock, FiTarget, FiUsers } from "react-icons/fi";
+import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
 import { GoPulse } from 'react-icons/go';
 import { AiOutlineTeam } from 'react-icons/ai';
 import { GrExpand } from "react-icons/gr";
@@ -266,7 +266,7 @@ const handleReportClose = () => setViewReport(false);
             {/* {
               gettaskTab(task.tab)
             } */}
-            <Button variant="primary" className="mt-3" onClick={() => {handleViewReport(taskData?.taskId)}}><FaEye/> View Report</Button>
+            <Button variant="dark" className="px-3 py-2" onClick={() => {handleViewReport(taskData?.taskId)}}><FaEye/> View Report</Button>
             {/* <Button variant="info" className="mt-3 ms-3" onClick={() => {handleShowRemarks()}}><TbReport /> View Remarks</Button> */}
           </li>
         ))}
@@ -1178,11 +1178,11 @@ const handleToggles = () => {
                                   <td className="ms-auto text-start text-xl-center">
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
                                     <br className="d-xl-none"/>
-                                    <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {result?.totalTime || 0}</span>
+                                    <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center"><FiClock className="me-1" /> {result?.totalTime || 0}</span>
                                   </td>
                                   <td className="text-start text-xl-center"><strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Members</strong>
                                     <br className="d-xl-none"/>
-                                    <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><LuUsers className="me-1" /> {reportData?.members?.length || 0}</div>
+                                    <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center"><LuUsers className="me-1" /> {reportData?.members?.length || 0}</div>
                                   </td>
                                   <td>
                                     <Button variant="dark" className="ms-auto px-3 py-2 d-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(reportData);setIsActive(1);}}><FaEye/> Details</Button>
@@ -1251,13 +1251,13 @@ const handleToggles = () => {
                                   <td className="ms-auto text-start text-xl-center">
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
                                     <br className="d-xl-none"/>
-                                    <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {result?.totalTime || 0}</span>
+                                    <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center"><FiClock className="me-1" /> {result?.totalTime || 0}</span>
                                   </td>
 
                                   <td className="text-start text-xl-center">
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Projects</strong>
                                     <br className="d-xl-none"/>
-                                    <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><LuFolderOpen className="me-1" /> {result?.totalProjects || 0}</div>
+                                    <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center"><LuFolderOpen className="me-1" /> {result?.totalProjects || 0}</div>
                                   </td>
                                   <td><Button variant="dark" className="mt-0 mt-xl-0 px-3 py-2 d-inline-flex align-items-center gap-2" onClick={() => { setSingleMemberReport(report); setIsActive(1);}}><FaEye/> Details</Button></td>
                                 </tr>
@@ -1350,127 +1350,129 @@ const handleToggles = () => {
         </div>
         {
           (isActive === 1 && activeMemberTab === 'members') ?
-        
-          <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
-            <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
-              <h3 className="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects ({singleMemberReport?.reports?.length || 0})</h3>
-              <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
-                <div className="text-center">
-                    <div className="text-lg font-bold text--blue">{getProjectSummary(singleMemberReport?.reports, 'time')}</div>
-                    <div className="text-slate-600">Total Hours</div>
-                </div>
-                <div className="text-center">
-                    <div className="text-lg font-bold text--green">{singleMemberReport?.reports?.length || 0}</div>
-                    <div className="text-slate-600">Projects</div>
+          <>
+            <div className='reports--heading'>
+              <div className="d-flex align-items-center gap-3 justify-content-between">
+                <h3 className="mb-0 d-flex align-items-center gap-3"><span><LuFolderOpen /></span>Projects ({singleMemberReport?.reports?.length || 0})</h3>
+                <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+                  <div className="text-center">
+                      <div className="text-lg font-bold text--blue">{getProjectSummary(singleMemberReport?.reports, 'time')}</div>
+                      <div className="text-slate-600">Total Hours</div>
+                  </div>
+                  <div className="text-center">
+                      <div className="text-lg font-bold text--green">{singleMemberReport?.reports?.length || 0}</div>
+                      <div className="text-slate-600">Projects</div>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            {
-              singleMemberReport?.reports?.map((report, index) => {
-                return (
-                  <>
-                    <div className="single--project--stack">
-                      <div eventKey={`single-member-accord-item-${singleMemberReport?.member?._id}`} key={`single-member-accord-item-${singleMemberReport?.member?._id}`} onClick={() => {setSelectedReport(report)}}>
-                        <div className="d-flex align-items-center justify-content-between gap-4">
-                          <h4 className="font-bold text-slate-800 text-lg mb-2">{report?.project?.name} 
-                            <span>{report?.project?.client?.name}</span>
-                          </h4>
-                          <Badge bg="warning">{report?.project?.status}</Badge>
+            <div className={`member--projects attendance--stats ${activeMemberTab === 'members' ? '' : 'd-none'}`}>
+              {
+                singleMemberReport?.reports?.map((report, index) => {
+                  return (
+                    <>
+                      <div className="single--project--stack">
+                        <div eventKey={`single-member-accord-item-${singleMemberReport?.member?._id}`} key={`single-member-accord-item-${singleMemberReport?.member?._id}`} onClick={() => {setSelectedReport(report)}}>
+                          <div className="d-flex align-items-center justify-content-between gap-4">
+                            <h4 className="d-flex align-items-center gap-3 justify-content-between">
+                              <strong>
+                                <span>
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-building2 w-4 h-4 text-blue-600"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>
+                                </span>
+                                {report?.project?.title}
+                              </strong>
+                            </h4>
+                            <Badge bg="warning">{report?.project?.status}</Badge>
+                          </div>
+                          <p><small className="d-flex align-items-center gap-2"><FiUser /> {report?.project?.client?.name}</small></p>
+                          <Row>
+                            <Col sm={12}>
+                              <div className="report--info">
+                                <p className="p--card">
+                                  <label>Tracked Time</label>
+                                  <p><LuTimer /> {calculateTotalTime(report?.activities,'tracker')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Manual Time</label>
+                                  <p><LuClock /> {calculateTotalTime(report?.activities, 'manual')}</p>
+                                </p>
+                                <p className="p--card">
+                                  <label>Total Time</label>
+                                  <p><BsClockHistory /> {calculateTotalTime(report?.activities, 'all')}</p>
+                                </p>
+                              </div>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col sm={12}>
+                              <div className="report--task--list">
+                                <h4>Tasks</h4>
+                                <TaskList report={report} />
+                              </div>
+                            </Col>
+                          </Row>
                         </div>
-                        <Row>
-                          <Col sm={12}>
-                        <div className="report--info">
-                          <p className="p--card">
-                            <label>Tracked Time</label>
-                            <p>{calculateTotalTime(report?.activities,'tracker')}</p>
-                          </p>
-                          <p className="p--card">
-                            <label>Manual Time</label>
-                            <p>{calculateTotalTime(report?.activities, 'manual')}</p>
-                          </p>
-                          <p className="p--card">
-                            <label>Total Time</label>
-                            <p>{calculateTotalTime(report?.activities, 'all')}</p>
-                          </p>
-                        </div>
-                        </Col>
-                        </Row>
-                        <Row>
-                          <Col sm={12}>
-                            <label>Tasks</label>
-                            <TaskList report={report} />
-                          </Col>
-                        </Row>
-                      </div>
-                    </div>
-                  </>
-                )
-              })
-            }
-          </div>
-          :
-          
-        <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
-          <div className="d-flex align-items-center gap-3 justify-content-between mb-4">
-            <h3 className="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members ({singleMemberReport?.members?.length || 0})</h3>
-            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
-              {/* <div className="text-center">
-                  <div className="text-lg font-bold text--blue">113h 15m</div>
-                  <div className="text-slate-600">Total Hours</div>
-              </div>
-              <div className="text-center">
-                  <div className="text-lg font-bold text--green">{singleMemberReport?.members?.length || 0}</div>
-                  <div className="text-slate-600">Members</div>
-              </div> */}
-            </div>
-          </div>
-          {
-            
-            singleMemberReport?.members?.map((member, index) => {
-              return (
-                      <>
-                    <div className={`single--project--stack-${member?._id}`}>
-                      <div className="d-flex justify-content-between mb-4" key={`single-member-accord-item-${member?._id}`}>
-                        <div className="project--name d-flex gap-3 align-items-center">
-                            <div className="title--initial">{member?.name?.substring(0,1)}</div>
-                            <div className="title--span flex-column d-flex align-items-start gap-0">
-                                <span>{member?.name} </span>
-                                <strong>{member?.role}</strong>
-                            </div>
-                        </div>
-                      </div>
-                      <Row>
-                        <Col>
-                      <div className="report--info">
-                        <p className="p--card">
-                          <label>Tracked Time</label>
-                          <p>{calculateTotalTime(member?.activities,'tracker')}</p>
-                        </p>
-                        <p className="p--card">
-                          <label>Manual Time</label>
-                          <p>{calculateTotalTime(member?.activities, 'manual')}</p>
-                        </p>
-                        <p className="p--card">
-                          <label>Total Time</label>
-                          <p>{calculateTotalTime(member?.activities, 'all')}</p>
-                        </p>
-                      </div>
-                      </Col>
-                      </Row>
-                      <Col sm={12}>
-                        <label>Tasks</label>
-                        <TaskList report={member} />
-                      </Col>
-                     
-                      {/* <Button variant="info" className="mt-3 ms-3"><TbReport /> View Remarks</Button> */}
                       </div>
                     </>
-              )
-            })
-          }
-        </div>
-      }
+                  )
+                })
+              }
+            </div>
+          </>
+          :
+          <>
+            <div className='reports--heading'>
+              <div className="d-flex align-items-center gap-3 justify-content-between">
+                <h3 className="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Team Members ({singleMemberReport?.members?.length || 0})</h3>
+              </div>
+            </div>
+            <div className={`member--projects attendance--stats team--members--list ${activeMemberTab === 'projects' ? '' : 'd-none'}`}>
+              {
+                singleMemberReport?.members?.map((member, index) => {
+                  return (
+                    <>
+                      <div className={`single--project--stack`}>
+                        <div className="d-flex justify-content-between mb-4" key={`single-member-accord-item-${member?._id}`}>
+                          <div className="project--name d-flex gap-3 align-items-center">
+                              <div className="title--initial">{member?.name?.substring(0,1)}</div>
+                              <div className="title--span flex-column d-flex align-items-start gap-0">
+                                  <span>{member?.name} </span>
+                                  <strong>{member?.role}</strong>
+                              </div>
+                          </div>
+                        </div>
+                        <Row>
+                          <Col>
+                            <div className="report--info">
+                              <p className="p--card">
+                                <label>Tracked Time</label>
+                                <p><LuTimer /> {calculateTotalTime(member?.activities,'tracker')}</p>
+                              </p>
+                              <p className="p--card">
+                                <label>Manual Time</label>
+                                <p><LuClock /> {calculateTotalTime(member?.activities, 'manual')}</p>
+                              </p>
+                              <p className="p--card">
+                                <label>Total Time</label>
+                                <p><BsClockHistory /> {calculateTotalTime(member?.activities, 'all')}</p>
+                              </p>
+                            </div>
+                          </Col>
+                        </Row>
+                        <Col sm={12}>
+                          <div className="report--task--list">
+                            <h4>Tasks</h4>
+                            <TaskList report={member} />
+                          </div>
+                        </Col>
+                      </div>
+                    </>
+                  )
+                })
+              }
+            </div>
+          </>
+        }
       </div>
       
 

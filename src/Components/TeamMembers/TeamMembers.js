@@ -1813,27 +1813,6 @@ function TeamMembersPage() {
                               <Card.Text>Create, edit, and delete clients</Card.Text>
                             </Card.Body>
                           </Card>
-                          {/* <Card className="mb-3">
-                            <span className="card--icon icon--orange"><FiEdit /></span>
-                            <Card.Body>
-                              <Card.Title>Task Management</Card.Title>
-                              <Card.Text>Create, edit, and delete tasks</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--indigo"><TbArrowsDownUp /></span>
-                            <Card.Body>
-                              <Card.Title>Project Ordering</Card.Title>
-                              <Card.Text>Reorder and organize projects</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card>
-                            <span className="card--icon icon--teal"><TbArrowsDownUp /></span>
-                            <Card.Body>
-                              <Card.Title>Task Ordering</Card.Title>
-                              <Card.Text>Reorder and organize tasks</Card.Text>
-                            </Card.Body>
-                          </Card> */}
                         </Accordion.Body>
                       </Accordion.Item>
                       <Accordion.Item eventKey="3" className="bg--blue--accordion">
@@ -2033,272 +2012,12 @@ function TeamMembersPage() {
                       </Accordion.Item>
                     </Accordion>
                   </Card.Text>
-                  {/* <div className="text-end mt-3">
-                    {
-                        (memberProfile?.permissions?.members?.create_edit_delete === true &&
-                        selectedMember?._id !== currentMember?._id  || memberProfile?.role?.slug === "owner") ? (
-                      <>
-                        <Button variant="danger" className="me-3" onClick={() => setShowDialog(true)}>Delete</Button>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {(memberProfile?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") ?
-                    <Button variant="primary" disabled={updateloader} onClick={handleUpdateSubmit}>{updateloader ? 'Please Wait...' : 'Save Changes'}</Button>
-                    :
-                    <></>
-                    }
-                  </div> */}
                 </Card.Body>
               </Card>
             </div>
           </>
         </div>
       )}
-
-      {/* {adjustPermissions && (
-        <Modal
-          show={adjustPermissions}
-          onHide={() => setAdjustPermissions(false)}
-          centered
-          size="lg"
-          className="add--team--member--modal add--member--modal"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Manage Permissions</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Card>
-              <Card.Body>
-                <Card.Title>Permissions</Card.Title>
-
-                <>
-                  <div className="card--header">
-                    <FormGroup className="form-group mb-0 pb-0">
-                      <Form.Check
-                        type="checkbox"
-                        id="all"
-                        label="Select All Permissions"
-                        checked={permissionModules.every((mod) => {
-                          const modSlug = mod.slug;
-                          const modPerms = permissions?.[modSlug] || {};
-
-                          const allPermsChecked = (mod.permissions || []).every(
-                            (perm) => modPerms[perm] === true
-                          );
-
-                          const selectedIds =
-                            modPerms["selected_members"] || [];
-                          const allMemberIds = memberFeeds.map((m) =>
-                            String(m._id)
-                          );
-                          if (modSlug === "projects")
-                            allMemberIds.push("unassigned");
-
-                          const allMembersChecked =
-                            selectedIds.length === allMemberIds.length &&
-                            allMemberIds.every((id) =>
-                              selectedIds.includes(id)
-                            );
-
-                          if (
-                            [
-                              "tracking",
-                              "projects",
-                              "reports",
-                              "attendance",
-                            ].includes(modSlug)
-                          ) {
-                            return allPermsChecked && allMembersChecked;
-                          }
-
-                          return allPermsChecked;
-                        })}
-                        onChange={(e) =>
-                          handleSelectAllPermissions(e.target.checked)
-                        }
-                      />
-                    </FormGroup>
-                    <Button type="button" variant="link" className="p-0 border-0" onClick={handleToggleExpandAll}>
-                      {permissionModules.every((mod) => expanded[mod.slug])
-                        ? "Collapse All"
-                        : "Expand All"}
-                    </Button>
-                  </div>
-                  <Accordion
-                    activeKey={Object.entries(expanded)
-                      .filter(([_, v]) => v)
-                      .map(([k]) => k)}
-                    alwaysOpen
-                  >
-                    {permissionModules.map((mod) => {
-                      const modSlug = mod.slug;
-                      const modPerms = permissions?.[modSlug] || {};
-                      const isExpanded = expanded?.[modSlug] || false;
-                      const isViewChecked = !!modPerms.view;
-                      const truePermissionCount = Object.values(
-                        modPerms
-                      ).filter((val) => val === true).length;
-
-                      return (
-                        <Accordion.Item eventKey={modSlug}>
-                          <Accordion.Header
-                            onClick={() => {
-                              setExpanded((prev) => ({
-                                ...prev,
-                                [modSlug]: !prev[modSlug],
-                              }));
-                            }}
-                          >
-                            {mod.name}{" "}
-                            <span className="per--count">
-                              {truePermissionCount}/{mod?.permissions?.length}
-                            </span>{" "}
-                          </Accordion.Header>
-                          <Accordion.Body>
-                            <div className="transition-all">
-                              {(mod.permissions || []).map((perm) => {
-                                if (perm === "view") {
-                                  return (
-                                    <Form.Check
-                                      key={`${modSlug}--view`}
-                                      type="checkbox"
-                                      id={`${modSlug}-view`}
-                                      label="View"
-                                      checked={!!modPerms.view}
-                                      //disabled={selectedMember?.role?.slug === "owner"}
-                                      onChange={
-                                        () => {
-                                          // if(selectedMember?.role?.slug !== "owner"){
-                                          toggleView(modSlug);
-                                        }
-                                        //}
-                                      }
-                                    />
-                                  );
-                                }
-
-                                return (
-                                  <>
-                                    <Form.Check
-                                      key={perm}
-                                      type="checkbox"
-                                      id={`${modSlug}-${perm}`}
-                                      label={perm
-                                        .replace(/[_-]/g, " ")
-                                        .replace(/^\w/, (l) => l.toUpperCase())}
-                                      disabled={!isViewChecked}
-                                      checked={!!modPerms[perm]}
-                                      //readOnly={selectedMember?.role?.slug === "owner"}
-                                      onChange={() => {
-                                        //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
-                                        togglePermission(modSlug, perm);
-                                      }}
-                                      className={
-                                        !isViewChecked
-                                          ? "parent-item text-muted"
-                                          : "parent-item"
-                                      }
-                                    />
-
-                                    {[
-                                      "tracking",
-                                      "projects",
-                                      "reports",
-                                      "attendance",
-                                    ].includes(modSlug) &&
-                                      perm === "view_others" &&
-                                      modPerms[perm] === true && (
-                                        <>
-                                          <Form.Check
-                                            key={`${modSlug}-${perm}-select-all`}
-                                            type="checkbox"
-                                            id={`${modSlug}-${perm}-select-all`}
-                                            label="Select all"
-                                            //disabled={selectedMember?.role?.slug === "owner"}
-                                            checked={memberFeeds.every(
-                                              (member) =>
-                                                modPerms[
-                                                  "selected_members"
-                                                ]?.includes(String(member._id))
-                                            )}
-                                            onChange={(e) => {
-                                              //if(selectedMember?.role?.slug !== "owner"){
-                                              handleSelectAll(
-                                                modSlug,
-                                                e.target.checked
-                                              );
-                                              // }
-                                            }}
-                                            className="sub-items"
-                                          />
-                                          <>
-                                            {memberFeeds.map((member) => (
-                                              <Form.Check
-                                                key={`${modSlug}-${perm}-${member._id}`}
-                                                type="checkbox"
-                                                id={`${modSlug}-${perm}-${member._id}`}
-                                                label={member.name}
-                                                checked={modPerms[
-                                                  "selected_members"
-                                                ]?.includes(String(member._id))}
-                                                // disabled={selectedMember?.role?.slug === "owner"}
-                                                onChange={() => {
-                                                  //if (selectedMember?.role?.slug !== "owner") {
-                                                  toggleMembers(
-                                                    modSlug,
-                                                    "selected_members",
-                                                    member._id
-                                                  );
-                                                  // }
-                                                }}
-                                                className="sub-items"
-                                              />
-                                            ))}
-
-                                            {modSlug === "projects" && (
-                                              <Form.Check
-                                                key={`${modSlug}-${perm}-unassigned`}
-                                                type="checkbox"
-                                                id={`${modSlug}-${perm}-unassigned`}
-                                                label="Unassigned"
-                                                checked={modPerms[
-                                                  "selected_members"
-                                                ]?.includes("unassigned")}
-                                                // disabled={selectedMember?.role?.slug === "owner"}
-                                                onChange={() => {
-                                                  // if (selectedMember?.role?.slug !== "owner") {
-                                                  toggleMembers(
-                                                    modSlug,
-                                                    "selected_members",
-                                                    "unassigned"
-                                                  );
-                                                  // }
-                                                }}
-                                                className="sub-items"
-                                              />
-                                            )}
-                                          </>
-                                        </>
-                                      )}
-                                  </>
-                                );
-                              })}
-                            </div>
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      );
-                    })}
-                  </Accordion>
-                  <div className="mt-4 text-end">
-                    <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save Permissions"}</Button>
-                  </div>
-                </>
-              </Card.Body>
-            </Card>
-          </Modal.Body>
-        </Modal>
-      )} */}
 
       <Modal
         show={show}
@@ -2347,7 +2066,7 @@ function TeamMembersPage() {
               {showError("role")}
             </div>
             <div className="form-row" key={`row-1`}>
-              <Form.Group>
+              <Form.Group className="mb-0 form-group">
                 {customFields.length > 0 && (
                   <>
                     {customFields.map((field, index) =>
@@ -2676,11 +2395,11 @@ function TeamMembersPage() {
                 <LuFolderOpen />
                 <h6 className="mb-0">Project Management <small className="d-block">Project access and management permissions</small></h6>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View Other Members</p>
                 <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
               </div>
@@ -2697,19 +2416,19 @@ function TeamMembersPage() {
                   ))}
                 </div>
               )}
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Create Edit Delete Project</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Create Edit Delete Task</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Update Projects Order</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Update Tasks Order</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
@@ -2739,11 +2458,11 @@ function TeamMembersPage() {
                 <LuUsers />
                 <h6 className="mb-0">Client Management <small className="d-block">Clients access and managementpermissions</small></h6>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View Other Members</p>
                 <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
               </div>
@@ -2760,7 +2479,7 @@ function TeamMembersPage() {
                   ))}
                 </div>
               )}
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Create Edit Delete Client</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
@@ -2770,11 +2489,11 @@ function TeamMembersPage() {
                 <LuTimer />
                 <h6 className="mb-0">Time Tracking Management <small className="d-block">Manage time tracking permissions</small></h6>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View Other Members</p>
                 <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
               </div>
@@ -2791,7 +2510,7 @@ function TeamMembersPage() {
                   ))}
                 </div>
               )}
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Delete Recordings</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
@@ -2801,11 +2520,11 @@ function TeamMembersPage() {
                 <LuChartLine />
                 <h6 className="mb-0">Reports Management <small className="d-block">Reports access and managementpermissions</small></h6>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View Other Members</p>
                 <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
               </div>
@@ -2822,7 +2541,7 @@ function TeamMembersPage() {
                   ))}
                 </div>
               )}
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Create Edit Delete Reports</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
@@ -2832,11 +2551,11 @@ function TeamMembersPage() {
                 <FiCalendar />
                 <h6 className="mb-0">Holidays Management <small className="d-block">Manage upcoming and past holidays</small></h6>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Create Edit Delete Project</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
@@ -2846,11 +2565,11 @@ function TeamMembersPage() {
                 <CgCalendarDates />
                 <h6 className="mb-0">Attendance Management <small className="d-block">Manage members daily attendance</small></h6>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">View Other Members</p>
                 <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
               </div>
@@ -2867,7 +2586,7 @@ function TeamMembersPage() {
                   ))}
                 </div>
               )}
-              <div className="d-flex gap-3 align-items-center mt-3">
+              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
                 <p className="mb-0">Create Edit Delete Attendance</p>
                 <Form.Check type="switch" className="ms-auto switch--small"/>
               </div>
