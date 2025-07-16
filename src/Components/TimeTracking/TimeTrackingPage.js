@@ -6,12 +6,12 @@ import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, 
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck, FaEye, FaPlay, FaTrash, FaPlus } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser } from "react-icons/fi";
+import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser, FiTrash2, FiCheckCircle } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
 import { HiOutlineLightningBolt } from 'react-icons/hi';
 import { BsDash } from 'react-icons/bs';
-import { LuTimer } from 'react-icons/lu';
+import { LuTimer, LuUsers } from 'react-icons/lu';
 import { GoPulse } from 'react-icons/go';
 import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill, BsDashLg } from "react-icons/bs";
 import { MdOutlineClose, MdOutlineSearch, MdDragIndicator, MdOutlineVideoLibrary } from "react-icons/md";
@@ -40,7 +40,7 @@ function TimeTrackingPage() {
     'last-month': 'Last month',
     'custom': 'Custom'
   };
-
+const [selected, setSelected] = useState(null);
   const memberProfile = currentMemberProfile()
   let totalhours = 0;
   let totalProjecthours = 0
@@ -53,7 +53,12 @@ function TimeTrackingPage() {
       inactiveCount: 0,
       totalHours: 0
     })
-    const handleShow = () => setShow(true);
+  const handleShow = () => setShow(true);
+
+  const handleProjectShow = () => setProjectShow(true);
+  const [showSelect, setProjectShow] = useState(false);
+  const handleProjectClose = () => setProjectShow(false);
+
   const [isActive, setIsActive] = useState(false);
   const MemberprojectFeed = useSelector(state => state.project.memberProjects);
    const [isActiveView, setIsActiveView] = useState(2);
@@ -907,10 +912,8 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
         <>
           <ListGroup.Item className="no--style">
             <Form className="d-flex align-items-center">
-              <Form.Group className="mb-0 form-group me-2">
-                
-              <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />
-                   
+              <Form.Group className="mb-0 form-group">
+                <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />
               </Form.Group>
               {
                 (selectedFilter === 'custom') && (
@@ -1110,7 +1113,7 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
                         </Dropdown.Menu>
                       </Dropdown>
                     )}
-                    <ListGroup horizontal className="bg-white expand--icon ms-3">
+                    <ListGroup horizontal className="bg-white expand--icon">
                         <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                         <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
                           <BsArrowClockwise onClick={handleLiveActivityList}/>
@@ -1417,8 +1420,8 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
               </Dropdown.Menu>
             </Dropdown>
           </div>
-          <ListGroup horizontal className="live--tabs me-auto">
-            <ListGroup horizontal className="me-3">
+          <ListGroup horizontal className="live--tabs ms-auto d-none d-xl-flex">
+            <ListGroup horizontal>
               <Button variant="secondary" className="btn--view" key={'live-key'} active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
                 if( currentActivity && Object.keys(currentActivity)){
                   const cact = currentActivity
@@ -1439,7 +1442,7 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
               activeInnerTab === "InnerRecorded" && showDate()
             }
           </ListGroup>
-          <ListGroup horizontal className="ms-auto p-0">
+          <ListGroup horizontal className="p-0">
             {showRecordedTabs()}
             <ListGroup horizontal className="bg-white expand--icon ms-3 p-0 b-0 rounded-0 align-items-center">
               <ListGroup.Item onClick={handleSidebar} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
@@ -1450,6 +1453,27 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
                 <MdOutlineClose />
               </ListGroup.Item>
             </ListGroup>
+          </ListGroup>
+          <ListGroup horizontal className="live--tabs mx-auto d-flex d-xl-none w-100 justify-content-between">
+            <ListGroup horizontal className="me-3">
+              <Button variant="secondary" className="btn--view" key={'live-key'} active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
+                if( currentActivity && Object.keys(currentActivity)){
+                  const cact = currentActivity
+                  leaveRoom(currentActivity?._id)
+                  startsharing(currentActivity?._id, currentActivity?.latestActivity?.status)
+                }
+                }}><FiMonitor className="me-1" /> Live
+              </Button>
+              <Button variant="primary" className="btn--view" key={'recored-key'} active={activeInnerTab === "InnerRecorded"} onClick={() => {setActiveInnerTab("InnerRecorded")
+                if( currentActivity && Object.keys(currentActivity)){
+                  leaveRoom(currentActivity?._id)
+                }
+              }}><FiVideo className="me-1" /> Recorded
+              </Button>
+            </ListGroup>
+            {
+              activeInnerTab === "InnerRecorded" && showDate()
+            }
           </ListGroup>
         </div>
         <div className={isScreenActive ? 'rounded--box activity--box fullscreen--box' : 'rounded--box activity--box'}>
@@ -1818,13 +1842,107 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
           <ManualTime />
         </Modal.Body>
       </Modal>
-
-      <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal" onShow={() => {selectboxObserver();}}>
+        
+      <Modal show={show} onHide={handleClose} centered size="md" className="AddReportModal AddTimeModal theme--modal" onShow={() => {selectboxObserver();}}>
         <Modal.Header closeButton>
-          <Modal.Title>Manual Time</Modal.Title>
+            <Modal.Title>
+                <strong>Manual Time Entry <small>Add time entries for completed work</small></strong>
+            </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleReportSubmit}>
+          <div className="new--entry">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h4>Added Entries (1)</h4>
+              <span class="bg-success px-2 py-1 rounded-3">Total: 0h 10m</span>
+            </div>
+            <Card className="p-3 shadow-sm rounded-4">
+              <Card.Title className="d-flex align-items-center justify-content-between gap-3">User Research <FiTrash2 className="text-danger" /></Card.Title>
+              <Card.Body className="p-0 pt-1">
+                <Card.Text className="mb-0">E-commerce App › Planned</Card.Text>
+                <Card.Text className="text-muted mb-0">09:00 - 09:10</Card.Text>
+                <Card.Text className="text-success mb-0"><strong>0h 10min</strong></Card.Text>
+              </Card.Body>
+            </Card>
+          </div>
+          <Form className="bg-light p-3 rounded-4 my-3">
+            {
+              //entries.map((entry, index) => (
+                <Row>
+                  <Col sm={12}><h6 className="d-flex align-items-center gap-2"><FaPlus /> Add New Entry</h6></Col>
+                  <Col md={6}>
+                    <Dropdown className="select--dropdown">
+                      <Dropdown.Toggle variant="success">Start Time</Dropdown.Toggle>
+                      <Dropdown.Menu>
+                          <div className="drop--scroll">
+                              <Form>
+                                  <Form.Group className="form-group mb-3">
+                                      <Form.Control type="text" placeholder="Search here.."  value="" onChange={(e) => {handleSearchChange('start_time', 0, e.target.value)}} />
+                                  </Form.Group>
+                              </Form>
+                              {
+                                
+                                timeSlots.map((slot) => {
+                                  const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                                  if( searchEntries[0]?.start_time && searchEntries[0]?.start_time !== ""){
+                                    if (slot?.toLowerCase().includes(searchEntries[0]?.start_time?.toLowerCase())) {
+                                      return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleEntryChange(0, "start_time", slot)} >{slot}</Dropdown.Item>
+                                    }else{
+                                      return null;
+                                    }
+                                    
+                                  }else{
+                                    return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleEntryChange(0, "start_time", slot)} >{slot} </Dropdown.Item>
+                                  }
+                                  
+                                })
+                              }
+                          </div>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    {/* {errors[index]?.start_time && <span className="form-error">{errors[index].start_time}</span>} */}
+                  </Col>
+                  <Col md={6}>
+                    <Dropdown className="select--dropdown">
+                      <Dropdown.Toggle variant="success">End Time</Dropdown.Toggle>
+                      <Dropdown.Menu>
+                          <div className="drop--scroll">
+                              <Form>
+                                  <Form.Group className="form-group mb-3">
+                                      <Form.Control type="text" placeholder="Search here.."  value={searchEntries[0]?.end_time} onChange={(e) => {handleSearchChange('end_time', 0, e.target.value)}} />
+                                  </Form.Group>
+                              </Form>
+                              {
+                                
+                                timeSlots.map((slot) => {
+                                  const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                                  if( searchEntries[0]?.end_time && searchEntries[0]?.end_time !== ""){
+                                    if (slot?.toLowerCase().includes(searchEntries[0]?.end_time?.toLowerCase())) {
+                                      return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleEntryChange(0, "end_time", slot)} >{slot} </Dropdown.Item>
+                                    }else{
+                                      return null;
+                                    }
+                                    
+                                  }else{
+                                    return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleEntryChange(0, "end_time", slot)}  >{slot} </Dropdown.Item>
+                                  }
+                                  
+                                })
+                              }
+                          </div>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    {/* {errors[index]?.end_time && <span className="form-error">{errors[index].end_time}</span>} */}
+                  </Col>
+                </Row>
+             // ))
+            }
+            <Row>
+              <Col md={12} className="mt-3 text-end">
+                <Button variant="dark" onClick={handleProjectShow}>Select Project</Button>
+              </Col>
+            </Row>
+          </Form>
+          {/* <Form onSubmit={handleReportSubmit}>
             <Row>
               <Col sm={12} lg={6}>
                 <Form.Group className="mb-0 form-group">
@@ -1882,225 +2000,270 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
               </Col>
             </Row>
             <Row>
-                {
-                  entries.length > 0 &&
-                  <Col sm={12} lg={12}>
-                    <Form.Group className="mb-0">
-                      <Form.Label>Task List</Form.Label>
-                    </Form.Group>
-                  </Col>
-                }
-              </Row>
-                {
-                  entries.map((entry, index) => (
-                    <Row className="mb-3">
-                      <Col md={4}>
-                        <Dropdown className="select--dropdown">
-                          <Dropdown.Toggle variant="success">
-                            { 
-                              
-                              entry.task_title ?
-                                <>
-                                {entry.task_title}
-                                </>
-                              :
-                              'Select'
-                            }
-
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                              <div className="drop--scroll">
-                                  <Form>
-                                      <Form.Group className="form-group mb-3">
-                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.tasksearch} onChange={(e) => {handleSearchChange('tasksearch', index, e.target.value)}} />
-                                      </Form.Group>
-                                  </Form>
-                                  {
-                                    filteredTasks &&  filteredTasks.length > 0  &&
-                                    filteredTasks.map((task) => {
-                                      if( searchEntries[index]?.tasksearch && searchEntries[index]?.tasksearch !== ""){
-                                        if (task?.title?.toLowerCase().includes(searchEntries[index]?.tasksearch?.toLowerCase())) {
-                                          return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
-                                        }else{
-                                          return null;
-                                        }
-                                        
-                                      }else{
-                                        return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
-                                      }
-                                      
-                                    })
-                                  }
-                              </div>
-                          </Dropdown.Menu>
-                      </Dropdown>
-
-
-                          {/* <Form.Select
-                              value={entry.task}
-                              onChange={(e) =>
-                                  handleEntryChange(index, "task", e.target.value)
-                              }
-                              key={`taskin-${selectedWorkflow}`}
-                              className="custom-selectbox"
-                          >
-                              <option value="">Select Task</option>
-                              {
-                                // Object.values(taskslists).map((tab, index) =>
-                                  filteredTasks &&  filteredTasks.length > 0 ? (
-                                    filteredTasks.map((task) => (
-                                        <option value={task._id}>{task.title}</option>
-                                      ))
-                                  ) : (
-                                    null
-                                  )
-                                // )
-                              }
-                          </Form.Select> */}
-                          {errors[index]?.task && <span className="form-error">{errors[index].task}</span>}
-                      </Col>
-                      <Col md={3}>
-                        {/* <Form.Select
-                          className="custom-selectbox"
-                          value={entry.start_time}
-                          onChange={(e) =>
-                              handleEntryChange(index, "start_time", e.target.value)
-                          }
-                        >
-                          {timeSlots.map((slot) => {
-                            const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                            return (
-                              <option key={slot} value={slot} disabled={isOccupied}>
-                                {slot}
-                              </option>
-                            );
-                          })}
-                        </Form.Select> */}
-
-                      <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="success">
-                          { 
-                            
-                            entry.start_time ?
-                              <>
-                              {entry.start_time}
-                              </>
-                            :
-                            'Select'
-                          }
-                        </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                              <div className="drop--scroll">
-                                  <Form>
-                                      <Form.Group className="form-group mb-3">
-                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.start_time} onChange={(e) => {handleSearchChange('start_time', index, e.target.value)}} />
-                                      </Form.Group>
-                                  </Form>
-                                  {
-                                    
-                                    timeSlots.map((slot) => {
-                                      const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                                      if( searchEntries[index]?.start_time && searchEntries[index]?.start_time !== ""){
-                                        if (slot?.toLowerCase().includes(searchEntries[index]?.start_time?.toLowerCase())) {
-                                          return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                        }else{
-                                          return null;
-                                        }
-                                        
-                                      }else{
-                                        return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                      }
-                                      
-                                    })
-                                  }
-                              </div>
-                          </Dropdown.Menu>
-                        </Dropdown>
+              {
+                entries.length > 0 &&
+                <Col sm={12} lg={12}>
+                  <Form.Group className="mb-0">
+                    <Form.Label>Task List</Form.Label>
+                  </Form.Group>
+                </Col>
+              }
+            </Row>
+            {
+              entries.map((entry, index) => (
+                <Row className="mb-3">
+                  <Col md={4}>
+                    <Dropdown className="select--dropdown">
+                      <Dropdown.Toggle variant="success">
+                        { 
                           
-                          {errors[index]?.start_time && <span className="form-error">{errors[index].start_time}</span>}
-                      </Col>
-                      <Col md={3}>
-                          
-                          {/* <Form.Select
-                          value={entry.end_time}
-                          className="custom-selectbox"
-                          onChange={(e) =>
-                              handleEntryChange(index, "end_time", e.target.value)
-                          }>
-                            {timeSlots.map((slot) => {
-                              const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                              return (
-                                <option key={slot} value={slot} disabled={isOccupied}>
-                                  {slot}
-                                </option>
-                              );
-                            })}
-                          </Form.Select> */}
-                          <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="success">
-                          { 
-                            
-                            entry.end_time ?
-                              <>
-                              {entry.end_time}
-                              </>
-                            :
-                            'Select'
-                          }
-                        </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                              <div className="drop--scroll">
-                                  <Form>
-                                      <Form.Group className="form-group mb-3">
-                                          <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.end_time} onChange={(e) => {handleSearchChange('end_time', index, e.target.value)}} />
-                                      </Form.Group>
-                                  </Form>
-                                  {
-                                    
-                                    timeSlots.map((slot) => {
-                                      const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                                      if( searchEntries[index]?.end_time && searchEntries[index]?.end_time !== ""){
-                                        if (slot?.toLowerCase().includes(searchEntries[index]?.end_time?.toLowerCase())) {
-                                          return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                        }else{
-                                          return null;
-                                        }
-                                        
-                                      }else{
-                                        return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                      }
-                                      
-                                    })
-                                  }
-                              </div>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                          {errors[index]?.end_time && <span className="form-error">{errors[index].end_time}</span>}
-                      </Col>
-                      <Col md={2} className="text-right">
-                        {
-                          index > 0 &&
-                            <Button
-                                variant="danger"
-                                onClick={() => handleRemoveEntry(index)}
-                            >
-                              <FaTrash />
-                            </Button>
+                          entry.task_title ?
+                            <>
+                            {entry.task_title}
+                            </>
+                          :
+                          'Select'
                         }
-                        {index === entries.length - 1 && (
-                            <Button variant="success" className="ms-2" onClick={handleAddEntry}>
-                                <FaPlus />
-                            </Button>
-                        )}
-                      </Col>
-                    </Row>
-                  ))
-                }
-          </Form>
+
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                          <div className="drop--scroll">
+                              <Form>
+                                  <Form.Group className="form-group mb-3">
+                                      <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.tasksearch} onChange={(e) => {handleSearchChange('tasksearch', index, e.target.value)}} />
+                                  </Form.Group>
+                              </Form>
+                              {
+                                filteredTasks &&  filteredTasks.length > 0  &&
+                                filteredTasks.map((task) => {
+                                  if( searchEntries[index]?.tasksearch && searchEntries[index]?.tasksearch !== ""){
+                                    if (task?.title?.toLowerCase().includes(searchEntries[index]?.tasksearch?.toLowerCase())) {
+                                      return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
+                                    }else{
+                                      return null;
+                                    }
+                                    
+                                  }else{
+                                    return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
+                                  }
+                                  
+                                })
+                              }
+                          </div>
+                      </Dropdown.Menu>
+                  </Dropdown>
+
+
+                      {errors[index]?.task && <span className="form-error">{errors[index].task}</span>}
+                  </Col>
+                  <Col md={3}>
+                    <Dropdown className="select--dropdown">
+                      <Dropdown.Toggle variant="success">
+                        { 
+                          entry.start_time ?
+                            <>
+                            {entry.start_time}
+                            </>
+                          :
+                          'Select'
+                        }
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                          <div className="drop--scroll">
+                              <Form>
+                                  <Form.Group className="form-group mb-3">
+                                      <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.start_time} onChange={(e) => {handleSearchChange('start_time', index, e.target.value)}} />
+                                  </Form.Group>
+                              </Form>
+                              {
+                                
+                                timeSlots.map((slot) => {
+                                  const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                                  if( searchEntries[index]?.start_time && searchEntries[index]?.start_time !== ""){
+                                    if (slot?.toLowerCase().includes(searchEntries[index]?.start_time?.toLowerCase())) {
+                                      return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
+                                    }else{
+                                      return null;
+                                    }
+                                    
+                                  }else{
+                                    return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
+                                  }
+                                  
+                                })
+                              }
+                          </div>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    {errors[index]?.start_time && <span className="form-error">{errors[index].start_time}</span>}
+                  </Col>
+                  <Col md={3}>
+                    <Dropdown className="select--dropdown">
+                      <Dropdown.Toggle variant="success">
+                        { 
+                          entry.end_time ?
+                            <>
+                            {entry.end_time}
+                            </>
+                          :
+                          'Select'
+                        }
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                          <div className="drop--scroll">
+                              <Form>
+                                  <Form.Group className="form-group mb-3">
+                                      <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.end_time} onChange={(e) => {handleSearchChange('end_time', index, e.target.value)}} />
+                                  </Form.Group>
+                              </Form>
+                              {
+                                
+                                timeSlots.map((slot) => {
+                                  const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                                  if( searchEntries[index]?.end_time && searchEntries[index]?.end_time !== ""){
+                                    if (slot?.toLowerCase().includes(searchEntries[index]?.end_time?.toLowerCase())) {
+                                      return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
+                                    }else{
+                                      return null;
+                                    }
+                                    
+                                  }else{
+                                    return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
+                                  }
+                                  
+                                })
+                              }
+                          </div>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    {errors[index]?.end_time && <span className="form-error">{errors[index].end_time}</span>}
+                  </Col>
+                  <Col md={2} className="text-right">
+                    {
+                      index > 0 &&
+                        <Button
+                            variant="danger"
+                            onClick={() => handleRemoveEntry(index)}
+                        >
+                          <FaTrash />
+                        </Button>
+                    }
+                    {index === entries.length - 1 && (
+                        <Button variant="success" className="ms-2" onClick={handleAddEntry}>
+                            <FaPlus />
+                        </Button>
+                    )}
+                  </Col>
+                </Row>
+              ))
+            }
+          </Form> */}
         </Modal.Body>
         <Modal.Footer>
+          <Button variant="dark"><FaPlus /> Add Time Entry</Button>
           <Button variant="primary" onClick={handleReportSubmit} disabled={loader}>{loader === true ? 'Please wait...': 'Submit'}</Button>
         </Modal.Footer>
+      </Modal>
+
+      <Modal show={showSelect} onHide={handleProjectClose} centered size="lg" className="AddReportModal AddTimeModal theme--modal">
+        <Modal.Header closeButton>
+            <Modal.Title>
+                <strong>Manual Time Entry <small>Add time entries for completed work</small></strong>
+            </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Row>
+              <Col sm={12} lg={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Project Status</Form.Label>
+                    <div className="drop--scroll">
+                      <Form.Select className="custom-selectbox">
+                        <option value="in-progress" selected>In Progress</option>
+                        <option value="on-hold">On Hold</option>
+                        <option value="completed">Completed</option>
+                      </Form.Select>
+                    </div>
+                </Form.Group>
+              </Col>
+              <Col sm={12} lg={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Select Workflow</Form.Label>
+                  <Form.Select className="form-control custom-selectbox" id="projects-tab"
+                    value={selectedWorkflow} onChange={(e) => {setWorkflow(e.target.value)}}>
+                      <option value={''}>Select Workflow Tab</option>
+                    { selectedproject && Object.keys(selectedproject).length > 0 &&
+                      selectedproject?.workflow?.tabs.map(tab => (
+                        <option value={tab._id}>{tab.title}</option>
+                      ))
+                    }
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col sm={12} lg={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Select Project</Form.Label>
+                  <ListGroup>
+                    <ListGroup.Item className={selected === 0 ? 'selected--list--item' : ''} onClick={() => setSelected(0)}>
+                      <strong>On Teams<span><LuUsers /> Web 1 Experts</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+
+                    <ListGroup.Item className={selected === 1 ? 'selected--list--item' : ''} onClick={() => setSelected(1)}>
+                      <strong>WordPress Website Developer<span><LuUsers /> Anand Anandan (Paramjeet)</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+
+                    <ListGroup.Item className={selected === 2 ? 'selected--list--item' : ''} onClick={() => setSelected(2)}>
+                      <strong>The Galaxy<span><LuUsers /> Daniel Fitzpatrick</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+
+                    <ListGroup.Item className={selected === 3 ? 'selected--list--item' : ''} onClick={() => setSelected(3)}>
+                      <strong>Tickets Project<span><LuUsers /> Daniel Fitzpatrick</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+
+                    <ListGroup.Item className={selected === 4 ? 'selected--list--item' : ''} onClick={() => setSelected(4)}>
+                      <strong>Fix Masseuse site<span><LuUsers /> Amin Khadempour (Shikha)</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+
+                    <ListGroup.Item className={selected === 5 ? 'selected--list--item' : ''} onClick={() => setSelected(5)}>
+                      <strong>SBA Loan System<span><LuUsers /> ChristopherFoster (Paramjeet)</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+
+                    <ListGroup.Item className={selected === 6 ? 'selected--list--item' : ''} onClick={() => setSelected(6)}>
+                      <strong>The Connected Home<span><LuUsers /> Dean Rossi(Paramjeet)</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+
+                    <ListGroup.Item className={selected === 7 ? 'selected--list--item' : ''} onClick={() => setSelected(7)}>
+                      <strong>WordPress + EventON Expert<span><LuUsers /> Carlton Riffel (Paramjeet)</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+
+                    <ListGroup.Item className={selected === 8 ? 'selected--list--item' : ''} onClick={() => setSelected(8)}>
+                      <strong>LiveYourSoul<span><LuUsers /> Rashid Wagstaff (Paramjeet)</span></strong>
+                      <div className="svg--check"><FiCheckCircle /></div>
+                    </ListGroup.Item>
+                  </ListGroup>
+                </Form.Group>
+              </Col>
+              <Col sm={12} lg={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Select Task</Form.Label>
+                  <ListGroup>
+                    <ListGroup.Item className={selectedTask === 0 ? 'selected--task--item' : ''} onClick={() => setSelectedTask(0)}><strong>Setup dev version of team app<span><FiClock/> 03:20:45</span></strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
+                    <ListGroup.Item className={selectedTask === 1 ? 'selected--task--item' : ''} onClick={() => setSelectedTask(1)}><strong>Development Points<span><FiClock/> 03:20:45</span></strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
+                    <ListGroup.Item className={selectedTask === 2 ? 'selected--task--item' : ''} onClick={() => setSelectedTask(2)}><strong>Reports Points #2<span><FiClock/> 03:20:45</span></strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
+                  </ListGroup>
+                </Form.Group>
+              </Col>
+            </Row>
+          </Form>
+        </Modal.Body>
       </Modal>
     </>
   );

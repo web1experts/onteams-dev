@@ -203,7 +203,7 @@ body {
 .team--page .page--title h2 .list-group .expand--icon .btn:focus-within {
   color: #ffffff;
   background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
-  border-color: #0f172a;
+  border-color: rgba(var(--theme-secondary), 1);
   outline: none;
 }
 
@@ -1283,7 +1283,7 @@ span.open--sidebar {
 }
 
 .open--sidebar svg {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
 }
 
 .view--project~.details--projects--grid .open--sidebar,
@@ -2197,9 +2197,7 @@ table tr.marked-project td {
 }
 
 .page--title .select--dropdown .form-control {
-  min-width: calc(100% - 15px);
-  width: calc(100% - 15px);
-  margin: .5rem auto 0;
+  min-width: 100%;
 }
 
 .select2-container--default .select2-selection--single {
@@ -2228,7 +2226,7 @@ table tr.marked-project td {
 .modal .select--dropdown .btn,
 .rounded--box .select--dropdown .btn,
 .common--form .select--dropdown .btn {
-  padding: .5rem 3rem .5rem 1rem;
+  padding: .5rem 2rem .5rem 1rem;
   display: block;
   font-size: 15px;
   font-weight: 400;
@@ -2275,8 +2273,8 @@ table tr.marked-project td {
   position: absolute;
   content: '\276E';
   transform: rotate(-90deg);
-  right: 1rem;
-  top: .5rem;
+  right: .75rem;
+  top: .75rem;
   margin: auto;
 }
 
@@ -4675,6 +4673,7 @@ pre {
   padding: 0;
   background: none;
   border: 1px solid transparent;
+  margin: 0;
 }
 
 .wrapper--title .live--tabs .list-group-item:last-child .form-control {
@@ -7585,6 +7584,16 @@ Media CSS-=-==
   
   .wrapper--title {
     gap: 10px;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+  }
+
+  .wrapper--title .dropdown-toggle {
+    min-width: 220px;
+  }
+
+  .wrapper--title .dropdown-menu {
+    min-width: 100%;
   }
 
   .select2-container--default .select2-selection--single {
@@ -7652,10 +7661,6 @@ Media CSS-=-==
 
   .project--grid--table td::before {
     margin-bottom: 0;
-  }
-
-  .wrapper--title {
-    flex-flow: row wrap;
   }
 
   .wrapper--title .members--list {
@@ -7822,7 +7827,7 @@ Media CSS-=-==
   }
 
   .team--page .page--title h2 {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
 
   .holiday--table--grid tbody {

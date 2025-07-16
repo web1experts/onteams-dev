@@ -1860,15 +1860,11 @@ function TeamMembersPage() {
         </Modal.Footer>
       </Modal>
       {showPermissions && (
-        <Modal
-          show={showPermissions}
-          onHide={() => setShowPermissions(false)}
-          centered
-          size="lg"
-          className="add--team--member--modal add--member--modal"
-        >
+        <Modal show={showPermissions} onHide={() => setShowPermissions(false)} centered size="lg" className="add--team--member--modal add--member--modal theme--modal">
           <Modal.Header closeButton>
-            <Modal.Title>Roles & Permissions</Modal.Title>
+              <Modal.Title>
+                  <strong>Roles & Permissions <small>Manage members role & permissions</small></strong>
+              </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {/* {rows.map((row, index) => ( */}
@@ -1903,8 +1899,8 @@ function TeamMembersPage() {
             </div>
             {/* ))} */}
             {fields?.role !== null && fields?.role !== "role" && (
-              <Card>
-                <Card.Body>
+              <Card className="border-0">
+                <Card.Body className="p-0 border-0">
                   <>
                     {/* <div className="card--header" data-roleid={fields?.role}>
                       <FormGroup className="form-group mb-0 pb-0">
@@ -1982,7 +1978,7 @@ function TeamMembersPage() {
                                 {(mod.permissions || []).map((perm) => {
                                   if (perm === "view") {
                                      return (
-                                        <div className="d-flex gap-3 align-items-center mt-3">
+                                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
                                           <p className="mb-0">View</p>
                                           <Form.Check key={`${modSlug}--view`} id={`${modSlug}-view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
                                             () => {
@@ -1997,10 +1993,8 @@ function TeamMembersPage() {
 
                                   return (
                                     <>
-                                    <div className="d-flex gap-3 align-items-center mt-3">
-                                      <p className="mb-0">{perm
-                                                          .replace(/[_-]/g, " ")
-                                                          .replace(/^\w/, (l) => l.toUpperCase())}</p>
+                                    <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                      <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
                                       <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
                                         disabled={!isViewChecked}
                                         checked={!!modPerms[perm]}
@@ -2113,7 +2107,7 @@ function TeamMembersPage() {
                 {(mod.permissions || []).map((perm) => {
                   if (perm === "view") {
                     return (
-                      <div className="d-flex gap-3 align-items-center mt-3">
+                      <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
                         <p className="mb-0">View</p>
                         <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
                           () => {
@@ -2127,10 +2121,8 @@ function TeamMembersPage() {
                   }
                   return (
                     <>
-                      <div className="d-flex gap-3 align-items-center mt-3">
-                        <p className="mb-0">{perm
-                                            .replace(/[_-]/g, " ")
-                                            .replace(/^\w/, (l) => l.toUpperCase())}</p>
+                      <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                        <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
                         <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
                           disabled={!isViewChecked}
                           checked={!!modPerms[perm]}
