@@ -110,10 +110,13 @@ const typeColorMap = {
   const [includeColumn, setIncludeColumn] = useState(false)
   const [isEditing, setIsEditing] = useState( false );
   const [selectedField, setSelectedField] = useState( {} )
-  const [ fields, setFields] = useState({name: '', type: '', showInTable: false, options: []})
+  const [ fields, setFields] = useState({name: '', type: '', showInTable: false, options: []});
+
+
   useEffect(() => { 
     setSelectedField({})
-    setShowDialog(false)
+    setShowDialog(false);
+    setShowOptions( false )
     setFields({name: '', type: '', showInTable: false, options: []})
     if( apiCustomfields.customFields){
       setCustomFields( apiCustomfields.customFields)
@@ -122,8 +125,8 @@ const typeColorMap = {
     if (apiCustomfields.newField) {
       setCustomFields((prevCustomFields) => {
         const updated = [
-          apiCustomfields.newField,
           ...prevCustomFields.filter(field => field._id !== apiCustomfields.newField._id),
+          apiCustomfields.newField,
         ];
         return updated;
       });
@@ -251,8 +254,7 @@ const typeColorMap = {
      
       //setShowOptions(false);
       // setShowAddedFields(true);
-      // setFieldName('');
-      // setFieldType('');
+      
       setOptions([]);
       setNewOption('');
       setBadgeColor('#28a745')
@@ -270,15 +272,15 @@ const typeColorMap = {
     setSelectedField({})
   };
 
-  const handleFieldTypeChange = (e) => {
-    setFieldType(e.target.value);
-    setFields({
-        ...fields,
-        options: []
-      });
-  };
+  // const handleFieldTypeChange = (e) => {
+  //   setFieldType(e.target.value);
+  //   setFields({
+  //       ...fields,
+  //       options: []
+  //     });
+  // };
 
-  const handleChange = ({ target: { name, value, type, checked} }) => { console.log(`${type}-- ${checked}`)
+  const handleChange = ({ target: { name, value, type, checked} }) => {
   if( type === "checkbox"){
     setFields({ ...fields, [name]: checked })
   }else{
@@ -414,7 +416,7 @@ const typeColorMap = {
                         <Form.Group className="mb-3 col">
                           <Form.Label>Field Type *</Form.Label>
                           <Form.Select
-                            value={fields?.type}
+                            value={fields?.type || ''}
                             name='type'
                             onChange={handleChange}
                             isInvalid={!!errors.fieldType}
