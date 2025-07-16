@@ -1644,372 +1644,91 @@ function TeamMembersPage() {
 
                     {/* /*New Accordion Design*/}
                     <Accordion className="new--accordion--block">
-                      <Accordion.Item eventKey="0" className="bg--blue--accordion">
-                        <Accordion.Header>
-                          <div className="d-flex gap-3 align-items-center">
-                            <LuFolderOpen />
-                            <h6 className="mb-0">Project Management <small className="d-block">Project access and management permissions</small></h6>
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--green"><BsEye /></span>
-                            <Card.Body>
-                              <Card.Title>Project Viewing</Card.Title>
-                              <Card.Text>Can view assigned projects and tasks</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--blue"><LuUsers /></span>
-                            <Card.Body>
-                              <Card.Title>Team Visibility</Card.Title>
-                              <Card.Text>Can view other team members' work</Card.Text>
-                              <div className="team--card--grid">
-                                <Card className="team--card">
-                                  <span className="team--initial">G</span>
-                                  <Card.Body>
-                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">T</span>
-                                  <Card.Body>
-                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">G</span>
-                                  <Card.Body>
-                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">T</span>
-                                  <Card.Body>
-                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                                  </Card.Body>
-                                </Card>
+                      {permissionModules.map((mod, ind) => {
+                         const modSlug = mod.slug;
+                        const modPerms = permissions?.[modSlug] || {};
+                        const isExpanded = expanded?.[modSlug] || false;
+                        const truePermissionCount = Object.values(
+                          modPerms
+                        ).filter((val) => val === true).length;
+
+                        return (
+                          <Accordion.Item eventKey={ind} className="bg--blue--accordion">
+                            <Accordion.Header>
+                              <div className="d-flex gap-3 align-items-center">
+                                <LuFolderOpen />
+                                <h6 className="mb-0">{mod.name}{" "}<small className="d-block">{mod.name} access and management permissions</small></h6>
                               </div>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
-                            <Card.Body>
-                              <Card.Title>Project Management</Card.Title>
-                              <Card.Text>Create, edit, and delete projects</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--orange"><FiEdit /></span>
-                            <Card.Body>
-                              <Card.Title>Task Management</Card.Title>
-                              <Card.Text>Create, edit, and delete tasks</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--indigo"><TbArrowsDownUp /></span>
-                            <Card.Body>
-                              <Card.Title>Project Ordering</Card.Title>
-                              <Card.Text>Reorder and organize projects</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card>
-                            <span className="card--icon icon--teal"><TbArrowsDownUp /></span>
-                            <Card.Body>
-                              <Card.Title>Task Ordering</Card.Title>
-                              <Card.Text>Reorder and organize tasks</Card.Text>
-                            </Card.Body>
-                          </Card>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="1" className="bg--blue--accordion">
-                        <Accordion.Header>
-                          <div className="d-flex gap-3 align-items-center">
-                            <FiUserCheck />
-                            <h6 className="mb-0">Team Management <small className="d-block">Manage team operations and member roles</small></h6>
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <div className="team--card--grid">
-                            <Card className="team--card">
-                              <span className="team--initial">G</span>
-                              <Card.Body>
-                                <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                              </Card.Body>
-                            </Card>
-                            <Card className="team--card">
-                              <span className="team--initial">T</span>
-                              <Card.Body>
-                                <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                              </Card.Body>
-                            </Card>
-                            <Card className="team--card">
-                              <span className="team--initial">G</span>
-                              <Card.Body>
-                                <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                              </Card.Body>
-                            </Card>
-                            <Card className="team--card">
-                              <span className="team--initial">T</span>
-                              <Card.Body>
-                                <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                              </Card.Body>
-                            </Card>
-                          </div>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="2" className="bg--blue--accordion">
-                        <Accordion.Header>
-                          <div className="d-flex gap-3 align-items-center">
-                            <LuUsers />
-                            <h6 className="mb-0">Client Management <small className="d-block">Clients access and management permissions</small></h6>
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--green"><BsEye /></span>
-                            <Card.Body>
-                              <Card.Title>Client Viewing</Card.Title>
-                              <Card.Text>Can view assigned projects and tasks</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--blue"><LuUsers /></span>
-                            <Card.Body>
-                              <Card.Title>Client Visibility</Card.Title>
-                              <Card.Text>Can view other team members' work</Card.Text>
-                              <div className="team--card--grid">
-                                <Card className="team--card">
-                                  <span className="team--initial">E</span>
-                                  <Card.Body>
-                                    <h4>Erik Christian <small className="d-block">Paramjeet</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">F</span>
-                                  <Card.Body>
-                                    <h4>Fatah Mokdad <small className="d-block">Akshay</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">S</span>
-                                  <Card.Body>
-                                    <h4>Steve Legaux <small className="d-block">Karman</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">S</span>
-                                  <Card.Body>
-                                    <h4>Sabrina Kouwenhoven <small className="d-block">Paramjeet</small></h4>
-                                  </Card.Body>
-                                </Card>
-                              </div>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
-                            <Card.Body>
-                              <Card.Title>Client Management</Card.Title>
-                              <Card.Text>Create, edit, and delete clients</Card.Text>
-                            </Card.Body>
-                          </Card>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="3" className="bg--blue--accordion">
-                        <Accordion.Header>
-                          <div className="d-flex gap-3 align-items-center">
-                            <LuTimer />
-                            <h6 className="mb-0">Time Tracking Management <small className="d-block">Manage time tracking permissions</small></h6>
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--green"><BsEye /></span>
-                            <Card.Body>
-                              <Card.Title>Time Tracking Viewing</Card.Title>
-                              <Card.Text>Can view assigned projects and tasks</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--blue"><LuUsers /></span>
-                            <Card.Body>
-                              <Card.Title>Team Visibility</Card.Title>
-                              <Card.Text>Can view other team members' work</Card.Text>
-                              <div className="team--card--grid">
-                                <Card className="team--card">
-                                  <span className="team--initial">G</span>
-                                  <Card.Body>
-                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">T</span>
-                                  <Card.Body>
-                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">G</span>
-                                  <Card.Body>
-                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">T</span>
-                                  <Card.Body>
-                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                                  </Card.Body>
-                                </Card>
-                              </div>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
-                            <Card.Body>
-                              <Card.Title>Recording Management</Card.Title>
-                              <Card.Text>can delete recordings</Card.Text>
-                            </Card.Body>
-                          </Card>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="4" className="bg--blue--accordion">
-                        <Accordion.Header>
-                          <div className="d-flex gap-3 align-items-center">
-                            <LuChartLine />
-                            <h6 className="mb-0">Reports Management <small className="d-block">Reports access and management permissions</small></h6>
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--green"><BsEye /></span>
-                            <Card.Body>
-                              <Card.Title>Reports Viewing</Card.Title>
-                              <Card.Text>Can view team reports, manual time and tasks</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--blue"><LuUsers /></span>
-                            <Card.Body>
-                              <Card.Title>Team Visibility</Card.Title>
-                              <Card.Text>Can view other team members' work</Card.Text>
-                              <div className="team--card--grid">
-                                <Card className="team--card">
-                                  <span className="team--initial">G</span>
-                                  <Card.Body>
-                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">T</span>
-                                  <Card.Body>
-                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">G</span>
-                                  <Card.Body>
-                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">T</span>
-                                  <Card.Body>
-                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                                  </Card.Body>
-                                </Card>
-                              </div>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
-                            <Card.Body>
-                              <Card.Title>Reports Management</Card.Title>
-                              <Card.Text>Create, edit, and delete reports</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--orange"><FiEdit /></span>
-                            <Card.Body>
-                              <Card.Title>Time Management</Card.Title>
-                              <Card.Text>Manual time update</Card.Text>
-                            </Card.Body>
-                          </Card>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="5" className="bg--blue--accordion">
-                        <Accordion.Header>
-                          <div className="d-flex gap-3 align-items-center">
-                            <FiCalendar />
-                            <h6 className="mb-0">Holidays Management <small className="d-block">Manage upcoming and past holidays</small></h6>
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--green"><BsEye /></span>
-                            <Card.Body>
-                              <Card.Title>Holidays Viewing</Card.Title>
-                              <Card.Text>Can view past and upcoming holidays</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card>
-                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
-                            <Card.Body>
-                              <Card.Title>Holiday Management</Card.Title>
-                              <Card.Text>Create, edit, and delete holidays</Card.Text>
-                            </Card.Body>
-                          </Card>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                      <Accordion.Item eventKey="6" className="bg--blue--accordion">
-                        <Accordion.Header>
-                          <div className="d-flex gap-3 align-items-center">
-                            <CgCalendarDates />
-                            <h6 className="mb-0">Attendance Management <small className="d-block">Manage members daily attendance</small></h6>
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <Card className="mb-3">
-                            <span className="card--icon icon--green"><BsEye /></span>
-                            <Card.Body>
-                              <Card.Title>Attendance Viewing</Card.Title>
-                              <Card.Text>View mambers daily attendance</Card.Text>
-                            </Card.Body>
-                          </Card>
-                          <Card>
-                            <span className="card--icon icon--purple"><LuFolderOpen /></span>
-                            <Card.Body>
-                              <Card.Title>Attendance Management</Card.Title>
-                              <Card.Text>Create, edit, and delete member attendance</Card.Text>
-                              <div className="team--card--grid">
-                                <Card className="team--card">
-                                  <span className="team--initial">G</span>
-                                  <Card.Body>
-                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">T</span>
-                                  <Card.Body>
-                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">G</span>
-                                  <Card.Body>
-                                    <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                                  </Card.Body>
-                                </Card>
-                                <Card className="team--card">
-                                  <span className="team--initial">T</span>
-                                  <Card.Body>
-                                    <h4>Tarun Giri <small className="d-block">Project Manager</small></h4>
-                                  </Card.Body>
-                                </Card>
-                              </div>
-                            </Card.Body>
-                          </Card>
-                        </Accordion.Body>
-                      </Accordion.Item>
+                            </Accordion.Header>
+                            <Accordion.Body>
+                               {(mod.permissions || []).map((perm) => {
+                                  const isChecked = !!modPerms[perm];
+                                  if (!isChecked) return null;
+
+                                  const label = perm
+                                    .replace(/[_-]/g, " ")
+                                    .replace(/^\w/, (l) => l.toUpperCase());
+
+                                  return (
+                                    <Card className="mb-3" key={`${modSlug}-${perm}`}>
+                                      <span className="card--icon icon--green">
+                                        <BsEye />
+                                      </span>
+                                      <Card.Body>
+                                        <Card.Title>{label}</Card.Title>
+                                        <Card.Text>Can view assigned projects and tasks</Card.Text>
+
+                                        {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
+                                          perm === "view_others" &&
+                                          Array.isArray(modPerms["selected_members"]) &&
+                                          modPerms["selected_members"].length > 0 && (
+                                            <div className="team--card--grid" key={`members-grid-${modSlug}`}>
+                                              {memberFeeds.map((member) => {
+                                                if (!modPerms["selected_members"].includes(String(member._id))) {
+                                                  return null;
+                                                }
+                                                return (
+                                                  
+                                                    <Card className="team--card">
+                                                      <span className="team--initial">
+                                                        {member.name?.charAt(0) || "U"}
+                                                      </span>
+                                                      <Card.Body>
+                                                        <h4>
+                                                          {member.name}{" "}
+                                                          <small className="d-block">{member.role?.name}</small>
+                                                        </h4>
+                                                      </Card.Body>
+                                                    </Card>
+                                                  
+                                                );
+                                              })}
+
+                                              {modSlug === "projects" &&
+                                                modPerms["selected_members"].includes("unassigned") && (
+                                                  <Card className="team--card">
+                                                    <span className="team--initial">
+                                                      {"U"}
+                                                    </span>
+                                                    <Card.Body>
+                                                      <h4>
+                                                        Unassigned
+                                                      </h4>
+                                                    </Card.Body>
+                                                  </Card>
+                                                )}
+                                            </div>
+                                          )}
+                                      </Card.Body>
+                                    </Card>
+                                  );
+                                })}
+
+                            </Accordion.Body>
+                          </Accordion.Item>
+                        )
+                      })}
+                      
                     </Accordion>
                   </Card.Text>
                 </Card.Body>
@@ -2153,7 +1872,7 @@ function TeamMembersPage() {
               <Card>
                 <Card.Body>
                   <>
-                    <div className="card--header" data-roleid={fields?.role}>
+                    {/* <div className="card--header" data-roleid={fields?.role}>
                       <FormGroup className="form-group mb-0 pb-0">
                         <Form.Check
                           type="checkbox"
@@ -2209,13 +1928,8 @@ function TeamMembersPage() {
                           ? "Collapse All"
                           : "Expand All"}
                       </Button>
-                    </div>
-                    <Accordion
-                      activeKey={Object.entries(expanded)
-                        .filter(([_, v]) => v)
-                        .map(([k]) => k)}
-                      alwaysOpen
-                    >
+                    </div> */}
+                    <div className="new--accordion--block">
                       {permissionModules.map((mod) => {
                         const modSlug = mod.slug;
                         const modPerms = permissions?.[modSlug] || {};
@@ -2226,144 +1940,101 @@ function TeamMembersPage() {
                         ).filter((val) => val === true).length;
 
                         return (
-                          <Accordion.Item eventKey={modSlug}>
-                            <Accordion.Header
-                              onClick={() => {
-                                setExpanded((prev) => ({
-                                  ...prev,
-                                  [modSlug]: !prev[modSlug],
-                                }));
-                              }}
-                            >
-                              {mod.name}{" "}
-                              <span className="per--count">
-                                {truePermissionCount}/{mod?.permissions?.length}
-                              </span>{" "}
-                            </Accordion.Header>
-                            <Accordion.Body>
-                              <div className="transition-all">
+                          <div className="bg--blue--accordion">
+                            <div className="d-flex gap-3 align-items-center">
+                              <LuFolderOpen />
+                              <h6 className="mb-0">{mod.name} Management <small className="d-block">{mod.name} access and management permissions</small></h6>
+                            </div>
                                 {(mod.permissions || []).map((perm) => {
                                   if (perm === "view") {
-                                    return (
-                                      <Form.Check
-                                        key={`${modSlug}--view`}
-                                        type="checkbox"
-                                        id={`${modSlug}-view`}
-                                        label="View"
-                                        checked={!!modPerms.view}
-                                        onChange={() => {
-                                          toggleView(modSlug);
-                                        }}
-                                      />
-                                    );
+                                     return (
+                                        <div className="d-flex gap-3 align-items-center mt-3">
+                                          <p className="mb-0">View</p>
+                                          <Form.Check key={`${modSlug}--view`} id={`${modSlug}-view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
+                                            () => {
+                                              // if(selectedMember?.role?.slug !== "owner"){
+                                              toggleView(modSlug);
+                                            }
+                                            //}
+                                          }/>
+                                        </div>
+                                      )
                                   }
 
                                   return (
                                     <>
-                                      <Form.Check
-                                        key={perm}
-                                        type="checkbox"
-                                        id={`${modSlug}-${perm}`}
-                                        label={perm
-                                          .replace(/[_-]/g, " ")
-                                          .replace(/^\w/, (l) =>
-                                            l.toUpperCase()
-                                          )}
+                                    <div className="d-flex gap-3 align-items-center mt-3">
+                                      <p className="mb-0">{perm
+                                                          .replace(/[_-]/g, " ")
+                                                          .replace(/^\w/, (l) => l.toUpperCase())}</p>
+                                      <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                                        disabled={!isViewChecked}
                                         checked={!!modPerms[perm]}
-                                        onChange={() => {
-                                          togglePermission(modSlug, perm);
-                                        }}
-                                        className={
-                                          !isViewChecked
-                                            ? "parent-item text-muted"
-                                            : "parent-item"
-                                        }
+                                        //onChange={(e) => setShowTeamGrid(e.target.checked)} 
+                                          onChange={() => {
+                                            //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
+                                            togglePermission(modSlug, perm);
+                                          }}
                                       />
-
-                                      {[
-                                        "tracking",
-                                        "projects",
-                                        "reports",
-                                        "attendance",
-                                      ].includes(modSlug) &&
-                                        perm === "view_others" &&
-                                        modPerms[perm] === true && (
-                                          <>
-                                            <Form.Check
-                                              key={`${modSlug}-${perm}-select-all`}
-                                              type="checkbox"
-                                              id={`${modSlug}-${perm}-select-all`}
-                                              label="Select all"
-                                              checked={memberFeeds.every(
-                                                (member) =>
-                                                  modPerms[
-                                                    "selected_members"
-                                                  ]?.includes(
-                                                    String(member._id)
-                                                  )
-                                              )}
-                                              onChange={(e) => {
-                                                handleSelectAll(
+                                    </div>
+                                    {[
+                                      "tracking",
+                                      "projects",
+                                      "reports",
+                                      "attendance",
+                                    ].includes(modSlug) &&
+                                      perm === "view_others" &&
+                                      modPerms[perm] === true && (
+                                        <div className="team--card--grid">
+                                          {memberFeeds.map((member) => (
+                                            <Card className={`team--card ${modPerms[
+                                                "selected_members"
+                                              ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                                //if (selectedMember?.role?.slug !== "owner") {
+                                                toggleMembers(
                                                   modSlug,
-                                                  e.target.checked
+                                                  "selected_members",
+                                                  member._id
                                                 );
-                                              }}
-                                              className="sub-items"
-                                            />
-                                            <>
-                                              {memberFeeds.map((member) => (
-                                                <Form.Check
-                                                  key={`${modSlug}-${perm}-${member._id}`}
-                                                  type="checkbox"
-                                                  id={`${modSlug}-${perm}-${member._id}`}
-                                                  label={member.name}
-                                                  checked={modPerms[
-                                                    "selected_members"
-                                                  ]?.includes(
-                                                    String(member._id)
-                                                  )}
-                                                  onChange={() => {
-                                                    toggleMembers(
-                                                      modSlug,
-                                                      "selected_members",
-                                                      member._id
-                                                    );
-                                                  }}
-                                                  className="sub-items"
-                                                />
-                                              ))}
+                                                // }
+                                              }}>
+                                              <span className="team--initial">G</span>
+                                              <Card.Body>
+                                                <h4>{member.name} <small className="d-block">UI/UX Designer</small></h4>
+                                              </Card.Body>
+                                              <FiCheck className="ms-auto" />
+                                            </Card>
+                                          ))}
 
-                                              {modSlug === "projects" && (
-                                                <Form.Check
-                                                  key={`${modSlug}-${perm}-unassigned`}
-                                                  type="checkbox"
-                                                  id={`${modSlug}-${perm}-unassigned`}
-                                                  label="Unassigned"
-                                                  checked={modPerms[
-                                                    "selected_members"
-                                                  ]?.includes("unassigned")}
-                                                  onChange={() => {
-                                                    toggleMembers(
-                                                      modSlug,
-                                                      "selected_members",
-                                                      "unassigned"
-                                                    );
-                                                  }}
-                                                  className="sub-items"
-                                                />
-                                              )}
-                                            </>
-                                          </>
-                                        )}
+                                          {modSlug === "projects" && (
+                                            <Card className={`team--card ${modPerms[
+                                                "selected_members"
+                                              ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                                //if (selectedMember?.role?.slug !== "owner") {
+                                                toggleMembers(
+                                                  modSlug,
+                                                  "selected_members",
+                                                  "unassigned"
+                                                );
+                                                // }
+                                              }} key={`${modSlug}-${perm}-unassigned`}>
+                                              <span className="team--initial">G</span>
+                                              <Card.Body>
+                                                <h4>Unassigned</h4>
+                                              </Card.Body>
+                                              <FiCheck className="ms-auto" />
+                                            </Card>
+                                          )}
+                                        </div>
+                                      )}
+                                      
                                     </>
                                   );
                                 })}
-                              </div>
-                            </Accordion.Body>
-                          </Accordion.Item>
+                          </div>
                         );
                       })}
-                    </Accordion>
+                    </div>
                   </>
                 </Card.Body>
               </Card>
@@ -2381,7 +2052,7 @@ function TeamMembersPage() {
         </Modal>
       )}
 
-      {/* /Permissions New Modal/ */}
+      {adjustPermissions && (
       <Modal className="theme--modal" show={adjustPermissions} onHide={() => setAdjustPermissions(false)} size="lg" centered>
         <Modal.Header closeButton>
             <Modal.Title>
@@ -2390,207 +2061,110 @@ function TeamMembersPage() {
         </Modal.Header>
         <Modal.Body>
           <div className="new--accordion--block">
-            <div className="bg--blue--accordion">
-              <div className="d-flex gap-3 align-items-center">
-                <LuFolderOpen />
-                <h6 className="mb-0">Project Management <small className="d-block">Project access and management permissions</small></h6>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View Other Members</p>
-                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
-              </div>
-              {showTeamGrid && (
-                <div className="team--card--grid">
-                  {teamMembers.map((member, index) => (
-                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
-                      <span className="team--initial">G</span>
-                      <Card.Body>
-                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                      </Card.Body>
-                      <FiCheck className="ms-auto" />
-                    </Card>
-                  ))}
+            {permissionModules.map((mod) => {
+              const modSlug = mod.slug;
+              const modPerms = permissions?.[modSlug] || {};
+              const isExpanded = expanded?.[modSlug] || false;
+              const isViewChecked = !!modPerms.view;
+              const truePermissionCount = Object.values(
+                modPerms
+              ).filter((val) => val === true).length;
+
+              return (
+              <div className="bg--blue--accordion">
+                <div className="d-flex gap-3 align-items-center">
+                  <LuFolderOpen />
+                  <h6 className="mb-0">{mod.name} Management <small className="d-block">{mod.name} access and management permissions</small></h6>
                 </div>
-              )}
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Create Edit Delete Project</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
+                {(mod.permissions || []).map((perm) => {
+                  if (perm === "view") {
+                    return (
+                      <div className="d-flex gap-3 align-items-center mt-3">
+                        <p className="mb-0">View</p>
+                        <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
+                          () => {
+                            // if(selectedMember?.role?.slug !== "owner"){
+                            toggleView(modSlug);
+                          }
+                          //}
+                        }/>
+                      </div>
+                    )
+                  }
+                  return (
+                    <>
+                      <div className="d-flex gap-3 align-items-center mt-3">
+                        <p className="mb-0">{perm
+                                            .replace(/[_-]/g, " ")
+                                            .replace(/^\w/, (l) => l.toUpperCase())}</p>
+                        <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                          disabled={!isViewChecked}
+                          checked={!!modPerms[perm]}
+                          //onChange={(e) => setShowTeamGrid(e.target.checked)} 
+                            onChange={() => {
+                              //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
+                              togglePermission(modSlug, perm);
+                            }}
+                        />
+                      </div>
+                      {[
+                        "tracking",
+                        "projects",
+                        "reports",
+                        "attendance",
+                      ].includes(modSlug) &&
+                        perm === "view_others" &&
+                        modPerms[perm] === true && (
+                          <div className="team--card--grid">
+                            {memberFeeds.map((member) => (
+                              <Card className={`team--card ${modPerms[
+                                  "selected_members"
+                                ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                  //if (selectedMember?.role?.slug !== "owner") {
+                                  toggleMembers(
+                                    modSlug,
+                                    "selected_members",
+                                    member._id
+                                  );
+                                  // }
+                                }}>
+                                <span className="team--initial">G</span>
+                                <Card.Body>
+                                  <h4>{member.name} <small className="d-block">UI/UX Designer</small></h4>
+                                </Card.Body>
+                                <FiCheck className="ms-auto" />
+                              </Card>
+                            ))}
+
+                            {modSlug === "projects" && (
+                              <Card className={`team--card ${modPerms[
+                                  "selected_members"
+                                ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                  //if (selectedMember?.role?.slug !== "owner") {
+                                  toggleMembers(
+                                    modSlug,
+                                    "selected_members",
+                                    "unassigned"
+                                  );
+                                  // }
+                                }} key={`${modSlug}-${perm}-unassigned`}>
+                                <span className="team--initial">G</span>
+                                <Card.Body>
+                                  <h4>Unassigned</h4>
+                                </Card.Body>
+                                <FiCheck className="ms-auto" />
+                              </Card>
+                            )}
+                          </div>
+                        )}
+                    </>
+                  )
+                })}
+                
               </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Create Edit Delete Task</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Update Projects Order</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Update Tasks Order</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-            </div>
-            <div className="bg--blue--accordion">
-              <div className="d-flex gap-3 align-items-center">
-                <FiUserCheck />
-                <h6 className="mb-0">Team Management <small className="d-block">Manage team operations and member roles</small></h6>
-                <Form.Check type="switch" className="ms-auto switch--big" onChange={(e) => setShowTeamGrid(e.target.checked)} />
-              </div>
-              {showTeamGrid && (
-                <div className="team--card--grid">
-                  {teamMembers.map((member, index) => (
-                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
-                      <span className="team--initial">G</span>
-                      <Card.Body>
-                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                      </Card.Body>
-                      <FiCheck className="ms-auto" />
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="bg--blue--accordion">
-              <div className="d-flex gap-3 align-items-center">
-                <LuUsers />
-                <h6 className="mb-0">Client Management <small className="d-block">Clients access and managementpermissions</small></h6>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View Other Members</p>
-                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
-              </div>
-              {showTeamGrid && (
-                <div className="team--card--grid">
-                  {teamMembers.map((member, index) => (
-                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
-                      <span className="team--initial">G</span>
-                      <Card.Body>
-                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                      </Card.Body>
-                      <FiCheck className="ms-auto" />
-                    </Card>
-                  ))}
-                </div>
-              )}
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Create Edit Delete Client</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-            </div>
-            <div className="bg--blue--accordion">
-              <div className="d-flex gap-3 align-items-center">
-                <LuTimer />
-                <h6 className="mb-0">Time Tracking Management <small className="d-block">Manage time tracking permissions</small></h6>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View Other Members</p>
-                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
-              </div>
-              {showTeamGrid && (
-                <div className="team--card--grid">
-                  {teamMembers.map((member, index) => (
-                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
-                      <span className="team--initial">G</span>
-                      <Card.Body>
-                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                      </Card.Body>
-                      <FiCheck className="ms-auto" />
-                    </Card>
-                  ))}
-                </div>
-              )}
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Delete Recordings</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-            </div>
-            <div className="bg--blue--accordion">
-              <div className="d-flex gap-3 align-items-center">
-                <LuChartLine />
-                <h6 className="mb-0">Reports Management <small className="d-block">Reports access and managementpermissions</small></h6>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View Other Members</p>
-                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
-              </div>
-              {showTeamGrid && (
-                <div className="team--card--grid">
-                  {teamMembers.map((member, index) => (
-                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
-                      <span className="team--initial">G</span>
-                      <Card.Body>
-                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                      </Card.Body>
-                      <FiCheck className="ms-auto" />
-                    </Card>
-                  ))}
-                </div>
-              )}
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Create Edit Delete Reports</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-            </div>
-            <div className="bg--blue--accordion">
-              <div className="d-flex gap-3 align-items-center">
-                <FiCalendar />
-                <h6 className="mb-0">Holidays Management <small className="d-block">Manage upcoming and past holidays</small></h6>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Create Edit Delete Project</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-            </div>
-            <div className="bg--blue--accordion">
-              <div className="d-flex gap-3 align-items-center">
-                <CgCalendarDates />
-                <h6 className="mb-0">Attendance Management <small className="d-block">Manage members daily attendance</small></h6>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">View Other Members</p>
-                <Form.Check type="switch" className="ms-auto switch--small" onChange={(e) => setShowTeamGrid(e.target.checked)} />
-              </div>
-              {showTeamGrid && (
-                <div className="team--card--grid">
-                  {teamMembers.map((member, index) => (
-                    <Card className={`team--card ${selectedCardIndex === index ? 'selected--card' : ''}`} onClick={() => setSelectedCardIndex(index)}>
-                      <span className="team--initial">G</span>
-                      <Card.Body>
-                        <h4>Gagandeep Singh <small className="d-block">UI/UX Designer</small></h4>
-                      </Card.Body>
-                      <FiCheck className="ms-auto" />
-                    </Card>
-                  ))}
-                </div>
-              )}
-              <div className="d-flex gap-3 align-items-center mt-3 bg-white rounded-3 px-2 py-2">
-                <p className="mb-0">Create Edit Delete Attendance</p>
-                <Form.Check type="switch" className="ms-auto switch--small"/>
-              </div>
-            </div>
+              )
+            })}
+            
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -2598,7 +2172,8 @@ function TeamMembersPage() {
             <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save Permissions"}</Button>
           </div>
         </Modal.Footer>
-    </Modal>
+    </Modal>)
+    }
 
       {(memberProfile &&
         memberProfile.role?.slug === "owner" &&
