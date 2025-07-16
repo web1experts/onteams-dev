@@ -2164,7 +2164,7 @@ function TeamMembersPage() {
                                 }}>
                                 <span className="team--initial">G</span>
                                 <Card.Body>
-                                  <h4>{member.name} <small className="d-block">UI/UX Designer</small></h4>
+                                  <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
                                 </Card.Body>
                                 <FiCheck className="ms-auto" />
                               </Card>

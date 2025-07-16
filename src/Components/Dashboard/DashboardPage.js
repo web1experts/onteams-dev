@@ -256,6 +256,7 @@ function DashboardPage() {
 
     if (type === 'image') {
       formData.append('caption', caption || '');
+      
     }
 
     if (type === 'video') {
@@ -274,6 +275,10 @@ function DashboardPage() {
     // Attach files if present
     if (files && files.length > 0) {
       files.forEach((file) => formData.append('files', file));
+    }else{
+      if(type === "image" || type === "video" && videoType === 'upload'){
+        formData.append('existing_file', fields?.existing_file);
+      }
     }
 
     // Dispatch the post creation
