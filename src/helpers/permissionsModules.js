@@ -1,3 +1,9 @@
+import React from 'react';
+import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiVideo, FiCamera, FiMonitor, FiUserCheck, FiCalendar, FiCheck} from "react-icons/fi";
+import { LuFolderOpen, LuUsers, LuTimer, LuChartLine } from "react-icons/lu";
+import { BsEye } from "react-icons/bs";
+import { TbArrowsDownUp } from "react-icons/tb";
+import { CgCalendarDates } from 'react-icons/cg';
 export const permissionModules = [
   {
     name: "Projects",
@@ -69,47 +75,150 @@ export const permissionModules = [
 
 export const permissionsLabel = {
   "projects": {
+    "heading": 'Project Management',
+    "sub_heading": "Project access and management permissions",
+    "icon": <LuFolderOpen />,
     "view": {
       heading: "View Projects",
-      sub_heading: 'an view assigned projects and tasks'
+      sub_heading: 'Can view assigned projects and tasks',
+      "icon": <BsEye />,
     },
     "view_others": {
-      heading: "View Other Members Projects",
-      sub_heading: "Can view other team members' projects"
+      heading: "Team Visibility",
+      sub_heading: "Can view other team members projects",
+      "icon": <LuUsers />,
     } ,
-    "create_edit_delete_project": "Create/Edit/Delete Projects",
-    "create_edit_delete_task": "Create/Edit/Delete Tasks",
-    "update_projects_order": "Change Projects Order",
-    "update_tasks_order": "Change Tasks Order"
+    "create_edit_delete_project":  {
+      heading: "Project Management",
+      sub_heading: "Create, edit, and delete projects",
+      "icon": <LuFolderOpen />,
+    },
+    "create_edit_delete_task": {
+      heading: "Task Management",
+      sub_heading: "Create, edit, and delete tasks",
+      "icon": <FiEdit />,
+    } ,
+    "update_projects_order": {
+      heading: "Project Ordering",
+      sub_heading: "Reorder and organize projects",
+      "icon": <TbArrowsDownUp />,
+    },
+    "update_tasks_order": {
+      heading: "Task Ordering",
+      sub_heading: "Reorder and organize tasks",
+      "icon": <TbArrowsDownUp />,
+    }
   },
   clients: {
-    "view": "View Clients",
-    "create_edit_delete": "Create/Edit/Delete Clients"
+    "heading" : 'Client Management',
+    "sub_heading": "Clients access and management permissions",
+    "icon": <LuUsers />,
+    "view": {
+      "icon": <BsEye />,
+      heading: "Client Viewing",
+      sub_heading: "View client lists"
+    },
+    "create_edit_delete": {
+      "icon": <LuFolderOpen />,
+      heading: "Client Management",
+      sub_heading: "Create, edit, and delete clients"
+    }
   },
   members: {
-    "view": "View Members",
-    "create_edit_delete": "Create/Edit/Delete Members",
-    "update_permissions": "Update Member Permissions"
+    "icon": <BsEye />,
+    "heading": "Team Management",
+    "sub_heading": "Manage team operations",
+    "view": {
+      "icon": <BsEye />,
+      heading: "Members Viewing",
+      sub_heading: "Can view team members"
+    },
+    "create_edit_delete": {
+      "icon": <BsEye />,
+      heading: "Members Management",
+      sub_heading: "Create, edit, and delete members"
+    },
+    "update_permissions": {
+      "icon": <BsEye />,
+      heading: "Member's Permissions",
+      sub_heading: "Modify member's permissions"
+    }
   },
   tracking: {
-    "view": "View Tracked Time",
-    "view_others" : "View Others Tracked Time",
-    "delete_recordings": "Delete Recordings"
+    "icon": <LuTimer />,
+    "heading": "Time Tracking Management",
+    "sub_heading": "Manage time tracking permissions",
+    "view": {
+      "icon": <BsEye />,
+      heading: "Time Tracking Viewing",
+      sub_heading: "Can view assigned projects and tasks"
+    },
+    "view_others" : { heading: "Team Visibility",
+      "icon": <LuUsers />,
+      sub_heading: "Can view other team members work"},
+    "delete_recordings": {
+      "icon": <LuFolderOpen />,
+      heading: "Recording Management",
+      sub_heading: "Can delete recordings"
+    }
     
   },
   reports: {
-    "view": "View Report",
-    "view_others": "View Other Members Report",
-    "create_edit_delete": "Create/Edit/Delete Report",
-    "update_manual_time": "Update Manual Time Of Members"
+    "icon": <LuChartLine />,
+    "heading": "Reports Management",
+    "sub_heading": "Reports access and management permissions",
+    "view": {
+      "icon": <BsEye />,
+      heading: "Reports Viewing",
+      sub_heading: "Can view team reports, manual time and tasks"
+    },
+    "view_others": { heading: "Team Visibility",
+      "icon": <LuUsers />,
+      sub_heading: "Can view other team members work"},
+    "create_edit_delete": {
+      "icon": <LuFolderOpen />,
+      heading: "Reports Management",
+      sub_heading: "Create, edit, and delete reports"
+    },
+    "update_manual_time": {
+      "icon": <FiEdit />,
+      heading: "Time Management",
+      sub_heading: "Manual time update"
+    }
   },
   holidays: {
-    "view": "View Holidays",
-    "create_edit_delete": "Create/Edit/Delete Holidays"
+    "icon": <FiCalendar />,
+    "heading": "Holidays Management",
+    "sub_heading": "Manage upcoming and past holidays",
+    "view": {
+      "icon": <BsEye />,
+      heading: "Holidays Viewing",
+      sub_heading: "Can view past and upcoming holidays"
+    },
+    "create_edit_delete": {
+      "icon": <LuFolderOpen />,
+      heading: "Holiday Management",
+      sub_heading: "Create, edit, and delete holidays"
+    }
   },
   attendance: {
-    "view": "View Attendance",
-    "create_edit": "Edit Attendance",
-    "view_others": "View Other Members Attendance"
+     "icon": <CgCalendarDates />,
+    "heading": "Attendance Management",
+    "sub_heading": "Manage members daily attendance",
+    "view": {
+      "icon": <BsEye />,
+      heading: "Attendance Viewing",
+      sub_heading: "View mambers daily attendance"
+    },
+    "create_edit": {
+      "icon": <LuFolderOpen />,
+      heading: "Attendance Management",
+      sub_heading: "Create, edit, and delete member attendance"
+    },
+    "view_others": {
+      "icon": <LuUsers />,
+      heading: "Team Visibility",
+      sub_heading: "Can view other team members attendance"
+    },
   }
 }

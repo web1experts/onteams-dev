@@ -24,7 +24,7 @@ import { AlertDialog, TransferOnwerShip } from "../modals";
 import { selectboxObserver, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
 import { socket, currentMemberProfile } from "../../helpers/auth";
 import { updatePermissions } from "../../redux/actions/permission.action";
-import { permissionModules } from "../../helpers/permissionsModules";
+import { permissionModules, permissionsLabel } from "../../helpers/permissionsModules";
 import { CustomFieldModal } from "../modals/customFields";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
@@ -1690,8 +1690,8 @@ function TeamMembersPage() {
                           <Accordion.Item eventKey={ind} className="bg--blue--accordion">
                             <Accordion.Header>
                               <div className="d-flex gap-3 align-items-center">
-                                <LuFolderOpen />
-                                <h6 className="mb-0">{mod.name}{" "}<small className="d-block">{mod.name} access and management permissions</small></h6>
+                                {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                                <h6 className="mb-0">{permissionsLabel[modSlug]?.heading}<small className="d-block"> {permissionsLabel[modSlug]?.sub_heading}</small></h6>
                               </div>
                             </Accordion.Header>
                             <Accordion.Body>
@@ -1706,11 +1706,11 @@ function TeamMembersPage() {
                                   return (
                                     <Card className="mb-3" key={`${modSlug}-${perm}`}>
                                       <span className="card--icon icon--green">
-                                        <BsEye />
+                                        {permissionsLabel[modSlug][perm]?.icon || <BsEye />}
                                       </span>
                                       <Card.Body>
-                                        <Card.Title>{label}</Card.Title>
-                                        <Card.Text>Can view assigned projects and tasks</Card.Text>
+                                        <Card.Title>{permissionsLabel[modSlug][perm]?.heading}</Card.Title>
+                                        <Card.Text>{permissionsLabel[modSlug][perm]?.sub_heading}</Card.Text>
 
                                         {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
                                           perm === "view_others" &&
@@ -1976,8 +1976,8 @@ function TeamMembersPage() {
                         return (
                           <div className="bg--blue--accordion">
                             <div className="d-flex gap-3 align-items-center">
-                              <LuFolderOpen />
-                              <h6 className="mb-0">{mod.name} Management <small className="d-block">{mod.name} access and management permissions</small></h6>
+                              {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                              <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
                             </div>
                                 {(mod.permissions || []).map((perm) => {
                                   if (perm === "view") {
@@ -1998,9 +1998,11 @@ function TeamMembersPage() {
                                   return (
                                     <>
                                     <div className="d-flex gap-3 align-items-center mt-3">
-                                      <p className="mb-0">{perm
+                                      <p className="mb-0">
+                                       {perm
                                                           .replace(/[_-]/g, " ")
-                                                          .replace(/^\w/, (l) => l.toUpperCase())}</p>
+                                                          .replace(/^\w/, (l) => l.toUpperCase())}
+                                                          </p>
                                       <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
                                         disabled={!isViewChecked}
                                         checked={!!modPerms[perm]}
@@ -2032,9 +2034,9 @@ function TeamMembersPage() {
                                                 );
                                                 // }
                                               }}>
-                                              <span className="team--initial">G</span>
+                                              <span className="team--initial">{member.name.charAt(0)}</span>
                                               <Card.Body>
-                                                <h4>{member.name} <small className="d-block">UI/UX Designer</small></h4>
+                                                <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
                                               </Card.Body>
                                               <FiCheck className="ms-auto" />
                                             </Card>
@@ -2107,8 +2109,9 @@ function TeamMembersPage() {
               return (
               <div className="bg--blue--accordion">
                 <div className="d-flex gap-3 align-items-center">
-                  <LuFolderOpen />
-                  <h6 className="mb-0">{mod.name} Management <small className="d-block">{mod.name} access and management permissions</small></h6>
+                   {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                  <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                  
                 </div>
                 {(mod.permissions || []).map((perm) => {
                   if (perm === "view") {
