@@ -442,6 +442,9 @@ export function getAttendanceBadges (status) {
     case 'Full Day':
       return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><span className="status--badge bg--green"><FiCheckCircle className="text--green me-2" /> Present</span></span>)
       break;
+    case 'Present':
+      return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><span className="status--badge bg--green"><FiCheckCircle className="text--green me-2" /> Present</span></span>)
+      break;
     case 'Absent':
       return (<span className="d-inline-flex mx-auto align-items-center gap-2" title="Present"><span className="status--badge bg--red"><AiOutlineCloseCircle className="text--red me-2" /> Absent</span></span>)
       break;

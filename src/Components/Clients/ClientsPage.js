@@ -656,7 +656,7 @@ function ClientsPage() {
                             <td className="task--last--buttons mt-auto" key={`client-td3-${index}`}>
                               <div className="d-flex justify-content-between">
                                   <div className="onHide">
-                                      <Button variant="dark" className="me-2 px-3 py-1" onClick={() => {handleClick(client);}}><BsEye /> View</Button>
+                                      <Button variant="dark" className="me-2 px-3 py-1" onClick={() => {handleClick(client); setIsActive(true)}}><BsEye /> View</Button>
                                   </div>
                               </div>
                             </td>
