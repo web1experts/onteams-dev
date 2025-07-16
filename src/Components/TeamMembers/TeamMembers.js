@@ -406,7 +406,7 @@ function TeamMembersPage() {
       // }
       // Add 'recordings' key with value 'both' if not present
       if (!("screenshot_recording" in cleanedMeta)) {
-        cleanedMeta.recording = {
+        cleanedMeta.screenshot_recording = {
           meta_key: "screenshot_recording",
           meta_value: "disabled",
         };
