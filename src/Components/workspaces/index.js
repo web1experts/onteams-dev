@@ -135,7 +135,7 @@ function Workspace(props) {
                       <td>
                         <div className="d-flex gap-3 align-items-center p-3 justify-content-end">
                           <Button variant="dark" className="px-3 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
-                          <Button variant="warning" className="px-3 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
+                          <Button variant="danger" className="px-3 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
                         </div>
                       </td>
                     </tr>

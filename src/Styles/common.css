@@ -192,19 +192,6 @@ fieldset:disabled .btn {
 }
 
 .btn-warning {
-    --bs-btn-bg: rgb(219 234 254);
-    --bs-btn-border-color: rgb(191 219 254);
-    --bs-btn-hover-bg: rgb(219 234 254 / 80%);
-    --bs-btn-hover-border-color: rgb(219 234 254 / 80%);
-    --bs-btn-focus-shadow-rgb: 217,164,6;
-    --bs-btn-active-bg: rgb(219 234 254 / 80%);
-    --bs-btn-active-border-color: rgb(191 219 254);
-    --bs-btn-color: rgb(30 64 175);
-    --bs-btn-hover-color: rgb(30 64 175);
-    font-weight: 700;
-}
-
-.btn-danger {
     --bs-btn-bg: rgb(254 249 195);
     --bs-btn-border-color: rgb(254 249 195);
     --bs-btn-hover-bg: rgb(254 249 195 / 80%);
@@ -214,6 +201,20 @@ fieldset:disabled .btn {
     --bs-btn-active-border-color: rgb(254 249 195 / 80%);
     --bs-btn-color: rgb(133 77 14);
     --bs-btn-hover-color: rgb(133 77 14);
+    font-weight: 700;
+    font-weight: 700;
+}
+
+.btn-danger {
+    --bs-btn-bg: #dc354510;
+    --bs-btn-border-color: #dc3545;
+    --bs-btn-hover-bg: #dc3545;
+    --bs-btn-hover-border-color: #dc3545;
+    --bs-btn-focus-shadow-rgb: 217,164,6;
+    --bs-btn-active-bg: #dc3545;
+    --bs-btn-active-border-color: #dc3545;
+    --bs-btn-color: #dc3545;
+    --bs-btn-hover-color: #ffffff;
     font-weight: 700;
 }
 
