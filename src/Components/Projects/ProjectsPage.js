@@ -992,8 +992,8 @@ function ProjectsPage() {
                                                                                     const matchedOption = field.options.find(opt => opt.value === mvalue);
                                                                                     if (matchedOption) {
                                                                                     mvalue = (
-                                                                                        <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td"><span
-                                                                                            className="priority--badge"
+                                                                                        <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td">
+                                                                                            <span className="priority--badge"
                                                                                             style={{
                                                                                                 backgroundColor: matchedOption.color,
                                                                                                 color: '#fff',
@@ -1297,7 +1297,6 @@ function ProjectsPage() {
                                             }
                                         </Form.Label>
                                         <div className={isdescEditor ? 'text--editor show--editor' : 'text--editor'}>
-
                                             <ReactQuill
                                                 value={fields['description'] || ''}
                                                 onChange={(value) => {
@@ -1334,14 +1333,8 @@ function ProjectsPage() {
                                                     className="task--date--change"
                                                     onClick={() => { setDateshow(true); }}
                                                 >
-                                                    {fields?.start_date && (
-                                                        new Date(fields.start_date).toISOString().split('T')[0]
-                                                    )}
-
-                                                    {fields?.start_date && fields?.due_date && (
-                                                        <span>/</span>
-                                                    )}
-
+                                                    {fields?.start_date && (new Date(fields.start_date).toISOString().split('T')[0])}
+                                                    {fields?.start_date && fields?.due_date && (<span>/</span>)}
                                                     {fields?.due_date && (
                                                         <>
                                                             {new Date(fields.due_date).toISOString().split('T')[0]}
@@ -1349,11 +1342,7 @@ function ProjectsPage() {
                                                     )}
 
                                                     {(fields?.start_date || fields?.due_date) && (
-                                                        <MdOutlineCancel
-                                                            onClick={() => {
-                                                                dispatch(updateStateData(PROJECT_FORM, { start_date: '', due_date: '' }));
-                                                            }}
-                                                        />
+                                                        <MdOutlineCancel onClick={() => {dispatch(updateStateData(PROJECT_FORM, { start_date: '', due_date: '' }));}}/>
                                                     )}
                                                 </label>
                                             )}
@@ -1363,9 +1352,9 @@ function ProjectsPage() {
                                     {customFields.length > 0 &&
                                         <>
                                         <hr />
-                                            <ListGroup>
-                                                <p className="m-0"> Other Fields</p>
-                                            </ListGroup>
+                                        <ListGroup>
+                                            <p className="m-0"> Other Fields</p>
+                                        </ListGroup>
                                         
                                         {customFields.map((field, index) =>
                                             renderDynamicField({

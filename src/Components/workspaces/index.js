@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup, ButtonGroup} from "react-bootstrap";
-import { FaPlus, FaEllipsisV } from "react-icons/fa";
+import { FaPlus, FaEllipsisV, FaTrashAlt } from "react-icons/fa";
 import { FiSidebar } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
+import { MdDragIndicator } from "react-icons/md";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import WorkspaceForm from "./workspaceform";
 import { refreshUserWorkspace } from "../../redux/actions/auth.actions";
@@ -12,6 +13,7 @@ import { AlertDialog, TransferOnwerShip } from "../modals";
 import { getMemberdata } from "../../helpers/commonfunctions";
 import { deleteWorkspace } from "../../redux/actions/workspace.action";
 import Spinner from 'react-bootstrap/Spinner';
+import { BsTrash2, BsEye } from "react-icons/bs";
 function Workspace(props) {
   const [spinner, setSpinner] = useState( true)
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
@@ -115,30 +117,26 @@ function Workspace(props) {
               </thead> */}
               <tbody>
                 {
-                   
-                   !spinner && workspaces && workspaces.length > 0 ?
+                  !spinner && workspaces && workspaces.length > 0 ?
                   workspaces.map((workspace, index) => (
-
                     <tr key={`row-${index}`}>
                       {/* <td width={30}>{index + 1 }</td> */}
                       <td className="cursor--pointer project--title--td">
-                        <div className="project--name">
-                            <abbr className="onHide">{index + 1 }</abbr> 
-                            <div className="title--span team--span">
+                        <div className="d-flex justify-content-between">
+                          <div className="project--name d-flex gap-3 align-items-center">
+                              <div className="drag--indicator"><abbr>{index + 1 }</abbr><MdDragIndicator /></div>
+                              <div className="title--initial">{workspace.company?.name?.substring(0,1)}</div>
+                              <div className="title--span flex-column d-flex align-items-start gap-0">
                                 <span>{workspace.company?.name}</span>
-                            </div>
+                              </div>
+                          </div>
                         </div>
                       </td>
                       <td>
-                        <Dropdown>
-                          <Dropdown.Toggle variant="primary">
-                            <FaEllipsisV />
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            <Dropdown.Item onClick={() => handleEdit(workspace.company)}>Edit</Dropdown.Item>
-                            <Dropdown.Item onClick={() => handledelete( workspace.company)}>Delete</Dropdown.Item>
-                          </Dropdown.Menu>
-                        </Dropdown>
+                        <div className="d-flex gap-3 align-items-center p-3 justify-content-end">
+                          <Button variant="dark" className="px-3 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
+                          <Button variant="warning" className="px-3 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
+                        </div>
                       </td>
                     </tr>
                   ))

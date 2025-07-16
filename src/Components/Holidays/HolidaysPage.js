@@ -264,79 +264,80 @@ const getDaysLeft = (date) => {
               <h3 class="mb-4 d-flex align-items-center gap-3"><span><FiCalendar /></span>Holiday Calendar - 2025</h3>
               <Table>
                 <tbody>
-                {
-                  (holidays && holidays.length > 0)
+                  {
+                    (holidays && holidays.length > 0)
                       ? holidays.map((holiday, index) => {
-                        return (<>
-                          <tr key={`holiday-row-${index}`} className={''}>
-                            <td key={`date-td-${index}`} data-label="Date">
-                              <div className="project--name d-flex align-items-center gap-4">
-                                <span className="bank">🏛️</span>
-                                <div className="title--span d-flex align-items-start gap-1 flex-column">
-                                  <h5 className="d-xl-flex gap-3 align-items-start" key={`occasion-td-${index}`} data-label="Occasion">{holiday.occasion} {getStatusBadge(holiday.date)}</h5>
-                                  <strong>{formatDateinString(holiday.date)}</strong>
-                                  <p className="mb-0">
-                                    <span className="me-3" key={`type-td-${index}`} data-label="Type">
-                                      {holiday.type
-                                        .split(' ')
-                                        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                                        .join(' ')}
-                                    </span>
-                                  </p>
+                          const isUpcoming = new Date(holiday.date) >= new Date(); // Compare with today's date
+                          return (
+                            <tr key={`holiday-row-${index}`} className={isUpcoming ? 'upcoming-holiday' : ''}>
+                              <td key={`date-td-${index}`} data-label="Date">
+                                <div className="project--name d-flex align-items-center gap-4">
+                                  <span className="bank">🏛️</span>
+                                  <div className="title--span d-flex align-items-start gap-1 flex-column">
+                                    <h5 className="d-xl-flex gap-3 align-items-start" key={`occasion-td-${index}`} data-label="Occasion">
+                                      {holiday.occasion} {getStatusBadge(holiday.date)}
+                                    </h5>
+                                    <strong>{formatDateinString(holiday.date)}</strong>
+                                    <p className="mb-0">
+                                      <span className="me-3" key={`type-td-${index}`} data-label="Type">
+                                        {holiday.type
+                                          .split(' ')
+                                          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                          .join(' ')}
+                                      </span>
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="text-end text-primary fw-semibold ms-xl-auto d-flex justify-content-between mt-3 mt-xl-0 align-items-center">
-                              <span className="days--left">{getDaysLeft(holiday.date)}</span>
-                              <div key={`action-td-${index}`} className="ms-3">
-                                <Dropdown>
-                                  <Dropdown.Toggle variant="dark"><FiEdit /></Dropdown.Toggle>
-                                  <Dropdown.Menu>
-                                    <Dropdown.Item
-                                      key={`edit-item-${index}`}
-                                      onClick={() => {
-                                        if (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') {
-                                          setEditItem(holiday);
-                                          handleShow();
-                                        } else {
-                                          console.log('action not allowed');
-                                        }
-                                      }}
-                                    >Edit
-                                    </Dropdown.Item>
-                                    <Dropdown.Item
-                                      key={`delete-item-${index}`}
-                                      onClick={() => {
-                                        if (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') {
-                                          handleDelete(holiday._id);
-                                        } else {
-                                          console.log('action not allowed');
-                                        }
-                                      }}
-                                    >
-                                      Delete
-                                    </Dropdown.Item>
-                                  </Dropdown.Menu>
-                                </Dropdown>
-                              </div>
-                            </td>
-                          </tr>
-                        </>)
-                      })
-                      :
-                      <></>
-                }
-                  
+                              </td>
+                              <td className="text-end text-primary fw-semibold ms-xl-auto d-flex justify-content-between mt-3 mt-xl-0 align-items-center">
+                                <span className="days--left">{getDaysLeft(holiday.date)}</span>
+                                <div key={`action-td-${index}`} className="ms-3">
+                                  <Dropdown>
+                                    <Dropdown.Toggle variant="dark"><FiEdit /></Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                      <Dropdown.Item
+                                        key={`edit-item-${index}`}
+                                        onClick={() => {
+                                          if (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') {
+                                            setEditItem(holiday);
+                                            handleShow();
+                                          } else {
+                                            console.log('action not allowed');
+                                          }
+                                        }}
+                                      >Edit
+                                      </Dropdown.Item>
+                                      <Dropdown.Item
+                                        key={`delete-item-${index}`}
+                                        onClick={() => {
+                                          if (memberProfile?.permissions?.holidays?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') {
+                                            handleDelete(holiday._id);
+                                          } else {
+                                            console.log('action not allowed');
+                                          }
+                                        }}
+                                      >
+                                        Delete
+                                      </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                  </Dropdown>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      : <></>
+                  }
+
                 </tbody>
               </Table>
               {
                 holidays && holidays.length == 0 &&
-                  <div className="text-center mt-5">
-                      <h2>No Holidays Found</h2>
-                  </div>
+                <div className="text-center mt-5">
+                    <h2>No Holidays Found</h2>
+                </div>
               }
             </div>
-            
           </Container>
         </div>
       </div>
@@ -347,8 +348,7 @@ const getDaysLeft = (date) => {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}> 
-            <Form.Group className="mb-3 form-group">
-              
+            <Form.Group className="form-group">
                 <DatePicker 
                   key={'date-filter'}
                   name="date"
@@ -372,7 +372,7 @@ const getDaysLeft = (date) => {
                 />
                 {showError('date')}
             </Form.Group>
-            <Form.Group className="mb-3 form-group">
+            <Form.Group className="form-group">
               <FloatingLabel label="Occasion">
                 <Form.Control type="text" name="occasion" value={fields['occasion']} placeholder="Occasion" onChange={handleChange} />
               </FloatingLabel>

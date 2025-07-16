@@ -1463,7 +1463,6 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
             <>
               <div className="current--player p-3" key={`activity-${currentActivity?._id}`}>
                 <div className="timer--task">
-                  
                   <h5 key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}>{ currentActivity?.latestActivity?.project?.title || <BsDash /> } [{currentActivity?.latestActivity?.project?.client?.name}] - <small>{ currentActivity?.latestActivity?.task?.title || <BsDash /> }</small></h5>
                   <span className="ms-md-3">{ currentActivity?.latestActivity?.app_version}</span>
                   <p className="task--timer">

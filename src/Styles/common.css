@@ -373,7 +373,7 @@ textarea.form-control {
 }
 
 .form-group {
-  padding-bottom: 18px;
+  padding-bottom: 20px;
   position: relative;
 }
 
@@ -415,8 +415,8 @@ textarea.form-control {
 
 .form-floating>.form-control:focus~label,
 .form-floating>.form-control:not(:placeholder-shown)~label {
-  transform: scale(.85) translateY(-.75rem) translateX(1rem);
-  -webkit-transform: scale(.85) translateY(-.75rem) translateX(1rem);
+  transform: scale(.85) translateY(-.85rem) translateX(1rem);
+  -webkit-transform: scale(.85) translateY(-.85rem) translateX(1rem);
   color: rgb(15 23 42);
   background: transparent;
 }
@@ -441,8 +441,8 @@ textarea.form-control {
 }
 
 .form-floating>.form-control:-webkit-autofill~label {
-  transform: scale(.85) translateY(-.65rem) translateX(1rem);
-  -webkit-transform: scale(.85) translateY(-.65rem) translateX(1rem);
+  transform: scale(.85) translateY(-.85rem) translateX(1rem);
+  -webkit-transform: scale(.85) translateY(-.85rem) translateX(1rem);
   color: rgb(15 23 42);
   background: transparent;
 }
@@ -454,7 +454,7 @@ textarea.form-control {
   bottom: 0;
   content: '';
   width: 100%;
-  background: #ffffff;
+  background: light-dark(rgb(232, 240, 254), rgba(70, 90, 126, 0.4));
   height: 3px;
   margin: auto 0;
   z-index: -1;
@@ -691,6 +691,11 @@ Add Project Modal CSS-=-=-
   border: var(--bs-border-width) solid var(--bs-border-color);
   transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
   -webkit-transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
+}
+
+.modal .rmdp-input, .project--form--inputs .rmdp-input {
+  box-shadow: none;
+  -webkit-box-shadow: none;
 }
 
 .project--form--inputs form .text--editor {
@@ -1079,7 +1084,7 @@ Add Project Modal CSS-=-=-
   margin-bottom: 1rem;
 }
 
-.add--new--field .dropdown-menu form {
+.add--new--field .dropdown-menu form, .select--dropdown .dropdown-menu form {
   max-width: calc(100% - 2rem);
   margin: 1rem auto 0;
 }

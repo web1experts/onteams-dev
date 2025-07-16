@@ -1,14 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form } from "react-bootstrap";
+import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form, Dropdown } from "react-bootstrap";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { BsTrash, BsPencil } from 'react-icons/bs'
-import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaStar, FaRegQuestionCircle, FaDotCircle, FaRegEnvelope, FaRegEye, FaPlus } from 'react-icons/fa';
-import { FiSidebar, FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiClock, FiCalendar, FiSend, FiYoutube } from "react-icons/fi";
+import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaRegQuestionCircle, FaRegEnvelope, FaPlus, FaEllipsisV } from 'react-icons/fa';
+import { FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiSend, FiYoutube, FiEdit } from "react-icons/fi";
 import { socket, SendComment, DeleteComment, UpdateComment, DeletePost } from '../../helpers/auth';
 import { LuVideo } from "react-icons/lu";
 import { MdLaptopMac, MdOutlineChatBubbleOutline } from "react-icons/md";
-import { BsChat, BsHeart, BsClock } from "react-icons/bs";
+import { BsChat, BsHeart, BsClock, BsHeartFill } from "react-icons/bs";
 import { HiOutlineLightningBolt, HiOutlineLocationMarker } from "react-icons/hi";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite} from "../../redux/actions/members.action";
 import { createPost, ListPosts, likePost, updatePost } from "../../redux/actions/post.action";
@@ -613,25 +612,21 @@ const isPostLikedByMember = (likes = [], memberId) => {
                     <Card key={post._id} className="mb-4 p-3 rounded-4 inner--card">
                       <Row className="mb-2">
                         <Col xs="auto">
-                          <Image
-                            src={post.author?.avatar || '/images/default.jpg'}
-                            roundedCircle
-                            width={40}
-                            height={40}
-                          />
+                          <Image src={post.author?.avatar || '/images/default.jpg'} roundedCircle width={40} height={40}/>
                         </Col>
                         <Col>
                           <strong>{post.author?.name || 'Unknown'}</strong>{' '}
                           <span className="text-muted" style={{ fontSize: '0.875rem' }}>
                             • {dayjs(post.createdAt).fromNow()}
                           </span>
-                          <BsPencil className="position-absolute top-0 m-2 text-danger cursor-pointer"
-                            role="button" onClick={() => handleEdit(post)}/>
-                          <BsTrash
-                            className="position-absolute top-0 end-0 m-2 text-danger cursor-pointer"
-                            role="button"
-                            onClick={() => handleDelete(post?._id)}
-                          />
+                          <Dropdown className="edit--dropdown">
+                            <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item onClick={() => handleEdit(post)}>Edit</Dropdown.Item>
+                              <Dropdown.Item onClick={() => handleDelete(post?._id)}>Delete</Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                          
                           <div className="mt-3">
                             {/* Text Post */}
                             {post.post_type === 'text' && (
@@ -714,7 +709,11 @@ const isPostLikedByMember = (likes = [], memberId) => {
                           {/* Likes / Comments */}
                           <div className="d-flex gap-3 text-muted mt-3 align-items-center">
                             <span className="icon--heart">
-                              <BsHeart onClick={() => handleLike(post._id)} className={`me-1 ${isLiked ? 'filled-heart' : ''}`} />{' '}
+                              {isLiked ? (
+                                <BsHeartFill onClick={() => handleLike(post._id)} className="me-1 filled--heart" />
+                              ) : (
+                                <BsHeart onClick={() => handleLike(post._id)} className="me-1" />
+                              )}
                               {post.likes?.length || 0}
                             </span>
                             <span className="open--comment" onClick={() => {setShowCommentBox((prev) => !prev); setCommentPostId(post._id)}}>
