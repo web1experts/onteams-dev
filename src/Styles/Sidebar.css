@@ -643,6 +643,10 @@ Sidebar CSS-=-=
   margin-bottom: 0;
 }
 
+.theme--modal .modal-footer {
+  padding: 1rem 1.5rem;
+}
+
 .theme--modal .modal-body {
   padding: 1.5rem;
 }
@@ -870,10 +874,6 @@ Sidebar CSS-=-=
     min-width: 190px;
   }
 
-  .collapse:not(.show) {
-    display: block;
-  }
-
   .panel--sidebar {
     transform: translateX(0%);
     -webkit-transform: translateX(0%);
@@ -972,15 +972,14 @@ Sidebar CSS-=-=
   .navbar-toggler {
     display: block !important;
     position: fixed;
-    top: -80px;
+    top: -70px;
     left: 0;
     right: 0;
     margin: auto;
     background: linear-gradient(to bottom right, #0f172a, #1e293b);
     border-radius: 100px;
-    width: 70px;
-    height: 70px;
-    z-index: 777777;
+    width: 60px;
+    height: 60px;
   }
 
   .panel--sidebar .dropdown-menu {

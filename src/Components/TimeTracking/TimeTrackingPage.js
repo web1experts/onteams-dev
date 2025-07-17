@@ -1268,17 +1268,17 @@ const handleProjectSelect = async (project) => {
                                         </div>
                                     </td>
                                     <td className="text-start">
-                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Name</strong>
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Project Name</strong>
                                       <br className="d-xl-none"/>
                                       <span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</span>
                                     </td>
                                     <td className="ms-auto text-start text-xl-center">
-                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Time</strong>
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Project Time</strong>
                                       <br className="d-xl-none"/>
                                       <div key={`task-time-${activity?._id}`} className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><LuTimer className="me-1" /> { convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
                                     </td>
                                     <td className="text-start text-xl-center" key={`total-time-${activity?._id}`}>
-                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Total Time</strong>
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Total Time</strong>
                                       <br className="d-xl-none"/>
                                       <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> { convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</span>
                                     </td>
@@ -1387,12 +1387,12 @@ const handleProjectSelect = async (project) => {
                                         </div>
                                     </td>
                                     {/* <td className="text-start">
-                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Project Name</strong>
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Project Name</strong>
                                       <br className="d-xl-none"/>
                                       
                                     </td> */}
                                     <td className="text-start text-xl-center ms-auto" key={`total-time-${activity?._id}`}>
-                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1 mb-1">Total Time</strong>
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Total Time</strong>
                                       <br className="d-xl-none"/>
                                       <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</span>
                                     </td>
