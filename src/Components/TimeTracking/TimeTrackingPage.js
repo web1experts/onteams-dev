@@ -16,7 +16,7 @@ import { GoPulse } from 'react-icons/go';
 import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise , BsArrowLeftCircleFill, BsArrowRightCircleFill, BsDashLg } from "react-icons/bs";
 import { MdOutlineClose, MdOutlineSearch, MdDragIndicator, MdOutlineVideoLibrary } from "react-icons/md";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
-import { getliveActivity, getRecoredActivity, deleteRecoredActivity, getAllMembersRecordedActivity } from "../../redux/actions/activity.action";
+import { getliveActivity, getRecoredActivity, deleteRecoredActivity, getAllMembersRecordedActivity, getMemberRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket, currentMemberProfile } from "../../helpers/auth";
 import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime, timeStringToDate } from "../../helpers/commonfunctions";
@@ -100,6 +100,7 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
   const [postMedia, setPostMedia] = useState([]);
   const [liveactivities, setLiveactivities] = useState([])
   const [ recordedactivities, setRecordedActivities] = useState([])
+  const [memberActivities, setMemberActivities] = useState([])
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setsearchTerm] = useState("");
   const [ filters, setFilters] = useState({status: 'live'});
@@ -231,7 +232,9 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
     setActSpinner(false)
   }
 
-  
+  const memberTodaysActivity = async () => {
+    await dispatch(getMemberRecoredActivity(memberProfile._id, 'recorded'))
+  }
 
   useEffect(() => {
     if(selectedFilter !== "custom" && isActive === true){
@@ -323,23 +326,41 @@ const handleListProjects = async () => {
 
   useEffect(() => {
       
-        if( reportState.singleProjectReport){
-          setOccupiedRanges(calculateOccupiedRanges(reportState.singleProjectReport))
+        if( memberActivities){
+          setOccupiedRanges(calculateOccupiedRanges(memberActivities))
         }
-      }, [reportState])
+      }, [memberActivities])
 
       useEffect(() => {
         console.log("occupiedRanges:: ", occupiedRanges)
       },[occupiedRanges])
 
+// const calculateOccupiedRanges = (data) => {
+//     return data.map((item) => {
+//       const start = new Date(item.createdAt); // Convert createdAt to a Date object
+//       // const end = new Date(item.duration); // Convert duration to a Date object (end time)
+//       const end = new Date(start.getTime() + item.duration * 1000);
+//       return { start, end };
+//     });
+//   };
 const calculateOccupiedRanges = (data) => {
-    return data.map((item) => {
-      const start = new Date(item.createdAt); // Convert createdAt to a Date object
-      const end = new Date(item.duration); // Convert duration to a Date object (end time)
-      
-      return { start, end };
-    });
-  };
+  return data.map((item) => {
+    const startUTC = new Date(item.createdAt);
+    const endUTC = new Date(startUTC.getTime() + item.duration * 1000);
+
+    // Convert to IST by adding 5.5 hours (19800000 ms)
+    const startIST = new Date(startUTC.getTime() + 19800000);
+    const endIST = new Date(endUTC.getTime() + 19800000);
+
+    // Return in ISO format with IST offset
+    return {
+      start: startIST.toISOString().replace('Z', '+05:30'),
+      end: endIST.toISOString().replace('Z', '+05:30'),
+    };
+  });
+};
+
+
   useEffect(() => {
       if(occupiedRanges){
         setTimeslots(generateTimeSlots(10))
@@ -588,6 +609,8 @@ const handleReportSubmit = async (e) => {
     handleLiveActivityList()
   }, 60000)
 
+  memberTodaysActivity()
+
   }, [])
 
   useEffect(() => {
@@ -598,6 +621,10 @@ const handleReportSubmit = async (e) => {
     if( activitystate?.recordedActivity ){
       setSelectedScreenshots({})
       setRecordedActivities(activitystate?.recordedActivity)
+    }
+
+    if(activitystate?.MemberrecordedActivity){
+      setMemberActivities(activitystate.MemberrecordedActivity)
     }
 
     if(activitystate.success){
@@ -1215,11 +1242,11 @@ const handleProjectSelect = async (project) => {
                       <thead className="onHide">
                         <tr key="project-table-header">
                           <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
-                          <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th>
-                          <th scope="col" key="client-project-header" className="onHide ms-auto"><LuTimer className="me-1" /> Project Time</th>
-                          <th scope="col" key="client-time-header" className="onHide"><FiClock className="me-1" /> Total Time</th>
-                          <th scope="col" key="client-status-header" className="onHide"><GoPulse className="me-1" /> Status</th>
-                          <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1"/> Action</th>
+                          <th scope="col" key="live-client-pname-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th>
+                          <th scope="col" key="live-client-project-header" className="onHide ms-auto"><LuTimer className="me-1" /> Project Time</th>
+                          <th scope="col" key="live-client-time-header" className="onHide"><FiClock className="me-1" /> Total Time</th>
+                          <th scope="col" key="live-client-status-header" className="onHide"><GoPulse className="me-1" /> Status</th>
+                          <th scope="col" key="live-client-action-header" className="onHide"><FiTarget className="me-1"/> Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1332,11 +1359,11 @@ const handleProjectSelect = async (project) => {
                   <div className='attendance--table--list'>
                     <Table>
                       <thead className="onHide">
-                        <tr key="project-table-header">
-                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header"><FiUsers className="me-1" /> Member</th>
+                        <tr key="project-table-header-recordings">
+                          <th scope="col" className="sticky pe-0 py-0" key="record-project-name-header"><FiUsers className="me-1" /> Member</th>
                           {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
-                          <th scope="col" key="client-time-header" className="onHide ms-auto"><FiClock className="me-1" /> Total Time</th>
-                          <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1" /> Action</th>
+                          <th scope="col" key="record-client-time-header" className="onHide ms-auto"><FiClock className="me-1" /> Total Time</th>
+                          <th scope="col" key="record-client-action-header" className="onHide"><FiTarget className="me-1" /> Action</th>
                         </tr>
                       </thead>
                       <tbody>

@@ -1,4 +1,4 @@
-import { ACTIVITY_COMMON_ERROR, LIVE_ACTIVITY_LIST_SUCCESS, RECORDED_ACTIVITY_SUCCESS, RECORDING_DELETE_SUCCESS, CLEAR_MESSAGES } from "../actions/types";
+import { ACTIVITY_COMMON_ERROR, LIVE_ACTIVITY_LIST_SUCCESS,CURRENT_RECORDED_ACTIVITY_SUCCESS, RECORDED_ACTIVITY_SUCCESS, RECORDING_DELETE_SUCCESS, CLEAR_MESSAGES } from "../actions/types";
 
 const initialState = {
     liveactivities: [],
@@ -18,6 +18,11 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 recordedActivity: action.payload.activityData
+            }
+        case CURRENT_RECORDED_ACTIVITY_SUCCESS: 
+            return {
+                ...state,
+                MemberrecordedActivity: action.payload.activityData
             }
         case RECORDING_DELETE_SUCCESS: 
             return {
