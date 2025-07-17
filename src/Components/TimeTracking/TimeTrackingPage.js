@@ -19,7 +19,7 @@ import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.ac
 import { getliveActivity, getRecoredActivity, deleteRecoredActivity, getAllMembersRecordedActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { socket, refreshSocket, currentMemberProfile } from "../../helpers/auth";
-import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime } from "../../helpers/commonfunctions";
+import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime, timeStringToDate } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 import "media-chrome";
 import "media-chrome/dist/menu";
@@ -41,6 +41,7 @@ function TimeTrackingPage() {
     'custom': 'Custom'
   };
 const [selected, setSelected] = useState(null);
+const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
   const memberProfile = currentMemberProfile()
   let totalhours = 0;
   let totalProjecthours = 0
@@ -54,7 +55,7 @@ const [selected, setSelected] = useState(null);
       totalHours: 0
     })
   const handleShow = () => setShow(true);
-
+    const [totalTaskDuration, setTotalTaskDuration] = useState(0)
   const handleProjectShow = () => setProjectShow(true);
   const [showSelect, setProjectShow] = useState(false);
   const handleProjectClose = () => setProjectShow(false);
@@ -77,6 +78,7 @@ const [selected, setSelected] = useState(null);
   const [open, setOpen] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [entries, setEntries] = useState([]);
+  const [timings, setTimings] = useState({'start_time': '', end_time: ''})
    const [ memberprojects, setMemberProjects ] = useState([])
     const [occupiedRanges, setOccupiedRanges] = useState([])
      const [timeSlots, setTimeslots] = useState([])
@@ -126,6 +128,7 @@ const [selected, setSelected] = useState(null);
     setEntries([])
     setSelectedProject('')
     setErrors([]);
+    setTimings({'start_time': '', end_time: ''})
   }
   const commonState = useSelector(state => state.common)
   const handleClick = (activity) => {
@@ -387,7 +390,17 @@ const calculateOccupiedRanges = (data) => {
             return timeDate >= startDate;
           });
         };
-        
+      
+  useEffect(() => {
+    const totalTaskDuration = entries.reduce((total, entry) => {
+      const startTime = timeStringToDate(entry.start_time, new Date());
+      const endTime = timeStringToDate(entry.end_time, new Date());
+      const taskDurationInMilliseconds = endTime - startTime;
+      const taskDuration = Math.round(taskDurationInMilliseconds / 1000);
+      return total + taskDuration;
+    }, 0);
+    setTotalTaskDuration(totalTaskDuration)
+  }, [entries])
         
 const handleReportSubmit = async (e) => {
   e.preventDefault();
@@ -450,7 +463,7 @@ const handleReportSubmit = async (e) => {
   }//return false;
   setErrors([]);
   setLoader( true )
-  const payload = { project_id: selectedproject, entries }
+  const payload = { entries }
   dispatch(addManualTime({...payload,...fields}))
 
 }
@@ -619,19 +632,36 @@ const handleReportSubmit = async (e) => {
     }
   }
 
-  const handleAddEntry = () => {
-    setEntries([...entries, { task: "", task_title: "", start_time: "", end_time: "" }]);
-};
-const handleEntryChange = (index, field, value) => {
+//   const handleAddEntry = () => {
+//     setEntries([...entries, { task: "", task_title: "", start_time: "", end_time: "" }]);
+// };
+
+const handleTimeChange = (name, value) => {
+  setTimings({...timings, [name]: value})
+}
+const handleEntryChange = (task) => {
     const updatedEntries = [...entries];
-    if( field === 'task'){
-      updatedEntries[index][field] = value._id;
-      updatedEntries[index]['task_title'] = value.title;
-    }else{
-      updatedEntries[index][field] = value;
-    }
+    updatedEntries.push({
+      task: task._id,
+      task_title: task.title,
+      project: selectedproject?._id,
+      project_title: selectedproject?.title,
+      start_time: timings?.start_time,
+      end_time: timings?.end_time,
+    });
+    // updatedEntries[updatedEntries.length - 1]['workflow'] = selectedproject?.title
+    // if( field === 'task'){
+    //   updatedEntries[index][field] = value._id;
+    //   updatedEntries[index]['task_title'] = value.title;
+    // }else{
+    //   updatedEntries[index][field] = value;
+    // }
     
     setEntries(updatedEntries);
+    setSelectedProject('');
+    setProjectShow(false);
+    setFilteredTasks([])
+    setTimings({'start_time': '', end_time: ''})
 };
 
 const handleSearchChange = (name, index, searchvalue) => {
@@ -740,17 +770,25 @@ const handleSearchChange = (name, index, searchvalue) => {
     setErrors(errors.filter((_, i) => i !== index));
 };
 
-const handleProjectSelect = async ({ target: { name, value, selectedOptions } }) => {
-    const selectedOption = selectedOptions[0];
+const handleProjectFilter = ({ target: { name, value } }) => {
+  setProjectFilter(prev => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
+
+const handleProjectSelect = async (project) => {
+    // const selectedOption = selectedOptions[0];
   
   // Retrieve the data-project attribute value
-  const projectData = JSON.parse(selectedOption.getAttribute("data-project"));
-    setSelectedProject(projectData)
-    if(projectData?.workflow?.tabs && projectData.workflow.tabs.length > 0){
-      setWorkflow(projectData.workflow.tabs[0]?._id)
+  // const projectData = JSON.parse(selectedOption.getAttribute("data-project"));
+    setSelectedProject(project)
+    if(project?.workflow?.tabs && project.workflow.tabs.length > 0){
+      setWorkflow(project.workflow.tabs[0]?._id)
     }
-    await dispatch(ListTasks(value));
-    await dispatch(getSingleProjectReport(value))
+    await dispatch(ListTasks(project?._id));
+    await dispatch(getSingleProjectReport(project?._id))
   }
 
   const handleTaskSelect = async ({ target: { name, value } }) => {
@@ -758,18 +796,19 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
   }
 
   useEffect(() => {
-        setEntries([]);
+        // setEntries([]);
         if (taskFeed?.taskData && Object.keys(taskFeed.taskData).length > 0) {
             setTasksLists(taskFeed.taskData)
             setFilteredTasks(taskFeed?.taskData[selectedWorkflow]?.tasks)
             
         }
     }, [taskFeed, dispatch])
-  useEffect(() => {
-    if (filteredTasks?.length > 0 && entries.length === 0) {
-      setEntries([...entries, { task: filteredTasks[0]._id, start_time: "", end_time: "" }]);
-    }  
-  }, [filteredTasks])
+
+  // useEffect(() => {
+  //   if (filteredTasks?.length > 0 && entries.length === 0) {
+  //     setEntries([...entries, { task: filteredTasks[0]._id, start_time: "", end_time: "" }]);
+  //   }  
+  // }, [filteredTasks])
 
     useEffect(() => {
       setFilteredTasks(taskslists[selectedWorkflow]?.tasks)
@@ -1852,17 +1891,32 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
         <Modal.Body>
           <div className="new--entry">
             <div class="d-flex align-items-center justify-content-between mb-3">
-              <h4>Added Entries (1)</h4>
-              <span class="bg-success px-2 py-1 rounded-3">Total: 0h 10m</span>
+              <h4>Added Entries ({entries?.length || 0})</h4>
+              <span class="bg-success px-2 py-1 rounded-3">Total: {convertSecondstoTime(totalTaskDuration)}</span>
             </div>
-            <Card className="p-3 shadow-sm rounded-4">
-              <Card.Title className="d-flex align-items-center justify-content-between gap-3">User Research <FiTrash2 className="text-danger" /></Card.Title>
-              <Card.Body className="p-0 pt-1">
-                <Card.Text className="mb-0">E-commerce App › Planned</Card.Text>
-                <Card.Text className="text-muted mb-0">09:00 - 09:10</Card.Text>
-                <Card.Text className="text-success mb-0"><strong>0h 10min</strong></Card.Text>
-              </Card.Body>
-            </Card>
+            {
+              entries?.length > 0 &&
+                entries.map((entry, i) => {
+                  const startTime = timeStringToDate(entry.start_time, new Date());
+                  const endTime = timeStringToDate(entry.end_time, new Date());
+                  const taskDurationInMilliseconds = endTime - startTime;
+                  const taskDuration = Math.round(taskDurationInMilliseconds / 1000);
+                  return (
+                    <Card className="p-3 shadow-sm rounded-4 mb-2">
+                      <Card.Title className="d-flex align-items-center justify-content-between gap-3">{entry?.project_title} <FiTrash2 className="text-danger" /></Card.Title>
+                      <Card.Body className="p-0 pt-1">
+                        <Card.Text className="mb-0">{entry?.task_title}</Card.Text>
+                        <Card.Text className="text-muted mb-0">{entry?.start_time } - {entry?.end_time}</Card.Text>
+                        <Card.Text className="text-success mb-0"><strong>{convertSecondstoTime(taskDuration)}</strong></Card.Text>
+                        {errors[i]?.start_time && <span className="form-error">{errors[i].start_time}</span>}
+                        {errors[i]?.end_time && <span className="form-error">{errors[i].end_time}</span>}
+                        {errors[i]?.task && <span className="form-error">{errors[i].task}</span>}
+                      </Card.Body>
+                    </Card>
+                  )
+                })
+            }
+            
           </div>
           <Form className="bg-light p-3 rounded-4 my-3">
             {
@@ -1871,28 +1925,37 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
                   <Col sm={12}><h6 className="d-flex align-items-center gap-2"><FaPlus /> Add New Entry</h6></Col>
                   <Col md={6}>
                     <Dropdown className="select--dropdown">
-                      <Dropdown.Toggle variant="success">Start Time</Dropdown.Toggle>
+                      <Dropdown.Toggle variant="success">{timings?.start_time || 'Start Time'}</Dropdown.Toggle>
                       <Dropdown.Menu>
                           <div className="drop--scroll">
-                              <Form>
+                              {/* <Form>
                                   <Form.Group className="form-group mb-3">
-                                      <Form.Control type="text" placeholder="Search here.."  value="" onChange={(e) => {handleSearchChange('start_time', 0, e.target.value)}} />
+                                      <Form.Control type="text" placeholder="Search here.."  value={timings?.start_time} onChange={(e) => {handleSearchChange('start_time', 0, e.target.value)}} />
                                   </Form.Group>
-                              </Form>
+                              </Form> */}
                               {
                                 
                                 timeSlots.map((slot) => {
-                                  const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                                  if( searchEntries[0]?.start_time && searchEntries[0]?.start_time !== ""){
-                                    if (slot?.toLowerCase().includes(searchEntries[0]?.start_time?.toLowerCase())) {
-                                      return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleEntryChange(0, "start_time", slot)} >{slot}</Dropdown.Item>
-                                    }else{
-                                      return null;
-                                    }
-                                    
-                                  }else{
-                                    return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleEntryChange(0, "start_time", slot)} >{slot} </Dropdown.Item>
+                                  let isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                                  if (!isOccupied) {
+                                    isOccupied = entries.some(entry => {
+                                      return (
+                                        (slot >= entry.start_time && slot <= entry.end_time) || // Between
+                                        slot === entry.start_time || // Equal to start
+                                        slot === entry.end_time      // Equal to end
+                                      );
+                                    });
                                   }
+                                  // if( searchEntries[0]?.start_time && searchEntries[0]?.start_time !== ""){
+                                  //   if (slot?.toLowerCase().includes(searchEntries[0]?.start_time?.toLowerCase())) {
+                                  //     return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleTimeChange("start_time", slot)} >{slot}</Dropdown.Item>
+                                  //   }else{
+                                  //     return null;
+                                  //   }
+                                    
+                                  // }else{
+                                    return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleTimeChange("start_time", slot)} disabled={isOccupied} style={{ pointerEvents: isOccupied ? 'none' : 'auto', opacity: isOccupied ? 0.5 : 1 }}>{slot} </Dropdown.Item>
+                                  // }
                                   
                                 })
                               }
@@ -1903,28 +1966,37 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
                   </Col>
                   <Col md={6}>
                     <Dropdown className="select--dropdown">
-                      <Dropdown.Toggle variant="success">End Time</Dropdown.Toggle>
+                      <Dropdown.Toggle variant="success">{timings?.end_time || 'End Time'}</Dropdown.Toggle>
                       <Dropdown.Menu>
                           <div className="drop--scroll">
-                              <Form>
+                              {/* <Form>
                                   <Form.Group className="form-group mb-3">
-                                      <Form.Control type="text" placeholder="Search here.."  value={searchEntries[0]?.end_time} onChange={(e) => {handleSearchChange('end_time', 0, e.target.value)}} />
+                                      <Form.Control type="text" placeholder="Search here.."  value={timings?.end_time} onChange={(e) => {handleSearchChange('end_time', 0, e.target.value)}} />
                                   </Form.Group>
-                              </Form>
+                              </Form> */}
                               {
                                 
                                 timeSlots.map((slot) => {
-                                  const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                                  if( searchEntries[0]?.end_time && searchEntries[0]?.end_time !== ""){
-                                    if (slot?.toLowerCase().includes(searchEntries[0]?.end_time?.toLowerCase())) {
-                                      return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleEntryChange(0, "end_time", slot)} >{slot} </Dropdown.Item>
-                                    }else{
-                                      return null;
-                                    }
-                                    
-                                  }else{
-                                    return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleEntryChange(0, "end_time", slot)}  >{slot} </Dropdown.Item>
+                                  let isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
+                                  if (!isOccupied) {
+                                    isOccupied = entries.some(entry => {
+                                      return (
+                                        (slot >= entry.start_time && slot <= entry.end_time) || // Between
+                                        slot === entry.start_time || // Equal to start
+                                        slot === entry.end_time      // Equal to end
+                                      );
+                                    });
                                   }
+                                  // if( searchEntries[0]?.end_time && searchEntries[0]?.end_time !== ""){
+                                  //   if (slot?.toLowerCase().includes(searchEntries[0]?.end_time?.toLowerCase())) {
+                                  //     return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleTimeChange("end_time", slot)} >{slot} </Dropdown.Item>
+                                  //   }else{
+                                  //     return null;
+                                  //   }
+                                    
+                                  // }else{
+                                    return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleTimeChange("end_time", slot)}  disabled={isOccupied} style={{ pointerEvents: isOccupied ? 'none' : 'auto', opacity: isOccupied ? 0.5 : 1 }} >{slot} </Dropdown.Item>
+                                  // }
                                   
                                 })
                               }
@@ -2160,7 +2232,7 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
           </Form> */}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="dark"><FaPlus /> Add Time Entry</Button>
+          {/* <Button variant="dark"><FaPlus /> Add Time Entry</Button> */}
           <Button variant="primary" onClick={handleReportSubmit} disabled={loader}>{loader === true ? 'Please wait...': 'Submit'}</Button>
         </Modal.Footer>
       </Modal>
@@ -2178,8 +2250,8 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
                 <Form.Group className="mb-3">
                   <Form.Label>Project Status</Form.Label>
                     <div className="drop--scroll">
-                      <Form.Select className="custom-selectbox">
-                        <option value="in-progress" selected>In Progress</option>
+                      <Form.Select className="custom-selectbox" name="status" onChange={handleProjectFilter} value={projectFilter?.status || 'in-progress'}>
+                        <option value="in-progress">In Progress</option>
                         <option value="on-hold">On Hold</option>
                         <option value="completed">Completed</option>
                       </Form.Select>
@@ -2203,51 +2275,27 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
               <Col sm={12} lg={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Select Project</Form.Label>
-                  <ListGroup>
-                    <ListGroup.Item className={selected === 0 ? 'selected--list--item' : ''} onClick={() => setSelected(0)}>
-                      <strong>On Teams<span><LuUsers /> Web 1 Experts</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
+                  <ListGroup key={projectFilter?.status || 'in-progress'}>
+                    {
+                      memberprojects
+                        .filter(project => project.status === (projectFilter?.status || 'in-progress'))
+                        .map((project, index) => (
+                          <ListGroup.Item
+                            key={project._id || index}  // Add `key` for React list rendering
+                            className={selected === 0 ? 'selected--list--item' : ''}
+                            onClick={() => handleProjectSelect(project)}
+                          >
+                            <strong>
+                              {project?.title}
+                              <span>
+                                <LuUsers /> {project?.client?.name}
+                              </span>
+                            </strong>
+                            <div className="svg--check"><FiCheckCircle /></div>
+                          </ListGroup.Item>
+                        ))
+                    }
 
-                    <ListGroup.Item className={selected === 1 ? 'selected--list--item' : ''} onClick={() => setSelected(1)}>
-                      <strong>WordPress Website Developer<span><LuUsers /> Anand Anandan (Paramjeet)</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
-
-                    <ListGroup.Item className={selected === 2 ? 'selected--list--item' : ''} onClick={() => setSelected(2)}>
-                      <strong>The Galaxy<span><LuUsers /> Daniel Fitzpatrick</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
-
-                    <ListGroup.Item className={selected === 3 ? 'selected--list--item' : ''} onClick={() => setSelected(3)}>
-                      <strong>Tickets Project<span><LuUsers /> Daniel Fitzpatrick</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
-
-                    <ListGroup.Item className={selected === 4 ? 'selected--list--item' : ''} onClick={() => setSelected(4)}>
-                      <strong>Fix Masseuse site<span><LuUsers /> Amin Khadempour (Shikha)</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
-
-                    <ListGroup.Item className={selected === 5 ? 'selected--list--item' : ''} onClick={() => setSelected(5)}>
-                      <strong>SBA Loan System<span><LuUsers /> ChristopherFoster (Paramjeet)</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
-
-                    <ListGroup.Item className={selected === 6 ? 'selected--list--item' : ''} onClick={() => setSelected(6)}>
-                      <strong>The Connected Home<span><LuUsers /> Dean Rossi(Paramjeet)</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
-
-                    <ListGroup.Item className={selected === 7 ? 'selected--list--item' : ''} onClick={() => setSelected(7)}>
-                      <strong>WordPress + EventON Expert<span><LuUsers /> Carlton Riffel (Paramjeet)</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
-
-                    <ListGroup.Item className={selected === 8 ? 'selected--list--item' : ''} onClick={() => setSelected(8)}>
-                      <strong>LiveYourSoul<span><LuUsers /> Rashid Wagstaff (Paramjeet)</span></strong>
-                      <div className="svg--check"><FiCheckCircle /></div>
-                    </ListGroup.Item>
                   </ListGroup>
                 </Form.Group>
               </Col>
@@ -2255,9 +2303,17 @@ const handleProjectSelect = async ({ target: { name, value, selectedOptions } })
                 <Form.Group className="mb-3">
                   <Form.Label>Select Task</Form.Label>
                   <ListGroup>
-                    <ListGroup.Item className={selectedTask === 0 ? 'selected--task--item' : ''} onClick={() => setSelectedTask(0)}><strong>Setup dev version of team app<span><FiClock/> 03:20:45</span></strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
-                    <ListGroup.Item className={selectedTask === 1 ? 'selected--task--item' : ''} onClick={() => setSelectedTask(1)}><strong>Development Points<span><FiClock/> 03:20:45</span></strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
-                    <ListGroup.Item className={selectedTask === 2 ? 'selected--task--item' : ''} onClick={() => setSelectedTask(2)}><strong>Reports Points #2<span><FiClock/> 03:20:45</span></strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
+                    {
+                      filteredTasks &&  filteredTasks.length > 0  &&
+                      filteredTasks.map((task) => {
+                        
+                            return <ListGroup.Item key={`task-${task?._id}`} className={(1 === task?._id ) ? 'selected--task--item' : ''} onClick={() => handleEntryChange(task)}><strong>{task.title}</strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
+                          
+                        
+                      })
+                    }
+                    
+                    
                   </ListGroup>
                 </Form.Group>
               </Col>
