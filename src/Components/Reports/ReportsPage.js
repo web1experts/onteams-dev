@@ -1152,7 +1152,7 @@ const handleToggles = () => {
                           <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1"/> Action</th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white">
+                      <tbody>
                         {
                           (projectReports?.reports && projectReports?.reports?.length > 0) && (
                             projectReports?.reports?.map((reportData, i) => {
@@ -1172,11 +1172,11 @@ const handleToggles = () => {
                                     </div>
                                   </td>
                                   <td className="ms-auto text-start text-xl-center">
-                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Total Hours</strong>
                                     <br className="d-xl-none"/>
                                     <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center"><FiClock className="me-1" /> {result?.totalTime || 0}</span>
                                   </td>
-                                  <td className="text-start text-xl-center"><strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Members</strong>
+                                  <td className="text-start text-xl-center"><strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Members</strong>
                                     <br className="d-xl-none"/>
                                     <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center"><LuUsers className="me-1" /> {reportData?.members?.length || 0}</div>
                                   </td>
@@ -1225,7 +1225,7 @@ const handleToggles = () => {
                           <th scope="col" key="client-action-header" className="onHide"><FiTarget className="me-1"/> Action</th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white">
+                      <tbody>
                         {
                           memberReports && memberReports.length > 0 ? 
                             memberReports.map((report, index) => {
@@ -1245,13 +1245,13 @@ const handleToggles = () => {
                                     </div>
                                   </td>
                                   <td className="ms-auto text-start text-xl-center">
-                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Total Hours</strong>
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Total Hours</strong>
                                     <br className="d-xl-none"/>
                                     <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center"><FiClock className="me-1" /> {result?.totalTime || 0}</span>
                                   </td>
 
                                   <td className="text-start text-xl-center">
-                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none px-2 py-1 bg-light rounded-1">Projects</strong>
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Projects</strong>
                                     <br className="d-xl-none"/>
                                     <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center"><LuFolderOpen className="me-1" /> {result?.totalProjects || 0}</div>
                                   </td>

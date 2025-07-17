@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Form, ListGroup, Card, FloatingLabel, FormGroup, Row, Col} from "react-bootstrap";
-import { FaEdit, FaTrashAlt,FaRegBell, FaRegUser } from "react-icons/fa";
+import { Button, Form, ListGroup, Card, FloatingLabel, Dropdown, Row, Col} from "react-bootstrap";
+import { FaEdit, FaTrashAlt,FaRegBell, FaRegUser, FaEllipsisV } from "react-icons/fa";
 import { FiGlobe} from "react-icons/fi";
 import { TbTimezone } from "react-icons/tb";
 import { MdLockOutline, MdOutlineEmail } from "react-icons/md";
@@ -69,8 +69,8 @@ function EditableField({
         </>
       ) : (
         <>
-          <strong>{label}</strong> {value}{" "}
-          <FaEdit onClick={() => onEditClick(true)} />
+          <strong>{label}</strong> <span>{value}{" "}<FaEdit onClick={() => onEditClick(true)} /></span>
+          
           <span className="error">{error}</span>
         </>
       )}
@@ -636,7 +636,7 @@ function SettingPage() {
           {activeTab === "Profile" && (
             <div className="rounded--box p-4">
               <h3>Profile</h3>
-              <Card className="p-3">
+              <Card>
                 <div className="card--img">
                   <Form.Control
                     type="file"
@@ -661,12 +661,22 @@ function SettingPage() {
                     )}
 
                     {!userProfile?.avatar && <span>Add Photo</span>}
-                    {userProfile?.avatar && <span>Edit Photo</span>}
+                    {/* {userProfile?.avatar && <span>Edit Photo</span>} */}
                   </Form.Label>
                   {userProfile?.avatar && (
-                    <span className="remove--photo" onClick={removeAvatar}>
-                      <FaTrashAlt />
-                    </span>
+                    <Dropdown className="edit--dropdown">
+                      <Dropdown.Toggle variant="dark">
+                        <FaEllipsisV />
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item>
+                          <Form.Label htmlFor="upload--avatar">
+                            <FaEdit /> {userProfile?.avatar && <span>Edit Photo</span>}
+                          </Form.Label>
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={removeAvatar}><FaTrashAlt /> Delete Photo</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   )}
                 </div>
 
@@ -706,41 +716,75 @@ function SettingPage() {
           {activeTab === "Security" && (
             <div className="rounded--box p-4">
               <h3>Security</h3>
-              <Form>
-                <Form.Group className="mb-3">
-                  <Form.Label>Current Password</Form.Label>
-                  <Form.Control type="password" />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>New Password</Form.Label>
-                  <Form.Control type="password" />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Confirm Password</Form.Label>
-                  <Form.Control type="password"/>
-                </Form.Group>
-                <div className="text-end">
-                  <Button variant="primary" type="submit">Update Password</Button> 
+              <div className="new--accordion--block">
+                <div className="bg--blue--accordion">
+                  <Form>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Current Password</Form.Label>
+                      <Form.Control type="password" />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>New Password</Form.Label>
+                      <Form.Control type="password" />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Confirm Password</Form.Label>
+                      <Form.Control type="password"/>
+                    </Form.Group>
+                    <div className="text-end">
+                      <Button variant="primary" type="submit">Update Password</Button> 
+                    </div>
+                  </Form>
                 </div>
-              </Form>
+              </div>
             </div>
           )}
           {activeTab === "Notifications" && (
             <div className="rounded--box p-4">
-              <h3>Notifications</h3>
+              
+                <h3 className="mb-0">Notifications</h3>
               <div className="new--accordion--block">
                 <div className="bg--blue--accordion mb-3">
-                  <div className="d-flex gap-3 align-items-center">
-                    <MdOutlineEmail />
-                    <h6 className="mb-0">Notifications</h6>
+                  <div className="d-flex gap-3 align-items-center mb-3">
+                    <div className="d-flex gap-3 align-items-center mb-3">
+                      <MdOutlineEmail />
+                      <h6 className="mb-0">Notifications</h6>
+                    </div>
+                    <div className="d-flex gap-3 align-items-center ms-auto">
+                      <p className="mb-0">Email</p>
+                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                    </div>
+                    <div className="d-flex gap-3 align-items-center">
+                      <p className="mb-0">Push</p>
+                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                    </div>
                   </div>
-                  <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                    <p className="mb-0">Email Notifications <small className="d-block text-muted">Get notified about project progress and changes</small></p>
-                    <Form.Check type="switch" className="ms-auto switch--small" checked/>
+                  <div className="d-flex gap-5 align-items-center mb-3 bg-white px-3 py-2 rounded-3">
+                    <p className="mb-0">Project Notifications</p>
+                    <div className="d-flex gap-3 align-items-center ms-auto">
+                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                    </div>
+                    <div className="d-flex gap-3 align-items-center">
+                      <Form.Check type="switch" className="ps-0 switch--small"/>
+                    </div>
                   </div>
-                  <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                    <p className="mb-0">Push Notifications <small className="d-block text-muted">Get notified about project progress and changes</small></p>
-                    <Form.Check type="switch" className="ms-auto switch--small" checked/>
+                  <div className="d-flex gap-5 align-items-center mb-3 bg-white px-3 py-2 rounded-3">
+                    <p className="mb-0">Client Notifications</p>
+                    <div className="d-flex gap-3 align-items-center ms-auto">
+                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                    </div>
+                    <div className="d-flex gap-3 align-items-center">
+                      <Form.Check type="switch" className="ps-0 switch--small"/>
+                    </div>
+                  </div>
+                  <div className="d-flex gap-5 align-items-center mb-3 bg-white px-3 py-2 rounded-3">
+                    <p className="mb-0">Members Notifications</p>
+                    <div className="d-flex gap-3 align-items-center ms-auto">
+                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                    </div>
+                    <div className="d-flex gap-3 align-items-center">
+                      <Form.Check type="switch" className="ps-0 switch--small"/>
+                    </div>
                   </div>
                 </div> 
                 <div className="text-end">

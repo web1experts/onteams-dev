@@ -313,10 +313,7 @@ function SidebarPanel() {
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <div className="menu--scroll">
-                            {/* <Link className="dropdown-item" to="/workspace" onClick={() => setShowDropdown(false)}><span className="nav--item--icon"><MdOutlineManageAccounts /></span> Manage Workspace</Link> */}
-                            {/* <Link className="dropdown-item" to="/setting" onClick={() => setShowDropdown(false)}><span className="nav--item--icon"><RiSettingsLine /></span> Account Settings</Link> */}
                             <Dropdown.Item onClick={handleSettingShow}><span className="nav--item--icon theme--item--icon"><RiSettingsLine /></span> Account Settings</Dropdown.Item>
-                            {/* <Link className="dropdown-item" to="/setting" onClick={() => setShowDropdown(false)}><span className="nav--item--icon"><FaRegUser /></span> Edit Profile</Link> */}
                             <Dropdown.Item onClick={handleShow}><span className="nav--item--icon theme--item--icon"><MdOutlineColorLens /></span> Theme Settings</Dropdown.Item>
                             <Dropdown.Item className="logout--btn" key="logout-btn" onClick={(event) => dispatch(logout())}><span className="nav--item--icon"><FiLogOut /></span> Logout</Dropdown.Item>
                         </div>
@@ -403,10 +400,11 @@ function SidebarPanel() {
                 </Modal.Body>
             </Modal>
 
-            <Modal show={showSetting} onHide={handleSettingClose} size="xl" centered className="setting__modal">
-                <Modal.Header closeButton className="border-bottom pb-3">
+            <Modal show={showSetting} onHide={handleSettingClose} size="xl" centered className="setting__modal theme--modal">
+                <Modal.Header closeButton>
                     <Modal.Title>
-                        <strong>Account Settings</strong>
+                        <span className="nav--item--icon"><RiSettingsLine /></span>
+                        <strong>Account Settings <small>Edit profile and preferences</small></strong>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-0">
