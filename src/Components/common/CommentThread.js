@@ -29,9 +29,11 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
         <Card.Body>
             <Card.Title>
               {comment.author?.name}
-              <Button variant="danger" size="sm" className="delete--button px-2 py-1" onClick={() => handleDelete(comment._id, comment?.post)}>
-                <BsTrash />
-              </Button>
+              {memberdata?._id === comment.author?._id &&
+                <Button variant="danger" size="sm" className="delete--button px-2 py-1" onClick={() => handleDelete(comment._id, comment?.post)}>
+                  <BsTrash />
+                </Button>
+              }
             </Card.Title>
             <Card.Text>{comment.text}</Card.Text>
             {comment.replies && comment.replies.length > 0 && (
