@@ -328,6 +328,10 @@ const handleListProjects = async () => {
         }
       }, [reportState])
 
+      useEffect(() => {
+        console.log("occupiedRanges:: ", occupiedRanges)
+      },[occupiedRanges])
+
 const calculateOccupiedRanges = (data) => {
     return data.map((item) => {
       const start = new Date(item.createdAt); // Convert createdAt to a Date object
@@ -1903,7 +1907,7 @@ const handleProjectSelect = async (project) => {
                   const taskDuration = Math.round(taskDurationInMilliseconds / 1000);
                   return (
                     <Card className="p-3 shadow-sm rounded-4 mb-2">
-                      <Card.Title className="d-flex align-items-center justify-content-between gap-3">{entry?.project_title} <FiTrash2 className="text-danger" /></Card.Title>
+                      <Card.Title className="d-flex align-items-center justify-content-between gap-3">{entry?.project_title} <FiTrash2 className="text-danger" onClick={() => handleRemoveEntry(i)} /></Card.Title>
                       <Card.Body className="p-0 pt-1">
                         <Card.Text className="mb-0">{entry?.task_title}</Card.Text>
                         <Card.Text className="text-muted mb-0">{entry?.start_time } - {entry?.end_time}</Card.Text>
