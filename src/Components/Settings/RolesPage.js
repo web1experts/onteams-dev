@@ -14,69 +14,6 @@ import { updatePermissions, addRoleWithPermissions, deleteRole} from "../../redu
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { Listmembers } from "../../redux/actions/members.action";
 const secretKey = process.env.REACT_APP_SECRET_KEY;
-function EditableField({
-  field,
-  type,
-  label,
-  value,
-  onChange,
-  isEditing,
-  onEditClick,
-  error,
-}) {
-  const inputRef = useRef(null);
-  const wrapperRef = useRef(null);
-  const [originalValue, setOriginalValue] = useState(value);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (inputRef.current && !inputRef.current.contains(event.target)) {
-        if (inputRef.current.value.trim() === "") {
-          onChange(originalValue);
-        }
-        onEditClick(false);
-      }
-    }
-    if (isEditing) {
-      setOriginalValue(value);
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isEditing, onEditClick, value]);
-
-  return (
-    <ListGroup.Item>
-      {isEditing ? (
-        <>
-          <strong>{label}</strong>
-          <FloatingLabel>
-            <Form.Control
-              placeholder={label}
-              type={type}
-              name={`${field}`}
-              ref={inputRef}
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-            />
-          </FloatingLabel>
-        </>
-      ) : (
-        <>
-          <strong>{label}</strong> {value}{" "}
-          <FaEdit onClick={() => onEditClick(true)} />
-          <span className="error">{error}</span>
-        </>
-      )}
-    </ListGroup.Item>
-  );
-}
 
 function RolesPage() {
   const dispatch = useDispatch();
