@@ -621,14 +621,18 @@ const isPostLikedByMember = (likes = [], memberId) => {
                         </Col>
                         <Col>
                           <strong>{post.author?.name || 'Unknown'}</strong>{' '}
-                          <span className="text-muted" style={{ fontSize: '0.875rem' }}> • {dayjs(post.createdAt).fromNow()}</span>
-                          <Dropdown className="edit--dropdown">
-                            <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
-                            <Dropdown.Menu>
-                              <Dropdown.Item onClick={() => handleEdit(post)}>Edit</Dropdown.Item>
-                              <Dropdown.Item onClick={() => handleDelete(post?._id)}>Delete</Dropdown.Item>
-                            </Dropdown.Menu>
-                          </Dropdown>
+                          <span className="text-muted" style={{ fontSize: '0.875rem' }}>
+                            • {dayjs(post.createdAt).fromNow()}
+                          </span>
+                          {memberdata?._id === post.author?._id && 
+                            <Dropdown className="edit--dropdown">
+                              <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
+                              <Dropdown.Menu>
+                                <Dropdown.Item onClick={() => handleEdit(post)}>Edit</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleDelete(post?._id)}>Delete</Dropdown.Item>
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          }
                           
                           <div className="mt-2">
                             {/* Text Post */}

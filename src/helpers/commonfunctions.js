@@ -383,6 +383,13 @@ export function secondstoMinutes(seconds) {
     return `${paddedHours}:${paddedMinutes}`;
 }
 
+export const timeStringToDate = (time, baseDate = new Date()) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const date = new Date(baseDate);
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+}
+
 
 export function mergePermissions(rolePerms = {}, memberPerms = {}) {
     const merged = {};
