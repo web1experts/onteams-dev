@@ -18,6 +18,8 @@ import { saveTheme } from "../../helpers/auth";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { logout } from '../../redux/actions/auth.actions';
 import { updateWorkSpaceTheme } from "../../redux/actions/workspace.action";
+import SettingPage from "../Settings/SettingPage";
+import { FaCogs } from "react-icons/fa";
 
 function SidebarPanel() {
     const secretKey = process.env.REACT_APP_SECRET_KEY
@@ -32,6 +34,11 @@ function SidebarPanel() {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const [showSetting, setSettingShow] = useState(false);
+    const handleSettingClose = () => setSettingShow(false);
+    const handleSettingShow = () => setSettingShow(true);
+
     const location = useLocation();
     let companyname = '';
     let selectedCompId;
@@ -307,7 +314,8 @@ function SidebarPanel() {
                     <Dropdown.Menu>
                         <div className="menu--scroll">
                             {/* <Link className="dropdown-item" to="/workspace" onClick={() => setShowDropdown(false)}><span className="nav--item--icon"><MdOutlineManageAccounts /></span> Manage Workspace</Link> */}
-                            <Link className="dropdown-item" to="/setting" onClick={() => setShowDropdown(false)}><span className="nav--item--icon"><RiSettingsLine /></span> Account Settings</Link>
+                            {/* <Link className="dropdown-item" to="/setting" onClick={() => setShowDropdown(false)}><span className="nav--item--icon"><RiSettingsLine /></span> Account Settings</Link> */}
+                            <Dropdown.Item onClick={handleSettingShow}><span className="nav--item--icon theme--item--icon"><RiSettingsLine /></span> Account Settings</Dropdown.Item>
                             {/* <Link className="dropdown-item" to="/setting" onClick={() => setShowDropdown(false)}><span className="nav--item--icon"><FaRegUser /></span> Edit Profile</Link> */}
                             <Dropdown.Item onClick={handleShow}><span className="nav--item--icon theme--item--icon"><MdOutlineColorLens /></span> Theme Settings</Dropdown.Item>
                             <Dropdown.Item className="logout--btn" key="logout-btn" onClick={(event) => dispatch(logout())}><span className="nav--item--icon"><FiLogOut /></span> Logout</Dropdown.Item>
@@ -392,6 +400,17 @@ function SidebarPanel() {
                             <Button variant="secondary" onClick={() => setShowCreateOption(false)}>Cancel</Button>
                         </Form.Group>
                     </div>
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={showSetting} onHide={handleSettingClose} size="xl" centered className="setting__modal">
+                <Modal.Header closeButton className="border-bottom pb-3">
+                    <Modal.Title>
+                        <strong>Account Settings</strong>
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-0">
+                    <SettingPage />
                 </Modal.Body>
             </Modal>
         </>

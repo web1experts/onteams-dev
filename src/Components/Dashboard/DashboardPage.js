@@ -621,9 +621,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                         </Col>
                         <Col>
                           <strong>{post.author?.name || 'Unknown'}</strong>{' '}
-                          <span className="text-muted" style={{ fontSize: '0.875rem' }}>
-                            • {dayjs(post.createdAt).fromNow()}
-                          </span>
+                          <span className="text-muted" style={{ fontSize: '0.875rem' }}> • {dayjs(post.createdAt).fromNow()}</span>
                           <Dropdown className="edit--dropdown">
                             <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
                             <Dropdown.Menu>

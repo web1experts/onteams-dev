@@ -826,13 +826,13 @@ function ProjectsPage() {
                                                 </Form.Group>
                                             </Form>
                                         </ListGroup.Item>
-                                        <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'd-none d-lg-flex ms-3'}>
+                                        <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'd-none d-lg-flex'}>
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                                         </ListGroup>
-                                        <ListGroup horizontal className={isActive !== 0 ? '' : 'bg-white expand--icon ms-3 d-flex'}>
+                                        <ListGroup horizontal className={isActive !== 0 ? '' : 'bg-white expand--icon d-flex'}>
                                             <ListGroup.Item className={isActive !== 0 ? 'd-flex d-xl-none me-1' : 'd-xl-none onHide me-1'} onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
-                                            <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                                            <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
                                             <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                                             {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
                                                 <ListGroup.Item className="btn btn-primary" onClick={() => handleShow('new') }><FaPlus /></ListGroup.Item>
@@ -1404,7 +1404,7 @@ function ProjectsPage() {
                                     </div>
                                 </ListGroup>
                                 <ListGroup className="mt-auto mb-0">
-                                    <ListGroup.Item className="text-center">
+                                    <ListGroup.Item className="text-center text-center d-flex align-items-center justify-content-center gap-5">
                                         <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
                                     </ListGroup.Item>
                                 </ListGroup>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Form, ListGroup, Card, FloatingLabel, FormGroup, Row, Col} from "react-bootstrap";
-import { FaEdit, FaTrashAlt,FaRegBell, FaRegUser } from "react-icons/fa";
-import { FiGlobe} from "react-icons/fi";
-import { TbTimezone } from "react-icons/tb";
-import { MdLockOutline, MdOutlineEmail } from "react-icons/md";
+import { Button, Form, ListGroup, Card, Modal, FloatingLabel, FormGroup, Row, Col} from "react-bootstrap";
+import { FaEdit, FaTrashAlt,FaRegBell, FaPlus, FaRegUser } from "react-icons/fa";
+import { FiCheck} from "react-icons/fi";
+import { LuFolderOpen } from "react-icons/lu";
+import { MdLockOutline } from "react-icons/md";
 import Spinner from "react-bootstrap/Spinner";
 import { getUserProfile, updateProfile } from "../../redux/actions/auth.actions";
 import { getFieldRules, validateField } from "../../helpers/rules";
@@ -78,7 +78,7 @@ function EditableField({
   );
 }
 
-function SettingPage() {
+function RolesPage() {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isActive, setIsActive] = useState(false);
@@ -624,163 +624,300 @@ function SettingPage() {
   return (
     <>
         <div className="page--wrapper setting--page">
-          <div className="setting--tabs">
-            <ListGroup horizontal className={isActive ? "toggle--menu" : ""}>
-              <ListGroup.Item action active={activeTab === "Profile"} onClick={() => setActiveTab("Profile")}><FaRegUser /> Profile</ListGroup.Item>
-              <ListGroup.Item action active={activeTab === "Security"} onClick={() => {setActiveTab("Security");}}><MdLockOutline /> Security</ListGroup.Item>
-              <ListGroup.Item action active={activeTab === "Notifications"} onClick={() => setActiveTab("Notifications")}><FaRegBell /> Notifications</ListGroup.Item>
-              <ListGroup.Item action active={activeTab === "Preferences"} onClick={() => {setActiveTab("Preferences");}}><FiGlobe /> Preferences</ListGroup.Item>
-              <ListGroup.Item action></ListGroup.Item>
-            </ListGroup>
-          </div>
-          {activeTab === "Profile" && (
-            <div className="rounded--box p-4">
-              <h3>Profile</h3>
-              <Card className="p-3">
-                <div className="card--img">
-                  <Form.Control
-                    type="file"
-                    id="upload--avatar"
-                    name="avatar"
-                    hidden
-                    onChange={(e) => handleFieldChange("avatar", e)}
-                    accept=".jpg, .jpeg, .png, .gif"
-                  />
-                  <Form.Label htmlFor="upload--avatar">
-                    {isEditing.remove_avatar === false ? (
-                      <Card.Img
-                        variant="top"
-                        src={
-                          avatarPreview ??
-                          userProfile?.avatar ??
-                          "./images/default.jpg"
-                        }
-                      />
-                    ) : (
-                      <Card.Img variant="top" src={"./images/default.jpg"} />
-                    )}
+            <div className="rounded--box permission__page p-4">
+                <h3 className="d-flex align-items-center justify-content-end">
+                    <Button variant="primary" onClick={() => handleShow()}><FaPlus /> Add New</Button>
+                </h3>
+                
+                {activeRole && Object.keys(activeRole).length > 0 && (
+                <>
+                    <Row className="mt-4">
+                    <Col lg={6}>
+                        <FormGroup className="form-group mb-0 pb-0">
+                        <FloatingLabel label="Role name">
+                            <Form.Control
+                            type="text"
+                            className={
+                            "form-control"
+                            }
+                            placeholder="Role name"
+                            name="name"
+                            value={fields['name']}
+                            onChange={(e) => {
+                                const { value} = e.target;
+                                setFields({...fields, ['name']: value})
+                            }}
+                            />
+                        </FloatingLabel>
+                        </FormGroup>
+                    </Col>
+                    <Col lg={6}>
+                        <FormGroup className="form-group mb-0 pb-0">
+                        <FloatingLabel label="Select Role">
+                            <Form.Select>
+                            {roles.map((role, index) => {
+                                return (
+                                <option key={`role-${role._id}`} action active={activeRole?._id === role._id} onClick={() => setActiveRole(role)}>{role.name}</option>
+                                );
+                            })}
+                            </Form.Select>
+                        </FloatingLabel>
+                        {/* <Form.Label>Select Role</Form.Label> */}
+                        
+                        </FormGroup>
+                    </Col>
+                    </Row>
+                    
+                    <div className="new--accordion--block w-100 mt-4">
+                    {permissionModules.map((mod) => {
+                        const modSlug = mod.slug;
+                        const modPerms = permissions?.[modSlug] || {};
+                        const isExpanded = expanded?.[modSlug] || false;
+                        const isViewChecked = !!modPerms.view;
+                        const truePermissionCount = Object.values(
+                        modPerms
+                        ).filter((val) => val === true).length;
+                        return (
+                        <div className="bg--blue--accordion">
+                            <div className="d-flex gap-3 align-items-center">
+                                {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                                <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                            </div>
+                            {(mod.permissions || []).map((perm) => {
+                            if (perm === "view") {
+                                return (
+                                <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                    <p className="mb-0">View</p>
+                                    <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view}
+                                        onChange={() => toggleView(modSlug)}/>
+                                </div>
+                                )
+                            }
+                            return (
+                                <>
+                                <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                    <p className="mb-0">{perm
+                                                        .replace(/[_-]/g, " ")
+                                                        .replace(/^\w/, (l) => l.toUpperCase())}</p>
+                                    <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                                    disabled={!isViewChecked}
+                                    checked={!!modPerms[perm]}
+                                    onChange={() =>
+                                        togglePermission(modSlug, perm)
+                                    }
+                                    />
+                                </div>
+                                {[
+                                    "tracking",
+                                    "projects",
+                                    "reports",
+                                    "attendance",
+                                ].includes(modSlug) &&
+                                    perm === "view_others" &&
+                                    modPerms[perm] === true && (
+                                    <div className="team--card--grid">
+                                        {memberFeeds.map((member) => (
+                                        <Card className={`team--card ${modPerms[
+                                            "selected_members"
+                                            ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                            //if (selectedMember?.role?.slug !== "owner") {
+                                            toggleMembers(
+                                                modSlug,
+                                                "selected_members",
+                                                member._id
+                                            )
+                                            // }
+                                            }}>
+                                            <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
+                                            <Card.Body>
+                                            <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
+                                            </Card.Body>
+                                            <FiCheck className="ms-auto" />
+                                        </Card>
+                                        ))}
+            
+                                        {modSlug === "projects" && (
+                                        <Card className={`team--card ${modPerms[
+                                            "selected_members"
+                                            ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                            //if (selectedMember?.role?.slug !== "owner") {
+                                            if(activeRole.slug !==
+                                                    "owner"
+                                                    ) {
+                                                    toggleMembers(
+                                                        modSlug,
+                                                        "selected_members",
+                                                        "unassigned"
+                                                    );
+                                                    }
+                                            // }
+                                            }} key={`${modSlug}-${perm}-unassigned`}>
+                                            <span className="team--initial">U</span>
+                                            <Card.Body>
+                                            <h4>Unassigned</h4>
+                                            </Card.Body>
+                                            <FiCheck className="ms-auto" />
+                                        </Card>
+                                        )}
+                                    </div>
+                                    )}
+                                </>
+                            )
+                            })}
+                            </div>
+                            )
+                        })}
 
-                    {!userProfile?.avatar && <span>Add Photo</span>}
-                    {userProfile?.avatar && <span>Edit Photo</span>}
-                  </Form.Label>
-                  {userProfile?.avatar && (
-                    <span className="remove--photo" onClick={removeAvatar}>
-                      <FaTrashAlt />
-                    </span>
-                  )}
-                </div>
-
-                <Card.Body>
-                  {
-                    <ListGroup>
-                      <ListGroup.Item>
-                        <strong>Email</strong> {profile?.email}
-                      </ListGroup.Item>
-                      <EditableField
-                        field="name"
-                        label="Name"
-                        type="text"
-                        value={profile?.name}
-                        onChange={(value) => handleFieldChange("name", value)}
-                        isEditing={isEditing.name}
-                        onEditClick={() => handleEditClick("name")}
-                        error={fieldserrors["name"] && fieldserrors["name"]}
-                      />
-                    </ListGroup>
-                  }
-
-                  <div className="text-end mt-3">
-                    <Button
-                      variant="primary"
-                      onClick={handleUpdateSubmit}
-                      disabled={loader}
-                    >
-                      {" "}
-                      {loader ? "Please wait..." : "Save Changes"}
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            </div>
-          )}
-          {activeTab === "Security" && (
-            <div className="rounded--box p-4">
-              <h3>Security</h3>
-              <Form>
-                <Form.Group className="mb-3">
-                  <Form.Label>Current Password</Form.Label>
-                  <Form.Control type="password" />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>New Password</Form.Label>
-                  <Form.Control type="password" />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Confirm Password</Form.Label>
-                  <Form.Control type="password"/>
-                </Form.Group>
-                <div className="text-end">
-                  <Button variant="primary" type="submit">Update Password</Button> 
-                </div>
-              </Form>
-            </div>
-          )}
-          {activeTab === "Notifications" && (
-            <div className="rounded--box p-4">
-              <h3>Notifications</h3>
-              <div className="new--accordion--block">
-                <div className="bg--blue--accordion mb-3">
-                  <div className="d-flex gap-3 align-items-center">
-                    <MdOutlineEmail />
-                    <h6 className="mb-0">Notifications</h6>
-                  </div>
-                  <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                    <p className="mb-0">Email Notifications <small className="d-block text-muted">Get notified about project progress and changes</small></p>
-                    <Form.Check type="switch" className="ms-auto switch--small" checked/>
-                  </div>
-                  <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                    <p className="mb-0">Push Notifications <small className="d-block text-muted">Get notified about project progress and changes</small></p>
-                    <Form.Check type="switch" className="ms-auto switch--small" checked/>
-                  </div>
-                </div> 
-                <div className="text-end">
-                  <Button variant="primary" type="submit">Save Changes</Button> 
-                </div>                        
-              </div>
-            </div>
-          )}
-          {activeTab === "Preferences" && (
-            <div className="rounded--box p-4">
-              <h3>Preferences</h3>
-              <div className="new--accordion--block">
-                <div className="bg--blue--accordion mb-3">
-                  <div className="d-flex gap-3 align-items-center">
-                    <FiGlobe />
-                    <h6 className="mb-0">Timezone</h6>
-                  </div>
-                  <Form>
-                    <div class="d-flex gap-3 mt-3">
-                      <Form.Group className="mb-0 form-group w-100 w-md-50">
-                        <Form.Label>Timezone</Form.Label>
-                        <Form.Select>
-                          <option>Pacific Time (PT)</option>
-                          <option>Mountain Time (MT)</option>
-                          <option>Central Time (CT)</option>
-                          <option>Eastern Time (ET)</option>
-                        </Form.Select>
-                      </Form.Group>
+                    <div className="mt-4 text-end">
+                    <Button variant="danger" onClick={() => setShowDelete(true)}>
+                        Delete Role
+                        </Button>
+                        <Button variant="primary" onClick={handleSave}>
+                        Save Permissions
+                        </Button>
                     </div>
-                  </Form>
-                </div>
-                <div className="text-end">
-                  <Button variant="primary" type="submit">Save Changes</Button> 
-                </div>                     
-              </div>
+                    </div>
+                </>
+                )}
             </div>
+          
+
+          {showdelete && (
+            <AlertDialog showdialog={showdelete} toggledialog={setShowDelete} msg="Are you sure?" callback={handleDeleteRole}/>
           )}
         </div>
+        {show && (
+            <Modal show={show} onHide={() => setShow(false)} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>Add New Role</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group controlId="roleName">
+                            <FloatingLabel label="Role Name *">
+                            <Form.Control
+                                type="text"
+                                name="name"
+                                value={fields?.name}
+                                onChange={(e) => {
+                                setFields({
+                                    ...fields,
+                                    ["name"]: e.target.value,
+                                });
+                                setErrors({ ...errors, ["name"]: "" });
+                                }}
+                                disabled={loader}
+                            />
+                            </FloatingLabel>
+
+                            {showError("name")}
+                        </Form.Group>
+
+                        <h5 className="mt-4">Permissions</h5>
+                        <div className="new--accordion--block mb-4">
+                            {permissionModules.map((mod) => {
+                                const modSlug = mod.slug;
+                                const modPerms = permissions?.[modSlug] || {};
+                                const isExpanded = expanded?.[modSlug] || false;
+                                const isViewChecked = !!modPerms.view;
+                                const truePermissionCount = Object.values(
+                                modPerms
+                                ).filter((val) => val === true).length;
+                                return (
+                                <div className="bg--blue--accordion">
+                                    <div className="d-flex gap-3 align-items-center">
+                                        {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                                        <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                                    </div>
+                                    {(mod.permissions || []).map((perm) => {
+                                    if (perm === "view") {
+                                        return (
+                                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                            <p className="mb-0">View</p>
+                                            <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
+                                        </div>
+                                        )
+                                    }
+                                    return (
+                                        <>
+                                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                            <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
+                                            <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                                            disabled={!isViewChecked}
+                                            checked={!!modPerms[perm]}
+                                            onChange={() =>
+                                                togglePermission(modSlug, perm)
+                                            }
+                                            />
+                                        </div>
+                                        {[
+                                            "tracking",
+                                            "projects",
+                                            "reports",
+                                            "attendance",
+                                        ].includes(modSlug) &&
+                                            perm === "view_others" &&
+                                            modPerms[perm] === true && (
+                                            <div className="team--card--grid">
+                                                {memberFeeds.map((member) => (
+                                                <Card className={`team--card ${modPerms[
+                                                    "selected_members"
+                                                    ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                                    //if (selectedMember?.role?.slug !== "owner") {
+                                                    toggleMembers(
+                                                        modSlug,
+                                                        "selected_members",
+                                                        member._id
+                                                    )
+                                                    // }
+                                                    }}>
+                                                    <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
+                                                    <Card.Body>
+                                                    <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
+                                                    </Card.Body>
+                                                    <FiCheck className="ms-auto" />
+                                                </Card>
+                                                ))}
+                    
+                                                {modSlug === "projects" && (
+                                                <Card className={`team--card ${modPerms[
+                                                    "selected_members"
+                                                    ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                                    //if (selectedMember?.role?.slug !== "owner") {
+                                                    toggleMembers(
+                                                        modSlug,
+                                                        "selected_members",
+                                                        "unassigned"
+                                                    );
+                                                    // }
+                                                    }} key={`${modSlug}-${perm}-unassigned`}>
+                                                    <span className="team--initial">U</span>
+                                                    <Card.Body>
+                                                    <h4>Unassigned</h4>
+                                                    </Card.Body>
+                                                    <FiCheck className="ms-auto" />
+                                                </Card>
+                                                )}
+                                            </div>
+                                            )}
+                                        </>
+                                    )
+                                    })}
+
+                            </div>
+                            )
+                        })}
+                        </div>
+                        <Button variant="primary" type="submit" disabled={loader}>
+                            {loader ? "Please wait..." : "Save Role"}
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+          )}
     </>
   );
 }
 
-export default SettingPage;
+export default RolesPage;

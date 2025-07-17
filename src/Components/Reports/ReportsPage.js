@@ -8,12 +8,12 @@ import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill, BsClockHistory } from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { LuFolderOpen, LuUsers, LuTimer, LuClock } from 'react-icons/lu';
-import { MdDragIndicator, MdOutlineClose } from "react-icons/md";
+import { MdDragIndicator, MdOutlineClose, MdOutlineVideoLibrary } from "react-icons/md";
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
 import { GoPulse } from 'react-icons/go';
 import { AiOutlineTeam } from 'react-icons/ai';
 import { GrExpand } from "react-icons/gr";
-import { TbReport } from 'react-icons/tb';
+import { TbReport, TbScreenshot } from 'react-icons/tb';
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { getReportsByMember, gerReportsByProject,  getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
@@ -275,12 +275,8 @@ const handleReportClose = () => setViewReport(false);
         <Modal show={ViewReport} onHide={handleReportClose} centered size="lg" key={`reports-${taskId}`} className="timeSheetModal">
           <Modal.Header closeButton>
             <ListGroup horizontal>
-              <ListGroup.Item action active={activeTab === "screenshots"} onClick={() => setActiveTab("screenshots")}>
-                Screenshots
-              </ListGroup.Item>
-              <ListGroup.Item action active={activeTab === "videos"} onClick={() => setActiveTab("videos")}>
-                Videos
-              </ListGroup.Item>
+              <ListGroup.Item action active={activeTab === "screenshots"} onClick={() => setActiveTab("screenshots")}><TbScreenshot className="me-1"/> Screenshots</ListGroup.Item>
+              <ListGroup.Item action active={activeTab === "videos"} onClick={() => setActiveTab("videos")}><MdOutlineVideoLibrary className="me-1"/> Videos</ListGroup.Item>
             </ListGroup>
           </Modal.Header>
           <Modal.Body>

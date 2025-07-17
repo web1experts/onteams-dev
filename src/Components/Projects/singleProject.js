@@ -828,7 +828,7 @@ useEffect(() => {
                             </div>
                         </ListGroup>
                         <ListGroup className="mt-auto mb-0">
-                            <ListGroup.Item className="text-center">
+                            <ListGroup.Item className="text-center d-flex align-items-center justify-content-center gap-5">
                                 <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
                                 <Button variant="secondary" key='delete-key' onClick={() => setShowDialog(true)}>Delete</Button>
                             </ListGroup.Item>

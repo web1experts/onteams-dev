@@ -189,7 +189,7 @@
 }
 
 .modal.show {
-    z-index: 777777;
+    z-index: 999999;
 }
 
 .tooltip {

@@ -1033,6 +1033,10 @@ table.draggable--table {
 
 .page--wrapper table td button {
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem;
 }
 
 .page--wrapper table .task--buttons button {
@@ -1199,10 +1203,6 @@ button.input-error.dropdown-toggle.btn.btn-success {
   display: block;
   margin: auto;
   min-width: 120px;
-}
-
-.project--form--actions .btn+.btn {
-  margin-top: 1rem;
 }
 
 .project--form--actions .add--member {
@@ -3707,6 +3707,7 @@ Project Task View CSS=-=-=
   flex-flow: row wrap;
   border: 1px solid rgb(219 234 254);
   background: #ffffff;
+  cursor: pointer;
 }
 
 .modal .team--card--grid .selected--card {
@@ -3760,10 +3761,10 @@ Project Task View CSS=-=-=
 }
 
 .new--accordion--block .accordion-body .icon--green svg {
-  background: rgb(34 197 94);
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
 }
 
-.new--accordion--block .accordion-body .icon--blue svg {
+/* .new--accordion--block .accordion-body .icon--blue svg {
   background: rgb(59 130 246);
 }
 
@@ -3781,7 +3782,7 @@ Project Task View CSS=-=-=
 
 .new--accordion--block .accordion-body .icon--teal svg {
   background: rgb(20 184 166);
-}
+} */
 
 .new--accordion--block .accordion-button::after {
   right: 1rem;
@@ -3918,7 +3919,7 @@ Project Task View CSS=-=-=
   color: rgba(var(--theme-primary));
 } */
 
-.new--accordion--block .bg--orange--accordion {
+/* .new--accordion--block .bg--orange--accordion {
   background-image: linear-gradient(to bottom right, rgb(255, 247, 237), rgb(255, 247, 237));
   border: 1px solid rgb(254, 215, 170);
 }
@@ -3961,7 +3962,7 @@ Project Task View CSS=-=-=
 
 .new--accordion--block .bg--indigo--accordion .accordion-button h6 {
   color: rgb(30 64 175);
-}
+} */
 
 .form-check-input:checked {
   background-color: rgba(var(--theme-primary), 1);
@@ -4313,11 +4314,14 @@ pre {
 }
 
 .timeSheetModal .list-group {
-    background: rgb(241 245 249);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    background: #ffffff;
     border-radius: .5rem;
     padding: .25rem;
-    grid-gap: 5px;
-    gap: 5px;
+    grid-gap: .5rem;
+    gap: .5rem;
+    border: 1px solid rgb(226 232 240);
 }
 
 .timeSheetModal .list-group-item-action {
@@ -4331,10 +4335,10 @@ pre {
     display: flex;
     height: auto;
     justify-content: center;
-    padding: .5rem 1rem;
+    padding: .35rem .65rem;
     text-transform: capitalize;
     width: auto;
-    font-size: 1rem;
+    font-size: 15px;
     font-weight: 600;
 }
 
@@ -4353,8 +4357,7 @@ pre {
 .timeSheetModal button.list-group-item:focus,
 .timeSheetModal .list-group-horizontal>.list-group-item+.list-group-item.active {
   color: #ffffff;
-  background: linear-gradient(to right,rgba(var(--theme-secondary), 1),rgba(var(--theme-primary), 1));
-  border: 0;
+  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
 .modal-open .timeSheetModal {
@@ -4971,22 +4974,29 @@ pre {
 }
 
 .setting--page .setting--tabs {
-  background: #ffffff;
+  padding: 1.5rem;
+  background: linear-gradient(to bottom, #f8fafc, #ffffff);
+  border-right: 1px solid rgb(226 232 240);
 }
-
 .setting--page .setting--tabs .list-group {
   flex-flow: row wrap;
   margin: 0;
+  gap: 1rem;
   position: sticky;
   position: -webkit-sticky;
   top: 0;
   min-width: 250px;
   padding: 0;
-  background: #ffffff;
+  background: none;
   border-right: 0;
   max-height: calc(100% - 53px);
   overflow-y: auto;
   max-width: 250px;
+}
+
+.setting__modal .modal-content {
+  border-radius: 1rem;
+  overflow: hidden;
 }
 
 .setting--page .setting--tabs h2 {
@@ -4997,18 +5007,22 @@ pre {
 
 .setting--tabs .list-group .list-group-item {
   margin: 0;
-  border-radius: 0;
   background-color: transparent;
   border: 0;
-  border-bottom: 1px solid #0c162d30;
-  padding: .85rem 1.5rem;
-  color: #0c162d;
+  padding: .75rem 1rem;
+  color: #475569;
   font-weight: 500;
   text-transform: capitalize;
-  border-radius: 0;
+  border-radius: 0.75rem;
   flex: 1 1 100%;
   max-width: 100%;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  transition-duration: 0.3s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .setting--tabs .list-group .list-group-item .btn {
@@ -5023,19 +5037,23 @@ pre {
 }
 
 .setting--tabs .list-group-horizontal>.list-group-item:first-child:not(:last-child) {
-  border-radius: 0;
-  -webkit-border-radius: 0;
+  border-radius: .75rem;
+  -webkit-border-radius: .75rem;
 }
 
 .setting--tabs .list-group .list-group-item:last-child {
   border-bottom: 0;
+  border-radius: .75rem;
+  -webkit-border-radius: .75rem;
 }
 
 .setting--tabs .list-group .list-group-item:hover,
 .setting--tabs .list-group .list-group-item.active,
 .setting--tabs .list-group .list-group-item:focus {
-  color: rgb(17 24 39);
-  background: rgba(226, 232, 240, .4);
+  color: #ffffff;
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
 }
 
 .setting--tabs .role--list .list-group-item {
@@ -5073,34 +5091,20 @@ pre {
   height: 100%;
 }
 
-.setting--page .rounded--box .card {
+/* .setting--page .rounded--box .card {
   background: #ffffff;
   gap: 1.5rem;
   height: 100%;
   padding: 1.2rem;
-}
-
-.setting--page .permission__page .card {
-  flex-flow: row wrap;
-  gap: 1rem;
-  height: auto;
-}
-
-.setting--page .permission__page .card--header {
-  flex: 1 1 100%;
-  margin: 0;
-}
-
-.setting--page .permission__page .accordion {
-  flex: 1 1 100%;
-}
+} */
 
 .setting--page .rounded--box .card .card--img {
   max-width: 400px;
 }
 
-.setting--page .rounded--box .card-body {
+.modal .setting--page .rounded--box .card-body {
   padding: 0;
+  padding-left: 1rem;
 }
 
 .setting--page .rounded--box .card-body .list-group-item {
@@ -7624,6 +7628,10 @@ Media CSS-=-==
     padding: 1rem;
   }
 
+  .new--accordion--block .card .card-body {
+    flex: 1 1;
+  }
+
   .rounded--box .card .card--img {
     margin: auto;
     text-align: center;
@@ -7882,6 +7890,14 @@ Media CSS-=-==
   }
 
   .page--wrapper .holidays--list .dropdown {
+    opacity: 1;
+  }
+
+  .new--accordion--block .team--card--grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .inner--card .edit--dropdown .btn, .comments--list .card .delete--button, .comments--list .card .delete--button, .comments--list .card .card .delete--button, .comments--list .card .card .delete--button {
     opacity: 1;
   }
 }
@@ -8484,6 +8500,10 @@ Media CSS-=-==
 
   .attendance--table--list table tr {
     max-width: calc(100% - 0rem);
+  }
+
+  .new--accordion--block .team--card--grid {
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 

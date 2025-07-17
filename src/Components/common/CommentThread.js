@@ -29,11 +29,12 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
         <Card.Body>
             <Card.Title>
               {comment.author?.name}
+              <span className="text-muted d-block mb-2" style={{ fontSize: '0.875rem' }}> 5 mins ago</span>
               <Button variant="danger" size="sm" className="delete--button px-2 py-1" onClick={() => handleDelete(comment._id, comment?.post)}>
                 <BsTrash />
               </Button>
             </Card.Title>
-            <Card.Text>{comment.text}</Card.Text>
+            <Card.Text className='mb-1'>{comment.text}</Card.Text>
             {comment.replies && comment.replies.length > 0 && (
               <div className="mt-3 ps-4 border-start border-2">
                 {comment.replies.map((reply) => (
@@ -42,7 +43,7 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
               </div>
             )}
             {allowReply === true && 
-              <Button variant="dark" size="sm" className="px-2 py-1" onClick={() => {setShowReply(!showReply);setSelectedComment(comment);}}>{showReply ? 'Cancel' : 'Reply'}</Button>
+              <Button variant="link" size="sm" className="border-0 p-0 text-primary" onClick={() => {setShowReply(!showReply);setSelectedComment(comment);}}>{showReply ? 'Cancel' : 'Reply'}</Button>
             }
 
             {showReply && (

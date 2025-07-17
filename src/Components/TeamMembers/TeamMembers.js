@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
 import { FaList, FaPlus, FaCog } from "react-icons/fa";
-import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiVideo, FiCamera, FiMonitor, FiUserCheck, FiCalendar, FiCheck} from "react-icons/fi";
+import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
-import { LuFolderOpen, LuUsers, LuTimer, LuChartLine } from "react-icons/lu";
-import { CgCalendarDates } from "react-icons/cg";
-import { TbArrowsDownUp } from "react-icons/tb";
+import { RiUserSettingsLine } from "react-icons/ri";
+import { LuFolderOpen } from "react-icons/lu";
 import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
@@ -22,24 +21,14 @@ import { createMember } from "../../redux/actions/members.action";
 import Invitation from "./Invitation";
 import { AlertDialog, TransferOnwerShip } from "../modals";
 import { selectboxObserver, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
+import { updatePermissions, deleteRole} from "../../redux/actions/permission.action";
 import { socket, currentMemberProfile } from "../../helpers/auth";
-import { updatePermissions } from "../../redux/actions/permission.action";
 import { permissionModules, permissionsLabel } from "../../helpers/permissionsModules";
 import { CustomFieldModal } from "../modals/customFields";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
-function EditableField({
-  selectedMember,
-  field,
-  label,
-  value,
-  onChange,
-  isEditing,
-  onEditClick,
-  error,
-  roles,
-  printval,
-}) {
+import RolesPage from "../Settings/RolesPage";
+function EditableField({ selectedMember, field, label, value, onChange, isEditing, onEditClick, error, roles, printval}) {
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
   const [originalValue, setOriginalValue] = useState(value);
@@ -166,9 +155,22 @@ function TeamMembersPage() {
     setIsActive((current) => !current);
   };
 
+  const [showdelete, setShowDelete] = useState(false);
+  const [activeKey, setActiveKey] = useState(null);
+  const [activeRole, setActiveRole] = useState({});
+
+  const handleDeleteRole = async (e) => {
+    setLoader(true); console.log(activeRole._id)
+    dispatch(deleteRole(activeRole._id))
+  }
+
   const [screenshots, setScreenshots] = useState(true);
   const [screenRecording, setScreenRecording] = useState(false);
   const [liveScreen, setLiveScreen] = useState(false);
+
+  const [showSetting, setSettingShow] = useState(false);
+  const handleSettingClose = () => setSettingShow(false);
+  const handleSettingShow = () => setSettingShow(true);
 
   const handleTableToggle = (member) => {
     setSelectedMember(member);
@@ -986,7 +988,7 @@ function TeamMembersPage() {
               <h2>
                 <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0); }}><FiSidebar /></span>
                 {activeTab}
-                <ListGroup horizontal className={isActive ? "d-none" : "me-3 ms-auto d-none d-md-flex" }>
+                <ListGroup horizontal className={isActive ? "d-none" : "me-2 ms-auto d-none d-md-flex" }>
                   <ListGroup horizontal>
                     <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
                     {(memberProfile?.permissions?.members
@@ -1005,12 +1007,13 @@ function TeamMembersPage() {
                   </ListGroup.Item>
                 </ListGroup>
                 <ListGroup horizontal className={isActive ? "d-none" : "d-flex ms-auto ms-md-0"}>
-                  <ListGroup horizontal>
+                  <ListGroup horizontal className="d-none d-flex">
                     <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                     <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
                   <ListGroup horizontal className={isActive ? "d-none" : "d-flex bg-white expand--icon"}>
-                    <ListGroup.Item className="d-none d-lg-flex me-2" key={`settingskey`} onClick={toggleCustomFields}><FaCog /></ListGroup.Item>
+                    <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><FaCog /></ListGroup.Item>
+                    <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
                     <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
@@ -1097,7 +1100,7 @@ function TeamMembersPage() {
                                   </div>
                                 </div>
                               </td>
-                              <td className="onHide new__td">{member.email}</td>
+                              <td className="onHide new--td">{member.email}</td>
                               {Array.isArray(customFields) &&
                                 customFields
                                   .filter(
@@ -1902,63 +1905,7 @@ function TeamMembersPage() {
               <Card className="border-0">
                 <Card.Body className="p-0 border-0">
                   <>
-                    {/* <div className="card--header" data-roleid={fields?.role}>
-                      <FormGroup className="form-group mb-0 pb-0">
-                        <Form.Check
-                          type="checkbox"
-                          id="all"
-                          label="Select All Permissions"
-                          checked={permissionModules.every((mod) => {
-                            const modSlug = mod.slug;
-                            const modPerms = permissions?.[modSlug] || {};
-
-                            const allPermsChecked = (
-                              mod.permissions || []
-                            ).every((perm) => modPerms[perm] === true);
-
-                            const selectedIds =
-                              modPerms["selected_members"] || [];
-                            const allMemberIds = memberFeeds.map((m) =>
-                              String(m._id)
-                            );
-                            if (modSlug === "projects")
-                              allMemberIds.push("unassigned");
-
-                            const allMembersChecked =
-                              selectedIds.length === allMemberIds.length &&
-                              allMemberIds.every((id) =>
-                                selectedIds.includes(id)
-                              );
-
-                            if (
-                              [
-                                "tracking",
-                                "projects",
-                                "reports",
-                                "attendance",
-                              ].includes(modSlug)
-                            ) {
-                              return allPermsChecked && allMembersChecked;
-                            }
-
-                            return allPermsChecked;
-                          })}
-                          onChange={(e) =>
-                            handleSelectAllPermissions(e.target.checked)
-                          }
-                        />
-                      </FormGroup>
-                      <Button
-                        type="button"
-                        variant="link"
-                        className="p-0"
-                        onClick={handleToggleExpandAll}
-                      >
-                        {permissionModules.every((mod) => expanded[mod.slug])
-                          ? "Collapse All"
-                          : "Expand All"}
-                      </Button>
-                    </div> */}
+                    
                     <div className="new--accordion--block">
                       {permissionModules.map((mod) => {
                         const modSlug = mod.slug;
@@ -2030,7 +1977,7 @@ function TeamMembersPage() {
                                                 );
                                                 // }
                                               }}>
-                                              <span className="team--initial">{member.name.charAt(0)}</span>
+                                              <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
                                               <Card.Body>
                                                 <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
                                               </Card.Body>
@@ -2050,7 +1997,7 @@ function TeamMembersPage() {
                                                 );
                                                 // }
                                               }} key={`${modSlug}-${perm}-unassigned`}>
-                                              <span className="team--initial">G</span>
+                                              <span className="team--initial">U</span>
                                               <Card.Body>
                                                 <h4>Unassigned</h4>
                                               </Card.Body>
@@ -2073,11 +2020,7 @@ function TeamMembersPage() {
             )}
           </Modal.Body>
           <Modal.Footer>
-            <Button
-              variant="primary"
-              onClick={handleSavePermissions}
-              disabled={loader}
-            >
+            <Button variant="primary" onClick={handleSavePermissions} disabled={loader}>
               {loader ? "Please Wait..." : "Save"}
             </Button>
           </Modal.Footer>
@@ -2085,126 +2028,126 @@ function TeamMembersPage() {
       )}
 
       {adjustPermissions && (
-      <Modal className="theme--modal" show={adjustPermissions} onHide={() => setAdjustPermissions(false)} size="lg" centered>
-        <Modal.Header closeButton>
-            <Modal.Title>
-                <strong>Edit Permissions <small>Manage access permissions</small></strong>
-            </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="new--accordion--block">
-            {permissionModules.map((mod) => {
-              const modSlug = mod.slug;
-              const modPerms = permissions?.[modSlug] || {};
-              const isExpanded = expanded?.[modSlug] || false;
-              const isViewChecked = !!modPerms.view;
-              const truePermissionCount = Object.values(
-                modPerms
-              ).filter((val) => val === true).length;
+        <Modal className="theme--modal" show={adjustPermissions} onHide={() => setAdjustPermissions(false)} size="lg" centered>
+          <Modal.Header closeButton>
+              <Modal.Title>
+                  <strong>Edit Permissions <small>Manage access permissions</small></strong>
+              </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="new--accordion--block">
+              {permissionModules.map((mod) => {
+                const modSlug = mod.slug;
+                const modPerms = permissions?.[modSlug] || {};
+                const isExpanded = expanded?.[modSlug] || false;
+                const isViewChecked = !!modPerms.view;
+                const truePermissionCount = Object.values(
+                  modPerms
+                ).filter((val) => val === true).length;
 
-              return (
-              <div className="bg--blue--accordion">
-                <div className="d-flex gap-3 align-items-center">
-                   {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                  <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                return (
+                <div className="bg--blue--accordion">
+                  <div className="d-flex gap-3 align-items-center">
+                    {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                    <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                    
+                  </div>
+                  {(mod.permissions || []).map((perm) => {
+                    if (perm === "view") {
+                      return (
+                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                          <p className="mb-0">View</p>
+                          <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
+                            () => {
+                              // if(selectedMember?.role?.slug !== "owner"){
+                              toggleView(modSlug);
+                            }
+                            //}
+                          }/>
+                        </div>
+                      )
+                    }
+                    return (
+                      <>
+                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                          <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
+                          <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                            disabled={!isViewChecked}
+                            checked={!!modPerms[perm]}
+                            //onChange={(e) => setShowTeamGrid(e.target.checked)} 
+                              onChange={() => {
+                                //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
+                                togglePermission(modSlug, perm);
+                              }}
+                          />
+                        </div>
+                        {[
+                          "tracking",
+                          "projects",
+                          "reports",
+                          "attendance",
+                        ].includes(modSlug) &&
+                          perm === "view_others" &&
+                          modPerms[perm] === true && (
+                            <div className="team--card--grid">
+                              {memberFeeds.map((member) => (
+                                <Card className={`team--card ${modPerms[
+                                    "selected_members"
+                                  ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                    //if (selectedMember?.role?.slug !== "owner") {
+                                    toggleMembers(
+                                      modSlug,
+                                      "selected_members",
+                                      member._id
+                                    );
+                                    // }
+                                  }}>
+                                  <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
+                                  <Card.Body>
+                                    <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
+                                  </Card.Body>
+                                  <FiCheck className="ms-auto" />
+                                </Card>
+                              ))}
+
+                              {modSlug === "projects" && (
+                                <Card className={`team--card ${modPerms[
+                                    "selected_members"
+                                  ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                    //if (selectedMember?.role?.slug !== "owner") {
+                                    toggleMembers(
+                                      modSlug,
+                                      "selected_members",
+                                      "unassigned"
+                                    );
+                                    // }
+                                  }} key={`${modSlug}-${perm}-unassigned`}>
+                                  <span className="team--initial">U</span>
+                                  <Card.Body>
+                                    <h4>Unassigned</h4>
+                                  </Card.Body>
+                                  <FiCheck className="ms-auto" />
+                                </Card>
+                              )}
+                            </div>
+                          )}
+                      </>
+                    )
+                  })}
                   
                 </div>
-                {(mod.permissions || []).map((perm) => {
-                  if (perm === "view") {
-                    return (
-                      <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                        <p className="mb-0">View</p>
-                        <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
-                          () => {
-                            // if(selectedMember?.role?.slug !== "owner"){
-                            toggleView(modSlug);
-                          }
-                          //}
-                        }/>
-                      </div>
-                    )
-                  }
-                  return (
-                    <>
-                      <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                        <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
-                        <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
-                          disabled={!isViewChecked}
-                          checked={!!modPerms[perm]}
-                          //onChange={(e) => setShowTeamGrid(e.target.checked)} 
-                            onChange={() => {
-                              //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
-                              togglePermission(modSlug, perm);
-                            }}
-                        />
-                      </div>
-                      {[
-                        "tracking",
-                        "projects",
-                        "reports",
-                        "attendance",
-                      ].includes(modSlug) &&
-                        perm === "view_others" &&
-                        modPerms[perm] === true && (
-                          <div className="team--card--grid">
-                            {memberFeeds.map((member) => (
-                              <Card className={`team--card ${modPerms[
-                                  "selected_members"
-                                ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
-                                  //if (selectedMember?.role?.slug !== "owner") {
-                                  toggleMembers(
-                                    modSlug,
-                                    "selected_members",
-                                    member._id
-                                  );
-                                  // }
-                                }}>
-                                <span className="team--initial">G</span>
-                                <Card.Body>
-                                  <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
-                                </Card.Body>
-                                <FiCheck className="ms-auto" />
-                              </Card>
-                            ))}
-
-                            {modSlug === "projects" && (
-                              <Card className={`team--card ${modPerms[
-                                  "selected_members"
-                                ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                  //if (selectedMember?.role?.slug !== "owner") {
-                                  toggleMembers(
-                                    modSlug,
-                                    "selected_members",
-                                    "unassigned"
-                                  );
-                                  // }
-                                }} key={`${modSlug}-${perm}-unassigned`}>
-                                <span className="team--initial">G</span>
-                                <Card.Body>
-                                  <h4>Unassigned</h4>
-                                </Card.Body>
-                                <FiCheck className="ms-auto" />
-                              </Card>
-                            )}
-                          </div>
-                        )}
-                    </>
-                  )
-                })}
-                
-              </div>
-              )
-            })}
-            
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <div className="mt-4 text-end">
-            <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save Permissions"}</Button>
-          </div>
-        </Modal.Footer>
-    </Modal>)
-    }
+                )
+              })}
+              
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <div className="m-0 text-end">
+              <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save Permissions"}</Button>
+            </div>
+          </Modal.Footer>
+        </Modal>)
+      }
 
       {(memberProfile &&
         memberProfile.role?.slug === "owner" &&
@@ -2251,11 +2194,7 @@ function TeamMembersPage() {
         <></>
       )}
       {/*--=-=Search Modal**/}
-      <Modal
-        show={showSearch}
-        onHide={handleSearchClose}
-        size="md"
-        className="search--modal"
+      <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal"
       >
         <Modal.Header closeButton>
           <Modal.Title>Search</Modal.Title>
@@ -2284,9 +2223,19 @@ function TeamMembersPage() {
         <CustomFieldModal toggle={setShowCustomFields} module="members" />
       )}
       {
-          showBadges !== null && 
-              <BadgesModal badgesData={showBadges} toggleBadges={toggleBadges} handleSelect={handleChange} value={fields[`custom_field[${showBadges?.name}]`] || ''}/>
+        showBadges !== null && 
+        <BadgesModal badgesData={showBadges} toggleBadges={toggleBadges} handleSelect={handleChange} value={fields[`custom_field[${showBadges?.name}]`] || ''}/>
       }
+      <Modal show={showSetting} onHide={handleSettingClose} size="xl" centered className="theme--modal">
+        <Modal.Header closeButton>
+            <Modal.Title>
+                <strong>Role & Permissions <small>Manage access permissions</small></strong>
+            </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-0">
+            <RolesPage />
+        </Modal.Body>
+    </Modal>
     </>
   );
 }
