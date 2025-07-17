@@ -25,10 +25,15 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
     };
   return (              
     <Card className="mb-2">
+        <div className="title--initial">{comment.author?.name?.charAt(0)}</div>
         <Card.Body>
-            <Card.Title>{comment.author?.name}</Card.Title>
+            <Card.Title>
+              {comment.author?.name}
+              <Button variant="danger" size="sm" className="delete--button px-2 py-1" onClick={() => handleDelete(comment._id, comment?.post)}>
+                <BsTrash />
+              </Button>
+            </Card.Title>
             <Card.Text>{comment.text}</Card.Text>
-            <BsTrash className="position-absolute top-0 end-0 mt-3 me-3 text-danger cursor-pointer" role="button" onClick={() => handleDelete(comment._id, comment?.post)} />
             {comment.replies && comment.replies.length > 0 && (
               <div className="mt-3 ps-4 border-start border-2">
                 {comment.replies.map((reply) => (

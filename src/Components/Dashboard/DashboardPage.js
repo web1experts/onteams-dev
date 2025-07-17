@@ -632,7 +632,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                             </Dropdown.Menu>
                           </Dropdown>
                           
-                          <div className="mt-3">
+                          <div className="mt-2">
                             {/* Text Post */}
                             {post.post_type === 'text' && (
                               <>

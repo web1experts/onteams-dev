@@ -5647,20 +5647,67 @@ ul#icon-tabs .nav-link span svg {
   height: auto;
 }
 
-.inner--card .edit--dropdown {
+.inner--card .edit--dropdown, .comments--list .card .delete--button {
     position: absolute;
-    right: 20px;
-    top: 20px;
+    right: 12px;
+    top: 12px;
 }
 
-.inner--card .edit--dropdown .btn {
+.inner--card .edit--dropdown .btn, .comments--list .card .delete--button {
   padding: 0;
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   opacity: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.comments--list .card:hover .delete--button {
+  opacity: 1;
+}
+
+.comments--list .card:hover .card .delete--button {
+  opacity: 0;
+}
+
+.comments--list .card .card:hover .delete--button {
+  opacity: 1;
+}
+
+.comments--list .card {
+    display: flex;
+    flex-flow: row wrap;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.comments--list .card .title--initial {
+  align-items: center;
+    background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 1rem;
+    font-weight: 500;
+    height: 35px;
+    width: 35px;
+    min-width: 35px;
+    justify-content: center;
+    margin-right: 0;
+    padding: .25rem 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.comments--list .card .card-body {
+  padding: 0;
+}
+
+.comments--list .card-title {
+  font-size: 1rem;
+  margin: 0;
 }
 
 .inner--card:hover .edit--dropdown .btn {
