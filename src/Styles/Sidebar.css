@@ -333,6 +333,7 @@ Sidebar CSS-=-=
   flex-flow: column wrap;
   align-items: flex-start;
   padding: 0;
+  display: flex !important;
 }
 
 .navbar-expand-lg .navbar-nav {

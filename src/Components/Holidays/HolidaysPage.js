@@ -206,9 +206,9 @@ const getDaysLeft = (date) => {
                         </Dropdown.Menu>
                     </Dropdown>
                     </ListGroup.Item>
-                    <ListGroup horizontal className="d-none d-xl-flex">
-                        <ListGroup.Item action className="d-none d-xl-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
-                        <ListGroup.Item action className="d-none d-xl-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                    <ListGroup horizontal className="d-none d-lg-flex">
+                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                        <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                     </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-md-flex'>
                       <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
@@ -289,7 +289,7 @@ const getDaysLeft = (date) => {
                                   </div>
                                 </div>
                               </td>
-                              <td className="text-end text-primary fw-semibold ms-xl-auto d-flex justify-content-between mt-3 mt-xl-0 align-items-center">
+                              <td className="text-end text-primary fw-semibold ms-auto d-flex justify-content-between mt-3 mt-xl-0 align-items-center">
                                 <span className="days--left">{getDaysLeft(holiday.date)}</span>
                                 <div key={`action-td-${index}`} className="ms-3">
                                   <Dropdown>

@@ -1481,9 +1481,9 @@ const handleProjectSelect = async (project) => {
               activeInnerTab === "InnerRecorded" && showDate()
             }
           </ListGroup>
-          <ListGroup horizontal className="p-0">
+          <ListGroup horizontal className="p-0 ms-auto">
             {showRecordedTabs()}
-            <ListGroup horizontal className="bg-white expand--icon ms-3 p-0 b-0 rounded-0 align-items-center">
+            <ListGroup horizontal className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center">
               <ListGroup.Item onClick={handleSidebar} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
               <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
                 <BsArrowClockwise onClick={handleRecordedActivity}/>
