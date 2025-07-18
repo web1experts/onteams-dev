@@ -63,7 +63,7 @@ console.log('Value:: ', value)
   }
 
   return (
-    <Form.Group className="mb-3" controlId={fieldId}>
+    <Form.Group className="w-100" controlId={fieldId}>
       {(type !== "badge" && label) && (<Form.Label label={label}>{label}</Form.Label>)}
 
       {/* Basic Inputs */}

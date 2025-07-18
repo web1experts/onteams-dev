@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {Button, Modal, Form, FloatingLabel, Card, ListGroup, Table } from "react-bootstrap";
 import { FaRegSave, FaRegTrashAlt } from "react-icons/fa";
+import { TbUsersPlus } from "react-icons/tb";
 import { createClient, ListClients } from "../../redux/actions/client.action";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -168,9 +169,12 @@ const showError = (name) => {
 
     return (
         <>
-            <Modal show={props.show} onHide={handleClose} centered size="md" className="add--member--modal">
+            <Modal show={props.show} onHide={handleClose} centered size="md" className="add--member--modal theme--modal">
                 <Modal.Header closeButton>
-                    <Modal.Title>Add Client</Modal.Title>
+                  <Modal.Title>
+                    <span className="nav--item--icon"><TbUsersPlus /></span>
+                    <strong>Add Client <small>Build your client list — add contacts and key details fast</small></strong>
+                  </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleSubmit}>

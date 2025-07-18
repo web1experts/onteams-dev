@@ -959,10 +959,9 @@ Sidebar CSS-=-=
     margin-left: 0;
   }
 
-  .open--sidebar,
   .show--project .open--sidebar,
   .open--panel--sidebar~.team--page .open--sidebar,
-  span.open--sidebar {
+  .wrapper--title .open--sidebar {
     display: none !important;
   }
 
@@ -971,7 +970,7 @@ Sidebar CSS-=-=
   }
 
   .navbar-toggler {
-    display: block !important;
+    display: none !important;
     position: fixed;
     top: -70px;
     left: 0;
@@ -1004,6 +1003,7 @@ Sidebar CSS-=-=
     right: 1rem;
     width: 50px;
     height: 50px;
+    display: block !important;
   }
 
   .open--panel--sidebar .navbar-toggler.collapsed .navbar-toggler-icon {

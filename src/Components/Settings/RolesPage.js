@@ -595,7 +595,7 @@ function RolesPage() {
                     </Col>
                     <Col lg={6}>
                         <FormGroup className="form-group mb-0 pb-0">
-                        <FloatingLabel label="Role name">
+                          <FloatingLabel label="Role name">
                             <Form.Control
                             type="text"
                             className={
@@ -609,7 +609,7 @@ function RolesPage() {
                                 setFields({...fields, ['name']: value})
                             }}
                             />
-                        </FloatingLabel>
+                          </FloatingLabel>
                         </FormGroup>
                     </Col>
                     

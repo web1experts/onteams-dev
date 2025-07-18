@@ -78,11 +78,6 @@ a:focus {
     background-color: rgb(241 245 249) !important;
 }
 
-.modal .btn {
-  padding: .5rem 1rem;
-  font-size: 1rem;
-}
-
 .AddTimeModal .btn {
   font-size: 1rem;
   display: inline-flex;
@@ -345,12 +340,24 @@ textarea.form-control {
   background: #fafafa;
 }
 
-.common--form .logo--sm {
+.common--form .new--logo {
   margin: auto auto 2rem;
   max-width: 100%;
   flex: 1 1 100%;
-  max-height: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.common--form .logo--sm {
   object-fit: contain;
+  max-width: 120px;
+  width: 120px;
+  height: 120px;
+  padding: .75rem;
+  border-radius: 1rem;
+  -webkit-border-radius: 1rem;
+  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
 }
 
 .main--login .login--image img {
@@ -558,7 +565,7 @@ textarea.form-control {
 }
 
 .common--form p a {
-  color: rgb(15 23 42);
+  color: #3b82f6;
 }
 
 .common--form p a:hover {
@@ -1107,6 +1114,26 @@ Add Project Modal CSS-=-=-
 
 .added--fields .card .card-body {
   padding: 0;
+}
+
+.col-auto {
+  position: relative;
+}
+
+.added--fields .card .card-body .drag--indicator {
+    position: absolute;
+    left: auto;
+    top: 0;
+    opacity: 0;
+    padding: 0 0.65em;
+}
+
+.added--fields .card:hover .drag--indicator {
+  opacity: 1;
+}
+
+.added--fields .card:hover .abbr--n {
+  opacity: 0;
 }
 
 .add--workflow--modal .nav-tabs .nav-link {

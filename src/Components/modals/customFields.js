@@ -1,14 +1,9 @@
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
+import React, { useEffect, useState, useMemo, useCallback, useRef} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, Card, Badge, Row, Col } from "react-bootstrap";
 import { FaRegTrashAlt, FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
+import { MdDragIndicator } from "react-icons/md";
 import { LuSettings } from "react-icons/lu";
 import { MdDragIndicator } from "react-icons/md";
 import {
@@ -66,9 +61,8 @@ export const CustomFieldModal = (props) => {
         <Card.Body>
           <Row className="align-items-center">
             <Col xs="auto">
-              <Badge pill bg="light" text="dark">
-                <MdDragIndicator /><abbr key={`index-${idx}`}>#{idx}</abbr> 
-              </Badge>
+              <Badge pill bg="light" className="abbr--n" text="dark">#{idx}</Badge>
+              <div className="drag--indicator"><MdDragIndicator /></div>
             </Col>
             <Col>
               <h5 className="mb-0 fw-bold">{label}</h5>
@@ -426,16 +420,11 @@ export const CustomFieldModal = (props) => {
 
   return (
     <>
-      <Modal
-        show={true}
-        onHide={props.toggle}
-        centered
-        size="lg"
-        className="add--workflow--modal"
-      >
+      <Modal show={true} onHide={props.toggle} centered size="lg" className="add--workflow--modal theme--modal">
         <Modal.Header closeButton>
           <Modal.Title>
-            <LuSettings /> Custom Fields
+            <span className="nav--item--icon"><LuSettings /></span>
+            <strong>Custom Fields <small>create custom fields for your projects</small></strong>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

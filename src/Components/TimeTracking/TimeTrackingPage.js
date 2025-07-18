@@ -88,7 +88,7 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
     const [ errors, setErrors] = useState([])
     const [ loader, setLoader] = useState(false)
     const [ selectedproject, setSelectedProject] = useState('')
-      const [ selectedTask, setSelectedTask] = useState('');
+      const [ selectedTask, setSelectedTask] = useState({});
       const [ selectedWorkflow, setWorkflow] = useState('')
         const [filteredTasks, setFilteredTasks] = useState([])
         const taskFeed = useSelector(state => state.task.tasks);
@@ -671,23 +671,16 @@ const handleReportSubmit = async (e) => {
 const handleTimeChange = (name, value) => {
   setTimings({...timings, [name]: value})
 }
-const handleEntryChange = (task) => {
+const handleEntryChange = () => {
     const updatedEntries = [...entries];
     updatedEntries.push({
-      task: task._id,
-      task_title: task.title,
+      task: selectedTask._id,
+      task_title: selectedTask.title,
       project: selectedproject?._id,
       project_title: selectedproject?.title,
       start_time: timings?.start_time,
       end_time: timings?.end_time,
     });
-    // updatedEntries[updatedEntries.length - 1]['workflow'] = selectedproject?.title
-    // if( field === 'task'){
-    //   updatedEntries[index][field] = value._id;
-    //   updatedEntries[index]['task_title'] = value.title;
-    // }else{
-    //   updatedEntries[index][field] = value;
-    // }
     
     setEntries(updatedEntries);
     setSelectedProject('');
@@ -823,9 +816,6 @@ const handleProjectSelect = async (project) => {
     await dispatch(getSingleProjectReport(project?._id))
   }
 
-  const handleTaskSelect = async ({ target: { name, value } }) => {
-    setSelectedTask(value)
-  }
 
   useEffect(() => {
         // setEntries([]);
@@ -1172,8 +1162,8 @@ const handleProjectSelect = async (project) => {
                       </Form>
                     </ListGroup.Item>
                     { (memberProfile?.permissions?.reports?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                      <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="success" id="dropdown-basic">Manual Time</Dropdown.Toggle>
+                      <Dropdown className="select--dropdown manual--dropdown">
+                        <Dropdown.Toggle variant="success" id="dropdown-basic"><LuTimer /></Dropdown.Toggle>
                         <Dropdown.Menu>
                           <Dropdown.Item onClick={handleShow}>Manual Time</Dropdown.Item>
                           {
@@ -2310,24 +2300,23 @@ const handleProjectSelect = async (project) => {
                   <ListGroup key={projectFilter?.status || 'in-progress'}>
                     {
                       memberprojects
-                        .filter(project => project.status === (projectFilter?.status || 'in-progress'))
-                        .map((project, index) => (
-                          <ListGroup.Item
-                            key={project._id || index}  // Add `key` for React list rendering
-                            className={selected === 0 ? 'selected--list--item' : ''}
-                            onClick={() => handleProjectSelect(project)}
-                          >
-                            <strong>
-                              {project?.title}
-                              <span>
-                                <LuUsers /> {project?.client?.name}
-                              </span>
-                            </strong>
-                            <div className="svg--check"><FiCheckCircle /></div>
-                          </ListGroup.Item>
-                        ))
+                      .filter(project => project.status === (projectFilter?.status || 'in-progress'))
+                      .map((project, index) => (
+                        <ListGroup.Item
+                          key={project._id || index}  // Add `key` for React list rendering
+                          className={selectedproject?._id === project?._id ? 'selected--list--item' : ''}
+                          onClick={() => handleProjectSelect(project)}
+                        >
+                          <strong>
+                            {project?.title}
+                            <span>
+                              <LuUsers /> {project?.client?.name}
+                            </span>
+                          </strong>
+                          <div className="svg--check"><FiCheckCircle /></div>
+                        </ListGroup.Item>
+                      ))
                     }
-
                   </ListGroup>
                 </Form.Group>
               </Col>
@@ -2338,20 +2327,18 @@ const handleProjectSelect = async (project) => {
                     {
                       filteredTasks &&  filteredTasks.length > 0  &&
                       filteredTasks.map((task) => {
-                        
-                            return <ListGroup.Item key={`task-${task?._id}`} className={(1 === task?._id ) ? 'selected--task--item' : ''} onClick={() => handleEntryChange(task)}><strong>{task.title}</strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
-                          
-                        
+                        return <ListGroup.Item key={`task-${task?._id}`} className={(selectedTask?._id === task?._id ) ? 'selected--task--item' : ''} onClick={() => setSelectedTask(task)}><strong>{task.title}</strong><div className="svg--check"><FiCheckCircle /></div></ListGroup.Item>
                       })
                     }
-                    
-                    
                   </ListGroup>
                 </Form.Group>
               </Col>
             </Row>
           </Form>
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleEntryChange}>Save</Button>
+        </Modal.Footer>
       </Modal>
     </>
   );

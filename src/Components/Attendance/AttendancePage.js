@@ -299,9 +299,11 @@ useEffect(() => {
                     </ListGroup>
                   </ListGroup>
                 </h2>
-                <ListGroup horizontal className="d-md-none d-flex">
-                    <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-none d-flex view--icon active mt-3 mt-lg-0': 'mt-3 mt-lg-0 d-lg-none d-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
-                    <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-none d-flex mt-3 mt-lg-0 view--icon active': 'd-lg-none d-flex mt-3 mt-lg-0 view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                <ListGroup horizontal className="d-md-none d-flex mt-3 mt-lg-0">
+                  <ListGroup horizontal>
+                    <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-none d-flex view--icon active ': ' d-lg-none d-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
+                    <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-none d-flex  view--icon active': 'd-lg-none d-flex  view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                  </ListGroup>
                 </ListGroup>
               </Col>
             </Row>
@@ -321,7 +323,7 @@ useEffect(() => {
                   <h3 className="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - {getMonthLabel(filters?.month)}</h3>
                   <Button variant="primary" onClick={() => downloadExcel(excelData)}><FiDownload /> Download Excel Excel</Button>
                 </div>
-                <div className='attendance--excel--table draggable--table new--project--rows table-responsive-xl'>
+                <div className='attendance--excel--table new--project--rows table-responsive-xl'>
                     <Table>
                         <thead>
                             <tr key="project-table-header">

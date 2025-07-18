@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { FaPlus, FaCheck, FaList } from "react-icons/fa";
 import { GrExpand } from "react-icons/gr";
 import { BsGrid } from "react-icons/bs";
+import { LuCalendarPlus } from "react-icons/lu";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { MdOutlineCheck } from "react-icons/md";
 import { getFieldRules, validateField } from "../../helpers/rules";
@@ -342,9 +343,12 @@ const getDaysLeft = (date) => {
         </div>
       </div>
 
-      <Modal show={show} onHide={handleClose} centered size="md" className="add--member--modal">
+      <Modal show={show} onHide={handleClose} centered size="md" className="add--member--modal theme--modal">
         <Modal.Header closeButton>
-          <Modal.Title>Add Holiday</Modal.Title>
+          <Modal.Title>
+            <span className="nav--item--icon"><LuCalendarPlus /></span>
+            <strong>Add Holiday <small>Add upcoming holidays to keep schedules aligned</small></strong>
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}> 

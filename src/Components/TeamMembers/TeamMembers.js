@@ -7,6 +7,7 @@ import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiVideo, FiCamera, Fi
 import { AiOutlineTeam } from "react-icons/ai";
 import { RiUserSettingsLine } from "react-icons/ri";
 import { LuFolderOpen } from "react-icons/lu";
+import { TbUsersPlus } from "react-icons/tb";
 import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
@@ -1678,16 +1679,12 @@ function TeamMembersPage() {
         </div>
       )}
 
-      <Modal
-        show={show}
-        onHide={handleClose}
-        centered
-        size="lg"
-        className="add--team--member--modal add--member--modal"
-        onShow={() => selectboxObserver()}
-      >
+      <Modal show={show} onHide={handleClose} centered size="lg" className="add--team--member--modal add--member--modal theme--modal" onShow={() => selectboxObserver()}>
         <Modal.Header closeButton>
-          <Modal.Title>Add Member</Modal.Title>
+          <Modal.Title>
+            <span className="nav--item--icon"><TbUsersPlus /></span>
+            <strong>Add Member <small>Add team members to collaborate and manage tasks together</small></strong>
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
@@ -1845,7 +1842,7 @@ function TeamMembersPage() {
 
                                   return (
                                     <>
-                                    <div className="d-flex gap-3 align-items-center mt-3">
+                                    <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
                                       <p className="mb-0">
                                        {perm
                                                           .replace(/[_-]/g, " ")

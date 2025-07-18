@@ -420,24 +420,22 @@ function SettingPage() {
                 <h3 className="mb-0">Notifications</h3>
               <div className="new--accordion--block">
                 <div className="bg--blue--accordion mb-3">
-                  <div className="d-flex gap-3 align-items-center mb-3">
+                  <div className="d-flex gap-5 align-items-center mb-3">
                     <div className="d-flex gap-3 align-items-center mb-3">
                       <MdOutlineEmail />
                       <h6 className="mb-0">Notifications</h6>
                     </div>
                     <div className="d-flex gap-3 align-items-center ms-auto">
                       <p className="mb-0">Email</p>
-                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
                     </div>
                     <div className="d-flex gap-3 align-items-center">
-                      <p className="mb-0">Push</p>
-                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                      <p className="mb-0 pe-4">Push</p>
                     </div>
                   </div>
                   <div className="d-flex gap-5 align-items-center mb-3 bg-white px-3 py-2 rounded-3">
                     <p className="mb-0">Project Notifications</p>
                     <div className="d-flex gap-3 align-items-center ms-auto">
-                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                      <Form.Check type="switch" className="ps-0 switch--small"/>
                     </div>
                     <div className="d-flex gap-3 align-items-center">
                       <Form.Check type="switch" className="ps-0 switch--small"/>
@@ -446,7 +444,7 @@ function SettingPage() {
                   <div className="d-flex gap-5 align-items-center mb-3 bg-white px-3 py-2 rounded-3">
                     <p className="mb-0">Client Notifications</p>
                     <div className="d-flex gap-3 align-items-center ms-auto">
-                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                      <Form.Check type="switch" className="ps-0 switch--small"/>
                     </div>
                     <div className="d-flex gap-3 align-items-center">
                       <Form.Check type="switch" className="ps-0 switch--small"/>
@@ -455,7 +453,7 @@ function SettingPage() {
                   <div className="d-flex gap-5 align-items-center mb-3 bg-white px-3 py-2 rounded-3">
                     <p className="mb-0">Members Notifications</p>
                     <div className="d-flex gap-3 align-items-center ms-auto">
-                      <Form.Check type="switch" className="ps-0 switch--small" checked/>
+                      <Form.Check type="switch" className="ps-0 switch--small"/>
                     </div>
                     <div className="d-flex gap-3 align-items-center">
                       <Form.Check type="switch" className="ps-0 switch--small"/>

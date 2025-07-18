@@ -554,7 +554,7 @@ body {
   font-weight: 400;
 }
 
-.page--wrapper .draggable--table thead, .page--wrapper .draggable--table tbody {
+.page--wrapper .draggable--table thead, .page--wrapper .draggable--table tbody, .page--wrapper .attendance--excel--table thead {
   width: 100%;
 }
 
@@ -570,7 +570,7 @@ body {
   min-width: 100%;
 }
 
-.page--wrapper .draggable--table thead {
+.page--wrapper .draggable--table thead, .page--wrapper .attendance--excel--table thead {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
@@ -633,11 +633,12 @@ body {
 }
 
 .page--wrapper .draggable--table thead tr,
-.page--wrapper .draggable--table th:first-child {
+.page--wrapper .draggable--table th:first-child, .page--wrapper .attendance--excel--table thead tr,
+.page--wrapper .attendance--excel--table thead {
   background: linear-gradient(to right, #f8fafc, #f1f5f9);
 }
 
-.page--wrapper .draggable--table thead tr {
+.page--wrapper .draggable--table thead tr, .page--wrapper .attendance--excel--table thead tr {
   border: 0;
 }
 
@@ -802,7 +803,7 @@ body {
 
 .project--grid--new--table td.new--td {
   color: rgb(71 85 105);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   line-height: 1.25rem;
   background: rgb(248 250 252);
   border-radius: .5rem;
@@ -1199,9 +1200,9 @@ button.input-error.dropdown-toggle.btn.btn-success {
 
 .project--form--actions .btn {
   width: auto;
-  flex: 1 1 100%;
+  /* flex: 1 1 100%; */
   display: block;
-  margin: auto;
+  margin: 0;
   min-width: 120px;
 }
 
@@ -1853,6 +1854,10 @@ span.open--sidebar {
   font-size: 2rem;
 }
 
+.rounded--box .contact--card.card .card-title .fs-small {
+  font-size: 1.2rem;
+}
+
 .screenshot--card, .recording--card, .live--card {
   border-radius: .75rem;
   padding: 0;
@@ -1894,6 +1899,7 @@ span.open--sidebar {
 
 .rounded--box .screenshot--card svg, .rounded--box .recording--card svg, .rounded--box .live--card svg {
   font-size: 18px;
+  min-width: 18px;
 }
 
 .rounded--box .screenshot--card .form-switch .form-check-input, .rounded--box .recording--card .form-switch .form-check-input, .rounded--box .live--card .form-switch .form-check-input {
@@ -2249,6 +2255,19 @@ table tr.marked-project td {
   min-width: 160px;
 }
 
+.team--page .page--title .manual--dropdown .btn {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  min-height: 40px;
+  width: 40px;
+  min-width: 40px;
+  color: rgb(17 24 39);
+  font-size: 20px;
+}
+
 .modal .select--dropdown .btn,
 .rounded--box .select--dropdown .btn,
 .common--form .select--dropdown .btn {
@@ -2276,6 +2295,10 @@ table tr.marked-project td {
   right: .75rem;
   top: .75rem;
   margin: auto;
+}
+
+.team--page .page--title .manual--dropdown .btn::before {
+  display: none;
 }
 
 .page--wrapper table td .select--dropdown .dropdown-menu,
@@ -2317,7 +2340,9 @@ table tr.marked-project td {
 }
 
 .wrapper--title .dropdown-menu[data-popper-placement="bottom-start"] {
-  margin-top: 10px;
+  border-radius: 0;
+  left: -1rem !important;
+  min-width: 356px;
 }
 
 .modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"],
@@ -2340,6 +2365,10 @@ table tr.marked-project td {
   left: auto;
 }
 
+.team--page .page--title .select--dropdown .dropdown-menu[data-popper-placement="bottom-end"]::before {
+  right: 5px;
+}
+
 .add--team--member--modal .select--dropdown {
   position: relative;
 }
@@ -2354,7 +2383,7 @@ table tr.marked-project td {
 }
 
 .wrapper--title .drop--scroll {
-  max-height: calc(100dvh - 120px);
+  max-height: calc(100dvh - 90px);
 }
 
 .modal .select--dropdown .dropdown-menu,
@@ -3496,7 +3525,7 @@ Project Task View CSS=-=-=
   align-items: flex-start;
   justify-content: space-between;
   flex-flow: column wrap;
-  padding-right: 7rem;
+  padding-right: 2rem;
   background: none;
   border: 0;
   box-shadow: none;
@@ -3642,6 +3671,7 @@ Project Task View CSS=-=-=
     justify-content: center;
     align-items: center;
     width: 2.5rem;
+    min-width: 2.5rem;
     height: 2.5rem;
     display: flex;
     color: #ffffff;
@@ -3655,6 +3685,7 @@ Project Task View CSS=-=-=
     align-items: center;
     width: auto;
     height: auto;
+    min-width: auto;
     display: flex;
     color: #ffffff;
     padding: 0;
@@ -3744,6 +3775,12 @@ Project Task View CSS=-=-=
 .team--card--grid .team--card h4 small {
   font-size: .85rem;
   font-weight: normal;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .team--card--grid .team--card .team--initial {
@@ -3786,7 +3823,7 @@ Project Task View CSS=-=-=
 } */
 
 .new--accordion--block .accordion-button::after {
-  right: 1rem;
+  right: 0;
   background-color: transparent;
   border-radius: 0;
   -webkit-border-radius: 0;
@@ -5558,6 +5595,7 @@ ul#icon-tabs .nav-link span svg {
   padding: 12px;
   width: 4rem;
   height: 4rem;
+  min-width: 4rem;
   border-radius: 1.5rem;
   -webkit-border-radius: 1.5rem;
 }
@@ -6470,7 +6508,7 @@ ul#icon-tabs .nav-link span svg {
 .project--grid--table tbody {
   display: flex;
   flex-flow: row wrap;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .project--grid--table tr,
@@ -6591,6 +6629,13 @@ ul#icon-tabs .nav-link span svg {
 .project--grid--table td:last-child {
   border: 0;
   border-top: 0;
+}
+
+.project--grid--new--table td.new--td .fs-small {
+  font-size: .75rem;
+  line-height: 1;
+  color: rgba(0, 0, 0, .5);
+  margin-bottom: .15rem;
 }
 
 .project--grid--table td::before {
@@ -6989,10 +7034,17 @@ ul#icon-tabs .nav-link span svg {
     width: auto;
     max-width: fit-content;
     min-width: 270px;
+    position: sticky;
+    position: -webkit-sticky;
+    left: 0;
+    background: #ffffff;
+    z-index: 222;
+    border-right: 0;
 }
 
 .page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table td {
     min-width: 120px;
+    border: 0;
 }
 
 .page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table th .padd--x, .page--wrapper .attendance--excel--table th .d-flex {
@@ -7325,12 +7377,7 @@ ul#icon-tabs .nav-link span svg {
   border: 0;
 }
 
-.show--details .project--grid--table tbody,
-.view--project .project--grid--table tbody,
-.view--invitee .project--grid--table tbody {
-  display: table-row-group;
-}
-
+/* 
 .show--details .project--grid--table tr,
 .view--project .project--grid--table tr,
 .view--invitee .project--grid--table tr {
@@ -7390,7 +7437,7 @@ ul#icon-tabs .nav-link span svg {
 .view--project .project--grid--table,
 .view--invitee .project--grid--table {
   display: table;
-}
+} */
 
 /* .clients--table td.project--title--td span.onHide {
   display: none;
@@ -7565,7 +7612,7 @@ Media CSS-=-==
 
   .project--grid--table tr,
   .activity--box .card-group .card {
-    max-width: calc(33.333% - 15px);
+    max-width: calc(33.333% - 16px);
   }
 
   .holiday--table--grid tbody {
@@ -7613,6 +7660,10 @@ Media CSS-=-==
     max-width: -moz-fit-content;
     max-width: fit-content;
     min-width: 250px;
+  }
+
+  .new--accordion--block .team--card--grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -7663,6 +7714,8 @@ Media CSS-=-==
 
   .rounded--box .card .card-body {
     flex: 1 1 100%;
+    padding: 0;
+    margin-top: 1rem;
   }
 
   .setting--page .rounded--box .card .card-body {
@@ -7677,6 +7730,13 @@ Media CSS-=-==
   .rounded--box .card .card--img {
     margin: auto;
     text-align: center;
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .rounded--box .permission--card .card-body, .rounded--box .work--card .card-body {
+    padding: 1.5rem;
+    margin: 0;
   }
   
   .wrapper--title {
@@ -7712,7 +7772,7 @@ Media CSS-=-==
 
   .project--grid--table tr,
   .activity--box .card-group .card {
-    max-width: calc(50% - 8px);
+    max-width: calc(50% - .75rem);
   }
 
   .holiday--table--grid tr {
@@ -7875,6 +7935,17 @@ Media CSS-=-==
   .inner--card .edit--dropdown .btn, .comments--list .card .delete--button, .comments--list .card .delete--button, .comments--list .card .card .delete--button, .comments--list .card .card .delete--button {
     opacity: 1;
   }
+
+  .modal .setting--page .rounded--box .card-body {
+    padding: 0;
+    padding-left: 1rem;
+    flex: auto;
+    margin-top: 0;
+  }
+
+  .wrapper--title h3 {
+    max-width: 220px;
+  }
 }
 
 @media screen and (max-width:992px) {
@@ -7915,7 +7986,7 @@ Media CSS-=-==
     background: none;
   }
 
-  .new--project--rows .project--title--td .project--name {
+  .new--project--rows.project--table .project--title--td .project--name {
     padding: 0;
     flex-flow: row wrap;
   }
@@ -7959,13 +8030,20 @@ Media CSS-=-==
     flex: 1 1 100%;
   }
 
-  .border-end {
+  /* .border-end {
     border-right: 0!important;
-  }
+  } */
 
   .table-responsive-xl {
-    overflow: visible;
+    /* overflow: visible; */
     max-height: 100%;
+    border: 0;
+    box-shadow: none;
+    background: no-repeat;
+  }
+
+  .project--table {
+    overflow: visible;
   }
 
   .wrapper--title {
@@ -7984,7 +8062,7 @@ Media CSS-=-==
   .page--wrapper .draggable--table tr {
     display: flex;
     flex-flow: column wrap;
-    gap: 1rem;
+    gap: .5rem;
   }
 
   .page--wrapper .draggable--table .border-bottom, .page--wrapper .draggable--table .border-end {
@@ -8018,7 +8096,7 @@ Media CSS-=-==
 
   .project--grid--table tr,
   .activity--box .card-group .card {
-    max-width: calc(50% - 10px);
+    max-width: calc(50% - .75rem);
   }
 
   .holiday--table--grid tr {
@@ -8033,6 +8111,7 @@ Media CSS-=-==
     border-radius: 0;
     -webkit-border-radius: 0;
     background: none !important;
+    margin-top: 2rem;
   }
 
   .holiday--table tbody,
@@ -8042,9 +8121,8 @@ Media CSS-=-==
     grid-gap: 2rem;
     grid-gap: 2rem;
     gap: 2rem;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: minmax(auto, auto);
+    display: flex;
+    flex-flow: row wrap
   }
 
   .holiday--table tbody tr {
@@ -8059,6 +8137,8 @@ Media CSS-=-==
     border-style: solid;
     border-radius: 1.5rem;
     -webkit-border-radius: 1.5rem;
+    flex: 1 1 100%;
+    max-width: calc(50% - 1rem);
   }
 
   .holiday--table tbody td,
@@ -8078,13 +8158,18 @@ Media CSS-=-==
   .project--table tr,
   .activity--table tr,
   .invoice--table tr {
-    border: 1px solid #eeeeee;
     border-radius: 1rem;
     -webkit-border-radius: 1rem;
     margin-bottom: 0;
     position: relative;
     padding: 1rem;
     outline: none;
+    flex: 1 1 100%;
+    max-width: calc(50% - 1rem);
+    background: #ffffff;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    border: 1px solid rgb(241 245 249);
   }
 
   .page--wrapper .draggable--table th:first-child, .page--wrapper .draggable--table td:first-child {
@@ -8129,7 +8214,7 @@ Media CSS-=-==
     min-width: 100%;
     order: 3;
     margin-top: auto;
-    padding-top: 1rem;
+    padding-top: .5rem;
     border-top: 1px solid rgb(241 245 249);
   }
 
@@ -8171,13 +8256,16 @@ Media CSS-=-==
 
   .page--wrapper table td.project--title--td .title--span {
     max-width: 100%;
+  }
+
+  .page--wrapper .project--table td.project--title--td .title--span {
     flex: 1 1 100%;
   }
 
   .holiday--table, .holiday--table td, .holiday--table tr, .project--table, .project--table td, .project--table tr, .activity--table, .activity--table td, .activity--table tr, .invoice--table, .invoice--table td, .invoice--table tr {
     display: block;
-    border: 0;
-    box-shadow: none;
+    /* border: 0;
+    box-shadow: none; */
   }
 
   .holiday--table td+td,
@@ -8383,7 +8471,7 @@ Media CSS-=-==
   }
 
   .page--wrapper .attendance--excel--table td.project--title--td {
-    padding: 1rem 1.5rem;
+    padding: 0;
   }
 
   .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
@@ -8397,6 +8485,10 @@ Media CSS-=-==
 
   .daily--welcome .card--icon h6 {
     font-size: 28px;
+  }
+
+  .modal .new--accordion--block .bg--blue--accordion, .setting--page .card {
+    padding: 1rem;
   }
 }
 
@@ -8422,8 +8514,13 @@ Media CSS-=-==
     max-width: calc(50% - 5px);
   }
 
+  .holiday--table tr+tr {
+    margin-top: 0;
+  }
+
   .wrapper--title h3 {
     min-height: 0;
+    max-width: 190px;
   }
 
   .show--details,
@@ -8494,12 +8591,64 @@ Media CSS-=-==
   .new--accordion--block .team--card--grid {
     grid-template-columns: repeat(1, 1fr);
   }
+
+  .rounded--box .contact--card.card .card-title {
+    font-size: 1.5rem;
+  }
+
+  .rounded--box .contact--card .card-body .list-group-item, .rounded--box .work--card .card-body .list-group-item {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .rounded--box .permission--card .card-body, .rounded--box .work--card .card-body {
+    padding: 1rem;
+  }
+
+  .new--accordion--block .accordion-body .card .card-body {
+    padding: 0;
+    padding-left: 1rem;
+  }
+
+  .rounded--box .card .card-title {
+    font-size: 1.1rem;
+  }
+
+  .new--accordion--block .accordion-button h6, .modal .new--accordion--block .bg--blue--accordion h6 {
+    font-size: 1rem;
+  }
+
+  .modal .new--accordion--block .team--card--grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .attendance--stats, .attendance--table {
+    padding: 1rem;
+  }
+
+  .activity--table--list, .members--view, .projects--view {
+    box-shadow: none;
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+    border-radius: 0;
+  }
 }
 
 @media screen and (max-width:575px) {
   .projects--page .page--title .list-group-item {
     flex: 1 1 100%;
     max-width: calc(50% - 5px);
+  }
+
+  .rounded--box .card .card-title {
+    flex-flow: row wrap;
+  }
+
+  .rounded--box .card .card-title .btn-primary {
+    flex: 1 1 100%;
+    max-width: 100%;
+    justify-content: center;
   }
 
   .project--grid--table tr,
@@ -8611,6 +8760,14 @@ Media CSS-=-==
     max-width: calc(100% - 0px);
   }
 
+  .page--wrapper table td.project--title--td span, .new--project--rows .project--name strong, .project--grid--new--table td.project--title--td strong, .attendance--table--list .title--span strong, .attendance--table--list table td h4 small {
+    display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  }
+
   .btn {
     padding: .55rem 1rem;
   }
@@ -8658,6 +8815,16 @@ Media CSS-=-==
 
   .holidays--page .card {
     margin-bottom: 0;
+  }
+
+  .accordion .accordion-body {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .accordion .accordion-button {
+    padding: 1rem;
+    padding-right: 2rem;
   }
 }
 
