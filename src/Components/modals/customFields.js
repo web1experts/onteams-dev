@@ -5,7 +5,6 @@ import { FaRegTrashAlt, FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { MdDragIndicator } from "react-icons/md";
 import { LuSettings } from "react-icons/lu";
-import { MdDragIndicator } from "react-icons/md";
 import {
   createCustomField,
   fetchCustomFields,
