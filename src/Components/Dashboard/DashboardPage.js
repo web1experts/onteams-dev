@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Col, Row, Card, Button,ListGroup, Image, CardTitle, CardBody, CardGroup, Tab, Tabs, Modal, Form, Dropdown } from "react-bootstrap";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { FaRegStar, FaDesktop, FaRegFileAlt, FaQuoteRight, FaImage, FaRegQuestionCircle, FaRegEnvelope, FaPlus, FaEllipsisV } from 'react-icons/fa';
-import { FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiSend, FiYoutube, FiEdit } from "react-icons/fi";
+import { FiShield, FiGlobe, FiDownload, FiUpload, FiX, FiSend, FiYoutube, FiSidebar } from "react-icons/fi";
 import { socket, SendComment, DeleteComment, UpdateComment, DeletePost } from '../../helpers/auth';
 import { LuVideo } from "react-icons/lu";
 import { MdLaptopMac, MdOutlineChatBubbleOutline } from "react-icons/md";
@@ -536,24 +536,24 @@ const isPostLikedByMember = (likes = [], memberId) => {
   return (
     <>
       <div className={isActive === 1 ? 'show--details team--page dashboard--page' : isActive === 2 ? ' view--project team--page dashboard--page' : 'team--page dashboard--page'}>
-        {/* <div className='page--title px-md-2 py-3 bg-white border-bottom'>
+        <div className='page--title px-md-2 py-3 bg-white border-bottom d-flex d-xl-none'>
           <Container fluid>
               <Row>
                   <Col sm={12} lg={12}>
                       <h2>
                           <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                           Dashboard
-                          <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
+                          {/* <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
                               <ListGroup horizontal className="bg-white expand--icon ms-3">
                                   <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                               </ListGroup>
-                          </ListGroup>
+                          </ListGroup> */}
                       </h2>
                   </Col>
               </Row>
           </Container>
-        </div> */}
-        <div className='page--wrapper p-md-3 py-3 pt-5 mt-3 text-center'>
+        </div>
+        <div className='page--wrapper p-md-3 py-3 pt-3 pt-lg-5 mt-3 text-center'>
           <Container fluid className="pb-5">
             <Row className="justify-content-center">
               <Col sm={12}>

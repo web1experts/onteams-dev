@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown, ListGroupItem } from "react-bootstrap";
 import { FaChevronDown, FaPlus, FaList, FaRegTrashAlt, FaRegCalendarAlt, FaCog } from "react-icons/fa";
 import { MdFileDownload, MdFilterList, MdOutlineClose, MdOutlineCancel, MdOutlineSearch, MdDragIndicator } from "react-icons/md";
-import { FiSidebar } from "react-icons/fi";
-import { FiFileText } from "react-icons/fi";
+import { FiSidebar, FiFileText } from "react-icons/fi";
 import { GrAttachment, GrExpand } from "react-icons/gr";
 import { BsGrid,BsEye, BsEyeSlash } from "react-icons/bs";
+import { RiFunctionAddLine } from "react-icons/ri";
 import { BiEdit } from "react-icons/bi";
 import { BadgesModal } from "../modals/badges";
 import { ListProjects, createProject, updateProject, deleteProject, reorderedProject } from "../../redux/actions/project.action"
@@ -831,7 +831,7 @@ function ProjectsPage() {
                                             <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                                         </ListGroup>
                                         <ListGroup horizontal className={isActive !== 0 ? '' : 'bg-white expand--icon d-flex'}>
-                                            <ListGroup.Item className={isActive !== 0 ? 'd-flex d-xl-none me-1' : 'd-xl-none onHide me-1'} onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
+                                            <ListGroup.Item className={isActive !== 0 ? 'd-flex d-xl-none' : 'd-xl-none onHide'} onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
                                             <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
                                             <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                                             {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
@@ -955,28 +955,26 @@ function ProjectsPage() {
                                                                                 <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
                                                                             </td>
                                                                             <td className="task--last--buttons">
-                                                                                <div className="d-flex justify-content-between">
-                                                                                    <div key={`actions-index-${index}`} data-label="Actions" className="onHide">
-                                                                                        <Button variant="dark" className="me-2 px-3 py-1" 
-                                                                                            onClick={() => {
-                                                                                                setIsActive(2);
-                                                                                            }}>
-                                                                                            <BsEye/> Details</Button>
-                                                                                        <Button variant="dark" className="px-3 py-1" onClick={() => {
-                                                                                            
-                                                                                            if (
-                                                                                                memberProfile?.permissions?.projects?.view === true ||
-                                                                                                memberProfile?.role?.slug === 'owner'
-                                                                                            ) {
-                                                                                            setIsActive(1);
-                                                                                            } else {
-                                                                                                console.log('not allowed to view tasks');
-                                                                                            }
-                                                                                        }}
-                                                                                        >
-                                                                                           <BiEdit /> Tasks
-                                                                                        </Button>
-                                                                                    </div>
+                                                                                <div className="d-flex" key={`actions-index-${index}`} data-label="Actions">
+                                                                                    <Button variant="dark" className="me-2 px-3 py-1" 
+                                                                                        onClick={() => {
+                                                                                            setIsActive(2);
+                                                                                        }}>
+                                                                                        <BsEye/> Details</Button>
+                                                                                    <Button variant="dark" className="px-3 py-1" onClick={() => {
+                                                                                        
+                                                                                        if (
+                                                                                            memberProfile?.permissions?.projects?.view === true ||
+                                                                                            memberProfile?.role?.slug === 'owner'
+                                                                                        ) {
+                                                                                        setIsActive(1);
+                                                                                        } else {
+                                                                                            console.log('not allowed to view tasks');
+                                                                                        }
+                                                                                    }}
+                                                                                    >
+                                                                                        <BiEdit /> Tasks
+                                                                                    </Button>
                                                                                 </div>
                                                                             </td>
                                                                             {Array.isArray(customFields) && customFields
@@ -992,8 +990,7 @@ function ProjectsPage() {
                                                                                     const matchedOption = field.options.find(opt => opt.value === mvalue);
                                                                                     if (matchedOption) {
                                                                                     mvalue = (
-                                                                                        <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td">
-                                                                                            <span className="priority--badge"
+                                                                                            <span className="priority--badge" key={`project-${fieldname || idx}-${mvalue}`}
                                                                                             style={{
                                                                                                 backgroundColor: matchedOption.color,
                                                                                                 color: '#fff',
@@ -1005,7 +1002,7 @@ function ProjectsPage() {
                                                                                             onClick={() => toggleBadges(field)}
                                                                                         >
                                                                                         {project?.customFields?.[fieldname]?.meta_value}
-                                                                                        </span></td>
+                                                                                        </span>
                                                                                     );
                                                                                     }
                                                                                 }else if(fieldType === 'password'){
@@ -1033,6 +1030,7 @@ function ProjectsPage() {
                                                                                 }
                                                                                 return (
                                                                                     <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td">
+                                                                                        {/* <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-none text-uppercase fs-small mb-1' : 'd-none text-uppercase fs-small mb-1'}>{field.label}</strong> */}
                                                                                         {mvalue}
                                                                                     </td>
                                                                                 );
@@ -1218,14 +1216,14 @@ function ProjectsPage() {
                             <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}><BiEdit className="me-1"/> Tasks</Button>
                         </ListGroup>
                     </ListGroup>
-                    <ListGroup horizontal className="expand--icon gap-2 p-0 b-0 rounded-0 align-items-center">
+                    <ListGroup horizontal className="expand--icon gap-2 p-0 b-0 rounded-0 align-items-center ms-auto ms-sm-0">
                         {
                         (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
-                            <ListGroup.Item className="d-lg-flex me-2" key={`work-settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
+                            <ListGroup.Item className="d-lg-flex" key={`work-settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>
                         )
                         }
                         <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
-                        <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
+                        <ListGroupItem className="btn btn-primary ms-0" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
                     </ListGroup>
                 </div>
                {isActive === 1 && <TasksList activeTab={activeTab} currentProject={currentProject} memberProfile={memberProfile} />} 
@@ -1236,9 +1234,12 @@ function ProjectsPage() {
             
             { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module='projects' />}
             {show &&
-                <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox" onShow={() => selectboxObserver()}>
+                <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox theme--modal" onShow={() => selectboxObserver()}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Create New Project</Modal.Title>
+                        <Modal.Title>
+                            <span className="nav--item--icon"><RiFunctionAddLine /></span>
+                            <strong>Create New Project <small>Easily initiate a new project to organize tasks, teams, and timelines</small></strong>
+                        </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <div className="project--form">
@@ -1404,7 +1405,7 @@ function ProjectsPage() {
                                     </div>
                                 </ListGroup>
                                 <ListGroup className="mt-auto mb-0">
-                                    <ListGroup.Item className="text-center text-center d-flex align-items-center justify-content-center gap-5">
+                                    <ListGroup.Item className="d-flex align-items-center justify-content-end gap-3">
                                         <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
                                     </ListGroup.Item>
                                 </ListGroup>

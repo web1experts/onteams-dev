@@ -589,9 +589,9 @@ useEffect(() => {
                         </ListGroup>
                     </ListGroup>
                    
-                    <ListGroup horizontal className="bg-white expand--icon gap-2 p-0 b-0 rounded-0 align-items-center">
+                    <ListGroup horizontal className="bg-white expand--icon gap-2 p-0 b-0 rounded-0 align-items-center ms-auto ms-sm-0">
                         <ListGroup.Item onClick={props.toggleSidebars} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
-                        <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {props.closeview(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
+                        <ListGroupItem className="btn btn-primary ms-0" key={`closekey`} onClick={() => {props.closeview(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
                     </ListGroup>
                 </div>
                 {(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === "owner") ? 
@@ -828,7 +828,7 @@ useEffect(() => {
                             </div>
                         </ListGroup>
                         <ListGroup className="mt-auto mb-0">
-                            <ListGroup.Item className="text-center d-flex align-items-center justify-content-center gap-5">
+                            <ListGroup.Item className="d-flex align-items-center justify-content-end gap-3">
                                 <Button variant="primary" onClick={handleSubmit} disabled={loader}>{loader ? 'Please wait...' : 'Save'}</Button>
                                 <Button variant="secondary" key='delete-key' onClick={() => setShowDialog(true)}>Delete</Button>
                             </ListGroup.Item>

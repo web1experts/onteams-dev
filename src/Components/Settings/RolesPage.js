@@ -568,10 +568,23 @@ function RolesPage() {
                 
                 {activeRole && Object.keys(activeRole).length > 0 && (
                 <>
-                    <Row className="mt-4">
+                  <Row className="mt-4">
+                    <Col lg={6} className="mb-3 mb-md-0">
+                        <FormGroup className="form-group mb-0 pb-0">
+                          <FloatingLabel label="Select Role">
+                            <Form.Select>
+                            {roles.map((role, index) => {
+                                return (
+                                <option key={`role-${role._id}`} action active={activeRole?._id === role._id} onClick={() => setActiveRole(role)}>{role.name}</option>
+                                );
+                            })}
+                            </Form.Select>
+                          </FloatingLabel>
+                        </FormGroup>
+                    </Col>
                     <Col lg={6}>
                         <FormGroup className="form-group mb-0 pb-0">
-                        <FloatingLabel label="Role name">
+                          <FloatingLabel label="Role name">
                             <Form.Control
                             type="text"
                             className={
@@ -585,25 +598,10 @@ function RolesPage() {
                                 setFields({...fields, ['name']: value})
                             }}
                             />
-                        </FloatingLabel>
+                          </FloatingLabel>
                         </FormGroup>
                     </Col>
-                    <Col lg={6}>
-                        <FormGroup className="form-group mb-0 pb-0">
-                        <FloatingLabel label="Select Role">
-                            <Form.Select>
-                            {roles.map((role, index) => {
-                                return (
-                                <option key={`role-${role._id}`} action active={activeRole?._id === role._id} onClick={() => setActiveRole(role)}>{role.name}</option>
-                                );
-                            })}
-                            </Form.Select>
-                        </FloatingLabel>
-                        {/* <Form.Label>Select Role</Form.Label> */}
-                        
-                        </FormGroup>
-                    </Col>
-                    </Row>
+                  </Row>
                     
                     <div className="new--accordion--block w-100 mt-4">
                     {permissionModules.map((mod) => {

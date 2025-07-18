@@ -15,7 +15,7 @@ function WorkspaceSetup() {
                     </Col>
                     <Col sm={12} lg={6} className="px-0">
                         <div className="common--form">
-                            <img className="logo--sm" src="../images/OnTeam-Logo.png" alt="MyTeams" />
+                            <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
                             <WorkspaceForm />
                         </div>
                     </Col>

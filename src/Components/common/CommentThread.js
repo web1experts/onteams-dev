@@ -1,7 +1,8 @@
 // CommentThread.js
 import React, { useState } from "react";
-import { Card, Button, Form, ButtonGroup } from "react-bootstrap";
+import { Card, Button, Form, Dropdown } from "react-bootstrap";
 import { BsTrash } from "react-icons/bs";
+import { FaEllipsisV } from 'react-icons/fa';
 import { getMemberdata } from "../../helpers/commonfunctions";
 import {
   socket,
@@ -41,14 +42,13 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
         <Card.Title>
           {comment.author?.name}
           {memberdata?._id === comment.author?._id && (
-            <Button
-              variant="danger"
-              size="sm"
-              className="delete--button px-2 py-1"
-              onClick={() => handleDelete(comment._id, comment?.post)}
-            >
-              <BsTrash />
-            </Button>
+            <Dropdown className="edit--dropdown">
+              <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => handleDelete(comment._id, comment?.post)}><BsTrash /> Delete</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            // <Button variant="danger" size="sm" className="delete--button px-2 py-1" onClick={() => handleDelete(comment._id, comment?.post)}><BsTrash /></Button>
           )}
         </Card.Title>
         <Card.Text>{comment.text}</Card.Text>
@@ -141,9 +141,7 @@ const CommentThread = ({ comments, post, toggle }) => {
           >
             Cancel
           </Button>
-          <Button variant="primary" onClick={postComment}>
-            Post
-          </Button>
+          <Button variant="primary" onClick={postComment}>Post</Button>
         </div>
       </div>
     </div>

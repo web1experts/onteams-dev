@@ -546,9 +546,9 @@ function ClientsPage() {
                           <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                       </ListGroup>
                     </ListGroup>
-                   <ListGroup horizontal className={isActive ? 'd-none' : 'd-none d-md-flex ms-auto ms-lg-0'}>
+                   <ListGroup horizontal className={isActive ? '' : 'd-md-flex ms-auto ms-lg-0'}>
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
-                      <ListGroup.Item className="d-none d-md-flex me-2" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                      <ListGroup.Item className="d-md-flex" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
                         <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
                         {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                           <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
@@ -706,7 +706,7 @@ function ClientsPage() {
                           <Dropdown.Item onClick={() => {handleClick(client)}} key={`client-item-${index}`} className={(selectedClient?._id === client?._id) ? 'active-project': ''}>
                             <div className="title--initial">{client?.name.charAt(0)}</div>
                             <div className="title--span flex-column align-items-start gap-0">
-                                <strong>{client?.name}</strong>
+                              <strong>{client?.name}</strong>
                             </div>
                           </Dropdown.Item>
                         )
@@ -770,8 +770,8 @@ function ClientsPage() {
               <Card.Title>
                 <FiMail /> Client Information
                 {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") &&
-                        <FiEdit onClick={() => setIsEditing(true)} />
-                      }
+                  <FiEdit className="fs-small" onClick={() => setIsEditing(true)} />
+                }
               </Card.Title>
               <Card.Text>
                 <ListGroup>
@@ -795,11 +795,11 @@ function ClientsPage() {
                         :
                         <>
                         <ListGroup.Item>
-                          <Form.Group className="mb-3">
-                            <Form.Label>Cliet Name</Form.Label>
+                          <Form.Group className="mb-0 w-100">
+                            <Form.Label>Client Name</Form.Label>
                             <Form.Control type="text" placeholder={'Name'} name={`name`}  value={fields?.name} onChange={handleChange} />
-                           </Form.Group>
-                          </ListGroup.Item>
+                          </Form.Group>
+                        </ListGroup.Item>
                             {customFields?.length > 0 && (
                             <>
                               {customFields.map((field, index) => (
@@ -814,7 +814,6 @@ function ClientsPage() {
                                     options: field?.options || [],
                                     onChange: (e) => {
                                         if(field.type === "date"){
-                                            
                                             handleDateChange(e, `custom_field[${field.name}]`)
                                         }else{
                                             handleChange(e)

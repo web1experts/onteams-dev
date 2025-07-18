@@ -121,7 +121,7 @@ function ForgotPassword() {
                     <Col sm={12} lg={6} className="px-0">
                         { !showmsg ? 
                         <div className="common--form">
-                            <img className="logo--sm" src="../images/OnTeam-Logo.png" alt="MyTeams" />
+                            <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
                             <Form onSubmit={handleSubmit}>
                                 <h2>Forgot Password</h2>
                                 <Form.Group className="mb-2 form-group">
@@ -138,7 +138,7 @@ function ForgotPassword() {
                                 
                         <>
                          <div className="common--form">
-                            <img className="logo--sm" src="../images/OnTeam-Logo.png" alt="MyTeams" />
+                            <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
                             <h6>We've sent a password reset email to {fields['email']}.</h6>
                             <p className='paragraph text-center '>Didn't see an email?</p>
                             <div className="">

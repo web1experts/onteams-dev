@@ -128,31 +128,31 @@ function MemberSignUp() {
                     </Col>
                     <Col sm={12} lg={6} className="px-0">
                         <div className="common--form">
-                            <img className="logo--sm" src="../images/OnTeam-Logo.png" alt="MyTeams" />
-                                <Form onSubmit={handleSubmit}> 
-                                    <h2>Don't have an account? Sign Up</h2>
-                                    <Form.Group className={`mb-3 form-group ${errors['email'] ? 'has-error' : ''}`}>
-                                        <FloatingLabel label="Email address *">
-                                            <Form.Control type="text" placeholder="Email address" name="email" value={fields.email} readonly disabled className={errors['email'] ? "input-error" : ''} />
-                                        </FloatingLabel>
-                                        {showError('email')}
-                                    </Form.Group>
-                                    <Form.Group className="mb-3 form-group">
-                                        <FloatingLabel label="Your Name *">
-                                            <Form.Control type="text" placeholder="Your Name" value={fields.name} className={errors['name'] ? "input-error" : ''} name="name" onChange={handleChange} />
-                                        </FloatingLabel>
-                                        {showError('name')}
-                                    </Form.Group>
-                                    <Form.Group className="mb-3 form-group">
-                                        <FloatingLabel label="Password *">
-                                            <Form.Control type="password" placeholder="Password" value={fields.password}  className={errors['password'] ? "input-error" : ''} name="password" onChange={handleChange} />
-                                        </FloatingLabel>
-                                        {showError('password')}
-                                    </Form.Group>
-                                    <Button variant="primary" type="submit" disabled={loader}>{loader ? 'Please Wait...' : 'Create Account'}</Button>
-                                    <p><span>OR</span></p>
-                                    <p>Already have an account. <Link to="/login">Login Here</Link></p>
-                                </Form>
+                            <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
+                            <Form onSubmit={handleSubmit}> 
+                                <h2>Don't have an account? Sign Up</h2>
+                                <Form.Group className={`mb-3 form-group ${errors['email'] ? 'has-error' : ''}`}>
+                                    <FloatingLabel label="Email address *">
+                                        <Form.Control type="text" placeholder="Email address" name="email" value={fields.email} readonly disabled className={errors['email'] ? "input-error" : ''} />
+                                    </FloatingLabel>
+                                    {showError('email')}
+                                </Form.Group>
+                                <Form.Group className="mb-3 form-group">
+                                    <FloatingLabel label="Your Name *">
+                                        <Form.Control type="text" placeholder="Your Name" value={fields.name} className={errors['name'] ? "input-error" : ''} name="name" onChange={handleChange} />
+                                    </FloatingLabel>
+                                    {showError('name')}
+                                </Form.Group>
+                                <Form.Group className="mb-3 form-group">
+                                    <FloatingLabel label="Password *">
+                                        <Form.Control type="password" placeholder="Password" value={fields.password}  className={errors['password'] ? "input-error" : ''} name="password" onChange={handleChange} />
+                                    </FloatingLabel>
+                                    {showError('password')}
+                                </Form.Group>
+                                <Button variant="primary" type="submit" disabled={loader}>{loader ? 'Please Wait...' : 'Create Account'}</Button>
+                                <p><span>OR</span></p>
+                                <p>Already have an account. <Link to="/login">Login Here</Link></p>
+                            </Form>
                         </div>
                     </Col>
                 </Row>
