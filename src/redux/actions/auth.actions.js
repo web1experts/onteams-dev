@@ -6,6 +6,7 @@ import {
   LOGIN_FAILED,
   LOGIN_SUCCESS,
   LOGOUT,
+  UPDATE_PASSWORD_SUCCESS,
   LOGIN_COMMON_ERROR,
   RESET_PASSWORD_SUCCESS,
   RESET_PASSWORD_FAILED,
@@ -147,6 +148,21 @@ export const resetPassword = (payload) => {
         await dispatch({ type: RESET_PASSWORD_SUCCESS, payload: response.data });
       } else {
         await dispatch({ type: RESET_PASSWORD_FAILED, payload: response.data.message });
+      }
+    } catch (error) {
+      errorRequest(error, dispatch)
+    }
+  }
+}
+
+export const updatePassword = (payload) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPatch('updatePassword', payload);
+      if (response.data && response.data.success) {
+        await dispatch({ type: UPDATE_PASSWORD_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: LOGIN_COMMON_ERROR, payload: response.data.message });
       }
     } catch (error) {
       errorRequest(error, dispatch)

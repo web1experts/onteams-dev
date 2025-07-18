@@ -20,6 +20,8 @@ import MonthHeader from "./monthheader";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
+const today = new Date();
+const currentMonthValue = `${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`; // 'MM/YYYY'
 
 function getMonthLabel(monthYear) {
   const [mm, yyyy] = monthYear.split('/');
@@ -131,7 +133,19 @@ useEffect(() => {
 
   useEffect(() => {
     if (attendanceFeed) {
-      setAttendances(attendanceFeed)
+      setAttendances(attendanceFeed);
+
+      if(isActive === 1 && selectedMember){
+        const matchedResult = attendanceFeed.find(
+          (atten) => atten?._id === selectedMember?._id
+        );
+        
+        if (matchedResult) {
+          handleMemberAttendance(matchedResult);
+          setIsActive(1)
+        }
+       
+      }
     }
   }, [attendanceFeed])
 
@@ -247,20 +261,30 @@ useEffect(() => {
                         <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
                         <Dropdown.Menu>
                           <div className="drop--scroll">
-                            {monthsArray.map((month) => (
-                              <Dropdown.Item
-                                key={month.value}
-                                className={`dropdown-item ${filters.month === month.value ? 'selected--option' : ''}`}
-                                as="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setFilters((prev) => ({ ...prev, month: month.value }));
-                                }}
-                              >
-                                {month.label}
-                                {filters.month === month.value && <MdOutlineCheck />}
-                              </Dropdown.Item>
-                            ))}
+                            {monthsArray.map((month) => {
+                              const isFuture =
+                                parseInt(month.value.split('/')[1]) > today.getFullYear() ||
+                                (parseInt(month.value.split('/')[1]) === today.getFullYear() &&
+                                  parseInt(month.value.split('/')[0]) > today.getMonth() + 1);
+                              return (
+                                <Dropdown.Item
+                                  key={month.value}
+                                  className={`dropdown-item ${filters.month === month.value ? 'selected--option' : ''}`}
+                                  as="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (!isFuture) {
+                                      setFilters((prev) => ({ ...prev, month: month.value }));
+                                    }
+                                  }}
+                                  disabled={isFuture}
+                                  style={{ pointerEvents: isFuture ? 'none' : 'auto', opacity: isFuture ? 0.5 : 1 }}
+                                >
+                                  {month.label}
+                                  {filters.month === month.value && <MdOutlineCheck />}
+                                </Dropdown.Item>
+                              )
+                            })}
                           </div>
                         </Dropdown.Menu>
 
@@ -471,7 +495,7 @@ useEffect(() => {
                               <td>
                                 <div className="d-flex justify-content-between">
                                   <div className="project--name d-flex gap-3 align-items-center">
-                                      <div className="title--initial">{attendanceData?.name?.substring(0, 2)}</div>
+                                      <div className="title--initial">{attendanceData?.name?.charAt(0)}</div>
                                       <div className="title--span flex-column d-flex align-items-start gap-0">
                                           <span>{attendanceData?.name}</span>
                                           <strong>{attendanceData?.role}</strong>
@@ -528,8 +552,12 @@ useEffect(() => {
                           {members.map((member, index) => {
                               return (
                                   <Dropdown.Item key={`drop-item-${member._id}`} value={member._id} onClick={() => { handleMemberAttendance(member) }}>
+                                    <div className="title--initial">{member?.name.charAt(0)}</div>
+                                      <div className="title--span flex-column align-items-start gap-0">
                                       <strong>{member.name}</strong>
+                                      <span>{member.role?.name}</span>
                                       
+                                      </div>
                                   </Dropdown.Item>
                               
                               )
@@ -538,13 +566,49 @@ useEffect(() => {
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
+              <ListGroup horizontal className="ms-auto">
+              <ListGroup.Item>
+                      <Dropdown className="select--dropdown">
+                        <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <div className="drop--scroll">
+                            {monthsArray.map((month) => {
+                              const isFuture =
+                                parseInt(month.value.split('/')[1]) > today.getFullYear() ||
+                                (parseInt(month.value.split('/')[1]) === today.getFullYear() &&
+                                  parseInt(month.value.split('/')[0]) > today.getMonth() + 1);
+                                return (
+                              <Dropdown.Item
+                                key={month.value}
+                                className={`dropdown-item ${filters.month === month.value ? 'selected--option' : ''}`}
+                                as="button"
+                                disabled={isFuture}
+                                style={{ pointerEvents: isFuture ? 'none' : 'auto', opacity: isFuture ? 0.5 : 1 }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (!isFuture) {
+                                    setFilters((prev) => ({ ...prev, month: month.value }));
+                                  }
+                                }}
+                              >
+                                {month.label}
+                                {filters.month === month.value && <MdOutlineCheck />}
+                              </Dropdown.Item>
+                                )
+                              })}
+                          </div>
+                        </Dropdown.Menu>
+
+                    </Dropdown>
+                    </ListGroup.Item>
+                  </ListGroup>
               <ListGroup horizontal>
                   <ListGroup.Item key={'toggle-handle'} onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
                   <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
               </ListGroup>
           </div>
           <div className="bg-white attendance--table daily--attendance--table">
-            <h3 className="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - June 2025</h3>
+            <h3 className="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - {getMonthLabel(filters?.month)}</h3>
             <div className="overflow-x-auto">
                 <Table>
                   <thead>

@@ -22,7 +22,8 @@ import {
     RESEND_INVITE_FAILED,
     GET_SINGLE_MEMBER_SUCCESS,
     GET_SINGLE_MEMBER_FAILED,
-    MEMBERS_BY_ROLES
+    MEMBERS_BY_ROLES,
+    MEMBERS_REORDER
 } from "./types";
 
 const config = {
@@ -221,4 +222,19 @@ export const getMembersGroupByRoles = () => {
           errorRequest(err, dispatch);
         }
     };
+}
+
+export const reorderedMember = (payload) => {
+    return async (dispatch)=>{
+        try{
+            const response = await API.apiPutUrl('member', `/reorder`, payload);
+            if(response.data && response.data.success){
+                await dispatch({ type: MEMBERS_REORDER, payload: response.data});
+            }else{
+                console.log('Reorder failed')
+            }
+        }catch (err){
+            errorRequest(err, dispatch);
+        }
+    }
 }

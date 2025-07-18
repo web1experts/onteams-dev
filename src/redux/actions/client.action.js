@@ -13,6 +13,7 @@ import {
     GET_SINGLE_CLIENT_SUCCESS,
     GET_SINGLE_CLIENT_FAILED,
     CLIENT_COMMON_ERROR,
+    CLIENTS_REORDER
 } from "./types";
 
 const config = {
@@ -105,3 +106,19 @@ export const updateClient = (clientId, payload) =>{
         }
     }
 }
+
+export const reorderedClient = (payload) => {
+    return async (dispatch)=>{
+        try{
+            const response = await API.apiPutUrl('client', `/reorder`, payload);
+            if(response.data && response.data.success){
+                await dispatch({ type: CLIENTS_REORDER, payload: response.data});
+            }else{
+                console.log('Reorder failed')
+            }
+        }catch (err){
+            errorRequest(err, dispatch);
+        }
+    }
+}
+

@@ -138,7 +138,8 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
 
     socket.emit('get-tracker-status-update', {userID: activity._id})
     setCurrentActivity( activity)
-    if(activeTab === "Recordings"){
+    console.log("activeTab: ", activeTab)
+    if(activeTab === "Recordings" || activeInnerTab === "InnerRecorded"){
       setActiveInnerTab("InnerRecorded")
     }else{
       setActiveInnerTab("InnerLive")
@@ -1408,7 +1409,7 @@ const handleProjectSelect = async (project) => {
                                               <span>
                                                 {activity.name}
                                               </span>
-                                              <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</strong>
+                                              <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.role?.name || '' }</strong>
                                             </div>
                                           </div>
                                         </div>
@@ -1466,7 +1467,7 @@ const handleProjectSelect = async (project) => {
                   <div className="title--span flex-column align-items-start gap-0">
                       <h3>
                         <strong>{currentActivity?.name}</strong>
-                        <span>{currentActivity?.latestActivity?.project?.title || ''}</span>
+                        <span>{currentActivity?.role?.name|| ''}</span>
                     </h3>
                   </div>
               </Dropdown.Toggle>
@@ -1480,7 +1481,7 @@ const handleProjectSelect = async (project) => {
                               <div className="title--initial">{activity?.name.charAt(0)}</div>
                               <div className="title--span flex-column align-items-start gap-0">
                                 <strong>{activity?.name}</strong>
-                                <span>{activity?.latestActivity?.project?.title || ''}</span>
+                                <span>{activity?.role?.name || ''}</span>
                               </div>
                             </Dropdown.Item>
                           )

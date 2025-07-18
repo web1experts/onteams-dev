@@ -23,7 +23,8 @@ import {
     USER_WORKSPACE_LIST_FAILED,
     PROFILE_SUCCESS,
     PUT_USER_SUCCESS,
-    PUT_USER_FAILED
+    PUT_USER_FAILED,
+    UPDATE_PASSWORD_SUCCESS
 } from "../actions/types";
 import * as auth from '../../helpers/auth';
 const token = auth.getToken();
@@ -111,6 +112,13 @@ export default (state = initialState, action) => {
                 ...state,
                 updateMessage: action.payload.message,
                 loggedIn: false,
+                success: true,
+                message: action.payload.message,
+                message_variant: 'success',
+            }
+        case UPDATE_PASSWORD_SUCCESS:
+            return {
+                ...state,
                 success: true,
                 message: action.payload.message,
                 message_variant: 'success',

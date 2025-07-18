@@ -792,17 +792,39 @@ function getProjectTabSummary(projectReport) {
   useEffect(() => {
       if (reportState?.memberReports) { 
         setMemberReports(reportState?.memberReports)
+        if(isActive === 1 && singleMemberReport && activeMemberTab === 'members'){ 
+          const matchedReport = reportState.memberReports.find(
+            (report) => report?.member._id === singleMemberReport?.member?._id
+          );
+          
+          if (matchedReport) {
+            setSingleMemberReport(matchedReport);
+            setIsActive(1);
+          }
+        }
       }
       if(reportState.projectReports){
         setProjectReports(reportState.projectReports)
+        if(isActive === 1 && singleMemberReport && activeMemberTab === 'projects'){
+          const matchedReport = reportState.projectReports?.reports?.find(
+            (report) => report._id === singleMemberReport?._id
+          );
+          
+          if (matchedReport) {
+            setSingleMemberReport(matchedReport);
+            setIsActive(1);
+          }
+        }
       }
 
       if( reportState.singleProjectReport){
         setsingleProjectReport(reportState.singleProjectReport)
-        // console.log(calculateOccupiedRanges(reportState.singleProjectReport))
-        // setOccupiedRanges(calculateOccupiedRanges(reportState.singleProjectReport))
       }
     }, [reportState])
+
+    useEffect(() => {
+      console.log('single member report: ', singleMemberReport)
+    },[singleMemberReport])
 
     const goToPrevious = () => {
       if (filters?.page > 1) {
@@ -1339,7 +1361,47 @@ const handleToggles = () => {
                   </Dropdown>
               }
             </div>
+            <ListGroup>
+              <ListGroup.Item className="d-none d-xl-block">
+                <Form>
+                  <Form.Group className="mb-0 form-group me-2">
+                  <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />
+                  </Form.Group>
+                  {
+                  (selectedFilter === 'custom') && (
+                  <Form.Group className="mb-0 form-group">
+                    <DatePicker 
+                        ref={datePickerRef}
+                        key={'date-filter'}
+                        name="date"
+                        weekStartDayIndex={1}
+                        id='datepicker-filter'
+                        value={filtereddate} 
+                        format="YYYY-MM-DD"
+                        range
+                        numberOfMonths={2}
+                        dateSeparator=" - " 
+                        onChange={async (value) => {
+                            setFilteredDate(value)
+                          }
+                        } 
+                        editable={false}         
+                        className="form-control"
+                        placeholder="dd/mm/yyyy"
+                        open={isPickerOpen} // Control visibility with state
+                        onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                        onClose={() => setIsPickerOpen(false)} // Update state when closed
+                        plugins={
+                          [<FilterButton position="bottom" />]
+                        } 
+                    />
+                      </Form.Group>
+                  )}
+                </Form>
+              </ListGroup.Item>
+            </ListGroup>
             <ListGroup horizontal>
+              
               <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
               <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
             </ListGroup>

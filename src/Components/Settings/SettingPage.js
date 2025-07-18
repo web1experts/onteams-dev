@@ -6,7 +6,7 @@ import { FiGlobe} from "react-icons/fi";
 import { TbTimezone } from "react-icons/tb";
 import { MdLockOutline, MdOutlineEmail } from "react-icons/md";
 import Spinner from "react-bootstrap/Spinner";
-import { getUserProfile, updateProfile } from "../../redux/actions/auth.actions";
+import { getUserProfile, updateProfile, updatePassword } from "../../redux/actions/auth.actions";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
 import { permissionModules, permissionsLabel } from "../../helpers/permissionsModules";
@@ -80,183 +80,29 @@ function EditableField({
 
 function SettingPage() {
   const dispatch = useDispatch();
+  const fileInputRef = useRef();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isActive, setIsActive] = useState(false);
   const [fieldserrors, setFieldErrors] = useState({ name: "" });
   const [profile, setProfile] = useState({});
   const [profileFields, setProfileFields] = useState({});
   const authprofile = useSelector((state) => state.auth.profile);
+  const authAPI = useSelector((state) => state.auth);
   const [userProfile, setUserProfile] = useState({});
   const [loader, setLoader] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
+  const [securityFields, setSecurityFields] = useState({})
+  const [secutiryErrors, setSecutiryErrors] = useState({})
   let fieldErrors = {};
   let hasError = false;
   const [isEditing, setIsEditing] = useState({
     name: false,
     avatar: false,
   });
-  let defaultrole;
   const [fields, setFields] = useState({ name: "" });
   const [errors, setErrors] = useState({});
-  const [show, setShow] = useState(false);
-  const [showdelete, setShowDelete] = useState(false);
-  const [activeKey, setActiveKey] = useState(null);
-  const [activeRole, setActiveRole] = useState({});
-  const workspace = useSelector((state) => state.workspace);
-  const members = useSelector((state) => state.member);
-  const apiPermission = useSelector((state) => state.permissions);
-  const memberFeed = useSelector((state) => state.member.members);
-  const [roles, setRoles] = useState([]);
-  const [memberslist, setMemberslist] = useState([]);
-  const [permissions, setPermissions] = useState({});
-  const [expanded, setExpanded] = useState({});
-  const [memberFeeds, setMemberFeed] = useState([]);
 
-  const handleToggleExpandAll = () => {
-    const areAllExpanded = permissionModules.every((mod) => expanded[mod.slug]);
-
-    const newExpandedState = {};
-    permissionModules.forEach((mod) => {
-      newExpandedState[mod.slug] = !areAllExpanded;
-    });
-
-    setExpanded(newExpandedState);
-  };
-
-  const toggleExpand = (module) => {
-    setExpanded((prev) => ({
-      ...prev,
-      [module]: !prev[module],
-    }));
-  };
-
-  const toggleView = (module) => {
-    const isChecked = !(permissions?.[module]?.view || false);
-
-    const currentPerms = permissions?.[module] || {};
-    const updated = {
-      ...currentPerms,
-      view: isChecked,
-    };
-
-    if (!isChecked) {
-      const moduleData = permissionModules.find((m) => m.slug === module);
-      if (moduleData) {
-        (moduleData.permissions || []).forEach((perm) => {
-          if (perm !== "view") {
-            updated[perm] = false;
-          }
-        });
-      }
-    }
-
-    setPermissions((prev) => ({
-      ...prev,
-      [module]: updated,
-    }));
-  };
-  const togglePermission = (module, perm) => {
-    setPermissions((prev) => {
-      const currentPerms = prev?.[module] || {};
-      return {
-        ...prev,
-        [module]: {
-          ...currentPerms,
-          [perm]: !currentPerms?.[perm],
-        },
-      };
-    });
-  };
-
-  const handleSelectAllPermissions = (isChecked) => {
-    const updatedPermissions = {};
-
-    permissionModules.forEach((mod) => {
-      const modSlug = mod.slug;
-      const currentModPerms = permissions?.[modSlug] || {};
-
-      const updatedModPerms = {};
-
-      // Set all boolean permissions to true/false
-      (mod.permissions || []).forEach((perm) => {
-        updatedModPerms[perm] = isChecked;
-      });
-
-      // For modules that have selected_members, add them
-      if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
-        if (isChecked) {
-          const allMemberIds = memberFeeds.map((m) => String(m._id));
-          if (modSlug === "projects") {
-            allMemberIds.push("unassigned");
-          }
-          updatedModPerms["selected_members"] = allMemberIds;
-        } else {
-          updatedModPerms["selected_members"] = [];
-        }
-      }
-
-      updatedPermissions[modSlug] = updatedModPerms;
-    });
-
-    setPermissions((prev) => ({ ...prev, ...updatedPermissions }));
-  };
-
-  const handleSelectAll = (modSlug, isChecked) => {
-    const memberIds = memberFeeds.map((member) => String(member._id));
-    if (isChecked) {
-      setPermissions((prev) => {
-        const currentPerms = prev?.[modSlug] || {};
-        const currentMembers = currentPerms["selected_members"] || [];
-
-        return {
-          ...prev,
-          [modSlug]: {
-            ...currentPerms,
-            ["selected_members"]: memberIds,
-          },
-        };
-      });
-    } else {
-      setPermissions((prev) => {
-        const currentPerms = prev?.[modSlug] || {};
-        return {
-          ...prev,
-          [modSlug]: {
-            ...currentPerms,
-            ["selected_members"]: [],
-          },
-        };
-      });
-    }
-  };
-
-  const toggleMembers = (module, perm, memberId) => {
-    setPermissions((prev) => {
-      const currentPerms = prev?.[module] || {};
-      const currentMembers = currentPerms[perm] || [];
-
-      const updatedMembers = currentMembers.includes(memberId)
-        ? currentMembers.filter((id) => id !== memberId)
-        : [...currentMembers, memberId];
-
-      return {
-        ...prev,
-        [module]: {
-          ...currentPerms,
-          [perm]: updatedMembers,
-        },
-      };
-    });
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setPermissions((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
@@ -264,6 +110,40 @@ function SettingPage() {
   const handleEditClick = (fieldName) => {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
+
+  const handleSecurityFields = ({target: {name, type, value}}) => {
+    setSecurityFields({...securityFields, [name]: value})
+  }
+
+  const handleSecurityUpdate = async (e) => {
+    e.preventDefault();
+
+    const errors = {};
+
+    Object.entries(securityFields).forEach(([key, value]) => {
+      if (!value || value.trim() === '') {
+        errors[key] = 'error';
+      }
+    });
+    if (
+      securityFields.new_password &&
+      securityFields.confirm_password &&
+      securityFields.new_password !== securityFields.confirm_password
+    ) {
+      errors.confirm_password = 'Passwords do not match';
+    }
+    setSecutiryErrors(errors);
+
+    if (Object.keys(errors).length === 0) {
+      console.log('Security Fields:', securityFields);
+      dispatch(updatePassword(securityFields))
+      // Proceed with API call or next steps
+      
+    }else{
+      return;
+    }
+  };
+
 
   const refreshProfile = async () => {
     setSpinner(true);
@@ -274,6 +154,12 @@ function SettingPage() {
   useEffect(() => {
     refreshProfile();
   }, []);
+
+  useEffect(() => {
+    if(authAPI.success){
+      setSecurityFields({})
+    }
+  },[authAPI])
 
   const handleFieldChange = (field, value) => {
     if (field === "avatar") {
@@ -294,58 +180,10 @@ function SettingPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const updatedErrorsPromises = Object.entries(fields).map(
-      async ([fieldName, value]) => {
-        if (value === "") {
-          return { fieldName, error: "Field cannot be blank" };
-        } else {
-          return { fieldName, error: "" };
-        }
-      }
-    );
-
-    // Wait for all promises to resolve
-    const updatedErrorsArray = await Promise.all(updatedErrorsPromises);
-    const errors = {};
-    updatedErrorsArray.forEach(({ fieldName, error }) => {
-      if (error) {
-        errors[fieldName] = error;
-      }
-    });
-    const hasError = Object.keys(errors).length > 0;
-
-    if (hasError) {
-      setErrors(errors);
-      return;
-    }
-    try {
-      const roleData = {
-        name: fields.name,
-        permissions,
-      };
-      
-      setLoader(true);
-      dispatch(addRoleWithPermissions(roleData));
-    } catch (err) {
-      console.error("Error adding role:", err);
-      alert("Error adding role");
-    }
-  };
+  
   useEffect(() => {
     if (authprofile) {
       setUserProfile(authprofile);
-      // if( localStorage.hasItem('current_loggedin_user')){
-      //   const jsondata = parseIfValidJSON(localStorage.getItem('current_loggedin_user'));
-
-      //   if( jsondata){
-      //     jsondata['name'] = authprofile?.name
-      //     jsondata['avatar'] = authprofile?.avatar
-      //     jsondata['name'] = authprofile?.name
-      //     localStorage.setItem('current_loggedin_user', JSON.stringify(jsondata, secretKey));
-      //   }
-      // }
     }
   }, [authprofile]);
 
@@ -441,185 +279,19 @@ function SettingPage() {
     setProfile({ ...profile, ["avatar"]: false });
   };
 
-  useEffect(() => {
-    if (activeRole) {
-      const merged = {};
 
-      // Step 1: Initialize merged with empty string values
-      permissionModules.forEach((mod) => {
-        merged[mod.slug] = {};
-        mod.permissions.forEach((p) => {
-          merged[mod.slug][p] = "";
-        });
-      });
-
-     
-      setPermissions((prev) => {
-        const newPerms = activeRole.permissions || {};
-
-        // Clone merged to avoid mutating the original reference
-        const updated = { ...merged };
-
-        // First, update existing keys in merged
-        for (const module in updated) {
-          updated[module] = { ...updated[module] }; // clone inner object
-          for (const key in updated[module]) {
-            if (newPerms?.[module] && key in newPerms[module]) {
-              updated[module][key] = newPerms[module][key];
-            } else {
-              updated[module][key] = "";
-            }
-          }
-        }
-
-        // Then, add any missing modules or keys from newPerms
-        for (const module in newPerms) {
-          if (!updated[module]) {
-            updated[module] = {};
-          }
-          for (const key in newPerms[module]) {
-            if (!(key in updated[module])) {
-              updated[module][key] = newPerms[module][key];
-            }
-          }
-        }
-
-        return updated;
-      });
-      setFields({...fields, ['name']: activeRole?.name})
+  const showError = (name, type = 'default') => {
+    if(type === 'security'){
+      if (secutiryErrors[name]) return <span className="error">{secutiryErrors[name]}</span>;
+    }else{
+      if (errors[name]) return <span className="error">{errors[name]}</span>;
     }
-  }, [activeRole]);
-
-  const handleDeleteRole = async (e) => {
-    setLoader(true); console.log(activeRole._id)
-    dispatch(deleteRole(activeRole._id))
-  }
-
-  const handleSave = async (e) => {
-    try {
-      const roleData = {
-        role: activeRole._id,
-        permissions,
-        type: "default",
-        name: fields['name']
-      };
-      setLoader(true);
-      dispatch(updatePermissions(roleData));
-    } catch (err) {
-      console.error("Error adding role:", err);
-      alert("Error adding role");
-    }
-  };
-  const handleShow = () => {
-    setShow((prev) => !prev);
-    setFields({})
-  };
-
-  useEffect(() => {
-    if( show === true){
-      setActiveRole({})
-    }else{ 
-      if (Array.isArray(roles) && roles.length > 0) {
-        setActiveRole(roles[0]);
-      }
-    }
-  },[show])
-
-  const showError = (name) => {
-    if (errors[name]) return <span className="error">{errors[name]}</span>;
     return null;
   };
 
-  const handleRoleList = async () => {
-    await dispatch(
-      getAvailableRolesByWorkspace({ fields: "_id name permissions" })
-    );
-  };
 
-  useEffect(() => {
-    if (memberFeed && memberFeed.memberData) {
-      setMemberFeed(memberFeed.memberData);
-    }
-  }, [memberFeed]);
 
-  useEffect(() => {
-    setLoader(false);
-    setShowDelete(false)
-    if (apiPermission.success) {
-      setShow(false);
-      setPermissions({})
-      if (apiPermission.savedrole) {
-        const savedrole = apiPermission.savedrole;
-        setFields({...fields, ['name']: savedrole.name})
-        setRoles((prev) => {
-          const index = prev.findIndex((role) => role._id === savedrole._id);
-          if (index !== -1) {
-            // Replace existing role
-            return prev.map((role) =>
-              role._id === savedrole._id ? savedrole : role
-            );
-          } else {
-            // Add new role
-            return [...prev, savedrole];
-          }
-        });
-        
-      }
-      if( apiPermission.deletedRole){
-        setRoles((prev) => prev.filter((role) => role._id !== apiPermission.deletedRole?._id));
-      }
-      if (apiPermission.updatedMeta) {
-        const meta = apiPermission.updatedMeta?.meta_value;
-        const memberIdToUpdate = apiPermission.updatedMeta?.member;
 
-        setMemberslist((prev) => {
-          const existing = prev[activeKey];
-
-          if (!existing) return prev;
-
-          const updatedMembers = existing.members.map((member) => {
-            if (member._id === memberIdToUpdate) {
-              return {
-                ...member,
-                permissions: meta, // or savedrole.permissions if that’s what you want
-              };
-            }
-            return member;
-          });
-
-          return {
-            ...prev,
-            [activeKey]: {
-              ...existing,
-              members: updatedMembers,
-            },
-          };
-        });
-      }
-    }
-  }, [apiPermission]);
-
-  useEffect(() => {
-    handleRoleList();
-    let prm = {};
-    permissionModules.forEach((mod) => {
-      prm[mod.slug] = {}; // Initialize object for each module
-      mod.permissions.forEach((p) => {
-        prm[mod.slug][p] = "";
-      });
-    });
-
-    setPermissions(prm);
-    dispatch(Listmembers());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (workspace.available_roles) {
-      setRoles(workspace.available_roles);
-      defaultrole = workspace.available_roles[0];
-      setActiveRole(workspace.available_roles[0]);
-    }
-  }, [workspace]);
 
   return (
     <>
@@ -639,6 +311,7 @@ function SettingPage() {
               <Card>
                 <div className="card--img">
                   <Form.Control
+                    ref={fileInputRef}
                     type="file"
                     id="upload--avatar"
                     name="avatar"
@@ -661,7 +334,6 @@ function SettingPage() {
                     )}
 
                     {!userProfile?.avatar && <span>Add Photo</span>}
-                    {/* {userProfile?.avatar && <span>Edit Photo</span>} */}
                   </Form.Label>
                   {userProfile?.avatar && (
                     <Dropdown className="edit--dropdown">
@@ -669,7 +341,7 @@ function SettingPage() {
                         <FaEllipsisV />
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        <Dropdown.Item>
+                        <Dropdown.Item onClick={() => fileInputRef.current.click()}>
                           <Form.Label htmlFor="upload--avatar">
                             <FaEdit /> {userProfile?.avatar && <span>Edit Photo</span>}
                           </Form.Label>
@@ -718,18 +390,21 @@ function SettingPage() {
               <h3>Security</h3>
               <div className="new--accordion--block">
                 <div className="bg--blue--accordion">
-                  <Form>
+                  <Form onSubmit={handleSecurityUpdate}>
                     <Form.Group className="mb-3">
                       <Form.Label>Current Password</Form.Label>
-                      <Form.Control type="password" />
+                      <Form.Control type="password" name="current_password" value={securityFields?.current_password || ''} onChange={handleSecurityFields} />
+                      {showError('current_password', 'security')}
                     </Form.Group>
                     <Form.Group className="mb-3">
                       <Form.Label>New Password</Form.Label>
-                      <Form.Control type="password" />
+                      <Form.Control type="password"  name="new_password" value={securityFields?.new_password || ''} onChange={handleSecurityFields}/>
+                      {showError('confirm_password', 'security')}
                     </Form.Group>
                     <Form.Group className="mb-3">
                       <Form.Label>Confirm Password</Form.Label>
-                      <Form.Control type="password"/>
+                      <Form.Control type="password" name="confirm_password" value={securityFields?.confirm_password || ''} onChange={handleSecurityFields}/>
+                      {showError('confirm_password', 'security')}
                     </Form.Group>
                     <div className="text-end">
                       <Button variant="primary" type="submit">Update Password</Button> 

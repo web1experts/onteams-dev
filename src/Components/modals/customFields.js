@@ -10,6 +10,7 @@ import { Button, Modal, Form, Card, Badge, Row, Col } from "react-bootstrap";
 import { FaRegTrashAlt, FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { LuSettings } from "react-icons/lu";
+import { MdDragIndicator } from "react-icons/md";
 import {
   createCustomField,
   fetchCustomFields,
@@ -66,7 +67,7 @@ export const CustomFieldModal = (props) => {
           <Row className="align-items-center">
             <Col xs="auto">
               <Badge pill bg="light" text="dark">
-                #{idx}
+                <MdDragIndicator /><abbr key={`index-${idx}`}>#{idx}</abbr> 
               </Badge>
             </Col>
             <Col>
@@ -413,7 +414,7 @@ export const CustomFieldModal = (props) => {
     }));
 
     // Dispatch the action with the new order
-    dispatch(reorderedCustomFields({ fields: newOrder }));
+    dispatch(reorderedCustomFields({ fields: newOrder, module: props.module }));
     // Update the state with reordered projects
     setCustomFields(reorderedFields);
   };
