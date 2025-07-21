@@ -7857,9 +7857,9 @@ Media CSS-=-==
     width: 250px;
   }
 
-  .page--wrapper .draggable--table th {
+  /* .page--wrapper .draggable--table th {
     min-width: 250px;
-  }
+  } */
 
   .page--wrapper .attendance--excel--table th, .page--wrapper .attendance--excel--table td {
     min-width: 120px;

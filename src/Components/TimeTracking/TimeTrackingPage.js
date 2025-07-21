@@ -2294,7 +2294,7 @@ const handleProjectSelect = async (project) => {
                 </Form.Group>
               </Col>
               <Col sm={12} lg={6}>
-                <Form.Group className="mb-3">
+                <Form.Group className="mb-0 form-group pb-0">
                   <Form.Label>Select Project</Form.Label>
                   <ListGroup key={projectFilter?.status || 'in-progress'}>
                     {
@@ -2320,7 +2320,7 @@ const handleProjectSelect = async (project) => {
                 </Form.Group>
               </Col>
               <Col sm={12} lg={6}>
-                <Form.Group className="mb-3">
+                <Form.Group className="mb-0 form-group pb-0">
                   <Form.Label>Select Task</Form.Label>
                   <ListGroup>
                     {

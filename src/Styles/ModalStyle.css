@@ -848,7 +848,7 @@ input.form-error, select.form-error {
 
 .AddTimeModal .list-group {
     gap: 1rem;
-    max-height: 350px;
+    max-height: 255px;
     overflow-y: auto;
 }
 
