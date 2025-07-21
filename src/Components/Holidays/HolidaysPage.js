@@ -191,7 +191,7 @@ const getDaysLeft = (date) => {
             <Row className="align-items-center">
               <Col md={12}>
                 <h2>
-                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                  <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                   Holidays
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup.Item>

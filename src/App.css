@@ -1005,21 +1005,21 @@ table.draggable--table {
   margin-right: 0;
 }
 
-.clients--table tr {
+/* .clients--table tr {
   cursor: pointer;
-}
+} */
 
-.clients--page .new--project--rows tr:hover,
+/* .clients--page .new--project--rows tr:hover,
 .team-members--page .new--project--rows tr:hover {
   cursor: auto;
-}
+} */
 
-.clients--page .new--project--rows tr:hover abbr,
+/* .clients--page .new--project--rows tr:hover abbr,
 .clients--page .project--grid--new--table tr:hover abbr,
 .team-members--page .new--project--rows tr:hover abbr,
 .team-members--page .project--grid--new--table tr:hover abbr {
   opacity: 1;
-}
+} */
 
 .clients--page .project--grid--table td:last-child,
 .team-members--page .project--grid--table td:last-child {
@@ -1287,10 +1287,8 @@ span.open--sidebar {
   font-size: 1.5rem;
 }
 
-.view--project~.details--projects--grid .open--sidebar,
-.show--details~.details--projects--grid .open--sidebar,
-.show--project~.details--projects--grid .open--sidebar,
 .open--panel--sidebar~.team--page .open--sidebar,
+.open--panel--sidebar~.common--project--grid .open--sidebar,
 .collapse-sidebar~.details--projects--grid .open--sidebar,
 .collapse-sidebar~.details--projects--view .open--sidebar {
   display: inline-flex;
@@ -1439,6 +1437,12 @@ span.open--sidebar {
   border: 0;
 }
 
+.wrapper--title .day--dropdown:hover {
+ background: #f7f7f7;
+    color: inherit;
+    border: 0;
+}
+
 .wrapper--title .list-group-item.btn {
   padding: 0;
   width: 40px;
@@ -1450,6 +1454,10 @@ span.open--sidebar {
   color: #ffffff;
   background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
   margin-left: .5rem;
+}
+
+.wrapper--title .expand--icon .day--dropdown {
+  box-shadow: none;
 }
 
 .wrapper--title .list-group-item.btn svg {
@@ -1471,6 +1479,10 @@ span.open--sidebar {
 .wrapper--title .list-group-item .btn:focus-visible svg,
 .wrapper--title .list-group-item .btn:focus-within svg {
   color: #ffffff;
+}
+
+.wrapper--title .expand--icon .day--dropdown:hover svg {
+  color: inherit;
 }
 
 .wrapper--title .list-group-horizontal>.list-group-item:first-child:not(:last-child) {
@@ -1856,6 +1868,7 @@ span.open--sidebar {
 
 .rounded--box .contact--card.card .card-title .fs-small {
   font-size: 1.2rem;
+  cursor: pointer;
 }
 
 .screenshot--card, .recording--card, .live--card {
@@ -2108,6 +2121,41 @@ span.open--sidebar {
   line-height: 1rem;
 }
 
+.contact--card .list-group-item .form-label {
+  display: block;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: rgb(17 24 39);
+  letter-spacing: .025rem;
+  line-height: 1rem;
+  text-align: left;
+}
+
+.contact--card .list-group-item .form-group {
+  width: 100%;
+}
+
+.rounded--box .contact--card.card .custom-dropdown-container {
+    max-width: fit-content;
+}
+
+.contact--card .list-group-item .form-control, .contact--card .list-group-item .form-select, .contact--card .list-group-item .select--dropdown .btn, .contact--card .list-group-item .rmdp-input {
+  padding: 0;
+  width: 100%;
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.25rem;
+  border: 0;
+  border-radius: 0;
+  min-height: max-content;
+  color: rgba(148, 163, 184, 1);
+}
+
+.contact--card .list-group-item .select--dropdown .btn::before {
+  top: 0;
+}
+
 .team--Cards.active,
 table tr.active td,
 table tr.marked-project td {
@@ -2233,7 +2281,9 @@ table tr.marked-project td {
 .rounded--box .select--dropdown .btn,
 .common--form .select--dropdown .btn {
   padding: .5rem 2rem .5rem 1rem;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: .35rem;
   font-size: 15px;
   font-weight: 400;
   line-height: normal;
@@ -3713,6 +3763,11 @@ Project Task View CSS=-=-=
   background: linear-gradient(to right,rgba(var(--theme-primary), .1),rgba(var(--theme-secondary), .1));
 }
 
+.modal .setting--page .bg--blue--accordion p {
+  flex: 1 1;
+}
+
+
 .new--accordion--block .team--card--grid {
   grid-gap: 1rem;
   gap: 1rem;
@@ -5008,7 +5063,7 @@ pre {
   flex-flow: row wrap;
   position: relative;
   background: #E8E8E860;
-  height: auto
+  height: 100%
 }
 
 .setting--page .setting--tabs {
@@ -5035,6 +5090,7 @@ pre {
 .setting__modal .modal-content {
   border-radius: 1rem;
   overflow: hidden;
+  height: 100%;
 }
 
 .setting--page .setting--tabs h2 {
@@ -7705,10 +7761,6 @@ Media CSS-=-==
   .view--project .open--sidebar,
   .show--project .open--sidebar,
   .open--panel--sidebar~.team--page .open--sidebar {
-    display: inline-flex;
-  }
-
-  span.open--sidebar {
     display: inline-flex;
   }
 

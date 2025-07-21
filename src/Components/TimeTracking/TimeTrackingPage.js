@@ -6,7 +6,7 @@ import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, 
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck, FaEye, FaPlay, FaTrash, FaPlus } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser, FiTrash2, FiCheckCircle } from "react-icons/fi";
+import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser, FiTrash2, FiCheckCircle, FiCheck } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
 import { HiOutlineLightningBolt } from 'react-icons/hi';
@@ -138,7 +138,8 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
 
     socket.emit('get-tracker-status-update', {userID: activity._id})
     setCurrentActivity( activity)
-    if(activeTab === "Recordings"){
+    console.log("activeTab: ", activeTab)
+    if(activeTab === "Recordings" || activeInnerTab === "InnerRecorded"){
       setActiveInnerTab("InnerRecorded")
     }else{
       setActiveInnerTab("InnerLive")
@@ -1122,7 +1123,7 @@ const handleProjectSelect = async (project) => {
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
+                  <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
                   {/* <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
                   <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button> */}
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
@@ -1398,7 +1399,7 @@ const handleProjectSelect = async (project) => {
                                               <span>
                                                 {activity.name}
                                               </span>
-                                              <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</strong>
+                                              <strong key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.role?.name || '' }</strong>
                                             </div>
                                           </div>
                                         </div>
@@ -1437,7 +1438,7 @@ const handleProjectSelect = async (project) => {
       {(isActive === true) &&
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-          <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+          <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
           <div className="projecttitle">
             <Dropdown>
               <Dropdown.Toggle variant="link" id="dropdown-basic">
@@ -1456,7 +1457,7 @@ const handleProjectSelect = async (project) => {
                   <div className="title--span flex-column align-items-start gap-0">
                       <h3>
                         <strong>{currentActivity?.name}</strong>
-                        <span>{currentActivity?.latestActivity?.project?.title || ''}</span>
+                        <span>{currentActivity?.role?.name|| ''}</span>
                     </h3>
                   </div>
               </Dropdown.Toggle>
@@ -1470,7 +1471,7 @@ const handleProjectSelect = async (project) => {
                               <div className="title--initial">{activity?.name.charAt(0)}</div>
                               <div className="title--span flex-column align-items-start gap-0">
                                 <strong>{activity?.name}</strong>
-                                <span>{activity?.latestActivity?.project?.title || ''}</span>
+                                <span>{activity?.role?.name || ''}</span>
                               </div>
                             </Dropdown.Item>
                           )
@@ -1502,7 +1503,7 @@ const handleProjectSelect = async (project) => {
               activeInnerTab === "InnerRecorded" && showDate()
             }
           </ListGroup>
-          <ListGroup horizontal className="p-0 ms-auto">
+          <ListGroup horizontal className="p-0">
             {showRecordedTabs()}
             <ListGroup horizontal className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center">
               <ListGroup.Item onClick={handleSidebar} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
@@ -1894,9 +1895,12 @@ const handleProjectSelect = async (project) => {
           </ListGroup>
         </Modal.Body>
       </Modal>
-      <Modal show={showNew} onHide={handleCloseNew} centered size="lg" className="AddReportModal AddTimeModal">
+      <Modal show={showNew} onHide={handleCloseNew} centered size="xl" className="AddReportModal AddTimeModal theme--modal">
         <Modal.Header closeButton>
-          <Modal.Title>Manual Time Approval</Modal.Title>
+            <Modal.Title>
+              <span className="nav--item--icon"><FiCheckCircle /></span>
+              <strong>Time Entry Approvals <small>Review and approve manual time entries</small></strong>
+            </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ManualTime />
@@ -1906,7 +1910,8 @@ const handleProjectSelect = async (project) => {
       <Modal show={show} onHide={handleClose} centered size="md" className="AddReportModal AddTimeModal theme--modal" onShow={() => {selectboxObserver();}}>
         <Modal.Header closeButton>
             <Modal.Title>
-                <strong>Manual Time Entry <small>Add time entries for completed work</small></strong>
+              <span className="nav--item--icon"><LuTimer /></span>
+              <strong>Manual Time Entry <small>Add time entries for completed work</small></strong>
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -2261,7 +2266,8 @@ const handleProjectSelect = async (project) => {
       <Modal show={showSelect} onHide={handleProjectClose} centered size="lg" className="AddReportModal AddTimeModal theme--modal">
         <Modal.Header closeButton>
             <Modal.Title>
-                <strong>Manual Time Entry <small>Add time entries for completed work</small></strong>
+              <span className="nav--item--icon"><LuTimer /></span>
+              <strong>Manual Time Entry <small>Add time entries for completed work</small></strong>
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>

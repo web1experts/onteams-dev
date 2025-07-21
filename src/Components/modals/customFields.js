@@ -5,7 +5,13 @@ import { FaRegTrashAlt, FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { MdDragIndicator } from "react-icons/md";
 import { LuSettings } from "react-icons/lu";
-import { createCustomField, fetchCustomFields, updateCustomField, deleteField, reorderedCustomFields} from "../../redux/actions/customfield.action";
+import {
+  createCustomField,
+  fetchCustomFields,
+  updateCustomField,
+  deleteField,
+  reorderedCustomFields,
+} from "../../redux/actions/customfield.action";
 import { AlertDialog } from ".";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -401,7 +407,7 @@ export const CustomFieldModal = (props) => {
     }));
 
     // Dispatch the action with the new order
-    dispatch(reorderedCustomFields({ fields: newOrder }));
+    dispatch(reorderedCustomFields({ fields: newOrder, module: props.module }));
     // Update the state with reordered projects
     setCustomFields(reorderedFields);
   };

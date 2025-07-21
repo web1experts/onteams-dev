@@ -390,102 +390,122 @@ const handleReportClose = () => setViewReport(false);
             )
           } */}
           
-          {activeTab === "screenshots" && screenshotsByTask[taskId]?.length > 0 && (
-  <>
-    {screenshotsByTask[taskId].map((screenshotData, idx) => (
-      <Card key={`screenshot-${taskId}-${idx}`}>
-        <Card.Body>
-          <img
-            className="card-img-top"
-            src={screenshotData?.url}
-            alt="screenshot"
-            onClick={() => triggerLightBox("screenshot", screenshotsByTask[taskId], idx)}
-          />
-          <p>
-            <strong>Task Name:</strong> {screenshotData?.task_data?.title}
-            <br />
-            <strong>Time:</strong> {showAmPmtime(screenshotData?.taken_time)}
-          </p>
-        </Card.Body>
-      </Card>
-    ))}
-  </>
-)}
-{activeTab === "videos" && videosByTask[taskId]?.length > 0 && (() => {
-  const taskVideos = videosByTask[taskId];
-  const page = currentVideoPage[`single-${report?.project?._id}`] || 1;
-  const start = (page - 1) * videosPerPage;
-  const end = page * videosPerPage;
-  const paginatedVideos = taskVideos.slice(start, end);
-
-  return (
+          {activeTab === "screenshots" ? (
+  screenshotsByTask?.[taskId]?.length > 0 ? (
     <>
-      {paginatedVideos.map((videoData, idx) => {
-        const realIndex = start + idx;
-        return (
-          <Card key={`video-card-${report?.project?._id}-${page}-${idx}`}>
-            <Card.Body onClick={() => triggerLightBox("video", taskVideos, realIndex)}>
-              <video
-                height="175px"
-                style={{ width: "100%" }}
-                preload="metadata"
-                muted
-                onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
-                controls={false}
-              >
-                <source src={videoData?.url} type="video/webm" />
-                Your browser does not support the video tag.
-              </video>
-              <p>
-                <strong>Task Name:</strong> {videoData.task_data?.title}
-                <br />
-                <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-              </p>
-            </Card.Body>
-          </Card>
-        );
-      })}
-
-      {/* Pagination */}
-      {taskVideos.length > videosPerPage && (
-        <div style={{ marginTop: "10px", textAlign: "center" }}>
-          <Button
-            variant="outline-primary"
-            disabled={page === 1}
-            onClick={() =>
-              setCurrentVideoPage((prev) => ({
-                ...prev,
-                [`single-${report?.project?._id}`]: page - 1,
-              }))
-            }
-          >
-            <BsArrowLeftCircleFill />
-          </Button>
-
-          <span style={{ margin: "0 10px" }}>
-            Page {page} of {Math.ceil(taskVideos.length / videosPerPage)}
-          </span>
-
-          <Button
-            variant="outline-primary"
-            disabled={page >= Math.ceil(taskVideos.length / videosPerPage)}
-            onClick={() =>
-              setCurrentVideoPage((prev) => ({
-                ...prev,
-                [`single-${report?.project?._id}`]: page + 1,
-              }))
-            }
-          >
-            <BsArrowRightCircleFill />
-          </Button>
-        </div>
-      )}
+      {screenshotsByTask[taskId].map((screenshotData, idx) => (
+        <Card key={`screenshot-${taskId}-${idx}`}>
+          <Card.Body>
+            <img
+              className="card-img-top"
+              src={screenshotData?.url}
+              alt="screenshot"
+              onClick={() =>
+                triggerLightBox("screenshot", screenshotsByTask[taskId], idx)
+              }
+              style={{ cursor: 'pointer' }}
+            />
+            <p>
+              <strong>Task Name:</strong> {screenshotData?.task_data?.title}
+              <br />
+              <strong>Time:</strong> {showAmPmtime(screenshotData?.taken_time)}
+            </p>
+          </Card.Body>
+        </Card>
+      ))}
     </>
-  );
-})()}
+  ) : (
+    <h3>No Data Available</h3>
+  )
+) : activeTab === "videos" ? (
+  videosByTask?.[taskId]?.length > 0 ? (
+    (() => {
+      const taskVideos = videosByTask[taskId];
+      const page = currentVideoPage[`single-${report?.project?._id}`] || 1;
+      const start = (page - 1) * videosPerPage;
+      const end = page * videosPerPage;
+      const paginatedVideos = taskVideos.slice(start, end);
 
-          </CardGroup>
-          </div>
+      return (
+        <>
+          {paginatedVideos.map((videoData, idx) => {
+            const realIndex = start + idx;
+            return (
+              <Card
+                key={`video-card-${report?.project?._id}-${page}-${idx}`}
+              >
+                <Card.Body
+                  style={{ cursor: 'pointer' }}
+                  onClick={() =>
+                    triggerLightBox("video", taskVideos, realIndex)
+                  }
+                >
+                  <video
+                    height="175px"
+                    style={{ width: "100%" }}
+                    preload="metadata"
+                    muted
+                    onLoadedMetadata={(e) => (e.target.currentTime = 0.1)}
+                    controls={false}
+                  >
+                    <source src={videoData?.url} type="video/webm" />
+                    Your browser does not support the video tag.
+                  </video>
+                  <p>
+                    <strong>Task Name:</strong> {videoData?.task_data?.title}
+                    <br />
+                    <strong>Time:</strong> {videoData?.start_time} to{" "}
+                    {videoData?.end_time}
+                  </p>
+                </Card.Body>
+              </Card>
+            );
+          })}
+
+          {/* Pagination */}
+          {taskVideos.length > videosPerPage && (
+            <div style={{ marginTop: "10px", textAlign: "center" }}>
+              <Button
+                variant="outline-primary"
+                disabled={page === 1}
+                onClick={() =>
+                  setCurrentVideoPage((prev) => ({
+                    ...prev,
+                    [`single-${report?.project?._id}`]: page - 1,
+                  }))
+                }
+              >
+                <BsArrowLeftCircleFill />
+              </Button>
+
+              <span style={{ margin: "0 10px" }}>
+                Page {page} of {Math.ceil(taskVideos.length / videosPerPage)}
+              </span>
+
+              <Button
+                variant="outline-primary"
+                disabled={page >= Math.ceil(taskVideos.length / videosPerPage)}
+                onClick={() =>
+                  setCurrentVideoPage((prev) => ({
+                    ...prev,
+                    [`single-${report?.project?._id}`]: page + 1,
+                  }))
+                }
+              >
+                <BsArrowRightCircleFill />
+              </Button>
+            </div>
+          )}
+        </>
+      );
+    })()
+  ) : (
+    <h3>No Data Available</h3>
+  )
+) : null}
+
+              </CardGroup>
+            </div>
           </Modal.Body>
         </Modal>
       }
@@ -792,17 +812,39 @@ function getProjectTabSummary(projectReport) {
   useEffect(() => {
       if (reportState?.memberReports) { 
         setMemberReports(reportState?.memberReports)
+        if(isActive === 1 && singleMemberReport && activeMemberTab === 'members'){ 
+          const matchedReport = reportState.memberReports.find(
+            (report) => report?.member._id === singleMemberReport?.member?._id
+          );
+          
+          if (matchedReport) {
+            setSingleMemberReport(matchedReport);
+            setIsActive(1);
+          }
+        }
       }
       if(reportState.projectReports){
         setProjectReports(reportState.projectReports)
+        if(isActive === 1 && singleMemberReport && activeMemberTab === 'projects'){
+          const matchedReport = reportState.projectReports?.reports?.find(
+            (report) => report._id === singleMemberReport?._id
+          );
+          
+          if (matchedReport) {
+            setSingleMemberReport(matchedReport);
+            setIsActive(1);
+          }
+        }
       }
 
       if( reportState.singleProjectReport){
         setsingleProjectReport(reportState.singleProjectReport)
-        // console.log(calculateOccupiedRanges(reportState.singleProjectReport))
-        // setOccupiedRanges(calculateOccupiedRanges(reportState.singleProjectReport))
       }
     }, [reportState])
+
+    useEffect(() => {
+      console.log('single member report: ', singleMemberReport)
+    },[singleMemberReport])
 
     const goToPrevious = () => {
       if (filters?.page > 1) {
@@ -1057,7 +1099,7 @@ const handleToggles = () => {
                   <Col sm={12} lg={12}>
                       <h2>
                           <p className="mb-0 d-flex align-items-center">
-                            <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                            <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                             Reports
                           </p>
                           <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
@@ -1307,7 +1349,7 @@ const handleToggles = () => {
       </div>
       <div className="details--projects--grid projects--grid common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-            <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+            <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
             <div className="projecttitle">
               {
                 (isActive === 1 && activeMemberTab === 'members') ?
@@ -1373,7 +1415,47 @@ const handleToggles = () => {
                   </Dropdown>
               }
             </div>
-            <ListGroup horizontal>
+            
+            <ListGroup horizontal className="expand--icon">
+              <ListGroup>
+                <ListGroup.Item className="d-none d-xl-block w-auto h-auto day--dropdown">
+                  <Form>
+                    <Form.Group className="mb-0 form-group p-0">
+                    <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />
+                    </Form.Group>
+                    {
+                    (selectedFilter === 'custom') && (
+                    <Form.Group className="mb-0 form-group">
+                      <DatePicker 
+                          ref={datePickerRef}
+                          key={'date-filter'}
+                          name="date"
+                          weekStartDayIndex={1}
+                          id='datepicker-filter'
+                          value={filtereddate} 
+                          format="YYYY-MM-DD"
+                          range
+                          numberOfMonths={2}
+                          dateSeparator=" - " 
+                          onChange={async (value) => {
+                              setFilteredDate(value)
+                            }
+                          } 
+                          editable={false}         
+                          className="form-control"
+                          placeholder="dd/mm/yyyy"
+                          open={isPickerOpen} // Control visibility with state
+                          onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                          onClose={() => setIsPickerOpen(false)} // Update state when closed
+                          plugins={
+                            [<FilterButton position="bottom" />]
+                          } 
+                      />
+                        </Form.Group>
+                    )}
+                  </Form>
+                </ListGroup.Item>
+              </ListGroup>
               <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
               <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
             </ListGroup>

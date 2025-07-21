@@ -10,7 +10,7 @@ import { LuFolderOpen } from "react-icons/lu";
 import { TbUsersPlus } from "react-icons/tb";
 import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
-import { MdOutlineSearch, MdOutlineClose, MdSearch } from "react-icons/md";
+import { MdOutlineSearch, MdOutlineClose, MdDragIndicator } from "react-icons/md";
 import { getMemberdata } from "../../helpers/commonfunctions";
 import { Listmembers, deleteMember, updateMember} from "../../redux/actions/members.action";
 import { toggleSidebar, toggleSidebarSmall} from "../../redux/actions/common.action";
@@ -18,7 +18,7 @@ import { leaveCompany } from "../../redux/actions/workspace.action";
 import { useNavigate } from "react-router-dom";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { getFieldRules, validateField } from "../../helpers/rules";
-import { createMember } from "../../redux/actions/members.action";
+import { createMember, reorderedMember } from "../../redux/actions/members.action";
 import Invitation from "./Invitation";
 import { AlertDialog, TransferOnwerShip } from "../modals";
 import { selectboxObserver, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
@@ -29,123 +29,7 @@ import { CustomFieldModal } from "../modals/customFields";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
 import RolesPage from "../Settings/RolesPage";
-function EditableField({ selectedMember, field, label, value, onChange, isEditing, onEditClick, error, roles, printval}) {
-  const inputRef = useRef(null);
-  const wrapperRef = useRef(null);
-  const [originalValue, setOriginalValue] = useState(value);
-
-  useEffect(() => {
-    // if( !value ){
-    function handleClickOutside(event) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        if (inputRef.current && inputRef.current.contains(event.target)) {
-          return; // Click is inside the select box or input field
-        }
-        if (inputRef.current.value.trim() === "") {
-          onChange(originalValue);
-        }
-      }
-    }
-
-    if (isEditing) {
-      setOriginalValue(value);
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-      document.addEventListener("mousedown", handleClickOutside);
-      selectboxObserver();
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-      if (document.querySelector(".conditional-box")) {
-        document.querySelector(".conditional-box").remove();
-      }
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-    // }
-  }, [isEditing]);
-
-  if (field === "role") {
-    return (
-      <ListGroup.Item ref={wrapperRef}>
-        <span className="info--icon">
-          <FiBriefcase />
-        </span>
-        <p>
-          <small>Role</small>
-          {isEditing ? (
-            <>
-              <Form.Group className="mb-0 form-group pb-0">
-                <Form.Select
-                  ref={inputRef}
-                  className={
-                    error
-                      ? "input-error form-control custom-selectbox conditional-box"
-                      : "form-control custom-selectbox conditional-box"
-                  }
-                  defaultValue={value}
-                  onChange={(e) => onChange(e.target.value)}
-                  name="role"
-                >
-                  <option value="none">None</option>
-                  {roles.map((role, index) => (
-                    <option key={index} value={role._id}>
-                      {role.name}
-                    </option>
-                  ))}
-                </Form.Select>
-
-                <span className="error">{error}</span>
-              </Form.Group>
-            </>
-          ) : (
-            <>
-              {printval}
-              <FiEdit
-                onClick={() => onEditClick(true)}
-                style={{ cursor: "pointer" }}
-              />
-            </>
-          )}
-        </p>
-      </ListGroup.Item>
-    );
-  } else if (field !== "email") {
-    return (
-      <li ref={wrapperRef}>
-        <strong>{label}</strong>
-        {isEditing ? (
-          <>
-            <Form.Control
-              type="text"
-              ref={inputRef}
-              placeholder="Search Member.."
-              onChange={(e) => onChange(e.target.value)}
-              id={`${field}`}
-              label={label}
-              name={`${field}`}
-              value={value}
-            />
-          </>
-        ) : (
-          <>
-            {value}
-            <FiEdit
-              onClick={() => onEditClick(true)}
-              style={{ cursor: "pointer" }}
-            />
-            <p className="MuiFormHelperText-root Mui-error">
-              <span className="error">{error}</span>
-            </p>
-          </>
-        )}
-      </li>
-    );
-  }
-  return null;
-}
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function TeamMembersPage() {
   const memberProfile = currentMemberProfile();
@@ -956,12 +840,6 @@ function TeamMembersPage() {
   };
 
   const handleSavePermissions = () => {
-    // const updatedRows = [...rows];
-    // updatedRows[memberIndex] = {
-    //   ...updatedRows[memberIndex],
-    //   ["permissions"]: permissions,
-    // };
-    // setRows(updatedRows);
     setFields({
       ...fields,
       [`custom_field[permissions]`]: permissions,
@@ -979,6 +857,38 @@ function TeamMembersPage() {
     { name: 'Gagandeep Singh', role: 'UI/UX Designer', initial: 'G' },
     { name: 'Tarun Giri', role: 'Project Manager', initial: 'T' },
   ];
+
+  const handleDragEnd = (result) => {
+    const { source, destination, draggableId } = result;
+    // If there's no destination (i.e., the item was dropped outside), do nothing
+    if (!destination) return;
+
+    const memberId = draggableId.split('-')[1]; // Extract task ID from draggableId
+    const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
+    const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
+
+    // Clone the projects array to avoid mutating the state directly
+    let reorderedMembers = [...memberFeeds];
+    if (sourceTabId === destinationTabId) {
+        // If the task was moved within the same tab, reorder the tasks
+        const [removed] = reorderedMembers.splice(source.index, 1); // Remove task from the source position
+        reorderedMembers.splice(destination.index, 0, removed); // Insert task to the destination position
+    } else {
+        // Task was moved to a different tab (if needed, handle cross-tab logic here)
+        const [removed] = reorderedMembers.splice(source.index, 1); // Remove from source tab
+        reorderedMembers.splice(destination.index, 0, removed); // Add to destination tab
+    }
+    // Generate a list of newly ordered projects
+    const newOrder = reorderedMembers.map((member, index) => ({
+        member_id: member._id, // Adjust this if your project ID key is different
+        order: index
+    }));
+
+    // Dispatch the action with the new order
+    dispatch(reorderedMember({ members: newOrder}));
+    // Update the state with reordered projects
+    setMemberFeed(reorderedMembers);
+};
   
   const pagetopbar = () => {
     return (
@@ -987,7 +897,7 @@ function TeamMembersPage() {
           <Row>
             <Col sm={12}>
               <h2>
-                <span className="open--sidebar me-3 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0); }}><FiSidebar /></span>
+                <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0); }}><FiSidebar /></span>
                 {activeTab}
                 <ListGroup horizontal className={isActive ? "d-none" : "me-2 ms-auto d-none d-md-flex" }>
                   <ListGroup horizontal>
@@ -1055,136 +965,157 @@ function TeamMembersPage() {
             )}
             <Container fluid className="pb-5 pt-2">
               <>
+                <DragDropContext onDragEnd={handleDragEnd}>
                 <div className={ isActiveView === 1 ? "project--grid--table project--grid--new--table table-responsive-xl" : isActiveView === 2 ? "project--table draggable--table new--project--rows table-responsive-xl" : "project--table new--project--rows table-responsive-xl"}>
-                  <Table>
-                    <thead className="onHide">
-                      <tr key="project-table-header">
-                        <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
-                          <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">Member{" "}<span key="client-action-header" className="onHide">Actions</span></div>
-                        </th>
-                        <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email{" "}</div>{" "}</th>
-                        {Array.isArray(customFields) &&
-                          customFields
-                            .filter((field) => field?.showInTable !== false)
-                            .map((field, idx) => (
-                              <th scope="col" key={`member-field-${idx}-header`} className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">{field.label}</div></th>
-                            ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {!showloader && memberFeeds && memberFeeds.length > 0
-                        ? memberFeeds.map((member, idx) => (
-                            <tr
-                              key={`member-table-row-${idx}`}
-                              className={
-                                member._id === selectedMember?._id
-                                  ? "project--active"
-                                  : ""
-                              }
-                              onClick={
-                                  () => handleTableToggle(member)
-                                  
-                              }
-                            >
-                              <td className="project--title--td sticky" data-label="Member Name">
-                                <div className="d-flex justify-content-between border-end flex-wrap">
-                                  <div className="project--name">
-                                    <div className="drag--indicator"><abbr>{idx + 1}</abbr></div>
-                                    <div className="title--initial">{member.name.charAt(0)}</div>
-                                    <div className="title--span flex-column align-items-start gap-0">
-                                      <span>{member.name}</span>
-                                      <strong>{member.role?.name}</strong>
-                                    </div>
-                                  </div>
-                                  <div className="onHide task--buttons">
-                                    <Button variant="primary" className="px-3 py-2" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /></Button>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="onHide new--td">{member.email}</td>
-                              {Array.isArray(customFields) &&
-                                customFields
-                                  .filter(
-                                    (field) => field?.showInTable !== false
-                                  )
-                                  .map((field, idx) => {
-                                    const fieldname = field.name;
-                                    let mvalue =
-                                      member?.memberMeta?.[fieldname]
-                                        ?.meta_value;
-                                    const fieldType = field.type;
-                                    const uniqueKey = `${fieldname || idx}-${mvalue}`;
-                                    if (
-                                      field.type === "badge" &&
-                                      Array.isArray(field.options)
-                                    ) {
-                                      const matchedOption = field.options.find(
-                                        (opt) => opt.value === mvalue
-                                      );
-                                      if (matchedOption) {
-                                        mvalue = (
-                                          <span
-                                            className="priority--badge"
-                                            style={{
-                                              backgroundColor: matchedOption.color,
-                                              color: "#fff",
-                                              display: "inline-block",
-                                              borderColor: matchedOption.color,
-                                              borderWidth: '1px',
-                                              borderStyle: 'solid'
-                                            }}
-                                            onClick={() => toggleBadges(field)}
-                                          >
-                                            {
-                                              member?.memberMeta?.[fieldname]
-                                                ?.meta_value
-                                            }
-                                          </span>
-                                        );
-                                      }
+                  
+                    <Table>
+                      <thead className="onHide">
+                        <tr key="project-table-header">
+                          <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
+                            <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">Member{" "}<span key="client-action-header" className="onHide">Actions</span></div>
+                          </th>
+                          <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email{" "}</div>{" "}</th>
+                          {Array.isArray(customFields) &&
+                            customFields
+                              .filter((field) => field?.showInTable !== false)
+                              .map((field, idx) => (
+                                <th scope="col" key={`member-field-${idx}-header`} className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">{field.label}</div></th>
+                              ))}
+                        </tr>
+                      </thead>
+                      <Droppable droppableId={`droppable-members-table`} type="MEMBERS" >
+                        {(provided) => (
+                        <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                          {!showloader && memberFeeds && memberFeeds.length > 0
+                            ? memberFeeds.map((member, idx) => (
+                              <>
+                              <Draggable
+                                key={member?._id}
+                                draggableId={`member-${member?._id}`}
+                                index={idx}
+                              >
+                                {(provided) => (
+                                  <tr
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    key={`member-table-row-${member._id}`}
+                                    className={
+                                      member._id === selectedMember?._id
+                                        ? "project--active"
+                                        : ""
                                     }
-                                    else if(fieldType === 'password'){
-                                        return (
-                                            <span className="d-flex align-items-center gap-2">
-                                                {visiblePasswords[uniqueKey] ? mvalue : '*****'}
-                                                <span
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={() => toggleVisibility(uniqueKey)}
-                                                >
-                                                    {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
-                                                </span>
-                                            </span>
+                                    onClick={
+                                        () => handleTableToggle(member)
+                                        
+                                    }
+                                  >
+                                    <td className="project--title--td sticky border-bottom" data-label="Member Name">
+                                      <div className="d-flex justify-content-between border-end flex-wrap">
+                                        <div className="project--name">
+                                          <div className="drag--indicator"><abbr>{idx + 1}</abbr><MdDragIndicator /></div>
+                                          <div className="title--initial">{member.name.charAt(0)}</div>
+                                          <div className="title--span flex-column align-items-start gap-0">
+                                            <span>{member.name}</span>
+                                            <strong>{member.role?.name}</strong>
+                                          </div>
+                                        </div>
+                                        <div className="onHide task--buttons">
+                                          <Button variant="primary" className="px-3 py-2" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /></Button>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="onHide new--td">{member.email}</td>
+                                    {Array.isArray(customFields) &&
+                                      customFields
+                                        .filter(
+                                          (field) => field?.showInTable !== false
                                         )
-                                    }
-                                    return (
-                                      <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
-                                        {mvalue}
-                                      </td>
-                                    );
-                                  })}
-                              <td className="task--last--buttons mt-auto">
-                                <div className="d-flex justify-content-between flex-wrap">
-                                  <div className="onHide">
-                                    <Button variant="dark" className="px-3 py-1" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /> View</Button>
-                                  </div>
-                                </div>
-                              </td>
-                            </tr>
-                          ))
-                        : !showloader &&
-                          memberFeeds &&
-                          memberFeeds.length === 0 && (
-                            <tr className="no--invite">
-                              <td colSpan={5}>
-                                <h2 className="mt-2 text-center">
-                                  Members Not Found
-                                </h2>
-                              </td>
-                            </tr>
-                          )}
-                    </tbody>
-                  </Table>
+                                        .map((field, idx) => {
+                                          const fieldname = field.name;
+                                          let mvalue =
+                                            member?.memberMeta?.[fieldname]
+                                              ?.meta_value;
+                                          const fieldType = field.type;
+                                          const uniqueKey = `${fieldname || idx}-${mvalue}`;
+                                          if (
+                                            field.type === "badge" &&
+                                            Array.isArray(field.options)
+                                          ) {
+                                            const matchedOption = field.options.find(
+                                              (opt) => opt.value === mvalue
+                                            );
+                                            if (matchedOption) {
+                                              mvalue = (
+                                                <span
+                                                  className="priority--badge"
+                                                  style={{
+                                                    backgroundColor: matchedOption.color,
+                                                    color: "#fff",
+                                                    display: "inline-block",
+                                                    borderColor: matchedOption.color,
+                                                    borderWidth: '1px',
+                                                    borderStyle: 'solid'
+                                                  }}
+                                                  onClick={() => toggleBadges(field)}
+                                                >
+                                                  {
+                                                    member?.memberMeta?.[fieldname]
+                                                      ?.meta_value
+                                                  }
+                                                </span>
+                                              );
+                                            }
+                                          }
+                                          else if(fieldType === 'password'){
+                                              return (
+                                                  <span className="d-flex align-items-center gap-2">
+                                                      {visiblePasswords[uniqueKey] ? mvalue : '*****'}
+                                                      <span
+                                                          style={{ cursor: 'pointer' }}
+                                                          onClick={() => toggleVisibility(uniqueKey)}
+                                                      >
+                                                          {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
+                                                      </span>
+                                                  </span>
+                                              )
+                                          }
+                                          return (
+                                            <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
+                                              {mvalue}
+                                            </td>
+                                          );
+                                        })}
+                                    <td className="task--last--buttons mt-auto">
+                                      <div className="d-flex justify-content-between flex-wrap">
+                                        <div className="onHide">
+                                          <Button variant="dark" className="px-3 py-1" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /> View</Button>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                                </Draggable>
+                                </>
+                              ))
+                            : !showloader &&
+                              memberFeeds &&
+                              memberFeeds.length === 0 && (
+                                <tr className="no--invite">
+                                  <td colSpan={5}>
+                                    <h2 className="mt-2 text-center">
+                                      Members Not Found
+                                    </h2>
+                                  </td>
+                                </tr>
+                              )}
+                        </tbody>
+                        )}
+                        </Droppable>
+                    </Table>
+                  
                 </div>
+                </DragDropContext>
               </>
             </Container>
           </div>
@@ -1196,7 +1127,7 @@ function TeamMembersPage() {
       {isActive && (
         <div className="details--member--view">
           <div className="wrapper--title py-2 bg-white border-bottom">
-            <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+            <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
             <div className="projecttitle">
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
@@ -1254,7 +1185,7 @@ function TeamMembersPage() {
                 <Card.Body className="p-0 ps-4">
                   <Card.Title>
                     {selectedMember?.name}
-                    {(memberProfile?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( <FiEdit onClick={() => setIsEditing(true)} />)}
+                    {(memberProfile?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( <FiEdit className="fs-small" onClick={() => setIsEditing(true)} />)}
                   </Card.Title>
 
                   {isEditing === false ? (
@@ -1409,8 +1340,8 @@ function TeamMembersPage() {
                                     type: field.type,
                                     label: field.label,
                                     value: field.type === 'date' && fields[`custom_field[${field.name}]`]
-                                                                                        ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
-                                                                                        : fields[`custom_field[${field.name}]`] || '',
+                                    ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                    : fields[`custom_field[${field.name}]`] || '',
                                     options: field?.options || [],
                                     
                                     onChange: (e) =>
@@ -1435,35 +1366,7 @@ function TeamMembersPage() {
                       </Card.Text>
                     </>
                   )}
-                  {/* <Card.Text>
-                    <ListGroup>
-                      {memberProfile?.permissions?.members
-                        ?.create_edit_delete === true ||
-                      memberProfile?.role?.slug === "owner" ? (
-                        <>
-                          <EditableField
-                            selectedMember={selectedMember}
-                            field="role"
-                            // label="Role"
-                            value={editedMember?.role}
-                            onChange={(value) =>
-                              handleFieldChange("role", value)
-                            }
-                            isEditing={isEditing.role}
-                            onEditClick={() => handleEditClick("role")}
-                            error={errors["role"] && errors["role"]}
-                            printval={editedMember.rolename}
-                            roles={roles}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          
-                        </>
-                      )}
-                     
-                    </ListGroup>
-                  </Card.Text> */}
+                  
                   <div className="text-end mt-3">
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true &&
@@ -1526,12 +1429,12 @@ function TeamMembersPage() {
                         <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording during work hours</small></h6>
                       </div>
                       <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
-                                 updateRecodingType({
-                                      custom_field: {
-                                          video_recording: event.target.checked ? "enable" : "disabled"
-                                      }
-                                  });
-                                }} name={`custom_field[video_recording]`} />
+                        updateRecodingType({
+                            custom_field: {
+                                video_recording: event.target.checked ? "enable" : "disabled"
+                            }
+                        });
+                      }} name={`custom_field[video_recording]`} />
                     </Card.Body>
                   </Card>
 
@@ -1806,6 +1709,7 @@ function TeamMembersPage() {
                   />
                 </FloatingLabel>
                 {showError("email")}
+                <span>{fields?.rolename || ''}</span>
               </Form.Group>
 
               <Button
@@ -1860,7 +1764,7 @@ function TeamMembersPage() {
         </Modal.Footer>
       </Modal>
       {showPermissions && (
-        <Modal show={showPermissions} onHide={() => setShowPermissions(false)} centered size="lg" className="add--team--member--modal add--member--modal theme--modal">
+        <Modal show={showPermissions} onShow={() => {selectboxObserver()}} onHide={() => setShowPermissions(false)} centered size="lg" className="add--team--member--modal add--member--modal theme--modal">
           <Modal.Header closeButton>
               <Modal.Title>
                   <strong>Roles & Permissions <small>Manage members role & permissions</small></strong>
@@ -1882,6 +1786,7 @@ function TeamMembersPage() {
                     const matchedRole = roles.find(
                       (role) => role._id === e.target.value
                     );
+                    handleChange({ target: { name: 'rolename', value: matchedRole.name } });
                     const matchedPermissions = matchedRole
                       ? matchedRole.permissions
                       : [];
@@ -2223,16 +2128,20 @@ function TeamMembersPage() {
         showBadges !== null && 
         <BadgesModal badgesData={showBadges} toggleBadges={toggleBadges} handleSelect={handleChange} value={fields[`custom_field[${showBadges?.name}]`] || ''}/>
       }
-      <Modal show={showSetting} onHide={handleSettingClose} size="xl" centered className="theme--modal">
-        <Modal.Header closeButton>
-            <Modal.Title>
-                <strong>Role & Permissions <small>Manage access permissions</small></strong>
-            </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="p-0">
-            <RolesPage />
-        </Modal.Body>
-    </Modal>
+      {
+        showSetting && 
+      
+        <Modal show={showSetting} onHide={handleSettingClose} size="xl" centered className="theme--modal">
+          <Modal.Header closeButton>
+              <Modal.Title>
+                  <strong>Role & Permissions <small>Manage access permissions</small></strong>
+              </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="p-0">
+              <RolesPage />
+          </Modal.Body>
+        </Modal>
+      }
     </>
   );
 }

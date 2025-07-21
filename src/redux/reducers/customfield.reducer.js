@@ -58,7 +58,8 @@ export default (state = initialState, action) => {
         }
     case FIELDS_REORDER:
         return {
-            successfull: true
+            successfull: true,
+            customFields: action.payload.customFields
         }
     default: return state;
   }

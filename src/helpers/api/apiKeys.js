@@ -4,6 +4,7 @@
 const apiKeys = {
     login: "/auth/login",
     register: "/auth/register",
+    updatePassword: "/auth/update-password",
     memberRegister: "/auth/member-register",
     account_setup: "/auth/account_setup",
     otpRequest:'/auth/otp/request',

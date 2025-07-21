@@ -6,7 +6,7 @@ import { BsGrid, BsEye, BsEyeSlash  } from "react-icons/bs";
 import { TbArrowsSort } from "react-icons/tb";
 import { GrExpand } from "react-icons/gr";
 import { MdOutlineSearch, MdDragIndicator, MdOutlineClose, MdSearch } from "react-icons/md";
-import { ListClients, deleteClient, updateClient } from "../../redux/actions/client.action";
+import { ListClients, deleteClient, updateClient, reorderedClient } from "../../redux/actions/client.action";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +20,7 @@ import { currentMemberProfile } from "../../helpers/auth";
 import { CustomFieldModal } from "../modals/customFields";
 import { convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY } from "../../helpers/commonfunctions";
 import { BadgesModal } from "../modals/badges";
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 /*function EditableField({ field, label, value, onChange, isEditing, onEditClick, error }) {
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
@@ -159,6 +160,37 @@ function ClientsPage() {
     setIsActive(false)
   }
 
+  const handleDragEnd = (result) => {
+          const { source, destination, draggableId } = result;
+          // If there's no destination (i.e., the item was dropped outside), do nothing
+          if (!destination) return;
+  
+          const clientId = draggableId.split('-')[1]; // Extract task ID from draggableId
+          const sourceTabId = source.droppableId.split('-')[1]; // Get source tab ID
+          const destinationTabId = destination.droppableId.split('-')[1]; // Get destination tab ID
+  
+          // Clone the projects array to avoid mutating the state directly
+          let reorderedClients = [...clientFeeds];
+          if (sourceTabId === destinationTabId) {
+              // If the task was moved within the same tab, reorder the tasks
+              const [removed] = reorderedClients.splice(source.index, 1); // Remove task from the source position
+              reorderedClients.splice(destination.index, 0, removed); // Insert task to the destination position
+          } else {
+              // Task was moved to a different tab (if needed, handle cross-tab logic here)
+              const [removed] = reorderedClients.splice(source.index, 1); // Remove from source tab
+              reorderedClients.splice(destination.index, 0, removed); // Add to destination tab
+          }
+          // Generate a list of newly ordered projects
+          const newOrder = reorderedClients.map((client, index) => ({
+              client_id: client._id, // Adjust this if your project ID key is different
+              order: index
+          }));
+  
+          // Dispatch the action with the new order
+          dispatch(reorderedClient({ clients: newOrder}));
+          // Update the state with reordered projects
+          setClientFeed(reorderedClients);
+      };
   
   
   const toggleVisibility = (key) => {
@@ -530,7 +562,7 @@ function ClientsPage() {
             <Row>
               <Col sm={12}>
                 <h2>
-                  <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                  <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                   Clients
                   <ListGroup horizontal className={isActive ? 'd-none' : 'onlyIconsView ms-auto d-none d-lg-flex'}>
                       <ListGroup.Item className='d-none d-lg-block'>
@@ -568,6 +600,7 @@ function ClientsPage() {
               </div>
           }
           <Container fluid className="pb-5 pt-2">
+            <DragDropContext onDragEnd={handleDragEnd}>
             <div className={isActiveView === 1 ? 'project--grid--table project--grid--new--table table-responsive-xl' : isActiveView === 2 ? 'project--table draggable--table new--project--rows table-responsive-xl' : 'project--table new--project--rows table-responsive-xl'}>
               <Table>
                 <thead className="onHide">
@@ -586,81 +619,95 @@ function ClientsPage() {
                       }
                     </tr>
                 </thead>
-                <tbody>
+                <Droppable droppableId={`droppable-client-table`} type="CLIENTS" >
+                  {(provided) => (
+                <tbody ref={provided.innerRef} {...provided.droppableProps}>
                   {
                     (!spinner && clientFeeds && clientFeeds.length > 0)
                       ? clientFeeds.map((client, index) => {
                         return (<>
-                          <tr key={`client-row-${index}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={ () => handleClick(client)}>
-                            {/* <td>{index + 1}</td> */}
-                            <td className="project--title--td sticky" key={`title-index-${index}`} data-label="Client Name">
-                              <div className="d-lg-flex justify-content-between border-end flex-wrap">
-                                  <div className="project--name">
-                                      <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr></div>
-                                      <div className="title--initial">{client.name.charAt(0)}</div>
-                                      <div className="title--span flex-column align-items-start gap-0">
-                                          <span>{client.name}</span>
-                                      </div>
-                                  </div>
-                                   <div className="onHide task--buttons">
-                                      <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client); setIsActive(true)}}><BsEye /></Button>
-                                  </div>
-                              </div>
-                            </td>
-                            {Array.isArray(customFields) && customFields
-                              .filter(field => field?.showInTable !== false)
-                              .map((field, idx) => {
-                                  const fieldname = field.name;
-                                  let mvalue = client?.customFields?.[fieldname]?.meta_value;
-                                  const fieldType = field.type;
-                                  const uniqueKey = `${fieldname || idx}-${mvalue}`;
-                                  if (field.type === 'badge' && Array.isArray(field.options)) {
-                                      const matchedOption = field.options.find(opt => opt.value === mvalue);
-                                      if (matchedOption) {
-                                      mvalue = (
-                                          <span
-                                            className="priority--badge"
-                                            style={{
-                                              backgroundColor: matchedOption.color,
-                                              color: "#fff",
-                                              display: "inline-block",
-                                              borderColor: matchedOption.color,
-                                              borderWidth: '1px',
-                                              borderStyle: 'solid'
-                                            }}
-                                            onClick={() => toggleBadges(field)}
-                                          >
-                                          {client?.customFields?.[fieldname]?.meta_value}
-                                          </span>
-                                      );
-                                      }
-                                  }else if(fieldType === 'password'){
-                                      return (
-                                          <span className="d-flex align-items-center gap-2">
-                                              {visiblePasswords[uniqueKey] ? mvalue : '*****'}
-                                              <span
-                                                  style={{ cursor: 'pointer' }}
-                                                  onClick={() => toggleVisibility(uniqueKey)}
-                                              >
-                                                  {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
-                                              </span>
-                                          </span>
-                                      )
-                                  }
-                                  return (
-                                      <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide new--td">
-                                          {mvalue}
-                                      </td>
-                                  );
-                              })}
-                            <td className="task--last--buttons mt-auto" key={`client-td3-${index}`}>
-                              <div className="d-flex justify-content-between">
-                                  <div className="onHide">
-                                      <Button variant="dark" className="me-2 px-3 py-1" onClick={() => {handleClick(client); setIsActive(true)}}><BsEye /> View</Button>
-                                  </div>
-                              </div>
-                            </td>
-                          </tr>
+                        <Draggable
+                          key={client?._id}
+                          draggableId={`client-${client?._id}`}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <tr
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              key={`client-row-${client._id}`} className={client._id === selectedClient?._id ? 'project--active' : ''} onClick={ () => handleClick(client)}>
+                              {/* <td>{index + 1}</td> */}
+                              <td className="project--title--td sticky border-bottom" key={`title-index-${index}`} data-label="Client Name">
+                                <div className="d-lg-flex justify-content-between border-end flex-wrap">
+                                    <div className="project--name">
+                                        <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
+                                        <div className="title--initial">{client.name.charAt(0)}</div>
+                                        <div className="title--span flex-column align-items-start gap-0">
+                                            <span>{client.name}</span>
+                                        </div>
+                                    </div>
+                                    <div className="onHide task--buttons">
+                                        <Button variant="primary" className="px-3 py-2" onClick={() => {handleClick(client); setIsActive(true)}}><BsEye /></Button>
+                                    </div>
+                                </div>
+                              </td>
+                              {Array.isArray(customFields) && customFields
+                                .filter(field => field?.showInTable !== false)
+                                .map((field, idx) => {
+                                    const fieldname = field.name;
+                                    let mvalue = client?.customFields?.[fieldname]?.meta_value;
+                                    const fieldType = field.type;
+                                    const uniqueKey = `${fieldname || idx}-${mvalue}`;
+                                    if (field.type === 'badge' && Array.isArray(field.options)) {
+                                        const matchedOption = field.options.find(opt => opt.value === mvalue);
+                                        if (matchedOption) {
+                                        mvalue = (
+                                            <span
+                                              className="priority--badge"
+                                              style={{
+                                                backgroundColor: matchedOption.color,
+                                                color: "#fff",
+                                                display: "inline-block",
+                                                borderColor: matchedOption.color,
+                                                borderWidth: '1px',
+                                                borderStyle: 'solid'
+                                              }}
+                                              onClick={() => toggleBadges(field)}
+                                            >
+                                            {client?.customFields?.[fieldname]?.meta_value}
+                                            </span>
+                                        );
+                                        }
+                                    }else if(fieldType === 'password'){
+                                        return (
+                                            <span className="d-flex align-items-center gap-2">
+                                                {visiblePasswords[uniqueKey] ? mvalue : '*****'}
+                                                <span
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => toggleVisibility(uniqueKey)}
+                                                >
+                                                    {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
+                                                </span>
+                                            </span>
+                                        )
+                                    }
+                                    return (
+                                        <td key={`client-${fieldname || idx}-${mvalue}`} className="onHide new--td">
+                                            {mvalue}
+                                        </td>
+                                    );
+                                })}
+                              <td className="task--last--buttons mt-auto" key={`client-td3-${index}`}>
+                                <div className="d-flex justify-content-between">
+                                    <div className="onHide">
+                                        <Button variant="dark" className="me-2 px-3 py-1" onClick={() => {handleClick(client); setIsActive(true)}}><BsEye /> View</Button>
+                                    </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                          </Draggable>
                         </>)
                       })
                       :
@@ -673,6 +720,8 @@ function ClientsPage() {
                         </tr>
                   }
                 </tbody>
+                )}
+                </Droppable>
               </Table>
               {
                   isActiveView === 1 && !spinner && clientFeeds && clientFeeds.length == 0 &&
@@ -681,13 +730,14 @@ function ClientsPage() {
                   </div>
               }
             </div>
+            </DragDropContext>
           </Container>
         </div>
       </div>
       {selectedClient &&
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-          <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+          <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
           <div className="projecttitle">
             <Dropdown>
               <Dropdown.Toggle variant="link" id="dropdown-basic">
@@ -779,7 +829,7 @@ function ClientsPage() {
                     (isEditing === false) ? 
                     <>
                       <ListGroup.Item>
-                        <span className="info--icon"><FiMail /></span>
+                        {/* <span className="info--icon"><FiMail /></span> */}
                         <p><small>Client Name</small>{selectedClient?.name}</p>
                         </ListGroup.Item>
                           {customFields?.length > 0 && (

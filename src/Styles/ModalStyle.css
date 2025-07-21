@@ -919,6 +919,82 @@ input.form-error, select.form-error {
     color: rgb(251 146 60);
 }
 
+.reports-section {
+    background: var(--bs-body-bg);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    background-clip: padding-box;
+    border: var(--bs-border-width) solid rgb(226 232 240);
+    border-radius: 1rem;
+    -webkit-border-radius: 1rem;
+    overflow: hidden;
+}
+
+.reports-section .reports--heading {
+    background: linear-gradient(to right, #f8fafc, #ffffff);
+    margin-bottom: 0;
+    border: 0;
+    border-bottom: 1px solid rgb(226 232 240);
+    padding: 1.5rem;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+}
+
+.reports-section .reports--heading .title--initial {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    color: rgb(255 255 255);
+    font-weight: 700;
+    border-radius: 1rem;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 3rem;
+   display: flex;
+   background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
+}
+
+.reports-section .reports--heading .title--span span {
+    color: rgb(30 41 59);
+    font-weight: 700;
+   font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.reports-section .reports--heading .title--span strong {
+    color: rgb(71 85 105);
+    font-weight: 500;
+   font-size: 1rem;
+}
+
+.reports-section .reports--heading .text--blue {
+    font-size: 1.5rem;
+}
+
+.reports-section:not(:first-child) {
+    margin-top: 1rem;
+}
+
+.reports-section .single--project--stack {
+    margin-bottom: 0;
+    border: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+}
+
+.reports-section .btns--set {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    border-top: 1px solid rgb(226 232 240);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
 @media (min-width:426px) {
     .add--team--member--modal form .d-md-none {
         display: none;

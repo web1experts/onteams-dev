@@ -707,7 +707,7 @@ Add Project Modal CSS-=-=-
   -webkit-transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
 }
 
-.modal .rmdp-input, .project--form--inputs .rmdp-input {
+.modal .rmdp-input, .project--form--inputs .rmdp-input, .rounded--box .rmdp-input {
   box-shadow: none;
   -webkit-box-shadow: none;
 }

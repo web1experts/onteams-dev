@@ -19,7 +19,8 @@ import {
     RESEND_INVITE_SUCCESS,
     RESEND_INVITE_FAILED,
     CLEAR_MESSAGES,
-    MEMBERS_BY_ROLES
+    MEMBERS_BY_ROLES,
+    MEMBERS_REORDER
 } from "../actions/types";
 
 const initialState = {

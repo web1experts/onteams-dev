@@ -1,31 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Form,
-  Table,
-  Modal,
-  Dropdown,
-  Accordion,
-  ToggleButton,
-  ButtonGroup
-} from "react-bootstrap";
-import {
-  getMemberdata, convertSecondstoTime
-} from "../../helpers/commonfunctions";
-import {
-  updateManualTimeStatus,
-  getManualTimeList,
-  getSingleActivityData
-} from "../../redux/actions/report.action";
+import { Container, Row, Col, Button, Form, Table, Modal, Dropdown, Accordion, ToggleButton, ButtonGroup } from "react-bootstrap";
+import { FaRegListAlt } from 'react-icons/fa';
+import { FiCalendar, FiCheckCircle } from 'react-icons/fi';
+import { AiOutlineCloseCircle } from 'react-icons/ai';
+import { getMemberdata, convertSecondstoTime } from "../../helpers/commonfunctions";
+import { updateManualTimeStatus, getManualTimeList, getSingleActivityData } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
-import {
-  ListProjectsByMembers,
-  ListMemberProjects,
-} from "../../redux/actions/project.action";
+import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/project.action";
 import { ListTasks } from "../../redux/actions/task.action";
 import { currentMemberProfile } from "../../helpers/auth";
 
@@ -98,8 +80,42 @@ function ManualTime() {
   return (
     <>
       <div className="reports-section">
-            
-                <Accordion defaultActiveKey="0">
+        <div className='reports--heading'>
+          <div className="d-flex align-items-center gap-3 justify-content-between">
+            <div className="mb-0 d-flex align-items-center gap-3">
+              <div className="title--initial">T</div>
+              <div className="title--span flex-column d-flex align-items-start gap-0">
+                <span>Tarun Giri</span>
+                <strong>Project Manager</strong>
+              </div>
+            </div>
+            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+              <div className="text-end">
+                  <div className="text-lg font-bold text--blue">8h</div>
+                  <div className="text-slate-600">Submitted July 16, 4:00 PM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="single--project--stack">
+          <div className="d-flex align-items-center justify-content-between gap-4">
+            <h4 className="d-flex flex-column gap-3">
+              <strong>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-building2 w-4 h-4 text-blue-600"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>
+                </span>
+                Icecat & Reviews App
+              </strong>
+              <p><small className="d-flex align-items-center gap-2"><FaRegListAlt /> Designing Icecat App</small></p>
+            </h4>
+            <p><strong><FiCalendar /> Monday, July 15,2025</strong><small className="d-flex mt-2 flex-column gap-0">09:00 - 17:00 <span>8 Hours</span></small></p>
+          </div>
+          <div className="btns--set">
+            <Button variant="primary"><FiCheckCircle className="me-1" /> Approve</Button>
+            <Button variant="danger"><AiOutlineCloseCircle className="me-1" /> Reject</Button>
+          </div>
+        </div>
+                {/* <Accordion defaultActiveKey="0">
                   {Object.entries(manualTimeList).map(([date, members], index) => (
                     <Accordion.Item eventKey={index.toString()} key={date}>
                       <Accordion.Header>{date}</Accordion.Header>
@@ -132,9 +148,45 @@ function ManualTime() {
                       </Accordion.Body>
                     </Accordion.Item>
                   ))}
-                </Accordion>
-             
+                </Accordion> */}
+      </div>
+      <div className="reports-section">
+        <div className='reports--heading'>
+          <div className="d-flex align-items-center gap-3 justify-content-between">
+            <div className="mb-0 d-flex align-items-center gap-3">
+              <div className="title--initial">G</div>
+              <div className="title--span flex-column d-flex align-items-start gap-0">
+                <span>Gagandeep Singh</span>
+                <strong>Project Manager</strong>
+              </div>
             </div>
+            <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+              <div className="text-end">
+                  <div className="text-lg font-bold text--blue">8h</div>
+                  <div className="text-slate-600">Submitted July 16, 4:00 PM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="single--project--stack">
+          <div className="d-flex align-items-center justify-content-between gap-4">
+            <h4 className="d-flex flex-column gap-3">
+              <strong>
+                <span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-building2 w-4 h-4 text-blue-600"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>
+                </span>
+                Icecat & Reviews App
+              </strong>
+              <p><small className="d-flex align-items-center gap-2"><FaRegListAlt /> Designing Icecat App</small></p>
+            </h4>
+            <p><strong><FiCalendar /> Monday, July 15,2025</strong><small className="d-flex mt-2 flex-column gap-0">09:00 - 17:00 <span>8 Hours</span></small></p>
+          </div>
+          <div className="btns--set">
+            <Button variant="primary"><FiCheckCircle className="me-1" /> Approve</Button>
+            <Button variant="danger"><AiOutlineCloseCircle className="me-1" /> Reject</Button>
+          </div>
+        </div>
+      </div>
       { show && 
         <Modal
           show={show}

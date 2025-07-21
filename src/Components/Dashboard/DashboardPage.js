@@ -541,7 +541,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
               <Row>
                   <Col sm={12} lg={12}>
                       <h2>
-                          <span className="open--sidebar me-2 d-flex d-xl-none" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                          <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                           Dashboard
                           {/* <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
                               <ListGroup horizontal className="bg-white expand--icon ms-3">

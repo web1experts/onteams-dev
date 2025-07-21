@@ -13,6 +13,7 @@ import { permissionModules, permissionsLabel } from "../../helpers/permissionsMo
 import { updatePermissions, addRoleWithPermissions, deleteRole} from "../../redux/actions/permission.action";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { Listmembers } from "../../redux/actions/members.action";
+import { selectboxObserver } from "../../helpers/commonfunctions";
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 
 function RolesPage() {
@@ -210,6 +211,10 @@ function RolesPage() {
 
   useEffect(() => {
     refreshProfile();
+    setTimeout(() => {
+      selectboxObserver()
+    },700)
+    
   }, []);
 
   const handleFieldChange = (field, value) => {
@@ -548,6 +553,7 @@ function RolesPage() {
 
     setPermissions(prm);
     dispatch(Listmembers());
+    
   }, [dispatch]);
 
   useEffect(() => {
@@ -568,18 +574,23 @@ function RolesPage() {
                 
                 {activeRole && Object.keys(activeRole).length > 0 && (
                 <>
-                  <Row className="mt-4">
-                    <Col lg={6} className="mb-3 mb-md-0">
+                    <Row className="mt-4">
+                      <Col lg={6}>
                         <FormGroup className="form-group mb-0 pb-0">
-                          <FloatingLabel label="Select Role">
-                            <Form.Select>
+                        <FloatingLabel label="Select Role">
+                            <Form.Select className="custom-selectbox"  onChange={(e) => {
+                              const selectedRole = roles.find((role) => role._id === e.target.value);
+                              setActiveRole(selectedRole);
+                            }}>
                             {roles.map((role, index) => {
                                 return (
-                                <option key={`role-${role._id}`} action active={activeRole?._id === role._id} onClick={() => setActiveRole(role)}>{role.name}</option>
+                                <option key={`role-${role._id}`} value={role?._id} action active={activeRole?._id === role._id}>{role.name}</option>
                                 );
                             })}
                             </Form.Select>
-                          </FloatingLabel>
+                        </FloatingLabel>
+                        {/* <Form.Label>Select Role</Form.Label> */}
+                        
                         </FormGroup>
                     </Col>
                     <Col lg={6}>
@@ -601,7 +612,8 @@ function RolesPage() {
                           </FloatingLabel>
                         </FormGroup>
                     </Col>
-                  </Row>
+                    
+                    </Row>
                     
                     <div className="new--accordion--block w-100 mt-4">
                     {permissionModules.map((mod) => {

@@ -16,6 +16,7 @@ import './Styles/common.css';
 import './Styles/Sidebar.css';
 import './Styles/ModalStyle.css';
 import './App.css';
+import { toggleTheme } from "./redux/actions/common.action";
 import {CREATE_POST_LIST_COMMENT, CREATE_LIST_COMMENT, DELETE_COMMENT, DELETE_POST } from "./redux/actions/types";
 
 const secretKey = process.env.REACT_APP_SECRET_KEY;
@@ -77,7 +78,6 @@ function App(props) {
         if( jsondata){
           jsondata['name'] = authprofile?.name
           jsondata['avatar'] = authprofile?.avatar
-          jsondata['name'] = authprofile?.name
           localStorage.setItem('current_loggedin_user', JSON.stringify(jsondata, secretKey));
         }
       }
@@ -152,6 +152,8 @@ function App(props) {
       primaryColor: 'rgb(30,144,255)', 
       secondaryColor: 'rgb(0,191,255)'
     })
+    localStorage.setItem('theme', themecolor)
+    dispatch(toggleTheme(JSON.parse(themecolor)));
   }
   const themedata = JSON.parse(themecolor)
   document.documentElement.style.setProperty(
