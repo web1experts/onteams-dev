@@ -944,7 +944,17 @@ function getProjectTabSummary(projectReport) {
       const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 2);
       const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of the last month
       lastMonthEnd.setHours(23, 59, 59, 999); // Ensure full-day inclusion for the last day
-  
+      
+      // Find Monday of this week
+      const currentWeekStart = new Date(today);
+      const day = currentWeekStart.getDay();
+      const diffToMonday = day === 0 ? 6 : day - 1; // if Sunday (0), move back 6 days; else subtract (day - 1)
+      currentWeekStart.setDate(currentWeekStart.getDate() - diffToMonday);
+      currentWeekStart.setHours(0, 0, 0, 0); // Set time to start of the day
+
+      // Current week's end is today
+      const currentWeekEnd = new Date(today);
+      currentWeekEnd.setHours(23, 59, 59, 999); // End of today
   
       return (
           <Dropdown className="select--dropdown">
@@ -954,6 +964,7 @@ function getProjectTabSummary(projectReport) {
                   
               <Dropdown.Item className={ selectedFilter === 'today'? 'selected--option': ''} key={'date-today'} onClick={(e) => {setSelectedFilter('today');handleDateFilter(e, today); }}>Today</Dropdown.Item>
               <Dropdown.Item className={ selectedFilter === 'yesterday'? 'selected--option': ''} key={'date-yesterday'} onClick={(e) =>{  setSelectedFilter('yesterday');handleDateFilter(e, yesterday);}}>Yesterday</Dropdown.Item>
+              <Dropdown.Item className={ selectedFilter === 'this-week'? 'selected--option': ''} key={'date-this-week'} onClick={(e) =>{  setSelectedFilter('this-week');handleDateFilter(e, currentWeekStart, currentWeekEnd);}}>This Week</Dropdown.Item>
               <Dropdown.Item className={ selectedFilter === '7days'? 'selected--option': ''} key={'date-7days'} onClick={(e) => { setSelectedFilter('7days');handleDateFilter(e, last7Days, today);}}>Last 7 days</Dropdown.Item>
               <Dropdown.Item className={ selectedFilter === 'last-week'? 'selected--option': ''} key={'date-last-week'} onClick={(e) => { setSelectedFilter('last-week');handleDateFilter(e, lastWeekStart, lastWeekEnd);}}>Last week</Dropdown.Item>
               <Dropdown.Item className={ selectedFilter === 'last2-weeks'? 'selected--option': ''} key={'date-last2-weeks'} onClick={(e) => {setSelectedFilter('last2-weeks');handleDateFilter(e, last2WeeksStart, lastWeekEnd); }}>Last 2 weeks</Dropdown.Item>
