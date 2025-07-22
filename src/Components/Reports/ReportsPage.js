@@ -8,7 +8,7 @@ import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeftCircleFill, BsArrowRightCircleFill, BsClockHistory } from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { LuFolderOpen, LuUsers, LuTimer, LuClock } from 'react-icons/lu';
-import { MdDragIndicator, MdOutlineClose, MdOutlineVideoLibrary } from "react-icons/md";
+import { MdDragIndicator, MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch } from "react-icons/md";
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
 import { GoPulse } from 'react-icons/go';
 import { AiOutlineTeam } from 'react-icons/ai';
@@ -1117,6 +1117,23 @@ const handleToggles = () => {
                             <ListGroup horizontal className={isActive ? "" : "d-md-flex"}>
                               <ListGroup.Item action onClick={() => {handlefilterchange('sort_by', 'members');setActiveViewTab('members')}} className={`${activeMemberTab === 'members'? 'd-md-flex gap-2 active ': ' d-md-flex gap-2'}`}><AiOutlineTeam /> Members</ListGroup.Item>
                               <ListGroup.Item action onClick={() => {handlefilterchange('sort_by', 'projects');setActiveViewTab('projects')}} className={`${activeMemberTab === 'projects'? 'd-md-flex gap-2 active ': ' d-md-flex gap-2'}`}><LuFolderOpen /> Projects</ListGroup.Item>
+                              
+                            </ListGroup>
+                            <ListGroup horizontal>
+                              <ListGroup.Item className={'d-none d-xl-flex'} key="search-filter-list">
+                                  <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
+                                      <Form.Group className="mb-0 form-group">
+                                          <MdOutlineSearch />
+                                          <Form.Control type="text" placeholder={activeMemberTab === 'members' ? 'Search by member' : 'Search by project'} onChange={(event) => {
+                                              const value = event.target.value;
+                                              if (value.length > 1 || value.length === 0) {
+                                                handlefilterchange('search', value);
+                                              }
+                                            }}
+                                          />
+                                      </Form.Group>
+                                  </Form>
+                              </ListGroup.Item>
                             </ListGroup>
                             {
                               filters['sort_by'] === 'projects' &&

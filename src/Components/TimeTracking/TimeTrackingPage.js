@@ -146,7 +146,7 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
 
     socket.emit('get-tracker-status-update', {userID: activity._id})
     setCurrentActivity( activity)
-    console.log("activeTab: ", activeTab)
+    
     if(activeTab === "Recordings" || activeInnerTab === "InnerRecorded"){
       setActiveInnerTab("InnerRecorded")
     }else{
