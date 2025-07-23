@@ -978,7 +978,7 @@ const handleProjectSelect = async (project) => {
               </Form.Group>
               {
                 (selectedFilter === 'custom') && (
-                  <Form.Group className="mb-0 form-group">
+                  <Form.Group className="mb-0 form-group ms-2">
                     <DatePicker 
                         key={'date-filter'}
                         ref={datePickerRef}
@@ -1895,19 +1895,20 @@ const handleProjectSelect = async (project) => {
           </ListGroup>
         </Modal.Body>
       </Modal>
-      <Modal show={showNew} onHide={handleCloseNew} centered size="xl" className="AddReportModal AddTimeModal theme--modal">
+      <Modal show={showNew} onHide={handleCloseNew} centered size="xl" className="AddEntryModal AddTimeModal theme--modal">
         <Modal.Header closeButton>
             <Modal.Title>
               <span className="nav--item--icon"><FiCheckCircle /></span>
               <strong>Time Entry Approvals <small>Review and approve manual time entries</small></strong>
             </Modal.Title>
+            <span className="pending--badge">Pending (4)</span>
         </Modal.Header>
         <Modal.Body>
           <ManualTime />
         </Modal.Body>
       </Modal>
         
-      <Modal show={show} onHide={handleClose} centered size="md" className="AddReportModal AddTimeModal theme--modal" onShow={() => {selectboxObserver();}}>
+      <Modal show={show} onHide={handleClose} centered size="md" className="AddTimeModal theme--modal" onShow={() => {selectboxObserver();}}>
         <Modal.Header closeButton>
             <Modal.Title>
               <span className="nav--item--icon"><LuTimer /></span>
@@ -2263,7 +2264,7 @@ const handleProjectSelect = async (project) => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showSelect} onHide={handleProjectClose} centered size="lg" className="AddReportModal AddTimeModal theme--modal">
+      <Modal show={showSelect} onHide={handleProjectClose} centered size="lg" className="AddTimeModal theme--modal">
         <Modal.Header closeButton>
             <Modal.Title>
               <span className="nav--item--icon"><LuTimer /></span>

@@ -120,6 +120,23 @@
     z-index: 111;
 }
 
+.AddEntryModal .modal-header .btn-close {
+    margin-left: 0;
+}
+
+.AddEntryModal .modal-header span.pending--badge {
+    margin-left: auto;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .5rem 1rem;
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    margin-right: 2rem;
+}
+
 .error {
     color: #de0606;
     font-size: 12px;
