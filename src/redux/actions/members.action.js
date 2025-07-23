@@ -23,7 +23,8 @@ import {
     GET_SINGLE_MEMBER_SUCCESS,
     GET_SINGLE_MEMBER_FAILED,
     MEMBERS_BY_ROLES,
-    MEMBERS_REORDER
+    MEMBERS_REORDER,
+    PUT_INVITE_SUCCESS
 } from "./types";
 
 const config = {
@@ -113,6 +114,22 @@ export const updateMember = (memberId, payload) => {
             const response = await API.apiPutUrl('member', `/update/${memberId}`, payload);
             if (response.data && response.data.success) {
                 await dispatch({ type: PUT_MEMBER_SUCCESS, payload: response.data });
+            } else {
+                await dispatch({ type: PUT_MEMBER_FAILED, payload: response.data.message });
+            }
+        } catch (err) {
+            errorRequest(err, dispatch);
+        }
+    }
+}
+
+export const updateInvite = (inviteId, payload) => {
+
+    return async (dispatch) => {
+        try {
+            const response = await API.apiPutUrl('invites', `/update/${inviteId}`, payload);
+            if (response.data && response.data.success) {
+                await dispatch({ type: PUT_INVITE_SUCCESS, payload: response.data });
             } else {
                 await dispatch({ type: PUT_MEMBER_FAILED, payload: response.data.message });
             }

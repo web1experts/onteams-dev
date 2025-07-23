@@ -146,11 +146,12 @@ function App(props) {
 
  useEffect(() => {
   let themecolor = localStorage.getItem('theme')
-  if( !themecolor){
+  
+  if( !themecolor){console.log("themecolor:: ", themecolor)
     themecolor = JSON.stringify({
-      color: 'linear-gradient(135deg, rgb(30,144,255), rgb(0,191,255))',
-      primaryColor: 'rgb(30,144,255)', 
-      secondaryColor: 'rgb(0,191,255)'
+      color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))',
+      primaryColor: '59, 130, 246', 
+      secondaryColor: '6, 182, 212'
     })
     localStorage.setItem('theme', themecolor)
     dispatch(toggleTheme(JSON.parse(themecolor)));

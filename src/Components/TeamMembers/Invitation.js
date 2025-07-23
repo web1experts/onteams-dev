@@ -3,17 +3,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Accordion, Row, Col, Button, Modal, Form, FormGroup, Card, ListGroup, Table , Dropdown} from "react-bootstrap";
 import { currentMemberProfile } from "../../helpers/auth";
 import { useNavigate } from "react-router-dom";
-import { permissionModules } from "../../helpers/permissionsModules";
+import { permissionModules, permissionsLabel } from "../../helpers/permissionsModules";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
+import { LuFolderOpen } from "react-icons/lu";
 import { GrExpand } from "react-icons/gr";
-import { BsEye } from "react-icons/bs";
+import { BsEye, BsBriefcase } from "react-icons/bs";
 import { TbArrowsSort } from "react-icons/tb";
-import { FiMail, FiBriefcase, FiShield, FiPhone, FiCalendar, FiSidebar } from "react-icons/fi";
-import { acceptCompanyinvite, listCompanyinvite, deleteInvite, resendInvite, Listmembers} from "../../redux/actions/members.action";
+import { FiEdit } from "react-icons/fi";
+import { FiMail, FiBriefcase, FiShield, FiPhone, FiCalendar, FiSidebar, FiCheck } from "react-icons/fi";
+import { acceptCompanyinvite, listCompanyinvite, deleteInvite, resendInvite, Listmembers, updateInvite} from "../../redux/actions/members.action";
 import { MdOutlineClose, MdSearch } from "react-icons/md";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { updatePermissions } from "../../redux/actions/permission.action";
+import { selectboxObserver, convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY } from "../../helpers/commonfunctions";
+import { renderDynamicField } from "../common/dynamicFields";
+import { BadgesModal } from "../modals/badges";
 function Invitation(props) {
   const [isActiveView, setIsActiveView] = useState(2);
   const [rows, setRows] = useState([{ email: "", role: "" }]);
@@ -22,12 +27,17 @@ function Invitation(props) {
   const memberProfile = currentMemberProfile()
   const [isActive, setIsActive] = useState(0);
   const [loader, setLoader] = useState(false);
+  const [showPasswordFields, setShowPasswordFields] = useState({});
+    const [isEditing, setIsEditing] = useState(false);
+  const [showBadges, setShowBadges] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(0);
   const apiPermission = useSelector((state) => state.permissions);
   const apiCustomfields = useSelector( state => state.customfields)
   const [customFields, setCustomFields] = useState([]);
+  const [fields, setFields] = useState({ email: "", name: "", role: "" });
+  const [errors, setErrors] = useState([]);
   const [selectedInvitation, setSelectedInvitation] = useState(null);
   const memberstate = useSelector((state) => state.member);
   const memberFeed = useSelector((state) => state.member.members);
@@ -35,7 +45,6 @@ function Invitation(props) {
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
    const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
   const commonState = useSelector(state => state.common)
-  const apiResult = useSelector((state) => state.member);
   const [invitationsFeeds, setInvitationsFeed] = useState([]);
   const [memberFeeds, setMemberFeed] = useState([]);
   const [total, setTotal] = useState(0);
@@ -230,21 +239,25 @@ function Invitation(props) {
         setShowloader(false);
     };
 
-    const showPermissionsModal = (index) => {
-     setMemberIndex( index )
-    if( rows[index] && rows[index]?.permissions){
-      setPermissions(rows[index]?.permissions)
-    }
+    const showPermissionsModal = () => {
+      if( selectedInvitation?.custom_fields?.permissions){
+        setPermissions(selectedInvitation?.custom_fields?.permissions)
+      }
     setShowPermissions( true )
   }
 
-  const handleSavePermissions = () => {
-    const updatedRows = [...rows];
-    updatedRows[memberIndex] = { ...updatedRows[memberIndex], ['permissions']: permissions };
-    setRows(updatedRows);
-    setShowPermissions( false )
-  }
-
+   const handleSavePermissions = () => {
+    setFields({
+      ...fields,
+      [`custom_field[permissions]`]: permissions,
+    });
+    // dispatch(updateInvite(selectedInvitation?._id, {
+    //   ...fields,
+    //   [`custom_field[permissions]`]: permissions,
+    // }))
+    sentInviteAgain(selectedInvitation?._id)
+    setShowPermissions(false);
+  };
     useEffect(() => {
       setLoader(false); 
       if (
@@ -253,24 +266,24 @@ function Invitation(props) {
       ) {
         setRoles(workspaceState.available_roles);
       }
-    }, [apiResult, workspaceState]);
+    }, [workspaceState]);
     
-    useEffect(() => {
-    setLoader(false);
-    if (apiPermission.success) {
+  //   useEffect(() => {
+  //   setLoader(false);
+  //   if (apiPermission.success) {
       
-      if (apiPermission.updatedMember) {
-        const updatedInvitationsFeeds = invitationsFeeds.map(m =>
-          m._id.toString() === apiPermission.updatedMember._id.toString()
-            ? apiPermission.updatedMember
-            : m
-        );
+  //     if (apiPermission.updatedMember) {
+  //       const updatedInvitationsFeeds = invitationsFeeds.map(m =>
+  //         m._id.toString() === apiPermission.updatedMember._id.toString()
+  //           ? apiPermission.updatedMember
+  //           : m
+  //       );
        
-        setInvitationsFeed(updatedInvitationsFeeds);
-        setSelectedInvitation(apiPermission.updatedMember)
-      }
-    }
-  }, [apiPermission]);
+  //       setInvitationsFeed(updatedInvitationsFeeds);
+  //       setSelectedInvitation(apiPermission.updatedMember)
+  //     }
+  //   }
+  // }, [apiPermission]);
 
   useEffect(() => {
     if (memberFeed && memberFeed.memberData) {
@@ -280,62 +293,161 @@ function Invitation(props) {
 
   useEffect(() => {
     if( selectedInvitation) {
+      const cleanedMeta = { ...selectedInvitation?.custom_fields };
+      
+      let fieldsSetup = {
+        role: selectedInvitation?.role?._id,
+      };
+
+      if (cleanedMeta && Object.keys(cleanedMeta).length > 0) {
+          Object.entries(cleanedMeta).forEach(([key, value]) => {
+              fieldsSetup[`custom_field[${key}]`] = value;
+          });
+      } else {
+          customFields.forEach((field) => {
+              fieldsSetup[`custom_field[${field.name}]`] = "";
+          });
+      }
+
+      setFields(fieldsSetup);
       const merged = {};
-                  
+
       // Step 1: Initialize merged with empty string values
       permissionModules.forEach((mod) => {
         merged[mod.slug] = {};
         mod.permissions.forEach((p) => {
-          merged[mod.slug][p] = '';
+          merged[mod.slug][p] = "";
         });
       });
-      if(selectedInvitation?.custom_fields?.permissions && Object.keys(selectedInvitation?.custom_fields?.permissions)?.length > 0 ){
-        setPermissions((prev) => {
-          const newPerms =  selectedInvitation?.custom_fields?.permissions;
-          // Clone merged to avoid mutating the original reference
-          const updated = { ...merged };
-        
-          // First, update existing keys in merged
-          for (const module in updated) {
-            updated[module] = { ...updated[module] }; // clone inner object
-            for (const key in updated[module]) {
-              if (newPerms?.[module] && key in newPerms[module]) {
-                updated[module][key] = newPerms[module][key];
-              } else {
-                updated[module][key] = '';
-              }
+
+      setPermissions((prev) => {
+        const newPerms = cleanedMeta?.permissions || {};
+
+        // Clone merged to avoid mutating the original reference
+        const updated = { ...merged };
+
+        // First, update existing keys in merged
+        for (const module in updated) {
+          updated[module] = { ...updated[module] }; // clone inner object
+          for (const key in updated[module]) {
+            if (newPerms?.[module] && key in newPerms[module]) {
+              updated[module][key] = newPerms[module][key];
+            } else {
+              updated[module][key] = "";
             }
           }
-        
-          // Then, add any missing modules or keys from newPerms
-          for (const module in newPerms) {
-            if (!updated[module]) {
-              updated[module] = {};
-            }
-            for (const key in newPerms[module]) {
-              if (!(key in updated[module])) {
-                updated[module][key] = newPerms[module][key];
-              }
+        }
+
+        // Then, add any missing modules or keys from newPerms
+        for (const module in newPerms) {
+          if (!updated[module]) {
+            updated[module] = {};
+          }
+          for (const key in newPerms[module]) {
+            if (!(key in updated[module])) {
+              updated[module][key] = newPerms[module][key];
             }
           }
+        }
+
+        return updated;
+      });
+      // const merged = {};
+                  
+      // // Step 1: Initialize merged with empty string values
+      // permissionModules.forEach((mod) => {
+      //   merged[mod.slug] = {};
+      //   mod.permissions.forEach((p) => {
+      //     merged[mod.slug][p] = '';
+      //   });
+      // });
+      // if(selectedInvitation?.custom_fields?.permissions && Object.keys(selectedInvitation?.custom_fields?.permissions)?.length > 0 ){
+      //   setPermissions((prev) => {
+      //     const newPerms =  selectedInvitation?.custom_fields?.permissions;
+      //     // Clone merged to avoid mutating the original reference
+      //     const updated = { ...merged };
         
-          return updated;
-        });
-      }else{
-        const matchedRole = roles.find(role => role._id === selectedInvitation.role?._id);
-        const matchedPermissions = matchedRole ? matchedRole.permissions : {};
-        setPermissions(matchedPermissions)
-      }
+      //     // First, update existing keys in merged
+      //     for (const module in updated) {
+      //       updated[module] = { ...updated[module] }; // clone inner object
+      //       for (const key in updated[module]) {
+      //         if (newPerms?.[module] && key in newPerms[module]) {
+      //           updated[module][key] = newPerms[module][key];
+      //         } else {
+      //           updated[module][key] = '';
+      //         }
+      //       }
+      //     }
+        
+      //     // Then, add any missing modules or keys from newPerms
+      //     for (const module in newPerms) {
+      //       if (!updated[module]) {
+      //         updated[module] = {};
+      //       }
+      //       for (const key in newPerms[module]) {
+      //         if (!(key in updated[module])) {
+      //           updated[module][key] = newPerms[module][key];
+      //         }
+      //       }
+      //     }
+        
+      //     return updated;
+      //   });
+      // }else{
+      //   const matchedRole = roles.find(role => role._id === selectedInvitation.role?._id);
+      //   const matchedPermissions = matchedRole ? matchedRole.permissions : {};
+      //   setPermissions(matchedPermissions)
+      // }
       
     }
   }, [selectedInvitation])
 
-  const handleChange = (index, event, fieldname = "") => {
-    const { name, value, type, files } = event.target;
-    const updatedRows = [...rows];
-    updatedRows[index] = { ...updatedRows[index], [name]: value };
-    setRows(updatedRows);
-  };
+  // const handleChange = (index, event, fieldname = "") => {
+  //   const { name, value, type, files } = event.target;
+  //   const updatedRows = [...rows];
+  //   updatedRows[index] = { ...updatedRows[index], [name]: value };
+  //   setRows(updatedRows);
+  // };
+
+  const handleDateChange = (value, name) =>{ 
+      setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
+      setErrors({ ...errors, [name]: '' })
+  }
+  
+  const handleChange = ({ target: { name, value, type, files, checked } }) => {
+      let finalValue;
+      if (type === 'checkbox' && name.includes('[]')) {
+          const arrayName = name.replace('[]', '');
+          const existing = fields[arrayName] || [];
+          if (checked) {
+            finalValue = [...existing, value];
+          } else {
+            finalValue = existing.filter((v) => v !== value);
+          }
+          name = arrayName;
+      } else if (type === 'checkbox') {
+          // For single checkbox: store value when checked, empty string when unchecked
+          finalValue = checked ? value : '';
+      } else if (type === 'file') {
+          finalValue = files;
+      } else {
+          finalValue = value;
+      }
+     
+      if (name === "role") {
+        const matchingRole = roles.find((role) => role._id === value);
+        setFields((prevState) => ({
+          ...prevState,
+          role: matchingRole._id,
+          rolename: matchingRole.name,
+          ["custom_field[permissions]"]: matchingRole.permissions,
+        }));
+      } else {
+        setFields({ ...fields, [name]: finalValue });
+      }
+  
+      setErrors({ ...errors, [name]: "" });
+    };
   
   useEffect(() => {
     if (currentPage !== "") {
@@ -377,8 +489,38 @@ function Invitation(props) {
   };
 
   const sentInviteAgain = (inviteId) => {
-    dispatch(resendInvite({ id: inviteId }));
+    const formData = new FormData();
+      Object.entries(fields).forEach(([fieldName, value]) => {
+        if (Array.isArray(value)) {
+          // Check if the value is an array
+          if (value.length === 0) {
+            formData.append(`${fieldName}[]`, []); // Append an empty array
+          } else {
+            value.forEach((item) => {
+              formData.append(`${fieldName}[]`, item); // Append with the same key for non-empty arrays
+            });
+          }
+        } else if (typeof value === "object") {
+          formData.append(fieldName, JSON.stringify(value));
+        } else {
+          formData.append(`${fieldName}`, value);
+        }
+      });
+    dispatch(updateInvite(inviteId, formData))
+    // dispatch(resendInvite({ id: inviteId }));
   };
+
+    const toggleShowPassword = (fieldId) => {
+    setShowPasswordFields((prev) => ({
+        ...prev,
+        [fieldId]: !prev[fieldId],
+    }));
+  };
+
+  const toggleBadges = (fieldIndex) => {
+        setShowBadges(fieldIndex);
+    };
+
 
   useEffect(() => {
     if (memberstate) {
@@ -386,6 +528,16 @@ function Invitation(props) {
     }
     if (memberstate.invite) {
       handleInvitationList();
+    }
+
+    if(memberstate?.udpatedInvite){
+      const updatedinviteFeeds = invitationsFeeds.map((m) =>
+        m._id.toString() === memberstate?.udpatedInvite?._id.toString()
+          ? memberstate?.udpatedInvite
+          : m
+      );
+      setInvitationsFeed(updatedinviteFeeds);
+      setSelectedInvitation(memberstate?.udpatedInvite);
     }
   }, [memberstate]);
 
@@ -544,42 +696,127 @@ function Invitation(props) {
               <Card.Img variant="top" src={selectedInvitation?.avatar ?? "./images/default.jpg"} />
             </div>
             <Card.Body className="p-0 ps-4">
-              <Card.Title><FiMail /> Contact Information</Card.Title>
-              <Card.Text>
-                <ListGroup>
-                  <ListGroup.Item>
-                    <span className="info--icon"><FiMail /></span>
-                    <p><small>Email</small>{selectedInvitation?.email}</p>
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <span className="info--icon"><FiBriefcase /></span>
-                    <p><small>Role</small>{selectedInvitation?.role?.name}</p>
-                  </ListGroup.Item>
-                
-                </ListGroup>
-              </Card.Text>
-              <Card.Text>
-                <ListGroup>
-                  {customFields?.length > 0 && (
+              <Card.Title><FiMail /> Contact Information
+                {(memberProfile?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( <FiEdit className="fs-small" onClick={() => setIsEditing(true)} />)}
+              </Card.Title>
+              {isEditing === false ? (
                     <>
-                      {customFields.map((field, index) => (
-                        <ListGroup.Item key={index}>
-                          <p><small>{field.label}</small>
-                          {selectedInvitation?.custom_fields?.[field.name] || ''}
-                          </p>
-                        </ListGroup.Item>
-                      ))}
-                    </>
-                  )}
+                <Card.Text>
+                  <ListGroup>
+                    <ListGroup.Item>
+                      <span className="info--icon"><FiMail /></span>
+                      <p><small>Email</small>{selectedInvitation?.email}</p>
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <span className="info--icon"><FiBriefcase /></span>
+                      <p><small>Role</small>{selectedInvitation?.role?.name}</p>
+                    </ListGroup.Item>
                   
-                </ListGroup>
-              </Card.Text>
+                  </ListGroup>
+                </Card.Text>
+                <Card.Text>
+                  <ListGroup>
+                    {customFields?.length > 0 && (
+                      <>
+                        {customFields.map((field, index) => (
+                          <ListGroup.Item key={index}>
+                            <p><small>{field.label}</small>
+                            {selectedInvitation?.custom_fields?.[field.name] || ''}
+                            </p>
+                          </ListGroup.Item>
+                        ))}
+                      </>
+                    )}
+                    
+                  </ListGroup>
+                </Card.Text>
+                </>)
+                :
+                    (
+                      <>
+                        <Card.Text>
+                          <ListGroup>
+                            <ListGroup.Item>
+                              <span className="info--icon">
+                                <FiMail />
+                              </span>
+                              <p>
+                                <small>Email</small>
+                                {selectedInvitation?.email}
+                              </p>
+                            </ListGroup.Item>
+                            {(memberProfile?.permissions?.members
+                              ?.create_edit_delete === true &&
+                              <ListGroup.Item>
+                                <Form.Group className="mb-0 form-group pb-0">
+                                  <Form.Label>Role</Form.Label>
+                                  <Form.Select
+                                    className={
+                                      errors["role"]
+                                        ? "input-error form-control custom-selectbox conditional-box"
+                                        : "form-control custom-selectbox conditional-box"
+                                    }
+                                    value={fields?.role || ""}
+                                    onChange={handleChange}
+                                    name="role"
+                                  >
+                                    <option value="">None</option>
+                                    {roles.map((role, index) => (
+                                      <option key={index} value={role._id}>
+                                        {role.name}
+                                      </option>
+                                    ))}
+                                  </Form.Select>
+                                </Form.Group>
+                              </ListGroup.Item>
+                            )}
+                          </ListGroup>
+                        </Card.Text>
+                        <Card.Text>
+                          <ListGroup>
+                            
+                            {customFields?.length > 0 && (
+                              <>
+                                {customFields.map((field, index) => (
+                                  <ListGroup.Item key={index}>
+                                    {renderDynamicField({
+                                      name: `custom_field[${field.name}]`,
+                                      type: field.type,
+                                      label: field.label,
+                                      value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                      ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                      : fields[`custom_field[${field.name}]`] || '',
+                                      options: field?.options || [],
+                                      
+                                      onChange: (e) =>
+                                        {
+                                          if(field.type === "date"){
+                                              
+                                              handleDateChange(e, `custom_field[${field.name}]`)
+                                          }else{
+                                              handleChange(e)
+                                          }
+                                      },
+                                      range_options: field?.range_options || {},
+                                      showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                                      toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                                      toggleBadges: () => toggleBadges(field),
+                                    })}
+                                  </ListGroup.Item>
+                                ))}
+                              </>
+                            )}
+                          </ListGroup>
+                        </Card.Text>
+                      </>
+                    )
+                }
               <div className="text-end mt-4">
                 <Button variant="secondary" onClick={() => rejectInvite(selectedInvitation?._id)}>{props.listfor && props.listfor === "company" ? "Delete" : "Decline"}</Button>
                 {props.listfor &&
                   props.listfor === "company" ? (
                   <>
-                    <Button variant="primary" className="ms-3" onClick={() => sentInviteAgain(selectedInvitation?._id)}>Send Again</Button>
+                    <Button variant="primary" className="ms-3" onClick={() => sentInviteAgain(selectedInvitation?._id)}>Send Changes</Button>
                   </>
                 ) : (
                   <>
@@ -592,8 +829,10 @@ function Invitation(props) {
           </Card>
           <Card className="permission--card">
             <Card.Body>
-              <Card.Title><FiShield /> Access Permissions <Button variant="primary" className="ms-auto" //onClick={() => {showPermissionsModal()}}
-                ><FiShield /> Manage Permissions</Button></Card.Title>
+              <Card.Title><FiShield /> Access Permissions <Button variant="primary" className="ms-auto" onClick={() => {showPermissionsModal()}}
+                >
+                  <FiShield /> Manage Permissions</Button>
+                  </Card.Title>
               <Card.Text>
                 <Accordion
                   activeKey={Object.entries(expanded)
@@ -730,14 +969,15 @@ function Invitation(props) {
         </div>
         
       </div>
-    { showPermissions &&
-      <Modal show={showPermissions} onHide={() => setShowPermissions( false )} centered size="lg" className="add--team--member--modal add--member--modal" >
-        <Modal.Header closeButton>
-          <Modal.Title>Roles & Permissions</Modal.Title>
-        </Modal.Header>
-          <Modal.Body>
-            
-              {/* {rows.map((row, index) => ( */}
+    {showPermissions && (
+            <Modal show={showPermissions} onShow={() => {selectboxObserver()}} onHide={() => setShowPermissions(false)} centered size="lg" className="add--team--member--modal add--member--modal theme--modal">
+              <Modal.Header closeButton>
+                  <Modal.Title>
+                      <strong>Roles & Permissions <small>Manage members role & permissions</small></strong>
+                  </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {/* {rows.map((row, index) => ( */}
                 <div className="form-row" key={`row-role-select`}>
                   <Form.Group className="mb-0 form-group">
                     <Form.Select
@@ -745,19 +985,18 @@ function Invitation(props) {
                       area-label="Role"
                       name="role"
                       controlId="floatingSelect"
-                      className={
-                        // errors[index] &&
-                        //   errors[index]["role"] &&
-                        //   errors[index]["role"] !== ""
-                        //   ? "input-error custom-selectbox"
-                          "form-control custom-selectbox"
-                      }
-                      value={rows[memberIndex]?.role}
+                      className={"form-control custom-selectbox"}
+                      defaultValue={fields?.role}
                       onChange={(e) => {
-                        handleChange(memberIndex, e, "role")
-                        const matchedRole = roles.find(role => role._id === e.target.value);
-                        const matchedPermissions = matchedRole ? matchedRole.permissions : [];
-                        setPermissions(matchedPermissions)
+                        handleChange(e);
+                        const matchedRole = roles.find(
+                          (role) => role._id === e.target.value
+                        );
+                        // handleChange({ target: { name: 'rolename', value: matchedRole.name } });
+                        const matchedPermissions = matchedRole
+                          ? matchedRole.permissions
+                          : [];
+                        setPermissions(matchedPermissions);
                       }}
                     >
                       <option value="role">Select role</option>
@@ -767,180 +1006,138 @@ function Invitation(props) {
                         </option>
                       ))}
                     </Form.Select>
-                    
                   </Form.Group>
                 </div>
-              {/* ))} */}
-            {(rows[memberIndex]?.role !== null && rows[memberIndex]?.role !== "role") &&
-              <Card>
-                <Card.Body>
+                {/* ))} */}
+                {fields?.role !== null && fields?.role !== "role" && (
+                  <Card className="border-0">
+                    <Card.Body className="p-0 border-0">
                       <>
-                      <div className="card--header" data-roleid={rows[memberIndex]?.role}>
-                        <FormGroup className="form-group mb-0 pb-0">
-                        <Form.Check
-                          type="checkbox"
-                          id="all"
-                          label="Select All Permissions"
-                          checked={permissionModules.every((mod) => {
+                        
+                        <div className="new--accordion--block">
+                          {permissionModules.map((mod) => {
                             const modSlug = mod.slug;
                             const modPerms = permissions?.[modSlug] || {};
-
-                            const allPermsChecked = (mod.permissions || []).every((perm) => modPerms[perm] === true);
-
-                            const selectedIds = modPerms["selected_members"] || [];
-                            const allMemberIds = memberFeeds.map((m) => String(m._id));
-                            if (modSlug === "projects") allMemberIds.push("unassigned");
-
-                            const allMembersChecked = selectedIds.length === allMemberIds.length &&
-                              allMemberIds.every((id) => selectedIds.includes(id));
-
-                            if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
-                              return allPermsChecked && allMembersChecked;
-                            }
-
-                            return allPermsChecked;
-                          })}
-                          onChange={(e) => handleSelectAllPermissions(e.target.checked)}
-                        />
-
-                        </FormGroup>
-                        <Button type="button" variant="link" className="p-0" onClick={handleToggleExpandAll}>
-                          {permissionModules.every(mod => expanded[mod.slug]) ? "Collapse All" : "Expand All"}
-                        </Button>
-
-                      
-                      </div>
-                      <Accordion  activeKey={Object.entries(expanded)
-                          .filter(([_, v]) => v)
-                          .map(([k]) => k)}
-                        alwaysOpen>
-                        {permissionModules.map((mod) => {
-                          const modSlug = mod.slug;
-                          const modPerms = permissions?.[modSlug] || {};
-                          const isExpanded = expanded?.[modSlug] || false;
-                          const isViewChecked = !!modPerms.view;
-                          const truePermissionCount = Object.values(modPerms).filter(val => val === true).length;
-
-                          return (
-                            <Accordion.Item eventKey={modSlug}>
-                                  <Accordion.Header onClick={() => {
-                                    setExpanded(prev => ({
-                                      ...prev,
-                                      [modSlug]: !prev[modSlug]
-                                    }));
-                                  }}>{mod.name} <span className="per--count">{truePermissionCount}/{mod?.permissions?.length}</span> </Accordion.Header>
-                                  <Accordion.Body>
-                                  <div className="transition-all">
-                                  {(mod.permissions || []).map((perm) => {
-                                    if (perm === 'view') {
-                                      return (
-                                        <Form.Check
-                                          key={`${modSlug}--view`}
-                                          type="checkbox"
-                                          id={`${modSlug}-view`}
-                                          label="View"
-                                          checked={!!modPerms.view}
-                                          onChange={() => {
-                                            toggleView(modSlug)
-                                          }
-                                          }
-                                        />
-                                      );
-                                    }
-
-                                    return (
-                                      <>
-                                        <Form.Check
-                                          key={perm}
-                                          type="checkbox"
-                                          id={`${modSlug}-${perm}`}
-                                          label={perm
-                                            .replace(/[_-]/g, " ")
-                                            .replace(/^\w/, (l) => l.toUpperCase())}
-                                          
-                                          checked={!!modPerms[perm]}
-                                          onChange={() => {
-                                            togglePermission(modSlug, perm)}
-
-                                          }
-                                          className={!isViewChecked ? 'parent-item text-muted' : 'parent-item'}
-                                        />
-                                    
-                                    {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
-                                      perm === "view_others" &&
-                                      modPerms[perm] === true &&
-                                      <>
-                                      <Form.Check
-                                        key={`${modSlug}-${perm}-select-all`}
-                                        type="checkbox"
-                                        id={`${modSlug}-${perm}-select-all`}
-                                        label="Select all"
-                                        
-                                        checked={memberFeeds.every((member) =>
-                                          modPerms["selected_members"]?.includes(String(member._id))
-                                        )}
-                                        onChange={(e) => {
-                                          
-                                            handleSelectAll(modSlug, e.target.checked)
-                                          
-                                        }}
-                                        className="sub-items"
-                                      />
-                                      <>
-                                        {memberFeeds.map((member) => (
-                                          <Form.Check
-                                            key={`${modSlug}-${perm}-${member._id}`}
-                                            type="checkbox"
-                                            id={`${modSlug}-${perm}-${member._id}`}
-                                            label={member.name}
-                                            checked={modPerms["selected_members"]?.includes(String(member._id))}
-                                            
-                                            onChange={() => {
-                                              toggleMembers(modSlug, "selected_members", member._id);
-                                            }}
-                                            className="sub-items"
-                                          />
-                                        ))}
-
-                                        {modSlug === "projects" && (
-                                          <Form.Check
-                                            key={`${modSlug}-${perm}-unassigned`}
-                                            type="checkbox"
-                                            id={`${modSlug}-${perm}-unassigned`}
-                                            label="Unassigned"
-                                            checked={modPerms["selected_members"]?.includes('unassigned')}
-                                            onChange={() => {
-                                                toggleMembers(modSlug, "selected_members", 'unassigned');
-                                            }}
-                                            className="sub-items"
-                                          />
-                                        )}
-                                        </>
-
-                                      </>
-                                      }
-                                      </>
-                                    );
-                                    
-                                  })}
-
+                            const isExpanded = expanded?.[modSlug] || false;
+                            const isViewChecked = !!modPerms.view;
+                            const truePermissionCount = Object.values(
+                              modPerms
+                            ).filter((val) => val === true).length;
+    
+                            return (
+                              <div className="bg--blue--accordion">
+                                <div className="d-flex gap-3 align-items-center">
+                                  {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                                  <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
                                 </div>
-                                  </Accordion.Body>
-                                </Accordion.Item>
-                            
-                          );
-                        })}
-                        </Accordion>
+                                    {(mod.permissions || []).map((perm) => {
+                                      if (perm === "view") {
+                                         return (
+                                            <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                              <p className="mb-0">View</p>
+                                              <Form.Check key={`${modSlug}--view`} id={`${modSlug}-view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
+                                                () => {
+                                                  // if(selectedMember?.role?.slug !== "owner"){
+                                                  toggleView(modSlug);
+                                                }
+                                                //}
+                                              }/>
+                                            </div>
+                                          )
+                                      }
+    
+                                      return (
+                                        <>
+                                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                          <p className="mb-0">
+                                           {perm
+                                                              .replace(/[_-]/g, " ")
+                                                              .replace(/^\w/, (l) => l.toUpperCase())}
+                                                              </p>
+                                          <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                                            disabled={!isViewChecked}
+                                            checked={!!modPerms[perm]}
+                                            //onChange={(e) => setShowTeamGrid(e.target.checked)} 
+                                              onChange={() => {
+                                                //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
+                                                togglePermission(modSlug, perm);
+                                              }}
+                                          />
+                                        </div>
+                                        {[
+                                          "tracking",
+                                          "projects",
+                                          "reports",
+                                          "attendance",
+                                        ].includes(modSlug) &&
+                                          perm === "view_others" &&
+                                          modPerms[perm] === true && (
+                                            <div className="team--card--grid">
+                                              {memberFeeds.map((member) => (
+                                                <Card className={`team--card ${modPerms[
+                                                    "selected_members"
+                                                  ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                                    //if (selectedMember?.role?.slug !== "owner") {
+                                                    toggleMembers(
+                                                      modSlug,
+                                                      "selected_members",
+                                                      member._id
+                                                    );
+                                                    // }
+                                                  }}>
+                                                  <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
+                                                  <Card.Body>
+                                                    <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
+                                                  </Card.Body>
+                                                  <FiCheck className="ms-auto" />
+                                                </Card>
+                                              ))}
+    
+                                              {modSlug === "projects" && (
+                                                <Card className={`team--card ${modPerms[
+                                                    "selected_members"
+                                                  ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                                    //if (selectedMember?.role?.slug !== "owner") {
+                                                    toggleMembers(
+                                                      modSlug,
+                                                      "selected_members",
+                                                      "unassigned"
+                                                    );
+                                                    // }
+                                                  }} key={`${modSlug}-${perm}-unassigned`}>
+                                                  <span className="team--initial">U</span>
+                                                  <Card.Body>
+                                                    <h4>Unassigned</h4>
+                                                  </Card.Body>
+                                                  <FiCheck className="ms-auto" />
+                                                </Card>
+                                              )}
+                                            </div>
+                                          )}
+                                          
+                                        </>
+                                      );
+                                    })}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </>
                     </Card.Body>
-                </Card>
-              }
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" onClick={handleSavePermissions} disabled={loader}>{loader ? "Please Wait..." : "Save"}</Button>
-          </Modal.Footer>
-      </Modal>
-    }
+                  </Card>
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="primary" onClick={() => {handleSavePermissions()}} disabled={loader}>
+                  {loader ? "Please Wait..." : "Save"}
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          )}
+          {
+              showBadges !== null && 
+              <BadgesModal badgesData={showBadges} toggleBadges={toggleBadges} handleSelect={handleChange} value={fields[`custom_field[${showBadges?.name}]`] || ''}/>
+            }
     </>
   );
 }

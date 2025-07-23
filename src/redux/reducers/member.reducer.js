@@ -20,7 +20,8 @@ import {
     RESEND_INVITE_FAILED,
     CLEAR_MESSAGES,
     MEMBERS_BY_ROLES,
-    MEMBERS_REORDER
+    MEMBERS_REORDER,
+    PUT_INVITE_SUCCESS
 } from "../actions/types";
 
 const initialState = {
@@ -145,6 +146,14 @@ export default (state = initialState, action) => {
             message: action.payload,
             createMember: initialState.createMember,
             message_variant: 'success',
+        }
+    case PUT_INVITE_SUCCESS: 
+        return {
+            ...state,
+            message: action.payload.message,
+            createMember: initialState.createMember,
+            message_variant: 'success',
+            udpatedInvite: action.payload.udpatedInvite
         }
     case INVITE_LIST_FAILED:
         return {

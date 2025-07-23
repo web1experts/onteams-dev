@@ -35,10 +35,10 @@ function errorRequest(err, dispatch) {
  * @function ListClients
  * @returns {Object}
  */
-export const ListHolidays = (currentPage = 0, searchterm = "") => {
+export const ListHolidays = (payload) => {
     return async (dispatch) => {
         try{
-            const response = await API.apiGet('holidays', { search: searchterm, currentPage:currentPage });
+            const response = await API.apiGet('holidays', payload);
             if(response.data && response.data.success){
             await dispatch({ type: HOLIDAY_LIST_SUCCESS, payload: response.data })
             }else{

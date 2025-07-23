@@ -15,6 +15,9 @@ import { FiCalendar, FiGift, FiSidebar, FiEdit } from 'react-icons/fi';
 import { createHoliday, ListHolidays, deleteHoliday, updateHoliday } from "../../redux/actions/holiday.action";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { currentMemberProfile } from "../../helpers/auth";
+import InputIcon from "react-multi-date-picker/components/input_icon"
+import Icon from "react-multi-date-picker/components/icon"
+
 function HolidaysPage() {
   const [isActiveView, setIsActiveView] = useState(2);
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
@@ -30,6 +33,8 @@ function HolidaysPage() {
   const [isActive, setIsActive] = useState(false);
   const [fields, setFields] = useState({ date: "", occasion: '', type: ''});
   const [errors, setErrors] = useState({})
+const [filters, setFilters] = useState({ year: new Date().getFullYear() });
+
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -82,13 +87,13 @@ function HolidaysPage() {
 
 const handleListHolidays = async () => {
   setSpinner(true)
-  await dispatch(ListHolidays());
+  await dispatch(ListHolidays(filters));
   setLoader(false)
   setSpinner(false)
 }
 
 useEffect(() => {
-  if (holidaysFeed && holidaysFeed.length > 0) {
+  if (holidaysFeed ) {
     const today = new Date();
     let nextHoliday = null;
     let minDiff = Infinity;
@@ -136,6 +141,11 @@ useEffect(() => {
   handleListHolidays()
   setLoader(true)
 }, [])
+
+useEffect(() => {
+  handleListHolidays()
+  setLoader(true)
+}, [filters])
 
 useEffect(() => {
   if( editItem !== false ){
@@ -195,7 +205,21 @@ const getDaysLeft = (date) => {
                   Holidays
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup.Item>
-                      <Dropdown className="select--dropdown">
+                      <DatePicker 
+                        onlyYearPicker 
+                        render={<Icon />}
+                        value={new Date(filters.year, 0, 1)}
+                        onChange={(timestamp) => {
+                          if (timestamp) {
+                              const year = new Date(timestamp).getFullYear();
+                              setFilters((prev) => ({
+                                  ...prev,
+                                  year,
+                              }));
+                          }
+                        }}
+                      /><span className="current-year">{filters['year']}</span>
+                      {/* <Dropdown className="select--dropdown">
                         <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> 2025</Dropdown.Toggle>
                         <Dropdown.Menu>
                             <div class="drop--scroll">
@@ -205,7 +229,7 @@ const getDaysLeft = (date) => {
                               <a href="#" class="dropdown-item" role="button">2026</a>
                             </div>
                         </Dropdown.Menu>
-                    </Dropdown>
+                    </Dropdown> */}
                     </ListGroup.Item>
                     <ListGroup horizontal className="d-none d-lg-flex">
                         <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
@@ -262,7 +286,7 @@ const getDaysLeft = (date) => {
               </Col>
             </Row>
             <div className={isActiveView === 1 ? 'project--grid--table holiday--table--grid' : isActiveView === 2 ? 'project--table holiday--table holidays--list bg-white' : 'project--table holiday--table holidays--list bg-white'}>
-              <h3 class="mb-4 d-flex align-items-center gap-3"><span><FiCalendar /></span>Holiday Calendar - 2025</h3>
+              <h3 class="mb-4 d-flex align-items-center gap-3"><span><FiCalendar /></span>Holiday Calendar - {filters['year']}</h3>
               <Table>
                 <tbody>
                   {

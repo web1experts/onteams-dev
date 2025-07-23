@@ -326,22 +326,20 @@ const getDayWithSuffix = (day) => {
   export function generateTimeRange(createdAt, duration) {
     // Create a Date object from createdAt
     const startTime = new Date(createdAt);
+    const options = { 
+      timeZone: 'Asia/Kolkata', 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+  };
 
     // Calculate the endTime by adding duration (in seconds) to the startTime
     const endTime = new Date(startTime.getTime() + duration * 1000); // Convert seconds to milliseconds
 
     // Format the start and end times using local time zone
-    const startTimeFormatted = startTime.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-    });
+    const startTimeFormatted = startTime.toLocaleTimeString('en-IN', options);
 
-    const endTimeFormatted = endTime.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true // Ensures 12-hour format (e.g., 3:00pm)
-    });
+    const endTimeFormatted = endTime.toLocaleTimeString('en-IN', options);
     const totaltime = convertSecondstoTime(duration)
     // Return the formatted time range in the desired format
     return `${startTimeFormatted} - ${endTimeFormatted} (${totaltime})`;

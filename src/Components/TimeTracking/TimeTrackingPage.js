@@ -346,14 +346,7 @@ const handleListProjects = async () => {
         console.log("occupiedRanges:: ", occupiedRanges)
       },[occupiedRanges])
 
-// const calculateOccupiedRanges = (data) => {
-//     return data.map((item) => {
-//       const start = new Date(item.createdAt); // Convert createdAt to a Date object
-//       // const end = new Date(item.duration); // Convert duration to a Date object (end time)
-//       const end = new Date(start.getTime() + item.duration * 1000);
-//       return { start, end };
-//     });
-//   };
+
 const calculateOccupiedRanges = (data) => {
   return data.map((item) => {
     const startUTC = new Date(item.createdAt);
@@ -1610,7 +1603,7 @@ const handleProjectSelect = async (project) => {
                       <div className="screens--tabs">
                         <Accordion.Header>
                           <h4 className="d-flex align-items-center gap-3 justify-content-between">
-                            <strong><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-building2 w-4 h-4 text-blue-600"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg></span>{recording?.project?.title}</strong>
+                            <strong><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" strokeLinejoin="round" className="lucide lucide-building2 w-4 h-4 text-blue-600"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg></span>{recording?.project?.title}</strong>
                             <strong className="activity-type-text d-flex align-items-center gap-2"><HiOutlineLightningBolt /> {recording?.type }</strong>
                           </h4>
                           <p><small className="d-flex align-items-center gap-2"><FiUser /> {recording?.project?.client?.name}</small></p>
@@ -1658,6 +1651,9 @@ const handleProjectSelect = async (project) => {
                                           <p>
                                             <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
                                             <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
+                                            <strong>Date: </strong>{ screenshotData?.taken_time
+                                              ? new Date(screenshotData.taken_time).toISOString().split('T')[0]
+                                              : ''}
                                           </p>
                                         </Card.Body>
                                       </Card>
@@ -1685,6 +1681,11 @@ const handleProjectSelect = async (project) => {
                                                   <p>
                                                     <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
                                                     <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                    <strong>Date:</strong>{
+                                                      videoData?.createdAt
+                                                        ? new Date(videoData?.createdAt).toISOString().split('T')[0]
+                                                        : ''
+                                                    }
                                                   </p>
                                                 </Card.Body>
                                               </Card>
@@ -1700,6 +1701,11 @@ const handleProjectSelect = async (project) => {
                                                   <p>
                                                     <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
                                                     <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                    <strong>Date:</strong>{
+                                                      videoData?.createdAt
+                                                        ? new Date(videoData?.createdAt).toISOString().split('T')[0]
+                                                        : ''
+                                                    }
                                                   </p>
                                                 </Card.Body>
                                               </Card>
@@ -1728,6 +1734,11 @@ const handleProjectSelect = async (project) => {
                                                   <p>
                                                     <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
                                                     <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
+                                                     <strong>Date:</strong>{
+                                                      videoData?.createdAt
+                                                        ? new Date(videoData?.createdAt).toISOString().split('T')[0]
+                                                        : ''
+                                                    }
                                                   </p>
                                                 </Card.Body>
                                               </Card>
