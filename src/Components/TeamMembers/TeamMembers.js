@@ -45,7 +45,7 @@ function TeamMembersPage() {
   const [activeRole, setActiveRole] = useState({});
 
   const handleDeleteRole = async (e) => {
-    setLoader(true); console.log(activeRole._id)
+    setLoader(true); 
     dispatch(deleteRole(activeRole._id))
   }
 
@@ -310,12 +310,7 @@ function TeamMembersPage() {
           meta_value: "disabled",
         };
       }
-      // setEditedMember({
-      //   name: selectedMember.name,
-      //   role: selectedMember.role?._id,
-      //   rolename: selectedMember.role?.name,
-      //   memberMeta: cleanedMeta, //selectedMember?.memberMeta
-      // });
+     
       let fieldsSetup = {
         name: selectedMember?.name,
         role: selectedMember?.role?._id,
@@ -376,10 +371,6 @@ function TeamMembersPage() {
     }
   }, [selectedMember]);
 
-  useEffect(() => {
-    console.log(fields);
-  }, [fields]);
-
   const handleEditClick = (fieldName) => {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
@@ -415,17 +406,20 @@ function TeamMembersPage() {
         },
       }));
     } else if (field === "role") {
-      const matchingRole = roles.find((role) => role._id === value);
-      setEditedMember((prevState) => ({
-        ...prevState,
-        ["rolename"]: matchingRole?.name,
-        ["role"]: matchingRole._id,
-        memberMeta: {
-          ...prevState.memberMeta,
-          ["permissions"]: matchingRole.permissions,
-        },
-      }));
+      if( value !== "role"){
+         const matchingRole = roles.find((role) => role._id === value);
+        setEditedMember((prevState) => ({
+          ...prevState,
+          ["rolename"]: matchingRole?.name,
+          ["role"]: matchingRole._id,
+          memberMeta: {
+            ...prevState.memberMeta,
+            ["permissions"]: matchingRole.permissions,
+          },
+        }));
+      }
       if (value !== "") {
+       
         removeError(field);
       }
     } else {
@@ -463,21 +457,24 @@ function TeamMembersPage() {
     } else {
         finalValue = value;
     }
-
-    if (name === "role") {
-      const matchingRole = roles.find((role) => role._id === value);
+   
+    if (name === "role") { 
+      if( finalValue !== "role"){
+        const matchingRole = roles.find((role) => role._id === value);
       setFields((prevState) => ({
         ...prevState,
         role: matchingRole._id,
+        rolename: matchingRole.name,
         ["custom_field[permissions]"]: matchingRole.permissions,
       }));
+      }
     } else {
       setFields({ ...fields, [name]: finalValue });
     }
 
     setErrors({ ...errors, [name]: "" });
 
-    if( showBadges !== null && Object.keys(selectedMember).length > 0 && isActive !== true){
+    if( showBadges !== null && selectedMember && Object.keys(selectedMember).length > 0 && isActive !== true){
         let payload = {};
 
         if (name.startsWith('custom_field[')) {
@@ -681,12 +678,12 @@ function TeamMembersPage() {
   const [projectToggle, setProjectToggle] = useState(false);
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
-      console.log("1");
+     
       handleSidebarSmall();
     } else {
       setProjectToggle(false);
       handleSidebarSmall();
-      console.log("3");
+     
     }
   };
 
@@ -742,9 +739,7 @@ function TeamMembersPage() {
     });
   };
 
-  useEffect(() => {
-    console.log("permissions:: ", permissions);
-  }, [permissions]);
+
 
   const handleSave = async (e) => {
     setLoader(true);
@@ -1210,20 +1205,6 @@ function TeamMembersPage() {
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>
-                          {/* <ListGroup.Item>
-                            <p>
-                              <small>Recording Type</small>
-                              <span>
-                                {selectedMember?.memberMeta?.recording
-                                  ? selectedMember?.memberMeta?.recording?.meta_value
-                                      ?.replace(/_/g, " ")
-                                      .replace(/^./, (char) =>
-                                        char.toUpperCase()
-                                      )
-                                  : "Screenshot only  "}
-                              </span>
-                            </p>
-                          </ListGroup.Item> */}
                           {customFields?.length > 0 && (
                             <>
                               {customFields.map((field, index) => (
@@ -1294,43 +1275,7 @@ function TeamMembersPage() {
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>
-                          {/* <ListGroup.Item>
-                            <Form.Label>Recording Type</Form.Label>
-                            {(memberProfile?.permissions?.members
-                              ?.create_edit_delete === true &&
-                              selectedMember?._id !== currentMember?._id) ||
-                            memberProfile?.role?.slug === "owner" ? (
-                              <Form.Select
-                                className="form-control custom-selectbox"
-                                id="member-meta"
-                                name={`custom_field[recording]`}
-                                onChange={(event) => handleChange(event)}
-                                value={
-                                  fields[`custom_field[recording]`] ||
-                                  "screenshot_only"
-                                }
-                              >
-                                <option key={`both`} value="both">
-                                  Screenshot And Video
-                                </option>
-                                <option
-                                  key={`screenshot_only`}
-                                  value="screenshot_only"
-                                >
-                                  Screenshot Only
-                                </option>
-                                <option key={`video_only`} value="video_only">
-                                  Video Only
-                                </option>
-                              </Form.Select>
-                            ) : (
-                              <span>
-                                {editedMember?.memberMeta?.recording
-                                  ?.replace(/_/g, " ")
-                                  .replace(/^./, (char) => char.toUpperCase())}
-                              </span>
-                            )}
-                          </ListGroup.Item> */}
+                          
                           {customFields?.length > 0 && (
                             <>
                               {customFields.map((field, index) => (
@@ -1780,13 +1725,13 @@ function TeamMembersPage() {
                   name="role"
                   controlId="floatingSelect"
                   className={"form-control custom-selectbox"}
-                  value={fields?.role}
+                  defaultValue={fields?.role}
                   onChange={(e) => {
                     handleChange(e);
                     const matchedRole = roles.find(
                       (role) => role._id === e.target.value
                     );
-                    handleChange({ target: { name: 'rolename', value: matchedRole.name } });
+                    // handleChange({ target: { name: 'rolename', value: matchedRole.name } });
                     const matchedPermissions = matchedRole
                       ? matchedRole.permissions
                       : [];
