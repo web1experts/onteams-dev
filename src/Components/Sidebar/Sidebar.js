@@ -215,6 +215,7 @@ function SidebarPanel() {
         localStorage.setItem('theme', JSON.stringify({ primaryColor, secondaryColor, themeName, color }));
         dispatch(updateWorkSpaceTheme({theme: { primaryColor, secondaryColor, themeName , color}}))
          dispatch(toggleTheme({ primaryColor, secondaryColor, themeName , color}));
+         handleClose()
         console.log('Applied theme:', primaryColor, secondaryColor, themeName, color);
     };
 

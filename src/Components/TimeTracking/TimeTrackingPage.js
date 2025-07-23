@@ -58,8 +58,6 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
     const [totalTaskDuration, setTotalTaskDuration] = useState(0)
   const handleProjectShow = () => setProjectShow(true);
   const [showSelect, setProjectShow] = useState(false);
-  const handleProjectClose = () => setProjectShow(false);
-
   const [isActive, setIsActive] = useState(false);
   const MemberprojectFeed = useSelector(state => state.project.memberProjects);
    const [isActiveView, setIsActiveView] = useState(2);
@@ -132,19 +130,31 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
     setTimings({'start_time': '', end_time: ''})
   }
   const commonState = useSelector(state => state.common)
+
+  const handleProjectClose = () => {
+    setWorkflow('')
+    setSelectedProject('');
+    setFilteredTasks([])
+    setTimings({'start_time': '', end_time: ''})
+    setProjectShow(false);
+  };
+
+  
   const handleClick = (activity) => {
     setIsActive(true);
     setRecordedRefresh( true )
 
     socket.emit('get-tracker-status-update', {userID: activity._id})
     setCurrentActivity( activity)
-    console.log("activeTab: ", activeTab)
+    
     if(activeTab === "Recordings" || activeInnerTab === "InnerRecorded"){
       setActiveInnerTab("InnerRecorded")
     }else{
       setActiveInnerTab("InnerLive")
     }
   };
+
+  
 
   const handleCloseNew = () => {
     setShowNew(false);
@@ -682,11 +692,11 @@ const handleEntryChange = () => {
       end_time: timings?.end_time,
     });
     
+    
     setEntries(updatedEntries);
-    setSelectedProject('');
-    setProjectShow(false);
-    setFilteredTasks([])
-    setTimings({'start_time': '', end_time: ''})
+    handleProjectClose()
+    
+    
 };
 
 const handleSearchChange = (name, index, searchvalue) => {
@@ -812,6 +822,7 @@ const handleProjectSelect = async (project) => {
     if(project?.workflow?.tabs && project.workflow.tabs.length > 0){
       setWorkflow(project.workflow.tabs[0]?._id)
     }
+    setFilteredTasks([])
     await dispatch(ListTasks(project?._id));
     await dispatch(getSingleProjectReport(project?._id))
   }
@@ -2041,222 +2052,6 @@ const handleProjectSelect = async (project) => {
               </Col>
             </Row>
           </Form>
-          {/* <Form onSubmit={handleReportSubmit}>
-            <Row>
-              <Col sm={12} lg={6}>
-                <Form.Group className="mb-0 form-group">
-                  <Form.Label>Select date</Form.Label>
-                  <DatePicker 
-                    ref={manuldatePickerRef}
-                    key={'manual-date-filter'}
-                    name="date"
-                    weekStartDayIndex={1}
-                    id='manual-datepicker'
-                    editable={false}
-                    value={fields['date']} 
-                    format="YYYY-MM-DD"
-                    dateSeparator=" - " 
-                    onChange={async (value) => {
-                      setFields({...fields, ['date']: value})
-                      }
-                    }          
-                    className="form-control"
-                    placeholder="dd/mm/yyyy"
-                    range={false}
-                    multiple={false}
-                  />
-                </Form.Group>
-              </Col>
-              <Col sm={12} lg={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Select your Project</Form.Label>
-                    <div className="drop--scroll">
-                      <Form.Select className="form-control custom-selectbox" id="projects"
-                        value={selectedproject._id} onChange={handleProjectSelect} name="project">
-                          <option key="blank" value={''}>Select Project</option>
-                        {
-                          memberprojects.map(project => (
-                            <option key={`${project._id}-opt`} data-project={JSON.stringify(project)} value={project._id}>{project.title}</option>
-                          ))
-                        }
-                      </Form.Select>
-                    </div>
-                </Form.Group>
-              </Col>
-              <Col sm={12} lg={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Select Workflow</Form.Label>
-                  <Form.Select className="form-control custom-selectbox" id="projects-tab"
-                    value={selectedWorkflow} onChange={(e) => {setWorkflow(e.target.value)}}>
-                      <option value={''}>Select Workflow Tab</option>
-                    { selectedproject && Object.keys(selectedproject).length > 0 &&
-                      selectedproject?.workflow?.tabs.map(tab => (
-                        <option value={tab._id}>{tab.title}</option>
-                      ))
-                    }
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row>
-              {
-                entries.length > 0 &&
-                <Col sm={12} lg={12}>
-                  <Form.Group className="mb-0">
-                    <Form.Label>Task List</Form.Label>
-                  </Form.Group>
-                </Col>
-              }
-            </Row>
-            {
-              entries.map((entry, index) => (
-                <Row className="mb-3">
-                  <Col md={4}>
-                    <Dropdown className="select--dropdown">
-                      <Dropdown.Toggle variant="success">
-                        { 
-                          
-                          entry.task_title ?
-                            <>
-                            {entry.task_title}
-                            </>
-                          :
-                          'Select'
-                        }
-
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                          <div className="drop--scroll">
-                              <Form>
-                                  <Form.Group className="form-group mb-3">
-                                      <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.tasksearch} onChange={(e) => {handleSearchChange('tasksearch', index, e.target.value)}} />
-                                  </Form.Group>
-                              </Form>
-                              {
-                                filteredTasks &&  filteredTasks.length > 0  &&
-                                filteredTasks.map((task) => {
-                                  if( searchEntries[index]?.tasksearch && searchEntries[index]?.tasksearch !== ""){
-                                    if (task?.title?.toLowerCase().includes(searchEntries[index]?.tasksearch?.toLowerCase())) {
-                                      return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
-                                    }else{
-                                      return null;
-                                    }
-                                    
-                                  }else{
-                                    return <Dropdown.Item key={`task-${task?._id}`} onClick={() => handleEntryChange(index, "task", task)} className={ (entry.task === task?._id ) ? 'selected--option' : ''} >{task.title} { (entry.task === task._id ) ? <FaCheck /> : null }</Dropdown.Item>
-                                  }
-                                  
-                                })
-                              }
-                          </div>
-                      </Dropdown.Menu>
-                  </Dropdown>
-
-
-                      {errors[index]?.task && <span className="form-error">{errors[index].task}</span>}
-                  </Col>
-                  <Col md={3}>
-                    <Dropdown className="select--dropdown">
-                      <Dropdown.Toggle variant="success">
-                        { 
-                          entry.start_time ?
-                            <>
-                            {entry.start_time}
-                            </>
-                          :
-                          'Select'
-                        }
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                          <div className="drop--scroll">
-                              <Form>
-                                  <Form.Group className="form-group mb-3">
-                                      <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.start_time} onChange={(e) => {handleSearchChange('start_time', index, e.target.value)}} />
-                                  </Form.Group>
-                              </Form>
-                              {
-                                
-                                timeSlots.map((slot) => {
-                                  const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                                  if( searchEntries[index]?.start_time && searchEntries[index]?.start_time !== ""){
-                                    if (slot?.toLowerCase().includes(searchEntries[index]?.start_time?.toLowerCase())) {
-                                      return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                    }else{
-                                      return null;
-                                    }
-                                    
-                                  }else{
-                                    return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "start_time", slot)} className={ (entry.start_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.start_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                  }
-                                  
-                                })
-                              }
-                          </div>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                    {errors[index]?.start_time && <span className="form-error">{errors[index].start_time}</span>}
-                  </Col>
-                  <Col md={3}>
-                    <Dropdown className="select--dropdown">
-                      <Dropdown.Toggle variant="success">
-                        { 
-                          entry.end_time ?
-                            <>
-                            {entry.end_time}
-                            </>
-                          :
-                          'Select'
-                        }
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                          <div className="drop--scroll">
-                              <Form>
-                                  <Form.Group className="form-group mb-3">
-                                      <Form.Control type="text" placeholder="Search here.."  value={searchEntries[index]?.end_time} onChange={(e) => {handleSearchChange('end_time', index, e.target.value)}} />
-                                  </Form.Group>
-                              </Form>
-                              {
-                                
-                                timeSlots.map((slot) => {
-                                  const isOccupied = isTimeSlotOccupied(slot, occupiedRanges);
-                                  if( searchEntries[index]?.end_time && searchEntries[index]?.end_time !== ""){
-                                    if (slot?.toLowerCase().includes(searchEntries[index]?.end_time?.toLowerCase())) {
-                                      return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                    }else{
-                                      return null;
-                                    }
-                                    
-                                  }else{
-                                    return <Dropdown.Item key={`slot-${slot}-${index}`} onClick={() => handleEntryChange(index, "end_time", slot)} className={ (entry.end_time === slot ) ? 'selected--option' : ''} >{slot} { (entry.end_time === slot ) ? <FaCheck /> : null }</Dropdown.Item>
-                                  }
-                                  
-                                })
-                              }
-                          </div>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                    {errors[index]?.end_time && <span className="form-error">{errors[index].end_time}</span>}
-                  </Col>
-                  <Col md={2} className="text-right">
-                    {
-                      index > 0 &&
-                        <Button
-                            variant="danger"
-                            onClick={() => handleRemoveEntry(index)}
-                        >
-                          <FaTrash />
-                        </Button>
-                    }
-                    {index === entries.length - 1 && (
-                        <Button variant="success" className="ms-2" onClick={handleAddEntry}>
-                            <FaPlus />
-                        </Button>
-                    )}
-                  </Col>
-                </Row>
-              ))
-            }
-          </Form> */}
         </Modal.Body>
         <Modal.Footer>
           {/* <Button variant="dark"><FaPlus /> Add Time Entry</Button> */}

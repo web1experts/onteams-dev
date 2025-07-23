@@ -596,12 +596,23 @@ function ProjectsPage() {
             // if( apiResult.updatedProject?.status !== currentProject?.status || isNotPresent){ console.log('here now')
             //     handleListProjects()
             // }else{
+                // setProjects((prevProjects) =>
+                //     prevProjects.map((project) =>
+                //       project._id === apiResult.updatedProject._id ? apiResult.updatedProject : project
+                //     )
+                // );  
+                // setCurrentProject(apiResult.updatedProject )
                 setProjects((prevProjects) =>
-                    prevProjects.map((project) =>
-                      project._id === apiResult.updatedProject._id ? apiResult.updatedProject : project
-                    )
-                );  
-                setCurrentProject(apiResult.updatedProject )
+                    prevProjects
+                        .map((project) =>
+                            project._id === apiResult.updatedProject._id ? apiResult.updatedProject : project
+                        )
+                        .filter((project) => project.status === filters['status'])
+                );
+
+                setCurrentProject((prev) =>
+                    apiResult.updatedProject.status === filters['status'] ? apiResult.updatedProject : null
+                );
             // } 
         }
 
