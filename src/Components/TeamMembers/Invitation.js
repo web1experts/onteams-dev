@@ -576,7 +576,7 @@ function Invitation(props) {
     <>
       <div className={`${isActive ? 'view--invitee team--page project-collapse' : 'team--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
         {props.topbar()}
-        <div className="page--wrapper px-md-2 pt-3">
+        <div className="page--wrapper px-md-2 py-5 pt-4">
           {
             showloader &&
             <div class="loading-bar">
@@ -684,9 +684,7 @@ function Invitation(props) {
           </Dropdown>
           <ListGroup horizontal>
             <ListGroup.Item nClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
-            <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {if (props.toggleActive) {
-                props.toggleActive(false)
-              } setIsActive(0);}}><MdOutlineClose /></ListGroup.Item>
+            <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {if (props.toggleActive) {props.toggleActive(false)} setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroup.Item>
           </ListGroup>
         </div>
         

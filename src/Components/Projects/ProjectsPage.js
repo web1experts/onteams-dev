@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, ListGroup, Table, Dropdown, ListGroupItem } from "react-bootstrap";
 import { FaChevronDown, FaPlus, FaList, FaRegTrashAlt, FaRegCalendarAlt, FaCog } from "react-icons/fa";
-import { MdFileDownload, MdFilterList, MdOutlineClose, MdOutlineCancel, MdOutlineSearch, MdDragIndicator } from "react-icons/md";
+import { MdFileDownload, MdFilterList, MdOutlineClose, MdOutlineCancel, MdOutlineSearch, MdDragIndicator, MdSearch } from "react-icons/md";
 import { FiSidebar, FiFileText } from "react-icons/fi";
 import { GrAttachment, GrExpand } from "react-icons/gr";
 import { BsGrid,BsEye, BsEyeSlash } from "react-icons/bs";
@@ -855,14 +855,14 @@ function ProjectsPage() {
                         </Row>
                     </Container>
                 </div>
-                <div className='page--wrapper px-md-2 py-3'>
+                <div className='page--wrapper px-md-2 py-5 pt-4'>
                     {
-                        spinner &&
+                        spinner ?
                         <div className="loading-bar">
                             <img src="images/OnTeam-icon.png" className="flipchar" />
                         </div>
-                    }
-                    <Container fluid className="pb-5 pt-2">
+                    :
+                    <Container fluid>
                         {
                             (memberProfile?.permissions?.projects?.update_projects_order === true || memberProfile?.role?.slug === "owner") ? 
                         
@@ -896,83 +896,42 @@ function ProjectsPage() {
                                             >
                                                 {
                                                     (!spinner && projects && projects.length > 0)
-                                                        ? projects.map((project, index) => {
-                                                            return (<>
-                                                                <Draggable
-                                                                    key={project?._id}
-                                                                    draggableId={`project-${project?._id}`}
-                                                                    index={index}
-                                                                >
-                                                                    {(provided) => (
-                                                                        <tr ref={provided.innerRef}
-                                                                            {...provided.draggableProps}
-                                                                            {...provided.dragHandleProps}
-                                                                            onDoubleClick={(event) => { 
-                                                                            (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner')
-                                                                                ?
-                                                                                    handleRowDoubleClick(project, index)
-                                                                                    : console.log('not allowed')
-                                                                            }}
-                                                                            key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
-                                                                                }`}>
-                                                                            <td className="project--title--td sticky border-bottom" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                                                <div className="d-flex justify-content-between border-end flex-wrap">
-                                                                                    <div className="project--name">
-                                                                                        <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
-                                                                                        <div className="title--initial">{project.title.charAt(0)}</div>
-                                                                                        <div className="title--span flex-column align-items-start gap-0">
-                                                                                            <span>{project.title}</span>
-                                                                                            <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'></span>}</strong>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons">
-                                                                                        <Button variant="primary" className="me-2" 
-                                                                                            onClick={() => {
-                                                                                                setIsActive(2);
-                                                                                            }}>
-                                                                                            <BsEye /></Button>
-                                                                                        <Button variant="primary" onClick={() => {
-                                                                                            
-                                                                                            if (
-                                                                                                memberProfile?.permissions?.projects?.view === true ||
-                                                                                                memberProfile?.role?.slug === 'owner'
-                                                                                            ) {
-                                                                                            setIsActive(1);
-                                                                                            } else {
-                                                                                                console.log('not allowed to view tasks');
-                                                                                            }
-                                                                                        }}
-                                                                                        >
-                                                                                            <BiEdit />
-                                                                                        </Button>
+                                                    ? projects.map((project, index) => {
+                                                        return (<>
+                                                            <Draggable
+                                                                key={project?._id}
+                                                                draggableId={`project-${project?._id}`}
+                                                                index={index}
+                                                            >
+                                                                {(provided) => (
+                                                                    <tr ref={provided.innerRef}
+                                                                        {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps}
+                                                                        onDoubleClick={(event) => { 
+                                                                        (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner')
+                                                                            ?
+                                                                                handleRowDoubleClick(project, index)
+                                                                                : console.log('not allowed')
+                                                                        }}
+                                                                        key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
+                                                                            }`}>
+                                                                        <td className="project--title--td sticky border-bottom" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
+                                                                            <div className="d-flex justify-content-between border-end flex-wrap">
+                                                                                <div className="project--name">
+                                                                                    <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
+                                                                                    <div className="title--initial">{project.title.charAt(0)}</div>
+                                                                                    <div className="title--span flex-column align-items-start gap-0">
+                                                                                        <span>{project.title}</span>
+                                                                                        <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'></span>}</strong>
                                                                                     </div>
                                                                                 </div>
-                                                                            </td>
-                                                                            
-                                                                            <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
-                                                                                <Dropdown className="select--dropdown" key='status-key'>
-                                                                                    <Dropdown.Toggle onClick={() => { 
-                                                                                        if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
-                                                                                            dispatch(updateStateData(DIRECT_UPDATE, true));
-                                                                                            handleStatusShow();
-                                                                                        } else {
-                                                                                            console.log('Not allowed');
-                                                                                        }
-                                                                                    }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                                                </Dropdown>
-                                                                            </td>
-                                                                            {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
-                                                                            <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles min__width">
-                                                                                <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
-                                                                            </td>
-                                                                            <td className="task--last--buttons">
-                                                                                <div className="d-flex" key={`actions-index-${index}`} data-label="Actions">
-                                                                                    <Button variant="dark" className="me-2 px-3 py-1" 
+                                                                                <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons">
+                                                                                    <Button variant="primary" className="me-2" 
                                                                                         onClick={() => {
                                                                                             setIsActive(2);
                                                                                         }}>
-                                                                                        <BsEye/> Details</Button>
-                                                                                    <Button variant="dark" className="px-3 py-1" onClick={() => {
+                                                                                        <BsEye /></Button>
+                                                                                    <Button variant="primary" onClick={() => {
                                                                                         
                                                                                         if (
                                                                                             memberProfile?.permissions?.projects?.view === true ||
@@ -984,84 +943,133 @@ function ProjectsPage() {
                                                                                         }
                                                                                     }}
                                                                                     >
-                                                                                        <BiEdit /> Tasks
+                                                                                        <BiEdit />
                                                                                     </Button>
                                                                                 </div>
-                                                                            </td>
-                                                                            {Array.isArray(customFields) && customFields
-                                                                            .filter(field => field?.showInTable !== false)
-                                                                            .map((field, idx) => {
-                                                                                const fieldname = field.name;
-                                                                                let mvalue = Array.isArray(project?.customFields?.[fieldname]?.meta_value)
-                                                                                                ? project.customFields[fieldname].meta_value.join(', ')
-                                                                                                : project?.customFields?.[fieldname]?.meta_value || '';
-                                                                                const fieldType = field.type;
-                                                                                const uniqueKey = `${fieldname || idx}-${mvalue}`;
-                                                                                if (field.type === 'badge' && Array.isArray(field.options)) {
-                                                                                    const matchedOption = field.options.find(opt => opt.value === mvalue);
-                                                                                    if (matchedOption) {
-                                                                                    mvalue = (
-                                                                                            <span className="priority--badge" key={`project-${fieldname || idx}-${mvalue}`}
-                                                                                            style={{
-                                                                                                backgroundColor: matchedOption.color,
-                                                                                                color: '#fff',
-                                                                                                display: 'inline-block',
-                                                                                                borderColor: matchedOption.color,
-                                                                                                borderStyle: 'solid',
-                                                                                                borderWidth: '1px'
-                                                                                            }}
-                                                                                            onClick={() => toggleBadges(field)}
-                                                                                        >
-                                                                                        {project?.customFields?.[fieldname]?.meta_value}
-                                                                                        </span>
-                                                                                    );
+                                                                            </div>
+                                                                        </td>
+                                                                        
+                                                                        <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
+                                                                            <Dropdown className="select--dropdown" key='status-key'>
+                                                                                <Dropdown.Toggle onClick={() => { 
+                                                                                    if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
+                                                                                        dispatch(updateStateData(DIRECT_UPDATE, true));
+                                                                                        handleStatusShow();
+                                                                                    } else {
+                                                                                        console.log('Not allowed');
                                                                                     }
-                                                                                }else if(fieldType === 'password'){
-                                                                                    mvalue =  (
-                                                                                        <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td"><span className="d-flex align-items-center gap-2">
-                                                                                            {visiblePasswords[uniqueKey] ? mvalue : '*****'}
-                                                                                            <span
-                                                                                                style={{ cursor: 'pointer' }}
-                                                                                                onClick={() => toggleVisibility(uniqueKey)}
-                                                                                            >
-                                                                                                {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
-                                                                                            </span>
-                                                                                        </span></td>
-                                                                                    )
-                                                                                }else if(fieldType === 'range'){
-                                                                                    // const maxvalue = field?.range_options?.max
-                                                                                    // let percentage = 0;
-                                                                                    // if(mvalue){
-                                                                                    //     percentage = (mvalue / maxvalue) * 100;
-                                                                                    // }
+                                                                                }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                            </Dropdown>
+                                                                        </td>
+                                                                        {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
+                                                                        <hr className={isActiveView === 1 ? 'd-flex' : isActiveView === 2 ? 'd-none' : 'd-none'} />
+                                                                        <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles min__width">
+                                                                            <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
+                                                                        </td>
+                                                                        <td className="task--last--buttons">
+                                                                            <div className="d-flex" key={`actions-index-${index}`} data-label="Actions">
+                                                                                <Button variant="dark" className="me-2 px-3 py-1" 
+                                                                                    onClick={() => {
+                                                                                        setIsActive(2);
+                                                                                    }}>
+                                                                                    <BsEye/> Details</Button>
+                                                                                <Button variant="dark" className="px-3 py-1" onClick={() => {
                                                                                     
-                                                                                    mvalue = (
-                                                                                        <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td"><div class="flex items-center space-x-2 w-full"><div class="flex-1 bg-slate-200 rounded-full h-2"><div class="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{width: `65%`}}></div></div><span class="text-sm font-bold text-slate-700">{mvalue}</span></div></td>
-                                                                                    )
-                                                                                }
-                                                                                return (
-                                                                                    <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td">
-                                                                                        {/* <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-none text-uppercase fs-small mb-1' : 'd-none text-uppercase fs-small mb-1'}>{field.label}</strong> */}
-                                                                                        {mvalue}
-                                                                                    </td>
+                                                                                    if (
+                                                                                        memberProfile?.permissions?.projects?.view === true ||
+                                                                                        memberProfile?.role?.slug === 'owner'
+                                                                                    ) {
+                                                                                    setIsActive(1);
+                                                                                    } else {
+                                                                                        console.log('not allowed to view tasks');
+                                                                                    }
+                                                                                }}
+                                                                                >
+                                                                                    <BiEdit /> Tasks
+                                                                                </Button>
+                                                                            </div>
+                                                                        </td>
+                                                                        {Array.isArray(customFields) && customFields
+                                                                        .filter(field => field?.showInTable !== false)
+                                                                        .map((field, idx) => {
+                                                                            const fieldname = field.name;
+                                                                            let mvalue = Array.isArray(project?.customFields?.[fieldname]?.meta_value)
+                                                                                            ? project.customFields[fieldname].meta_value.join(', ')
+                                                                                            : project?.customFields?.[fieldname]?.meta_value || '';
+                                                                            const fieldType = field.type;
+                                                                            const uniqueKey = `${fieldname || idx}-${mvalue}`;
+                                                                            if (field.type === 'badge' && Array.isArray(field.options)) {
+                                                                                const matchedOption = field.options.find(opt => opt.value === mvalue);
+                                                                                if (matchedOption) {
+                                                                                mvalue = (
+                                                                                        <span className="priority--badge" key={`project-${fieldname || idx}-${mvalue}`}
+                                                                                        style={{
+                                                                                            backgroundColor: matchedOption.color,
+                                                                                            color: '#fff',
+                                                                                            display: 'inline-block',
+                                                                                            borderColor: matchedOption.color,
+                                                                                            borderStyle: 'solid',
+                                                                                            borderWidth: '1px'
+                                                                                        }}
+                                                                                        onClick={() => toggleBadges(field)}
+                                                                                    >
+                                                                                    {project?.customFields?.[fieldname]?.meta_value}
+                                                                                    </span>
                                                                                 );
+                                                                                }
+                                                                            }else if(fieldType === 'password'){
+                                                                                mvalue =  (
+                                                                                    <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td"><span className="d-flex align-items-center gap-2">
+                                                                                        {visiblePasswords[uniqueKey] ? mvalue : '*****'}
+                                                                                        <span
+                                                                                            style={{ cursor: 'pointer' }}
+                                                                                            onClick={() => toggleVisibility(uniqueKey)}
+                                                                                        >
+                                                                                            {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
+                                                                                        </span>
+                                                                                    </span></td>
+                                                                                )
+                                                                            }else if(fieldType === 'range'){
+                                                                                // const maxvalue = field?.range_options?.max
+                                                                                // let percentage = 0;
+                                                                                // if(mvalue){
+                                                                                //     percentage = (mvalue / maxvalue) * 100;
+                                                                                // }
                                                                                 
-                                                                            })}
-                                                                        </tr>
-                                                                    )}
-                                                                </Draggable>
-                                                            </>)
-                                                        })
-                                                        :
+                                                                                mvalue = (
+                                                                                    <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td">
+                                                                                        <div class="flex items-center space-x-2 w-full">
+                                                                                            <div class="flex-1 bg-slate-200 rounded-full h-2">
+                                                                                                <div class="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{width: `65%`}}></div>
+                                                                                            </div>
+                                                                                            <span class="text-sm font-bold text-slate-700">{mvalue}</span>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                )
+                                                                            }
+                                                                            return (
+                                                                                <td key={`project-${fieldname || idx}-${mvalue}`} className="onHide new--td">
+                                                                                    <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-flex d-lg-none text-uppercase fs-small mb-1' : 'd-flex d-lg-none text-uppercase fs-small mb-1'}>{field.label}</strong>
+                                                                                    {mvalue}
+                                                                                </td>
+                                                                            );
+                                                                            
+                                                                        })}
+                                                                    </tr>
+                                                                )}
+                                                            </Draggable>
+                                                        </>)
+                                                    })
+                                                    :
 
-                                                        !spinner && isActiveView === 2 &&
-                                                        <>
-                                                            <tr key={`noresults-row`} className="no--invite">
-                                                                <td key={`empty-index`} colSpan={9} className="text-center">
-                                                                    <h2 className="mt-2 text-center">No Projects Found</h2>
-                                                                </td>
-                                                            </tr>
-                                                        </>
+                                                    !spinner && isActiveView === 2 &&
+                                                    <>
+                                                        <tr key={`noresults-row`} className="no--invite">
+                                                            <td key={`empty-index`} colSpan={9} className="text-center">
+                                                                <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                            </td>
+                                                        </tr>
+                                                    </>
                                                 }
                                             </tbody>
                                         )}
@@ -1086,94 +1094,93 @@ function ProjectsPage() {
                             <tbody id={`projectable-body`} className="projects--list">
                                 {
                                     (!spinner && projects && projects.length > 0)
-                                        ? projects.map((project, index) => {
-                                            return (<>
-                                                <tr onDoubleClick={(event) => { 
-                                                    (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner')
-                                                        ?
-                                                            handleRowDoubleClick(project, index)
-                                                            : console.log('not allowed')
-                                                    }}
-                                                    key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
-                                                        }`}>
-                                                    <td className="project--title--td sticky border-bottom" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
-                                                        <div className="d-flex justify-content-between border-end flex-wrap">
-                                                            <div className="project--name">
-                                                                <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
-                                                                <div className="title--initial">{project.title.charAt(0)}</div>
-                                                                <div className="title--span flex-column align-items-start gap-0">
-                                                                    <span>{project.title}</span>
-                                                                    <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'></span>}</strong>
-                                                                </div>
-                                                            </div>
-                                                            <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons sticky">
-                                                                <Button variant="primary" className="me-2" 
-                                                                    onClick={() => {
-                                                                        setIsActive(2);
-                                                                    }}>
-                                                                    <BsEye /></Button>
-                                                                <Button variant="primary" onClick={() => {
-                                                                    
-                                                                    if (
-                                                                        memberProfile?.permissions?.projects?.view === true ||
-                                                                        memberProfile?.role?.slug === 'owner'
-                                                                    ) {
-                                                                    setIsActive(1);
-                                                                    } else {
-                                                                        console.log('not allowed to view tasks');
-                                                                    }
-                                                                }}
-                                                                >
-                                                                    <BiEdit />
-                                                                </Button>
+                                    ? projects.map((project, index) => {
+                                        return (<>
+                                            <tr onDoubleClick={(event) => { 
+                                                (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner')
+                                                    ?
+                                                        handleRowDoubleClick(project, index)
+                                                        : console.log('not allowed')
+                                                }}
+                                                key={`project-row-${project._id}`} onClick={() => { handleProjectChange(project) }} className={`${project._id === currentProject?._id ? 'project--active' : ''} ${project.marked_by && project.marked_by.includes(memberdata._id) ? 'marked-project' : ''
+                                                    }`}>
+                                                <td className="project--title--td sticky border-bottom" key={`title-index-${index}`} data-label="Project Name" onClick={viewTasks}>
+                                                    <div className="d-flex justify-content-between border-end flex-wrap">
+                                                        <div className="project--name">
+                                                            <div className="drag--indicator"><abbr key={`index-${index}`}>{index + 1}</abbr><MdDragIndicator /></div>
+                                                            <div className="title--initial">{project.title.charAt(0)}</div>
+                                                            <div className="title--span flex-column align-items-start gap-0">
+                                                                <span>{project.title}</span>
+                                                                <strong key={`cname-index-${index}`} data-label="Client Name">{project.client?.name || <span className='text-muted'></span>}</strong>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    
-                                                    <td key={`td-status-index-${index}`} data-label="Status" className="onHide status__key">
-                                                        <Dropdown className="select--dropdown" key='status-key'>
-                                                            <Dropdown.Toggle onClick={() => { 
-                                                                if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
-                                                                    dispatch(updateStateData(DIRECT_UPDATE, true));
-                                                                    handleStatusShow();
+                                                        <div key={`actions-index-${index}`} data-label="Actions" className="onHide task--buttons sticky">
+                                                            <Button variant="primary" className="me-2" 
+                                                                onClick={() => {
+                                                                    setIsActive(2);
+                                                                }}>
+                                                                <BsEye /></Button>
+                                                            <Button variant="primary" onClick={() => {
+                                                                
+                                                                if (
+                                                                    memberProfile?.permissions?.projects?.view === true ||
+                                                                    memberProfile?.role?.slug === 'owner'
+                                                                ) {
+                                                                setIsActive(1);
                                                                 } else {
-                                                                    console.log('Not allowed');
+                                                                    console.log('not allowed to view tasks');
                                                                 }
-                                                            }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                        </Dropdown>
-                                                    </td>
-                                                    <td key={`td-priority-index-${index}`} data-label="Status" className="onHide status__key">
-                                                        <Dropdown className="select--dropdown" key='status-key'>
-                                                            <Dropdown.Toggle onClick={() => { 
-                                                                if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
-                                                                    dispatch(updateStateData(DIRECT_UPDATE, true));
-                                                                    handleStatusShow();
-                                                                } else {
-                                                                    console.log('Not allowed');
-                                                                }
-                                                            }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
-                                                        </Dropdown>
-                                                    </td>
-                                                    {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
-                                                    <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles min__width">
-                                                        <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
-                                                    </td>
-                                                </tr>
-                                            </>)
-                                        })
-                                        :
-
-                                        !spinner && isActiveView === 2 &&
-                                        <>
-                                            <tr key={`noresults-row`} className="no--invite">
-                                                <td key={`empty-index`} colSpan={9} className="text-center">
-                                                    <h2 className="mt-2 text-center">No Projects Found</h2>
+                                                            }}
+                                                            >
+                                                                <BiEdit />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                
+                                                <td key={`td-status-index-${index}`} data-label="Status" className="onHide status__key">
+                                                    <Dropdown className="select--dropdown" key='status-key'>
+                                                        <Dropdown.Toggle onClick={() => { 
+                                                            if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
+                                                                dispatch(updateStateData(DIRECT_UPDATE, true));
+                                                                handleStatusShow();
+                                                            } else {
+                                                                console.log('Not allowed');
+                                                            }
+                                                        }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                    </Dropdown>
+                                                </td>
+                                                <td key={`td-priority-index-${index}`} data-label="Status" className="onHide status__key">
+                                                    <Dropdown className="select--dropdown" key='status-key'>
+                                                        <Dropdown.Toggle onClick={() => { 
+                                                            if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
+                                                                dispatch(updateStateData(DIRECT_UPDATE, true));
+                                                                handleStatusShow();
+                                                            } else {
+                                                                console.log('Not allowed');
+                                                            }
+                                                        }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                    </Dropdown>
+                                                </td>
+                                                {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
+                                                <td key={`amember-index-${index}`} data-label="Assigned Member" className="onHide member--circles min__width">
+                                                    <MemberInitials directUpdate={true} key={`MemberNames-${index}-${project._id}`} members={project.members} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={project._id} type="project"/>
                                                 </td>
                                             </tr>
-                                        </>
+                                        </>)
+                                    })
+                                    :
+
+                                    !spinner && isActiveView === 2 &&
+                                    <>
+                                        <tr key={`noresults-row`} className="no--invite">
+                                            <td key={`empty-index`} colSpan={9} className="text-center">
+                                                <h2 className="mt-2 text-center">No Projects Found</h2>
+                                            </td>
+                                        </tr>
+                                    </>
                                 }
                             </tbody>
-                                
                         </Table>
                         }
                         {
@@ -1183,11 +1190,12 @@ function ProjectsPage() {
                             </div>
                         }
                     </Container>
+                    }
                 </div>
             </div>
             <div className="details--projects--grid projects--grid common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
-                    <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                    <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                     <div className="projecttitle">
                         <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
@@ -1217,11 +1225,11 @@ function ProjectsPage() {
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
-                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
+                    <ListGroup horizontal className="members--list me-md-2 ms-auto d-none d-xl-flex">
                         <ListGroup.Item key={`memberskey`} className="me-3">Members</ListGroup.Item>
                         {<MemberInitials directUpdate={true} key={`MemberNames-header-${currentProject?._id}`} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} members={currentProject?.members || []}  postId={currentProject?._id} type="project"/>}
                     </ListGroup>
-                    <ListGroup horizontal className="ms-auto ms-xl-0 p-0 mt-0 mt-md-0 d-none d-sm-flex">
+                    <ListGroup horizontal className="ms-auto ms-xl-0 p-0 mt-0 mt-md-0 d-none d-md-flex">
                         <ListGroup horizontal className="bx--shadow">
                             <Button variant="secondary" className="btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}><BsEye className="me-1"/> Details</Button>
                             <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}><BiEdit className="me-1"/> Tasks</Button>
@@ -1260,7 +1268,6 @@ function ProjectsPage() {
                                         <FloatingLabel label="Project Title *">
                                             <Form.Control type="text" name="title" placeholder="Project Title" value={fields['title'] || ""} onChange={handleChange} />
                                         </FloatingLabel>
-                                        
                                     </Form.Group>
                                     <Form.Group className="mb-0 form-group">
                                         <Form.Label>
@@ -1454,28 +1461,51 @@ function ProjectsPage() {
                 </Modal.Header>
                 <Modal.Body>
                     <ListGroup>
-                        <ListGroup.Item key="showfor-filter-list">
-                            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('show_for', event.target.value)} value={filters['show_for'] || 'all'}>
-                                <option value="all">All Projects</option>
-                                <option value="my">My Projects</option>
-                            </Form.Select>
-                        </ListGroup.Item>
                         <ListGroup.Item key="member-filter-list">
-                            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'} >
+                            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('member', event.target.value)} value={filters['member'] || 'all'}>
+                                <option value={memberdata?._id} key="my-projects-option">My Projects</option>
                                 {
-                                    allMembers?.map((member, index) => {
-                                        return <option key={`member-option--${index}`} value={member.value}>{member.label}</option>
-                                    })
+                                    (memberProfile?.permissions?.projects?.view_others === true || memberProfile?.role?.slug === 'owner') &&
+                                    <>
+                                    {
+                                        (memberProfile?.permissions?.projects?.selected_members?.length > 0 || memberProfile?.role?.slug === 'owner') && (
+                                            <option key={`member-projects-all`} value={'all'}>All Members</option>
+                                        )
+                                    }
+                                    
+                                    {allMembers.map((member, index) => 
+                                        (memberProfile?.permissions?.projects?.selected_members?.includes(member.value)  || memberProfile?.role?.slug === 'owner') ? (
+                                            <option key={`member-projects-${index}`} value={member.value}>
+                                            {member.label}
+                                            </option>
+                                        ) : null
+                                        )
+                                    }
+                                    </>
                                 }
+                                {
+                                    (memberProfile?.permissions?.projects?.selected_members?.includes('unassigned') || memberProfile?.role?.slug === 'owner') && (
+                                    <option value="unassigned">Unassigned</option>
+                                    )
+                                }
+                                
                             </Form.Select>
                         </ListGroup.Item>
                         <ListGroup.Item key="status-filter-list">
                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
-                                <option key={`view-all--option`} value="all">View All</option>
-                                <option key={`progress--option`} value="in-progress">In Progress</option>
-                                <option key={`hold--option`} value="on-hold">On Hold</option>
-                                <option key={`completed--option`} value="completed">Completed</option>
+                                <option value="all">View All</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="on-hold">On Hold</option>
+                                <option value="completed">Completed</option>
                             </Form.Select>
+                        </ListGroup.Item>
+                         <ListGroup.Item key="search-filter-list">
+                            <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault()}}>
+                                <Form.Group className="mb-0 form-group">
+                                    <MdOutlineSearch />
+                                    <Form.Control type="text" placeholder="Search by Project or Client" onChange={(event) => handlefilterchange('search', event.target.value)} />
+                                </Form.Group>
+                            </Form>
                         </ListGroup.Item>
                     </ListGroup>
                 </Modal.Body>

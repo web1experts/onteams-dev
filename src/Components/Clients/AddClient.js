@@ -178,7 +178,6 @@ const showError = (name) => {
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleSubmit}>
-                    
                       <div key={`row-0`} className="form-row">
                           <Form.Group className="mb-0 form-group">
                               <FloatingLabel label="Client Name *">

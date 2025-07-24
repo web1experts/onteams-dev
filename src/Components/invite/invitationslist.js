@@ -20,6 +20,8 @@ function InvitationList(props) {
   const [total, setTotal] = useState(0);
   const [showloader, setShowloader] = useState(false);
 
+  const [projectToggle, setProjectToggle] = useState(false);
+
   const handleInvitationList = async () => {
     setInvitationsFeed([])
     setShowloader(true);
@@ -81,7 +83,7 @@ function InvitationList(props) {
   return (
     <>
       
-        <div className={isActive ? "show--details team--page" : "team--page"}>
+        <div className={`${ isActive ? "show--details team--page project-collapse" : "team--page" } ${projectToggle === true ? "project-collapse" : ""}`}>
           <div className= "page--title p-md-3 py-3 bg-white border-bottom">
           <Container fluid>
               <Row>
@@ -91,7 +93,7 @@ function InvitationList(props) {
               </Row>
             </Container>
           </div>
-          <div className="page--wrapper p-md-3 py-3">
+          <div className="page--wrapper px-md-2 py-5 pt-4">
           {
               showloader &&
               <div class="loading-bar">

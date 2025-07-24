@@ -205,7 +205,7 @@ const getDaysLeft = (date) => {
                   Holidays
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup.Item>
-                      <DatePicker 
+                      {/* <DatePicker 
                         onlyYearPicker 
                         render={<Icon />}
                         value={new Date(filters.year, 0, 1)}
@@ -218,8 +218,8 @@ const getDaysLeft = (date) => {
                               }));
                           }
                         }}
-                      /><span className="current-year">{filters['year']}</span>
-                      {/* <Dropdown className="select--dropdown">
+                      /><span className="current-year">{filters['year']}</span> */}
+                      <Dropdown className="select--dropdown">
                         <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> 2025</Dropdown.Toggle>
                         <Dropdown.Menu>
                             <div class="drop--scroll">
@@ -229,7 +229,7 @@ const getDaysLeft = (date) => {
                               <a href="#" class="dropdown-item" role="button">2026</a>
                             </div>
                         </Dropdown.Menu>
-                    </Dropdown> */}
+                    </Dropdown>
                     </ListGroup.Item>
                     <ListGroup horizontal className="d-none d-lg-flex">
                         <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
@@ -251,14 +251,14 @@ const getDaysLeft = (date) => {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper px-md-2 py-3'>
+        <div className='page--wrapper px-md-2 py-5 pt-4'>
         {
-            spinner &&
-            <div className="loading-bar">
-                <img src="images/OnTeam-icon.png" className="flipchar" />
-            </div>
-        }
-          <Container fluid className="pb-5 pt-2">
+          spinner ?
+          <div className="loading-bar">
+            <img src="images/OnTeam-icon.png" className="flipchar" />
+          </div>
+        :
+          <Container fluid>
             <Row className="gap-3 gap-lg-0">
               <Col lg={4}>
                 <Card className="card--blue">
@@ -364,6 +364,7 @@ const getDaysLeft = (date) => {
               }
             </div>
           </Container>
+        }
         </div>
       </div>
 

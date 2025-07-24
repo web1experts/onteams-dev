@@ -536,18 +536,13 @@ const isPostLikedByMember = (likes = [], memberId) => {
   return (
     <>
       <div className={isActive === 1 ? 'show--details team--page dashboard--page' : isActive === 2 ? ' view--project team--page dashboard--page' : 'team--page dashboard--page'}>
-        <div className='page--title px-md-2 py-3 bg-white border-bottom d-flex d-xl-none'>
+        <div className='page--title px-md-2 py-3 bg-white border-bottom d-flex d-md-none'>
           <Container fluid>
               <Row>
                   <Col sm={12} lg={12}>
                       <h2>
                           <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                           Dashboard
-                          {/* <ListGroup horizontal className={isActive !== 0 ? 'd-none' : 'ms-auto d-none d-lg-flex'}>
-                              <ListGroup horizontal className="bg-white expand--icon ms-3">
-                                  <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
-                              </ListGroup>
-                          </ListGroup> */}
                       </h2>
                   </Col>
               </Row>
@@ -737,7 +732,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                   )})}
                 </Card> 
               </Col>
-              <Col xl={4}>
+              <Col xl={4} className="pb-5 pb-lg-0">
                 <div className="sticky--right">
                   <div className="download--wrapper">
                     <div className="app--title">
@@ -806,10 +801,8 @@ const isPostLikedByMember = (likes = [], memberId) => {
                             </ListGroup>
                           </Card.Body>
                         </Card>
-                        <Button variant="primary" className="w-100 my-3" onClick={() => {if (window.Tawk_API?.toggle) {
-            window.Tawk_API.toggle();
-          }}}><MdOutlineChatBubbleOutline /> Start Live Chat</Button>
-                        <p>Average response time: <strong>2 minutes</strong></p>
+                        <Button variant="primary" className="w-100 my-3" onClick={() => {if (window.Tawk_API?.toggle) {window.Tawk_API.toggle();}}}><MdOutlineChatBubbleOutline /> Start Live Chat</Button>
+                        <p className="mb-0">Average response time: <strong>2 minutes</strong></p>
                       </Container>
                     </div>
                   </div>

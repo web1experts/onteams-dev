@@ -904,30 +904,23 @@ Sidebar CSS-=-=
 }
 
 @media screen and (max-width:992px) {
-  .panel--sidebar {
-    transform: translateX(-100%);
-    -webkit-transform: translateX(-100%);
+  .navbar-toggler {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    background: linear-gradient(to bottom right, #0f172a, #1e293b);
+    border-radius: 100px;
+    width: 60px;
+    height: 60px;
+    z-index: 999999;
+    transform: translate(0px, -70px);
+    -webkit-transform: translate(0px, -70px);
   }
 
-  .open--panel--sidebar {
-    transform: translateX(0%);
-  }
-
-  .team--page {
-    max-width: calc(100% - 0rem);
-    margin-left: 0rem;
-  }
-
-  .open--panel--sidebar~.team--page {
-    max-width: calc(100% - 0rem);
-    margin-left: 0rem;
-    opacity: .8;
-    filter: blur(1.5px);
-    -webkit-filter: blur(1.5px);
-  }
-}
-
-@media screen and (max-width:767px) {
   .panel--sidebar {
     transform: translateX(0) translateY(100%);
     -webkit-transform: translateX(0) translateY(100%);
@@ -972,19 +965,6 @@ Sidebar CSS-=-=
     height: auto;
   }
 
-  .navbar-toggler {
-    display: none !important;
-    position: fixed;
-    top: -70px;
-    left: 0;
-    right: 0;
-    margin: auto;
-    background: linear-gradient(to bottom right, #0f172a, #1e293b);
-    border-radius: 100px;
-    width: 60px;
-    height: 60px;
-  }
-
   .panel--sidebar .dropdown-menu {
     width: calc(100% - 25px);
   }
@@ -1007,6 +987,7 @@ Sidebar CSS-=-=
     width: 50px;
     height: 50px;
     display: block !important;
+    transform: none;
   }
 
   .open--panel--sidebar .navbar-toggler.collapsed .navbar-toggler-icon {
@@ -1021,7 +1002,7 @@ Sidebar CSS-=-=
 
   .navbar-light .navbar-nav .nav-link {
     flex: 1 1 100%;
-    max-width: calc(50% - 0.5rem);
+    max-width: calc(25% - 0.5rem);
     flex-flow: column wrap;
     gap: 1rem;
     padding: 2rem 1rem;
@@ -1044,5 +1025,11 @@ Sidebar CSS-=-=
   .navbar-light .navbar-nav .show>.nav-link,
   .navbar-light .navbar-nav .nav-link:focus {
     padding: 2rem 1rem;
+  }
+}
+
+@media screen and (max-width:575px) {
+  .navbar-light .navbar-nav .nav-link {
+    max-width: calc(50% - 0.5rem);
   }
 }

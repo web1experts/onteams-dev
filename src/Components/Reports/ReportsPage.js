@@ -1241,14 +1241,8 @@ function ReportsPage() {
                     </span>
                     Reports
                   </p>
-                  <ListGroup
-                    horizontal
-                    className={isActive ? "d-none" : "activity--tabs ms-auto"}
-                  >
-                    <ListGroup
-                      horizontal
-                      className={isActive ? "" : "d-md-flex"}
-                    >
+                  <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
+                    <ListGroup horizontal className={isActive ? "" : "d-md-flex"}>
                       <ListGroup.Item
                         action
                         onClick={() => {
@@ -1278,38 +1272,37 @@ function ReportsPage() {
                         <LuFolderOpen /> Projects
                       </ListGroup.Item>
                     </ListGroup>
-                    <ListGroup horizontal>
-                      <ListGroup.Item
-                        className={"d-none d-xl-flex"}
-                        key="search-filter-list"
+                  </ListGroup>
+                  <ListGroup horizontal className="mx-2">
+                    <ListGroup.Item className={"d-none d-xl-flex"} key="search-filter-list">
+                      <Form
+                        className="search-filter-list"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                        }}
                       >
-                        <Form
-                          className="search-filter-list"
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                          }}
-                        >
-                          <Form.Group className="mb-0 form-group">
-                            <MdOutlineSearch />
-                            <Form.Control
-                              type="text"
-                              placeholder={
-                                activeMemberTab === "members"
-                                  ? "Search by member"
-                                  : "Search by project"
+                        <Form.Group className="mb-0 form-group">
+                          <MdOutlineSearch />
+                          <Form.Control
+                            type="text"
+                            placeholder={
+                              activeMemberTab === "members"
+                                ? "Search by member"
+                                : "Search by project"
+                            }
+                            onChange={(event) => {
+                              const value = event.target.value;
+                              if (value.length > 1 || value.length === 0) {
+                                setFilters({...filters, ['page']: 1})
+                                handlefilterchange("search", value);
                               }
-                              onChange={(event) => {
-                                const value = event.target.value;
-                                if (value.length > 1 || value.length === 0) {
-                                  setFilters({...filters, ['page']: 1})
-                                  handlefilterchange("search", value);
-                                }
-                              }}
-                            />
-                          </Form.Group>
-                        </Form>
-                      </ListGroup.Item>
-                    </ListGroup>
+                            }}
+                          />
+                        </Form.Group>
+                      </Form>
+                    </ListGroup.Item>
+                  </ListGroup>
+                  <ListGroup horizontal>
                     {filters["sort_by"] === "projects" && (
                       <>
                         <ListGroup.Item key="status-filter-list">
@@ -1333,7 +1326,7 @@ function ReportsPage() {
                     )}
                     <ListGroup.Item className="d-none d-xl-block">
                       <Form>
-                        <Form.Group className="mb-0 form-group me-2">
+                        <Form.Group className="mb-0 form-group">
                           <FiltersDate
                             position="left"
                             setFilteredDate={setFilteredDate}
@@ -1384,19 +1377,11 @@ function ReportsPage() {
                     </ListGroup>
                   </ListGroup>
                 </h2>
-                <ListGroup
-                  horizontal
-                  className="justify-content-start mt-3 mt-md-0 d-md-none d-flex"
-                >
+                <ListGroup horizontal className="justify-content-start mt-3 mt-md-0 d-md-none d-flex">
                   <ListGroup.Item>
                     <Form>
                       <Form.Group className="mb-0 form-group">
-                        <FiltersDate
-                          position="left"
-                          setFilteredDate={setFilteredDate}
-                          setSelectedFilter={setSelectedFilter}
-                          setIsPickerOpen={setIsPickerOpen}
-                        />
+                        <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen}/>
                       </Form.Group>
                       {selectedFilter === "custom" && (
                         <Form.Group className="mb-0 form-group">
@@ -1431,147 +1416,20 @@ function ReportsPage() {
             </Row>
           </Container>
         </div>
-        <div className="page--wrapper daily--reports px-md-2 py-3">
-          {spinner && (
+        <div className="page--wrapper px-md-2 py-5 pt-4 daily--reports">
+          {spinner ?
             <div className="loading-bar">
               <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
-          )}
-          <Container fluid className="py-4">
-            {activeMemberTab === "projects" && (
-              <div
-                className="attendance--table projects--view"
-                id="projects--view"
-              >
-                <div className="attendance--table--list">
-                  <Table>
-                    <thead className="onHide">
-                      <tr key="project-table-header">
-                        <th
-                          scope="col"
-                          className="sticky pe-0 py-0"
-                          key="project-name-header"
-                        >
-                          <LuFolderOpen className="me-1" /> Project
-                        </th>
-                        <th
-                          scope="col"
-                          key="client-time-header"
-                          className="onHide ms-auto"
-                        >
-                          <FiClock className="me-1" /> Total Hours
-                        </th>
-                        <th
-                          scope="col"
-                          key="client-status-header"
-                          className="onHide"
-                        >
-                          <FiUsers className="me-1" /> Members
-                        </th>
-                        <th
-                          scope="col"
-                          key="client-action-header"
-                          className="onHide"
-                        >
-                          <FiTarget className="me-1" /> Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {projectReports?.reports &&
-                        projectReports?.reports?.length > 0 &&
-                        projectReports?.reports?.map((reportData, i) => {
-                          const result = getProjectTabSummary(reportData);
-                          return (
-                            <tr>
-                              <td>
-                                <div className="d-flex justify-content-between">
-                                  <div className="project--name d-flex gap-3 align-items-center">
-                                    <div className="drag--indicator">
-                                      <abbr>{i + 1}</abbr>
-                                      <MdDragIndicator />
-                                    </div>
-                                    <div className="title--initial">
-                                      {reportData?.title?.substring(0, 1)}
-                                    </div>
-                                    <div className="title--span flex-column d-flex align-items-start gap-0">
-                                      <span>{reportData?.title}</span>
-                                      <strong>
-                                        {reportData?.client?.name}
-                                      </strong>
-                                    </div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="ms-auto text-start text-xl-center">
-                                <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                  Total Hours
-                                </strong>
-                                <br className="d-xl-none" />
-                                <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center">
-                                  <FiClock className="me-1" />{" "}
-                                  {result?.totalTime || 0}
-                                </span>
-                              </td>
-                              <td className="text-start text-xl-center">
-                                <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                  Members
-                                </strong>
-                                <br className="d-xl-none" />
-                                <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center">
-                                  <LuUsers className="me-1" />{" "}
-                                  {reportData?.members?.length || 0}
-                                </div>
-                              </td>
-                              <td>
-                                <Button
-                                  variant="dark"
-                                  className="ms-auto px-3 py-2 d-flex align-items-center gap-2"
-                                  onClick={() => {
-                                    setSingleMemberReport(reportData);
-                                    setIsActive(1);
-                                  }}
-                                >
-                                  <FaEye /> Details
-                                </Button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </Table>
-                  {projectReports?.totalPages > 1 && (
-                    <Pagination>
-                      <Pagination.Prev
-                        onClick={goToPrevious}
-                        disabled={filters?.page === 1}
-                      />
-                      <Pagination.Next
-                        onClick={goToNext}
-                        disabled={filters?.page === projectReports?.totalPages}
-                      />
-                    </Pagination>
-                    // <ButtonGroup>
-                    //   <Button variant="light" onClick={goToPrevious} disabled={filters?.page === 1}>
-                    //     ◀
-                    //   </Button>
-                    //   <Button variant="light" onClick={goToNext} disabled={filters?.page === projectReports?.totalPages}>
-                    //     ▶
-                    //   </Button>
-                    // </ButtonGroup>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {activeMemberTab === "members" && (
-              <>
+          :
+            <Container fluid>
+              {activeMemberTab === "projects" && (
                 <div
-                  className="attendance--table members--view"
-                  id="members--view"
+                  className="attendance--table projects--view"
+                  id="projects--view"
                 >
                   <div className="attendance--table--list">
-                    <Table responsive="lg">
+                    <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">
                           <th
@@ -1579,7 +1437,7 @@ function ReportsPage() {
                             className="sticky pe-0 py-0"
                             key="project-name-header"
                           >
-                            <FiUsers className="me-1" /> Member
+                            <LuFolderOpen className="me-1" /> Project
                           </th>
                           <th
                             scope="col"
@@ -1593,7 +1451,7 @@ function ReportsPage() {
                             key="client-status-header"
                             className="onHide"
                           >
-                            <LuFolderOpen className="me-1" /> Projects
+                            <FiUsers className="me-1" /> Members
                           </th>
                           <th
                             scope="col"
@@ -1605,27 +1463,27 @@ function ReportsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {memberReports && memberReports.length > 0 ? (
-                          memberReports.map((report, index) => {
-                            const result = getProjectSummary(
-                              report.reports,
-                              "both"
-                            );
+                        {projectReports?.reports &&
+                          projectReports?.reports?.length > 0 &&
+                          projectReports?.reports?.map((reportData, i) => {
+                            const result = getProjectTabSummary(reportData);
                             return (
-                              <tr key={`report-key-${index}`}>
+                              <tr>
                                 <td>
                                   <div className="d-flex justify-content-between">
                                     <div className="project--name d-flex gap-3 align-items-center">
                                       <div className="drag--indicator">
-                                        <abbr>{index + 1}</abbr>
+                                        <abbr>{i + 1}</abbr>
                                         <MdDragIndicator />
                                       </div>
                                       <div className="title--initial">
-                                        {report?.member?.name.substring(0, 1)}
+                                        {reportData?.title?.substring(0, 1)}
                                       </div>
                                       <div className="title--span flex-column d-flex align-items-start gap-0">
-                                        <span>{report?.member?.name}</span>
-                                        <strong>{report?.member?.role}</strong>
+                                        <span>{reportData?.title}</span>
+                                        <strong>
+                                          {reportData?.client?.name}
+                                        </strong>
                                       </div>
                                     </div>
                                   </div>
@@ -1640,23 +1498,22 @@ function ReportsPage() {
                                     {result?.totalTime || 0}
                                   </span>
                                 </td>
-
                                 <td className="text-start text-xl-center">
                                   <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                    Projects
+                                    Members
                                   </strong>
                                   <br className="d-xl-none" />
                                   <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center">
-                                    <LuFolderOpen className="me-1" />{" "}
-                                    {result?.totalProjects || 0}
+                                    <LuUsers className="me-1" />{" "}
+                                    {reportData?.members?.length || 0}
                                   </div>
                                 </td>
                                 <td>
                                   <Button
                                     variant="dark"
-                                    className="mt-0 mt-xl-0 px-3 py-2 d-inline-flex align-items-center gap-2"
+                                    className="ms-auto px-3 py-2 d-flex align-items-center gap-2"
                                     onClick={() => {
-                                      setSingleMemberReport(report);
+                                      setSingleMemberReport(reportData);
                                       setIsActive(1);
                                     }}
                                   >
@@ -1665,23 +1522,152 @@ function ReportsPage() {
                                 </td>
                               </tr>
                             );
-                          })
-                        ) : (
-                          <></>
-                        )}
+                          })}
                       </tbody>
                     </Table>
+                    {projectReports?.totalPages > 1 && (
+                      <Pagination>
+                        <Pagination.Prev
+                          onClick={goToPrevious}
+                          disabled={filters?.page === 1}
+                        />
+                        <Pagination.Next
+                          onClick={goToNext}
+                          disabled={filters?.page === projectReports?.totalPages}
+                        />
+                      </Pagination>
+                      // <ButtonGroup>
+                      //   <Button variant="light" onClick={goToPrevious} disabled={filters?.page === 1}>
+                      //     ◀
+                      //   </Button>
+                      //   <Button variant="light" onClick={goToNext} disabled={filters?.page === projectReports?.totalPages}>
+                      //     ▶
+                      //   </Button>
+                      // </ButtonGroup>
+                    )}
                   </div>
                 </div>
-              </>
-            )}
-          </Container>
+              )}
+
+              {activeMemberTab === "members" && (
+                <>
+                  <div
+                    className="attendance--table members--view"
+                    id="members--view"
+                  >
+                    <div className="attendance--table--list">
+                      <Table responsive="lg">
+                        <thead className="onHide">
+                          <tr key="project-table-header">
+                            <th
+                              scope="col"
+                              className="sticky pe-0 py-0"
+                              key="project-name-header"
+                            >
+                              <FiUsers className="me-1" /> Member
+                            </th>
+                            <th
+                              scope="col"
+                              key="client-time-header"
+                              className="onHide ms-auto"
+                            >
+                              <FiClock className="me-1" /> Total Hours
+                            </th>
+                            <th
+                              scope="col"
+                              key="client-status-header"
+                              className="onHide"
+                            >
+                              <LuFolderOpen className="me-1" /> Projects
+                            </th>
+                            <th
+                              scope="col"
+                              key="client-action-header"
+                              className="onHide"
+                            >
+                              <FiTarget className="me-1" /> Action
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {memberReports && memberReports.length > 0 ? (
+                            memberReports.map((report, index) => {
+                              const result = getProjectSummary(
+                                report.reports,
+                                "both"
+                              );
+                              return (
+                                <tr key={`report-key-${index}`}>
+                                  <td>
+                                    <div className="d-flex justify-content-between">
+                                      <div className="project--name d-flex gap-3 align-items-center">
+                                        <div className="drag--indicator">
+                                          <abbr>{index + 1}</abbr>
+                                          <MdDragIndicator />
+                                        </div>
+                                        <div className="title--initial">
+                                          {report?.member?.name.substring(0, 1)}
+                                        </div>
+                                        <div className="title--span flex-column d-flex align-items-start gap-0">
+                                          <span>{report?.member?.name}</span>
+                                          <strong>{report?.member?.role}</strong>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="ms-auto text-start text-xl-center">
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                      Total Hours
+                                    </strong>
+                                    <br className="d-xl-none" />
+                                    <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center">
+                                      <FiClock className="me-1" />{" "}
+                                      {result?.totalTime || 0}
+                                    </span>
+                                  </td>
+
+                                  <td className="text-start text-xl-center">
+                                    <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                      Projects
+                                    </strong>
+                                    <br className="d-xl-none" />
+                                    <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center">
+                                      <LuFolderOpen className="me-1" />{" "}
+                                      {result?.totalProjects || 0}
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <Button
+                                      variant="dark"
+                                      className="mt-0 mt-xl-0 px-3 py-2 d-inline-flex align-items-center gap-2"
+                                      onClick={() => {
+                                        setSingleMemberReport(report);
+                                        setIsActive(1);
+                                      }}
+                                    >
+                                      <FaEye /> Details
+                                    </Button>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          ) : (
+                            <></>
+                          )}
+                        </tbody>
+                      </Table>
+                    </div>
+                  </div>
+                </>
+              )}
+            </Container>
+          }
         </div>
       </div>
       <div className="details--projects--grid projects--grid common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
           <span
-            className="open--sidebar me-2"
+            className="open--sidebar"
             onClick={() => {
               handleSidebarSmall(false);
               setIsActive(0);
@@ -1779,7 +1765,7 @@ function ReportsPage() {
             )}
           </div>
 
-          <ListGroup horizontal className="expand--icon">
+          <ListGroup horizontal className="expand--icon ms-auto">
             <ListGroup>
               <ListGroup.Item className="d-none d-xl-block w-auto h-auto day--dropdown">
                 <Form>
@@ -1820,22 +1806,8 @@ function ReportsPage() {
                 </Form>
               </ListGroup.Item>
             </ListGroup>
-            <ListGroup.Item
-              onClick={handleToggles}
-              className="d-none d-lg-flex"
-            >
-              <GrExpand />
-            </ListGroup.Item>
-            <ListGroupItem
-              className="btn btn-primary"
-              key={`closekey`}
-              onClick={() => {
-                setIsActive(0);
-                dispatch(toggleSidebarSmall(false));
-              }}
-            >
-              <MdOutlineClose />
-            </ListGroupItem>
+            <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
+            <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => { setIsActive(0); dispatch(toggleSidebarSmall(false));}}><MdOutlineClose /></ListGroupItem>
           </ListGroup>
         </div>
         {isActive === 1 && activeMemberTab === "members" ? (

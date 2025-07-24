@@ -528,7 +528,7 @@ export const CustomFieldModal = (props) => {
                     <>
                       <Form.Group className="mb-3">
                         <Form.Label>Options *</Form.Label>
-                        <div className="d-flex">
+                        <div className="d-flex color--selection">
                           <Form.Control
                             type="text"
                             placeholder="Add option..."
@@ -537,25 +537,18 @@ export const CustomFieldModal = (props) => {
                           />
                           {fields?.type === "badge" && (
                             <>
-                              <Form.Control
-                                type="color"
-                                placeholder="#000DDD"
-                                value={badgeColor}
-                                onChange={(e) => setBadgeColor(e.target.value)}
-                              />
                               <p className="selected-badge-color">
-                                Selected Color:{" "}
+                                <Form.Control
+                                  type="color"
+                                  placeholder="#000DDD"
+                                  value={badgeColor}
+                                  onChange={(e) => setBadgeColor(e.target.value)}
+                                />{" "}
                                 <span style={{ badgeColor }}>{badgeColor}</span>
                               </p>
                             </>
                           )}
-                          <Button
-                            type="button"
-                            onClick={handleAddOption}
-                            style={{ marginLeft: "10px" }}
-                          >
-                            Add
-                          </Button>
+                          <Button type="button" onClick={handleAddOption}>Add</Button>
                         </div>
                         {errors.options && (
                           <div className="text-danger mt-1">
@@ -568,34 +561,26 @@ export const CustomFieldModal = (props) => {
                         {fields?.options.map((opt, idx) => (
                           <div
                             key={idx}
+                            className="text-xs bg-white text-secondary px-2 py-1 rounded border d-flex align-items-center"
                             style={{
-                              backgroundColor: "#e0e7ff",
-                              padding: "5px 10px",
-                              borderRadius: "20px",
-                              display: "flex",
-                              alignItems: "center",
+                              fontSize: '0.75rem'
                             }}
                           >
+                            {fields?.type === "badge" && (
+                              <FaCircle className="me-2" style={{ color: opt.color }}>
+                                {opt.color}
+                              </FaCircle>
+                            )}
                             <span
                               style={{
                                 marginRight: "10px",
-                                color: "#3730a3",
                                 fontWeight: 500,
                               }}
                             >
                               {opt.label}
                             </span>
-                            {fields?.type === "badge" && (
-                              <FaCircle style={{ color: opt.color }}>
-                                {opt.color}
-                              </FaCircle>
-                            )}
-                            <span
-                              style={{ cursor: "pointer" }}
-                              onClick={() => removeOption(idx)}
-                            >
-                              ×
-                            </span>
+                            
+                            <span style={{ cursor: "pointer" }} onClick={() => removeOption(idx)}>×</span>
                           </div>
                         ))}
                       </div>
