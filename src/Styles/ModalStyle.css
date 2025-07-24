@@ -9,9 +9,11 @@
     font-size: 22px;
     margin-bottom: 20px;
 }
+
 .btn-check:checked+.btn.btn-outline-danger {
     background: #dc3545;
 }
+
 .captureModal .status--circle {
     border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -145,23 +147,27 @@
     bottom: 3px;
 }
 
-.add--team--member--modal form .form-row, .add--member--modal form .form-row {
+.add--team--member--modal form .form-row,
+.add--member--modal form .form-row {
     display: flex;
     align-items: flex-start;
     flex-flow: row wrap;
     gap: 15px;
 }
 
-.add--team--member--modal .error, .add--member--modal .error {
+.add--team--member--modal .error,
+.add--member--modal .error {
     position: relative;
     bottom: 3px;
 }
 
-.add--team--member--modal form .form-row+.form-row, .add--member--modal form .form-row+.form-row {
+.add--team--member--modal form .form-row+.form-row,
+.add--member--modal form .form-row+.form-row {
     margin-top: 0;
 }
 
-.add--team--member--modal form .form-group, .add--member--modal form .form-group {
+.add--team--member--modal form .form-group,
+.add--member--modal form .form-group {
     flex: 1 1;
     position: unset;
     padding-bottom: 1rem;
@@ -171,7 +177,8 @@
     position: relative;
 }
 
-.add--team--member--modal form .btn-link, .add--member--modal form .btn-link {
+.add--team--member--modal form .btn-link,
+.add--member--modal form .btn-link {
     padding: 0;
     color: #de0606;
     padding-bottom: 0;
@@ -181,8 +188,10 @@
     outline: none;
 }
 
-.add--team--member--modal form .btn:focus-visible, .add--team--member--modal form .btn:active, 
-.add--member--modal form .btn:focus-visible, .add--member--modal form .btn:active {
+.add--team--member--modal form .btn:focus-visible,
+.add--team--member--modal form .btn:active,
+.add--member--modal form .btn:focus-visible,
+.add--member--modal form .btn:active {
     background: none;
     color: #de0606;
     border: 0;
@@ -228,10 +237,29 @@
     z-index: 999999;
 }
 
-/* .AddTimeModal .modal-body {
-    max-height: 100%;
-    overflow-y: visible;
-} */
+.reports__Data__modal .modal-content {
+    height: calc(100% - 20px);
+}
+
+.reports__Data__modal .modal-body {
+    display: flex;
+}
+
+.reports__Data__modal .modal-body .shots--list {
+    flex: 1 1;
+}
+
+.reports__Data__modal .reports__card {
+    padding-bottom: 1rem !important;
+}
+
+.reports__Data__modal .shots--list h3.no__data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    flex: 1 1;
+}
 
 .tooltip {
     z-index: 999999;
@@ -409,7 +437,8 @@
     flex: 1 1;
 }
 
-.edit--task--modal form .input-group .message--area, ul#subtasks-ul .form-group .message--area {
+.edit--task--modal form .input-group .message--area,
+ul#subtasks-ul .form-group .message--area {
     flex: 1 1;
     position: relative;
     min-height: 35px;
@@ -419,7 +448,8 @@ ul#subtasks-ul .form-group .message--area+button {
     display: none;
 }
 
-.edit--task--modal form .input-group textarea, ul#subtasks-ul .form-group textarea {
+.edit--task--modal form .input-group textarea,
+ul#subtasks-ul .form-group textarea {
     display: block;
     width: 100%;
     position: absolute;
@@ -441,7 +471,8 @@ ul#subtasks-ul .form-group .new--textarea {
     position: relative;
 }
 
-.edit--task--modal form .input-group .textarea--content, ul#subtasks-ul .form-group .textarea--content {
+.edit--task--modal form .input-group .textarea--content,
+ul#subtasks-ul .form-group .textarea--content {
     position: relative;
     width: 100%;
     color: transparent;
@@ -466,7 +497,9 @@ ul#subtasks-ul li {
     margin-bottom: 0;
 }
 
-ul#subtasks-ul .form-group .form-control, ul#subtasks-ul .form-group .form-control:focus, ul#subtasks-ul .form-group .form-control:focus-visible {
+ul#subtasks-ul .form-group .form-control,
+ul#subtasks-ul .form-group .form-control:focus,
+ul#subtasks-ul .form-group .form-control:focus-visible {
     border: 0;
     box-shadow: none;
     outline: 0;
@@ -505,7 +538,8 @@ ul#subtasks-ul .form-group:hover svg {
     background: none;
 }
 
-.add--team--member--modal .task--action--buttons .btn, .task--action--buttons .more--actions .btn {
+.add--team--member--modal .task--action--buttons .btn,
+.task--action--buttons .more--actions .btn {
     color: #ffffff;
     padding: .25rem 1rem;
     font-size: 14px;
@@ -515,11 +549,13 @@ ul#subtasks-ul {
     margin-bottom: .5rem;
 }
 
-ul#subtasks-ul .form-group input[type="checkbox"]:checked + .form-control {
+ul#subtasks-ul .form-group input[type="checkbox"]:checked+.form-control {
     text-decoration: line-through;
 }
 
-#subtasks-ul .form-group .form-control:focus, #subtasks-ul .form-group .form-control:focus-visible, #subtasks-ul .form-group .form-control:focus-within {
+#subtasks-ul .form-group .form-control:focus,
+#subtasks-ul .form-group .form-control:focus-visible,
+#subtasks-ul .form-group .form-control:focus-within {
     outline: none;
     border: 0;
     box-shadow: none;
@@ -547,7 +583,8 @@ ul#subtasks-ul .form-group:hover button {
     opacity: 1;
 }
 
-ul#subtasks-ul .form-group textarea.form-control, ul#subtasks-ul .form-group textarea.form-control:focus,
+ul#subtasks-ul .form-group textarea.form-control,
+ul#subtasks-ul .form-group textarea.form-control:focus,
 ul#subtasks-ul .form-group textarea.form-control:focus-visible {
     border: 0;
     max-width: 100%;
@@ -619,7 +656,7 @@ ul#subtasks-ul li textarea.form-control+button {
     max-width: calc(100% - 45px);
     white-space: pre-line;
     line-break: anywhere;
-  }
+}
 
 .task--message .msg-member-info small {
     display: block;
@@ -733,19 +770,12 @@ ul#subtasks-ul li textarea.form-control+button {
 .rmdp-ep-arrow[direction=top] {
     opacity: 0;
 }
-input.form-error, select.form-error {
+
+input.form-error,
+select.form-error {
     color: red;
     border: 1px solid red;
 }
-/* 
-.modal .rmdp-input {
-    opacity: 0;
-    height: 0;
-    min-height: 0;
-    padding: 0;
-    margin: 0;
-    border: 0;
-} */
 
 .rmdp-header {
     margin-top: 0;
@@ -761,7 +791,8 @@ input.form-error, select.form-error {
     padding: 0;
 }
 
-.rmdp-calendar, .rmdp-top-class {
+.rmdp-calendar,
+.rmdp-top-class {
     width: 100%;
 }
 
@@ -778,7 +809,8 @@ input.form-error, select.form-error {
     width: 100%;
 }
 
-.page--title .rmdp-wrapper, .page--title .rmdp-wrapper.form-control {
+.page--title .rmdp-wrapper,
+.page--title .rmdp-wrapper.form-control {
     margin-top: 10px;
     border: 0;
     padding: 0;
@@ -798,15 +830,18 @@ input.form-error, select.form-error {
     background-color: #6fbeef;
 }
 
-.rmdp-day, .rmdp-week-day {
+.rmdp-day,
+.rmdp-week-day {
     border-radius: 50%;
 }
 
-.rmdp-week, .rmdp-ym {
+.rmdp-week,
+.rmdp-ym {
     margin-bottom: .25rem;
 }
 
-.project--form--inputs form .task--date--picker, .project--form--inputs form .task--date--change {
+.project--form--inputs form .task--date--picker,
+.project--form--inputs form .task--date--change {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -855,11 +890,13 @@ input.form-error, select.form-error {
     font-size: 13px;
 }
 
-.ql-editor ol, .ql-editor ul {
+.ql-editor ol,
+.ql-editor ul {
     padding-left: 1rem;
 }
 
-.ql-editor ol li:not(.ql-direction-rtl), .ql-editor ul li:not(.ql-direction-rtl) {
+.ql-editor ol li:not(.ql-direction-rtl),
+.ql-editor ul li:not(.ql-direction-rtl) {
     padding-left: 0;
 }
 
@@ -880,7 +917,7 @@ input.form-error, select.form-error {
     justify-content: space-between;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);
     transition-property: all;
-    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
     transition-duration: .15s;
 }
 
@@ -914,7 +951,7 @@ input.form-error, select.form-error {
 .AddTimeModal .list-group .list-group-item .svg--check {
     opacity: 0;
     transition-property: all;
-    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
     transition-duration: .15s;
 }
 
@@ -968,21 +1005,21 @@ input.form-error, select.form-error {
     align-items: center;
     width: 3rem;
     height: 3rem;
-   display: flex;
-   background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
+    display: flex;
+    background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
 .reports-section .reports--heading .title--span span {
     color: rgb(30 41 59);
     font-weight: 700;
-   font-size: 1.25rem;
+    font-size: 1.25rem;
     line-height: 1.75rem;
 }
 
 .reports-section .reports--heading .title--span strong {
     color: rgb(71 85 105);
     font-weight: 500;
-   font-size: 1rem;
+    font-size: 1rem;
 }
 
 .reports-section .reports--heading .text--blue {
@@ -1059,10 +1096,11 @@ input.form-error, select.form-error {
         display: none;
     }
 
-    .add--team--member--modal form .form-row, .add--team--member--modal form .form-row {
+    .add--team--member--modal form .form-row,
+    .add--team--member--modal form .form-row {
         gap: 5px;
     }
-    
+
     .add--team--member--modal .select--dropdown .dropdown-menu {
         width: 90%;
     }

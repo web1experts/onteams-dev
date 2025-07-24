@@ -301,7 +301,7 @@ const TaskList = ({ report }) => {
           centered
           size="lg"
           key={`reports-${taskId}`}
-          className="timeSheetModal"
+          className="timeSheetModal reports__Data__modal"
         >
           <Modal.Header closeButton>
             <ListGroup horizontal>
@@ -323,7 +323,7 @@ const TaskList = ({ report }) => {
           </Modal.Header>
           <Modal.Body>
             <div className="shots--list">
-              <CardGroup key={`card-group-${taskId}`}>
+              <CardGroup key={`card-group-${taskId}`} className="reports__card">
                 {activeTab === "screenshots" ? (
                   screenshotsByTask?.[taskId]?.length > 0 ? (
                     <>
@@ -361,7 +361,7 @@ const TaskList = ({ report }) => {
                       ))}
                     </>
                   ) : (
-                    <h3>No Data Available</h3>
+                    <h3 className="no__data">No Data Available</h3>
                   )
                 ) : activeTab === "videos" ? (
                   videosByTask?.[taskId]?.length > 0 ? (
@@ -472,7 +472,7 @@ const TaskList = ({ report }) => {
                       );
                     })()
                   ) : (
-                    <h3>No Data Available</h3>
+                    <h3 className="no__data">No Data Available</h3>
                   )
                 ) : null}
               </CardGroup>
