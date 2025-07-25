@@ -528,7 +528,7 @@ useEffect(() => {
         <>
             <div className="details--projects--view common--project--grid">
                 <div className="wrapper--title py-2 bg-white border-bottom">
-                    <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+                    <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
                     <div className="projecttitle">
                         <Dropdown>
                             <Dropdown.Toggle variant="link" id="dropdown-basic">
@@ -559,7 +559,7 @@ useEffect(() => {
                         </Dropdown>
                     </div>
                     
-                    <ListGroup horizontal className="members--list me-md-0 me-xl-auto ms-auto ms-md-2 d-none d-xxl-flex">
+                    <ListGroup horizontal className="members--list me-md-2 ms-auto d-none d-xl-flex">
                         <ListGroup.Item key={`project-assign-${currentProject?._id}`} className="me-3">Members</ListGroup.Item>
                             <MemberInitials showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} members={fields?.members || []} directUpdate={true} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={currentProject?._id} type = "project" 
                             />

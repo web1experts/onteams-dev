@@ -309,14 +309,14 @@ useEffect(() => {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper px-md-2 py-3'>
+        <div className='page--wrapper px-md-2 py-5 pt-4'>
           {
-            spinner &&
+            spinner ?
             <div className="loading-bar">
                 <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
-          }
-          <Container fluid className="pb-5 pt-2">
+          :
+          <Container fluid>
             {activeTab === 'excel' && (
               <div className="attendance--table excel--view" id="excel--view">
                 <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
@@ -384,13 +384,13 @@ useEffect(() => {
                                         data.attendanceData.map((atten, ind) => {
                                           if (atten.count !== undefined) {
                                             return (
-                                              <td className={`${atten?.bg} text-center border-bottom`} key={ind}>
+                                              <td className={`${atten?.bg} text-center border-bottom border-end`} key={ind}>
                                                 <strong>{atten?.count}</strong>
                                               </td>
                                             );
                                           } else {
                                             return (
-                                              <td className="text-center border-bottom" key={ind}>
+                                              <td className="text-center border-bottom border-end" key={ind}>
                                                 <span className={`att--badge ${getBadgeColor(atten?.status)}`}>
                                                   {
                                                     atten?.status && atten?.status !== <BsDash />
@@ -535,12 +535,13 @@ useEffect(() => {
               </>
             )}
           </Container>
+        }
         </div>
       </div>
       {isActive === 1 &&
         <div className="details--projects--grid projects--grid common--project--grid">
           <div className="wrapper--title py-2 bg-white border-bottom">
-              <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+              <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
               <div className="projecttitle">
                 <Dropdown key={'member-filter'}>
                   <Dropdown.Toggle variant="link" id="dropdown-basic" key={'member-filter-toggle'}>

@@ -5,7 +5,7 @@ import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown, Accordion } from "react-bootstrap";
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaCheck, FaEye, FaPlay, FaTrash, FaPlus } from "react-icons/fa";
-import { MdClose } from "react-icons/md";
+import { MdClose, MdSearch } from "react-icons/md";
 import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser, FiTrash2, FiCheckCircle, FiCheck } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
@@ -122,6 +122,17 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
   
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
+  const [projectToggle, setProjectToggle] = useState(false);
+    const handleToggles = () => {
+      if (commonState.sidebar_small === false) {
+       
+        handleSidebarSmall();
+      } else {
+        setProjectToggle(false);
+        handleSidebarSmall();
+       
+      }
+    };
     const handleClose = () => {
     setShow(false);
     setFields({})
@@ -1001,7 +1012,7 @@ const handleProjectSelect = async (project) => {
               </Form.Group>
               {
                 (selectedFilter === 'custom') && (
-                  <Form.Group className="mb-0 form-group">
+                  <Form.Group className="mb-0 form-group ms-2">
                     <DatePicker 
                         key={'date-filter'}
                         ref={datePickerRef}
@@ -1140,7 +1151,7 @@ const handleProjectSelect = async (project) => {
         }}
       />
       
-      <div className={isActive ? "show--details team--page" : "team--page"}>
+      <div className={`${ isActive ? "show--details team--page project-collapse" : "team--page" } ${projectToggle === true ? "project-collapse" : ""}`}>
         <div className='page--title px-md-2 py-3 bg-white border-bottom'>
           <Container fluid>
             <Row>
@@ -1198,7 +1209,8 @@ const handleProjectSelect = async (project) => {
                       </Dropdown>
                     )}
                     <ListGroup horizontal className="bg-white expand--icon">
-                        <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
+                        <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdSearch /></ListGroup.Item>
+                        <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
                         <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
                           <BsArrowClockwise onClick={handleLiveActivityList}/>
                         </ListGroup.Item>
@@ -1209,14 +1221,14 @@ const handleProjectSelect = async (project) => {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper daily--reports activity--table px-md-2 py-3'>
+        <div className='page--wrapper px-md-2 py-5 pt-4 daily--reports activity--table'>
           {
-              spinner &&
+              spinner ?
               <div className="loading-bar">
                   <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
-          }
-          <Container fluid className="pt-2 py-3">
+          :
+          <Container fluid>
             {activeTab === "Live" && (
               <>
                 <div className="activity--stats">
@@ -1456,12 +1468,13 @@ const handleProjectSelect = async (project) => {
               </>
             )}
           </Container>
+          }
         </div>
       </div>
       {(isActive === true) &&
       <div className="details--wrapper common--project--grid">
         <div className="wrapper--title py-2 bg-white border-bottom">
-          <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+          <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
           <div className="projecttitle">
             <Dropdown>
               <Dropdown.Toggle variant="link" id="dropdown-basic">
@@ -1529,11 +1542,11 @@ const handleProjectSelect = async (project) => {
           <ListGroup horizontal className="p-0">
             {showRecordedTabs()}
             <ListGroup horizontal className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center">
-              <ListGroup.Item onClick={handleSidebar} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
+              <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
               <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
                 <BsArrowClockwise onClick={handleRecordedActivity}/>
               </ListGroup.Item>
-              <ListGroup.Item className="btn btn-primary" key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false);}}>
+              <ListGroup.Item className="btn btn-primary" key={'closekey'} onClick={() => { socket.emit('leaveRoom', socket.id, currentActivity?._id ); setCurrentActivity(false); setIsActive(false);dispatch(toggleSidebarSmall( false))}}>
                 <MdOutlineClose />
               </ListGroup.Item>
             </ListGroup>
@@ -1939,19 +1952,20 @@ const handleProjectSelect = async (project) => {
           </ListGroup>
         </Modal.Body>
       </Modal>
-      <Modal show={showNew} onHide={handleCloseNew} centered size="xl" className="AddReportModal AddTimeModal theme--modal">
+      <Modal show={showNew} onHide={handleCloseNew} centered size="xl" className="AddEntryModal AddTimeModal theme--modal">
         <Modal.Header closeButton>
             <Modal.Title>
               <span className="nav--item--icon"><FiCheckCircle /></span>
               <strong>Time Entry Approvals <small>Review and approve manual time entries</small></strong>
             </Modal.Title>
+            <span className="pending--badge">Pending (4)</span>
         </Modal.Header>
         <Modal.Body>
           <ManualTime />
         </Modal.Body>
       </Modal>
         
-      <Modal show={show} onHide={handleClose} centered size="md" className="AddReportModal AddTimeModal theme--modal" onShow={() => {selectboxObserver();}}>
+      <Modal show={show} onHide={handleClose} centered size="md" className="AddTimeModal theme--modal" onShow={() => {selectboxObserver();}}>
         <Modal.Header closeButton>
             <Modal.Title>
               <span className="nav--item--icon"><LuTimer /></span>
@@ -2091,7 +2105,7 @@ const handleProjectSelect = async (project) => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showSelect} onHide={handleProjectClose} centered size="lg" className="AddReportModal AddTimeModal theme--modal">
+      <Modal show={showSelect} onHide={handleProjectClose} centered size="lg" className="AddTimeModal theme--modal">
         <Modal.Header closeButton>
             <Modal.Title>
               <span className="nav--item--icon"><LuTimer /></span>

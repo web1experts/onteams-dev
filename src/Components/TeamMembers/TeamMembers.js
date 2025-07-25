@@ -2,15 +2,15 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
-import { FaList, FaPlus, FaCog } from "react-icons/fa";
-import { FiEdit, FiMail, FiSidebar, FiBriefcase, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
+import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
+import { FiEdit, FiMail, FiSidebar, FiTrash2, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { RiUserSettingsLine } from "react-icons/ri";
-import { LuFolderOpen } from "react-icons/lu";
+import { LuFolderOpen, LuUser } from "react-icons/lu";
 import { TbUsersPlus } from "react-icons/tb";
 import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
-import { MdOutlineSearch, MdOutlineClose, MdDragIndicator } from "react-icons/md";
+import { MdOutlineSearch, MdOutlineClose, MdDragIndicator, MdSearch, MdFilterList } from "react-icons/md";
 import { getMemberdata } from "../../helpers/commonfunctions";
 import { Listmembers, deleteMember, updateMember} from "../../redux/actions/members.action";
 import { toggleSidebar, toggleSidebarSmall} from "../../redux/actions/common.action";
@@ -895,7 +895,7 @@ function TeamMembersPage() {
               <h2>
                 <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0); }}><FiSidebar /></span>
                 {activeTab}
-                <ListGroup horizontal className={isActive ? "d-none" : "me-2 ms-auto d-none d-md-flex" }>
+                <ListGroup horizontal className={isActive ? "d-none" : "me-2 ms-auto d-none d-xl-flex" }>
                   <ListGroup horizontal>
                     <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
                     {(memberProfile?.permissions?.members
@@ -913,12 +913,26 @@ function TeamMembersPage() {
                     </Form>
                   </ListGroup.Item>
                 </ListGroup>
-                <ListGroup horizontal className={isActive ? "d-none" : "d-flex ms-auto ms-md-0"}>
+                <ListGroup horizontal className={isActive ? "d-none" : "d-flex ms-auto ms-xl-0"}>
                   <ListGroup horizontal className="d-none d-flex">
                     <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                     <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
+                  <ListGroup horizontal className="d-flex d-xl-none bg-white shadow-none p-0 border-0">
+                    <Dropdown className="select--dropdown manual--dropdown">
+                      <Dropdown.Toggle variant="success" id="dropdown-basic" className="border-0"><MdFilterList /></Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item className="d-none d-md-block" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
+                        {(memberProfile?.permissions?.members
+                          ?.create_edit_delete === true ||
+                          memberProfile?.role?.slug === "owner") && (
+                          <Dropdown.Item className="d-none d-md-block" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</Dropdown.Item>
+                        )}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </ListGroup>
                   <ListGroup horizontal className={isActive ? "d-none" : "d-flex bg-white expand--icon"}>
+                    <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdSearch /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><FaCog /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
                     <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
@@ -930,19 +944,6 @@ function TeamMembersPage() {
                   </ListGroup>
                 </ListGroup>
               </h2>
-              <ListGroup horizontal className={isActive ? "d-none" : "me-auto mt-3 ms-0 d-flex d-md-none justify-content-start"}>
-                <ListGroup horizontal>
-                  <ListGroup.Item action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}>
-                    <AiOutlineTeam /> Team Members
-                  </ListGroup.Item>
-                  {(memberProfile?.permissions?.members?.create_edit_delete === true ||
-                    memberProfile?.role?.slug === "owner") && (
-                    <ListGroup.Item action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}>
-                      <FiMail /> Invitations
-                    </ListGroup.Item>
-                  )}
-                </ListGroup>
-              </ListGroup>
             </Col>
           </Row>
         </Container>
@@ -955,165 +956,166 @@ function TeamMembersPage() {
       {activeTab === "Members" && (
         <div className={`${ isActive ? "show--details team--page project-collapse" : "team--page" } ${projectToggle === true ? "project-collapse" : ""}`}>
           {pagetopbar()}
-          <div className="page--wrapper px-md-2 py-3">
-            {showloader && (
+          <div className="page--wrapper px-md-2 py-5 pt-4">
+            {showloader ?
               <div className="loading-bar"><img src="images/OnTeam-icon.png" className="flipchar" /></div>
-            )}
-            <Container fluid className="pb-5 pt-2">
+            :
+            <Container fluid>
               <>
                 <DragDropContext onDragEnd={handleDragEnd}>
-                <div className={ isActiveView === 1 ? "project--grid--table project--grid--new--table table-responsive-xl" : isActiveView === 2 ? "project--table draggable--table new--project--rows table-responsive-xl" : "project--table new--project--rows table-responsive-xl"}>
-                  
-                    <Table>
-                      <thead className="onHide">
-                        <tr key="project-table-header">
-                          <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
-                            <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">Member{" "}<span key="client-action-header" className="onHide">Actions</span></div>
-                          </th>
-                          <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email{" "}</div>{" "}</th>
-                          {Array.isArray(customFields) &&
-                            customFields
-                              .filter((field) => field?.showInTable !== false)
-                              .map((field, idx) => (
-                                <th scope="col" key={`member-field-${idx}-header`} className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">{field.label}</div></th>
-                              ))}
-                        </tr>
-                      </thead>
-                      <Droppable droppableId={`droppable-members-table`} type="MEMBERS" >
-                        {(provided) => (
-                        <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                          {!showloader && memberFeeds && memberFeeds.length > 0
-                            ? memberFeeds.map((member, idx) => (
-                              <>
-                              <Draggable
-                                key={member?._id}
-                                draggableId={`member-${member?._id}`}
-                                index={idx}
-                              >
-                                {(provided) => (
-                                  <tr
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    key={`member-table-row-${member._id}`}
-                                    className={
-                                      member._id === selectedMember?._id
-                                        ? "project--active"
-                                        : ""
-                                    }
-                                    onClick={
-                                        () => handleTableToggle(member)
-                                        
-                                    }
-                                  >
-                                    <td className="project--title--td sticky border-bottom" data-label="Member Name">
-                                      <div className="d-flex justify-content-between border-end flex-wrap">
-                                        <div className="project--name">
-                                          <div className="drag--indicator"><abbr>{idx + 1}</abbr><MdDragIndicator /></div>
-                                          <div className="title--initial">{member.name.charAt(0)}</div>
-                                          <div className="title--span flex-column align-items-start gap-0">
-                                            <span>{member.name}</span>
-                                            <strong>{member.role?.name}</strong>
+                  <div className={ isActiveView === 1 ? "project--grid--table project--grid--new--table table-responsive-xl" : isActiveView === 2 ? "project--table draggable--table new--project--rows table-responsive-xl" : "project--table new--project--rows table-responsive-xl"}>
+                    
+                      <Table>
+                        <thead className="onHide">
+                          <tr key="project-table-header">
+                            <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
+                              <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">Member{" "}<span key="client-action-header" className="onHide">Actions</span></div>
+                            </th>
+                            <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email{" "}</div>{" "}</th>
+                            {Array.isArray(customFields) &&
+                              customFields
+                                .filter((field) => field?.showInTable !== false)
+                                .map((field, idx) => (
+                                  <th scope="col" key={`member-field-${idx}-header`} className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">{field.label}</div></th>
+                                ))}
+                          </tr>
+                        </thead>
+                        <Droppable droppableId={`droppable-members-table`} type="MEMBERS" >
+                          {(provided) => (
+                          <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                            {!showloader && memberFeeds && memberFeeds.length > 0
+                              ? memberFeeds.map((member, idx) => (
+                                <>
+                                <Draggable
+                                  key={member?._id}
+                                  draggableId={`member-${member?._id}`}
+                                  index={idx}
+                                >
+                                  {(provided) => (
+                                    <tr
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      key={`member-table-row-${member._id}`}
+                                      className={
+                                        member._id === selectedMember?._id
+                                          ? "project--active"
+                                          : ""
+                                      }
+                                      onClick={
+                                          () => handleTableToggle(member)
+                                          
+                                      }
+                                    >
+                                      <td className="project--title--td sticky border-bottom" data-label="Member Name">
+                                        <div className="d-flex justify-content-between border-end flex-wrap">
+                                          <div className="project--name">
+                                            <div className="drag--indicator"><abbr>{idx + 1}</abbr><MdDragIndicator /></div>
+                                            <div className="title--initial">{member.name.charAt(0)}</div>
+                                            <div className="title--span flex-column align-items-start gap-0">
+                                              <span>{member.name}</span>
+                                              <strong>{member.role?.name}</strong>
+                                            </div>
+                                          </div>
+                                          <div className="onHide task--buttons">
+                                            <Button variant="primary" className="px-3 py-2" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /></Button>
                                           </div>
                                         </div>
-                                        <div className="onHide task--buttons">
-                                          <Button variant="primary" className="px-3 py-2" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /></Button>
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td className="onHide new--td">{member.email}</td>
-                                    {Array.isArray(customFields) &&
-                                      customFields
-                                        .filter(
-                                          (field) => field?.showInTable !== false
-                                        )
-                                        .map((field, idx) => {
-                                          const fieldname = field.name;
-                                          let mvalue =
-                                            member?.memberMeta?.[fieldname]
-                                              ?.meta_value;
-                                          const fieldType = field.type;
-                                          const uniqueKey = `${fieldname || idx}-${mvalue}`;
-                                          if (
-                                            field.type === "badge" &&
-                                            Array.isArray(field.options)
-                                          ) {
-                                            const matchedOption = field.options.find(
-                                              (opt) => opt.value === mvalue
-                                            );
-                                            if (matchedOption) {
-                                              mvalue = (
-                                                <span
-                                                  className="priority--badge"
-                                                  style={{
-                                                    backgroundColor: matchedOption.color,
-                                                    color: "#fff",
-                                                    display: "inline-block",
-                                                    borderColor: matchedOption.color,
-                                                    borderWidth: '1px',
-                                                    borderStyle: 'solid'
-                                                  }}
-                                                  onClick={() => toggleBadges(field)}
-                                                >
-                                                  {
-                                                    member?.memberMeta?.[fieldname]
-                                                      ?.meta_value
-                                                  }
-                                                </span>
+                                      </td>
+                                      <td className="onHide new--td">{member.email}</td>
+                                      {Array.isArray(customFields) &&
+                                        customFields
+                                          .filter(
+                                            (field) => field?.showInTable !== false
+                                          )
+                                          .map((field, idx) => {
+                                            const fieldname = field.name;
+                                            let mvalue =
+                                              member?.memberMeta?.[fieldname]
+                                                ?.meta_value;
+                                            const fieldType = field.type;
+                                            const uniqueKey = `${fieldname || idx}-${mvalue}`;
+                                            if (
+                                              field.type === "badge" &&
+                                              Array.isArray(field.options)
+                                            ) {
+                                              const matchedOption = field.options.find(
+                                                (opt) => opt.value === mvalue
                                               );
-                                            }
-                                          }
-                                          else if(fieldType === 'password'){
-                                              return (
-                                                  <span className="d-flex align-items-center gap-2">
-                                                      {visiblePasswords[uniqueKey] ? mvalue : '*****'}
-                                                      <span
-                                                          style={{ cursor: 'pointer' }}
-                                                          onClick={() => toggleVisibility(uniqueKey)}
-                                                      >
-                                                          {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
-                                                      </span>
+                                              if (matchedOption) {
+                                                mvalue = (
+                                                  <span
+                                                    className="priority--badge"
+                                                    style={{
+                                                      backgroundColor: matchedOption.color,
+                                                      color: "#fff",
+                                                      display: "inline-block",
+                                                      borderColor: matchedOption.color,
+                                                      borderWidth: '1px',
+                                                      borderStyle: 'solid'
+                                                    }}
+                                                    onClick={() => toggleBadges(field)}
+                                                  >
+                                                    {
+                                                      member?.memberMeta?.[fieldname]
+                                                        ?.meta_value
+                                                    }
                                                   </span>
-                                              )
-                                          }
-                                          return (
-                                            <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
-                                              {mvalue}
-                                            </td>
-                                          );
-                                        })}
-                                    <td className="task--last--buttons mt-auto">
-                                      <div className="d-flex justify-content-between flex-wrap">
-                                        <div className="onHide">
-                                          <Button variant="dark" className="px-3 py-1" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /> View</Button>
+                                                );
+                                              }
+                                            }
+                                            else if(fieldType === 'password'){
+                                                return (
+                                                    <span className="d-flex align-items-center gap-2">
+                                                        {visiblePasswords[uniqueKey] ? mvalue : '*****'}
+                                                        <span
+                                                            style={{ cursor: 'pointer' }}
+                                                            onClick={() => toggleVisibility(uniqueKey)}
+                                                        >
+                                                            {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
+                                                        </span>
+                                                    </span>
+                                                )
+                                            }
+                                            return (
+                                              <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
+                                                {mvalue}
+                                              </td>
+                                            );
+                                          })}
+                                      <td className="task--last--buttons mt-auto">
+                                        <div className="d-flex justify-content-between flex-wrap">
+                                          <div className="onHide">
+                                            <Button variant="dark" className="px-3 py-1" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /> View</Button>
+                                          </div>
                                         </div>
-                                      </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                  </Draggable>
+                                  </>
+                                ))
+                              : !showloader &&
+                                memberFeeds &&
+                                memberFeeds.length === 0 && (
+                                  <tr className="no--invite">
+                                    <td colSpan={5}>
+                                      <h2 className="mt-2 text-center">
+                                        Members Not Found
+                                      </h2>
                                     </td>
                                   </tr>
                                 )}
-                                </Draggable>
-                                </>
-                              ))
-                            : !showloader &&
-                              memberFeeds &&
-                              memberFeeds.length === 0 && (
-                                <tr className="no--invite">
-                                  <td colSpan={5}>
-                                    <h2 className="mt-2 text-center">
-                                      Members Not Found
-                                    </h2>
-                                  </td>
-                                </tr>
-                              )}
-                        </tbody>
-                        )}
-                        </Droppable>
-                    </Table>
-                  
-                </div>
+                          </tbody>
+                          )}
+                          </Droppable>
+                      </Table>
+                    
+                  </div>
                 </DragDropContext>
               </>
             </Container>
+            }
           </div>
         </div>
       )}
@@ -1123,7 +1125,7 @@ function TeamMembersPage() {
       {isActive && (
         <div className="details--member--view">
           <div className="wrapper--title py-2 bg-white border-bottom">
-            <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
+            <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
             <div className="projecttitle">
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
@@ -1152,23 +1154,9 @@ function TeamMembersPage() {
                 </Dropdown.Menu>
               </Dropdown>
             </div>
-            <ListGroup horizontal>
-              <ListGroup.Item
-                onClick={handleToggles}
-                className="d-none d-lg-flex"
-              >
-                <GrExpand />
-              </ListGroup.Item>
-              <ListGroup.Item
-                className="btn btn-primary"
-                key={`closekey`}
-                onClick={() => {
-                  setIsActive(0);
-                  setSelectedMember({});
-                }}
-              >
-                <MdOutlineClose />
-              </ListGroup.Item>
+            <ListGroup horizontal className="expand--icon ms-auto">
+              <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
+              <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0); setSelectedMember({});dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroup.Item>
             </ListGroup>
           </div>
 
@@ -1177,13 +1165,26 @@ function TeamMembersPage() {
               <Card className="contact--card">
                 <div className="card--img">
                   <Card.Img variant="top" src={selectedMember?.avatar ?? "./images/default.jpg"}/>
-                </div>
-                <Card.Body className="p-0 ps-4">
-                  <Card.Title>
+                  <h3>
                     {selectedMember?.name}
-                    {(memberProfile?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( <FiEdit className="fs-small" onClick={() => setIsEditing(true)} />)}
+                    <small>{selectedMember?.role?.name}</small>
+                  </h3>
+                </div>
+                <Card.Body className="p-0">
+                  <Card.Title>
+                    <LuUser /> Member Information
+                    {(memberProfile?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( 
+                      <Dropdown>
+                        <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                          <FaEllipsisV />
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
+                          <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> Delete</Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    )}
                   </Card.Title>
-
                   {isEditing === false ? (
                     <>
                       <Card.Text>
@@ -1312,37 +1313,26 @@ function TeamMembersPage() {
                       </Card.Text>
                     </>
                   )}
-                  
-                  <div className="text-end mt-3">
-                    {(memberProfile?.permissions?.members
-                      ?.create_edit_delete === true &&
-                      selectedMember?._id !== currentMember?._id) ||
-                    memberProfile?.role?.slug === "owner" ? (
-                      <>
-                        <Button
-                          variant="secondary"
-                          className="me-3"
-                          onClick={() => setShowDialog(true)}
-                        >
-                          Delete
-                        </Button>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                    {memberProfile?.permissions?.members?.create_edit_delete ===
-                      true || memberProfile?.role?.slug === "owner" ? (
-                      <Button
-                        variant="primary"
-                        disabled={updateloader}
-                        onClick={handleUpdateSubmit}
-                      >
-                        {updateloader ? "Please Wait..." : "Save Changes"}
-                      </Button>
-                    ) : (
-                      <></>
-                    )}
-                  </div>
+                  {isEditing === true && (
+                    <div className="text-end mt-3">
+                      {(memberProfile?.permissions?.members
+                        ?.create_edit_delete === true &&
+                        selectedMember?._id !== currentMember?._id) ||
+                      memberProfile?.role?.slug === "owner" ? (
+                        <>
+                          <Button variant="secondary" className="me-3" onClick={() => setIsEditing(false)}>Cancel</Button>
+                        </>
+                      ) : (
+                        <></>
+                      )}
+                      {memberProfile?.permissions?.members?.create_edit_delete ===
+                        true || memberProfile?.role?.slug === "owner" ? (
+                        <Button variant="primary" disabled={updateloader} onClick={handleUpdateSubmit}>{updateloader ? "Please Wait..." : "Save Changes"}</Button>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  )}
                 </Card.Body>
               </Card>
               <Card className="work--card">

@@ -17,7 +17,7 @@ const daysInMonth = new Date(currentYear, currentMonth, 0).getDate(); // current
 
     headers.push(
       <th key={day} className="text-center p-0">
-        <div className="border-bottom padd--x border-top">
+        <div className="border-bottom padd--x border-top border-end">
           <small>{dayName}</small>
           <strong>{day}</strong>
         </div>

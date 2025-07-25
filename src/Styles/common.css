@@ -3,7 +3,7 @@
 }
 
 :root {
-  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
+  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
 ::-webkit-scrollbar {
@@ -75,7 +75,7 @@ a:focus {
 }
 
 .bg-light {
-    background-color: rgb(241 245 249) !important;
+  background-color: rgb(241 245 249) !important;
 }
 
 .AddTimeModal .btn {
@@ -116,8 +116,8 @@ fieldset:disabled .btn {
 
 .dropdown .dropdown-item .active--color {
   background: green;
-  animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
-  -webkit-animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
+  animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
+  -webkit-animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
 }
 
 .dropdown .dropdown-item .idle--color {
@@ -130,7 +130,7 @@ fieldset:disabled .btn {
 
 .btn-primary {
   color: #ffffff;
-  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
+  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
   border: 0;
 }
 
@@ -165,14 +165,18 @@ fieldset:disabled .btn {
 .btn-primary:not(:disabled):not(.disabled):active,
 .show>.btn-primary.dropdown-toggle {
   color: #ffffff;
-  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
+  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
   border-color: transparent;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   outline: none;
 }
 
-.show>.btn-primary.dropdown-toggle, .show>.btn-primary.dropdown-toggle:focus, .show>.btn-primary.dropdown-toggle:focus-visible, .show>.btn-primary.dropdown-toggle:focus-within, .panel--sidebar .btn-primary:not(:disabled):not(.disabled):active {
+.show>.btn-primary.dropdown-toggle,
+.show>.btn-primary.dropdown-toggle:focus,
+.show>.btn-primary.dropdown-toggle:focus-visible,
+.show>.btn-primary.dropdown-toggle:focus-within,
+.panel--sidebar .btn-primary:not(:disabled):not(.disabled):active {
   border: 1px solid rgb(203 213 225 / 10%);
   background: #1e293b80;
 }
@@ -187,71 +191,76 @@ fieldset:disabled .btn {
 }
 
 .btn-warning {
-    --bs-btn-bg: rgb(254 249 195);
-    --bs-btn-border-color: rgb(254 249 195);
-    --bs-btn-hover-bg: rgb(254 249 195 / 80%);
-    --bs-btn-hover-border-color: rgb(254 249 195 / 80%);
-    --bs-btn-focus-shadow-rgb: 217,164,6;
-    --bs-btn-active-bg: rgb(254 249 195 / 80%);
-    --bs-btn-active-border-color: rgb(254 249 195 / 80%);
-    --bs-btn-color: rgb(133 77 14);
-    --bs-btn-hover-color: rgb(133 77 14);
-    font-weight: 700;
-    font-weight: 700;
+  --bs-btn-bg: rgb(254 249 195);
+  --bs-btn-border-color: rgb(254 249 195);
+  --bs-btn-hover-bg: rgb(254 249 195 / 80%);
+  --bs-btn-hover-border-color: rgb(254 249 195 / 80%);
+  --bs-btn-focus-shadow-rgb: 217, 164, 6;
+  --bs-btn-active-bg: rgb(254 249 195 / 80%);
+  --bs-btn-active-border-color: rgb(254 249 195 / 80%);
+  --bs-btn-color: rgb(133 77 14);
+  --bs-btn-hover-color: rgb(133 77 14);
+  font-weight: 700;
+  font-weight: 700;
 }
 
 .btn-danger {
-    --bs-btn-bg: #dc354510;
-    --bs-btn-border-color: #dc3545;
-    --bs-btn-hover-bg: #dc3545;
-    --bs-btn-hover-border-color: #dc3545;
-    --bs-btn-focus-shadow-rgb: 217,164,6;
-    --bs-btn-active-bg: #dc3545;
-    --bs-btn-active-border-color: #dc3545;
-    --bs-btn-color: #dc3545;
-    --bs-btn-hover-color: #ffffff;
-    font-weight: 700;
+  --bs-btn-bg: #dc354510;
+  --bs-btn-border-color: #dc3545;
+  --bs-btn-hover-bg: #dc3545;
+  --bs-btn-hover-border-color: #dc3545;
+  --bs-btn-focus-shadow-rgb: 217, 164, 6;
+  --bs-btn-active-bg: #dc3545;
+  --bs-btn-active-border-color: #dc3545;
+  --bs-btn-color: #dc3545;
+  --bs-btn-hover-color: #ffffff;
+  font-weight: 700;
 }
 
 .btn-success {
-    --bs-btn-bg: rgb(220 252 231);
-    --bs-btn-border-color: rgb(187 247 208);
-    --bs-btn-hover-bg: rgb(220 252 231 / 80%);
-    --bs-btn-hover-border-color: rgb(187 247 208);
-    --bs-btn-focus-shadow-rgb: 217,164,6;
-    --bs-btn-active-bg: rgb(220 252 231 / 80%);
-    --bs-btn-active-border-color: rgb(187 247 208);
-    --bs-btn-color: rgb(22 101 52);
-    --bs-btn-hover-color: rgb(22 101 52);
-    font-weight: 700;
+  --bs-btn-bg: rgb(220 252 231);
+  --bs-btn-border-color: rgb(187 247 208);
+  --bs-btn-hover-bg: rgb(220 252 231 / 80%);
+  --bs-btn-hover-border-color: rgb(187 247 208);
+  --bs-btn-focus-shadow-rgb: 217, 164, 6;
+  --bs-btn-active-bg: rgb(220 252 231 / 80%);
+  --bs-btn-active-border-color: rgb(187 247 208);
+  --bs-btn-color: rgb(22 101 52);
+  --bs-btn-hover-color: rgb(22 101 52);
+  font-weight: 700;
 }
 
 .btn-dark {
-    --bs-btn-color: rgb(51 65 85);
-    --bs-btn-bg: rgb(203 213 225);
-    border: 0;
-    --bs-btn-hover-color: #ffffff;
-    --bs-btn-hover-bg: rgb(148 163 184);
-    --bs-btn-focus-shadow-rgb: 66,70,73;
-    --bs-btn-active-color: rgb(51 65 85);
-    --bs-btn-active-bg: rgb(148 163 184);
+  --bs-btn-color: rgb(51 65 85);
+  --bs-btn-bg: rgb(203 213 225);
+  border: 0;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: rgb(148 163 184);
+  --bs-btn-focus-shadow-rgb: 66, 70, 73;
+  --bs-btn-active-color: rgb(51 65 85);
+  --bs-btn-active-bg: rgb(148 163 184);
 }
 
 strong.activity-type-text {
   text-transform: capitalize;
 }
 
-.btn-outline-primary:hover, .btn-outline-primary.focus, .btn-outline-primary:focus, .btn-check:checked+.btn, :not(.btn-check)+.btn:active {
+.btn-outline-primary:hover,
+.btn-outline-primary.focus,
+.btn-outline-primary:focus,
+.btn-check:checked+.btn,
+:not(.btn-check)+.btn:active {
   color: rgb(15 23 42);
   background-color: transparent;
   border-color: transparent;
   box-shadow: none
 }
 
-.btn.active, .btn.show {
-    color: #ffffff;
-    background-color: var(--bs-btn-active-bg);
-    border-color: var(--bs-btn-active-bg);
+.btn.active,
+.btn.show {
+  color: #ffffff;
+  background-color: var(--bs-btn-active-bg);
+  border-color: var(--bs-btn-active-bg);
 }
 
 .btn:focus-visible {
@@ -261,9 +270,9 @@ strong.activity-type-text {
 }
 
 .btn-secondary {
-    --bs-btn-color: rgba(51, 65, 85, 1);
-    --bs-btn-bg: rgba(241, 245, 249, 1);
-    --bs-btn-border-color: rgba(51, 65, 85, 0);
+  --bs-btn-color: rgba(51, 65, 85, 1);
+  --bs-btn-bg: rgba(241, 245, 249, 1);
+  --bs-btn-border-color: rgba(51, 65, 85, 0);
 }
 
 .form-control:focus {
@@ -315,7 +324,8 @@ Login Forms CSS-=-=
   font-size: 15px;
 }
 
-.wrapper--title .form-select, .page--title .form-select {
+.wrapper--title .form-select,
+.page--title .form-select {
   padding: .5rem 2rem .5rem 1.2rem;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
@@ -357,7 +367,7 @@ textarea.form-control {
   padding: .75rem;
   border-radius: 1rem;
   -webkit-border-radius: 1rem;
-  background: linear-gradient(to right,rgba(var(--theme-primary), 1),rgba(var(--theme-secondary), 1));
+  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
 .main--login .login--image img {
@@ -447,18 +457,21 @@ textarea.form-control {
   border-radius: 50px 0 0 0;
 }
 
-.form-floating>.form-control:disabled~label::before, .form-floating>.form-select:disabled~label::before {
+.form-floating>.form-control:disabled~label::before,
+.form-floating>.form-select:disabled~label::before {
   background: var(--bs-secondary-bg);
 }
 
-.form-floating>.form-control:-webkit-autofill~label, .form-floating>.form-select:-webkit-autofill~label {
+.form-floating>.form-control:-webkit-autofill~label,
+.form-floating>.form-select:-webkit-autofill~label {
   transform: scale(.85) translateY(-.85rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.85rem) translateX(1rem);
   color: rgb(15 23 42);
   background: transparent;
 }
 
-.form-floating>.form-control:-webkit-autofill~label::before, .form-floating>.form-select:-webkit-autofill~label::before {
+.form-floating>.form-control:-webkit-autofill~label::before,
+.form-floating>.form-select:-webkit-autofill~label::before {
   position: absolute;
   left: 0;
   top: 0;
@@ -472,14 +485,16 @@ textarea.form-control {
   border-radius: 50px 0 0 0;
 }
 
-.form-floating>.form-control:-moz-autofill~label, .form-floating>.form-select:-moz-autofill~label {
+.form-floating>.form-control:-moz-autofill~label,
+.form-floating>.form-select:-moz-autofill~label {
   transform: scale(.85) translateY(-.65rem) translateX(1rem);
   -webkit-transform: scale(.85) translateY(-.65rem) translateX(1rem);
   color: rgb(15 23 42);
   background: transparent;
 }
 
-.form-floating>.form-control:-moz-autofill~label::before, .form-floating>.form-select:-moz-autofill~label::before {
+.form-floating>.form-control:-moz-autofill~label::before,
+.form-floating>.form-select:-moz-autofill~label::before {
   position: absolute;
   left: 0;
   top: 0;
@@ -707,7 +722,9 @@ Add Project Modal CSS-=-=-
   -webkit-transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
 }
 
-.modal .rmdp-input, .project--form--inputs .rmdp-input, .rounded--box .rmdp-input {
+.modal .rmdp-input,
+.project--form--inputs .rmdp-input,
+.rounded--box .rmdp-input {
   box-shadow: none;
   -webkit-box-shadow: none;
 }
@@ -1063,31 +1080,31 @@ Add Project Modal CSS-=-=-
 }
 
 .add--workflow--modal .tab-content {
-    border: 1px solid var(--bs-border-color);
-    border-top: 0;
-    padding: 1rem;
+  border: 1px solid var(--bs-border-color);
+  border-top: 0;
+  padding: 1rem;
 }
 
 .add--workflow--modal .custom--field svg {
-    width: 40px;
-    height: auto;
-    margin-bottom: 1rem;
-    color: #64748b;
+  width: 40px;
+  height: auto;
+  margin-bottom: 1rem;
+  color: #64748b;
 }
 
 .custom--field {
-    display: flex;
-    flex-flow: column wrap;
-    align-items: center;
-    padding: 3rem;
-    color: #64748b;
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  padding: 3rem;
+  color: #64748b;
 }
 
 .add--workflow--modal .custom--field .btn svg {
-    width: 20px;
-    height: auto;
-    margin-bottom: 0;
-    color: inherit;
+  width: 20px;
+  height: auto;
+  margin-bottom: 0;
+  color: inherit;
 }
 
 .add--new--field {
@@ -1098,7 +1115,8 @@ Add Project Modal CSS-=-=-
   margin-bottom: 1rem;
 }
 
-.add--new--field .dropdown-menu form, .select--dropdown .dropdown-menu form {
+.add--new--field .dropdown-menu form,
+.select--dropdown .dropdown-menu form {
   max-width: calc(100% - 2rem);
   margin: 1rem auto 0;
 }
@@ -1121,11 +1139,11 @@ Add Project Modal CSS-=-=-
 }
 
 .added--fields .card .card-body .drag--indicator {
-    position: absolute;
-    left: auto;
-    top: 0;
-    opacity: 0;
-    padding: 0 0.65em;
+  position: absolute;
+  left: auto;
+  top: 0;
+  opacity: 0;
+  padding: 0 0.65em;
 }
 
 .added--fields .card:hover .drag--indicator {
@@ -1140,8 +1158,9 @@ Add Project Modal CSS-=-=-
   color: #495057;
 }
 
-.add--workflow--modal .nav-tabs .nav-item.show .nav-link, .add--workflow--modal .nav-tabs .nav-link.active {
-    color: var(--bs-nav-tabs-link-active-color);
+.add--workflow--modal .nav-tabs .nav-item.show .nav-link,
+.add--workflow--modal .nav-tabs .nav-link.active {
+  color: var(--bs-nav-tabs-link-active-color);
 }
 
 .select2-container--open {
@@ -1340,7 +1359,6 @@ span.status--circle.info--color {
   line-clamp: 1;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
-  /* overflow: hidden; */
   border-radius: 0;
 }
 

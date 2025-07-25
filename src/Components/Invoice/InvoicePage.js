@@ -32,7 +32,7 @@ function InvoicePage() {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper px-md-2 py-3'>
+        <div className='page--wrapper px-md-2 py-5 pt-4'>
           <Container fluid>
             <Table responsive="lg" className="invoice--table">
               <thead>
