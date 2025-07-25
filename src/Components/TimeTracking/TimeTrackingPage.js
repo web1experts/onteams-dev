@@ -61,6 +61,7 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
   const [isActive, setIsActive] = useState(false);
   const MemberprojectFeed = useSelector(state => state.project.memberProjects);
    const [isActiveView, setIsActiveView] = useState(2);
+   const [liveStreaming, setLiveStreaming] = useState('disabled')
   const [isScreenActive, setIsScreenActive] = useState(false);
   const [ recordedRefresh, setRecordedRefresh ] = useState(true)
   const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true))
@@ -313,11 +314,8 @@ const handleListProjects = async () => {
 
   useEffect(() => {
     setActSpinner( false )
+    setLiveStreaming(currentActivity?.memberMeta?.live_streaming?.meta_value || 'disabled');
     
-    if(currentActivity !== false && activeTab === "Live" || currentActivity !== false && activeInnerTab === "InnerLive"){ 
-        setSpinner( false )
-        startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
-    }
     if(currentActivity !== false && activeInnerTab === "InnerRecorded" && recordedRefresh === true || currentActivity !== false && activeTab === "Recordings" && recordedRefresh === true){
       // setActiveInnerTab("InnerRecorded")
    
@@ -327,6 +325,13 @@ const handleListProjects = async () => {
       setActSpinner( false )
     }
   },[currentActivity])
+
+  useEffect(() => {
+    if(currentActivity !== false && activeTab === "Live" && liveStreaming === 'enable' || currentActivity !== false && activeInnerTab === "InnerLive" && liveStreaming === 'enable'){ 
+        setSpinner( false )
+        startsharing(currentActivity._id, currentActivity?.latestActivity?.status);
+    }
+  }, [liveStreaming])
 
    useEffect(() => {
     if (Object.keys(filters).length > 0 && !showFilter) {
@@ -503,6 +508,13 @@ const handleReportSubmit = async (e) => {
     selectboxObserver()
     handleLiveActivityList()
 
+    socket.on('receive_record_types', async (record_types = {}) => { 
+      
+      if(activeTab === 'Live'){
+        setLiveStreaming(record_types?.live_streaming || 'disabled')
+      }
+    });
+
     socket.on('trackerstateUpdate', (memberData, status = false) => {
       setRecordedRefresh(false); 
       setLiveactivities((prevActivities) => {
@@ -548,7 +560,7 @@ const handleReportSubmit = async (e) => {
       });
   
       // handleLiveActivityList() if required
-  });
+    });
   
 
     socket.on('offer', function (id, description, roomId) {
@@ -620,6 +632,13 @@ const handleReportSubmit = async (e) => {
   useEffect(() => {
     if (activitystate?.liveactivities?.memberData) { 
       setLiveactivities(activitystate.liveactivities.memberData)
+      if(currentActivity && activeTab === 'Live'){
+        
+        const updatedActivity = activitystate.liveactivities.memberData.find(
+          (m) => m._id.toString() === currentActivity._id.toString()
+        );
+        setCurrentActivity(updatedActivity);
+      }
     }
 
     if( activitystate?.recordedActivity ){
@@ -1573,6 +1592,9 @@ const handleProjectSelect = async (project) => {
                   </div>
                 </div>
                 {
+                  (liveStreaming === 'disabled') ?
+                    <p className="text-center">Live streaming is disabled.</p>
+                  :
                   currentActivity?.latestActivity?.status ? 
                   <video ref={videoRef} id='remoteVideo' width="100%"  className="video" onLoadedData={() => {setActSpinner( false )}}
                   preload="auto"

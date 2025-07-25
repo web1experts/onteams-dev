@@ -196,6 +196,7 @@ function TeamMembersPage() {
       if (activeTab === "Members") {
         if (apiResult.updatedMember) {
           socket.emit("refresh_record_type", selectedMember?._id);
+          socket.emit("refresh_record_types", selectedMember?._id);
           const updatedMemberFeeds = memberFeeds.map((m) =>
             m._id.toString() === apiResult.updatedMember._id.toString()
               ? apiResult.updatedMember

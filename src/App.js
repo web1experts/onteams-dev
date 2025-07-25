@@ -253,7 +253,7 @@ function App(props) {
           <SidebarPanel />
         }
         <ToastAlerts />
-        {loggedIn ? (
+        {(loggedIn) ? (
           <Routes>{getRoutes(privateRoutes)}</Routes>
         ) : (
           <Routes>{getRoutes(publicRoutes)}</Routes>

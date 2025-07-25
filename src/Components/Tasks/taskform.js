@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, ListGroup, Row, Col, InputGroup, Dropdown, Image } from "react-bootstrap";
 import { MdFileDownload } from "react-icons/md";
 import { FaEllipsisV, FaPlus, FaRegTrashAlt, FaChevronDown, FaCheck, FaEdit } from "react-icons/fa";
-import { selectboxObserver, getMemberdata, makeLinksClickable, formatTimeAgo, parseDateWithoutTimezone, timeAgo } from "../../helpers/commonfunctions";
+import { selectboxObserver, getMemberdata, makeLinksClickable, formatTimeAgo, parseDateWithoutTimezone, timeAgo, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { TASK_FORM, RESET_FORMS, ACTIVE_FORM_TYPE, CURRENT_TASK } from '../../redux/actions/types';
 import { FiFileText } from "react-icons/fi";
@@ -16,7 +16,6 @@ import { LuWorkflow } from "react-icons/lu";
 import { FilesPreviewModal } from '../modals';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
-import { getFieldRules, validateField } from '../../helpers/rules';
 import { updateTask, deleteTask } from '../../redux/actions/task.action';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -25,6 +24,8 @@ import { DatePicker, Calendar } from "react-multi-date-picker";
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import AutoLinks from "quill-auto-links";
+import { fetchCustomFields } from "../../redux/actions/customfield.action";
+import { renderDynamicField } from "../common/dynamicFields";
 Quill.register("modules/autoLinks", AutoLinks);
 
 export const TaskForm = (props) => {
@@ -59,6 +60,7 @@ export const TaskForm = (props) => {
     const [workflowstatus, setWorkflowStatus] = useState(false)
     const [datePickerModal, setDatePickerModal] = useState(false)
     const modalstate = useSelector(state => state.common.taskmodal);
+    const apiCustomfields = useSelector( state => state.customfields)
     const taskForm = useSelector(state => state.common.taskForm)
     const apiResult = useSelector(state => state.task);
     const commonState = useSelector(state => state.common)
@@ -83,6 +85,9 @@ export const TaskForm = (props) => {
     const [editmessage, setEditMessage] = useState({})
     const [comments, setComments] = useState('');
     const [workflowstatuses, setFlowstatus] = useState([])
+    const [showPasswordFields, setShowPasswordFields] = useState({});
+    const [showBadges, setShowBadges] = useState(null);
+    const [customFields, setCustomFields] = useState([]);
     const handleNewComment = (event) => {
         setComments(event.target.value);
     }
@@ -153,6 +158,17 @@ export const TaskForm = (props) => {
                 due_date: currentTask.due_date ? new Date(currentTask.due_date).toISOString().split('T')[0] : ''
             };
 
+            if (currentTask.customFields && Object.keys(currentTask.customFields).length > 0) {
+                Object.values(currentTask.customFields).forEach(field => {
+                    fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
+                });
+            }else{
+                customFields.forEach(field => {
+                    fieldsSetup[`custom_field[${field.name}]`] = ''
+                });
+                
+            }
+
             setSubtasks(() => {
                 const subtasks = currentTask.subtasks ? currentTask.subtasks : [];
                 if (issubopen) {
@@ -191,7 +207,15 @@ export const TaskForm = (props) => {
             // }, 150)
             dispatch(updateStateData(TASK_FORM, fieldsSetup))
         }
+        dispatch(fetchCustomFields({module: 'tasks'}))
     }, [currentTask]);
+
+    useEffect(() => { 
+        if( apiCustomfields.customFields){
+            setCustomFields( apiCustomfields.customFields)
+        }
+    
+    }, [apiCustomfields]);
 
     const refreshstates = (formtype) => {
         switch (formtype) {
@@ -373,11 +397,45 @@ export const TaskForm = (props) => {
             }
         }
     }
+    const toggleShowPassword = (fieldId) => {
+        setShowPasswordFields((prev) => ({
+            ...prev,
+            [fieldId]: !prev[fieldId],
+        }));
+    };
+    const toggleBadges = (fieldIndex) => {
+        setShowBadges(fieldIndex);
+    };
 
-    const handleChange = ({ target: { name, value } }) => {
+    const handleDateChange = (value, name) =>{ console.log(new Date(value))
+        setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
+        dispatch(updateStateData(TASK_FORM, { [name]: value }));
+        setErrors({ ...errors, [name]: '' })
+    }
+    
+    const handleChange = ({ target: { name, value, type, files, checked } }) => {
 
         // Handle other form inputs
-        setFields({ ...fields, [name]: value })
+        let finalValue;
+
+        if (type === 'checkbox' && name.includes('[]')) {
+            const arrayName = name.replace('[]', '');
+            const existing = fields[arrayName] || [];
+            if (checked) {
+            finalValue = [...existing, value];
+            } else {
+            finalValue = existing.filter((v) => v !== value);
+            }
+            name = arrayName;
+        } else if (type === 'checkbox') {
+            // For single checkbox: store value when checked, empty string when unchecked
+            finalValue = checked ? value : '';
+        } else if (type === 'file') {
+            finalValue = files;
+        } else {
+            finalValue = value;
+        }
+        setFields({ ...fields, [name]: finalValue })
         dispatch(updateStateData(TASK_FORM, { [name]: value }));
         setErrors({ ...errors, [name]: '' });
         // }
@@ -896,7 +954,39 @@ const renderSubtasks = () => {
                                 >
                                     <FaPlus /> Add subtasks
                                 </small>
-
+                                <Form.Group className="mb-0 form-group pb-0">
+                                {customFields?.length > 0 &&
+                                    <>
+                                    <hr />
+                                    <Form.Label>
+                                        <small>Other Fields</small>
+                                    </Form.Label>
+                                    {customFields?.map((field, index) =>
+                                        renderDynamicField({
+                                            name: `custom_field[${field.name}]`,
+                                            type: field.type,
+                                            label: field.label,
+                                            value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                                    ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                                    : fields[`custom_field[${field.name}]`] || '',
+                                            options: field?.options || [],
+                                            onChange: (e) => {
+                                                if(field.type === "date"){
+                                                    
+                                                    handleDateChange(e, `custom_field[${field.name}]`)
+                                                }else{
+                                                    handleChange(e)
+                                                }
+                                            },
+                                            range_options: field?.range_options || {},
+                                            showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                                            toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                                            toggleBadges: () => toggleBadges(field),
+                                        })
+                                    )}
+                                    </>
+                                }
+                                </Form.Group>
                                 <Form.Group className="mb-0 mt-3 form-group">
                                     <Form.Label className="w-100 m-0">
                                         <small>Task chat</small>

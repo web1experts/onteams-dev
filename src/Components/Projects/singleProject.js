@@ -327,10 +327,6 @@ function SingleProject(props) {
     };
 
 
-    useEffect(() => {
-        console.log('All fields: ', fields)
-    }, [fields])
-
     const handleWorkflowSelect = (flow) => {
         setFields({ ...fields, ['workflow']: flow });
         setSelectedWorkflow( flow )
@@ -526,20 +522,6 @@ useEffect(() => {
     const handleDateclose = useCallback(() => {
         setDateshow(false);
     }, []); // Empty dependency array means this function is memoized and won't change across renders
-    
-    // const [projectToggle, setProjectToggle ] = useState(false)
-    // const handleToggles = () => {
-    //     if(commonState.sidebar_small === false ){ console.log('1')
-    //         handleSidebarSmall()
-    //     }else if(commonState.sidebar_small === true){
-    //         setProjectToggle(true)
-    //             console.log('2')
-    //     }else{
-    //         setProjectToggle(false)
-    //         handleSidebarSmall()
-    //             console.log('3')
-    //     }
-    // }
     
 
     return (

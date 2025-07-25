@@ -1227,6 +1227,9 @@ function ProjectsPage() {
                             <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}><BiEdit className="me-1"/> Tasks</Button>
                         </ListGroup>
                     </ListGroup>
+                    <ListGroup horizontal className={"d-flex bg-white expand--icon"}>
+                        <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><FaCog /></ListGroup.Item>
+                    </ListGroup>
                     <ListGroup horizontal className="expand--icon gap-2 p-0 b-0 rounded-0 align-items-center ms-auto ms-sm-0">
                         {
                         (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
@@ -1243,7 +1246,7 @@ function ProjectsPage() {
             {isActive === 2 && <SingleProject key={`single-project-view-${currentProject?._id}`} projects={projects} currentProject={currentProject} clientlist={clientlist} members={members} closeview={setIsActive} memberProfile={memberProfile} toggleSidebars={handleToggles} projectChange={handleProjectChange} customFields={customFields} /> }
             { commonState?.taskForm && <TaskForm memberProfile={memberProfile}/> }
             
-            { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module='projects' />}
+            { showCustomFields && <CustomFieldModal toggle={setShowCustomFields} module={isActive === 1 ? 'tasks' :'projects'} />}
             {show &&
                 <Modal show={show} onHide={handleClose} centered size="lg" className="add--member--modal modalbox theme--modal" onShow={() => selectboxObserver()}>
                     <Modal.Header closeButton>
