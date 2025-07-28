@@ -775,7 +775,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                         </Card.Link>
                       </Card>
                       <Card className="mac--download app--download" href='/downloads/onteams-darwin-x64.zip' download>
-                        <Card.Link href='/downloads/onteams-win32-ia32.zip' download>
+                        <Card.Link href='/downloads/onteams-darwin-x64.zip' download>
                           <CardTitle>
                             <span><MdLaptopMac /></span>
                             <h4>macOS App <small>macOS Monterey and later</small></h4>

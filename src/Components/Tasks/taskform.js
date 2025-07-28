@@ -972,10 +972,19 @@ const renderSubtasks = () => {
                                             options: field?.options || [],
                                             onChange: (e) => {
                                                 if(field.type === "date"){
-                                                    
                                                     handleDateChange(e, `custom_field[${field.name}]`)
                                                 }else{
                                                     handleChange(e)
+                                                }
+                                            },
+                                            onBlur: (e) => {
+                                                if (currentTask.customFields?.[field.name]?.meta_value !== fields[`custom_field[${field.name}]`]) {
+                                                    if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                                                        const formData = new FormData();
+                                                        const dynamicKey = `custom_field[${field.name}]`;
+                                                        formData.append(dynamicKey, fields[`custom_field[${field.name}]`]);
+                                                        dispatch(updateTask(currentTask._id, formData))
+                                                    }  
                                                 }
                                             },
                                             range_options: field?.range_options || {},
@@ -1114,7 +1123,7 @@ const renderSubtasks = () => {
                                     </Row>
                                 </Form.Group>
 
-                                {currentTask?.taskmeta?.length > 0 &&
+                                {/* {currentTask?.taskmeta?.length > 0 &&
 
                                     currentTask.taskmeta.sort((a, b) => {
                                         // Sort such that 'timeline' comes before 'task_created_updated'
@@ -1123,15 +1132,16 @@ const renderSubtasks = () => {
                                     }).map((meta, index) => {
                                         // Conditionally render based on the meta_key value
                                         if (meta.meta_key === 'timeline') {
-                                            return (
+                                            return ( */}
+                                            { currentTask?.customFields?.['timeline'] &&
                                                 <Form.Group className="mb-0 mt-3 form-group">
                                                     <Form.Label className="w-100 m-0">
                                                         <small>Timeline</small>
                                                     </Form.Label>
                                                     <div className='timeline--container' key={`timeline-area-${currentTask?._id}`}>
                                                         {
-                                                            meta?.meta_value?.length > 0 &&
-                                                            meta.meta_value.map((timeline, index) => {
+                                                            currentTask?.customFields?.['timeline']?.meta_value?.length > 0 &&
+                                                            currentTask?.customFields?.['timeline'].meta_value.map((timeline, index) => {
                                                                 return (
                                                                     <div className='timeline--blip'>
                                                                         <div className='timeline--blip--line'></div>
@@ -1149,21 +1159,24 @@ const renderSubtasks = () => {
 
                                                     </div>
                                                 </Form.Group>
-                                            );
+                                            }
+                                            {/* );
                                         } else if (meta.meta_key === 'task_created_updated') {
-                                            return (
+                                            return ( */}
+                                            { currentTask?.customFields?.['task_created_updated'] &&
                                                 <div className='task--cr--status'>
-                                                    <p className='mb-0'>Created on: <strong>{timeAgo(meta?.createdAt)} by {meta.meta_value?.created_by}</strong></p>
+                                                    <p className='mb-0'>Created on: <strong>{timeAgo(currentTask?.customFields?.['task_created_updated']?.createdAt)} by {currentTask?.customFields?.['task_created_updated'].meta_value?.created_by}</strong></p>
                                                     {
-                                                        meta.meta_value?.updated_by && meta.meta_value?.updated_by !== "" &&
-                                                        <p className='mb-0'>Last update: <strong>{timeAgo(meta?.updatedAt)} by {meta.meta_value?.updated_by}</strong></p>
+                                                        currentTask?.customFields?.['task_created_updated'].meta_value?.updated_by && currentTask?.customFields?.['task_created_updated'].meta_value?.updated_by !== "" &&
+                                                        <p className='mb-0'>Last update: <strong>{timeAgo(currentTask?.customFields?.['task_created_updated']?.updatedAt)} by {currentTask?.customFields?.['task_created_updated'].meta_value?.updated_by}</strong></p>
                                                     }
 
                                                 </div>
-                                            );
+                                            }
+                                            {/* );
                                         }
                                     })
-                                }
+                                } */}
 
 
 

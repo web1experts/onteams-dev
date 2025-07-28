@@ -1687,8 +1687,14 @@ const handleProjectSelect = async (project) => {
                                             <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
                                             <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
                                             <strong>Date: </strong>{ screenshotData?.taken_time
-                                              ? new Date(screenshotData.taken_time).toISOString().split('T')[0]
-                                              : ''}
+                                              ? new Date(screenshotData.taken_time).toLocaleDateString('en-GB', {
+                                                  day: 'numeric',
+                                                  month: 'long',
+                                                  year: 'numeric'
+                                                })
+                                              : ''
+                                            }
+
                                           </p>
                                         </Card.Body>
                                       </Card>
@@ -1716,11 +1722,15 @@ const handleProjectSelect = async (project) => {
                                                   <p>
                                                     <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
                                                     <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                    <strong>Date:</strong>{
-                                                      videoData?.createdAt
-                                                        ? new Date(videoData?.createdAt).toISOString().split('T')[0]
-                                                        : ''
+                                                    <strong>Date:</strong>{ videoData?.createdAt
+                                                      ? new Date(videoData.createdAt).toLocaleDateString('en-GB', {
+                                                          day: 'numeric',
+                                                          month: 'long',
+                                                          year: 'numeric'
+                                                        })
+                                                      : ''
                                                     }
+
                                                   </p>
                                                 </Card.Body>
                                               </Card>
@@ -1736,10 +1746,13 @@ const handleProjectSelect = async (project) => {
                                                   <p>
                                                     <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
                                                     <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                    <strong>Date:</strong>{
-                                                      videoData?.createdAt
-                                                        ? new Date(videoData?.createdAt).toISOString().split('T')[0]
-                                                        : ''
+                                                    <strong>Date:</strong>{ videoData?.createdAt
+                                                      ? new Date(videoData.createdAt).toLocaleDateString('en-GB', {
+                                                          day: 'numeric',
+                                                          month: 'long',
+                                                          year: 'numeric'
+                                                        })
+                                                      : ''
                                                     }
                                                   </p>
                                                 </Card.Body>

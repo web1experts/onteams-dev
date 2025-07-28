@@ -350,11 +350,14 @@ const TaskList = ({ report }) => {
                               <strong>Time:</strong>{" "}
                               {showAmPmtime(screenshotData?.taken_time)}
                               <br />
-                              <strong>Date:</strong>{" "}{
-                                screenshotData?.taken_time
-                                  ? new Date(screenshotData.taken_time).toISOString().split('T')[0]
-                                  : ''
-                              }
+                              <strong>Date:</strong>{" "}{ screenshotData?.taken_time
+                                                ? new Date(screenshotData?.taken_time).toLocaleDateString('en-GB', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                  })
+                                                : ''
+                                              }
                             </p>
                           </Card.Body>
                         </Card>
@@ -415,11 +418,14 @@ const TaskList = ({ report }) => {
                                     {videoData?.start_time} to{" "}
                                     {videoData?.end_time}
                                     <br />
-                                    <strong>Date:</strong>{" "}{
-                                      videoData?.createdAt
-                                        ? new Date(videoData?.createdAt).toISOString().split('T')[0]
-                                        : ''
-                                    }
+                                    <strong>Date:</strong>{" "}{ videoData?.createdAt
+                                                      ? new Date(videoData.createdAt).toLocaleDateString('en-GB', {
+                                                          day: 'numeric',
+                                                          month: 'long',
+                                                          year: 'numeric'
+                                                        })
+                                                      : ''
+                                                    }
                                   </p>
                                 </Card.Body>
                               </Card>
