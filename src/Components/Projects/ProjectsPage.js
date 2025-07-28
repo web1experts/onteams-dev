@@ -593,27 +593,43 @@ function ProjectsPage() {
         });
 
         if( apiResult.success === true && apiResult.updatedProject){
-            // if( apiResult.updatedProject?.status !== currentProject?.status || isNotPresent){ console.log('here now')
-            //     handleListProjects()
-            // }else{
-                // setProjects((prevProjects) =>
-                //     prevProjects.map((project) =>
-                //       project._id === apiResult.updatedProject._id ? apiResult.updatedProject : project
-                //     )
-                // );  
-                // setCurrentProject(apiResult.updatedProject )
-                setProjects((prevProjects) =>
-                    prevProjects
-                        .map((project) =>
-                            project._id === apiResult.updatedProject._id ? apiResult.updatedProject : project
-                        )
-                        .filter((project) => project.status === filters['status'])
-                );
+            if( apiResult.updatedProject?.status !== currentProject?.status ){ 
+                handleListProjects()
+            }else{
+                
+                if (filters.member !== 'all') {
+                    const memberExists = apiResult.updatedProject.members.some(
+                        member => member._id.toString() === filters.member.toString()
+                    );
 
-                setCurrentProject((prev) =>
-                    apiResult.updatedProject.status === filters['status'] ? apiResult.updatedProject : null
-                );
-            // } 
+                    if (memberExists) {
+                        setProjects((prevProjects) =>
+                            prevProjects
+                                .map((project) =>
+                                    project._id === apiResult.updatedProject._id ? apiResult.updatedProject : project
+                                )
+                                .filter((project) => project.status === filters['status'])
+                        );
+                        setCurrentProject((prev) =>
+                            apiResult.updatedProject.status === filters['status'] ? apiResult.updatedProject : null
+                        );
+                    } else {
+                        handleListProjects();
+                    }
+                } else {
+                    setProjects((prevProjects) =>
+                        prevProjects
+                            .map((project) =>
+                                project._id === apiResult.updatedProject._id ? apiResult.updatedProject : project
+                            )
+                            .filter((project) => project.status === filters['status'])
+                    );
+
+                    setCurrentProject((prev) =>
+                        apiResult.updatedProject.status === filters['status'] ? apiResult.updatedProject : null
+                    );
+                }
+            } 
         }
 
     }, [apiResult])
