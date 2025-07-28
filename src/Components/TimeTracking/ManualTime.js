@@ -35,6 +35,7 @@ import {
 } from "../../redux/actions/project.action";
 import { ListTasks } from "../../redux/actions/task.action";
 import { currentMemberProfile } from "../../helpers/auth";
+import { LuClock } from "react-icons/lu";
 
 function ManualTime() {
   const dispatch = useDispatch();
@@ -185,56 +186,50 @@ function ManualTime() {
                 {member.projects?.length > 0 &&
                   member.projects.map((project) => (
                     <div className="single--project--stack" key={project._id}>
-                      <div className="d-flex align-items-center justify-content-between gap-4">
-                        <h4 className="d-flex flex-column gap-3">
-                          <strong className="d-flex align-items-center gap-2">
-                            <span>
-                              <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="lucide lucide-building2 w-4 h-4 text-blue-600"
-                              >
-                                <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path>
-                                <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path>
-                                <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path>
-                                <path d="M10 6h4"></path>
-                                <path d="M10 10h4"></path>
-                                <path d="M10 14h4"></path>
-                                <path d="M10 18h4"></path>
-                              </svg>
-                            </span>
-                            {project.title}
-                          </strong>
+                      <h4 className="d-flex flex-column gap-3">
+                        <strong className="d-flex align-items-center gap-2">
+                          <span>
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="lucide lucide-building2 w-4 h-4 text-blue-600"
+                            >
+                              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path>
+                              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path>
+                              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path>
+                              <path d="M10 6h4"></path>
+                              <path d="M10 10h4"></path>
+                              <path d="M10 14h4"></path>
+                              <path d="M10 18h4"></path>
+                            </svg>
+                          </span>
+                          {project.title}
+                        </strong>
 
-                          {project.activities?.length > 0 &&
-                            project.activities.map(
-                              (activity) =>
-                                activity.tasks?.length > 0 &&
-                                activity.tasks.map((taskdata, taskIndex) => (
-                                  <div key={`${activity._id}-${taskIndex}`}>
-                                    <p>
-                                      <small className="d-flex align-items-center gap-2">
-                                        <FaRegListAlt /> {taskdata?.task?.title}
-                                      </small>
-                                    </p>
-                                    <p>
-                                      <small className="d-flex mt-2 flex-column gap-0">
-                                        Time:{" "}
-                                        {generateTimeRange(
-                                          activity?.createdAt,
-                                          activity?.duration
-                                        )}
-                                      </small>
-                                    </p>
-                                  </div>
-                                ))
-                            )}
-                        </h4>
-                      </div>
+                        {project.activities?.length > 0 &&
+                          project.activities.map(
+                            (activity) =>
+                              activity.tasks?.length > 0 &&
+                              activity.tasks.map((taskdata, taskIndex) => (
+                                <p key={`${activity._id}-${taskIndex}`} className="d-flex align-items-center justify-content-between gap-2 bg-light px-3 py-2 border rounded-3 mb-0">
+                                  <strong className="d-flex align-items-center gap-2">
+                                    <FaRegListAlt /> {taskdata?.task?.title}
+                                  </strong>
+                                  <small>
+                                    <LuClock />{" "}
+                                      {generateTimeRange(
+                                        activity?.createdAt,
+                                        activity?.duration
+                                      )}
+                                  </small>
+                                </p>
+                              ))
+                          )}
+                      </h4>
                       <div className="btns--set">
                         <Button variant="primary" onClick={() => {handleReportSubmit('approved', date, member?._id, project.activities)}}>
                           <FiCheckCircle className="me-1"  /> Approve

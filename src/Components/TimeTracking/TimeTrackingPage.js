@@ -4,8 +4,8 @@ import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown, Accordion } from "react-bootstrap";
 import  Fullscreen  from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaCheck, FaEye, FaPlay, FaTrash, FaPlus } from "react-icons/fa";
-import { MdClose, MdSearch } from "react-icons/md";
+import { FaEye, FaPlay, FaPlus } from "react-icons/fa";
+import { MdClose, MdFilterList } from "react-icons/md";
 import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser, FiTrash2, FiCheckCircle, FiCheck } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
@@ -106,6 +106,7 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
   const filtersRef = useRef(filters); 
   const [ date, setDate ] = useState('')
   const [showFilter, setFilterShow] = useState(false);
+  const [showInnerFilter, setInnerFilterShow] = useState(false);
   const [selectedFilter, setSelectedFilter ] = useState('today')
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [showSearch, setSearchShow] = useState(false);
@@ -114,6 +115,9 @@ const [projectFilter, setProjectFilter] = useState({status: 'in-progress'})
   
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
+
+  const handleInnerFilterClose = () => setInnerFilterShow(false);
+  const handleInnerFilterShow = () => setInnerFilterShow(true);
   
   const [ filtereddate, setFilteredDate ] = useState([new Date().toISOString().split('T')[0]])
   const [currentVideoPage, setCurrentVideoPage] = useState({});
@@ -1007,7 +1011,7 @@ const handleProjectSelect = async (project) => {
         <>
           <ListGroup.Item className="no--style">
             <Form className="d-flex align-items-center">
-              <Form.Group className="mb-0 form-group">
+              <Form.Group className="mb-0 form-group pb-0">
                 <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen} />
               </Form.Group>
               {
@@ -1158,10 +1162,8 @@ const handleProjectSelect = async (project) => {
               <Col sm={12}>
                 <h2>
                   <span className="open--sidebar me-2" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>Activity
-                  {/* <Button variant="primary" className={isActive ? 'd-flex ms-auto' : 'd-lg-none'} onClick={handleSearchShow}><MdSearch /></Button>
-                  <Button variant="primary" className={isActive ? 'd-flex' : 'd-xl-none'} onClick={handleFilterShow}><MdFilterList /></Button> */}
-                  <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
-                    <ListGroup horizontal>
+                  <ListGroup horizontal className="activity--tabs ms-auto">
+                    <ListGroup horizontal className="d-none d-xl-flex">
                         <ListGroup.Item action active={activeTab === "Live"} onClick={() => {
                           if( currentActivity && Object.keys(currentActivity)){
                             const cact = currentActivity
@@ -1182,7 +1184,6 @@ const handleProjectSelect = async (project) => {
                               <option value="pause">On Break</option>
                               <option value="inactive">Inactive</option>
                           </Form.Select>
-                          
                         </ListGroup.Item>
                       )
                     }
@@ -1209,7 +1210,7 @@ const handleProjectSelect = async (project) => {
                       </Dropdown>
                     )}
                     <ListGroup horizontal className="bg-white expand--icon">
-                        <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdSearch /></ListGroup.Item>
+                        <ListGroup.Item className="d-flex d-xl-none" onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
                         <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
                         <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
                           <BsArrowClockwise onClick={handleLiveActivityList}/>
@@ -1228,7 +1229,7 @@ const handleProjectSelect = async (project) => {
                   <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           :
-          <Container fluid>
+          <Container fluid className="pb-3">
             {activeTab === "Live" && (
               <>
                 <div className="activity--stats">
@@ -1539,9 +1540,10 @@ const handleProjectSelect = async (project) => {
               activeInnerTab === "InnerRecorded" && showDate()
             }
           </ListGroup>
-          <ListGroup horizontal className="p-0">
+          <ListGroup horizontal className="p-0 ms-auto ms-xl-0">
             {showRecordedTabs()}
             <ListGroup horizontal className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center">
+              <ListGroup.Item className="d-flex d-xl-none" onClick={handleInnerFilterShow}><MdFilterList /></ListGroup.Item>
               <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
               <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
                 <BsArrowClockwise onClick={handleRecordedActivity}/>
@@ -1550,27 +1552,6 @@ const handleProjectSelect = async (project) => {
                 <MdOutlineClose />
               </ListGroup.Item>
             </ListGroup>
-          </ListGroup>
-          <ListGroup horizontal className="live--tabs mx-auto d-flex d-xl-none w-100 justify-content-between">
-            <ListGroup horizontal className="me-3">
-              <Button variant="secondary" className="btn--view" key={'live-key'} active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
-                if( currentActivity && Object.keys(currentActivity)){
-                  const cact = currentActivity
-                  leaveRoom(currentActivity?._id)
-                  startsharing(currentActivity?._id, currentActivity?.latestActivity?.status)
-                }
-                }}><FiMonitor className="me-1" /> Live
-              </Button>
-              <Button variant="primary" className="btn--view" key={'recored-key'} active={activeInnerTab === "InnerRecorded"} onClick={() => {setActiveInnerTab("InnerRecorded")
-                if( currentActivity && Object.keys(currentActivity)){
-                  leaveRoom(currentActivity?._id)
-                }
-              }}><FiVideo className="me-1" /> Recorded
-              </Button>
-            </ListGroup>
-            {
-              activeInnerTab === "InnerRecorded" && showDate()
-            }
           </ListGroup>
         </div>
         <div className={isScreenActive ? 'rounded--box activity--box fullscreen--box' : 'rounded--box activity--box'}>
@@ -1859,94 +1840,86 @@ const handleProjectSelect = async (project) => {
         </Modal.Header>
         <Modal.Body>
           <ListGroup>
-            <ListGroup.Item key="filter-key-1" className="mt-0">
-              <Dropdown className="select--dropdown">
-                <Dropdown.Toggle variant="success">Team Projects</Dropdown.Toggle>
+            <ListGroup.Item>
+              <Dropdown className="select--dropdown manual--dropdown">
+                <Dropdown.Toggle variant="success">{activeTab}</Dropdown.Toggle>
                 <Dropdown.Menu>
-                <div className="drop--scroll">
-                  <Form>
-                    <Form.Group className="form-group mb-3">
-                      <Form.Control type="text" placeholder="Search here.." />
-                    </Form.Group>
-                  </Form>
-                  <Dropdown.Item className="selected--option" href="#/action-1">Team Projects <FaCheck /></Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">My Projects</Dropdown.Item>
-                  </div>
-                </Dropdown.Menu>
-              </Dropdown>
-              
-            </ListGroup.Item>
-            <ListGroup.Item key="filter-key-2" className="mt-3">
-              <Dropdown className="select--dropdown">
-                <Dropdown.Toggle variant="success">View All</Dropdown.Toggle>
-                <Dropdown.Menu>
-                <div className="drop--scroll">
-                  <Form>
-                    <Form.Group className="form-group mb-3">
-                      <Form.Control type="text" placeholder="Search here.." />
-                    </Form.Group>
-                  </Form>
-                  <Dropdown.Item className="selected--option" href="#/action-1">View All <FaCheck /></Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Active</Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Paused</Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Inactive</Dropdown.Item>
-                  </div>
-                </Dropdown.Menu>
-              </Dropdown>
-            </ListGroup.Item>
-            <ListGroup.Item key="filter-key-3" className="mt-3">
-              <Dropdown className="select--dropdown">
-                <Dropdown.Toggle variant="success">All Projects</Dropdown.Toggle>
-                <Dropdown.Menu>
-                <div className="drop--scroll">
-                  <Form>
-                    <Form.Group className="form-group mb-3">
-                      <Form.Control type="text" placeholder="Search here.." />
-                    </Form.Group>
-                  </Form>
-                  <Dropdown.Item className="selected--option" href="#/action-1">All Projects <FaCheck /></Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">The Galaxy</Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">On Teams</Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Ticket</Dropdown.Item>
-                  </div>
-                </Dropdown.Menu>
-              </Dropdown>
-            </ListGroup.Item>
-            <ListGroup.Item key="filter-key-4" className="mt-3">
-              <Form>
-                <Form.Group className="mb-0 form-group">
-                <DatePicker 
-                    name="date"
-                    id='date--picker'
-                    value={date} 
-                    onChange={async (value) => {
-                        const date = value.toDate();
-                        // Manually format the date to YYYY-MM-DDTHH:mm:ss.sss+00:00 without converting to UTC
-                        const year = date.getFullYear();
-                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
-                        const day = date.getDate().toString().padStart(2, '0');
-                        const hours = date.getHours().toString().padStart(2, '0');
-                        const minutes = date.getMinutes().toString().padStart(2, '0');
-                        const seconds = date.getSeconds().toString().padStart(2, '0');
-                        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-                        // Combine into the desired format
-                        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
-                        
-                        setDate(formattedDate)
+                  <div className="drop--scroll">
+                    <Dropdown.Item action active={activeTab === "Live"} onClick={() => {
+                      if( currentActivity && Object.keys(currentActivity)){
+                        const cact = currentActivity
+                        leaveRoom(currentActivity?._id)
+                        setCurrentActivity(cact);
                       }
-                    }                    
-                    className="form-control"
-                    placeholder="dd/mm/yyyy"
-                />
+                      setActiveTab("Live")}}><FiMonitor className="me-1" /> Live
+                    </Dropdown.Item>
+                    <Dropdown.Item action active={activeTab === "Recordings"} onClick={() => {setActiveTab("Recordings")}}><FiVideo className="me-1" /> Recorded</Dropdown.Item>
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
+          
+            {showTabs()}
+            {
+              activeTab === "Live" && (
+                <ListGroup.Item key="filter-key-6">
+                  <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('tracker_status', event.target.value)} value={filters['tracker_status'] || 'all'}>
+                      <option value="all">View All</option>
+                      <option value="active">Active</option>
+                      <option value="pause">On Break</option>
+                      <option value="inactive">Inactive</option>
+                  </Form.Select>
+                </ListGroup.Item>
+              )
+            }
+            
+            <ListGroup.Item key="filter-key-7">
+              <Form className="search-filter-list">
+                <Form.Group className="mb-0 form-group">
+                  <MdOutlineSearch />
+                  <Form.Control type="text" name="search" placeholder="Search by name" onChange={(event) => handlefilterchange('search', event.target.value)} />
                 </Form.Group>
               </Form>
             </ListGroup.Item>
           </ListGroup>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleFilterClose}>Cancel</Button>
-          <Button variant="primary">Save</Button>
-        </Modal.Footer>
+      </Modal>
+      {/*--=-=Inner Filter Modal**/}
+      <Modal show={showInnerFilter} onHide={handleInnerFilterClose} centered size="md" className="filter--modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Filter</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ListGroup>
+            <ListGroup.Item>
+              <Dropdown className="select--dropdown manual--dropdown">
+                <Dropdown.Toggle variant="success">{activeInnerTab === 'InnerLive' ? 'Live': 'Recorded'}</Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    <Dropdown.Item variant="secondary" className="btn--view" key={'live-key'} active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
+                      if( currentActivity && Object.keys(currentActivity)){
+                        const cact = currentActivity
+                        leaveRoom(currentActivity?._id)
+                        startsharing(currentActivity?._id, currentActivity?.latestActivity?.status)
+                      }
+                      }}><FiMonitor className="me-1" /> Live
+                    </Dropdown.Item>
+                    <Dropdown.Item variant="primary" className="btn--view" key={'recored-key'} active={activeInnerTab === "InnerRecorded"} onClick={() => {setActiveInnerTab("InnerRecorded")
+                      if( currentActivity && Object.keys(currentActivity)){
+                        leaveRoom(currentActivity?._id)
+                      }
+                    }}><FiVideo className="me-1" /> Recorded
+                    </Dropdown.Item>
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
+          
+            {
+              activeInnerTab === "InnerRecorded" && showDate()
+            }
+          </ListGroup>
+        </Modal.Body>
       </Modal>
       {/*--=-=Search Modal**/}
       <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">

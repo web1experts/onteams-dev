@@ -258,7 +258,7 @@ const getDaysLeft = (date) => {
             <img src="images/OnTeam-icon.png" className="flipchar" />
           </div>
         :
-          <Container fluid>
+          <Container fluid className="pb-5">
             <Row className="gap-3 gap-lg-0">
               <Col lg={4}>
                 <Card className="card--blue">

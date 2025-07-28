@@ -943,7 +943,7 @@ Sidebar CSS-=-=
     max-width: 100%;
     width: 100%;
     min-width: auto;
-    z-index: 222;
+    z-index: 999999;
     transform: translateX(0) translateY(0%);
     -webkit-transform: translateX(0) translateY(0%);
     height: 100%;

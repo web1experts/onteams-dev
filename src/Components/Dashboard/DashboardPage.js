@@ -536,7 +536,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
   return (
     <>
       <div className={isActive === 1 ? 'show--details team--page dashboard--page' : isActive === 2 ? ' view--project team--page dashboard--page' : 'team--page dashboard--page'}>
-        <div className='page--title px-md-2 py-3 bg-white border-bottom d-flex d-md-none'>
+        {/* <div className='page--title px-md-2 py-3 bg-white border-bottom d-flex d-md-none'>
           <Container fluid>
               <Row>
                   <Col sm={12} lg={12}>
@@ -547,7 +547,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                   </Col>
               </Row>
           </Container>
-        </div>
+        </div> */}
         <div className='page--wrapper p-md-3 py-3 pt-3 pt-lg-5 mt-3 text-center'>
           <Container fluid className="pb-5">
             <Row className="justify-content-center">

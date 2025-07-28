@@ -4,14 +4,8 @@ import { Button, Modal, Form, Card, Badge, Row, Col } from "react-bootstrap";
 import { FaRegTrashAlt, FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { MdDragIndicator } from "react-icons/md";
-import { LuSettings } from "react-icons/lu";
-import {
-  createCustomField,
-  fetchCustomFields,
-  updateCustomField,
-  deleteField,
-  reorderedCustomFields,
-} from "../../redux/actions/customfield.action";
+import { LuSettings2 } from "react-icons/lu";
+import { createCustomField, fetchCustomFields, updateCustomField, deleteField, reorderedCustomFields } from "../../redux/actions/customfield.action";
 import { AlertDialog } from ".";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -422,7 +416,7 @@ export const CustomFieldModal = (props) => {
       <Modal show={true} onHide={props.toggle} centered size="lg" className="add--workflow--modal theme--modal">
         <Modal.Header closeButton>
           <Modal.Title>
-            <span className="nav--item--icon"><LuSettings /></span>
+            <span className="nav--item--icon"><LuSettings2 /></span>
             <strong>Custom Fields <small>create custom fields for your projects</small></strong>
           </Modal.Title>
         </Modal.Header>
