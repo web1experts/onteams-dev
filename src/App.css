@@ -1119,7 +1119,7 @@ Collapsible Action CSS-=-=
   background: #f8fafc;
   flex: 1 1;
   overflow-y: auto;
-  padding: 0 1rem 1rem;
+  padding: 0 1rem 0;
   position: absolute;
   right: -100%;
   top: 0;
@@ -1163,7 +1163,7 @@ button.input-error.dropdown-toggle.btn.btn-success {
 .details--projects--view .project--form {
   background: #ffffff;
   padding: 1rem 1.2rem;
-  height: calc(100dvh - 80px);
+  height: calc(100dvh - 120px);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
 }
@@ -1342,8 +1342,12 @@ span.open--sidebar {
 }
 
 .page--title {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 777777;
 }
 
 .wrapper--title {
@@ -1562,7 +1566,7 @@ span.open--sidebar {
   padding-right: 2rem;
   box-shadow: none;
   position: relative;
-  min-width: 340px;
+  min-width: 335px;
 }
 
 .wrapper--title .dropdown-toggle::before {
@@ -2080,11 +2084,11 @@ span.open--sidebar {
 }
 
 .rounded--box .card .card--img label, .team-members--page .rounded--box .card img.card-img-top {
-  max-width: 200px;
+  max-width: 220px;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
-  min-width: 200px;
-  height: 200px;
+  min-width: 220px;
+  height: 220px;
   border-radius: 20px;
   -webkit-border-radius: 20px;
 }
@@ -2349,6 +2353,10 @@ table tr.marked-project td {
   min-width: 160px;
 }
 
+.wrapper--title .select--dropdown .btn {
+  width: 100%;
+}
+
 .team--page .page--title .manual--dropdown .btn {
   padding: 0;
   display: flex;
@@ -2442,7 +2450,7 @@ table tr.marked-project td {
 .wrapper--title .dropdown-menu[data-popper-placement="bottom-start"] {
   border-radius: 0;
   left: -1rem !important;
-  min-width: 356px;
+  min-width: 350px;
 }
 
 .modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"],
@@ -2517,7 +2525,7 @@ table tr.marked-project td {
   border-color: transparent transparent #ececec;
   content: "";
   height: 0;
-  left: 30px;
+  left: 15px;
   margin: auto;
   position: absolute;
   top: -20px;
@@ -2639,20 +2647,20 @@ table tr.marked-project td {
   margin: auto 0;
 }
 
-.team--page .page--title .manual--dropdown .dropdown-item.active {
+.team--page .page--title .manual--dropdown .dropdown-item.active, .manual--dropdown .dropdown-item.active {
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
   color: #ffffff;
 }
 
-.team--page .page--title .manual--dropdown .dropdown-item:first-child {
+.team--page .page--title .manual--dropdown .dropdown-item:first-child, .manual--dropdown .dropdown-item:first-child {
   border-radius: .5rem .5rem 0 0;
 }
 
-.team--page .page--title .manual--dropdown .dropdown-item:last-child {
+.team--page .page--title .manual--dropdown .dropdown-item:last-child, .manual--dropdown .dropdown-item:last-child {
   border-radius: 0 0 .5rem .5rem;
 }
 
-.team--page .page--title .manual--dropdown .dropdown-item svg {
+.team--page .page--title .manual--dropdown .dropdown-item svg, .modal .manual--dropdown .dropdown-item svg {
   position: relative;
   right: auto;
 }
@@ -3085,7 +3093,7 @@ Project Task View CSS=-=-=
   scrollbar-width: thin;
   -ms-overflow-style: none;
   gap: 1rem;
-  height: calc(100dvh - 100px);
+  height: calc(100dvh - 120px);
 }
 
 .projects--grid .task--list::-webkit-scrollbar {
@@ -5020,7 +5028,7 @@ pre {
   flex-flow: row wrap;
   position: relative;
   background: #E8E8E860;
-  height: 100%
+  height: auto
 }
 
 .setting--page .setting--tabs {
@@ -5140,7 +5148,8 @@ pre {
 .setting--page .rounded--box {
   flex: 1 1;
   background: none;
-  height: 100%;
+  height: auto;
+  overflow-y: visible;
 }
 
 .setting--page .rounded--box .card .card--img {
@@ -5169,12 +5178,18 @@ pre {
   height: 32px;
 }
 
-.setting--page .rounded--box .card .card--img .edit--dropdown .dropdown-item,
-.setting--page .rounded--box .card .card--img .edit--dropdown label {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  width: 100%;
+.setting--page .rounded--box .card .card--img .edit--dropdown .dropdown-item, .setting--page .rounded--box .card .card--img .edit--dropdown label {
+    display: flex;
+    align-items: center;
+    grid-gap: .5rem;
+    gap: .5rem;
+    width: 100%;
+    height: auto;
+    background: none;
+    box-shadow: none;
+    min-width: fit-content;
+    max-width: 100%;
+    border-radius: 0;
 }
 
 .rounded--box .card .edit--dropdown .form-label span {
@@ -5214,10 +5229,6 @@ pre {
   vertical-align: middle;
   opacity: .5;
   margin-top: -.15rem;
-}
-
-.setting--page .rounded--box .btn {
-  margin-left: 1rem;
 }
 
 .setting--page .switch-wrapper {
@@ -7627,7 +7638,7 @@ Media CSS-=-==
     line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    max-width: 160px;
+    max-width: 100%;
     text-overflow: ellipsis;
   }
 
@@ -7718,11 +7729,8 @@ Media CSS-=-==
     flex: 1 1;
   }
 
-  .rounded--box .card .card--img {
-    margin: auto;
-    text-align: center;
-    max-width: 100%;
-    min-width: 100%;
+  .rounded--box .card .card--img h3 {
+    font-size: calc(1.3rem + .4vw);
   }
 
   .rounded--box .permission--card .card-body,
@@ -7735,10 +7743,6 @@ Media CSS-=-==
     gap: 10px;
     flex-flow: row wrap;
     justify-content: flex-start;
-  }
-
-  .wrapper--title .dropdown-toggle {
-    min-width: 220px;
   }
 
   .wrapper--title .dropdown-menu {
@@ -7766,6 +7770,10 @@ Media CSS-=-==
   .activity--box .card-group .card {
     max-width: calc(50% - .75rem);
     padding: 1rem;
+  }
+
+  .activity--box .card-group .card {
+    padding: 0;
   }
 
   .project--grid--new--table .status__key {
@@ -7871,7 +7879,7 @@ Media CSS-=-==
     flex-flow: column wrap;
     flex: 1 1 100%;
     gap: .75rem;
-    max-width: calc(50% - 1rem);
+    max-width: calc(50% - .5rem);
   }
 
   .attendance--table--list table tr td .fs-small {
@@ -7932,6 +7940,38 @@ Media CSS-=-==
   .wrapper--title h3 {
     max-width: 220px;
   }
+
+  .page--title .progress--filter, .page--title .no--style {
+    display: none;
+  }
+
+  .modal .no--style .form-group {
+    width: 100%;
+  }
+
+  .modal .no--style .d-flex {
+    flex-flow: column wrap;
+    gap: 1rem;
+  }
+
+  .modal .no--style .d-flex .ms-2 {
+    margin-left: 0!important;
+  }
+
+  .holidays--page .card {
+    padding: 1rem;
+    border-radius: 1rem;
+    -webkit-border-radius: 1rem;
+  }
+
+  .holiday--table--grid tbody {
+    grid-gap: 1rem;
+    gap: 1rem;
+  }
+
+  .wrapper--title .dropdown-toggle {
+    min-width: 260px;
+  }
 }
 
 @media screen and (max-width:992px) {
@@ -7977,6 +8017,7 @@ Media CSS-=-==
   .new--project--rows.project--table .project--title--td .project--name {
     padding: 0;
     flex-flow: row wrap;
+    width: 100%;
   }
 
   .project--grid--table tr.marked-project,
@@ -8006,6 +8047,7 @@ Media CSS-=-==
     border-radius: .5rem;
     -webkit-border-radius: .5rem;
     padding: .5rem;
+    min-height: 52px;
   }
 
   .page--wrapper .draggable--table td.new--td:empty {
@@ -8105,8 +8147,8 @@ Media CSS-=-==
   .project--table tbody,
   .activity--table tbody,
   .invoice--table tbody {
-    grid-gap: 2rem;
-    gap: 2rem;
+    grid-gap: 1rem;
+    gap: 1rem;
     display: flex;
     flex-flow: row wrap
   }
@@ -8124,7 +8166,7 @@ Media CSS-=-==
     border-radius: 1.5rem;
     -webkit-border-radius: 1.5rem;
     flex: 1 1 100%;
-    max-width: calc(50% - 1rem);
+    max-width: calc(50% - .5rem);
   }
 
   .holiday--table tbody td,
@@ -8151,7 +8193,7 @@ Media CSS-=-==
     padding: 1rem;
     outline: none;
     flex: 1 1 100%;
-    max-width: calc(50% - 1rem);
+    max-width: calc(50% - .5rem);
     background: #ffffff;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
     -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
@@ -8407,14 +8449,6 @@ Media CSS-=-==
     position: relative;
   }
 
-  .details--wrapper,
-  .details--projects--grid,
-  .details--projects--view,
-  .details--member--view,
-  .details--invitee--view {
-    padding-bottom: 1rem;
-  }
-
   .clients--table td.project--title--td span.onHide {
     display: block !important;
   }
@@ -8423,9 +8457,9 @@ Media CSS-=-==
     display: none !important;
   }
 
-  .rmdp-input {
+  /* .rmdp-input {
     max-width: 180px;
-  }
+  } */
 
   .dashboard--page .my-5 {
     margin-top: 1.5rem !important;
@@ -8492,6 +8526,51 @@ Media CSS-=-==
     -webkit-box-orient: vertical;
     white-space: normal;
   }
+
+  .page--title {
+    position: relative;
+  }
+
+  .holidays--page .card {
+    margin-bottom: 0;
+  }
+
+  .holiday--table tr+tr {
+    margin-top: 0;
+  }
+
+  .rounded--box .contact--card.card .card-title {
+    font-size: 1.5rem;
+  }
+
+  .setting--page .setting--tabs {
+    border-right: 0;
+    flex: 1 1 100%;
+  }
+
+  .setting--page .setting--tabs .list-group {
+    position: relative;
+    min-width: 100%;
+    border-right: 0;
+    max-height: max-content;
+    overflow-y: visible;
+    max-width: 100%;
+  }
+
+  .modal .setting--page .rounded--box .card-body {
+    padding-left: 0;
+    margin-top: 1rem;
+  }
+
+  .setting--page .rounded--box .card .card--img {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .setting--page .rounded--box .card .card--img label {
+    max-width: 100%;
+    min-width: 100%;
+  }
 }
 
 @media screen and (max-width:767px) {
@@ -8549,7 +8628,6 @@ Media CSS-=-==
     height: 100%;
     overflow-y: auto;
     z-index: 1;
-    padding-bottom: 1rem;
   }
 
   .team--page .page--title h2,
@@ -8645,6 +8723,14 @@ Media CSS-=-==
     padding: 0;
     border-radius: 0;
   }
+
+  .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
+    position: relative;
+  }
+
+  .attendance--excel--table {
+    margin: 0 -1rem;
+  }
 }
 
 @media screen and (max-width:575px) {
@@ -8704,10 +8790,6 @@ Media CSS-=-==
 
   .setting--page .setting--tabs h2 {
     flex: 1 1 100%;
-  }
-
-  .setting--page .rounded--box .btn {
-    margin-left: 0.5rem;
   }
 
   .switch-wrapper label {

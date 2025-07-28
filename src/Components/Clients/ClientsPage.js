@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Dropdown } from "react-bootstrap";
-import { FaEye, FaList, FaPlus, FaTrashAlt, FaCog, FaEllipsisV } from "react-icons/fa";
-import { FiEdit, FiMail, FiPhone, FiSidebar, FiTrash2 } from "react-icons/fi";
+import { Container, Row, Col, Button, Modal, Form, Card, ListGroup, Table, Dropdown } from "react-bootstrap";
+import { FaList, FaPlus, FaTrashAlt, FaEllipsisV } from "react-icons/fa";
+import { LuSettings2 } from 'react-icons/lu';
+import { FiEdit, FiMail, FiSidebar, FiTrash2 } from "react-icons/fi";
 import { BsGrid, BsEye, BsEyeSlash  } from "react-icons/bs";
-import { TbArrowsSort } from "react-icons/tb";
 import { GrExpand } from "react-icons/gr";
 import { MdOutlineSearch, MdDragIndicator, MdOutlineClose, MdSearch } from "react-icons/md";
 import { ListClients, deleteClient, updateClient, reorderedClient } from "../../redux/actions/client.action";
@@ -21,56 +21,6 @@ import { CustomFieldModal } from "../modals/customFields";
 import { convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY } from "../../helpers/commonfunctions";
 import { BadgesModal } from "../modals/badges";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-/*function EditableField({ field, label, value, onChange, isEditing, onEditClick, error }) {
-  const inputRef = useRef(null);
-  const wrapperRef = useRef(null);
-  const [originalValue, setOriginalValue] = useState(value);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (inputRef.current && !inputRef.current.contains(event.target)) {
-        if (inputRef.current.value.trim() === '') {
-          onChange(originalValue);
-        }
-        onEditClick(false);
-      }
-    }
-    if (isEditing) {
-      setOriginalValue(value);
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isEditing, onEditClick, value]);
-
-
-  return (
-    <>
-
-      {isEditing ? (
-        <>
-          <FloatingLabel label={label}>
-            <Form.Control type="text" placeholder={label} name={`${field}`} ref={inputRef} value={value} onChange={(e) => onChange(e.target.value)} />
-          </FloatingLabel>
-        </>
-
-      ) : (
-        <>
-          <strong>{label}</strong> {value} <FiEdit onClick={() => onEditClick(true)} />
-          <p className='error'><span className='error'>{error}</span></p>
-        </>
-      )}
-    </>
-  );
-
-}*/
-
 
 function ClientsPage() {
   const [spinner, setSpinner] = useState(false)
@@ -581,7 +531,7 @@ function ClientsPage() {
                    <ListGroup horizontal className={isActive ? '' : 'd-md-flex ms-auto ms-lg-0'}>
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
                       <ListGroup.Item className="d-flex d-lg-none" onClick={handleSearchShow}><MdSearch /></ListGroup.Item>
-                      <ListGroup.Item className="d-md-flex" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                      <ListGroup.Item className="d-md-flex" key={`settingskey`} onClick={toggleCustomFields }><LuSettings2 /></ListGroup.Item>
                       <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
                       {(memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
                         <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
@@ -839,7 +789,13 @@ function ClientsPage() {
                   {
                     (isEditing === false) ? 
                     <>
-                      
+                      <ListGroup.Item>
+                        <span className="info--icon"><FiMail /></span>
+                        <p>
+                          <small>Client Name</small>
+                          {selectedClient?.name}
+                        </p>
+                      </ListGroup.Item>
                       {customFields?.length > 0 && (
                         <>
                           {customFields.map((field, index) => (

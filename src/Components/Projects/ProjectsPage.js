@@ -34,6 +34,7 @@ import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { renderDynamicField } from "../common/dynamicFields";
 import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE, EDIT_PROJECT_FORM } from "../../redux/actions/types";
+import { LuSettings2 } from "react-icons/lu";
 Quill.register("modules/autoLinks", AutoLinks);
 
 function ProjectsPage() {
@@ -859,7 +860,7 @@ function ProjectsPage() {
                                         </ListGroup>
                                         <ListGroup horizontal className={isActive !== 0 ? '' : 'bg-white expand--icon d-flex'}>
                                             <ListGroup.Item className={isActive !== 0 ? 'd-flex d-xl-none' : 'd-xl-none onHide'} onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
-                                            <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields }><FaCog /></ListGroup.Item>
+                                            <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields }><LuSettings2 /></ListGroup.Item>
                                             <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                                             {(memberProfile?.permissions?.projects?.create_edit_delete_project === true  || memberProfile?.role?.slug === 'owner') && (
                                                 <ListGroup.Item className="btn btn-primary" onClick={() => handleShow('new') }><FaPlus /></ListGroup.Item>
@@ -1251,10 +1252,8 @@ function ProjectsPage() {
                             <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}><BiEdit className="me-1"/> Tasks</Button>
                         </ListGroup>
                     </ListGroup>
-                    <ListGroup horizontal className={"d-flex bg-white expand--icon"}>
-                        <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><FaCog /></ListGroup.Item>
-                    </ListGroup>
                     <ListGroup horizontal className="expand--icon gap-2 p-0 b-0 rounded-0 align-items-center ms-auto ms-sm-0">
+                        <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>
                         {
                         (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (
                             <ListGroup.Item className="d-lg-flex" key={`work-settingskey`} onClick={() => { dispatch(updateStateData(DIRECT_UPDATE, true)); dispatch(togglePopups('workflow', true)) }}><FaCog /></ListGroup.Item>

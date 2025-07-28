@@ -1042,6 +1042,21 @@ select.form-error {
     -webkit-border-radius: 0;
 }
 
+.reports-section .single--project--stack p strong {
+    font-weight: 600;
+    font-size: .9rem;
+}
+
+.reports-section .single--project--stack p small {
+    font-size: .85rem;
+    font-weight: normal;
+}
+
+.reports-section .single--project--stack+.single--project--stack {
+    margin-top: 1.2rem;
+    border-top: 1px solid rgb(229 231 235);
+}
+
 .reports-section .btns--set {
     display: flex;
     align-items: center;
@@ -1107,6 +1122,11 @@ select.form-error {
 
     ul#subtasks-ul .form-group button {
         opacity: 1;
+    }
+
+    .modal .rmdp-input {
+        max-width: 100%;
+        margin: 0;
     }
 }
 

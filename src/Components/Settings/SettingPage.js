@@ -302,7 +302,6 @@ function SettingPage() {
               <ListGroup.Item action active={activeTab === "Security"} onClick={() => {setActiveTab("Security");}}><MdLockOutline /> Security</ListGroup.Item>
               <ListGroup.Item action active={activeTab === "Notifications"} onClick={() => setActiveTab("Notifications")}><FaRegBell /> Notifications</ListGroup.Item>
               <ListGroup.Item action active={activeTab === "Preferences"} onClick={() => {setActiveTab("Preferences");}}><FiGlobe /> Preferences</ListGroup.Item>
-              <ListGroup.Item action></ListGroup.Item>
             </ListGroup>
           </div>
           {activeTab === "Profile" && (

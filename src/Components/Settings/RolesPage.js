@@ -576,7 +576,7 @@ function RolesPage() {
                 <>
                     <Row className="mt-4">
                       <Col lg={6}>
-                        <FormGroup className="form-group mb-0 pb-0">
+                        <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
                         <FloatingLabel label="Select Role">
                             <Form.Select className="custom-selectbox"  onChange={(e) => {
                               const selectedRole = roles.find((role) => role._id === e.target.value);

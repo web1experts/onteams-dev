@@ -263,43 +263,43 @@ function SidebarPanel() {
                     </div>
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav>
-                            <Link key="dashboard-menu" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} to="/dashboard"><span className="nav--item--icon"><FiHome /></span> <strong>Dashboard</strong></Link>
+                            <Link key="dashboard-menu" onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}} className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} to="/dashboard"><span className="nav--item--icon"><FiHome /></span> <strong>Dashboard</strong></Link>
                             {
                                 (memberProfile?.permissions?.projects?.view === true || memberProfile?.role?.slug === 'owner') && (
-                                    <Link key="project-menu" className={`nav-link ${location.pathname === '/projects' ? 'active' : ''}`} to="/projects">
+                                    <Link onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}} key="project-menu" className={`nav-link ${location.pathname === '/projects' ? 'active' : ''}`} to="/projects">
                                         <span className="nav--item--icon"><LuFolderOpen /></span> <strong>Projects</strong>
                                     </Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.clients?.view === true  || memberProfile?.role?.slug === 'owner') && (
-                                    <Link  key="client-menu"  className={`nav-link ${location.pathname === '/clients' ? 'active' : ''}`} to="/clients"><span className="nav--item--icon"><FiUserCheck /></span> <strong>Clients</strong></Link>
+                                    <Link onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}} key="client-menu"  className={`nav-link ${location.pathname === '/clients' ? 'active' : ''}`} to="/clients"><span className="nav--item--icon"><FiUserCheck /></span> <strong>Clients</strong></Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.members?.view === true   || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="members-menu" className={`nav-link ${location.pathname === '/team-members' ? 'active' : ''}`} to="/team-members"><span className="nav--item--icon"><AiOutlineTeam /></span> <strong>Team Members</strong></Link>
+                                <Link onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}} key="members-menu" className={`nav-link ${location.pathname === '/team-members' ? 'active' : ''}`} to="/team-members"><span className="nav--item--icon"><AiOutlineTeam /></span> <strong>Team Members</strong></Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.tracking?.view === true   || memberProfile?.role?.slug === 'owner' ) && (
-                                <Link  key="tracking-menu" className={`nav-link ${location.pathname === '/time-tracking' ? 'active' : ''}`} to="/time-tracking"><span className="nav--item--icon"><LuTimer /></span> <strong>Time Tracking</strong></Link>
+                                <Link onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}} key="tracking-menu" className={`nav-link ${location.pathname === '/time-tracking' ? 'active' : ''}`} to="/time-tracking"><span className="nav--item--icon"><LuTimer /></span> <strong>Time Tracking</strong></Link>
                                 )
                             }
                                 {/* <Link  key="invite-menu" className={`nav-link ${location.pathname === '/invitations' ? 'active' : ''}`} to="/invitations"><span className="nav--item--icon"><HiUserPlus /></span> Invitations</Link> */}
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.reports?.view === true   || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="reports-menu" className={`nav-link ${location.pathname === '/reports' ? 'active' : ''}`} to="/reports"><span className="nav--item--icon"><TbReport /></span> <strong>Reports</strong></Link>
+                                <Link onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}} key="reports-menu" className={`nav-link ${location.pathname === '/reports' ? 'active' : ''}`} to="/reports"><span className="nav--item--icon"><TbReport /></span> <strong>Reports</strong></Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.holidays?.view === true   || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="holidays-menu" className={`nav-link ${location.pathname === '/holidays' ? 'active' : ''}`} to="/holidays"><span className="nav--item--icon"><BsCalendar2Week /></span> <strong>Holidays</strong></Link>
+                                <Link onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}} key="holidays-menu" className={`nav-link ${location.pathname === '/holidays' ? 'active' : ''}`} to="/holidays"><span className="nav--item--icon"><BsCalendar2Week /></span> <strong>Holidays</strong></Link>
                                 )
                             }
                             {
                                 (memberProfile?.permissions && memberProfile?.permissions?.attendance?.view === true  || memberProfile?.role?.slug === 'owner') && (
-                                <Link  key="attendance-menu" className={`nav-link ${location.pathname === '/attendance' ? 'active' : ''}`} to="/attendance"><span className="nav--item--icon"><CgCalendarDates /></span> <strong>Attendance</strong></Link>
+                                <Link onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}} key="attendance-menu" className={`nav-link ${location.pathname === '/attendance' ? 'active' : ''}`} to="/attendance"><span className="nav--item--icon"><CgCalendarDates /></span> <strong>Attendance</strong></Link>
                                 )
                             }
                         </Nav>

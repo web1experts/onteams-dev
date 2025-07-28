@@ -6,7 +6,7 @@ import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
 import { FiEdit, FiMail, FiSidebar, FiTrash2, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { RiUserSettingsLine } from "react-icons/ri";
-import { LuFolderOpen, LuUser } from "react-icons/lu";
+import { LuFolderOpen, LuUser, LuSettings2 } from 'react-icons/lu';
 import { TbUsersPlus } from "react-icons/tb";
 import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
@@ -933,7 +933,7 @@ function TeamMembersPage() {
                   </ListGroup>
                   <ListGroup horizontal className={isActive ? "d-none" : "d-flex bg-white expand--icon"}>
                     <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdSearch /></ListGroup.Item>
-                    <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><FaCog /></ListGroup.Item>
+                    <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
                     <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
                     {(memberProfile?.permissions?.members
@@ -1022,7 +1022,10 @@ function TeamMembersPage() {
                                           </div>
                                         </div>
                                       </td>
-                                      <td className="onHide new--td">{member.email}</td>
+                                      <td className="onHide new--td">
+                                        <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-flex d-lg-none text-uppercase fs-small mb-1' : 'd-flex d-lg-none text-uppercase fs-small mb-1'}>Email</strong>
+                                        {member.email}
+                                      </td>
                                       {Array.isArray(customFields) &&
                                         customFields
                                           .filter(
@@ -1079,6 +1082,7 @@ function TeamMembersPage() {
                                             }
                                             return (
                                               <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
+                                                <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-flex d-lg-none text-uppercase fs-small mb-1' : 'd-flex d-lg-none text-uppercase fs-small mb-1'}>{field.label}</strong>
                                                 {mvalue}
                                               </td>
                                             );

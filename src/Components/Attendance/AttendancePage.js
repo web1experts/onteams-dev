@@ -316,12 +316,12 @@ useEffect(() => {
                 <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
           :
-          <Container fluid>
+          <Container fluid className="pb-3">
             {activeTab === 'excel' && (
               <div className="attendance--table excel--view" id="excel--view">
                 <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
                   <h3 className="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - {getMonthLabel(filters?.month)}</h3>
-                  <Button variant="primary" onClick={() => downloadExcel(excelData)}><FiDownload /> Download Excel Excel</Button>
+                  <Button variant="primary" className="mt-3 mt-sm-0" onClick={() => downloadExcel(excelData)}><FiDownload /> Download Excel Excel</Button>
                 </div>
                 <div className='attendance--excel--table new--project--rows table-responsive-xl'>
                     <Table>
@@ -505,7 +505,7 @@ useEffect(() => {
                                   </div>
                                 </div>
                               </td>
-                              <td className="ms-lg-auto">
+                              <td className="ms-xl-auto">
                                 <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                                   <div className="text-center">
                                     <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">{attendanceData?.attendance?.present || 0} <small>Present</small></h4>

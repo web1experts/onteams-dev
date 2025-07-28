@@ -2,58 +2,22 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Form,
-  ListGroup,
-  Modal,
-  Card,
-  Dropdown,
-  CardGroup,
-  Badge,
-  Table,
-  ListGroupItem,
-  Pagination,
-} from "react-bootstrap";
+import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
-import {
-  BsArrowLeftCircleFill,
-  BsArrowRightCircleFill,
-  BsClockHistory,
-} from "react-icons/bs";
-import {
-  showAmPmtime,
-  getMemberdata,
-  selectboxObserver,
-} from "../../helpers/commonfunctions";
+import { BsArrowLeftCircleFill, BsArrowRightCircleFill, BsClockHistory } from "react-icons/bs";
+import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { LuFolderOpen, LuUsers, LuTimer, LuClock } from "react-icons/lu";
-import {
-  MdDragIndicator,
-  MdOutlineClose,
-  MdOutlineVideoLibrary,
-  MdOutlineSearch,
-} from "react-icons/md";
+import { MdDragIndicator, MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdSearch, MdFilterList} from "react-icons/md";
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
 import { GoPulse } from "react-icons/go";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";
 import { TbReport, TbScreenshot } from "react-icons/tb";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import {
-  getReportsByMember,
-  gerReportsByProject,
-  getSingleProjectReport,
-  addRemarkstoProject,
-} from "../../redux/actions/report.action";
+import { getReportsByMember, gerReportsByProject, getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
-import {
-  ListProjectsByMembers,
-  ListMemberProjects,
-} from "../../redux/actions/project.action";
+import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
 import { ListTasks } from "../../redux/actions/task.action";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -1221,15 +1185,7 @@ function ReportsPage() {
         }}
       />
 
-      <div
-        className={`${
-          isActive === 1
-            ? "show--details team--page project-collapse holidays--page"
-            : isActive === 2
-            ? "view--project team--page project-collapse holidays--page"
-            : "team--page holidays--page"
-        } ${projectToggle === true ? "project-collapse" : ""}`}
-      >
+      <div className={`${ isActive === 1 ? "show--details team--page project-collapse holidays--page" : isActive === 2 ? "view--project team--page project-collapse holidays--page" : "team--page holidays--page"} ${projectToggle === true ? "project-collapse" : ""}`}>
         <div className="page--title px-md-2 py-3 bg-white border-bottom">
           <Container fluid>
             <Row>
@@ -1248,33 +1204,11 @@ function ReportsPage() {
                     Reports
                   </p>
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
-                    <ListGroup horizontal className={isActive ? "" : "d-md-flex"}>
-                      <ListGroup.Item
-                        action
-                        onClick={() => {
-                          handlefilterchange("sort_by", "members");
-                          setActiveViewTab("members");
-                        }}
-                        className={`${
-                          activeMemberTab === "members"
-                            ? "d-md-flex gap-2 active "
-                            : " d-md-flex gap-2"
-                        }`}
-                      >
+                    <ListGroup horizontal className="d-none d-xl-flex">
+                      <ListGroup.Item action onClick={() => { handlefilterchange("sort_by", "members"); setActiveViewTab("members");}} className={`${activeMemberTab === "members" ? "d-none d-xl-flex gap-2 active " : "d-none d-xl-flex gap-2"}`}>
                         <AiOutlineTeam /> Members
                       </ListGroup.Item>
-                      <ListGroup.Item
-                        action
-                        onClick={() => {
-                          handlefilterchange("sort_by", "projects");
-                          setActiveViewTab("projects");
-                        }}
-                        className={`${
-                          activeMemberTab === "projects"
-                            ? "d-md-flex gap-2 active "
-                            : " d-md-flex gap-2"
-                        }`}
-                      >
+                      <ListGroup.Item action onClick={() => { handlefilterchange("sort_by", "projects"); setActiveViewTab("projects");}} className={`${activeMemberTab === "projects" ? "d-none d-xl-flex gap-2 active " : "d-none d-xl-flex gap-2"}`}>
                         <LuFolderOpen /> Projects
                       </ListGroup.Item>
                     </ListGroup>
@@ -1311,7 +1245,7 @@ function ReportsPage() {
                   <ListGroup horizontal>
                     {filters["sort_by"] === "projects" && (
                       <>
-                        <ListGroup.Item key="status-filter-list">
+                        <ListGroup.Item key="status-filter-list" className="progress--filter">
                           <Form.Select
                             className="custom-selectbox"
                             onChange={(event) =>
@@ -1369,17 +1303,9 @@ function ReportsPage() {
                       </Form>
                     </ListGroup.Item>
 
-                    <ListGroup
-                      horizontal
-                      className="bg-white expand--icon d-none d-lg-flex"
-                    >
-                      <ListGroup.Item
-                        onClick={() => {
-                          handleSidebarSmall(false);
-                        }}
-                      >
-                        <GrExpand />
-                      </ListGroup.Item>
+                    <ListGroup horizontal className="bg-white expand--icon d-flex">
+                      <ListGroup.Item className="d-flex d-xl-none" onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
+                      <ListGroup.Item onClick={() => { handleSidebarSmall(false); }}><GrExpand /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>
@@ -1428,7 +1354,7 @@ function ReportsPage() {
               <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
           :
-            <Container fluid>
+            <Container fluid className="pb-3">
               {activeMemberTab === "projects" && (
                 <div
                   className="attendance--table projects--view"
@@ -2025,12 +1951,7 @@ function ReportsPage() {
       </div>
 
       {/*--=-=Filter Modal**/}
-      <Modal
-        show={showFilter}
-        onHide={handleFilterClose}
-        centered
-        size="md"
-        className="filter--modal"
+      <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal"
       >
         <Modal.Header closeButton>
           <Modal.Title>Filters</Modal.Title>
@@ -2038,66 +1959,143 @@ function ReportsPage() {
         <Modal.Body>
           <ListGroup>
             <ListGroup.Item>
-              <Dropdown className="select--dropdown">
-                <Dropdown.Toggle variant="success">Sort by</Dropdown.Toggle>
+              <Dropdown className="select--dropdown manual--dropdown">
+                <Dropdown.Toggle variant="success">{activeMemberTab}</Dropdown.Toggle>
                 <Dropdown.Menu>
                   <div className="drop--scroll">
-                    <Form>
-                      <Form.Group className="form-group mb-3">
-                        <Form.Control type="text" placeholder="Search here.." />
-                      </Form.Group>
-                    </Form>
-                    <Dropdown.Item
-                      className="selected--option"
-                      href="#/action-1"
-                    >
-                      Sort by <FaCheck />
+                    <Dropdown.Item action onClick={() => { handlefilterchange("sort_by", "members");setActiveViewTab("members"); }} className={`${ activeMemberTab === "members" ? "d-md-flex gap-2 active " : " d-md-flex gap-2" }`}>
+                      <AiOutlineTeam /> Members
                     </Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Screenshots</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Projects</Dropdown.Item>
+                    <Dropdown.Item action onClick={() => { handlefilterchange("sort_by", "projects"); setActiveViewTab("projects");}} className={`${activeMemberTab === "projects" ? "d-md-flex gap-2 active " : " d-md-flex gap-2"}`}>
+                      <LuFolderOpen /> Projects
+                    </Dropdown.Item>
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
             </ListGroup.Item>
-            <ListGroup.Item>
-              <Dropdown className="select--dropdown">
-                <Dropdown.Toggle variant="success">My Reports</Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <div className="drop--scroll">
-                    <Form>
-                      <Form.Group className="form-group mb-3">
-                        <Form.Control type="text" placeholder="Search here.." />
-                      </Form.Group>
-                    </Form>
-                    <Dropdown.Item
-                      className="selected--option"
-                      href="#/action-1"
-                    >
-                      My Reports <FaCheck />
-                    </Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">
-                      Hitesh Kumar
-                    </Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Tarun Giri</Dropdown.Item>
-                  </div>
-                </Dropdown.Menu>
-              </Dropdown>
+          
+            <ListGroup.Item key="search-filter-list">
+              <Form
+                className="search-filter-list"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <Form.Group className="mb-0 form-group">
+                  <MdOutlineSearch />
+                  <Form.Control
+                    type="text"
+                    placeholder={
+                      activeMemberTab === "members"
+                        ? "Search by member"
+                        : "Search by project"
+                    }
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      if (value.length > 1 || value.length === 0) {
+                        setFilters({...filters, ['page']: 1})
+                        handlefilterchange("search", value);
+                      }
+                    }}
+                  />
+                </Form.Group>
+              </Form>
+            </ListGroup.Item>
+          
+            {filters["sort_by"] === "projects" && (
+              <>
+                <ListGroup.Item key="status-filter-list">
+                  <Form.Select
+                    className="custom-selectbox"
+                    onChange={(event) =>
+                      handlefilterchange(
+                        "project_status",
+                        event.target.value
+                      )
+                    }
+                    value={filters["project_status"] || "in-progress"}
+                  >
+                    <option value="all">View All</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="on-hold">On Hold</option>
+                    <option value="completed">Completed</option>
+                  </Form.Select>
+                </ListGroup.Item>
+              </>
+            )}
+            <ListGroup.Item className="d-none d-xl-block">
+              <Form>
+                <Form.Group className="mb-0 form-group">
+                  <FiltersDate
+                    position="left"
+                    setFilteredDate={setFilteredDate}
+                    setSelectedFilter={setSelectedFilter}
+                    setIsPickerOpen={setIsPickerOpen}
+                  />
+                </Form.Group>
+                {selectedFilter === "custom" && (
+                  <Form.Group className="mb-0 form-group">
+                    <DatePicker
+                      ref={datePickerRef}
+                      key={"date-filter"}
+                      name="date"
+                      weekStartDayIndex={1}
+                      id="datepicker-filter"
+                      value={filtereddate}
+                      format="YYYY-MM-DD"
+                      range
+                      numberOfMonths={2}
+                      dateSeparator=" - "
+                      onChange={async (value) => {
+                        setFilteredDate(value);
+                      }}
+                      editable={false}
+                      className="form-control"
+                      placeholder="dd/mm/yyyy"
+                      open={isPickerOpen} // Control visibility with state
+                      onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                      onClose={() => setIsPickerOpen(false)} // Update state when closed
+                      plugins={[<FilterButton position="bottom" />]}
+                    />
+                  </Form.Group>
+                )}
+              </Form>
             </ListGroup.Item>
             <ListGroup.Item>
               <Form>
                 <Form.Group className="mb-0 form-group">
-                  <Form.Control type="date" name="date" />
+                  <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen}/>
                 </Form.Group>
+                {selectedFilter === "custom" && (
+                  <Form.Group className="mb-0 form-group">
+                    <DatePicker
+                      ref={datePickerRef}
+                      key={"date-filter"}
+                      name="date"
+                      weekStartDayIndex={1}
+                      id="datepicker-filter"
+                      value={filtereddate}
+                      format="YYYY-MM-DD"
+                      range
+                      numberOfMonths={2}
+                      dateSeparator=" - "
+                      onChange={async (value) => {
+                        setFilteredDate(value);
+                      }}
+                      editable={false}
+                      className="form-control"
+                      placeholder="dd/mm/yyyy"
+                      open={isPickerOpen} // Control visibility with state
+                      onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                      onClose={() => setIsPickerOpen(false)} // Update state when closed
+                      plugins={[<FilterButton position="bottom" />]}
+                    />
+                  </Form.Group>
+                )}
               </Form>
             </ListGroup.Item>
           </ListGroup>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleFilterClose}>
-            Cancel
-          </Button>
-          <Button variant="primary">Save</Button>
-        </Modal.Footer>
       </Modal>
     </>
   );
