@@ -34,7 +34,6 @@ function HolidaysPage() {
   const [fields, setFields] = useState({ date: "", occasion: '', type: ''});
   const [errors, setErrors] = useState({})
 const [filters, setFilters] = useState({ year: new Date().getFullYear() });
-
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -45,6 +44,11 @@ const [filters, setFilters] = useState({ year: new Date().getFullYear() });
   const [spinner, setSpinner] = useState(false)
   const [nextHoliday, setNextHoliday] = useState(null);
   const [currentMonthHolidayCount, setCurrentMonthHolidayCount] = useState(0);
+
+  const startYear = 2025;//new Date().getFullYear();
+  // const startYear = currentYear + 2; // start from 2 years ahead
+  const years = Array.from({ length: 10 }, (_, i) => startYear + i);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoader(true)
@@ -192,6 +196,8 @@ const getDaysLeft = (date) => {
   return diff >= 0 ? `${diff} days left` : <span className="text-muted">Past Holiday</span>;
 };
 
+
+
   return (
     <>
 
@@ -220,16 +226,29 @@ const getDaysLeft = (date) => {
                         }}
                       /><span className="current-year">{filters['year']}</span> */}
                       <Dropdown className="select--dropdown">
-                        <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> 2025</Dropdown.Toggle>
+                        <Dropdown.Toggle variant="link" id="dropdown-basic">
+                          <FiCalendar /> {filters['year']}
+                        </Dropdown.Toggle>
                         <Dropdown.Menu>
-                            <div class="drop--scroll">
-                              <a href="#" class="dropdown-item" role="button">2023</a>
-                              <a href="#" class="dropdown-item" role="button">2024</a>
-                              <a href="#" class="selected--option dropdown-item" role="button">2025 <MdOutlineCheck /></a>
-                              <a href="#" class="dropdown-item" role="button">2026</a>
-                            </div>
+                          <div className="drop--scroll">
+                            {years.map((year) => (
+                              <a
+                                key={year}
+                                href="#"
+                                className={`dropdown-item ${year === filters['year'] ? 'selected--option' : ''}`}
+                                role="button"
+                                onClick={() => setFilters((prev) => ({
+                                  ...prev,
+                                  year,
+                                }))}
+                              >
+                                {year} {year === filters['year'] && <MdOutlineCheck />}
+                              </a>
+                            ))}
+                          </div>
                         </Dropdown.Menu>
-                    </Dropdown>
+                      </Dropdown>
+                      
                     </ListGroup.Item>
                     <ListGroup horizontal className="d-none d-lg-flex">
                         <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
