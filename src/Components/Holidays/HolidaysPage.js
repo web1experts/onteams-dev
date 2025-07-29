@@ -270,14 +270,14 @@ const getDaysLeft = (date) => {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper px-md-2 py-5 pt-4'>
+        <div className='page--wrapper px-md-2 pb-4 pt-4'>
         {
           spinner ?
           <div className="loading-bar">
             <img src="images/OnTeam-icon.png" className="flipchar" />
           </div>
         :
-          <Container fluid className="pb-5">
+          <Container fluid>
             <Row className="gap-3 gap-lg-0">
               <Col lg={4}>
                 <Card className="card--blue">

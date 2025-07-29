@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Form, Dropdown, ListGroup, Table, Modal, Button, Card, ListGroupItem } from "react-bootstrap";
 import { FaCheck, FaEye } from "react-icons/fa";
 import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload, FiLogIn, FiLogOut, FiEdit3, FiSidebar } from "react-icons/fi";
-import { MdOutlineCheck, MdOutlineClose } from 'react-icons/md';
+import { MdOutlineCheck, MdOutlineClose, MdFilterList } from 'react-icons/md';
 import { GrExpand } from "react-icons/gr";
 import { LuTimer, LuCircleDot } from "react-icons/lu";
 import { BsDash } from "react-icons/bs";
@@ -296,8 +296,17 @@ useEffect(() => {
                     </Dropdown>
                     </ListGroup.Item>
                     <ListGroup horizontal className="d-none d-md-flex">
-                        <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
-                        <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                      <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
+                      <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
+                    </ListGroup>
+                    <ListGroup horizontal className="d-flex d-md-none bg-white shadow-none p-0 border-0">
+                      <Dropdown className="select--dropdown manual--dropdown">
+                        <Dropdown.Toggle variant="success" id="dropdown-basic" className="border-0"><MdFilterList className="me-0" /></Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam /> Team View</Dropdown.Item>
+                          <Dropdown.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar /> Excel View</Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
                     </ListGroup>
                     <ListGroup horizontal className={'bg-white expand--icon d-flex'}>
                       <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleAttendanceStatus }><FaCog /></ListGroup.Item>
@@ -307,27 +316,21 @@ useEffect(() => {
                     </ListGroup>
                   </ListGroup>
                 </h2>
-                <ListGroup horizontal className="d-md-none d-flex mt-3 mt-lg-0">
-                  <ListGroup horizontal>
-                    <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-lg-none d-flex view--icon active ': ' d-lg-none d-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
-                    <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-lg-none d-flex  view--icon active': 'd-lg-none d-flex  view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
-                  </ListGroup>
-                </ListGroup>
               </Col>
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper px-md-2 py-5 pt-4'>
+        <div className='page--wrapper px-md-2 pb-4 pt-4'>
           {
             spinner ?
             <div className="loading-bar">
                 <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
           :
-          <Container fluid className="pb-3">
+          <Container fluid>
             {activeTab === 'excel' && (
               <div className="attendance--table excel--view" id="excel--view">
-                <div className="d-md-flex align-items-center gap-3 justify-content-between mb-4">
+                <div className="d-sm-flex align-items-center gap-3 justify-content-between mb-4">
                   <h3 className="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - {getMonthLabel(filters?.month)}</h3>
                   <Button variant="primary" className="mt-3 mt-sm-0" onClick={() => downloadExcel(excelData)}><FiDownload /> Download Excel Excel</Button>
                 </div>

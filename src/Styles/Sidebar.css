@@ -937,6 +937,7 @@ Sidebar CSS-=-=
   .team--page {
     max-width: calc(100% - 0rem);
     margin-left: 0rem;
+    padding-bottom: 70px;
   }
 
   .open--panel--sidebar {
@@ -959,6 +960,12 @@ Sidebar CSS-=-=
   .open--panel--sidebar~.team--page .open--sidebar,
   .wrapper--title .open--sidebar {
     display: none !important;
+  }
+
+  .show--details.project-collapse, .view--project.project-collapse, .view--invitee.project-collapse {
+    transform: translateX(-100%);
+    flex: none;
+    max-width: 0;
   }
 
   .panel--sidebar .navbar {

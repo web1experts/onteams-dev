@@ -894,7 +894,7 @@ function ProjectsPage() {
                         </Row>
                     </Container>
                 </div>
-                <div className='page--wrapper px-md-2 py-5 pt-4'>
+                <div className='page--wrapper px-md-2 pb-4 pt-4'>
                     {
                         spinner ?
                         <div className="loading-bar">
@@ -1274,7 +1274,7 @@ function ProjectsPage() {
                             <Button variant="primary" className="active btn--view d-none d-sm-flex" onClick={() => { setIsActive(1); }}><BiEdit className="me-1"/> Tasks</Button>
                         </ListGroup>
                     </ListGroup>
-                    <ListGroup horizontal className="expand--icon gap-2 p-0 b-0 rounded-0 align-items-center ms-auto ms-sm-0">
+                    <ListGroup horizontal className="expand--icon gap-2 p-0 b-0 rounded-0 align-items-center ms-auto ms-md-0">
                         <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>
                         {
                         (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') && (

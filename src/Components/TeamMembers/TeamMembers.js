@@ -855,11 +855,11 @@ function TeamMembersPage() {
                     <Dropdown className="select--dropdown manual--dropdown">
                       <Dropdown.Toggle variant="success" id="dropdown-basic" className="border-0"><MdFilterList /></Dropdown.Toggle>
                       <Dropdown.Menu>
-                        <Dropdown.Item className="d-none d-md-block" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
+                        <Dropdown.Item action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
                         {(memberProfile?.permissions?.members
                           ?.create_edit_delete === true ||
                           memberProfile?.role?.slug === "owner") && (
-                          <Dropdown.Item className="d-none d-md-block" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</Dropdown.Item>
+                          <Dropdown.Item action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</Dropdown.Item>
                         )}
                       </Dropdown.Menu>
                     </Dropdown>
@@ -889,7 +889,7 @@ function TeamMembersPage() {
       {activeTab === "Members" && (
         <div className={`${ isActive ? "show--details team--page project-collapse" : "team--page" } ${projectToggle === true ? "project-collapse" : ""}`}>
           {pagetopbar()}
-          <div className="page--wrapper px-md-2 py-5 pt-4">
+          <div className="page--wrapper px-md-2 pb-4 pt-4">
             {showloader ?
               <div className="loading-bar"><img src="images/OnTeam-icon.png" className="flipchar" /></div>
             :
