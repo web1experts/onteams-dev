@@ -549,7 +549,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
           </Container>
         </div> */}
         <div className='page--wrapper p-md-3 py-3 pt-3 pt-lg-5 mt-3 text-center'>
-          <Container fluid className="pb-5">
+          <Container fluid>
             <Row className="justify-content-center">
               <Col sm={12}>
                 <DateTimeCard />
@@ -732,7 +732,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                   )})}
                 </Card> 
               </Col>
-              <Col xl={4} className="pb-5 pb-lg-0">
+              <Col xl={4} className="pb-2 pb-lg-0">
                 <div className="sticky--right">
                   <div className="download--wrapper">
                     <div className="app--title">

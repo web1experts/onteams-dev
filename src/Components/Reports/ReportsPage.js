@@ -1294,61 +1294,23 @@ function ReportsPage() {
 
                     <ListGroup horizontal className="bg-white expand--icon d-flex">
                       <ListGroup.Item className="d-flex d-xl-none" onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
-                      <ListGroup.Item onClick={() => { handleSidebarSmall(false); }}><GrExpand /></ListGroup.Item>
+                      <ListGroup.Item className="d-none d-lg-flex" onClick={() => { handleSidebarSmall(false); }}><GrExpand /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>
-                <ListGroup horizontal className="justify-content-start mt-3 mt-md-0 d-md-none d-flex">
-                  <ListGroup.Item>
-                    <Form>
-                      <Form.Group className="mb-0 form-group">
-                        <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen}/>
-                      </Form.Group>
-                      {selectedFilter === "custom" && (
-                        <Form.Group className="mb-0 form-group">
-                          <DatePicker
-                            ref={datePickerRef}
-                            key={"date-filter"}
-                            name="date"
-                            weekStartDayIndex={1}
-                            id="datepicker-filter"
-                            value={filtereddate}
-                            format="YYYY-MM-DD"
-                            range
-                            numberOfMonths={2}
-                            dateSeparator=" - "
-                            onChange={async (value) => {
-                              setFilteredDate(value);
-                            }}
-                            editable={false}
-                            className="form-control"
-                            placeholder="dd/mm/yyyy"
-                            open={isPickerOpen} // Control visibility with state
-                            onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                            onClose={() => setIsPickerOpen(false)} // Update state when closed
-                            plugins={[<FilterButton position="bottom" />]}
-                          />
-                        </Form.Group>
-                      )}
-                    </Form>
-                  </ListGroup.Item>
-                </ListGroup>
               </Col>
             </Row>
           </Container>
         </div>
-        <div className="page--wrapper px-md-2 py-5 pt-4 daily--reports">
+        <div className="page--wrapper px-md-2 pb-4 pt-4 daily--reports">
           {spinner ?
             <div className="loading-bar">
               <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
           :
-            <Container fluid className="pb-3">
+            <Container fluid>
               {activeMemberTab === "projects" && (
-                <div
-                  className="attendance--table projects--view"
-                  id="projects--view"
-                >
+                <div className="attendance--table projects--view mb-0" id="projects--view">
                   <div className="attendance--table--list">
                     <Table>
                       <thead className="onHide">
@@ -1413,7 +1375,7 @@ function ReportsPage() {
                                   <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                     Total Hours
                                   </strong>
-                                  <br className="d-xl-none" />
+                                  
                                   <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center">
                                     <FiClock className="me-1" />{" "}
                                     {result?.totalTime || 0}
@@ -1423,7 +1385,7 @@ function ReportsPage() {
                                   <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                     Members
                                   </strong>
-                                  <br className="d-xl-none" />
+                                  
                                   <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center">
                                     <LuUsers className="me-1" />{" "}
                                     {reportData?.members?.length || 0}
@@ -1472,10 +1434,7 @@ function ReportsPage() {
 
               {activeMemberTab === "members" && (
                 <>
-                  <div
-                    className="attendance--table members--view"
-                    id="members--view"
-                  >
+                  <div className="attendance--table members--view mb-0" id="members--view">
                     <div className="attendance--table--list">
                       <Table responsive="lg">
                         <thead className="onHide">
@@ -1540,7 +1499,7 @@ function ReportsPage() {
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                       Total Hours
                                     </strong>
-                                    <br className="d-xl-none" />
+                                    
                                     <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center">
                                       <FiClock className="me-1" />{" "}
                                       {result?.totalTime || 0}
@@ -1551,7 +1510,7 @@ function ReportsPage() {
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                       Projects
                                     </strong>
-                                    <br className="d-xl-none" />
+                                    
                                     <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center">
                                       <LuFolderOpen className="me-1" />{" "}
                                       {result?.totalProjects || 0}
@@ -1732,7 +1691,7 @@ function ReportsPage() {
           </ListGroup>
         </div>
         {isActive === 1 && activeMemberTab === "members" ? (
-          <>
+          <div className="rounded--box activity--box">
             <div className="reports--heading">
               <div className="d-flex align-items-center gap-3 justify-content-between">
                 <h3 className="mb-0 d-flex align-items-center gap-3">
@@ -1757,11 +1716,7 @@ function ReportsPage() {
                 </div>
               </div>
             </div>
-            <div
-              className={`member--projects attendance--stats ${
-                activeMemberTab === "members" ? "" : "d-none"
-              }`}
-            >
+            <div className={`member--projects attendance--stats mb-0 ${activeMemberTab === "members" ? "" : "d-none"}`}>
               {singleMemberReport?.reports?.map((report, index) => {
                 return (
                   <>
@@ -1855,9 +1810,9 @@ function ReportsPage() {
                 );
               })}
             </div>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="rounded--box activity--box">
             <div className="reports--heading">
               <div className="d-flex align-items-center gap-3 justify-content-between">
                 <h3 className="mb-0 d-flex align-items-center gap-3">
@@ -1868,11 +1823,7 @@ function ReportsPage() {
                 </h3>
               </div>
             </div>
-            <div
-              className={`member--projects attendance--stats team--members--list ${
-                activeMemberTab === "projects" ? "" : "d-none"
-              }`}
-            >
+            <div className={`member--projects attendance--stats mb-0 team--members--list ${activeMemberTab === "projects" ? "" : "d-none"}`}>
               {singleMemberReport?.members?.map((member, index) => {
                 return (
                   <>
@@ -1935,7 +1886,7 @@ function ReportsPage() {
                 );
               })}
             </div>
-          </>
+          </div>
         )}
       </div>
 

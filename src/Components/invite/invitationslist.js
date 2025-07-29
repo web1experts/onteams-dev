@@ -93,7 +93,7 @@ function InvitationList(props) {
               </Row>
             </Container>
           </div>
-          <div className="page--wrapper px-md-2 py-5 pt-4">
+          <div className="page--wrapper px-md-2 pb-4 pt-4">
           {
               showloader &&
               <div class="loading-bar">

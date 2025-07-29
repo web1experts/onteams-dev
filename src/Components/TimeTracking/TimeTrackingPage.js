@@ -1222,14 +1222,14 @@ const handleProjectSelect = async (project) => {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper px-md-2 py-5 pt-4 daily--reports activity--table'>
+        <div className='page--wrapper px-md-2 pb-4 pt-4 daily--reports activity--table'>
           {
               spinner ?
               <div className="loading-bar">
                   <img src="images/OnTeam-icon.png" className="flipchar" />
               </div>
           :
-          <Container fluid className="pb-3">
+          <Container fluid>
             {activeTab === "Live" && (
               <>
                 <div className="activity--stats">
@@ -1263,7 +1263,7 @@ const handleProjectSelect = async (project) => {
                   </Row>
                 </div>
                 {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
-                <div className="attendance--table activity--table--list">
+                <div className="attendance--table activity--table--list mb-0">
                   <div className='attendance--table--list'>
                     <Table>
                       <thead className="onHide">
@@ -1323,17 +1323,14 @@ const handleProjectSelect = async (project) => {
                                     </td>
                                     <td className="text-start">
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Project Name</strong>
-                                      <br className="d-xl-none"/>
                                       <span key={`project-title-${activity?._id}`} className="project--title--td">{ activity?.latestActivity?.project?.title || <FiClock className="text-muted" /> }</span>
                                     </td>
                                     <td className="ms-auto text-start text-xl-center">
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Project Time</strong>
-                                      <br className="d-xl-none"/>
                                       <div key={`task-time-${activity?._id}`} className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><LuTimer className="me-1" /> { convertSecondstoTime(activity?.latestActivity?.duration || 0) || '00:00'}</div>
                                     </td>
                                     <td className="text-start text-xl-center" key={`total-time-${activity?._id}`}>
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Total Time</strong>
-                                      <br className="d-xl-none"/>
                                       <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> { convertSecondstoTime(activity?.totalDuration || 0) || '00:00'}</span>
                                     </td>
                                     <td key={`status-title-${activity?._id}`} className="onHide">
@@ -1382,7 +1379,7 @@ const handleProjectSelect = async (project) => {
             {activeTab === "Recordings" && (
               <>
                 {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
-                <div className="attendance--table activity--table--list">
+                <div className="attendance--table activity--table--list mb-0">
                   <div className='attendance--table--list'>
                     <Table>
                       <thead className="onHide">
@@ -1442,12 +1439,10 @@ const handleProjectSelect = async (project) => {
                                     </td>
                                     {/* <td className="text-start">
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Project Name</strong>
-                                      <br className="d-xl-none"/>
                                       
                                     </td> */}
                                     <td className="text-start text-xl-center ms-auto" key={`total-time-${activity?._id}`}>
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Total Time</strong>
-                                      <br className="d-xl-none"/>
                                       <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"><FiClock className="me-1" /> {convertSecondstoTime(activity?.totalTaskDuration || 0) || '00:00'}</span>
                                     </td>
                                     <td className="onHide text-lg-end"><Button variant="dark" onClick={() => {handleClick(activity);}}><FaEye/> Details</Button></td>
@@ -1518,7 +1513,7 @@ const handleProjectSelect = async (project) => {
               </Dropdown.Menu>
             </Dropdown>
           </div>
-          <ListGroup horizontal className="live--tabs ms-auto d-none d-xl-flex">
+          <ListGroup horizontal className="live--tabs ms-auto d-none d-xxl-flex">
             <ListGroup horizontal>
               <Button variant="secondary" className="btn--view" key={'live-key'} active={activeInnerTab === "InnerLive"} onClick={() => {setActiveInnerTab("InnerLive")
                 if( currentActivity && Object.keys(currentActivity)){
@@ -1540,10 +1535,10 @@ const handleProjectSelect = async (project) => {
               activeInnerTab === "InnerRecorded" && showDate()
             }
           </ListGroup>
-          <ListGroup horizontal className="p-0 ms-auto ms-xl-0">
+          <ListGroup horizontal className="p-0 ms-auto ms-xxl-0">
             {showRecordedTabs()}
             <ListGroup horizontal className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center">
-              <ListGroup.Item className="d-flex d-xl-none" onClick={handleInnerFilterShow}><MdFilterList /></ListGroup.Item>
+              <ListGroup.Item className="d-flex d-xxl-none" onClick={handleInnerFilterShow}><MdFilterList /></ListGroup.Item>
               <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
               <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
                 <BsArrowClockwise onClick={handleRecordedActivity}/>
@@ -1666,7 +1661,7 @@ const handleProjectSelect = async (project) => {
                                           />
                                           <p>
                                             <strong>Task Name:</strong> {screenshotData?.task_data?.title} <br />
-                                            <strong>Time:{showAmPmtime(screenshotData?.taken_time)}</strong>
+                                            <strong>Time:</strong> {showAmPmtime(screenshotData?.taken_time)}<br />
                                             <strong>Date: </strong>{ screenshotData?.taken_time
                                               ? new Date(screenshotData.taken_time).toLocaleDateString('en-GB', {
                                                   day: 'numeric',
@@ -1742,7 +1737,7 @@ const handleProjectSelect = async (project) => {
                                               <Card key={`video-card-${recording?._id}-${currentVideoPage[recording?._id] || 1}-${j}`}>
                                                 <Card.Body onClick={() => handleLightBox('video', meta.meta_value, j)}>
                                                 { videoData?.is_deleted !== true && memberProfile?.permissions?.tracking?.delete_recordings === true && memberProfile?._id === recording?.member && 
-                                                  <div className="d-flex justify-content-between align-items-start">
+                                                  <div className="card--checkbox">
                                                     <Form.Check
                                                       type="checkbox"
                                                       checked={selectedScreenshots[recording?._id]?.includes(j) || false}
@@ -1762,8 +1757,8 @@ const handleProjectSelect = async (project) => {
                                                   </video>
                                                   <p>
                                                     <strong>Task Name:</strong> {videoData?.task_data?.title} <br />
-                                                    <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}
-                                                     <strong>Date:</strong>{
+                                                    <strong>Time:</strong> {videoData?.start_time} to {videoData?.end_time}<br />
+                                                    <strong>Date:</strong> {
                                                       videoData?.createdAt
                                                         ? new Date(videoData?.createdAt).toISOString().split('T')[0]
                                                         : ''
@@ -1918,6 +1913,18 @@ const handleProjectSelect = async (project) => {
             {
               activeInnerTab === "InnerRecorded" && showDate()
             }
+            
+            <ListGroup.Item>
+              <Dropdown className="select--dropdown manual--dropdown">
+                <Dropdown.Toggle variant="success">{screenshotTab}</Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    <Dropdown.Item variant="secondary" className="btn--view" key={'screenshots1-tab-key'} active={screenshotTab === "Screenshots"} onClick={() => setScreenshotTab("Screenshots")}><TbScreenshot className="me-1"/> Screenshots</Dropdown.Item>
+                    <Dropdown.Item variant="primary" className="btn--view" key={'videos1-tab-key'} active={screenshotTab === "Videos"} onClick={() => setScreenshotTab("Videos")}><MdOutlineVideoLibrary className="me-1"/> Videos</Dropdown.Item>
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
           </ListGroup>
         </Modal.Body>
       </Modal>

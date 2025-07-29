@@ -576,7 +576,7 @@ function Invitation(props) {
     <>
       <div className={`${isActive ? 'view--invitee team--page project-collapse' : 'team--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
         {props.topbar()}
-        <div className="page--wrapper px-md-2 py-5 pt-4">
+        <div className="page--wrapper px-md-2 pb-4 pt-4">
           {
             showloader &&
             <div class="loading-bar">
