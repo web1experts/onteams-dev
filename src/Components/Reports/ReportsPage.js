@@ -5,7 +5,7 @@ import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
-import { BsArrowLeftCircleFill, BsArrowRightCircleFill, BsClockHistory } from "react-icons/bs";
+import { BsArrowLeft, BsArrowLeftCircleFill, BsArrowRight, BsArrowRightCircleFill, BsClockHistory } from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { LuFolderOpen, LuUsers, LuTimer, LuClock } from "react-icons/lu";
 import { MdDragIndicator, MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdSearch, MdFilterList} from "react-icons/md";
@@ -398,13 +398,8 @@ const TaskList = ({ report }) => {
 
                           {/* Pagination */}
                           {taskVideos.length > videosPerPage && (
-                            <div
-                              style={{ marginTop: "10px", textAlign: "center" }}
-                            >
-                              <Button
-                                variant="outline-primary"
-                                disabled={page === 1}
-                                onClick={() =>
+                            <div className="d-flex align-items-center justify-content-between mt-3 w-100">
+                              <Button variant="secondary" className="px-2 py-1" disabled={page === 1} onClick={() =>
                                   setCurrentVideoPage((prev) => ({
                                     ...prev,
                                     [`single-${report?.project?._id}`]:
@@ -412,7 +407,7 @@ const TaskList = ({ report }) => {
                                   }))
                                 }
                               >
-                                <BsArrowLeftCircleFill />
+                                <BsArrowLeft />
                               </Button>
 
                               <span style={{ margin: "0 10px" }}>
@@ -420,13 +415,7 @@ const TaskList = ({ report }) => {
                                 {Math.ceil(taskVideos.length / videosPerPage)}
                               </span>
 
-                              <Button
-                                variant="outline-primary"
-                                disabled={
-                                  page >=
-                                  Math.ceil(taskVideos.length / videosPerPage)
-                                }
-                                onClick={() =>
+                              <Button variant="primary" className="px-2 py-1" disabled={page >= Math.ceil(taskVideos.length / videosPerPage)} onClick={() =>
                                   setCurrentVideoPage((prev) => ({
                                     ...prev,
                                     [`single-${report?.project?._id}`]:
@@ -434,7 +423,7 @@ const TaskList = ({ report }) => {
                                   }))
                                 }
                               >
-                                <BsArrowRightCircleFill />
+                                <BsArrowRight/>
                               </Button>
                             </div>
                           )}

@@ -8731,6 +8731,22 @@ Media CSS-=-==
   .attendance--excel--table {
     margin: 0 -1rem;
   }
+
+  .timeSheetModal .card-group {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1rem;
+  }
+
+  .timeSheetModal .card {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    flex: 1 1 100%;
+    margin-bottom: 0;
+    padding: 0;
+    max-width: calc(33.333% - 8px);
+  }
 }
 
 @media screen and (max-width:575px) {
@@ -8953,6 +8969,10 @@ Media CSS-=-==
   .accordion .accordion-button {
     padding: 1rem;
     padding-right: 2rem;
+  }
+
+  .timeSheetModal .card {
+    max-width: calc(50% - 8px);
   }
 }
 
