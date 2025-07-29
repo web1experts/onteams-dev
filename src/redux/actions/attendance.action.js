@@ -6,7 +6,9 @@ import {
     ATTENDANCE_LIST_SUCCESS,
     MEMBER_ATTENDANCE_SUCCESS,
     ATTENDANCE_SUMMARY_SUCCESS,
-    ATTENDANCE_EXCEL_SUCCESS
+    ATTENDANCE_EXCEL_SUCCESS,
+    ATTENDANCE_STATUS_LIST_SUCCESS,
+    ATTENDANCE_STATUS_SAVE_SUCCESS
 } from "./types";
 
 const config = {
@@ -42,6 +44,21 @@ export const ListAttendance = (filters) => {
             const response = await API.apiGet('attendance', filters);
             if(response.data && response.data.success){
             await dispatch({ type: ATTENDANCE_LIST_SUCCESS, payload: response.data })
+            }else{
+            await dispatch({ type: ATTENDANCE_ERROR, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+}
+
+export const ListAttendanceStatuses = () => {
+    return async (dispatch) => {
+        try{
+            const response = await API.apiGetByKey('attendance', '/statuses');
+            if(response.data && response.data.success){
+            await dispatch({ type: ATTENDANCE_STATUS_LIST_SUCCESS, payload: response.data })
             }else{
             await dispatch({ type: ATTENDANCE_ERROR, payload: response.data.message });
             }
@@ -87,6 +104,21 @@ export const getMonthlyAttendanceExcelView = (payload) => {
             const response = await API.apiGetByKey('attendance', `/excel`, payload);
             if(response.data && response.data.success){
             await dispatch({ type: ATTENDANCE_EXCEL_SUCCESS, payload: response.data })
+            }else{
+            await dispatch({ type: ATTENDANCE_ERROR, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+}
+
+export const saveAttendanceStatuses = (payload) => {
+    return async (dispatch) => {
+        try{
+            const response = await API.apiPostUrl('attendance', `/status`, payload);
+            if(response.data && response.data.success){
+            await dispatch({ type: ATTENDANCE_STATUS_SAVE_SUCCESS, payload: response.data })
             }else{
             await dispatch({ type: ATTENDANCE_ERROR, payload: response.data.message });
             }

@@ -17,6 +17,7 @@ import reportReducer from "./report.reducer";
 import paymentReducer from "./payment.reducer";
 import postReducer from "./post.reducer";
 import customfieldReducer from "./customfield.reducer";
+import systemfieldReducer from "./systemfield.reducer";
 export default combineReducers({
   auth: authReducer,
   project: projectReducer,
@@ -35,5 +36,6 @@ export default combineReducers({
   permissions: permissionReducer,
   payment: paymentReducer,
   post: postReducer,
-  customfields: customfieldReducer
+  customfields: customfieldReducer,
+  systemfields: systemfieldReducer
 });

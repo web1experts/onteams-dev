@@ -880,36 +880,11 @@ const handleProjectSelect = async (project) => {
       return (
         <>
           {showDate()}
-          {/* <ListGroup.Item key="filter-key-5" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-            <Form className="search-filter-list">
-              <Form.Group className="mb-0 form-group">
-                <MdOutlineSearch />
-                <Form.Control type="text" name="search" placeholder="Search by name" />
-              </Form.Group>
-            </Form>
-          </ListGroup.Item> */}
         </>
       )
     } else {
       return (
         <>
-          {/* <ListGroup.Item key="filter-key-6" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('tracker_status', event.target.value)} value={filters['status'] || 'all'}>
-                <option value="all">View All</option>
-                <option value="active">Active</option>
-                <option value="pause">Paused</option>
-                <option value="inactive">Inactive</option>
-            </Form.Select>
-            
-          </ListGroup.Item>
-          <ListGroup.Item key="filter-key-7" className={isActive ? 'd-none' : 'd-none d-xl-flex'}>
-            <Form className="search-filter-list">
-              <Form.Group className="mb-0 form-group">
-                <MdOutlineSearch />
-                <Form.Control type="text" name="search" placeholder="Search by name" onChange={(event) => handlefilterchange('search', event.target.value)} />
-              </Form.Group>
-            </Form>
-          </ListGroup.Item> */}
         </>
       )
     }

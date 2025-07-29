@@ -5,21 +5,18 @@ import { FaRegTrashAlt, FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { MdDragIndicator } from "react-icons/md";
 import { LuSettings2 } from "react-icons/lu";
-import { createCustomField, fetchCustomFields, updateCustomField, deleteField, reorderedCustomFields } from "../../redux/actions/customfield.action";
+import { fetchSystemFields, updateSystemField } from "../../redux/actions/systemfield.action";
 import { AlertDialog } from ".";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { SystemFieldModal } from "./systemFields";
-export const CustomFieldModal = (props) => {
+export const SystemFieldModal = (props) => {
   const formRef = useRef();
   const dispatch = useDispatch();
   const commonState = useSelector((state) => state.common);
-  const apiCustomfields = useSelector((state) => state.customfields);
-  const [activeTab, setActiveTab] = useState('custom')
+  const apiSystemfields = useSelector((state) => state.systemfields);
   useEffect(() => {
-    dispatch(fetchCustomFields({ module: props.module }));
+    dispatch(fetchSystemFields({ module: props.module }));
   }, []);
-  const [showdialog, setShowDialog] = useState(false);
 
   const typeLabelMap = {
     text: "Text Field",
@@ -50,7 +47,7 @@ export const CustomFieldModal = (props) => {
   };
 
   const FieldCard = ({ field, idx }) => {
-    const { _id, type, label, options, showInTable } = field || {};
+    const { _id, type, label, options } = field || {};
     return (
       <Card className="mb-3">
         <Card.Body>
@@ -62,13 +59,7 @@ export const CustomFieldModal = (props) => {
             <Col>
               <h5 className="mb-0 fw-bold">{label}</h5>
             </Col>
-            {showInTable && (
-              <Col xs="auto">
-                <Badge pill bg="success" text="dark">
-                  In Columns
-                </Badge>
-              </Col>
-            )}
+            
             <Col xs="auto">
               <Badge bg={typeColorMap[type] || "secondary"}>
                 {typeLabelMap[type] || type}
@@ -84,13 +75,7 @@ export const CustomFieldModal = (props) => {
               >
                 <FaRegEdit />
               </Button>
-              <Button
-                variant="outline-danger"
-                className="border-0 p-0"
-                onClick={() => handleFieldDelete(field._id)}
-              >
-                <FaRegTrashAlt />
-              </Button>
+              
             </Col>
           </Row>
 
@@ -130,7 +115,7 @@ export const CustomFieldModal = (props) => {
   const [newOption, setNewOption] = useState("");
   const [badgeColor, setBadgeColor] = useState("#28a745");
   const [errors, setErrors] = useState({});
-  const [customFields, setCustomFields] = useState([]);
+  const [systemFields, setSystemFields] = useState([]);
   const [includeColumn, setIncludeColumn] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedField, setSelectedField] = useState({});
@@ -143,43 +128,23 @@ export const CustomFieldModal = (props) => {
 
   useEffect(() => {
     setSelectedField({});
-    setShowDialog(false);
     setShowOptions(false);
     setFields({ name: "", type: "", showInTable: false, options: [] });
-    if (apiCustomfields.customFields) {
-      setCustomFields(apiCustomfields.customFields);
+    if (apiSystemfields.systemFieldsArray) {
+      setSystemFields(apiSystemfields.systemFieldsArray);
     }
 
-    if (apiCustomfields.newField) {
-      setCustomFields((prevCustomFields) => {
-        const updated = [
-          ...prevCustomFields.filter(
-            (field) => field._id !== apiCustomfields.newField._id
-          ),
-          apiCustomfields.newField,
-        ];
-        return updated;
-      });
-    }
-
-    if (apiCustomfields.updatedField) {
-      setCustomFields((prevCustomFields) =>
-        prevCustomFields.map((field) =>
-          field._id === apiCustomfields.updatedField._id
-            ? apiCustomfields.updatedField
+    if (apiSystemfields.updatedField) {
+      setSystemFields((prevSystemFields) =>
+        prevSystemFields.map((field) =>
+          field._id === apiSystemfields.updatedField._id
+            ? apiSystemfields.updatedField
             : field
         )
       );
     }
 
-    if (apiCustomfields.deletedField) {
-      setCustomFields((prevCustomFields) =>
-        prevCustomFields.filter(
-          (field) => field._id !== apiCustomfields.deletedField
-        )
-      );
-    }
-  }, [apiCustomfields]);
+  }, [apiSystemfields]);
 
   const handleFieldEdit = (field) => {
     setSelectedField(field);
@@ -199,7 +164,6 @@ export const CustomFieldModal = (props) => {
   const handleAddFieldClick = () => {
     setShowOptions(true);
     setShowInitialMessage(false);
-    // setShowAddedFields(false);
     setErrors({});
     setFieldName("");
     setFieldType("");
@@ -241,13 +205,9 @@ export const CustomFieldModal = (props) => {
       range_options: fields?.range_options || {},
     };
     try {
-      // dispatch action here
-      //setCustomFields([...customFields, payload]);
-      await dispatch(updateCustomField(selectedField?._id, payload));
-      console.log("Submitting:", payload);
+      await dispatch(updateSystemField(selectedField?._id, payload));
 
       setShowOptions(false);
-      // setShowAddedFields(true);
       setFields({ name: "", type: "", showInTable: false, options: [] });
       setNewOption("");
       setBadgeColor("#28a745");
@@ -258,65 +218,16 @@ export const CustomFieldModal = (props) => {
     }
   };
 
-  const handleAddNewClick = async () => {
-    const newErrors = {};
-    if (!fields?.name.trim()) newErrors.fieldName = "Field name is required";
-    if (!fields?.type) newErrors.fieldType = "Field type is required";
-    if (
-      ["radio", "dropdown", "badge", "checkbox"].includes(fields?.type) &&
-      fields?.options.length === 0
-    ) {
-      newErrors.options = "At least one option is required";
-    }
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length > 0) return;
-
-    const payload = {
-      name: createSlug(fields?.name.trim()),
-      label: fields?.name.trim(),
-      type: fields?.type,
-      options: ["radio", "dropdown", "badge", "checkbox"].includes(fields?.type)
-        ? fields?.options
-        : [],
-      showInTable: fields?.showInTable,
-      module: props.module,
-      range_options: fields?.range_options || {},
-    };
-
-    try {
-      // dispatch action here
-      // setCustomFields([...customFields, payload]);
-      await dispatch(createCustomField(payload));
-
-      //setShowOptions(false);
-      // setShowAddedFields(true);
-
-      setOptions([]);
-      setNewOption("");
-      setBadgeColor("#28a745");
-    } catch (err) {
-      console.error("Failed to add custom field:", err);
-    }
-  };
+  
 
   const handleCancelClick = () => {
     setShowOptions(false);
-    // setShowAddedFields(true);
     setErrors({});
     setFields({ name: "", type: "", showInTable: false, options: [] });
     setIsEditing(false);
     setSelectedField({});
   };
 
-  // const handleFieldTypeChange = (e) => {
-  //   setFieldType(e.target.value);
-  //   setFields({
-  //       ...fields,
-  //       options: []
-  //     });
-  // };
 
   const handleChange = ({ target: { name, value, type, checked } }) => {
     if (type === "checkbox") {
@@ -363,50 +274,8 @@ export const CustomFieldModal = (props) => {
     });
   };
 
-  const handleFieldDelete = async (id) => {
-    setShowDialog(true);
-    setSelectedField({ _id: id });
-  };
 
-  const deleteCustomField = () => {
-    dispatch(deleteField(selectedField._id));
-  };
-
-  const handleCheck = (e) => {
-    const { name, checked } = e.target;
-    setIncludeColumn(checked);
-  };
-
-  const handleDragEnd = (result) => {
-    const { source, destination, draggableId } = result;
-    // If there's no destination (i.e., the item was dropped outside), do nothing
-    if (!destination) return;
-    const fieldId = draggableId.split("-")[1]; // Extract task ID from draggableId
-    const sourceTabId = source.droppableId.split("-")[1]; // Get source tab ID
-    const destinationTabId = destination.droppableId.split("-")[1]; // Get destination tab ID
-
-    // Clone the projects array to avoid mutating the state directly
-    let reorderedFields = [...customFields];
-    if (sourceTabId === destinationTabId) {
-      // If the task was moved within the same tab, reorder the tasks
-      const [removed] = reorderedFields.splice(source.index, 1); // Remove task from the source position
-      reorderedFields.splice(destination.index, 0, removed); // Insert task to the destination position
-    } else {
-      // Task was moved to a different tab (if needed, handle cross-tab logic here)
-      const [removed] = reorderedFields.splice(source.index, 1); // Remove from source tab
-      reorderedFields.splice(destination.index, 0, removed); // Add to destination tab
-    }
-    // Generate a list of newly ordered projects
-    const newOrder = reorderedFields.map((field, index) => ({
-      field_id: field._id, // Adjust this if your project ID key is different
-      order: index,
-    }));
-
-    // Dispatch the action with the new order
-    dispatch(reorderedCustomFields({ fields: newOrder, module: props.module }));
-    // Update the state with reordered projects
-    setCustomFields(reorderedFields);
-  };
+  
 
   const shouldShowOptions = ["dropdown", "badge", "radio", "checkbox"].includes(
     fields?.type
@@ -415,17 +284,10 @@ export const CustomFieldModal = (props) => {
 
   return (
     <>
-      <Modal show={true} onHide={props.toggle} centered size="lg" className="add--workflow--modal theme--modal">
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <span className="nav--item--icon"><LuSettings2 /></span>
-            <strong>Custom Fields <small>create custom fields for your projects</small></strong>
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      
           {showInitialMessage && (
             <div className="custom--field">
-              <h3>No custom fields added yet</h3>
+              <h3>No system fields added yet</h3>
               <p>Click "Add Field" to create custom fields for your project</p>
               <Button
                 variant="primary"
@@ -440,7 +302,7 @@ export const CustomFieldModal = (props) => {
           {(showOptions || isEditing) && (
             <div className="field--options">
               <div className="add--new--field">
-                <h5>Add New Custom Field</h5>
+                <h5>Edit System Field</h5>
                 <Form ref={formRef}>
                   <Row>
                     <Col>
@@ -450,6 +312,8 @@ export const CustomFieldModal = (props) => {
                           type="text"
                           name="name"
                           placeholder="Enter field name"
+                          readOnly
+                          disabled
                           value={fields?.name}
                           onChange={handleChange}
                           isInvalid={!!errors.fieldName}
@@ -576,7 +440,10 @@ export const CustomFieldModal = (props) => {
                               {opt.label}
                             </span>
                             
-                            <span style={{ cursor: "pointer" }} onClick={() => removeOption(idx)}>×</span>
+                            {( fields?.options?.length > 2) && (
+                                <span style={{ cursor: "pointer" }} onClick={() => removeOption(idx)}>×</span>
+                            )}
+
                           </div>
                         ))}
                       </div>
@@ -584,17 +451,7 @@ export const CustomFieldModal = (props) => {
                   )}
 
                   <Row>
-                    <Col>
-                      <Form.Group controlId="formBasicCheckbox">
-                        <Form.Check
-                          type="checkbox"
-                          label="Include in columns"
-                          name="showInTable"
-                          checked={fields?.showInTable}
-                          onChange={handleChange}
-                        />
-                      </Form.Group>
-                    </Col>
+                    
                     <Col className="text-end">
                       <Button
                         variant="secondary"
@@ -603,16 +460,7 @@ export const CustomFieldModal = (props) => {
                       >
                         Cancel
                       </Button>
-                      {!isEditing ? (
-                        <Button
-                          variant="info"
-                          type="button"
-                          className="add--new--btn ms-3"
-                          onClick={handleAddNewClick}
-                        >
-                          Add Field
-                        </Button>
-                      ) : (
+                      
                         <Button
                           variant="info"
                           type="button"
@@ -621,79 +469,31 @@ export const CustomFieldModal = (props) => {
                         >
                           Update Field
                         </Button>
-                      )}
                     </Col>
                   </Row>
                 </Form>
               </div>
             </div>
           )}
-          <Button onClick={() => {setActiveTab('custom')}}>Custom Fields</Button>
-          <Button onClick={() => {setActiveTab('system')}}>System Fields</Button>
-          {/* {showAddedFields && ( */}
-          { activeTab === 'custom' ? 
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <div className="added--fields">
-                {!isEditing && (
-                  <h4 className="d-flex align-items-center justify-content-between mb-4">
-                    <Button
-                      variant="primary"
-                      className="field--btn"
-                      onClick={handleAddFieldClick}
-                    >
-                      <FiPlus /> Add Field
-                    </Button>
-                  </h4>
-                )}
-                <h5>Added Custom Fields</h5>
-                <Droppable
-                  droppableId="droppable-custom-field-table"
-                  direction="vertical"
-                >
-                  {(provided) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps}>
-                      {customFields.length === 0 ? (
-                        <p className="text-muted">No custom fields added yet.</p>
-                      ) : (
-                        customFields.map((field, index) => (
-                          <Draggable
-                            key={field?._id}
-                            draggableId={`field-${field?._id}`}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <FieldCard idx={index + 1} field={field} />
-                              </div>
-                            )}
-                          </Draggable>
-                        ))
-                      )}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </div>
-            </DragDropContext>
-            :
-            <SystemFieldModal module={props.module}/>
-            }
-          {/* )} */}
-        </Modal.Body>
-      </Modal>
 
-      {showdialog && (
-        <AlertDialog
-          showdialog={showdialog}
-          toggledialog={setShowDialog}
-          msg="Are you sure you want to delete this field?"
-          callback={deleteCustomField}
-        />
-      )}
+          
+            <div className="added--fields">
+              <h5>Systen Fields</h5>
+             
+                  <div >
+                    {systemFields?.length === 0 ? (
+                      <p className="text-muted">No system fields.</p>
+                    ) : (
+                      systemFields?.map((field, index) => (
+                        
+                            <div>
+                              <FieldCard idx={index + 1} field={field} />
+                            </div>
+                      ))
+                    )}
+                    
+                  </div>
+            </div>
     </>
   );
 };

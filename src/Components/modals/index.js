@@ -5,7 +5,7 @@ import useFilledClass from "../customHooks/useFilledclass";
 import {updateProject} from "../../redux/actions/project.action"
 import { Button, Modal, Form, ListGroup, FloatingLabel, Dropdown , Alert, Tabs, Tab, Card, Badge, Row, Col } from 'react-bootstrap';
 import { selectboxObserver } from "../../helpers/commonfunctions";
-import { FaCheck, FaPlusCircle, FaTimesCircle, FaUpload, FaRegTrashAlt, FaEllipsisV, FaTrashAlt, FaRegTimesCircle, FaRegEdit } from "react-icons/fa";
+import { FaCheck,FaCircle, FaPlusCircle, FaTimesCircle, FaUpload, FaRegTrashAlt, FaEllipsisV, FaTrashAlt, FaRegTimesCircle, FaRegEdit } from "react-icons/fa";
 import fileIcon from './../../images/file-icon-image.jpg'
 import { ListWorkflows } from '../../redux/actions/workflow.action';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -162,6 +162,8 @@ export function TransferOnwerShip(props) {
 export function StatusModal(props){
   const modalstate = useSelector(state => state.common.statusModal);
   const commonState = useSelector( state => state.common)
+  const statuses = props.statuses
+  console.log("statuses:: " , statuses)
   useFilledClass('.form-floating .form-control');
   const [search, setSearch] = useState('');
   const dispatch = useDispatch()
@@ -181,7 +183,7 @@ export function StatusModal(props){
         
         
         const editstateObject = {}
-        editstateObject['status'] = commonState.editProjectForm.status || "in-progress"
+        editstateObject['status'] = commonState.editProjectForm.status
         editstateObject['title'] = commonState.editProjectForm.title
         editstateObject['formtype'] = formtype
         
@@ -191,11 +193,7 @@ export function StatusModal(props){
 
   const [statusModalState, setStatusModalState] = useState({})
 
-  const statuses = [
-    { key: 'in-progress', label: 'In Progress', circleClass: 'progress--circle' },
-    { key: 'on-hold', label: 'On Hold', circleClass: 'hold--circle' },
-    { key: 'completed', label: 'Completed', circleClass: 'complete--circle' },
-  ];
+
 
   const filteredStatuses = statuses.filter(status => 
     status.label.toLowerCase().includes(search.toLowerCase())
@@ -230,16 +228,16 @@ export function StatusModal(props){
                     <ListGroup className="status--list">
                     {
                       filteredStatuses.map(status => (
-                        <ListGroup.Item key={`status-${status.key}`} className={statusModalState?.status == status.key ? "status--active": ""} onClick={() => {
+                        <ListGroup.Item key={`status-${status.value}`} className={statusModalState?.status == status.value ? "status--active": ""} onClick={() => {
                           
                           if(statusModalState?.formtype === 'project'){ 
-                            dispatch( updateStateData(PROJECT_FORM, { 'status': status.key} ))
+                            dispatch( updateStateData(PROJECT_FORM, { 'status': status.value} ))
                            
                           }else if(statusModalState?.formtype === 'edit_project'){ 
                             if( commonState?.directUpdate === true){
-                              dispatch( updateProject(commonState?.currentProject?._id, { 'status': status.key} ))
+                              dispatch( updateProject(commonState?.currentProject?._id, { 'status': status.value} ))
                             }else{
-                              dispatch( updateStateData(EDIT_PROJECT_FORM, { 'status': status.key} ))
+                              dispatch( updateStateData(EDIT_PROJECT_FORM, { 'status': status.value} ))
                             }
                             
                            
@@ -248,8 +246,9 @@ export function StatusModal(props){
                           }
                           dispatch(togglePopups('status', false))
                           }}>
-                            <span className={`${status.circleClass} status--circle`}></span>
-                            <p>{status.label} {statusModalState?.status === status.key && <FaCheck />}</p>
+                            <FaCircle className="me-2" style={{ color: status.color }}>
+                            </FaCircle>
+                            <p>{status.label} {statusModalState?.status === status.value && <FaCheck />}</p>
                         </ListGroup.Item>
                        ))}
                         

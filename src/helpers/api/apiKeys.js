@@ -35,7 +35,8 @@ const apiKeys = {
     payment: 'payment',
     post: 'post',
     custom_field: 'custom_field',
-    quote: '/workspace/getQuote'
+    quote: '/workspace/getQuote',
+    system_field: 'system_field'
 };
   
 export default apiKeys;

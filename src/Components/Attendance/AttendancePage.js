@@ -10,6 +10,7 @@ import { BsDash } from "react-icons/bs";
 import { GoDotFill } from "react-icons/go";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
+import { FaCog } from "react-icons/fa";
 import { formatDateinString, selectboxObserver, getAttendanceBadges } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { ListAttendance,getAttendanceByMember, getAttendanceSummary, getMonthlyAttendanceExcelView } from "../../redux/actions/attendance.action";
@@ -19,6 +20,7 @@ import { currentMemberProfile } from "../../helpers/auth";
 import MonthHeader from "./monthheader";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import AttendanceStatusManager from "../modals/attendanceStatus";
 
 const today = new Date();
 const currentMonthValue = `${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`; // 'MM/YYYY'
@@ -61,6 +63,7 @@ function AttendancePage() {
   const [isActive, setIsActive] = useState(0);
   const [attendanceSummary, setAttendanceSummary] = useState({})
   const [ excelData, setExcelData] = useState([])
+  const [ showAttendanceStatus, setShowAttendacneStatus] = useState( false )
   const [ filters, setFilters] = useState({month: getCurrentMonthValue()});
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
@@ -160,7 +163,9 @@ useEffect(() => {
       }
   }
 
-  
+  const toggleAttendanceStatus = () => {
+       setShowAttendacneStatus(prev => !prev);
+  }
 
   const changeDate = (days) => {
     const newDate = new Date(date);
@@ -294,6 +299,9 @@ useEffect(() => {
                         <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
                         <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex d-none view--icon active': 'd-md-flex d-none view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
                     </ListGroup>
+                    <ListGroup horizontal className={'bg-white expand--icon d-flex'}>
+                      <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleAttendanceStatus }><FaCog /></ListGroup.Item>
+                  </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-none d-lg-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                     </ListGroup>
@@ -453,7 +461,7 @@ useEffect(() => {
                   </div>
                   <Row>
                     <Col className="card--stack">
-                      <Card className="card--green">
+                      {/* <Card className="card--green">
                         <Card.Body>
                           <Card.Title><span>Present</span>{attendanceSummary?.present}</Card.Title>
                           <Card.Text><FiCheckCircle /></Card.Text>
@@ -482,7 +490,23 @@ useEffect(() => {
                           <Card.Title><span>Short Leave (6h)</span>{attendanceSummary?.short_leave}</Card.Title>
                           <Card.Text><LuTimer /></Card.Text>
                         </Card.Body>
-                      </Card>
+                      </Card> */}
+                      {Object.entries(attendanceSummary).map(([key, count], index) => {
+                        const config = { color: 'blue', icon: <FiCoffee /> };
+                        const label = key.replace(/_/g, ' ')  // e.g. short_leave => short leave
+                                        .replace(/\b\w/g, char => char.toUpperCase()); // capitalize words
+                        return (
+                          <Card key={index} className={`card--${config.color}`}>
+                            <Card.Body>
+                              <Card.Title>
+                                <span>{label}</span> {count}
+                              </Card.Title>
+                              <Card.Text>{config.icon}</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        );
+                      })}
+
                     </Col>
                   </Row>
                 </div>
@@ -712,6 +736,9 @@ useEffect(() => {
           <Button variant="primary">Save</Button>
         </Modal.Footer>
       </Modal>
+      { showAttendanceStatus && 
+        <AttendanceStatusManager show={showAttendanceStatus} toggle={toggleAttendanceStatus} />
+      }
     </>
   );
 }

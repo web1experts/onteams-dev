@@ -14,7 +14,6 @@ import { Listmembers } from "../../redux/actions/members.action";
 import { formatStatus } from "../../utils/common";
 import { StatusModal, MemberModal, WorkFlowModal, FilesModal, FilesPreviewModal } from "../modals";
 import { ListClients } from "../../redux/actions/client.action";
-import AddClient from "../Clients/AddClient";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
 import { selectboxObserver, getMemberdata, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
@@ -33,18 +32,19 @@ import ProjectDatePicker from "../Datepickers/projectDatepicker";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { renderDynamicField } from "../common/dynamicFields";
-import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, ASSIGN_MEMBER, DIRECT_UPDATE, EDIT_PROJECT_FORM } from "../../redux/actions/types";
+import { ALL_MEMBERS, ACTIVE_FORM_TYPE, PROJECT_FORM, RESET_FORMS, CURRENT_PROJECT, ALL_CLIENTS, DIRECT_UPDATE, EDIT_PROJECT_FORM } from "../../redux/actions/types";
 import { LuSettings2 } from "react-icons/lu";
+import { fetchSystemFields } from "../../redux/actions/systemfield.action";
 Quill.register("modules/autoLinks", AutoLinks);
 
 function ProjectsPage() {
     const memberProfile = currentMemberProfile()
-    
     const [isActiveView, setIsActiveView] = useState(2);
+    const [customFields, setCustomFields] = useState([]);
     const dispatch = useDispatch();
     const memberdata = getMemberdata()
     const [projects, setProjects] = useState([]);
-    const [filters, setFilters] = useState({ member: memberdata?._id, status: 'in-progress' })
+    const [filters, setFilters] = useState({ member: memberdata?._id })
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [] });
     const [errors, setErrors] = useState({ title: '' });
     const [loader, setLoader] = useState(false);
@@ -53,7 +53,6 @@ function ProjectsPage() {
     const [selectedMembers, setselectedMembers] = useState([]);
     const [showPasswordFields, setShowPasswordFields] = useState({});
     const [showBadges, setShowBadges] = useState(null);
-    const [customFields, setCustomFields] = useState([]);
     const projectFeed = useSelector(state => state.project.projects);
     const apiResult = useSelector(state => state.project);
     const clientFeed = useSelector(state => state.client.clients);
@@ -76,6 +75,8 @@ function ProjectsPage() {
     const [ showCustomFields, setShowCustomFields] = useState( false )
     let fieldErrors = {};
     const quillRef = useRef(null);
+    const apiSystemfields = useSelector((state) => state.systemfields);
+    const [systemFields, setSystemFields] = useState([]);
     const pasteOccurred = useRef(false);
     let active = 2;
     const workflowstate = useSelector(state => state.workflow)
@@ -114,6 +115,7 @@ function ProjectsPage() {
         selectboxObserver()
         dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
         dispatch(fetchCustomFields({module: 'projects'}))
+        dispatch(fetchSystemFields({module: 'projects', return_type: 'object', fields: ['status']}))
     }, [dispatch]);
 
  
@@ -124,6 +126,19 @@ function ProjectsPage() {
             dispatch(updateStateData(ALL_CLIENTS, clientFeed.clientData))
         }
     }, [clientFeed, dispatch])
+
+    useEffect(() => {
+        if (apiSystemfields.systemFieldsObject) {
+          setSystemFields(apiSystemfields.systemFieldsObject);
+        }
+    }, [apiSystemfields]);
+
+    useEffect(() => {
+        if(systemFields?.status){
+            setFilters({ ...filters, ['status']: systemFields?.status?.options[0]?.value })
+            setFields({ ...fields, ['status']: systemFields?.status?.options[0]?.value })
+        }
+    },[systemFields])
 
     useEffect(() => { 
         if( apiCustomfields.customFields){
@@ -363,9 +378,10 @@ function ProjectsPage() {
     };
 
     useEffect(() => {
-        setProjects([])
-        handleListProjects()
-        setSpinner(true)
+        dispatch(fetchSystemFields({module: 'projects', return_type: 'object', fields: ['status']}))
+        // setProjects([])
+        // handleListProjects()
+        // setSpinner(true)
     }, [])
 
     useEffect(() => {
@@ -841,9 +857,15 @@ function ProjectsPage() {
                                         <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-xl-flex'} key="status-filter-list">
                                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
                                                 <option value="all">View All</option>
-                                                <option value="in-progress">In Progress</option>
+                                                {/* <option value="in-progress">In Progress</option>
                                                 <option value="on-hold">On Hold</option>
-                                                <option value="completed">Completed</option>
+                                                <option value="completed">Completed</option> */
+                                                systemFields?.status?.options?.map((option, i) => {
+                                                    return (
+                                                         <option value={option.value}>{option.label}</option>
+                                                    )
+                                                })
+                                                }
                                             </Form.Select>
                                         </ListGroup.Item>
                                         <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-xl-flex'} key="search-filter-list">
@@ -1291,8 +1313,25 @@ function ProjectsPage() {
                                         <Form.Label>
                                             <small>Status</small>
                                             <div className="status--modal" onClick={handleStatusShow}>
-                                                <span className={`${fields['status'] === 'in-progress' ? 'progress--circle' : fields['status'] === 'on-hold' ? 'hold--circle' : fields['status'] === 'completed' ? 'complete--circle' : ''} status--circle`}></span> {fields['status']?.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())} <FaChevronDown />
-                                            </div>
+                                                {(() => {
+                                                    const currentStatus = fields['status'];
+                                                    const statusOption = systemFields?.status?.options.find(opt => opt.value === currentStatus);
+                                                    const color = statusOption?.color || '#ccc';
+                                                    const label = currentStatus
+                                                    ?.replace(/-/g, ' ')
+                                                    .replace(/\b\w/g, char => char.toUpperCase());
+
+                                                    return (
+                                                    <>
+                                                        <span
+                                                        className="status--circle"
+                                                        style={{ backgroundColor: color }}
+                                                        ></span>{' '}
+                                                        {label} <FaChevronDown />
+                                                    </>
+                                                    );
+                                                })()}
+                                               </div>
                                         </Form.Label>
                                     </Form.Group>
                                     <Form.Group className="mb-0 form-group">
@@ -1451,7 +1490,7 @@ function ProjectsPage() {
                 </Modal>
             }
            
-            {commonState?.statusModal && <StatusModal key="create-project-status" /> }
+            {commonState?.statusModal && <StatusModal key="create-project-status" statuses={systemFields?.status?.options || []} /> }
             {commonState?.membersModal && <MemberModal isedit={isEdit} />}
             {commonState?.workflowmodal && <WorkFlowModal /> }
             {commonState?.filesmodal && <FilesModal /> }
