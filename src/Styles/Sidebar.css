@@ -860,8 +860,8 @@ Sidebar CSS-=-=
 }
 
 .theme--modal .form-label {
-  font-weight: 600;
-  margin: 0.15rem;
+  font-weight: 500;
+  margin: 0 0 0.15rem;
 }
 
 .theme--modal .btn--group .btn {
@@ -903,7 +903,7 @@ Sidebar CSS-=-=
   }
 }
 
-@media screen and (max-width:992px) {
+@media screen and (max-width:991px) {
   .navbar-toggler {
     display: flex !important;
     position: fixed;
@@ -966,6 +966,7 @@ Sidebar CSS-=-=
     transform: translateX(-100%);
     flex: none;
     max-width: 0;
+    display: none;
   }
 
   .panel--sidebar .navbar {

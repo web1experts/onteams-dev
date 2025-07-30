@@ -186,22 +186,17 @@ const showError = (name) => {
                               {showError('name')}
                           </Form.Group>
                       </div>
-                     
-                      {customFields.length > 0 &&
+                      <Form.Group className="mb-0 form-group pb-0 other__fields">
+                        {customFields.length > 0 &&
                           <>
-                          <hr />
-                              <ListGroup>
-                                  <p className="m-0"> Other Fields</p>
-                              </ListGroup>
-                          
                           {customFields.map((field, index) =>
                               renderDynamicField({
                               name: `custom_field[${field.name}]`,
                               type: field.type,
-                              label: field.label,
+                              placeholder: field.label,
                               value: field.type === 'date' && rows[`custom_field[${field.name}]`]
-                                                                                  ? convertDDMMYYYYtoYYYYMMDD(rows[`custom_field[${field.name}]`])
-                                                                                  : rows[`custom_field[${field.name}]`] || '',
+                              ? convertDDMMYYYYtoYYYYMMDD(rows[`custom_field[${field.name}]`])
+                              : rows[`custom_field[${field.name}]`] || '',
                               options: field?.options || [],
                               onChange: (e) => {
                                   if(field.type === "date"){
@@ -219,7 +214,8 @@ const showError = (name) => {
                               })
                           )}
                           </>
-                      }  
+                        }  
+                      </Form.Group>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>

@@ -779,6 +779,10 @@ body {
   min-width: 35px;
 }
 
+.wrapper--title .dropdown-toggle .title--span {
+    max-width: calc(100% - 56px);
+}
+
 .show--details .new--project--rows tr.project--active .title--initial,
 .view--project .new--project--rows tr.project--active .title--initial,
 .view--invitee .new--project--rows tr.project--active .title--initial {
@@ -1350,8 +1354,8 @@ span.open--sidebar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  grid-gap: 30px;
-  gap: 30px;
+  grid-gap: 20px;
+  gap: 20px;
   margin-left: -15px;
   margin-right: -15px;
 }
@@ -2420,6 +2424,10 @@ table tr.marked-project td {
   inset: 0 !important;
   height: fit-content;
   top: 100% !important;
+}
+
+.wrapper--title .dropdown-menu {
+  height: calc(100dvh - 80px);
 }
 
 .rounded--box .contact--card.card .card-title .dropdown-menu {
@@ -7701,11 +7709,6 @@ Media CSS-=-==
     flex: 1 1 100%;
     justify-content: flex-start;
   }
-
-  .wrapper--title {
-    grid-gap: 15px;
-    gap: 15px;
-  }
 }
 
 @media screen and (max-width:1399px) {
@@ -7758,11 +7761,6 @@ Media CSS-=-==
     min-width: 280px;
   }
 
-  .wrapper--title {
-    grid-gap: 10px;
-    gap: 10px;
-  }
-
   .wrapper--title .screens--shots {
     display: none;
   }
@@ -7778,6 +7776,10 @@ Media CSS-=-==
 
   .modal .no--style .d-flex .ms-2 {
     margin-left: 0!important;
+  }
+
+  .wrapper--title h3 {
+    max-width: 100%;
   }
 }
 
@@ -7816,7 +7818,6 @@ Media CSS-=-==
   }
 
   .wrapper--title {
-    gap: 10px;
     flex-flow: row wrap;
     justify-content: flex-start;
   }
@@ -8023,9 +8024,9 @@ Media CSS-=-==
     margin-top: 0;
   }
 
-  .wrapper--title h3 {
-    max-width: 220px;
-  }
+  /* .wrapper--title h3 {
+    max-width: 200px;
+  } */
 
   .page--title .progress--filter, .page--title .no--style {
     display: none;
@@ -8047,11 +8048,29 @@ Media CSS-=-==
   .wrapper--title .btn--view {
     padding: .35rem .5rem;
   }
+
+  .wrapper--title {
+    gap: 20px;
+  }
+
+ .wrapper--title .projecttitle {
+    flex: 1 1 100%;
+    max-width: 40%;
+  }
+
+  .wrapper--title .dropdown-toggle {
+    min-width: 100%;
+    width: 100%;
+  }
 }
 
-@media screen and (max-width:992px) {
+@media screen and (max-width:991px) {
   .common--form {
     padding: 2rem;
+  }
+
+  .wrapper--title .projecttitle {
+    flex: 1 1;
   }
 
   .page--title .list-group {
@@ -8657,23 +8676,40 @@ Media CSS-=-==
     height: auto;
   }
 
-  .activity--box {
-    max-height: calc(100dvh - 195px);
-    margin-bottom: 90px;
-  }
-
   .daily--attendance--table {
-    max-height: calc(100dvh - 195px);
-    overflow-y: auto;
-    margin-bottom: 90px;
+    max-height: 100%;
+    overflow-y: visible;
+    margin-bottom: 0;
   }
 
   .details--projects--view .project--form {
-    height: calc(100dvh - 105px);
+    height: auto;
+  }
+
+  .common--project--grid {
+    height: auto;
+    overflow-y: visible;
+    width: 100%;
+    padding-bottom: 90px;
+  }
+
+  .details--member--view {
+    padding-bottom: 90px;
+  }
+
+  .rounded--box {
+    height: auto;
+    overflow-y: visible;
+    max-height: 100%;
   }
 }
 
 @media screen and (max-width:767px) {
+.wrapper--title .projecttitle {
+    flex: 1 1 100%;
+    max-width: calc(100% - 156px);
+  }
+
   .attendance--stats h3, .attendance--table h3 {
     font-size: 1.2rem;
   }
@@ -9051,10 +9087,6 @@ Media CSS-=-==
     flex-flow: row wrap;
   }
 
-  .wrapper--title {
-    gap: 1rem;
-  }
-
   .holidays--page .card--stack .card,
   .card--stack .card {
     flex: 1 1 100%;
@@ -9117,9 +9149,14 @@ Media CSS-=-==
     gap: .5rem;
   }
 
-  .wrapper--title h3 {
-    max-width: 115px;
+  .details--projects--view .wrapper--title .projecttitle {
+    flex: 1 1 100%;
+    max-width: calc(100% - 60px);
   }
+
+  /* .wrapper--title h3 {
+    max-width: 115px;
+  } */
 }
 
 @media screen and (max-width:414px) {

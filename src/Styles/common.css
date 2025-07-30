@@ -620,6 +620,14 @@ Add Project Modal CSS-=-=-
   padding-bottom: 0;
 }
 
+.project--form--inputs form .other__fields .w-100+.w-100, .add--member--modal form .other__fields .w-100+.w-100  {
+  padding-top: 15px;
+}
+
+.add--member--modal form .form-control, .add--member--modal form .form-select {
+  min-height: 43px;
+}
+
 .project--form--inputs form .status--modal {
   display: flex;
   align-items: center;
@@ -887,17 +895,20 @@ Add Project Modal CSS-=-=-
 }
 
 .workflow--modal .workflow--selected {
-  background: rgba(15, 23, 42, .1);
+  background: rgba(var(--theme-primary), .1);
   color: rgb(15 23 42);
   padding: 0.5rem .75rem;
   display: inline-block;
-  border-top: 3px solid rgb(15 23 42);
+  border-top: 3px solid rgba(var(--theme-primary), 1);
   border-radius: .25rem;
   -webkit-border-radius: .25rem;
 }
 
 .project--form--inputs form .form-label {
   margin-bottom: 0;
+  text-transform: capitalize;
+  font-size: .875em;
+  font-weight: 500;
 }
 
 .modal-backdrop.show {

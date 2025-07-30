@@ -699,12 +699,12 @@ useEffect(() => {
                                         
                                     </div>
                             </Form.Group>
-                            <Form.Group className="mb-0 form-group pb-0">
+                            <Form.Group className="mb-0 form-group">
                                 <Form.Label>
                                     <small>Start/Due Date</small>
                                 </Form.Label>
                                 <Row>
-                                {(!fields?.start_date && !fields?.due_date) ? (
+                                    {(!fields?.start_date && !fields?.due_date) ? (
                                         <label 
                                             htmlFor="startdate--picker" 
                                             className="task--date--picker" 
@@ -745,35 +745,33 @@ useEffect(() => {
                                     )}
                                     <ProjectDatePicker isShow={datepickerShow} close={handleDateclose} ></ProjectDatePicker>
                                 </Row>
+                            </Form.Group>
+                            <Form.Group className="mb-0 form-group pb-0 other__fields">
                                 {projectCustomFields?.length > 0 &&
                                     <>
-                                    <hr />
-                                    <Form.Label>
-                                        <small>Other Fields</small>
-                                    </Form.Label>
-                                    {projectCustomFields?.map((field, index) =>
-                                        renderDynamicField({
-                                            name: `custom_field[${field.name}]`,
-                                            type: field.type,
-                                            label: field.label,
-                                            value: field.type === 'date' && fields[`custom_field[${field.name}]`]
-                                                    ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
-                                                    : fields[`custom_field[${field.name}]`] || '',
-                                            options: field?.options || [],
-                                            onChange: (e) => {
-                                                if(field.type === "date"){
-                                                    
-                                                    handleDateChange(e, `custom_field[${field.name}]`)
-                                                }else{
-                                                    handleChange(e)
-                                                }
-                                            },
-                                            range_options: field?.range_options || {},
-                                            showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
-                                            toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
-                                            toggleBadges: () => toggleBadges(field),
-                                        })
-                                    )}
+                                        {/* <h4>Other Fields</h4> */}
+                                        {projectCustomFields?.map((field, index) =>
+                                            renderDynamicField({
+                                                name: `custom_field[${field.name}]`,
+                                                type: field.type,
+                                                label: field.label,
+                                                value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                                        ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                                        : fields[`custom_field[${field.name}]`] || '',
+                                                options: field?.options || [],
+                                                onChange: (e) => {
+                                                    if(field.type === "date"){
+                                                        handleDateChange(e, `custom_field[${field.name}]`)
+                                                    }else{
+                                                        handleChange(e)
+                                                    }
+                                                },
+                                                range_options: field?.range_options || {},
+                                                showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                                                toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                                                toggleBadges: () => toggleBadges(field),
+                                            })
+                                        )}
                                     </>
                                 }
                             </Form.Group>
@@ -991,8 +989,6 @@ useEffect(() => {
                 <Modal.Body>
                     <div className="file--flex">
                         <ListGroup>
-
-
                             {
                                 currentProject?.files && currentProject?.files.length > 0 &&
                                 currentProject.files.map((preview, index) => (
