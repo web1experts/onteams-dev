@@ -128,7 +128,12 @@ export const MemberInitials = React.memo(( props ) => {
                             <ListGroup.Item action key={`member-${memberIndex}`}>
                                 <Initials title={member.name} id={`member-${member._id}`}>
                                     <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>
-                                        {member.name?.substring(0, 1).toUpperCase()}
+                                        {
+                                            (member?.avatar && member?.avatar !== null ) ? 
+                                            <span><img src={member?.avatar} alt={'member-avatar'} /></span>
+                                            :
+                                            member.name?.substring(0, 1).toUpperCase()
+                                        }
                                     </span>
                                 </Initials>
                                 {props.showRemove && (
@@ -159,7 +164,12 @@ export const MemberInitials = React.memo(( props ) => {
                                 <ListGroup.Item action key={`member-${memberIndex}`}>
                                     <Initials title={member.name} id={`member-${member._id}`}>
                                         <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>
-                                            {member.name?.substring(0, 1).toUpperCase()}
+                                            {
+                                                (member?.avatar && member?.avatar !== null ) ? 
+                                                <span><img src={member?.avatar} alt={'member-avatar'} /></span>
+                                                :
+                                                member.name?.substring(0, 1).toUpperCase()
+                                            }
                                         </span>
                                     </Initials>
                                     {props.showRemove && (

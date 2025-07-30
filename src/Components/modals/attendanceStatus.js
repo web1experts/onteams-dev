@@ -80,6 +80,7 @@ const removeStatus = (indexToRemove) => {
                   <Form.Range
                     min="0"
                     max="12"
+                    step={0.01}
                     value={status.from}
                     onChange={(e) =>
                       handleChange(index, "from", e.target.value)
@@ -91,6 +92,7 @@ const removeStatus = (indexToRemove) => {
                   <Form.Range
                     min="0"
                     max="12"
+                    step={0.01}
                     value={status.to}
                     onChange={(e) =>
                       handleChange(index, "to", e.target.value)
