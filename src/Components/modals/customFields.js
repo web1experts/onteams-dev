@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Modal, Form, Card, Badge, Row, Col } from "react-bootstrap";
+import { Button, Modal, Form, Card, Badge, Row, Col, ListGroup } from "react-bootstrap";
 import { FaRegTrashAlt, FaRegEdit, FaCircle } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
 import { MdDragIndicator } from "react-icons/md";
@@ -55,12 +55,12 @@ export const CustomFieldModal = (props) => {
       <Card className="mb-3">
         <Card.Body>
           <Row className="align-items-center">
-            <Col xs="auto">
-              <Badge pill bg="light" className="abbr--n" text="dark">#{idx}</Badge>
-              <div className="drag--indicator"><MdDragIndicator /></div>
-            </Col>
             <Col>
-              <h5 className="mb-0 fw-bold">{label}</h5>
+              <div className="d-flex align-items-center gap-3">
+                <Badge pill bg="light" className="abbr--n" text="dark">#{idx}</Badge>
+                <div className="drag--indicator"><MdDragIndicator /></div>
+                <h5 className="mb-0 fw-bold">{label}</h5>
+              </div>
             </Col>
             {showInTable && (
               <Col xs="auto">
@@ -427,15 +427,14 @@ export const CustomFieldModal = (props) => {
             <div className="custom--field">
               <h3>No custom fields added yet</h3>
               <p>Click "Add Field" to create custom fields for your project</p>
-              <Button
-                variant="primary"
-                className="field--btn"
-                onClick={handleAddFieldClick}
-              >
-                Add Field
-              </Button>
+              <Button variant="primary" className="field--btn" onClick={handleAddFieldClick}>Add Field</Button>
             </div>
           )}
+
+          <ListGroup horizontal className="field__tabs">
+            <ListGroup.Item className={`btn--view ${activeTab === 'custom' ? 'active' : ''}`} onClick={() => setActiveTab('custom')}>Custom Fields</ListGroup.Item>
+            <ListGroup.Item className={`btn--view ${activeTab === 'system' ? 'active' : ''}`} onClick={() => setActiveTab('system')}>System Fields</ListGroup.Item>
+          </ListGroup>
 
           {(showOptions || isEditing) && (
             <div className="field--options">
@@ -628,8 +627,7 @@ export const CustomFieldModal = (props) => {
               </div>
             </div>
           )}
-          <Button onClick={() => {setActiveTab('custom')}}>Custom Fields</Button>
-          <Button onClick={() => {setActiveTab('system')}}>System Fields</Button>
+          
           {/* {showAddedFields && ( */}
           { activeTab === 'custom' ? 
           <DragDropContext onDragEnd={handleDragEnd}>

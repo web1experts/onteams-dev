@@ -53,6 +53,54 @@
     border-top-left-radius: 0;
 }
 
+.theme--modal .modal-body .field__tabs {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
+    background: rgb(255, 255, 255);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    gap: 5px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(226, 232, 240);
+    width: max-content;
+    margin-bottom: 1rem;
+}
+
+.theme--modal .modal-body .field__tabs .btn--view {
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 0px;
+    margin-right: 0px;
+    color: rgb(17, 24, 39);
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: transparent;
+    --bs-btn-color: transparent;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.65rem;
+    background: transparent;
+    border-width: 0px;
+    border-style: initial;
+    border-color: initial;
+    border-image: initial;
+}
+
+.theme--modal .modal-body .field__tabs .btn--view.active,
+.theme--modal .modal-body .field__tabs .btn--view:focus-visible,
+.theme--modal .modal-body .field__tabs .btn--view:hover,
+.theme--modal .modal-body .field__tabs .btn-primary:not(:disabled):not(.disabled).active {
+    color: rgb(255, 255, 255);
+    box-shadow: none !important;
+    background: linear-gradient(90deg, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
+    border-width: 0px;
+    border-style: initial;
+    border-color: initial;
+    border-image: initial;
+}
+
 .captureModal .nav-tabs {
     border: 0;
 }
@@ -1096,6 +1144,7 @@ select.form-error {
     padding: 0;
     border: 0;
 }
+
 @media (min-width:426px) {
     .add--team--member--modal form .d-md-none {
         display: none;
@@ -1155,6 +1204,19 @@ select.form-error {
 
     .add--team--member--modal .select--dropdown .dropdown-menu {
         width: 90%;
+    }
+
+    .added--fields .card .card-body .col {
+        flex: 1 1 100%;
+        margin-bottom: .5rem;
+    }
+
+    .added--fields .card .card-body .col-auto {
+        flex: 1 1;
+    }
+
+    .added--fields .card .card-body .col-auto:last-child {
+        text-align: right;
     }
 }
 
