@@ -142,15 +142,15 @@ function ProjectsPage() {
 
 
     useEffect(() => { 
-        if( apiCustomfields.customFields){
+        if( apiCustomfields.customFields && apiCustomfields?.fieldModule === 'projects'){
           setCustomFields( apiCustomfields.customFields)
         }
     
-        if( apiCustomfields.newField){
+        if( apiCustomfields.newField && apiCustomfields.newField?.module === 'projects'){
           setCustomFields((prevCustomFields) => [apiCustomfields.newField, ...prevCustomFields]);
         }
     
-         if (apiCustomfields.updatedField) {
+         if (apiCustomfields.updatedField && apiCustomfields.updatedField?.module === 'projects') {
           setCustomFields((prevCustomFields) =>
             prevCustomFields.map((field) =>
               field._id === apiCustomfields.updatedField._id
