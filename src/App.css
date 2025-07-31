@@ -9171,6 +9171,10 @@ Media CSS-=-==
     max-width: calc(100% - 60px);
   }
 
+  .team--page .page--title h2 {
+    font-size: 1.6rem;
+  }
+
   /* .wrapper--title h3 {
     max-width: 115px;
   } */
