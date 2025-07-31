@@ -548,7 +548,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
               </Row>
           </Container>
         </div> */}
-        <div className='page--wrapper p-md-3 py-3 pt-3 pt-lg-5 mt-3 text-center'>
+        <div className='page--wrapper px-md-2 pb-4 pt-4 text-center'>
           <Container fluid>
             <Row className="justify-content-center">
               <Col sm={12}>
