@@ -427,7 +427,12 @@ useEffect(() => {
                                     <td className="project--title--td sticky border-bottom">
                                       <div className="d-flex justify-content-between">
                                         <div className="project--name d-flex justify-content-start gap-3 align-items-center border-end">
-                                            <div className="title--initial">{data?.name?.substring(0, 2)}</div>
+                                            <div className="title--initial">{
+                                               (data?.avatar && data?.avatar !== null ) ? 
+                                                <span><img src={data?.avatar} alt={'member-avatar'} /></span>
+                                              :
+                                                data?.name?.substring(0, 1)
+                                            }</div>
                                             <div className="title--span flex-column d-flex align-items-start gap-0">
                                                 <span>{data?.name}</span>
                                                 <strong>{data?.role}</strong>
@@ -449,10 +454,8 @@ useEffect(() => {
                                               <td className="text-center border-bottom border-end" key={ind}>
                                                 <span className={`att--badge ${getBadgeColor(atten?.status)}`}>
                                                   {
-                                                    atten?.status && atten?.status !== <BsDash />
-                                                      ? (atten.status.split(" ").length === 2
-                                                          ? atten.status.substring(0, 2)
-                                                          : atten.status.charAt(0))
+                                                    atten?.status && atten?.status !== '--'
+                                                      ? statusObject[atten?.status?.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.code || atten?.status
                                                       : <BsDash />
                                                   }
                                                 </span>
@@ -575,7 +578,12 @@ useEffect(() => {
                               <td>
                                 <div className="d-flex justify-content-between">
                                   <div className="project--name d-flex gap-3 align-items-center">
-                                      <div className="title--initial">{attendanceData?.name?.charAt(0)}</div>
+                                      <div className="title--initial">{
+                                         (attendanceData?.avatar && attendanceData?.avatar !== null ) ? 
+                                            <span><img src={attendanceData?.avatar} alt={'member-avatar'} /></span>
+                                          :
+                                          attendanceData?.name?.charAt(0)
+                                      }</div>
                                       <div className="title--span flex-column d-flex align-items-start gap-0">
                                           <span>{attendanceData?.name}</span>
                                           <strong>{attendanceData?.role}</strong>

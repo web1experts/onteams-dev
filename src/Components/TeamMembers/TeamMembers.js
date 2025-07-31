@@ -944,7 +944,12 @@ function TeamMembersPage() {
                                         <div className="d-flex justify-content-between border-end flex-wrap">
                                           <div className="project--name">
                                             <div className="drag--indicator"><abbr>{idx + 1}</abbr><MdDragIndicator /></div>
-                                            <div className="title--initial">{member.name.charAt(0)}</div>
+                                            <div className="title--initial">{
+                                              (member?.avatar && member?.avatar !== null ) ? 
+                                                <span><img src={member?.avatar} alt={'member-avatar'} /></span>
+                                                :
+                                                member.name.charAt(0)
+                                            }</div>
                                             <div className="title--span flex-column align-items-start gap-0">
                                               <span>{member.name}</span>
                                               <strong>{member.role?.name}</strong>

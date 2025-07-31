@@ -6,7 +6,7 @@ import { ListAttendanceStatuses, saveAttendanceStatuses } from "../../redux/acti
 import { FiPlus } from "react-icons/fi";
 
 const AttendanceStatusManager = ({ toggle, show }) => {
-  
+  const [EditIndex, setEditIndex] = useState(false);
   const [showRules, setRulesShow] = useState(false);
   const [form, setForm] = useState({
     ruleName: '',
@@ -28,15 +28,23 @@ const AttendanceStatusManager = ({ toggle, show }) => {
   });
   const handleRulesClose = () => {
     setRulesShow(false);
-    setForm({
-      ruleName: '',
-      code: '',
-      startHour: '00',
-      startMinute: '00',
-      endHour: '00',
-      endMinute: '00',
-      color: '#eab308',
-    })
+    if (attendanceStatus.length > 0) {
+      // Find the highest "to" value
+      const rawMax = Math.max(...attendanceStatus.map(s => parseFloat(s.to)));
+      const highestTo = parseFloat((rawMax + 0.01).toFixed(2)); // avoid overlap
+
+      const { hour, minute } = decimalToTimeParts(highestTo);
+      setForm({
+        ruleName: '',
+        code: '',
+        startHour: hour,
+        startMinute: minute,
+        endHour: '00',
+        endMinute: '00',
+        color: '#eab308',
+      })
+    }
+    
   }
   const handleRulesShow = () => setRulesShow(true);
   
@@ -58,36 +66,109 @@ const AttendanceStatusManager = ({ toggle, show }) => {
   
   }, [apiResult])
 
+useEffect(() => {
+  if (attendanceStatus.length > 0) {
+    // Find the highest "to" value
+    const rawMax = Math.max(...attendanceStatus.map(s => parseFloat(s.to)));
+    const highestTo = parseFloat((rawMax + 0.01).toFixed(2)); // avoid overlap
+
+    const { hour, minute } = decimalToTimeParts(highestTo);
+
+    setForm(prev => ({
+      ...prev,
+      startHour: hour,
+      startMinute: minute,
+    }));
+  }
+}, [attendanceStatus]);
+
+
+
+
+  const decimalToTimeParts = (decimal) => {
+    const hour = String(Math.floor(decimal)).padStart(2, '0');
+    const minute = String(Math.round((decimal - Math.floor(decimal)) * 60)).padStart(2, '0');
+    return { hour, minute };
+  };
+
+  const editRule = (index) => {
+    const status = attendanceStatus[index];
+    if (!status) return;
+    setEditIndex(index)
+    const { hour: startHour, minute: startMinute } = decimalToTimeParts(status.from);
+    const { hour: endHour, minute: endMinute } = decimalToTimeParts(status.to);
+
+    setForm({
+      ruleName: status.label || '',
+      code: status.code || '',
+      color: status.color || '',
+      startHour,
+      startMinute,
+      endHour,
+      endMinute,
+    });
+    setRulesShow(true)
+    
+  }
+
+// const removeStatus = (indexToRemove) => {
+//   if (attendanceStatus.length > 2) {
+//     // Filter out the removed index
+//     const updatedStatuses = attendanceStatus.filter((_, index) => index !== indexToRemove);
+
+//     // Build payload with updated statuses
+//     const payload = {
+//       statuses: updatedStatuses.map(status => ({
+//         label: status.label.trim(),
+//         from: status.from,
+//         code: status.code,
+//         to: status.to,
+//         color: status.color,
+//       }))
+//     };
+
+//     // Dispatch the updated payload
+//     dispatch(saveAttendanceStatuses(payload));
+//   }
+// };
 
 const removeStatus = (indexToRemove) => {
-  if (attendanceStatus.length > 2) {
-    // Filter out the removed index
-    const updatedStatuses = attendanceStatus.filter((_, index) => index !== indexToRemove);
+  if (attendanceStatus.length <= 2) return;
 
-    // Build payload with updated statuses
-    const payload = {
-      statuses: updatedStatuses.map(status => ({
-        label: status.label.trim(),
-        from: status.from,
-        code: status.code,
-        to: status.to,
-        color: status.color,
-      }))
+  const roundToTwo = (num) => Math.round(num * 100) / 100;
+
+  const updatedStatuses = [...attendanceStatus];
+
+  // Remove the selected rule
+  updatedStatuses.splice(indexToRemove, 1);
+
+  // Get previous rule's to (new starting point for next rule)
+  if (indexToRemove > 0 && updatedStatuses[indexToRemove]) {
+    const prevTo = attendanceStatus[indexToRemove - 1].to;
+    const newFrom = roundToTwo(prevTo + 0.1); // increment by 0.1
+
+    updatedStatuses[indexToRemove] = {
+      ...updatedStatuses[indexToRemove],
+      from: newFrom,
+      // to remains unchanged
     };
-
-    // Dispatch the updated payload
-    dispatch(saveAttendanceStatuses(payload));
-    setForm({
-      ruleName: '',
-      code: '',
-      startHour: '00',
-      startMinute: '00',
-      endHour: '00',
-      endMinute: '00',
-      color: '#eab308',
-    })
   }
+
+  const payload = {
+    statuses: updatedStatuses.map(status => ({
+      label: status.label.trim(),
+      code: status.code,
+      from: status.from,
+      to: status.to,
+      color: status.color,
+    })),
+  };
+
+  dispatch(saveAttendanceStatuses(payload));
 };
+
+
+
 
 
 const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
@@ -107,7 +188,7 @@ const colorOptions = [
   
 
   const AttendanceCard = ({ index, total, color, label, code, from, to }) => {
-    const showTrashIcon = total > 2 && index !== 0;
+    const showTrashIcon = total > 2 && index !== 0 && index !== 1;
 
     return (
       <Card className="mb-3 rules--card">
@@ -121,7 +202,7 @@ const colorOptions = [
               <p className="mb-0">{decimalToTimeRange(from, to)}</p>
             </Col>
             <Col xs="auto" className="rules--actions">
-              <FiEdit3 />
+              <FiEdit3 onClick={() => editRule(index)} />
               {showTrashIcon && <FiTrash2 onClick={() => removeStatus(index)} />}
             </Col>
           </Row>
@@ -162,9 +243,12 @@ const showError = (name) => {
       return <span className="form-error">{errors[name]}</span>;
     return null;
   };
+
 const convertToDecimalTime = (hour, minute) => {
-  return parseFloat((parseInt(hour) + parseInt(minute) / 60).toFixed(2));
+  const decimal = parseInt(hour) + parseInt(minute) / 60;
+  return Math.ceil(decimal * 100) / 100;
 };
+
 
 const decimalToTimeRange = (from, to) => {
   const formatTime = (decimal) => {
@@ -195,26 +279,26 @@ const handleSubmit = (e) => {
     }
   }
 
-  attendanceStatus.forEach((status) => {
-    const existingFrom = parseFloat(status.from);
-    const existingTo = parseFloat(status.to);
-    console.log(`${startTime} < ${existingTo} && ${endTime} > ${existingFrom}`)
+  // attendanceStatus.forEach((status) => {
+  //   const existingFrom = parseFloat(status.from);
+  //   const existingTo = parseFloat(status.to);
+  //   console.log(`${startTime} < ${existingTo} && ${endTime} > ${existingFrom}`)
     
-      // Only run conflict check if the time range is valid
-      attendanceStatus.forEach((status) => {
-        const existingFrom = parseFloat(status.from);
-        const existingTo = parseFloat(status.to);
+  //     // Only run conflict check if the time range is valid
+  //     attendanceStatus.forEach((status) => {
+  //       const existingFrom = parseFloat(status.from);
+  //       const existingTo = parseFloat(status.to);
 
-        const isOverlapping = startTime < existingTo && endTime > existingFrom;
+  //       const isOverlapping = startTime < existingTo && endTime > existingFrom;
 
-        if (isOverlapping) {
-          hasError = true;
-          newErrors["timeConflict"] = `Time range conflicts with existing status "${status.label}".`;
-        }
-      });
+  //       if (isOverlapping) {
+  //         hasError = true;
+  //         newErrors["timeConflict"] = `Time range conflicts with existing status "${status.label}".`;
+  //       }
+  //     });
     
-  });
-console.log(newErrors)
+  // });
+
   setErrors(newErrors);
 
   if (hasError) {
@@ -223,23 +307,108 @@ console.log(newErrors)
 
   setLoading(true)
   
-    const payload = {
-      statuses: [
-        ...attendanceStatus.map(status => ({
-          label: status.label.trim(),
-          from: status.from,
-          to: status.to,
-          color: status.color,
-        })),
-        {
-          label: form.ruleName.trim(),
-          code: form.code.trim(),
-          from: startTime,
-          to: endTime,
-          color: form.color
-        }
-      ]
+    // const payload = {
+    //   statuses: [
+    //     ...attendanceStatus.map(status => ({
+    //       label: status.label.trim(),
+    //       from: status.from,
+    //       to: status.to,
+    //       code: status.code,
+    //       color: status.color,
+    //     })),
+    //     {
+    //       label: form.ruleName.trim(),
+    //       code: form.code.trim(),
+    //       from: startTime,
+    //       to: endTime,
+    //       color: form.color
+    //     }
+    //   ]
+    // };
+  //   const formStatus = {
+  //     label: form.ruleName.trim(),
+  //     code: form.code.trim(),
+  //     from: startTime,
+  //     to: endTime,
+  //     color: form.color,
+  //   };
+
+  // const updatedStatuses = attendanceStatus.map((status, i) => {
+  //   if (EditIndex === i) {
+  //     // Replace the rule being edited with the new form values
+  //     return formStatus;
+  //   }
+  //   return {
+  //     label: status.label.trim(),
+  //     code: status.code,
+  //     from: status.from,
+  //     to: status.to,
+  //     color: status.color,
+  //   };
+  // });
+
+  // if (EditIndex === false || EditIndex === null || EditIndex === undefined) {
+  //   updatedStatuses.push(formStatus);
+  // }
+
+  // const payload = {
+  //   statuses: updatedStatuses,
+  // };
+
+  const formStatus = {
+      label: form.ruleName.trim(),
+      code: form.code.trim(),
+      from: startTime,
+      to: endTime,
+      color: form.color,
     };
+
+    let updatedStatuses = attendanceStatus.map((status, i) => ({
+      label: status.label.trim(),
+      code: status.code,
+      from: status.from,
+      to: status.to,
+      color: status.color,
+    }));
+
+    if (
+      EditIndex === false ||
+      EditIndex === null ||
+      EditIndex === undefined
+    ) {
+      // New entry: just push
+      updatedStatuses.push(formStatus);
+    } else {
+      // Update the edited rule
+      updatedStatuses[EditIndex] = formStatus;
+
+      // Update all following rules' from time (keep to value unchanged)
+      let previousTo = endTime;
+
+      for (let i = EditIndex + 1; i < updatedStatuses.length; i++) {
+        const rule = updatedStatuses[i];
+
+        const nextFrom = parseFloat((previousTo + 0.01).toFixed(2)); // ensure there's no overlap
+
+        updatedStatuses[i] = {
+          ...rule,
+          from: nextFrom,
+          to: rule.to, // keep the original to value
+        };
+
+        previousTo = rule.to; // still use original to for next iteration
+      }
+    }
+
+    const sortedStatuses = updatedStatuses.sort((a, b) => {
+      if (a.from !== b.from) return a.from - b.from;
+      return a.to - b.to;
+    });
+    const payload = {
+      statuses: sortedStatuses,
+    };
+
+
     dispatch(saveAttendanceStatuses(payload))
     setLoading(false)
     
@@ -266,71 +435,7 @@ console.log(newErrors)
           {attendanceStatus.map((item, index) => (
             <AttendanceCard key={index} {...item} index={index} total={attendanceStatus?.length} />
           ))}
-          {/* <Form>
-            {attendanceStatus.map((status, index) => (
-              <div key={status.id} className="mb-4 p-3 border rounded bg-light">
-                <Row className="align-items-center">
-                  <Col xs={12} md={6}>
-                    <Form.Label>From: {status.from}h</Form.Label>
-                    <Form.Range
-                      min="0"
-                      max="12"
-                      step={0.01}
-                      value={status.from}
-                      onChange={(e) =>
-                        handleChange(index, "from", e.target.value)
-                      }
-                    />
-                  </Col>
-                  <Col xs={12} md={6}>
-                    <Form.Label>To: {status.to}h</Form.Label>
-                    <Form.Range
-                      min="0"
-                      max="12"
-                      step={0.01}
-                      value={status.to}
-                      onChange={(e) =>
-                        handleChange(index, "to", e.target.value)
-                      }
-                    />
-                  </Col>
-                </Row>
-                <Row className="mt-3 align-items-center">
-                  <Col xs={10}>
-                    <Form.Control
-                      type="text"
-                      placeholder="Status label (e.g. Present)"
-                      value={status.label}
-                      onChange={(e) =>
-                        handleChange(index, "label", e.target.value)
-                      }
-                    />
-                  </Col>
-                  <Col xs={2} className="text-end">
-                    {attendanceStatus.length > 2 && (
-                      <Button
-                        onClick={() => removeStatus(index)}
-                        title="Remove Status"
-                      >
-                        <BsTrash />
-                      </Button>
-                    )}
-                  </Col>
-                </Row>
-              </div>
-            ))}
-
-            <div className="d-flex justify-content-between">
-              <Button variant="outline-primary" onClick={addStatus}>
-                <i className="bi bi-plus-circle me-2" />
-                Add More
-              </Button>
-              <Button variant="primary" onClick={saveStatuses} disabled={loading}>
-                <i className="bi bi-save me-2" />
-                {loading ? 'Please wait...' :'Save'}
-              </Button>
-            </div>
-          </Form> */}
+          
         </Modal.Body>
       </Modal>
       <Modal show={showRules} centered onHide={handleRulesClose} backdrop="static" keyboard={false} size="md">
@@ -355,19 +460,21 @@ console.log(newErrors)
               <Form.Label>Start Time</Form.Label>
               <Col>
                 <Form.Label><small>Hours</small></Form.Label>
-                <Form.Select value={form.startHour} onChange={(e) => handleRulesChange('startHour', e.target.value)}>
-                  {hours.map((h) => (
+                <Form.Select value={form.startHour} onChange={(e) => handleRulesChange('startHour', e.target.value)} disabled>
+                  <option key={form.startHour} value={form.startHour}>{form.startHour}</option>
+                  {/* {hours.map((h) => (
                     <option key={h} value={h}>{h}</option>
-                  ))}
+                  ))} */}
                 </Form.Select>
                 {showError("startHour")}
               </Col>
               <Col>
                 <Form.Label><small>Minutes</small></Form.Label>
-                <Form.Select value={form.startMinute} onChange={(e) => handleRulesChange('startMinute', e.target.value)}>
-                  {minutes.map((m) => (
+                <Form.Select value={form.startMinute} onChange={(e) => handleRulesChange('startMinute', e.target.value)} disabled>
+                   <option key={form.startMinute} value={form.startMinute}>{form.startMinute}</option>
+                  {/* {minutes.map((m) => (
                     <option key={m} value={m}>{m}</option>
-                  ))}
+                  ))} */}
                 </Form.Select>
                 {showError("startMinute")}
               </Col>

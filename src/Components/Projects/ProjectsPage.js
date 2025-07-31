@@ -44,7 +44,7 @@ function ProjectsPage() {
     const dispatch = useDispatch();
     const memberdata = getMemberdata()
     const [projects, setProjects] = useState([]);
-    const [filters, setFilters] = useState({ member: memberdata?._id })
+    const [filters, setFilters] = useState({})
     const [fields, setFields] = useState({ title: '', status: 'in-progress', members: [] });
     const [errors, setErrors] = useState({ title: '' });
     const [loader, setLoader] = useState(false);
@@ -135,7 +135,7 @@ function ProjectsPage() {
 
     useEffect(() => {
         if(systemFields?.status){
-            setFilters({ ...filters, ['status']: systemFields?.status?.options[0]?.value })
+            setFilters({ ...filters, ['status']: systemFields?.status?.options[0]?.value, member: memberdata?._id })
             setFields({ ...fields, ['status']: systemFields?.status?.options[0]?.value })
         }
     },[systemFields])
@@ -330,6 +330,9 @@ function ProjectsPage() {
     const handleListProjects = async () => {
         setSpinner(true)
         let selectedfilters = { currentPage: currentPage }
+        // if(!selectedfilters.member){
+        //     selectedfilters['member'] =  memberdata?._id
+        // }
         if (Object.keys(filters).length > 0) {
             selectedfilters = { ...selectedfilters, ...filters }
         }
@@ -857,8 +860,8 @@ function ProjectsPage() {
                                                 
                                             </Form.Select>
                                         </ListGroup.Item>
-                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-xl-flex'} key="status-filter-list">
-                                            <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
+                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-xl-flex'} key={`project-status-filter-list-desktop-${filters['status']}`}>
+                                            <Form.Select className="custom-selectbox"  onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
                                                 <option value="all">View All</option>
                                                 {/* <option value="in-progress">In Progress</option>
                                                 <option value="on-hold">On Hold</option>
@@ -1548,12 +1551,16 @@ function ProjectsPage() {
                                 
                             </Form.Select>
                         </ListGroup.Item>
-                        <ListGroup.Item key="status-filter-list">
+                        <ListGroup.Item key="status-filter-list-mobile">
                             <Form.Select className="custom-selectbox" onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
                                 <option value="all">View All</option>
-                                <option value="in-progress">In Progress</option>
-                                <option value="on-hold">On Hold</option>
-                                <option value="completed">Completed</option>
+                                {
+                                    systemFields?.status?.options?.map((option, i) => {
+                                        return (
+                                                <option value={option.value}>{option.label}</option>
+                                        )
+                                    })
+                                }
                             </Form.Select>
                         </ListGroup.Item>
                          <ListGroup.Item key="search-filter-list">

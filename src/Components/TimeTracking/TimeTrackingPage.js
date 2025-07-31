@@ -1276,7 +1276,12 @@ const handleProjectSelect = async (project) => {
                                           <div className="project--name d-flex gap-3 align-items-center">
                                               <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
                                               <div className="title--initial">
-                                                {activity.name.charAt(0)}
+                                                {
+                                                  (activity?.avatar && activity?.avatar !== null ) ? 
+                                                    <span><img src={activity?.avatar} alt={'member-avatar'} /></span>
+                                                  :
+                                                  activity.name.charAt(0)
+                                                }
                                                 {
                                                   activity?.latestActivity?.status ? 
                                                   <small className="status--circle active--color"></small>
@@ -1392,7 +1397,12 @@ const handleProjectSelect = async (project) => {
                                           <div className="project--name d-flex gap-3 align-items-center">
                                             <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
                                             <div className="title--initial">
-                                              {activity.name.charAt(0)}
+                                              {
+                                                (activity?.avatar && activity?.avatar !== null ) ? 
+                                                  <span><img src={activity?.avatar} alt={'member-avatar'} /></span>
+                                                :
+                                                activity.name.charAt(0)
+                                              }
                                               {
                                                   activity?.latestActivity?.status ? 
                                                   <small className="status--circle active--color"></small>

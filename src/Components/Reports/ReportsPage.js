@@ -1486,7 +1486,12 @@ function ReportsPage() {
                                           <MdDragIndicator />
                                         </div>
                                         <div className="title--initial">
-                                          {report?.member?.name.substring(0, 1)}
+                                          {
+                                            (report?.member?.avatar && report?.member?.avatar !== null ) ? 
+                                              <span><img src={report?.member?.avatar} alt={'member-avatar'} /></span>
+                                            :
+                                            report?.member?.name.substring(0, 1)
+                                          }
                                         </div>
                                         <div className="title--span flex-column d-flex align-items-start gap-0">
                                           <span>{report?.member?.name}</span>
@@ -1834,7 +1839,12 @@ function ReportsPage() {
                       >
                         <div className="project--name d-flex gap-3 align-items-center">
                           <div className="title--initial">
-                            {member?.name?.substring(0, 1)}
+                            {
+                              (member?.avatar && member?.avatar !== null ) ? 
+                                <span><img src={member?.avatar} alt={'member-avatar'} /></span>
+                              :
+                              member?.name?.substring(0, 1)
+                            }
                           </div>
                           <div className="title--span flex-column d-flex align-items-start gap-0">
                             <span>{member?.name} </span>
