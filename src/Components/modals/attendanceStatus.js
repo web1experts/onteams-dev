@@ -8,9 +8,38 @@ import { FiPlus } from "react-icons/fi";
 const AttendanceStatusManager = ({ toggle, show }) => {
   
   const [showRules, setRulesShow] = useState(false);
-  const handleRulesClose = () => setRulesShow(false);
+  const [form, setForm] = useState({
+    ruleName: '',
+    code: '',
+    startHour: '00',
+    startMinute: '00',
+    endHour: '00',
+    endMinute: '00',
+    color: '#eab308',
+  });
+  const [errors, setErrors] = useState({
+    ruleName: '',
+    code: '',
+    startHour: '',
+    startMinute: '',
+    endHour: '',
+    endMinute: '',
+    color: '',
+  });
+  const handleRulesClose = () => {
+    setRulesShow(false);
+    setForm({
+      ruleName: '',
+      code: '',
+      startHour: '00',
+      startMinute: '00',
+      endHour: '00',
+      endMinute: '00',
+      color: '#eab308',
+    })
+  }
   const handleRulesShow = () => setRulesShow(true);
-
+  
   const dispatch = useDispatch();
   const apiResult = useSelector((state) => state.attendance);
   const [attendanceStatus, setAttendanceStatus] = useState([]);
@@ -29,28 +58,37 @@ const AttendanceStatusManager = ({ toggle, show }) => {
   
   }, [apiResult])
 
- 
-
-const handleChange = (index, field, value) => {
-  setAttendanceStatus((prev) =>
-    prev.map((status, i) =>
-      i === index
-        ? { ...status, [field]: field === "label" ? value : Number(value) }
-        : status
-    )
-  );
-};
-
-
-const addStatus = () => {
-  setAttendanceStatus([...attendanceStatus, { from: 0, to: 1, label: "" }]);
-};
 
 const removeStatus = (indexToRemove) => {
   if (attendanceStatus.length > 2) {
-    setAttendanceStatus(attendanceStatus.filter((_, index) => index !== indexToRemove));
+    // Filter out the removed index
+    const updatedStatuses = attendanceStatus.filter((_, index) => index !== indexToRemove);
+
+    // Build payload with updated statuses
+    const payload = {
+      statuses: updatedStatuses.map(status => ({
+        label: status.label.trim(),
+        from: status.from,
+        code: status.code,
+        to: status.to,
+        color: status.color,
+      }))
+    };
+
+    // Dispatch the updated payload
+    dispatch(saveAttendanceStatuses(payload));
+    setForm({
+      ruleName: '',
+      code: '',
+      startHour: '00',
+      startMinute: '00',
+      endHour: '00',
+      endMinute: '00',
+      color: '#eab308',
+    })
   }
 };
+
 
 const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
@@ -68,23 +106,23 @@ const colorOptions = [
   ];
   
 
-  const AttendanceCard = ({ index, total, color, title, code, time }) => {
-    const showTrashIcon = total > 1 && index !== 0;
+  const AttendanceCard = ({ index, total, color, label, code, from, to }) => {
+    const showTrashIcon = total > 2 && index !== 0;
 
     return (
       <Card className="mb-3 rules--card">
         <Card.Body>
           <Row className="align-items-center">
             <Col xs="auto">
-              <div className={`rules--bg bg-${color}`}></div>
+              <div className={`rules--bg`} style={{'background': color}}></div>
             </Col>
             <Col className="ps-0">
-              <strong className="d-flex align-items-center gap-2">{title} <Badge bg="light" text="dark">{code}</Badge></strong>{' '}
-              <p className="mb-0">{time}</p>
+              <strong className="d-flex align-items-center gap-2">{label} <Badge bg="light" text="dark">{code}</Badge></strong>{' '}
+              <p className="mb-0">{decimalToTimeRange(from, to)}</p>
             </Col>
             <Col xs="auto" className="rules--actions">
               <FiEdit3 />
-              {showTrashIcon && <FiTrash2 />}
+              {showTrashIcon && <FiTrash2 onClick={() => removeStatus(index)} />}
             </Col>
           </Row>
         </Card.Body>
@@ -92,45 +130,123 @@ const colorOptions = [
     );
   };
 
-  const data = attendanceData; // Replace with state if dynamically updating
-  const totalCards = data.length;
+  // const data = attendanceData; // Replace with state if dynamically updating
+  // const totalCards = data.length;
 
-  const [form, setForm] = useState({
-    ruleName: '',
-    shortName: '',
-    startHour: '00',
-    startMinute: '00',
-    endHour: '00',
-    endMinute: '00',
-    color: '',
-  });
+  
 
-  const handleRulesChange = (field, value) => {
-    setForm({ ...form, [field]: value });
-  };
+ const handleRulesChange = (field, value) => {
+  const updatedForm = { ...form, [field]: value };
+
+  // If startHour or startMinute was updated, also update endHour
+  if (field === 'startHour' || field === 'startMinute') {
+    const startTime = parseInt(updatedForm.startHour) + parseInt(updatedForm.startMinute) / 60;
+
+    // Find first hour > startTime
+    const nextEndHour = hours.find((h) => parseInt(h) > startTime);
+
+    // Set to found value or default to last hour
+    updatedForm.endHour = nextEndHour || hours[hours.length - 1];
+  }
+
+  setForm(updatedForm);
+};
+
 
   const handleColorSelect = (color) => {
     setForm({ ...form, color });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Submitted form:', form);
-    // add validation or API logic here
+const showError = (name) => {
+    if (errors && errors[name])
+      return <span className="form-error">{errors[name]}</span>;
+    return null;
+  };
+const convertToDecimalTime = (hour, minute) => {
+  return parseFloat((parseInt(hour) + parseInt(minute) / 60).toFixed(2));
+};
+
+const decimalToTimeRange = (from, to) => {
+  const formatTime = (decimal) => {
+    const hours = Math.floor(decimal);
+    const minutes = Math.round((decimal - hours) * 60);
+    return `${hours}:${String(minutes).padStart(2, '0')}`;
   };
 
-  const saveStatuses = () => {
-    setLoading(true)
+  return `${formatTime(from)} - ${formatTime(to)}`;
+};
+
+
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  let hasError = false;
+  const newErrors = {};
+
+  const startTime = convertToDecimalTime(form.startHour, form.startMinute);
+  const endTime = convertToDecimalTime(form.endHour, form.endMinute);
+
+  // Check for empty fields
+  for (const [key, value] of Object.entries(form)) {
+    if (value.trim() === '') {
+      hasError = true;
+      newErrors[key] = `${key} cannot be blank.`;
+    }
+  }
+
+  attendanceStatus.forEach((status) => {
+    const existingFrom = parseFloat(status.from);
+    const existingTo = parseFloat(status.to);
+    console.log(`${startTime} < ${existingTo} && ${endTime} > ${existingFrom}`)
+    
+      // Only run conflict check if the time range is valid
+      attendanceStatus.forEach((status) => {
+        const existingFrom = parseFloat(status.from);
+        const existingTo = parseFloat(status.to);
+
+        const isOverlapping = startTime < existingTo && endTime > existingFrom;
+
+        if (isOverlapping) {
+          hasError = true;
+          newErrors["timeConflict"] = `Time range conflicts with existing status "${status.label}".`;
+        }
+      });
+    
+  });
+console.log(newErrors)
+  setErrors(newErrors);
+
+  if (hasError) {
+    return;
+  }
+
+  setLoading(true)
+  
     const payload = {
-        statuses: attendanceStatus.map(status => ({
-            label: status.label.trim(),
-            from: status.from,
-            to: status.to,
+      statuses: [
+        ...attendanceStatus.map(status => ({
+          label: status.label.trim(),
+          from: status.from,
+          to: status.to,
+          color: status.color,
         })),
+        {
+          label: form.ruleName.trim(),
+          code: form.code.trim(),
+          from: startTime,
+          to: endTime,
+          color: form.color
+        }
+      ]
     };
     dispatch(saveAttendanceStatuses(payload))
     setLoading(false)
-  };
+    
+    handleRulesClose()
+  // Proceed with API logic or further actions
+};
+
 
   return (
     <>
@@ -139,11 +255,16 @@ const colorOptions = [
           <Modal.Title>
             <strong>Attendance Rules Configuration <small>Configure time ranges and attendance categories</small></strong>
           </Modal.Title>
-          <Button variant="primary" onClick={handleRulesShow}><FiPlus/> Add Rule</Button>
+          {
+            (attendanceStatus?.length < 7) && (
+            <Button variant="primary" onClick={handleRulesShow}><FiPlus/> Add Rule</Button>
+            )
+          }
+          
         </Modal.Header>
         <Modal.Body>
-          {data.map((item, index) => (
-            <AttendanceCard key={index} {...item} index={index} total={totalCards} />
+          {attendanceStatus.map((item, index) => (
+            <AttendanceCard key={index} {...item} index={index} total={attendanceStatus?.length} />
           ))}
           {/* <Form>
             {attendanceStatus.map((status, index) => (
@@ -221,11 +342,13 @@ const colorOptions = [
             <Form.Group className="mb-3">
               <Form.Label>Rule Name</Form.Label>
               <Form.Control type="text" placeholder="e.g., Present, Absent, Half Day" value={form.ruleName} onChange={(e) => handleRulesChange('ruleName', e.target.value)}/>
+              {showError("ruleName")}
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Short Name (Max 2 characters)</Form.Label>
-              <Form.Control type="text" maxLength={2} placeholder="e.g., P, A, HD" value={form.shortName} onChange={(e) => handleRulesChange('shortName', e.target.value)}/>
+              <Form.Control type="text" maxLength={2} placeholder="e.g., P, A, HD" value={form.code} onChange={(e) => handleRulesChange('code', e.target.value)}/>
+              {showError("code")}
             </Form.Group>
 
             <Row className="mb-3">
@@ -237,6 +360,7 @@ const colorOptions = [
                     <option key={h} value={h}>{h}</option>
                   ))}
                 </Form.Select>
+                {showError("startHour")}
               </Col>
               <Col>
                 <Form.Label><small>Minutes</small></Form.Label>
@@ -245,6 +369,7 @@ const colorOptions = [
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </Form.Select>
+                {showError("startMinute")}
               </Col>
             </Row>
 
@@ -252,11 +377,27 @@ const colorOptions = [
               <Form.Label>End Time</Form.Label>
               <Col>
                 <Form.Label><small>Hours</small></Form.Label>
-                <Form.Select value={form.endHour} onChange={(e) => handleRulesChange('endHour', e.target.value)}>
-                  {hours.map((h) => (
-                    <option key={h} value={h}>{h}</option>
-                  ))}
+                <Form.Select
+                  value={form.endHour}
+                  onChange={(e) => handleRulesChange('endHour', e.target.value)}
+                >
+                  {(() => {
+                    const startInMinutes = parseInt(form.startHour) * 60 + parseInt(form.startMinute);
+                    
+                    return hours
+                      .filter((h) => {
+                        const hourInMinutes = parseInt(h) * 60;
+                        return hourInMinutes > startInMinutes;
+                      })
+                      .map((h) => (
+                        <option key={h} value={h}>
+                          {h}
+                        </option>
+                      ));
+                  })()}
                 </Form.Select>
+
+                {showError("endHour")}
               </Col>
               <Col>
                 <Form.Label><small>Minutes</small></Form.Label>
@@ -265,6 +406,7 @@ const colorOptions = [
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </Form.Select>
+                {showError("endMinute")}
               </Col>
             </Row>
 
@@ -284,11 +426,12 @@ const colorOptions = [
                 ))}
               </div>
             </Form.Group>
+            {showError("timeConflict")}
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleRulesClose}>Cancel</Button>
-          <Button variant="primary">Save Rule</Button>
+          <Button variant="primary" onClick={handleSubmit}>Save Rule</Button>
         </Modal.Footer>
       </Modal>
     </>

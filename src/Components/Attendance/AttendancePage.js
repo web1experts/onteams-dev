@@ -56,6 +56,7 @@ function AttendancePage() {
   const apiResult = useSelector(state => state.attendance)
   const [memberAttendance, setMemberAttendance] = useState([])
   const [attendanceStatus, setAttendanceStatus] = useState([]);
+  const [statusObject, setStatusObject] = useState({})
   const [ attendances, setAttendances] = useState([])
   const memberFeed = useSelector((state) => state.member.members)
   const [members, setMembers] = useState([])
@@ -114,6 +115,16 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
   useEffect(() => {
     handleAttendanceList()
   },[filters])
+
+  useEffect(() => {
+    const statusMap = attendanceStatus?.reduce((acc, status) => {
+      const key = status.label.toLowerCase().replace(/\s+/g, '_');
+      acc[key] = status;
+      return acc;
+    }, {});
+    
+    setStatusObject(statusMap)
+  }, [attendanceStatus])
 
   useEffect(() => {
     if (memberFeed && memberFeed.memberData) {
@@ -177,6 +188,25 @@ useEffect(() => {
     newDate.setDate(date.getDate() + days);
     setDate(newDate);
   };
+
+  const lightenColor = (hex, percent = 30) => {
+  // Remove '#' if present
+  hex = hex.replace(/^#/, '');
+
+  // Parse the hex components
+  const num = parseInt(hex, 16);
+  let r = (num >> 16) + Math.round(2.55 * percent);
+  let g = ((num >> 8) & 0x00FF) + Math.round(2.55 * percent);
+  let b = (num & 0x0000FF) + Math.round(2.55 * percent);
+
+  // Clamp values between 0–255
+  r = Math.min(255, r);
+  g = Math.min(255, g);
+  b = Math.min(255, b);
+
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', {
@@ -351,12 +381,22 @@ useEffect(() => {
                                   </div>
                                 </th>
                                 <MonthHeader month={filters?.month?.split("/")[0]} year={filters?.month?.split("/")[1]} />
-                                <th className="bg--green text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Present</strong>
-                                  </div>
-                                </th>
-                                <th className="bg--red text-center p-0">
+                                {
+                                  attendanceStatus?.map((status, idx) => {
+                                    
+                                  const lightBorderColor = lightenColor(status?.color, 40);
+                                  const lightBgColor = lightenColor(status?.color, 70);
+                                    return (
+                                      <th className="text-center p-0" style={{'color': status.color, 'background-color': lightBgColor, 'border-right': `1px solid ${lightBorderColor}` ,'border-bottom': `1px solid ${lightBorderColor}`}}>
+                                        <div className="border-bottom padd--x border-top">
+                                          <strong>{status.label}</strong>
+                                        </div>
+                                      </th>
+                                    )
+                                  })
+                                }
+                                
+                                {/* <th className="bg--red text-center p-0">
                                   <div className="border-bottom padd--x border-top">
                                     <strong>Absent</strong>
                                   </div>
@@ -375,7 +415,7 @@ useEffect(() => {
                                   <div className="border-bottom padd--x border-top">
                                     <strong>Short (2h)</strong>
                                   </div>
-                                </th>
+                                </th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -436,12 +476,17 @@ useEffect(() => {
                 </div>
                 <div className="pt-4">
                   <div className="d-flex align-items-center gap-3 gap-md-4 flex-wrap att--status--abbr">
-                      <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--green">P</span><span className="text-slate-600">Present</span></div>
-                      <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--purple">SL</span><span className="text-slate-600">Short Leave</span></div>
-                      <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--red">A</span><span className="text-slate-600">Absent</span></div>
-                      <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--orange">S</span><span className="text-slate-600">Short</span></div>
-                      <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center bg--blue">H</span><span className="text-slate-600">Half Day</span></div>
-                  </div>
+                    {
+                      attendanceStatus?.map((status, idx) => {
+                        const lightBorderColor = lightenColor(status?.color, 40);
+                        const lightBgColor = lightenColor(status?.color, 70);
+                        return (
+                          <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center" style={{'color': status.color, 'background-color': lightBgColor, 'border-right': `1px solid ${lightBorderColor}` ,'border-bottom': `1px solid ${lightBorderColor}`, 'width': '30px','height': '30px','font-size': '.75rem','font-weight': '700','border-radius': '.5rem'}}>{status.code}</span><span className="text-slate-600">{status.label}</span></div>
+                      
+                        )
+                      })
+                    }
+                     </div>
                 </div>
               </div>
             )}
@@ -503,8 +548,9 @@ useEffect(() => {
                         const config = { color: 'blue', icon: <FiCoffee /> };
                         const label = key.replace(/_/g, ' ')  // e.g. short_leave => short leave
                                         .replace(/\b\w/g, char => char.toUpperCase()); // capitalize words
+                        
                         return (
-                          <Card key={index} className={`card--${config.color}`}>
+                          <Card key={index} style={{background: statusObject?.[key]?.color || '#3b82f6'}}>
                             <Card.Body>
                               <Card.Title>
                                 <span>{label}</span> {count}
@@ -541,9 +587,9 @@ useEffect(() => {
                                 <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                                   {attendanceStatus.map((status, index) => (
                                     <div className="text-center">
-                                      <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">
+                                      <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center" style={{color: statusObject?.[status?.label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.color || '#16a34a'}}>
                                         {
-                                          attendanceData?.attendance?.[status?.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '')] || 0
+                                          attendanceData?.attendance?.[status?.label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')] || 0
                                         } <small>{status?.label}</small></h4>
                                     </div>
                                   ))}
@@ -685,7 +731,33 @@ useEffect(() => {
                               <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--blue" title="Logged Hours"> {(attendance.tracked_time !== '--' ? attendance.tracked_time : <GoDotFill />)}</span></td>
                               <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--purple" title="Manual Entry"> {(attendance.manual_time !== '--') ? attendance.manual_time : <FiEdit3 />}</span></td>
                               <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--moove" title="Total Hours"> {(attendance.total_time !== "--") ? attendance.total_time : <GoDotFill />}</span></td>
-                              <td className="px-3 py-3 text-center">{getAttendanceBadges(attendance?.status)}</td>
+                              <td className="px-3 py-3 text-center">
+                                {(() => {
+                                  const key = attendance.status
+                                    .toLowerCase()
+                                    .replace(/\s+/g, '_')
+                                    .replace(/[^a-z0-9_]/g, '');
+
+                                  const baseColor = statusObject?.[key]?.color || '#16a34a';
+                                  const lightBorderColor = lightenColor(baseColor, 40);
+                                  const lightBgColor = lightenColor(baseColor, 70);
+
+                                  return (
+                                    <span
+                                      className="d-inline-flex mx-auto align-items-center gap-2"
+                                      title={attendance.status}
+                                    >
+                                      <span
+                                        className="status--badge"
+                                        style={{ color: baseColor, border: `1px solid ${lightBorderColor}`, 'background-color': lightBgColor}}
+                                      >
+                                        {attendance.status}
+                                      </span>
+                                    </span>
+                                  );
+                                })()}
+
+                              </td>
                             </tr>
                           ))
                         )
