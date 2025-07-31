@@ -846,10 +846,10 @@ function TeamMembersPage() {
                     </Form>
                   </ListGroup.Item>
                 </ListGroup>
-                <ListGroup horizontal className={isActive ? "d-none" : "d-flex ms-auto ms-xl-0"}>
-                  <ListGroup horizontal className="d-none d-flex">
-                    <ListGroup.Item action className="view--icon d-none d-lg-flex" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
-                    <ListGroup.Item action className="d-none d-lg-flex view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
+                <ListGroup horizontal className="ms-auto ms-xl-0">
+                  <ListGroup horizontal className="d-none d-lg-flex">
+                    <ListGroup.Item action className="view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
+                    <ListGroup.Item action className="view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
                   <ListGroup horizontal className="d-flex d-xl-none bg-white shadow-none p-0 border-0">
                     <Dropdown className="select--dropdown manual--dropdown">

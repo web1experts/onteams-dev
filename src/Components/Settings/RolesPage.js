@@ -715,14 +715,10 @@ function RolesPage() {
                             )
                         })}
 
-                    <div className="mt-4 text-end">
-                    <Button variant="danger" onClick={() => setShowDelete(true)}>
-                        Delete Role
-                        </Button>
-                        <Button variant="primary" onClick={handleSave}>
-                        Save Permissions
-                        </Button>
-                    </div>
+                      <div className="mt-4 text-end fixed--bottom">
+                        <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete Role</Button>
+                        <Button variant="primary" className="ms-3" onClick={handleSave}>Save Permissions</Button>
+                      </div>
                     </div>
                 </>
                 )}
@@ -760,7 +756,6 @@ function RolesPage() {
 
                             {showError("name")}
                         </Form.Group>
-
                         <h5 className="mt-4">Permissions</h5>
                         <div className="new--accordion--block mb-4">
                             {permissionModules.map((mod) => {
@@ -856,11 +851,11 @@ function RolesPage() {
                             )
                         })}
                         </div>
-                        <Button variant="primary" type="submit" disabled={loader}>
-                            {loader ? "Please wait..." : "Save Role"}
-                        </Button>
                     </Form>
                 </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="primary" onClick={handleSubmit} type="submit" disabled={loader}>{loader ? "Please wait..." : "Save Role"}</Button>
+                </Modal.Footer>
             </Modal>
           )}
     </>

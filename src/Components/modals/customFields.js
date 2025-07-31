@@ -55,7 +55,7 @@ export const CustomFieldModal = (props) => {
       <Card className="mb-3">
         <Card.Body>
           <Row className="align-items-center">
-            <Col>
+            <Col sm={12} md={6}>
               <div className="d-flex align-items-center gap-3">
                 <Badge pill bg="light" className="abbr--n" text="dark">#{idx}</Badge>
                 <div className="drag--indicator"><MdDragIndicator /></div>
@@ -442,7 +442,7 @@ export const CustomFieldModal = (props) => {
                 <h5>Add New Custom Field</h5>
                 <Form ref={formRef}>
                   <Row>
-                    <Col>
+                    <Col sm={12} md={6}>
                       <Form.Group className="mb-3 col">
                         <Form.Label>Field Name *</Form.Label>
                         <Form.Control
@@ -459,7 +459,7 @@ export const CustomFieldModal = (props) => {
                       </Form.Group>
                     </Col>
                     {!isEditing && (
-                      <Col>
+                      <Col sm={12} md={6}>
                         <Form.Group className="mb-3 col">
                           <Form.Label>Field Type *</Form.Label>
                           <Form.Select
@@ -583,7 +583,7 @@ export const CustomFieldModal = (props) => {
                   )}
 
                   <Row>
-                    <Col>
+                    <Col sm={12} md={6}>
                       <Form.Group controlId="formBasicCheckbox">
                         <Form.Check
                           type="checkbox"
@@ -594,7 +594,7 @@ export const CustomFieldModal = (props) => {
                         />
                       </Form.Group>
                     </Col>
-                    <Col className="text-end">
+                    <Col sm={12} md={6} className="text-end mt-3 mt-md-0">
                       <Button
                         variant="secondary"
                         type="button"
