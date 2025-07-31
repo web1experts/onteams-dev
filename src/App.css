@@ -4,12 +4,15 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  text-decoration: none;
+  outline: none;
 }
 
 *:focus,
 *:focus-visible,
 *:focus-within {
   box-shadow: none;
+  text-decoration: none;
   outline: none;
 }
 
@@ -757,7 +760,8 @@ body {
 .page--wrapper table td .title--initial,
 .team--members--list .title--initial,
 .wrapper--title .dropdown-toggle .title--initial,
-.wrapper--title .dropdown-item .title--initial {
+.wrapper--title .dropdown-item .title--initial,
+.comments--list .card .title--initial, .modal .single--project--stack .title--initial {
   align-items: center;
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
   border-radius: 100px;
@@ -775,6 +779,14 @@ body {
   text-align: center;
   position: relative;
   text-transform: uppercase;
+}
+
+.comments--list .card .title--initial, .modal .single--project--stack .title--initial {
+  border-radius: .5rem;
+  -webkit-border-radius: .5rem;
+  height: 35px;
+  width: 35px;
+  min-width: 35px;
 }
 
 .wrapper--title .dropdown-item .title--initial {
@@ -3009,6 +3021,12 @@ table tr.marked-project td {
 .tasks-form-action .list-group-item:nth-child(even) .team--initial {
   background: rgba(var(--theme-secondary), .7);
   color: #ffffff;
+}
+
+.tasks-form-action .list-group-item .team--initial span, .tasks-form-action .list-group-item .team--initial img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .projects--page .table .list-group-item .btn {
@@ -5823,25 +5841,6 @@ ul#icon-tabs .nav-link span svg {
   gap: 1rem;
 }
 
-.comments--list .card .title--initial {
-  align-items: center;
-  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-  border-radius: .5rem;
-  -webkit-border-radius: .5rem;
-  color: #ffffff;
-  display: inline-flex;
-  font-size: 1rem;
-  font-weight: 500;
-  height: 35px;
-  width: 35px;
-  min-width: 35px;
-  justify-content: center;
-  margin-right: 0;
-  padding: .25rem 0;
-  text-align: center;
-  text-transform: uppercase;
-}
-
 .comments--list .card .card-body {
   padding: 0;
 }
@@ -7314,25 +7313,6 @@ ul#icon-tabs .nav-link span svg {
     text-overflow: ellipsis;
 }
 
-.modal .single--project--stack .title--initial {
-  align-items: center;
-  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-  border-radius: .5rem;
-  -webkit-border-radius: .5rem;
-  color: #ffffff;
-  display: inline-flex;
-  font-size: 1rem;
-  font-weight: 500;
-  height: 35px;
-  width: 35px;
-  min-width: 35px;
-  justify-content: center;
-  margin-right: 0;
-  padding: .25rem 0;
-  text-align: center;
-  text-transform: uppercase;
-}
-
 .modal .single--project--stack .title--span span {
   font-size: 18px;
   font-weight: 700;
@@ -8717,14 +8697,18 @@ Media CSS-=-==
   .rounded--box {
     height: auto;
     overflow-y: visible;
-    max-height: 100%;
   }
 }
 
 @media screen and (max-width:767px) {
-.wrapper--title .projecttitle {
+  .wrapper--title .projecttitle {
     flex: 1 1 100%;
     max-width: calc(100% - 156px);
+  }
+
+  .attendance--page .wrapper--title .projecttitle {
+    flex: 1 1 100%;
+    max-width: calc(100% - 250px);
   }
 
   .attendance--stats h3, .attendance--table h3 {
@@ -8855,7 +8839,7 @@ Media CSS-=-==
   }
 
   .rounded--box .card .card-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .new--accordion--block .accordion-button h6,
@@ -9142,8 +9126,20 @@ Media CSS-=-==
 
   .client--box, .team-members--page .rounded--box {
     padding-top: 1.5rem;
-    margin-bottom: 90px;
-    height: calc(100dvh - 195px);
+  }
+
+  .rounded--box .contact--card {
+    background: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .rounded--box {
+    padding: 1rem;
+  }
+
+  .rounded--box .contact--card .card-body .list-group-item, .rounded--box .work--card .card-body .list-group-item {
+    background: rgb(248 250 252);
   }
 
   .rounded--box .card .card--img h3 {

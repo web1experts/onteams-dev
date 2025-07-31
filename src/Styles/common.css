@@ -72,6 +72,7 @@ a:focus {
   text-transform: capitalize;
   font-weight: 500;
   border-color: rgb(227 231 241);
+  text-decoration: none;
 }
 
 .bg-light {
