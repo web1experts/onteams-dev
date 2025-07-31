@@ -43,7 +43,8 @@ export default (state = initialState, action) => {
     case CUSTOM_FIELDS_LIST: 
         return {
             ...state,
-            customFields: action.payload.customFields
+            customFields: action.payload.customFields,
+            fieldModule: action.payload.module
         }
     case CLEAR_MESSAGES:
         return {
@@ -59,7 +60,8 @@ export default (state = initialState, action) => {
     case FIELDS_REORDER:
         return {
             successfull: true,
-            customFields: action.payload.customFields
+            customFields: action.payload.customFields,
+            fieldModule: action.payload.module
         }
     default: return state;
   }

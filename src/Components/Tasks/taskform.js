@@ -211,7 +211,7 @@ export const TaskForm = (props) => {
     }, [currentTask]);
 
     useEffect(() => { 
-        if( apiCustomfields.customFields){
+        if( apiCustomfields.customFields  && apiCustomfields?.fieldModule === 'tasks'){
             setCustomFields( apiCustomfields.customFields)
         }
     
