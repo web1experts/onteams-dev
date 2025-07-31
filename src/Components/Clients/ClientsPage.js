@@ -808,7 +808,23 @@ function ClientsPage() {
                       </>
                       :
                       <>
-                      
+                      <ListGroup.Item key={'name-field'}>
+                        <Form.Group className="mb-0 form-group pb-0">
+                          <Form.Label>Client Name</Form.Label>
+                          <Form.Control
+                            type="text"
+                            className={
+                              errors["name"] && errors["name"] !== ""
+                                ? "input-error"
+                                : "form-control"
+                            }
+                            placeholder="Client name"
+                            name="name"
+                            value={fields?.name}
+                            onChange={handleChange}
+                          />
+                        </Form.Group>
+                      </ListGroup.Item>
                       {customFields?.length > 0 && (
                         <>
                           {customFields.map((field, index) => (

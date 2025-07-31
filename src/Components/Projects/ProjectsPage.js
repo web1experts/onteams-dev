@@ -115,7 +115,7 @@ function ProjectsPage() {
         selectboxObserver()
         dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
         
-        // dispatch(fetchSystemFields({module: 'projects', return_type: 'object', fields: ['status']}))
+        dispatch(fetchSystemFields({module: 'projects', return_type: 'object', fields: ['status']}))
     }, [dispatch]);
 
  
@@ -140,9 +140,6 @@ function ProjectsPage() {
         }
     },[systemFields])
 
-    useEffect(() => {
-        console.log(customFields)
-    },customFields)
 
     useEffect(() => { 
         if( apiCustomfields.customFields){
@@ -384,7 +381,7 @@ function ProjectsPage() {
 
     useEffect(() => {
         dispatch(fetchCustomFields({module: 'projects'}))
-        dispatch(fetchSystemFields({module: 'projects', return_type: 'object', fields: ['status']}))
+        // dispatch(fetchSystemFields({module: 'projects', return_type: 'object', fields: ['status']}))
         // setProjects([])
         // handleListProjects()
         // setSpinner(true)
