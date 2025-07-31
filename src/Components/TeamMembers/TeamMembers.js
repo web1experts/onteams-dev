@@ -1489,7 +1489,7 @@ function TeamMembersPage() {
               {showError("role")}
             </div>
             <div className="form-row" key={`row-1`}>
-              <Form.Group className="mb-0 form-group">
+              <Form.Group className="mb-0 form-group other__fields">
                 {customFields.length > 0 && (
                   <>
                     {customFields.map((field, index) =>
@@ -1862,8 +1862,7 @@ function TeamMembersPage() {
         <></>
       )}
       {/*--=-=Search Modal**/}
-      <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal"
-      >
+      <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
         <Modal.Header closeButton>
           <Modal.Title>Search</Modal.Title>
         </Modal.Header>

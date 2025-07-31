@@ -643,6 +643,7 @@ Sidebar CSS-=-=
   color: #ffffff;
   background: linear-gradient(to right, #1e293b, #334155);
   margin-bottom: 0;
+  gap: 1rem;
 }
 
 .theme--modal .modal-footer {
@@ -661,6 +662,7 @@ Sidebar CSS-=-=
   border-radius: 1rem;
   width: 3rem;
   height: 3rem;
+  min-width: 3rem;
 }
 
 .theme--modal .modal-header .btn-close {
@@ -680,6 +682,7 @@ Sidebar CSS-=-=
   align-items: center;
   width: 32px;
   height: 32px;
+  min-width: 32px;
   display: flex;
   padding: 0;
   font-size: .75rem;
@@ -967,10 +970,6 @@ Sidebar CSS-=-=
     flex: none;
     max-width: 0;
     display: none;
-  }
-
-  .panel--sidebar .navbar {
-    height: auto;
   }
 
   .panel--sidebar .dropdown-menu {

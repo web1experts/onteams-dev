@@ -296,7 +296,7 @@ useEffect(() => {
                   <span className="open--sidebar me-2" onClick={() => { handleSidebarSmall(false); setIsActive(0); }}><FiSidebar /></span>
                   Attendance
                   <ListGroup horizontal className="ms-auto">
-                    <ListGroup.Item>
+                    <ListGroup.Item className="d-none d-md-flex">
                       <Dropdown className="select--dropdown">
                         <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
                         <Dropdown.Menu>
@@ -327,25 +327,16 @@ useEffect(() => {
                             })}
                           </div>
                         </Dropdown.Menu>
-
-                    </Dropdown>
+                      </Dropdown>
                     </ListGroup.Item>
                     <ListGroup horizontal className="d-none d-md-flex">
                       <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
                       <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
                     </ListGroup>
-                    <ListGroup horizontal className="d-flex d-md-none bg-white shadow-none p-0 border-0">
-                      <Dropdown className="select--dropdown manual--dropdown">
-                        <Dropdown.Toggle variant="success" id="dropdown-basic" className="border-0"><MdFilterList className="me-0" /></Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          <Dropdown.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam /> Team View</Dropdown.Item>
-                          <Dropdown.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar /> Excel View</Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </ListGroup>
                     <ListGroup horizontal className={'bg-white expand--icon d-flex'}>
+                      <ListGroup.Item className='d-flex d-md-none' onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
                       <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleAttendanceStatus }><FaCog /></ListGroup.Item>
-                  </ListGroup>
+                    </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-none d-lg-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                     </ListGroup>
@@ -780,57 +771,56 @@ useEffect(() => {
       {/*--=-=Filter Modal**/}
       <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal">
         <Modal.Header closeButton>
-          <Modal.Title>Filters</Modal.Title>
+            <Modal.Title>Filters</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ListGroup>
             <ListGroup.Item>
-              <Form>
-                <Form.Group className="mb-0 form-group">
-                  <Dropdown className="select--dropdown">
-                    <Dropdown.Toggle variant="success">Members</Dropdown.Toggle>
-                    <Dropdown.Menu>
-                    <div className="drop--scroll">
-                      <Form>
-                        <Form.Group className="form-group mb-3">
-                          <Form.Control type="text" placeholder="Search here.." />
-                        </Form.Group>
-                      </Form>
-                      <Dropdown.Item className="selected--option" href="#/action-1">Members <FaCheck /></Dropdown.Item>
-                        {
-                          members.map((member, index) => {
-                              return <Dropdown.Item key={`member-projects-${index}`} onClick={() => handlefilterchange('member', member._id)}>{member.name}</Dropdown.Item>
-                          })
-                        }
-                      </div>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                 
-                </Form.Group>
-                <Form.Group className="mb-0 form-group">
-                  <DatePicker 
-                    key={'month-filter'}
-                    name="month"
-                    onlyMonthPicker={true}
-                    value=""
-                    open={true}
-                    onChange={async (value) => {
-                        handlefilterchange('month', value)
-                      }
-                    }    
-                    editable={false}      
-                    className="form-control"
-                    placeholder="Select month"
-                  />
-                </Form.Group>
-              </Form>
+              <Dropdown className="select--dropdown manual--dropdown">
+                <Dropdown.Toggle variant="success">{activeTab}</Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    <Dropdown.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam /> Team View</Dropdown.Item>
+                    <Dropdown.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar /> Excel View</Dropdown.Item>
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <Dropdown className="select--dropdown">
+                <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    {monthsArray.map((month) => {
+                      const isFuture =
+                        parseInt(month.value.split('/')[1]) > today.getFullYear() ||
+                        (parseInt(month.value.split('/')[1]) === today.getFullYear() &&
+                          parseInt(month.value.split('/')[0]) > today.getMonth() + 1);
+                      return (
+                        <Dropdown.Item
+                          key={month.value}
+                          className={`dropdown-item ${filters.month === month.value ? 'selected--option' : ''}`}
+                          as="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (!isFuture) {
+                              setFilters((prev) => ({ ...prev, month: month.value }));
+                            }
+                          }}
+                          disabled={isFuture}
+                          style={{ pointerEvents: isFuture ? 'none' : 'auto', opacity: isFuture ? 0.5 : 1 }}
+                        >
+                          {month.label}
+                          {filters.month === month.value && <MdOutlineCheck />}
+                        </Dropdown.Item>
+                      )
+                    })}
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
             </ListGroup.Item>
           </ListGroup>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleFilterClose}>Cancel</Button>
-          <Button variant="primary">Save</Button>
-        </Modal.Footer>
       </Modal>
       { showAttendanceStatus && 
         <AttendanceStatusManager show={showAttendanceStatus} toggle={toggleAttendanceStatus} />
