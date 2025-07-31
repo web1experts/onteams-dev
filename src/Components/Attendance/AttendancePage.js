@@ -13,7 +13,7 @@ import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
 import { FaCog } from "react-icons/fa";
 import { formatDateinString, selectboxObserver, getAttendanceBadges } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { ListAttendance,getAttendanceByMember, getAttendanceSummary, getMonthlyAttendanceExcelView } from "../../redux/actions/attendance.action";
+import { ListAttendance,getAttendanceByMember, getAttendanceSummary, getMonthlyAttendanceExcelView, ListAttendanceStatuses } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import DatePicker from "react-multi-date-picker";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -21,7 +21,6 @@ import MonthHeader from "./monthheader";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import AttendanceStatusManager from "../modals/attendanceStatus";
-
 const today = new Date();
 const currentMonthValue = `${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`; // 'MM/YYYY'
 
@@ -56,6 +55,7 @@ function AttendancePage() {
   const attendanceFeed = useSelector(state => state.attendance.attendances)
   const apiResult = useSelector(state => state.attendance)
   const [memberAttendance, setMemberAttendance] = useState([])
+  const [attendanceStatus, setAttendanceStatus] = useState([]);
   const [ attendances, setAttendances] = useState([])
   const memberFeed = useSelector((state) => state.member.members)
   const [members, setMembers] = useState([])
@@ -94,6 +94,7 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
 
   const handleAttendanceList = async () => {
     setSpinner(true)
+    dispatch(ListAttendanceStatuses())
    await dispatch(ListAttendance(filters))
    dispatch(getMonthlyAttendanceExcelView(filters))
    setSpinner(false)
@@ -121,6 +122,10 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
 }, [memberFeed, dispatch]);
 
 useEffect(() => {
+  if( apiResult.attendanceStatuses){
+    setAttendanceStatus(apiResult.attendanceStatuses)
+  }
+
   if( apiResult.memberAttendance){
     setMemberAttendance(apiResult.memberAttendance)
   }
@@ -534,7 +539,15 @@ useEffect(() => {
                               </td>
                               <td className="ms-xl-auto">
                                 <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
-                                  <div className="text-center">
+                                  {attendanceStatus.map((status, index) => (
+                                    <div className="text-center">
+                                      <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">
+                                        {
+                                          attendanceData?.attendance?.[status?.label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '')] || 0
+                                        } <small>{status?.label}</small></h4>
+                                    </div>
+                                  ))}
+                                  {/* <div className="text-center">
                                     <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">{attendanceData?.attendance?.present || 0} <small>Present</small></h4>
                                   </div>
                                   <div className="text-center">
@@ -548,7 +561,7 @@ useEffect(() => {
                                   </div>
                                   <div className="text-center">
                                     <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">{attendanceData?.attendance?.absent || 0} <small>Absent</small></h4>
-                                  </div>
+                                  </div> */}
                                   <Button variant="dark" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {handleMemberAttendance(attendanceData);setIsActive(1)}}><FaEye/> Details</Button>
                                 </div>
                               </td>
