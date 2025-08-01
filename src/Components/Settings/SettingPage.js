@@ -1,18 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, act } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Form, ListGroup, Card, FloatingLabel, Dropdown, Row, Col} from "react-bootstrap";
 import { FaEdit, FaTrashAlt,FaRegBell, FaRegUser, FaEllipsisV } from "react-icons/fa";
 import { FiGlobe} from "react-icons/fi";
-import { TbTimezone } from "react-icons/tb";
 import { MdLockOutline, MdOutlineEmail } from "react-icons/md";
-import Spinner from "react-bootstrap/Spinner";
 import { getUserProfile, updateProfile, updatePassword } from "../../redux/actions/auth.actions";
 import { getFieldRules, validateField } from "../../helpers/rules";
-import { AlertDialog } from "../modals";
-import { permissionModules, permissionsLabel } from "../../helpers/permissionsModules";
-import { updatePermissions, addRoleWithPermissions, deleteRole} from "../../redux/actions/permission.action";
-import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
-import { Listmembers } from "../../redux/actions/members.action";
+import { selectboxObserver } from "../../helpers/commonfunctions";
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function EditableField({
   field,
@@ -154,6 +148,12 @@ function SettingPage() {
   useEffect(() => {
     refreshProfile();
   }, []);
+
+  useEffect(() => {
+    if( activeTab === 'Preferences'){
+      selectboxObserver()
+    }
+  }, [activeTab])
 
   useEffect(() => {
     if(authAPI.success){
@@ -477,7 +477,7 @@ function SettingPage() {
                     <div class="d-flex gap-3 mt-3">
                       <Form.Group className="mb-0 form-group w-100 w-md-50">
                         <Form.Label>Timezone</Form.Label>
-                        <Form.Select>
+                        <Form.Select className="custom-selectbox">
                           <option>Pacific Time (PT)</option>
                           <option>Mountain Time (MT)</option>
                           <option>Central Time (CT)</option>

@@ -430,11 +430,17 @@ export const CustomFieldModal = (props) => {
               <Button variant="primary" className="field--btn" onClick={handleAddFieldClick}>Add Field</Button>
             </div>
           )}
-
-          <ListGroup horizontal className="field__tabs">
-            <ListGroup.Item className={`btn--view ${activeTab === 'custom' ? 'active' : ''}`} onClick={() => setActiveTab('custom')}>Custom Fields</ListGroup.Item>
-            <ListGroup.Item className={`btn--view ${activeTab === 'system' ? 'active' : ''}`} onClick={() => setActiveTab('system')}>System Fields</ListGroup.Item>
+          {
+              props.module === 'projects' && (
+            <ListGroup horizontal className="field__tabs">
+              <ListGroup.Item className={`btn--view ${activeTab === 'custom' ? 'active' : ''}`} onClick={() => setActiveTab('custom')}>Custom Fields</ListGroup.Item>
+              
+                  <ListGroup.Item className={`btn--view ${activeTab === 'system' ? 'active' : ''}`} onClick={() => setActiveTab('system')}>System Fields</ListGroup.Item>
+              
+            
           </ListGroup>
+          )
+            }
 
           {(showOptions || isEditing) && (
             <div className="field--options">

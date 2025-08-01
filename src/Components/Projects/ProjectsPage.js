@@ -112,7 +112,7 @@ function ProjectsPage() {
     ];
 
     useEffect(() => {
-        selectboxObserver()
+        
         dispatch(updateStateData(PROJECT_FORM, { title: '', status: 'in-progress', members: [] }))
         
         dispatch(fetchSystemFields({module: 'projects', return_type: 'object', fields: ['status']}))
@@ -131,6 +131,19 @@ function ProjectsPage() {
         if (apiSystemfields.systemFieldsObject) {
           setSystemFields(apiSystemfields.systemFieldsObject);
         }
+
+        if (apiSystemfields.updatedField) {
+            if (apiSystemfields.updatedField) {
+                setSystemFields((prevSystemFields) => ({
+                    ...prevSystemFields,
+                    [apiSystemfields.updatedField?.name]: apiSystemfields.updatedField
+                }));
+            }
+
+        }
+        setTimeout(()=>{
+            selectboxObserver()
+        },600)
     }, [apiSystemfields]);
 
     useEffect(() => {

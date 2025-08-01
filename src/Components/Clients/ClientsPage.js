@@ -18,7 +18,7 @@ import { renderDynamicField } from "../common/dynamicFields";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { currentMemberProfile } from "../../helpers/auth";
 import { CustomFieldModal } from "../modals/customFields";
-import { convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY } from "../../helpers/commonfunctions";
+import { convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY, selectboxObserver } from "../../helpers/commonfunctions";
 import { BadgesModal } from "../modals/badges";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -189,18 +189,6 @@ function ClientsPage() {
       }
     }
     setDisable(false)
-    // } else {
-    //   setEditedClient((prevState) => ({
-    //     ...prevState,
-    //     [field]: value,
-    //   }));
-    //   setEditedClient((prevState) => ({
-    //     ...prevState,
-    //     usermeta: prevState.usermeta.map(meta =>
-    //       meta.meta_key === field ? { ...meta, meta_value: value } : meta
-    //     )
-    //   }));
-    // }
   };
 
   const toggleCustomFields = () => {
@@ -210,14 +198,7 @@ function ClientsPage() {
   const deleteSuccess = useSelector(state => state.client.deletedClient);
 
   useEffect(() => {
-    if (selectedClient) { // Check if data is available
-      // setIsEditing({
-      //   name: false,
-      //   avatar: false,
-      //   remove_avatar: false
-      // });
-      // setEditedClient({ ...selectedClient });
-    }
+    
     let fieldsSetup = {
       name: selectedClient?.name,
       remove_avatar: false
@@ -235,6 +216,7 @@ function ClientsPage() {
     setFields(
       fieldsSetup
     )
+    
   }, [selectedClient]);
 
   useEffect(() => {
@@ -244,10 +226,11 @@ function ClientsPage() {
     }
   }, [deleteSuccess])
 
-  // const [isEditing, setIsEditing] = useState({
-  //   name: false,
-  //   avatar: false
-  // });
+ useEffect(() => {
+  setTimeout(() => {
+    selectboxObserver()
+  },600)
+ },[isEditing])
 
   const handleListClients = async () => {
     setClientFeed([])
