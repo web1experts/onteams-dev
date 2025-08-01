@@ -1,17 +1,22 @@
+// ⬇️ PLACEHOLDER: Add your imports (React, Redux, etc.) above this line
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Modal, Button, Form, Row, Col, Card, Badge } from "react-bootstrap";
-import { FiEdit3, FiTrash2 } from "react-icons/fi";
+import { FiEdit3, FiTrash2, FiPlus } from "react-icons/fi";
 import {
   ListAttendanceStatuses,
   saveAttendanceStatuses,
 } from "../../redux/actions/attendance.action";
-import { FiPlus } from "react-icons/fi";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 
 const AttendanceStatusManager = ({ toggle, show }) => {
+  const dispatch = useDispatch();
+  const apiResult = useSelector((state) => state.attendance);
+
   const [EditIndex, setEditIndex] = useState(false);
   const [showRules, setRulesShow] = useState(false);
+  const [attendanceStatus, setAttendanceStatus] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     ruleName: "",
     code: "",
@@ -21,28 +26,77 @@ const AttendanceStatusManager = ({ toggle, show }) => {
     endMinute: "00",
     color: "#eab308",
   });
-  const [errors, setErrors] = useState({
-    ruleName: "",
-    code: "",
-    startHour: "",
-    startMinute: "",
-    endHour: "",
-    endMinute: "",
-    color: "",
-  });
-  const handleRulesClose = () => {
-    setRulesShow(false);
-    if (attendanceStatus.length > 0) {
-      // Find the highest "to" value
-      const rawMax = Math.max(...attendanceStatus.map((s) => parseFloat(s.to)));
+  const [errors, setErrors] = useState({});
 
-      // Convert decimal to minutes, add 1 min, and convert back to decimal hours
+  useEffect(() => {
+    dispatch(ListAttendanceStatuses());
+  }, []);
+
+  useEffect(() => {
+    if (apiResult.attendanceStatuses) {
+      const sortedStatuses = [...apiResult.attendanceStatuses].sort((a, b) => a.from - b.from);
+      setAttendanceStatus(sortedStatuses);
+    }
+  }, [apiResult]);
+
+  useEffect(() => {
+    if (attendanceStatus.length > 0 && EditIndex === false) {
+      const rawMax = Math.max(...attendanceStatus.map((s) => parseFloat(s.to)));
       const totalMinutes = Math.round(rawMax * 60) + 1;
       const newDecimal = parseFloat((totalMinutes / 60).toFixed(2));
+      const { hour, minute } = fromDecimal(newDecimal);
 
-      // Convert to hour and minute parts
-      const { hour, minute } = decimalToTimeParts(newDecimal);
+      setForm((prev) => ({
+        ...prev,
+        startHour: hour,
+        startMinute: minute,
+      }));
+    }
+  }, [attendanceStatus]);
 
+  const decimalToTimeRange = (from, to) => {
+    const formatTime = (decimal) => {
+      const hours = Math.floor(decimal);
+      const minutes = Math.round((decimal - hours) * 60);
+      return `${hours}:${String(minutes).padStart(2, "0")}`;
+    };
+    return `${formatTime(from)} - ${formatTime(to)}`;
+  };
+
+  const toDecimal = (hour, minute) => {
+    const h = parseInt(hour, 10);
+    const m = parseInt(minute, 10);
+
+    // Convert total minutes
+    const totalMinutes = h * 60 + m;
+
+    // Truncate to 2 decimal places without rounding
+    const decimal = Math.floor((totalMinutes * 100) / 60) / 100;
+
+    return decimal;
+  };
+
+
+  const fromDecimal = (decimal) => {
+    const hour = String(Math.floor(decimal)).padStart(2, '0');
+    const minute = String(Math.round((decimal - Math.floor(decimal)) * 60)).padStart(2, '0');
+    return { hour, minute };
+  };
+
+  const handleRulesShow = () => {
+    setRulesShow(true);
+    setTimeout(() => selectboxObserver(), 500);
+  };
+
+  const handleRulesClose = () => {
+    setEditIndex(false);
+    setRulesShow(false);
+    setErrors({});
+    if (attendanceStatus.length > 0) {
+      const maxTo = Math.max(...attendanceStatus.map((s) => s.to));
+      const totalMinutes = Math.round(maxTo * 60) + 1;
+      const newDecimal = totalMinutes / 60;
+      const { hour, minute } = fromDecimal(newDecimal);
       setForm({
         ruleName: "",
         code: "",
@@ -54,181 +108,247 @@ const AttendanceStatusManager = ({ toggle, show }) => {
       });
     }
   };
-  const handleRulesShow = () => {
-    setRulesShow(true);
-    setTimeout(() => {
-      selectboxObserver();
-    }, 600);
-  };
 
-  const dispatch = useDispatch();
-  const apiResult = useSelector((state) => state.attendance);
-  const [attendanceStatus, setAttendanceStatus] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const listStatuses = () => {
-    dispatch(ListAttendanceStatuses());
-  };
-  useEffect(() => {
-    listStatuses();
-  }, []);
+  const handleRulesChange = (field, value) => {
+  const updatedForm = { ...form, [field]: value };
 
-  useEffect(() => {
-    if (apiResult.attendanceStatuses) {
-      const sortedStatuses = apiResult.attendanceStatuses.sort((a, b) => {
-        if (a.from !== b.from) return a.from - b.from;
-        return a.to - b.to;
-      });
-      setAttendanceStatus(sortedStatuses);
+  const startDecimal = toDecimal(updatedForm.startHour, updatedForm.startMinute);
+  const endDecimal = toDecimal(updatedForm.endHour, updatedForm.endMinute);
+
+  if (EditIndex !== false) {
+    const updatedStatuses = [...attendanceStatus];
+    const oneMinute = 1 / 60;
+    const twoMinutes = 1.5 / 60;
+    setForm(updatedForm);
+    // ⏩ End time changes
+    if (field === "endHour" || field === "endMinute") {
+      const next = updatedStatuses[EditIndex + 1];
+      if (next) { console.log(`${endDecimal}::: ${(next.to - twoMinutes)}`)
+        const isTooCloseToNextEnd = endDecimal > (next.to - twoMinutes);
+        const isSameAsNextEnd = endDecimal === next.to;
+        //const isSameAsNextStart = endDecimal === next.from;
+console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
+        if (isTooCloseToNextEnd === true || isSameAsNextEnd === true) {
+          setErrors({
+            timeConflict: `End time must be at least 2 minutes before "${next.label}" ends.`,
+          });
+          return;
+        }
+
+        // Update next.from = current.to + 1 minute
+        updatedStatuses[EditIndex + 1] = {
+          ...next,
+          from: Math.floor((endDecimal + oneMinute) * 100) / 100,
+        };
+      }
+
+      setErrors({});
     }
-  }, [apiResult]);
 
-  useEffect(() => {
-    if (attendanceStatus.length > 0) {
-      // Find the highest "to" value
-      const rawMax = Math.max(...attendanceStatus.map((s) => parseFloat(s.to)));
+    // ⏮️ Start time changes
+    if ((field === "startHour" || field === "startMinute") && EditIndex > 0) {
+      const prev = updatedStatuses[EditIndex - 1];
+      if (prev) {
+        const minAllowedStart = prev.from + oneMinute;
 
-      // Convert decimal to minutes, add 1 min, and convert back to decimal hours
-      const totalMinutes = Math.round(rawMax * 60) + 1;
-      const newDecimal = parseFloat((totalMinutes / 60).toFixed(2));
+        if (startDecimal < minAllowedStart) {
+          setErrors({
+            timeConflict: `Start time must be at least 1 minute after "${prev.label}" starts.`,
+          });
+          return;
+        }
+      }
 
-      // Convert to hour and minute parts
-      const { hour, minute } = decimalToTimeParts(newDecimal);
-
-      setForm((prev) => ({
-        ...prev,
-        startHour: hour,
-        startMinute: minute,
-      }));
+      setErrors({});
     }
-  }, [attendanceStatus]);
 
-  // const decimalToTimeParts = (decimal) => {
-  //   const hour = String(Math.floor(decimal)).padStart(2, '0');
-  //   const minute = String(Math.round((decimal - Math.floor(decimal)) * 60)).padStart(2, '0');
-  //   return { hour, minute };
-  // };
-  const decimalToTimeParts = (decimal) => {
-    const hour = Math.floor(decimal);
-    const minute = Math.round((decimal - hour) * 60);
-    return { hour, minute };
+    
+  }
+
+  
+};
+
+
+
+
+
+
+  const handleColorSelect = (color) => {
+    setForm({ ...form, color });
   };
+
+  const showError = (field) => errors[field] ? <span className="form-error">{errors[field]}</span> : null;
+
+  const handleSubmit = (e) => {
+  e.preventDefault();
+
+  const newErrors = {};
+  let hasError = false;
+
+  const oneMinute = 1 / 60;
+  const twoMinutes = 2 / 60;
+
+  const startDecimal = toDecimal(form.startHour, form.startMinute);
+  const endDecimal = toDecimal(form.endHour, form.endMinute);
+
+  // Validate required fields
+  for (const [key, val] of Object.entries(form)) {
+    if (!val || val.trim() === "") {
+      newErrors[key] = `${key} is required.`;
+      hasError = true;
+    }
+  }
+
+  // Must be at least 1-minute duration
+  if (endDecimal - startDecimal < oneMinute) {
+    newErrors.timeConflict = "Each status must be at least 1 minute long.";
+    hasError = true;
+  }
+
+  // Validate against next status
+  if (EditIndex !== false && EditIndex < attendanceStatus.length - 1) {
+    const next = attendanceStatus[EditIndex + 1];
+    const nextFrom = parseFloat(next.from);
+    const nextTo = parseFloat(next.to);
+
+    if (
+      endDecimal >= nextTo ||           // must be less than next.to
+      //endDecimal === nextFrom ||        // cannot match next start
+      endDecimal === nextTo ||          // cannot match next end
+      endDecimal > nextTo - twoMinutes  // must be at least 2 mins before next.to
+    ) {
+      newErrors.timeConflict = `End time must be at least 2 minutes before "${next.label}" ends and not match its start/end.`;
+      hasError = true;
+    }
+  }
+
+  // Validate against previous status
+  if (EditIndex !== false && EditIndex > 0) {
+    const prev = attendanceStatus[EditIndex - 1];
+    const prevFrom = parseFloat(prev.from);
+
+    if (startDecimal <= prevFrom || startDecimal - prevFrom < oneMinute) {
+      newErrors.timeConflict = `Start time must be at least 1 minute after "${prev.label}" starts.`;
+      hasError = true;
+    }
+  }
+
+  if (hasError) {
+    setErrors(newErrors);
+    return;
+  }
+
+  // Prepare new rule
+  const newRule = {
+    label: form.ruleName.trim(),
+    code: form.code.trim(),
+    from: startDecimal,
+    to: endDecimal,
+    color: form.color,
+  };
+
+  let updatedStatuses = [...attendanceStatus];
+
+  if (EditIndex === false) {
+    // ➕ New rule
+    updatedStatuses.push(newRule);
+  } else {
+    // ✏️ Update rule
+    updatedStatuses[EditIndex] = newRule;
+
+    // Update next rule’s start time if it exists
+    if (EditIndex < updatedStatuses.length - 1) {
+      const newNextStart = parseFloat((endDecimal + oneMinute).toFixed(2));
+      updatedStatuses[EditIndex + 1] = {
+        ...updatedStatuses[EditIndex + 1],
+        from: newNextStart,
+      };
+    }
+
+    // Update previous rule’s end time if it exists
+   if (EditIndex > 0) {
+      const prev = updatedStatuses[EditIndex - 1];
+      const current = attendanceStatus[EditIndex];
+
+      const originalStart = parseFloat(current.from);
+      if (startDecimal !== originalStart) {
+        updatedStatuses[EditIndex - 1] = {
+          ...prev,
+          to: parseFloat((startDecimal - oneMinute).toFixed(2)),
+        };
+      }
+    }
+
+  }
+
+  const sortedStatuses = updatedStatuses.sort((a, b) => a.from - b.from);
+  dispatch(saveAttendanceStatuses({ statuses: sortedStatuses }));
+  setAttendanceStatus(sortedStatuses);
+  handleRulesClose();
+};
+
+
+
+
+
 
   const editRule = (index) => {
     const status = attendanceStatus[index];
     if (!status) return;
+
     setEditIndex(index);
-    const { hour: startHour, minute: startMinute } = decimalToTimeParts(
-      status.from
-    );
-    const { hour: endHour, minute: endMinute } = decimalToTimeParts(status.to);
+    const { hour: startHour, minute: startMinute } = fromDecimal(status.from);
+    const { hour: endHour, minute: endMinute } = fromDecimal(status.to);
 
     setForm({
-      ruleName: status.label || "",
-      code: status.code || "",
-      color: status.color || "",
-      startHour: startHour,
-      startMinute: startMinute,
-      endHour: endHour,
-      endMinute: endMinute,
+      ruleName: status.label,
+      code: status.code,
+      startHour,
+      startMinute,
+      endHour,
+      endMinute,
+      color: status.color,
     });
-    setRulesShow(true);
-  };
 
-  useEffect(() => {
-    console.log("form data:: ", form);
-  }, [form]);
+    handleRulesShow();
+  };
 
   const removeStatus = (indexToRemove) => {
     if (attendanceStatus.length <= 2) return;
 
-    const roundToTwo = (num) => Math.round(num * 100) / 100;
-
     const updatedStatuses = [...attendanceStatus];
-
-    // Remove the selected rule
     updatedStatuses.splice(indexToRemove, 1);
 
-    // Get previous rule's to (new starting point for next rule)
     if (indexToRemove > 0 && updatedStatuses[indexToRemove]) {
-      const prevTo = attendanceStatus[indexToRemove - 1].to;
-      const newFrom = roundToTwo(prevTo + 0.1); // increment by 0.1
-
+      const prevTo = updatedStatuses[indexToRemove - 1].to;
       updatedStatuses[indexToRemove] = {
         ...updatedStatuses[indexToRemove],
-        from: newFrom,
-        // to remains unchanged
+        from: Math.floor((prevTo + 1 / 60) * 100) / 100,
       };
     }
 
-    const payload = {
-      statuses: updatedStatuses.map((status) => ({
-        label: status.label.trim(),
-        code: status.code,
-        from: status.from,
-        to: status.to,
-        color: status.color,
-      })),
-    };
-
-    dispatch(saveAttendanceStatuses(payload));
+    dispatch(saveAttendanceStatuses({ statuses: updatedStatuses }));
+    setAttendanceStatus(updatedStatuses);
   };
-
-  const hours = Array.from({ length: 24 }, (_, i) =>
-    String(i).padStart(2, "0")
-  );
-  const minutes = Array.from({ length: 60 }, (_, i) =>
-    String(i).padStart(2, "0")
-  );
-
-  const colorOptions = [
-    "#ef4444",
-    "#eab308",
-    "#f97315",
-    "#22c55d",
-    "#3c82f6",
-    "#a855f7",
-    "#ec4899",
-    "#6466f1",
-  ];
-
-  const attendanceData = [
-    { color: "absent", title: "Absent", code: "A", time: "0:00 - 1:59" },
-    { color: "halfday", title: "Half Day", code: "HD", time: "2:00 - 4:00" },
-    {
-      color: "shortleave",
-      title: "Short Leave",
-      code: "SL",
-      time: "4:01 - 6:00",
-      badgeColor: "orange",
-    },
-    { color: "present", title: "Present", code: "P", time: "6:01 - 8:00" },
-    { color: "overtime", title: "Overtime", code: "OT", time: "8:01 - 12:00" },
-  ];
 
   const AttendanceCard = ({ index, total, color, label, code, from, to }) => {
     const showTrashIcon = total > 2 && index !== 0 && index !== 1;
-
     return (
       <Card className="mb-3 rules--card">
         <Card.Body>
           <Row className="align-items-center">
             <Col xs="auto">
-              <div className={`rules--bg`} style={{ background: color }}></div>
+              <div className="rules--bg" style={{ background: color }}></div>
             </Col>
             <Col className="ps-0">
               <strong className="d-flex align-items-center gap-2">
-                {label}{" "}
-                <Badge bg="light" text="dark">
-                  {code}
-                </Badge>
-              </strong>{" "}
+                {label} <Badge bg="light" text="dark">{code}</Badge>
+              </strong>
               <p className="mb-0">{decimalToTimeRange(from, to)}</p>
             </Col>
             <Col xs="auto" className="rules--actions">
               <FiEdit3 onClick={() => editRule(index)} />
-              {showTrashIcon && (
-                <FiTrash2 onClick={() => removeStatus(index)} />
-              )}
+              {showTrashIcon && <FiTrash2 onClick={() => removeStatus(index)} />}
             </Col>
           </Row>
         </Card.Body>
@@ -236,186 +356,13 @@ const AttendanceStatusManager = ({ toggle, show }) => {
     );
   };
 
-  // const data = attendanceData; // Replace with state if dynamically updating
-  // const totalCards = data.length;
-
-  //  const handleRulesChange = (field, value) => {
-  //   const updatedForm = { ...form, [field]: value };
-
-  //   // If startHour or startMinute was updated, also update endHour
-  //   if (field === 'startHour' || field === 'startMinute') {
-  //     const startTime = parseInt(updatedForm.startHour) + parseInt(updatedForm.startMinute) / 60;
-
-  //     // Find first hour > startTime
-  //     const nextEndHour = hours.find((h) => parseInt(h) > startTime);
-
-  //     // Set to found value or default to last hour
-  //     updatedForm.endHour = nextEndHour || hours[hours.length - 1];
-  //   }
-
-  //   setForm(updatedForm);
-  // };
-
-  const handleRulesChange = (field, value) => {
-    const updatedForm = { ...form, [field]: value };
-
-    // If startHour or startMinute was updated, also update endHour
-    if (field === "startHour" || field === "startMinute") {
-      const startHour = parseInt(updatedForm.startHour, 10);
-      const startMinute = parseInt(updatedForm.startMinute, 10);
-      const startTimeDecimal = parseFloat(
-        (startHour + startMinute / 60).toFixed(2)
-      );
-
-      // Convert `hours` to numeric array if needed
-      const nextEndHour = hours.find((h) => parseFloat(h) > startTimeDecimal);
-
-      // Fallback to last hour if no greater hour found
-      updatedForm.endHour = nextEndHour || hours[hours.length - 1];
-    }
-
-    setForm(updatedForm);
-  };
-
-  const handleColorSelect = (color) => {
-    setForm({ ...form, color });
-  };
-
-  const showError = (name) => {
-    if (errors && errors[name])
-      return <span className="form-error">{errors[name]}</span>;
-    return null;
-  };
-
-  // const convertToDecimalTime = (hour, minute) => {
-  //   const decimal = parseInt(hour) + parseInt(minute) / 60;
-  //   return Math.ceil(decimal * 100) / 100;
-  // };
-  const convertToDecimalTime = (hour, minute) => {
-    const decimal = parseInt(hour) + parseInt(minute) / 60;
-    return Math.floor(decimal * 100) / 100;
-  };
-
-
-
-  const decimalToTimeRange = (from, to) => {
-    const formatTime = (decimal) => {
-      const hours = Math.floor(decimal);
-      const minutes = Math.round((decimal - hours) * 60);
-      return `${hours}:${String(minutes).padStart(2, "0")}`;
-    };
-
-    return `${formatTime(from)} - ${formatTime(to)}`;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    let hasError = false;
-    const newErrors = {};
-
-    const startTime = convertToDecimalTime(form.startHour, form.startMinute);
-    const endTime = convertToDecimalTime(form.endHour, form.endMinute);
-   
-    // Check for empty fields
-    for (const [key, value] of Object.entries(form)) {
-      const isEmpty =
-        typeof value === "string"
-          ? value.trim() === ""
-          : value === "" || value === null || value === undefined;
-
-      if (isEmpty) {
-        hasError = true;
-        newErrors[key] = `${key} cannot be blank.`;
-      }
-    }
-
-    setErrors(newErrors);
-
-    if (hasError) {
-      return;
-    }
-
-const formStatus = {
-  label: form.ruleName.trim(),
-  code: form.code.trim(),
-  from: startTime,
-  to: endTime,
-  color: form.color,
-};
-
-let updatedStatuses = attendanceStatus.map((status) => ({
-  label: status.label.trim(),
-  code: status.code,
-  from: parseFloat(status.from),
-  to: parseFloat(status.to),
-  color: status.color,
-}));
-
-if (EditIndex === false || EditIndex === null || EditIndex === undefined) {
-  // New rule
-  updatedStatuses.push(formStatus);
-} else {
-  // Update current rule
-  updatedStatuses[EditIndex] = formStatus;
-
-  const nextIndex = EditIndex + 1;
-
-  if (nextIndex < updatedStatuses.length) {
-    const nextStatus = updatedStatuses[nextIndex];
-
-    // Calculate next start time (truncate to 2 decimal places)
-    const nextFromRaw = formStatus.to + 1 / 60;
-    const nextFrom = Math.floor(nextFromRaw * 100) / 100;
-
-    // Check if new from overlaps or exceeds to of next status
-    if (nextFrom >= nextStatus.to) {
-      setErrors({
-        timeConflict: `Cannot update. "${nextStatus.label}" will not have enough time left. Please adjust or remove overlapping statuses.`,
-      });
-      return;
-    }
-
-    // Update only 'from' of the immediate next status
-    updatedStatuses[nextIndex] = {
-      ...nextStatus,
-      from: nextFrom,
-    };
-  }
-}
-
-
-
-
-
-
-
-
-    const sortedStatuses = updatedStatuses.sort((a, b) => {
-      if (a.from !== b.from) return a.from - b.from;
-      return a.to - b.to;
-    });
-    const payload = {
-      statuses: sortedStatuses,
-    };
-      setLoading(true);
-    console.log("Payload:: ", payload);
-    dispatch(saveAttendanceStatuses(payload))
-    setLoading(false);
-
-    handleRulesClose();
-    // Proceed with API logic or further actions
-  };
+  const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+  const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
+  const colorOptions = ["#ef4444", "#eab308", "#f97315", "#22c55d", "#3c82f6", "#a855f7", "#ec4899", "#6466f1"];
 
   return (
     <>
-      <Modal
-        show={show}
-        onHide={toggle}
-        centered
-        size="lg"
-        className="status--modal rules--modal"
-      >
+      <Modal show={show} onHide={toggle} centered size="lg" className="status--modal rules--modal">
         <Modal.Header closeButton className="border-bottom">
           <Modal.Title>
             <strong>
@@ -440,16 +387,10 @@ if (EditIndex === false || EditIndex === null || EditIndex === undefined) {
           ))}
         </Modal.Body>
       </Modal>
-      <Modal
-        show={showRules}
-        centered
-        onHide={handleRulesClose}
-        backdrop="static"
-        keyboard={false}
-        size="md"
-      >
+
+      <Modal show={showRules} centered onHide={handleRulesClose} backdrop="static" keyboard={false} size="md">
         <Modal.Header className="pb-0">
-          <Modal.Title>Add New Rule</Modal.Title>
+          <Modal.Title>{EditIndex !== false ? "Edit Rule" : "Add New Rule"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
@@ -457,7 +398,6 @@ if (EditIndex === false || EditIndex === null || EditIndex === undefined) {
               <Form.Label>Rule Name</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="e.g., Present, Absent, Half Day"
                 value={form.ruleName}
                 onChange={(e) => handleRulesChange("ruleName", e.target.value)}
               />
@@ -469,7 +409,6 @@ if (EditIndex === false || EditIndex === null || EditIndex === undefined) {
               <Form.Control
                 type="text"
                 maxLength={2}
-                placeholder="e.g., P, A, HD"
                 value={form.code}
                 onChange={(e) => handleRulesChange("code", e.target.value)}
               />
@@ -479,122 +418,75 @@ if (EditIndex === false || EditIndex === null || EditIndex === undefined) {
             <Row className="mb-3">
               <Form.Label>Start Time</Form.Label>
               <Col>
-                <Form.Label>
-                  <small>Hours</small>
-                </Form.Label>
                 <Form.Select
                   value={form.startHour}
-                  onChange={(e) =>
-                    handleRulesChange("startHour", e.target.value)
-                  }
-                  disabled
+                  onChange={(e) => handleRulesChange("startHour", e.target.value)}
+                  disabled={EditIndex === false || EditIndex === 0}
                 >
-                  <option key={form.startHour} value={form.startHour}>
-                    {form.startHour}
-                  </option>
-                  {/* {hours.map((h) => (
+                  {(EditIndex !== false && EditIndex !== 0
+                    ? hours
+                    : [form.startHour]
+                  ).map((h) => (
                     <option key={h} value={h}>{h}</option>
-                  ))} */}
+                  ))}
                 </Form.Select>
-                {showError("startHour")}
+
               </Col>
               <Col>
-                <Form.Label>
-                  <small>Minutes</small>
-                </Form.Label>
                 <Form.Select
                   value={form.startMinute}
-                  onChange={(e) =>
-                    handleRulesChange("startMinute", e.target.value)
-                  }
-                  disabled
+                  onChange={(e) => handleRulesChange("startMinute", e.target.value)}
+                  disabled={EditIndex === false || EditIndex === 0}
                 >
-                  <option key={form.startMinute} value={form.startMinute}>
-                    {form.startMinute}
-                  </option>
-                  {/* {minutes.map((m) => (
+                  {(EditIndex !== false && EditIndex !== 0
+                    ? minutes
+                    : [form.startMinute]
+                  ).map((m) => (
                     <option key={m} value={m}>{m}</option>
-                  ))} */}
+                  ))}
                 </Form.Select>
-                {showError("startMinute")}
+
               </Col>
+              {showError("startHour")}
             </Row>
 
             <Row className="mb-3">
               <Form.Label>End Time</Form.Label>
               <Col>
-                <Form.Label>
-                  <small>Hours</small>
-                </Form.Label>
                 <Form.Select
-                  className="custom-selectbox"
                   value={form.endHour}
                   onChange={(e) => handleRulesChange("endHour", e.target.value)}
                 >
-                  {(() => {
-                    const startHour = parseInt(form.startHour);
-                    const startMinute = parseInt(form.startMinute);
-                    const startInMinutes = startHour * 60 + startMinute;
-
-                    return hours
-                      .filter((h) => {
-                        const hour = parseInt(h);
-                        const hourInMinutes = hour * 60;
-
-                        // Allow hour if it's after startHour
-                        // or if it's equal but user will pick later minutes
-                        return (
-                          hourInMinutes > startInMinutes ||
-                          (hour === startHour && startMinute < 59)
-                        );
-                      })
-                      .map((h) => (
-                        <option key={h} value={h}>
-                          {h}
-                        </option>
-                      ));
-                  })()}
+                  {hours.map((h) => <option key={h} value={h}>{h}</option>)}
                 </Form.Select>
-
-                {showError("endHour")}
               </Col>
               <Col>
-                <Form.Label>
-                  <small>Minutes</small>
-                </Form.Label>
                 <Form.Select
-                  className="custom-selectbox"
                   value={form.endMinute}
-                  onChange={(e) =>
-                    handleRulesChange("endMinute", e.target.value)
-                  }
+                  onChange={(e) => handleRulesChange("endMinute", e.target.value)}
                 >
-                  {minutes.map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
+                  {minutes.map((m) => <option key={m} value={m}>{m}</option>)}
                 </Form.Select>
-                {showError("endMinute")}
               </Col>
+              {showError("endHour")}
             </Row>
 
             <Form.Group className="mb-3">
               <Form.Label>Color</Form.Label>
-              <div className="d-flex flex-wrap gap-3 justify-content-between mt-2">
+              <div className="d-flex flex-wrap gap-2">
                 {colorOptions.map((color) => (
                   <div
-                    className="color--bg"
                     key={color}
                     onClick={() => handleColorSelect(color)}
                     style={{
                       backgroundColor: color,
-                      border:
-                        form.color === color
-                          ? "2px solid #444"
-                          : "2px solid transparent",
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      cursor: "pointer",
+                      border: form.color === color ? "2px solid black" : "1px solid #ccc",
                     }}
-                  ></div>
+                  />
                 ))}
               </div>
             </Form.Group>
