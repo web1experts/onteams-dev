@@ -314,13 +314,7 @@ function ManualTime() {
         </div>
       </div>
       {show && (
-        <Modal
-          show={show}
-          onHide={handleClose}
-          centered
-          size="lg"
-          className="AddReportModal AddTimeModal"
-        >
+        <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal">
           <Modal.Header closeButton>
             <Modal.Title>
               {singleManualRecord?.length > 0 ? (

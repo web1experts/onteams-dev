@@ -132,31 +132,33 @@ function AccountSetup() {
                     <Col sm={12} lg={6} className="px-0">
                         <div className="common--form">
                             <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
-                            {(companyform === false) ?
-                                <Form onSubmit={handleSubmit} >
-                                    <h2>Complete account setup</h2>
-                                    <Form.Group className="mb-3 form-group">
-                                        <FloatingLabel label="Your Name" controlId="floatingInput">
-                                            <Form.Control type="text" className={errors['name'] ? "input-error" : ''} placeholder="Your Name*" name="name" onChange={handleChange} />
-                                        </FloatingLabel>
-                                        {showError('name')}
-                                    </Form.Group>
-                                    <Form.Group className="mb-3 form-group">
-                                        <FloatingLabel label="Password" controlId="floatingPassword">
-                                            <Form.Control type="password"  className={errors['password'] ? "input-error" : ''} placeholder="Password*" name="password" onChange={handleChange} />
-                                        </FloatingLabel>
-                                        {showError('password')}
-                                    </Form.Group>
-                                    <Button variant="primary" type="submit" disabled={loader}>{loader ? 'Please wait...' : 'Setup Account' }</Button>
-                                </Form>
-                             :
-                             <>
-                                 <WorkspaceForm  show_more_buttons={true} heading={true} />
-                             </>
-                            }
-                            
-                            <p><span>OR</span></p>
-                            <p>Already have an account. <Link to="/login">Login Here</Link></p>
+                            <div className="account--setup">
+                                {(companyform === false) ?
+                                    <Form onSubmit={handleSubmit} >
+                                        <h2>Complete account setup</h2>
+                                        <Form.Group className="mb-3 form-group">
+                                            <FloatingLabel label="Your Name" controlId="floatingInput">
+                                                <Form.Control type="text" className={errors['name'] ? "input-error" : ''} placeholder="Your Name*" name="name" onChange={handleChange} />
+                                            </FloatingLabel>
+                                            {showError('name')}
+                                        </Form.Group>
+                                        <Form.Group className="mb-3 form-group">
+                                            <FloatingLabel label="Password" controlId="floatingPassword">
+                                                <Form.Control type="password"  className={errors['password'] ? "input-error" : ''} placeholder="Password*" name="password" onChange={handleChange} />
+                                            </FloatingLabel>
+                                            {showError('password')}
+                                        </Form.Group>
+                                        <Button variant="primary" type="submit" disabled={loader}>{loader ? 'Please wait...' : 'Setup Account' }</Button>
+                                    </Form>
+                                :
+                                <>
+                                    <WorkspaceForm  show_more_buttons={true} heading={true} />
+                                </>
+                                }
+                                
+                                <p><span>OR</span></p>
+                                <p>Already have an account. <Link to="/login">Login Here</Link></p>
+                            </div>
                         </div>
                     </Col>
                 </Row>

@@ -1193,7 +1193,7 @@ function ReportsPage() {
                     Reports
                   </p>
                   <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
-                    <ListGroup horizontal className="d-none d-xl-flex">
+                    <ListGroup horizontal className="d-none d-xxl-flex">
                       <ListGroup.Item action onClick={() => { handlefilterchange("sort_by", "members"); setActiveViewTab("members");}} className={`${activeMemberTab === "members" ? "d-none d-xl-flex gap-2 active " : "d-none d-xl-flex gap-2"}`}>
                         <AiOutlineTeam /> Members
                       </ListGroup.Item>
@@ -1203,7 +1203,7 @@ function ReportsPage() {
                     </ListGroup>
                   </ListGroup>
                   <ListGroup horizontal className="mx-2">
-                    <ListGroup.Item className={"d-none d-xl-flex"} key="search-filter-list">
+                    <ListGroup.Item className={"d-none d-xxl-flex"} key="search-filter-list">
                       <Form
                         className="search-filter-list"
                         onSubmit={(e) => {
@@ -1253,8 +1253,8 @@ function ReportsPage() {
                         </ListGroup.Item>
                       </>
                     )}
-                    <ListGroup.Item className="d-none d-xl-block">
-                      <Form>
+                    <ListGroup.Item className="d-none d-xxl-block">
+                      <Form className="d-flex align-items-center gap-2">
                         <Form.Group className="mb-0 form-group">
                           <FiltersDate
                             position="left"
@@ -1293,7 +1293,7 @@ function ReportsPage() {
                     </ListGroup.Item>
 
                     <ListGroup horizontal className="bg-white expand--icon d-flex">
-                      <ListGroup.Item className="d-flex d-xl-none" onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
+                      <ListGroup.Item className="d-flex d-xxl-none" onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
                       <ListGroup.Item className="d-none d-lg-flex" onClick={() => { handleSidebarSmall(false); }}><GrExpand /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
@@ -1651,9 +1651,9 @@ function ReportsPage() {
           </div>
 
           <ListGroup horizontal className="expand--icon ms-auto">
-            <ListGroup>
+            <ListGroup className="p-0">
               <ListGroup.Item className="d-none d-xl-block w-auto h-auto day--dropdown">
-                <Form>
+                <Form className="d-flex align-items-center gap-2">
                   <Form.Group className="mb-0 form-group p-0">
                     <FiltersDate
                       position="left"
@@ -1663,7 +1663,7 @@ function ReportsPage() {
                     />
                   </Form.Group>
                   {selectedFilter === "custom" && (
-                    <Form.Group className="mb-0 form-group">
+                    <Form.Group className="mb-0 form-group p-0">
                       <DatePicker
                         ref={datePickerRef}
                         key={"date-filter"}
@@ -1973,7 +1973,7 @@ function ReportsPage() {
                 </ListGroup.Item>
               </>
             )}
-            <ListGroup.Item className="d-none d-xl-block">
+            <ListGroup.Item>
               <Form>
                 <Form.Group className="mb-0 form-group">
                   <FiltersDate
@@ -1982,39 +1982,6 @@ function ReportsPage() {
                     setSelectedFilter={setSelectedFilter}
                     setIsPickerOpen={setIsPickerOpen}
                   />
-                </Form.Group>
-                {selectedFilter === "custom" && (
-                  <Form.Group className="mb-0 form-group">
-                    <DatePicker
-                      ref={datePickerRef}
-                      key={"date-filter"}
-                      name="date"
-                      weekStartDayIndex={1}
-                      id="datepicker-filter"
-                      value={filtereddate}
-                      format="YYYY-MM-DD"
-                      range
-                      numberOfMonths={2}
-                      dateSeparator=" - "
-                      onChange={async (value) => {
-                        setFilteredDate(value);
-                      }}
-                      editable={false}
-                      className="form-control"
-                      placeholder="dd/mm/yyyy"
-                      open={isPickerOpen} // Control visibility with state
-                      onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                      onClose={() => setIsPickerOpen(false)} // Update state when closed
-                      plugins={[<FilterButton position="bottom" />]}
-                    />
-                  </Form.Group>
-                )}
-              </Form>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Form>
-                <Form.Group className="mb-0 form-group">
-                  <FiltersDate position="left" setFilteredDate={setFilteredDate} setSelectedFilter={setSelectedFilter} setIsPickerOpen={setIsPickerOpen}/>
                 </Form.Group>
                 {selectedFilter === "custom" && (
                   <Form.Group className="mb-0 form-group">

@@ -558,13 +558,11 @@ useEffect(() => {
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>
-                    
-                    <ListGroup horizontal className="members--list me-md-2 ms-auto d-none d-xl-flex">
+                    <ListGroup horizontal className="members--list mx-auto d-none d-xxl-flex">
                         <ListGroup.Item key={`project-assign-${currentProject?._id}`} className="me-3">Members</ListGroup.Item>
-                            <MemberInitials showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} members={fields?.members || []} directUpdate={true} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={currentProject?._id} type = "project" 
-                            />
+                        <MemberInitials showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') ? true : false} members={fields?.members || []} directUpdate={true} showAssignBtn={(memberProfile?.permissions?.members?.view === true || memberProfile?.role?.slug === 'owner') ? true : false} postId={currentProject?._id} type = "project" />
                     </ListGroup>
-                    <ListGroup horizontal className="ms-auto ms-xl-0 p-0 mt-0 mt-md-0 d-none d-md-flex">
+                    <ListGroup horizontal className="ms-auto ms-xxl-0 p-0 mt-0 mt-md-0 d-none d-md-flex">
                         <ListGroup horizontal className="bx--shadow">
                             <Button variant="secondary" className="active btn--view d-none d-sm-flex" onClick={() => setIsActive(2)}><BsEye className="me-1" /> Details</Button>
                             <Button variant="primary" className="btn--view d-none d-sm-flex" onClick={() => props.closeview(1)}><BiEdit className="me-1"/> Tasks</Button>

@@ -1456,18 +1456,9 @@ function TeamMembersPage() {
           <Form onSubmit={handleSubmit}>
             {/* {rows.map((row, index) => ( */}
             <div className="form-row" key={`row-0`}>
-              <Form.Group className="mb-0 form-group">
-                <FloatingLabel
-                  label="Email address *"
-                  controlId={`floatingInput-0`}
-                >
-                  <Form.Control
-                    type="text"
-                    className={
-                      errors["email"] && errors["email"] !== ""
-                        ? "input-error"
-                        : "form-control"
-                    }
+              <Form.Group className="mb-0 form-group d-flex gap-3 align-items-center">
+                <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
+                  <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
                     placeholder="Email address"
                     name="email"
                     value={fields?.email}
@@ -1475,7 +1466,7 @@ function TeamMembersPage() {
                   />
                 </FloatingLabel>
                 {showError("email")}
-                <span>{fields?.rolename || ''}</span>
+                <span className="badge bg-success">{fields?.rolename || ''}</span>
               </Form.Group>
 
               <Button
@@ -1902,7 +1893,7 @@ function TeamMembersPage() {
                   <strong>Role & Permissions <small>Manage access permissions</small></strong>
               </Modal.Title>
           </Modal.Header>
-          <Modal.Body className="p-0">
+          <Modal.Body className="pb-0">
               <RolesPage />
           </Modal.Body>
         </Modal>

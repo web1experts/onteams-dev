@@ -63,7 +63,7 @@ export const CustomFieldModal = (props) => {
               </div>
             </Col>
             {showInTable && (
-              <Col xs="auto">
+              <Col xs="auto" className="ms-md-auto">
                 <Badge pill bg="success" text="dark">
                   In Columns
                 </Badge>

@@ -374,18 +374,33 @@ useEffect(() => {
                                 <MonthHeader month={filters?.month?.split("/")[0]} year={filters?.month?.split("/")[1]} />
                                 {
                                   attendanceStatus?.map((status, idx) => {
-                                    
-                                  const lightBorderColor = lightenColor(status?.color, 40);
-                                  const lightBgColor = lightenColor(status?.color, 70);
+                                    const rgbaBorder = hexToRgba(status?.color, 0.4);
+                                    const rgbaBg = hexToRgba(status?.color, 0.1);
+                                    function hexToRgba(hex, alpha) {
+                                      hex = hex.replace('#', '');
+
+                                      if (hex.length === 3) {
+                                        hex = hex.split('').map(c => c + c).join('');
+                                      }
+
+                                      const bigint = parseInt(hex, 16);
+                                      const r = (bigint >> 16) & 255;
+                                      const g = (bigint >> 8) & 255;
+                                      const b = bigint & 255;
+
+                                      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                                    }
+
                                     return (
-                                      <th className="text-center p-0" style={{'color': status.color, 'background-color': lightBgColor, 'border-right': `1px solid ${lightBorderColor}` ,'border-bottom': `1px solid ${lightBorderColor}`}}>
-                                        <div className="border-bottom padd--x border-top">
+                                      <th key={idx} className="text-center p-0" style={{color: status.color,backgroundColor: rgbaBg}}>
+                                        <div className="padd--x" style={{ borderRight: `1px solid ${rgbaBorder}`, borderBottom: `1px solid ${rgbaBorder}`}}>
                                           <strong>{status.label}</strong>
                                         </div>
                                       </th>
-                                    )
+                                    );
                                   })
                                 }
+
                                 
                                 {/* <th className="bg--red text-center p-0">
                                   <div className="border-bottom padd--x border-top">
@@ -472,15 +487,32 @@ useEffect(() => {
                   <div className="d-flex align-items-center gap-3 gap-md-4 flex-wrap att--status--abbr">
                     {
                       attendanceStatus?.map((status, idx) => {
-                        const lightBorderColor = lightenColor(status?.color, 40);
-                        const lightBgColor = lightenColor(status?.color, 70);
+                        const rgbaBg = hexToRgba(status?.color, 0.1);
+                        function hexToRgba(hex, alpha) {
+                          hex = hex.replace('#', '');
+
+                          if (hex.length === 3) {
+                            hex = hex.split('').map(c => c + c).join('');
+                          }
+
+                          const bigint = parseInt(hex, 16);
+                          const r = (bigint >> 16) & 255;
+                          const g = (bigint >> 8) & 255;
+                          const b = bigint & 255;
+
+                          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                        }
                         return (
-                          <div className="d-flex align-items-center gap-2 flex-column flex-md-row"><span className="d-flex align-items-center justify-content-center" style={{'color': status.color, 'background-color': lightBgColor, 'border-right': `1px solid ${lightBorderColor}` ,'border-bottom': `1px solid ${lightBorderColor}`, 'width': '30px','height': '30px','font-size': '.75rem','font-weight': '700','border-radius': '.5rem'}}>{status.code}</span><span className="text-slate-600">{status.label}</span></div>
-                      
-                        )
+                          <div key={idx} className="d-flex align-items-center gap-2 flex-column flex-md-row">
+                            <span className="d-flex align-items-center justify-content-center att--status--span" style={{ color: status.color, backgroundColor: rgbaBg,}}>
+                              {status.code}
+                            </span>
+                            <span className="text-slate-600">{status.label}</span>
+                          </div>
+                        );
                       })
                     }
-                     </div>
+                  </div>
                 </div>
               </div>
             )}

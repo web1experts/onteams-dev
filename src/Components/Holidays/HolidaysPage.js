@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Dropdown, ListGroup, Table, Card, Badge } from "react-bootstrap";
 import dayjs from 'dayjs';
-import { FaPlus, FaCheck, FaList } from "react-icons/fa";
+import { FaPlus, FaCheck, FaList, FaEllipsisV } from "react-icons/fa";
 import { GrExpand } from "react-icons/gr";
 import { BsGrid } from "react-icons/bs";
 import { LuCalendarPlus } from "react-icons/lu";
@@ -278,7 +278,7 @@ const getDaysLeft = (date) => {
           </div>
         :
           <Container fluid>
-            <Row className="gap-3 gap-lg-0">
+            <Row className="gap-3 gap-lg-0 mb-4">
               <Col lg={4}>
                 <Card className="card--blue">
                   <Card.Body>
@@ -337,7 +337,7 @@ const getDaysLeft = (date) => {
                                 <span className="days--left">{getDaysLeft(holiday.date)}</span>
                                 <div key={`action-td-${index}`} className="ms-3">
                                   <Dropdown>
-                                    <Dropdown.Toggle variant="dark"><FiEdit /></Dropdown.Toggle>
+                                    <Dropdown.Toggle variant="dark"><FaEllipsisV/> </Dropdown.Toggle>
                                     <Dropdown.Menu>
                                       <Dropdown.Item
                                         key={`edit-item-${index}`}

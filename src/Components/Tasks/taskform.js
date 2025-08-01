@@ -957,10 +957,10 @@ const renderSubtasks = () => {
                                 <Form.Group className="mb-0 form-group pb-0">
                                 {customFields?.length > 0 &&
                                     <>
-                                    <hr />
+                                    {/* <hr />
                                     <Form.Label>
                                         <small>Other Fields</small>
-                                    </Form.Label>
+                                    </Form.Label> */}
                                     {customFields?.map((field, index) =>
                                         renderDynamicField({
                                             name: `custom_field[${field.name}]`,

@@ -611,8 +611,8 @@ const isPostLikedByMember = (likes = [], memberId) => {
                     return (
                     <Card key={post._id} className="mb-4 p-3 rounded-4 inner--card">
                       <Row className="mb-2">
-                        <Col xs="auto">
-                          <Image src={post.author?.avatar || '/images/default.jpg'} roundedCircle width={40} height={40}/>
+                        <Col xs="auto" className="update--image">
+                          <Image src={post.author?.avatar || '/images/default.jpg'} roundedCircle/>
                         </Col>
                         <Col>
                           <strong>{post.author?.name || 'Unknown'}</strong>{' '}

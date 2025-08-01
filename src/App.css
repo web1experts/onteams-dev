@@ -292,6 +292,11 @@ body {
   border-radius: .5rem;
 }
 
+.page--title .rmdp-container {
+    width: auto;
+    max-width: 130px;
+}
+
 .wrapper--title .expand--icon .list-group-item {
   width: 40px;
   height: 40px;
@@ -489,7 +494,23 @@ body {
   justify-content: center;
 }
 
-.team--Cards .dropdown-menu,
+.holiday--table .dropdown-menu {
+  margin-top: 15px;
+}
+
+.holiday--table .dropdown-menu::before {
+    border: 10px solid;
+    border-color: transparent transparent var(--bs-dropdown-border-color);
+    content: "";
+    height: 0;
+    right: 6px;
+    margin: auto;
+    position: absolute;
+    top: -20px;
+    width: 0;
+}
+
+/* 
 .page--wrapper table td .dropdown-menu {
   padding: 0;
   border: 0;
@@ -502,7 +523,6 @@ body {
   top: 100% !important;
 }
 
-.team--Cards .dropdown-menu:before,
 .page--wrapper table td .dropdown-menu::before {
   border: 10px solid;
   border-color: transparent transparent rgb(17 24 39);
@@ -521,7 +541,6 @@ body {
   right: 0;
 }
 
-.team--Cards .dropdown .dropdown-item,
 .page--wrapper table td .dropdown-item {
   background: rgb(17 24 39);
   border: 0;
@@ -536,11 +555,10 @@ body {
   text-transform: capitalize;
 }
 
-.team--Cards .dropdown .dropdown-item:hover,
 .page--wrapper table td .dropdown-item:hover {
   background: rgb(17 24 39);
   color: #fff;
-}
+} */
 
 .team--Cards .dropdown {
   position: absolute;
@@ -860,6 +878,12 @@ body {
   text-overflow: ellipsis;
   max-width: 630px;
   width: 100%;
+}
+
+.password--new span {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 10px;
 }
 
 .project--grid--new--table td.new--td td.new--td {
@@ -1232,7 +1256,8 @@ button.input-error.dropdown-toggle.btn.btn-success {
   width: auto;
   display: block;
   margin: 0;
-  min-width: 120px;
+  /* min-width: 120px; */
+  /* flex: 1 1; */
 }
 
 .project--form--actions .add--member {
@@ -1487,8 +1512,9 @@ span.open--sidebar {
   margin-left: .5rem;
 }
 
-.wrapper--title .expand--icon .day--dropdown {
+.wrapper--title .expand--icon .day--dropdown, .wrapper--title .expand--icon .day--dropdown:hover, .wrapper--title .expand--icon .day--dropdown:focus {
   box-shadow: none;
+  background: none;
 }
 
 .wrapper--title .list-group-item.btn svg {
@@ -2452,10 +2478,6 @@ table tr.marked-project td {
   top: 100% !important;
 }
 
-.wrapper--title .dropdown-menu {
-  height: calc(100dvh - 80px);
-}
-
 .rounded--box .contact--card.card .card-title .dropdown-menu {
   min-width: 120px;
   margin-top: 20px;
@@ -2524,7 +2546,7 @@ table tr.marked-project td {
 }
 
 .wrapper--title .drop--scroll {
-  max-height: calc(100dvh - 90px);
+  max-height: calc(100dvh - 106px);
 }
 
 .modal .select--dropdown .dropdown-menu,
@@ -3142,6 +3164,86 @@ Project Task View CSS=-=-=
   background: rgba(0, 0, 0, 0.1);
 }
 
+.workflow--color-0 {
+  background: #999999;
+}
+
+.workflow--color-1 {
+  background: #FEBBCC;
+}
+
+.workflow--color-2 {
+  background: #ecc259;
+}
+
+.workflow--color-3 {
+  background: #5ace5d;
+}
+
+.workflow--color-4 {
+  background: darkblue;
+}
+
+.workflow--color-5 {
+  background: rgb(193, 236, 129);
+}
+
+.workflow--color-6 {
+  background: #f6cf87;
+}
+
+.workflow--color-7 {
+  background: #9398f3;
+}
+
+.workflow--color-8 {
+  background: #36c1f8;
+}
+
+.workflow--color-9 {
+  background: rgb(245, 158, 99);
+}
+
+.workflow--color-10 {
+  background: #5d58f3;
+}
+
+.workflow--color-11 {
+  background: #615055;
+}
+
+.workflow--color-12 {
+  background: #ecb72e;
+}
+
+.workflow--color-13 {
+  background: #f45555;
+}
+
+.workflow--color-14 {
+  background: rgb(234, 130, 50);
+}
+
+.workflow--color-15 {
+  background: rgb(71, 190, 237);
+}
+
+.workflow--color-16 {
+  background: #49a0e3;
+}
+
+.workflow--color-17 {
+  background: #b6d215;
+}
+
+.workflow--color-18 {
+  background: #0a86b7;
+}
+
+.workflow--color-19 {
+  background: rgb(195, 84, 9);
+}
+
 .projects--grid .task--list .task--grid {
   flex: 1 1;
   max-width: 30%;
@@ -3216,86 +3318,6 @@ Project Task View CSS=-=-=
 
 .projects--grid .task--list .workflow--color-15 {
   background: rgb(199 230 242);
-}
-
-.flow--circle.workflow--color-0 {
-  background: #999999;
-}
-
-.flow--circle.workflow--color-1 {
-  background: #FEBBCC;
-}
-
-.flow--circle.workflow--color-2 {
-  background: #ecc259;
-}
-
-.flow--circle.workflow--color-3 {
-  background: #5ace5d;
-}
-
-.flow--circle.workflow--color-4 {
-  background: darkblue;
-}
-
-.flow--circle.workflow--color-5 {
-  background: rgb(193, 236, 129);
-}
-
-.flow--circle.workflow--color-6 {
-  background: #f6cf87;
-}
-
-.flow--circle.workflow--color-7 {
-  background: #9398f3;
-}
-
-.flow--circle.workflow--color-8 {
-  background: #36c1f8;
-}
-
-.flow--circle.workflow--color-9 {
-  background: rgb(245, 158, 99);
-}
-
-.flow--circle.workflow--color-10 {
-  background: #5d58f3;
-}
-
-.flow--circle.workflow--color-11 {
-  background: #615055;
-}
-
-.flow--circle.workflow--color-12 {
-  background: #ecb72e;
-}
-
-.flow--circle.workflow--color-13 {
-  background: #f45555;
-}
-
-.flow--circle.workflow--color-14 {
-  background: rgb(234, 130, 50);
-}
-
-.flow--circle.workflow--color-15 {
-  background: rgb(71, 190, 237);
-}
-
-.flow--circle.workflow--color-16 {
-  background: #49a0e3;
-}
-
-.flow--circle.workflow--color-17 {
-  background: #b6d215;
-}
-
-.flow--circle.workflow--color-18 {
-  background: #0a86b7;
-}
-
-.flow--circle.workflow--color-19 {
-  background: rgb(195, 84, 9);
 }
 
 .projects--grid .task--list .task--grid h5 {
@@ -3550,7 +3572,6 @@ Project Task View CSS=-=-=
   border-radius: 1.5rem;
   -webkit-border-radius: 1.5rem;
   border: 0;
-  margin-bottom: 2rem;
   overflow: hidden;
 }
 
@@ -3634,7 +3655,7 @@ Project Task View CSS=-=-=
   -webkit-border-radius: 1.5rem;
 }
 
-.holidays--list h3 span {
+.holidays--list h3 span, .holiday--table--grid h3 span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3893,7 +3914,7 @@ Project Task View CSS=-=-=
 .setting--page .card {
   padding: 1.5rem;
   border-radius: 1rem;
-  background: linear-gradient(to right, rgba(var(--theme-primary), .1), rgba(var(--theme-secondary), .1));
+  background: linear-gradient(to right, rgba(var(--theme-primary), .08), rgba(var(--theme-secondary), .08));
 }
 
 .modal .setting--page .bg--blue--accordion p {
@@ -4828,14 +4849,6 @@ pre {
   outline: none;
 }
 
-.rmdp-wrapper {
-  border-radius: 12px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, .125);
-  -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, .125);
-  max-height: calc(100dvh - 100px);
-  overflow-y: auto;
-}
-
 .filter-box {
   padding: 1rem 0;
   display: flex;
@@ -5070,8 +5083,9 @@ pre {
   display: flex;
   flex-flow: row wrap;
   position: relative;
-  background: #E8E8E860;
-  height: auto
+  background: none;
+  height: auto;
+  overflow: visible;
 }
 
 .setting--page .setting--tabs {
@@ -5193,6 +5207,14 @@ pre {
   background: none;
   height: auto;
   overflow-y: visible;
+}
+
+.setting--page .fixed--bottom {
+    position: sticky;
+    bottom: 0;
+    background: #ffffff;
+    padding: 1rem 0;
+    position: -webkit-sticky;
 }
 
 .setting--page .rounded--box .card .card--img {
@@ -5795,6 +5817,13 @@ ul#icon-tabs .nav-link span svg {
 .dashboard--page .inner--card iframe {
   max-width: 100%;
   width: 100%;
+}
+
+.dashboard--page .inner--card .update--image img {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  object-fit: cover;
 }
 
 .team--updates .mb-4:last-child {
@@ -7155,6 +7184,8 @@ ul#icon-tabs .nav-link span svg {
   align-items: center;
   justify-content: center;
   flex-flow: column wrap;
+  padding: 0 1rem;
+  line-height: 1.2;
 }
 
 .attendance--excel--table th strong {
@@ -7380,11 +7411,7 @@ ul#icon-tabs .nav-link span svg {
   border: 1px solid rgb(199 210 254);
 }
 
-.att--status--abbr .bg--blue,
-.att--status--abbr .bg--red,
-.att--status--abbr .bg--green,
-.att--status--abbr .bg--orange,
-.att--status--abbr .bg--purple {
+.att--status--abbr .att--status--span{
   width: 30px;
   height: 30px;
   font-size: .75rem;
@@ -7781,6 +7808,10 @@ Media CSS-=-==
   .wrapper--title h3 {
     max-width: 100%;
   }
+
+  .page--title .progress--filter, .page--title .no--style {
+    display: none;
+  }
 }
 
 @media screen and (max-width:1299px) {
@@ -7870,6 +7901,11 @@ Media CSS-=-==
     padding-bottom: 1rem;
     margin-bottom: 1rem;
     width: 100%;
+    flex: 1 1 100%;
+    max-width: 100%;
+    max-height: max-content;
+    overflow: visible;
+    height: auto;
   }
 
   .project--form--actions {
@@ -8028,9 +8064,7 @@ Media CSS-=-==
     max-width: 200px;
   } */
 
-  .page--title .progress--filter, .page--title .no--style {
-    display: none;
-  }
+  
 
   .holidays--page .card {
     padding: 1rem;
@@ -8621,10 +8655,6 @@ Media CSS-=-==
     white-space: normal;
   }
 
-  .holidays--page .card {
-    margin-bottom: 0;
-  }
-
   .holiday--table tr+tr {
     margin-top: 0;
   }
@@ -8677,7 +8707,7 @@ Media CSS-=-==
   }
 
   .daily--attendance--table {
-    max-height: 100%;
+    max-height: max-content;
     overflow-y: visible;
     margin-bottom: 0;
   }
@@ -8704,6 +8734,7 @@ Media CSS-=-==
 
   .activity--box {
     padding: 0;
+    max-height: max-content;
   }
 }
 
@@ -9100,10 +9131,6 @@ Media CSS-=-==
     flex: 1 1 100%;
     max-width: calc(100% - 0rem);
     height: auto;
-  }
-
-  .holidays--page .card {
-    margin-bottom: 0;
   }
 
   .accordion .accordion-body {

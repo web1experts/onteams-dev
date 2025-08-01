@@ -302,11 +302,11 @@ Sidebar CSS-=-=
 .panel--sidebar .navbar {
   display: block !important;
   background: transparent;
-  height: 100dvh;
+  height: calc(100dvh - 112px);
 }
 
 .panel--sidebar .navbar-expand-lg .navbar-collapse {
-  max-height: calc(100% - 290px);
+  max-height: calc(100% - 190px);
   overflow-y: auto;
   overflow-x: hidden;
   padding-bottom: 2rem;
