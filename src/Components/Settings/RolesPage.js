@@ -567,297 +567,295 @@ function RolesPage() {
   return (
     <>
         <div className="page--wrapper setting--page">
-            <div className="rounded--box permission__page p-4">
-                <h3 className="d-flex align-items-center justify-content-end">
-                    <Button variant="primary" onClick={() => handleShow()}><FaPlus /> Add New</Button>
-                </h3>
-                
-                {activeRole && Object.keys(activeRole).length > 0 && (
-                <>
-                    <Row className="mt-4">
-                      <Col lg={6}>
-                        <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
-                        <FloatingLabel label="Select Role">
-                            <Form.Select className="custom-selectbox"  onChange={(e) => {
-                              const selectedRole = roles.find((role) => role._id === e.target.value);
-                              setActiveRole(selectedRole);
-                            }}>
-                            {roles.map((role, index) => {
-                                return (
-                                <option key={`role-${role._id}`} value={role?._id} action active={activeRole?._id === role._id}>{role.name}</option>
-                                );
-                            })}
-                            </Form.Select>
-                        </FloatingLabel>
-                        {/* <Form.Label>Select Role</Form.Label> */}
-                        
-                        </FormGroup>
-                    </Col>
-                    <Col lg={6}>
-                        <FormGroup className="form-group mb-0 pb-0">
-                          <FloatingLabel label="Role name">
-                            <Form.Control
-                            type="text"
-                            className={
-                            "form-control"
-                            }
-                            placeholder="Role name"
-                            name="name"
-                            value={fields['name']}
-                            onChange={(e) => {
-                                const { value} = e.target;
-                                setFields({...fields, ['name']: value})
-                            }}
-                            />
-                          </FloatingLabel>
-                        </FormGroup>
-                    </Col>
-                    
-                    </Row>
-                    
-                    <div className="new--accordion--block w-100 mt-4">
-                    {permissionModules.map((mod) => {
-                        const modSlug = mod.slug;
-                        const modPerms = permissions?.[modSlug] || {};
-                        const isExpanded = expanded?.[modSlug] || false;
-                        const isViewChecked = !!modPerms.view;
-                        const truePermissionCount = Object.values(
-                        modPerms
-                        ).filter((val) => val === true).length;
-                        return (
-                        <div className="bg--blue--accordion">
-                            <div className="d-flex gap-3 align-items-center">
-                                {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                                <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                            </div>
-                            {(mod.permissions || []).map((perm) => {
-                            if (perm === "view") {
-                                return (
-                                <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                    <p className="mb-0">View</p>
-                                    <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view}
-                                        onChange={() => toggleView(modSlug)}/>
-                                </div>
-                                )
-                            }
-                            return (
-                                <>
-                                <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                    <p className="mb-0">{perm
-                                                        .replace(/[_-]/g, " ")
-                                                        .replace(/^\w/, (l) => l.toUpperCase())}</p>
-                                    <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
-                                    disabled={!isViewChecked}
-                                    checked={!!modPerms[perm]}
-                                    onChange={() =>
-                                        togglePermission(modSlug, perm)
-                                    }
-                                    />
-                                </div>
-                                {[
-                                    "tracking",
-                                    "projects",
-                                    "reports",
-                                    "attendance",
-                                ].includes(modSlug) &&
-                                    perm === "view_others" &&
-                                    modPerms[perm] === true && (
-                                    <div className="team--card--grid">
-                                        {memberFeeds.map((member) => (
-                                        <Card className={`team--card ${modPerms[
-                                            "selected_members"
-                                            ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
-                                            //if (selectedMember?.role?.slug !== "owner") {
-                                            toggleMembers(
-                                                modSlug,
-                                                "selected_members",
-                                                member._id
-                                            )
-                                            // }
-                                            }}>
-                                            <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
-                                            <Card.Body>
-                                            <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
-                                            </Card.Body>
-                                            <FiCheck className="ms-auto" />
-                                        </Card>
-                                        ))}
+          <div className="rounded--box permission__page">
+            <h3 className="d-flex align-items-center justify-content-end">
+                <Button variant="primary" onClick={() => handleShow()}><FaPlus /> Add New</Button>
+            </h3>
             
-                                        {modSlug === "projects" && (
-                                        <Card className={`team--card ${modPerms[
-                                            "selected_members"
-                                            ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                            //if (selectedMember?.role?.slug !== "owner") {
-                                            if(activeRole.slug !==
-                                                    "owner"
-                                                    ) {
-                                                    toggleMembers(
-                                                        modSlug,
-                                                        "selected_members",
-                                                        "unassigned"
-                                                    );
-                                                    }
-                                            // }
-                                            }} key={`${modSlug}-${perm}-unassigned`}>
-                                            <span className="team--initial">U</span>
-                                            <Card.Body>
-                                            <h4>Unassigned</h4>
-                                            </Card.Body>
-                                            <FiCheck className="ms-auto" />
-                                        </Card>
-                                        )}
-                                    </div>
-                                    )}
-                                </>
-                            )
-                            })}
-                            </div>
-                            )
+            {activeRole && Object.keys(activeRole).length > 0 && (
+            <>
+                <Row className="mt-4">
+                  <Col lg={6}>
+                    <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
+                    <FloatingLabel label="Select Role">
+                        <Form.Select className="custom-selectbox"  onChange={(e) => {
+                          const selectedRole = roles.find((role) => role._id === e.target.value);
+                          setActiveRole(selectedRole);
+                        }}>
+                        {roles.map((role, index) => {
+                            return (
+                            <option key={`role-${role._id}`} value={role?._id} action active={activeRole?._id === role._id}>{role.name}</option>
+                            );
                         })}
-
-                      <div className="mt-4 text-end fixed--bottom">
-                        <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete Role</Button>
-                        <Button variant="primary" className="ms-3" onClick={handleSave}>Save Permissions</Button>
-                      </div>
-                    </div>
-                </>
-                )}
-            </div>
-          
-
-          {showdelete && (
-            <AlertDialog showdialog={showdelete} toggledialog={setShowDelete} msg="Are you sure?" callback={handleDeleteRole}/>
-          )}
-        </div>
-        {show && (
-            <Modal show={show} onHide={() => setShow(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>Add New Role</Modal.Title>
-                </Modal.Header>
-
-                <Modal.Body>
-                    <Form onSubmit={handleSubmit}>
-                        <Form.Group controlId="roleName">
-                            <FloatingLabel label="Role Name *">
-                            <Form.Control
-                                type="text"
-                                name="name"
-                                value={fields?.name}
-                                onChange={(e) => {
-                                setFields({
-                                    ...fields,
-                                    ["name"]: e.target.value,
-                                });
-                                setErrors({ ...errors, ["name"]: "" });
-                                }}
-                                disabled={loader}
-                            />
-                            </FloatingLabel>
-
-                            {showError("name")}
-                        </Form.Group>
-                        <h5 className="mt-4">Permissions</h5>
-                        <div className="new--accordion--block mb-4">
-                            {permissionModules.map((mod) => {
-                                const modSlug = mod.slug;
-                                const modPerms = permissions?.[modSlug] || {};
-                                const isExpanded = expanded?.[modSlug] || false;
-                                const isViewChecked = !!modPerms.view;
-                                const truePermissionCount = Object.values(
-                                modPerms
-                                ).filter((val) => val === true).length;
-                                return (
-                                <div className="bg--blue--accordion">
-                                    <div className="d-flex gap-3 align-items-center">
-                                        {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                                        <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                                    </div>
-                                    {(mod.permissions || []).map((perm) => {
-                                    if (perm === "view") {
-                                        return (
-                                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                            <p className="mb-0">View</p>
-                                            <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
-                                        </div>
-                                        )
-                                    }
-                                    return (
-                                        <>
-                                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                            <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
-                                            <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
-                                            disabled={!isViewChecked}
-                                            checked={!!modPerms[perm]}
-                                            onChange={() =>
-                                                togglePermission(modSlug, perm)
-                                            }
-                                            />
-                                        </div>
-                                        {[
-                                            "tracking",
-                                            "projects",
-                                            "reports",
-                                            "attendance",
-                                        ].includes(modSlug) &&
-                                            perm === "view_others" &&
-                                            modPerms[perm] === true && (
-                                            <div className="team--card--grid">
-                                                {memberFeeds.map((member) => (
-                                                <Card className={`team--card ${modPerms[
-                                                    "selected_members"
-                                                    ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
-                                                    //if (selectedMember?.role?.slug !== "owner") {
-                                                    toggleMembers(
-                                                        modSlug,
-                                                        "selected_members",
-                                                        member._id
-                                                    )
-                                                    // }
-                                                    }}>
-                                                    <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
-                                                    <Card.Body>
-                                                    <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
-                                                    </Card.Body>
-                                                    <FiCheck className="ms-auto" />
-                                                </Card>
-                                                ))}
+                        </Form.Select>
+                    </FloatingLabel>
+                    {/* <Form.Label>Select Role</Form.Label> */}
                     
-                                                {modSlug === "projects" && (
-                                                <Card className={`team--card ${modPerms[
-                                                    "selected_members"
-                                                    ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                                    //if (selectedMember?.role?.slug !== "owner") {
-                                                    toggleMembers(
-                                                        modSlug,
-                                                        "selected_members",
-                                                        "unassigned"
-                                                    );
-                                                    // }
-                                                    }} key={`${modSlug}-${perm}-unassigned`}>
-                                                    <span className="team--initial">U</span>
-                                                    <Card.Body>
-                                                    <h4>Unassigned</h4>
-                                                    </Card.Body>
-                                                    <FiCheck className="ms-auto" />
-                                                </Card>
-                                                )}
-                                            </div>
-                                            )}
-                                        </>
-                                    )
-                                    })}
-
+                    </FormGroup>
+                </Col>
+                <Col lg={6}>
+                    <FormGroup className="form-group mb-0 pb-0">
+                      <FloatingLabel label="Role name">
+                        <Form.Control
+                        type="text"
+                        className={
+                        "form-control"
+                        }
+                        placeholder="Role name"
+                        name="name"
+                        value={fields['name']}
+                        onChange={(e) => {
+                            const { value} = e.target;
+                            setFields({...fields, ['name']: value})
+                        }}
+                        />
+                      </FloatingLabel>
+                    </FormGroup>
+                </Col>
+                
+                </Row>
+                
+                <div className="new--accordion--block w-100 mt-4">
+                {permissionModules.map((mod) => {
+                    const modSlug = mod.slug;
+                    const modPerms = permissions?.[modSlug] || {};
+                    const isExpanded = expanded?.[modSlug] || false;
+                    const isViewChecked = !!modPerms.view;
+                    const truePermissionCount = Object.values(
+                    modPerms
+                    ).filter((val) => val === true).length;
+                    return (
+                    <div className="bg--blue--accordion">
+                        <div className="d-flex gap-3 align-items-center">
+                            {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                            <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                        </div>
+                        {(mod.permissions || []).map((perm) => {
+                        if (perm === "view") {
+                            return (
+                            <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                <p className="mb-0">View</p>
+                                <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view}
+                                    onChange={() => toggleView(modSlug)}/>
                             </div>
                             )
+                        }
+                        return (
+                            <>
+                            <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                <p className="mb-0">{perm
+                                                    .replace(/[_-]/g, " ")
+                                                    .replace(/^\w/, (l) => l.toUpperCase())}</p>
+                                <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                                disabled={!isViewChecked}
+                                checked={!!modPerms[perm]}
+                                onChange={() =>
+                                    togglePermission(modSlug, perm)
+                                }
+                                />
+                            </div>
+                            {[
+                                "tracking",
+                                "projects",
+                                "reports",
+                                "attendance",
+                            ].includes(modSlug) &&
+                                perm === "view_others" &&
+                                modPerms[perm] === true && (
+                                <div className="team--card--grid">
+                                    {memberFeeds.map((member) => (
+                                    <Card className={`team--card ${modPerms[
+                                        "selected_members"
+                                        ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                        //if (selectedMember?.role?.slug !== "owner") {
+                                        toggleMembers(
+                                            modSlug,
+                                            "selected_members",
+                                            member._id
+                                        )
+                                        // }
+                                        }}>
+                                        <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
+                                        <Card.Body>
+                                        <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
+                                        </Card.Body>
+                                        <FiCheck className="ms-auto" />
+                                    </Card>
+                                    ))}
+        
+                                    {modSlug === "projects" && (
+                                    <Card className={`team--card ${modPerms[
+                                        "selected_members"
+                                        ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                        //if (selectedMember?.role?.slug !== "owner") {
+                                        if(activeRole.slug !==
+                                                "owner"
+                                                ) {
+                                                toggleMembers(
+                                                    modSlug,
+                                                    "selected_members",
+                                                    "unassigned"
+                                                );
+                                                }
+                                        // }
+                                        }} key={`${modSlug}-${perm}-unassigned`}>
+                                        <span className="team--initial">U</span>
+                                        <Card.Body>
+                                        <h4>Unassigned</h4>
+                                        </Card.Body>
+                                        <FiCheck className="ms-auto" />
+                                    </Card>
+                                    )}
+                                </div>
+                                )}
+                            </>
+                        )
                         })}
                         </div>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button variant="primary" onClick={handleSubmit} type="submit" disabled={loader}>{loader ? "Please wait..." : "Save Role"}</Button>
-                </Modal.Footer>
-            </Modal>
-          )}
+                        )
+                    })}
+
+                  <div className="mt-4 text-end fixed--bottom">
+                    <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete Role</Button>
+                    <Button variant="primary" className="ms-3" onClick={handleSave}>Save Permissions</Button>
+                  </div>
+                </div>
+            </>
+            )}
+        </div>
+        {showdelete && (
+          <AlertDialog showdialog={showdelete} toggledialog={setShowDelete} msg="Are you sure?" callback={handleDeleteRole}/>
+        )}
+      </div>
+      {show && (
+        <Modal show={show} onHide={() => setShow(false)} size="lg">
+            <Modal.Header closeButton>
+                <Modal.Title>Add New Role</Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group controlId="roleName">
+                        <FloatingLabel label="Role Name *">
+                        <Form.Control
+                            type="text"
+                            name="name"
+                            value={fields?.name}
+                            onChange={(e) => {
+                            setFields({
+                                ...fields,
+                                ["name"]: e.target.value,
+                            });
+                            setErrors({ ...errors, ["name"]: "" });
+                            }}
+                            disabled={loader}
+                        />
+                        </FloatingLabel>
+
+                        {showError("name")}
+                    </Form.Group>
+                    <h5 className="mt-4">Permissions</h5>
+                    <div className="new--accordion--block mb-4">
+                        {permissionModules.map((mod) => {
+                            const modSlug = mod.slug;
+                            const modPerms = permissions?.[modSlug] || {};
+                            const isExpanded = expanded?.[modSlug] || false;
+                            const isViewChecked = !!modPerms.view;
+                            const truePermissionCount = Object.values(
+                            modPerms
+                            ).filter((val) => val === true).length;
+                            return (
+                            <div className="bg--blue--accordion">
+                                <div className="d-flex gap-3 align-items-center">
+                                    {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                                    <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                                </div>
+                                {(mod.permissions || []).map((perm) => {
+                                if (perm === "view") {
+                                    return (
+                                    <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                        <p className="mb-0">View</p>
+                                        <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
+                                    </div>
+                                    )
+                                }
+                                return (
+                                    <>
+                                    <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
+                                        <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
+                                        <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                                        disabled={!isViewChecked}
+                                        checked={!!modPerms[perm]}
+                                        onChange={() =>
+                                            togglePermission(modSlug, perm)
+                                        }
+                                        />
+                                    </div>
+                                    {[
+                                        "tracking",
+                                        "projects",
+                                        "reports",
+                                        "attendance",
+                                    ].includes(modSlug) &&
+                                        perm === "view_others" &&
+                                        modPerms[perm] === true && (
+                                        <div className="team--card--grid">
+                                            {memberFeeds.map((member) => (
+                                            <Card className={`team--card ${modPerms[
+                                                "selected_members"
+                                                ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                                //if (selectedMember?.role?.slug !== "owner") {
+                                                toggleMembers(
+                                                    modSlug,
+                                                    "selected_members",
+                                                    member._id
+                                                )
+                                                // }
+                                                }}>
+                                                <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
+                                                <Card.Body>
+                                                <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
+                                                </Card.Body>
+                                                <FiCheck className="ms-auto" />
+                                            </Card>
+                                            ))}
+                
+                                            {modSlug === "projects" && (
+                                            <Card className={`team--card ${modPerms[
+                                                "selected_members"
+                                                ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                                //if (selectedMember?.role?.slug !== "owner") {
+                                                toggleMembers(
+                                                    modSlug,
+                                                    "selected_members",
+                                                    "unassigned"
+                                                );
+                                                // }
+                                                }} key={`${modSlug}-${perm}-unassigned`}>
+                                                <span className="team--initial">U</span>
+                                                <Card.Body>
+                                                <h4>Unassigned</h4>
+                                                </Card.Body>
+                                                <FiCheck className="ms-auto" />
+                                            </Card>
+                                            )}
+                                        </div>
+                                        )}
+                                    </>
+                                )
+                                })}
+
+                        </div>
+                        )
+                    })}
+                    </div>
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="primary" onClick={handleSubmit} type="submit" disabled={loader}>{loader ? "Please wait..." : "Save Role"}</Button>
+            </Modal.Footer>
+        </Modal>
+      )}
     </>
   );
 }

@@ -377,6 +377,10 @@ textarea.form-control {
   height: 100dvh;
 }
 
+.rmdp-day-picker > div {
+    flex: 1 1;
+}
+
 .common--form h2 {
   margin: 0 0 25px;
   font-weight: 400;
@@ -389,6 +393,18 @@ textarea.form-control {
   width: 100%;
   flex: 1 1 100%;
   max-width: 500px;
+}
+
+.common--form .account--setup {
+  width: 100%;
+  flex: 1 1 100%;
+  max-width: 500px;
+}
+
+.common--form .account--setup form {
+  width: 100%;
+  flex: 1 1 100%;
+  max-width: 100%;
 }
 
 .form-group {
@@ -613,6 +629,11 @@ Add Project Modal CSS-=-=-
   overflow-y: auto;
 }
 
+.modalbox .project--form--inputs {
+  max-height: calc(100dvh - 200px);
+  padding-top: 0;
+}
+
 .project--form--inputs form .form-group {
   width: 100%;
 }
@@ -673,6 +694,7 @@ Add Project Modal CSS-=-=-
 
 .project--form--inputs form label small {
   font-weight: 500;
+  font-size: 14px;
 }
 
 .project--form--inputs form .client--input {
@@ -705,7 +727,7 @@ Add Project Modal CSS-=-=-
   align-items: center;
   font-size: .9375rem;
   font-weight: normal;
-  padding: 0.25rem 0;
+  padding: 0;
   gap: 10px;
   cursor: pointer;
 }
@@ -891,7 +913,7 @@ Add Project Modal CSS-=-=-
 }
 
 .workflow--modal {
-  margin-top: .25rem;
+  margin-top: 0;
   cursor: pointer;
 }
 
@@ -908,8 +930,17 @@ Add Project Modal CSS-=-=-
 .project--form--inputs form .form-label {
   margin-bottom: 0;
   text-transform: capitalize;
-  font-size: .875em;
+  font-size: 14px;
   font-weight: 500;
+}
+
+.project--form--inputs form .task--date--picker,
+.project--form--inputs form .task--date--change {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0;
+    cursor: pointer;
 }
 
 .modal-backdrop.show {
@@ -1395,7 +1426,7 @@ ul#subtasks-ul .form-group .quill--editor svg {
     height: auto;
   }
 
-  .project--form--inputs {
+  .project--form--inputs, .modalbox .project--form--inputs {
     max-height: max-content;
     overflow-y: visible;
     height: auto;

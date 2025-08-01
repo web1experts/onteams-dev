@@ -1985,7 +1985,7 @@ const handleProjectSelect = async (project) => {
               //entries.map((entry, index) => (
                 <Row>
                   <Col sm={12}><h6 className="d-flex align-items-center gap-2"><FaPlus /> Add New Entry</h6></Col>
-                  <Col md={6}>
+                  <Col md={6} className="mb-3 mb-md-0">
                     <Dropdown className="select--dropdown">
                       <Dropdown.Toggle variant="success">{timings?.start_time || 'Start Time'}</Dropdown.Toggle>
                       <Dropdown.Menu>
@@ -2093,7 +2093,7 @@ const handleProjectSelect = async (project) => {
         <Modal.Body>
           <Form>
             <Row>
-              <Col sm={12} lg={6}>
+              <Col sm={12} lg={6} className="order-0 order-lg-0">
                 <Form.Group className="mb-3">
                   <Form.Label>Project Status</Form.Label>
                     <div className="drop--scroll">
@@ -2105,7 +2105,7 @@ const handleProjectSelect = async (project) => {
                     </div>
                 </Form.Group>
               </Col>
-              <Col sm={12} lg={6}>
+              <Col sm={12} lg={6} className="order-2 order-lg-1 mt-3 mt-lg-0">
                 <Form.Group className="mb-3">
                   <Form.Label>Select Workflow</Form.Label>
                   <Form.Select className="form-control custom-selectbox" id="projects-tab"
@@ -2119,7 +2119,7 @@ const handleProjectSelect = async (project) => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-              <Col sm={12} lg={6}>
+              <Col sm={12} lg={6} className="order-1 order-lg-2">
                 <Form.Group className="mb-0 form-group pb-0">
                   <Form.Label>Select Project</Form.Label>
                   <ListGroup key={projectFilter?.status || 'in-progress'}>
@@ -2145,7 +2145,7 @@ const handleProjectSelect = async (project) => {
                   </ListGroup>
                 </Form.Group>
               </Col>
-              <Col sm={12} lg={6}>
+              <Col sm={12} lg={6} className="order-3 order-lg-3">
                 <Form.Group className="mb-0 form-group pb-0">
                   <Form.Label>Select Task</Form.Label>
                   <ListGroup>
