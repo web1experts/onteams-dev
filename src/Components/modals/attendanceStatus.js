@@ -85,7 +85,7 @@ const AttendanceStatusManager = ({ toggle, show }) => {
 
   const handleRulesShow = () => {
     setRulesShow(true);
-    setTimeout(() => selectboxObserver(), 500);
+    setTimeout(() => selectboxObserver(), 700);
   };
 
   const handleRulesClose = () => {
@@ -111,7 +111,7 @@ const AttendanceStatusManager = ({ toggle, show }) => {
 
   const handleRulesChange = (field, value) => {
   const updatedForm = { ...form, [field]: value };
-
+    setForm(updatedForm);
   const startDecimal = toDecimal(updatedForm.startHour, updatedForm.startMinute);
   const endDecimal = toDecimal(updatedForm.endHour, updatedForm.endMinute);
 
@@ -119,7 +119,7 @@ const AttendanceStatusManager = ({ toggle, show }) => {
     const updatedStatuses = [...attendanceStatus];
     const oneMinute = 1 / 60;
     const twoMinutes = 1.5 / 60;
-    setForm(updatedForm);
+    
     // ⏩ End time changes
     if (field === "endHour" || field === "endMinute") {
       const next = updatedStatuses[EditIndex + 1];
@@ -419,6 +419,7 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
               <Form.Label>Start Time</Form.Label>
               <Col>
                 <Form.Select
+                  className="custom-selectbox"
                   value={form.startHour}
                   onChange={(e) => handleRulesChange("startHour", e.target.value)}
                   disabled={EditIndex === false || EditIndex === 0}
@@ -434,6 +435,7 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
               </Col>
               <Col>
                 <Form.Select
+                className="custom-selectbox"
                   value={form.startMinute}
                   onChange={(e) => handleRulesChange("startMinute", e.target.value)}
                   disabled={EditIndex === false || EditIndex === 0}
@@ -454,6 +456,7 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
               <Form.Label>End Time</Form.Label>
               <Col>
                 <Form.Select
+                className="custom-selectbox"
                   value={form.endHour}
                   onChange={(e) => handleRulesChange("endHour", e.target.value)}
                 >
@@ -462,6 +465,7 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
               </Col>
               <Col>
                 <Form.Select
+                className="custom-selectbox"
                   value={form.endMinute}
                   onChange={(e) => handleRulesChange("endMinute", e.target.value)}
                 >
