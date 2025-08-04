@@ -52,7 +52,7 @@ function EditableField({
           <strong>{label}</strong>
           <FloatingLabel>
             <Form.Control
-              placeholder={label}
+              // placeholder={label}
               type={type}
               name={`${field}`}
               ref={inputRef}

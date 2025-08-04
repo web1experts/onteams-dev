@@ -396,8 +396,8 @@ Sidebar CSS-=-=
   padding: .75rem 1rem .75rem 2rem;
   border: 1px solid #fff3;
   background: linear-gradient(to right, #3b82f615, #06b6d415);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
-  -webkit-box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
 }
 
 .navbar-light .navbar-nav .active>.nav-link .nav--item--icon,
@@ -498,9 +498,10 @@ Sidebar CSS-=-=
   transform: translateX(-100%);
 }
 
-.open--panel--sidebar~.team--page {
+.open--panel--sidebar~.team--page, .open--panel--sidebar~.team--page .loading-bar {
   max-width: calc(100% - 0rem);
   margin-left: 0rem;
+  width: 100%;
 }
 
 .show--details.project-collapse,
@@ -648,10 +649,12 @@ Sidebar CSS-=-=
 
 .theme--modal .modal-footer {
   padding: 1rem 1.5rem;
+  background: var(--bs-modal-bg);
 }
 
 .theme--modal .modal-body {
   padding: 1.5rem;
+  background: var(--bs-modal-bg);
 }
 
 .theme--modal .modal-title span.nav--item--icon {
@@ -734,6 +737,7 @@ Sidebar CSS-=-=
 
 .theme--modal .modal-content {
   overflow: hidden;
+  background: none;
 }
 
 .theme--modal .modal-title {
@@ -753,8 +757,8 @@ Sidebar CSS-=-=
 }
 
 .theme--card:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
-  -webkit-box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
 }
 
 .theme--card.active--theme {
@@ -954,8 +958,9 @@ Sidebar CSS-=-=
     bottom: auto;
   }
 
-  .open--panel--sidebar~.team--page {
+  .open--panel--sidebar~.team--page, .open--panel--sidebar~.team--page .loading-bar {
     max-width: calc(100% - 0rem);
+    width: 100%;
     margin-left: 0;
   }
 

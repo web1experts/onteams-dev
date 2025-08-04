@@ -293,8 +293,8 @@ body {
 }
 
 .page--title .rmdp-container {
-    width: auto;
-    max-width: 130px;
+  width: auto;
+  max-width: 135px;
 }
 
 .wrapper--title .expand--icon .list-group-item {
@@ -361,7 +361,8 @@ body {
   height: 40px;
 }
 
-.page--title .list-group-item .form-group, .search-filter-list .form-group {
+.page--title .list-group-item .form-group,
+.search-filter-list .form-group {
   padding-bottom: 0;
 }
 
@@ -499,15 +500,15 @@ body {
 }
 
 .holiday--table .dropdown-menu::before {
-    border: 10px solid;
-    border-color: transparent transparent var(--bs-dropdown-border-color);
-    content: "";
-    height: 0;
-    right: 6px;
-    margin: auto;
-    position: absolute;
-    top: -20px;
-    width: 0;
+  border: 10px solid;
+  border-color: transparent transparent var(--bs-dropdown-border-color);
+  content: "";
+  height: 0;
+  right: 6px;
+  margin: auto;
+  position: absolute;
+  top: -20px;
+  width: 0;
 }
 
 /* 
@@ -779,7 +780,8 @@ body {
 .team--members--list .title--initial,
 .wrapper--title .dropdown-toggle .title--initial,
 .wrapper--title .dropdown-item .title--initial,
-.comments--list .card .title--initial, .modal .single--project--stack .title--initial {
+.comments--list .card .title--initial,
+.modal .single--project--stack .title--initial {
   align-items: center;
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
   border-radius: 100px;
@@ -799,8 +801,11 @@ body {
   text-transform: uppercase;
 }
 
-.wrapper--title .members--list .list-group-item .team--initial span, .wrapper--title .members--list .list-group-item .team--initial span img,
-.page--wrapper table td.project--title--td .title--initial span, .page--wrapper table td .title--initial span img, .page--wrapper table td .title--initial span {
+.wrapper--title .members--list .list-group-item .team--initial span,
+.wrapper--title .members--list .list-group-item .team--initial span img,
+.page--wrapper table td.project--title--td .title--initial span,
+.page--wrapper table td .title--initial span img,
+.page--wrapper table td .title--initial span {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -808,7 +813,8 @@ body {
   -webkit-border-radius: 9999px;
 }
 
-.comments--list .card .title--initial, .modal .single--project--stack .title--initial {
+.comments--list .card .title--initial,
+.modal .single--project--stack .title--initial {
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   height: 35px;
@@ -824,7 +830,7 @@ body {
 }
 
 .wrapper--title .dropdown-toggle .title--span {
-    max-width: calc(100% - 56px);
+  max-width: calc(100% - 56px);
 }
 
 .show--details .new--project--rows tr.project--active .title--initial,
@@ -881,9 +887,9 @@ body {
 }
 
 .password--new span {
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 10px;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 10px;
 }
 
 .project--grid--new--table td.new--td td.new--td {
@@ -1512,7 +1518,9 @@ span.open--sidebar {
   margin-left: .5rem;
 }
 
-.wrapper--title .expand--icon .day--dropdown, .wrapper--title .expand--icon .day--dropdown:hover, .wrapper--title .expand--icon .day--dropdown:focus {
+.wrapper--title .expand--icon .day--dropdown,
+.wrapper--title .expand--icon .day--dropdown:hover,
+.wrapper--title .expand--icon .day--dropdown:focus {
   box-shadow: none;
   background: none;
 }
@@ -1925,7 +1933,7 @@ span.open--sidebar {
   display: block;
   font-size: 1rem;
   font-weight: 500;
-  color: rgba(148, 163, 184,1);
+  color: rgba(148, 163, 184, 1);
 }
 
 .rounded--box .contact--card.card .card-title {
@@ -2122,8 +2130,9 @@ span.open--sidebar {
   cursor: pointer;
 }
 
-.client--box, .team-members--page .rounded--box {
-    padding-top: 160px;
+.client--box,
+.team-members--page .rounded--box {
+  padding-top: 160px;
 }
 
 .rounded--box .card .card--img {
@@ -2135,7 +2144,8 @@ span.open--sidebar {
   margin-top: -150px;
 }
 
-.rounded--box .card .card--img label, .team-members--page .rounded--box .card img.card-img-top {
+.rounded--box .card .card--img label,
+.team-members--page .rounded--box .card img.card-img-top {
   max-width: 220px;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
@@ -2239,7 +2249,10 @@ span.open--sidebar {
   max-width: 100%;
 }
 
-.contact--card .list-group-item .form-control, .contact--card .list-group-item .form-select, .contact--card .list-group-item .select--dropdown .btn, .contact--card .list-group-item .rmdp-input {
+.contact--card .list-group-item .form-control,
+.contact--card .list-group-item .form-select,
+.contact--card .list-group-item .select--dropdown .btn,
+.contact--card .list-group-item .rmdp-input {
   padding: .3rem .75rem;
   width: 100%;
   margin: 0;
@@ -2648,8 +2661,8 @@ table tr.marked-project td {
 
 .wrapper--title .dropdown-item.active-project {
   background: linear-gradient(to right, rgba(var(--theme-primary), .07), rgba(var(--theme-secondary), .07));
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
-  -webkit-box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
 }
 
 .wrapper--title .dropdown-item:hover {
@@ -2699,20 +2712,24 @@ table tr.marked-project td {
   margin: auto 0;
 }
 
-.team--page .page--title .manual--dropdown .dropdown-item.active, .manual--dropdown .dropdown-item.active {
+.team--page .page--title .manual--dropdown .dropdown-item.active,
+.manual--dropdown .dropdown-item.active {
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
   color: #ffffff;
 }
 
-.team--page .page--title .manual--dropdown .dropdown-item:first-child, .manual--dropdown .dropdown-item:first-child {
+.team--page .page--title .manual--dropdown .dropdown-item:first-child,
+.manual--dropdown .dropdown-item:first-child {
   border-radius: .5rem .5rem 0 0;
 }
 
-.team--page .page--title .manual--dropdown .dropdown-item:last-child, .manual--dropdown .dropdown-item:last-child {
+.team--page .page--title .manual--dropdown .dropdown-item:last-child,
+.manual--dropdown .dropdown-item:last-child {
   border-radius: 0 0 .5rem .5rem;
 }
 
-.team--page .page--title .manual--dropdown .dropdown-item svg, .modal .manual--dropdown .dropdown-item svg {
+.team--page .page--title .manual--dropdown .dropdown-item svg,
+.modal .manual--dropdown .dropdown-item svg {
   position: relative;
   right: auto;
 }
@@ -3054,7 +3071,8 @@ table tr.marked-project td {
   color: #ffffff;
 }
 
-.tasks-form-action .list-group-item .team--initial span, .tasks-form-action .list-group-item .team--initial img {
+.tasks-form-action .list-group-item .team--initial span,
+.tasks-form-action .list-group-item .team--initial img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -3655,7 +3673,8 @@ Project Task View CSS=-=-=
   -webkit-border-radius: 1.5rem;
 }
 
-.holidays--list h3 span, .holiday--table--grid h3 span {
+.holidays--list h3 span,
+.holiday--table--grid h3 span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3704,8 +3723,8 @@ Project Task View CSS=-=-=
 }
 
 .accordion .accordion-item:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
-  -webkit-box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  -webkit-box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
 }
 
 .accordion .accordion-button {
@@ -3893,6 +3912,20 @@ Project Task View CSS=-=-=
   color: #ffffff;
   padding: 0;
   opacity: 0;
+}
+
+.modal .select--dropdown .selected--option svg {
+  background: none !important;
+  fill: rgba(var(--theme-primary), 1);
+  box-shadow: none;
+  border-radius: 0;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  min-width: auto;
+  height: auto;
+  display: flex;
+  padding: 0;
 }
 
 .new--accordion--block .accordion-body .card--icon {
@@ -4419,6 +4452,13 @@ pre {
   -webkit-border-radius: 0.25rem;
   cursor: pointer;
   position: relative;
+}
+
+.timeSheetModal .card .card-body img,
+.timeSheetModal .card .card-body video {
+  object-fit: cover;
+  width: 100%;
+  height: auto;
 }
 
 .timeSheetModal h6 {
@@ -5210,11 +5250,11 @@ pre {
 }
 
 .setting--page .fixed--bottom {
-    position: sticky;
-    bottom: 0;
-    background: #ffffff;
-    padding: 1rem 0;
-    position: -webkit-sticky;
+  position: sticky;
+  bottom: 0;
+  background: #ffffff;
+  padding: 1rem 0;
+  position: -webkit-sticky;
 }
 
 .setting--page .rounded--box .card .card--img {
@@ -5243,18 +5283,19 @@ pre {
   height: 32px;
 }
 
-.setting--page .rounded--box .card .card--img .edit--dropdown .dropdown-item, .setting--page .rounded--box .card .card--img .edit--dropdown label {
-    display: flex;
-    align-items: center;
-    grid-gap: .5rem;
-    gap: .5rem;
-    width: 100%;
-    height: auto;
-    background: none;
-    box-shadow: none;
-    min-width: fit-content;
-    max-width: 100%;
-    border-radius: 0;
+.setting--page .rounded--box .card .card--img .edit--dropdown .dropdown-item,
+.setting--page .rounded--box .card .card--img .edit--dropdown label {
+  display: flex;
+  align-items: center;
+  grid-gap: .5rem;
+  gap: .5rem;
+  width: 100%;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  min-width: fit-content;
+  max-width: 100%;
+  border-radius: 0;
 }
 
 .rounded--box .card .edit--dropdown .form-label span {
@@ -5474,6 +5515,12 @@ pre {
   object-fit: cover;
   height: 100%;
   border-radius: var(--bs-border-radius) !important;
+}
+
+@media screen and (min-width:768px) {
+  .inner--card .comment--body {
+    padding-left: 56px;
+  }
 }
 
 .comments--list {
@@ -6657,13 +6704,13 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .project--grid--table hr {
-    order: 2;
-    width: 100%;
-    margin: auto;
-    margin-top: .5rem;
-    margin-bottom: 0;
-    padding: 0;
-    opacity: .1;
+  order: 2;
+  width: 100%;
+  margin: auto;
+  margin-top: .5rem;
+  margin-bottom: 0;
+  padding: 0;
+  opacity: .1;
 }
 
 .project--grid--new--table .task--buttons {
@@ -6718,7 +6765,8 @@ ul#icon-tabs .nav-link span svg {
   border-top: 0;
 }
 
-.project--grid--new--table td.new--td .fs-small, .page--wrapper .draggable--table td.new--td .fs-small {
+.project--grid--new--table td.new--td .fs-small,
+.page--wrapper .draggable--table td.new--td .fs-small {
   font-size: .75rem;
   line-height: 1;
   color: rgba(0, 0, 0, .5);
@@ -6988,10 +7036,10 @@ ul#icon-tabs .nav-link span svg {
 
 .attendance--table--list table tr td .project--title--td {
   display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    max-width: 100%;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
 }
 
 .activity--table--list table tr,
@@ -7339,12 +7387,12 @@ ul#icon-tabs .nav-link span svg {
 
 .single--project--stack h4 strong {
   display: -webkit-box;
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    max-width: 100%;
-    text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
 }
 
 .modal .single--project--stack .title--span span {
@@ -7411,7 +7459,7 @@ ul#icon-tabs .nav-link span svg {
   border: 1px solid rgb(199 210 254);
 }
 
-.att--status--abbr .att--status--span{
+.att--status--abbr .att--status--span {
   width: 30px;
   height: 30px;
   font-size: .75rem;
@@ -7496,14 +7544,15 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .projects--page .table .list-group-item .team--initial span {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
-.clients--table tr td img, .new--project--rows tr td img {
-    object-fit: cover;
-    height: 100%;
-    width: 100%;
+.clients--table tr td img,
+.new--project--rows tr td img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
 }
 
 /* .show--details .clients--table tr td img,
@@ -7730,9 +7779,10 @@ Media CSS-=-==
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .page--wrapper .project--grid--table td .title--span, 
+  .page--wrapper .project--grid--table td .title--span,
   .page--wrapper .project--grid--table td.project--title--td .title--span,
-  .project--grid--table .task--last--buttons, .project--grid--new--table .member--circles {
+  .project--grid--table .task--last--buttons,
+  .project--grid--new--table .member--circles {
     flex: 1 1 100%;
     justify-content: flex-start;
   }
@@ -7772,15 +7822,18 @@ Media CSS-=-==
     height: auto;
   }
 
-  .image--title h3, .today--card h3 {
+  .image--title h3,
+  .today--card h3 {
     font-size: 20px;
   }
 
-  .attendance--table--list thead th:first-child, .attendance--table--list tbody td:first-child {
+  .attendance--table--list thead th:first-child,
+  .attendance--table--list tbody td:first-child {
     min-width: 280px;
   }
 
-  .attendance--table--list thead th, .attendance--table--list tbody td {
+  .attendance--table--list thead th,
+  .attendance--table--list tbody td {
     min-width: 130px;
   }
 
@@ -7802,19 +7855,21 @@ Media CSS-=-==
   }
 
   .modal .no--style .d-flex .ms-2 {
-    margin-left: 0!important;
+    margin-left: 0 !important;
   }
 
   .wrapper--title h3 {
     max-width: 100%;
   }
 
-  .page--title .progress--filter, .page--title .no--style {
+  .page--title .progress--filter,
+  .page--title .no--style {
     display: none;
   }
 }
 
 @media screen and (max-width:1299px) {
+
   .view--project .open--sidebar,
   .show--project .open--sidebar,
   .open--panel--sidebar~.team--page .open--sidebar {
@@ -7845,7 +7900,7 @@ Media CSS-=-==
   .new--accordion--block .card .card-body {
     flex: 1 1;
     padding: 0;
-    padding-left: 1rem; 
+    padding-left: 1rem;
   }
 
   .wrapper--title {
@@ -8064,7 +8119,7 @@ Media CSS-=-==
     max-width: 200px;
   } */
 
-  
+
 
   .holidays--page .card {
     padding: 1rem;
@@ -8075,6 +8130,10 @@ Media CSS-=-==
   .holiday--table--grid tbody {
     grid-gap: 1rem;
     gap: 1rem;
+  }
+
+  .project--form--actions .list-group:last-child {
+    position: relative;
   }
 }
 
@@ -8087,7 +8146,7 @@ Media CSS-=-==
     gap: 20px;
   }
 
- .wrapper--title .projecttitle {
+  .wrapper--title .projecttitle {
     flex: 1 1 100%;
     max-width: 40%;
   }
@@ -8573,10 +8632,6 @@ Media CSS-=-==
     margin-top: 0;
   }
 
-  .project--form--actions .list-group:last-child {
-    position: relative;
-  }
-
   .clients--table td.project--title--td span.onHide {
     display: block !important;
   }
@@ -8745,11 +8800,15 @@ Media CSS-=-==
   }
 
   .attendance--page .wrapper--title .projecttitle {
-    flex: 1 1 100%;
     max-width: calc(100% - 250px);
   }
 
-  .attendance--stats h3, .attendance--table h3 {
+  .clients--page .wrapper--title .projecttitle, .team-members--page .wrapper--title .projecttitle {
+    max-width: calc(100% - 76px);
+  }
+
+  .attendance--stats h3,
+  .attendance--table h3 {
     font-size: 1.2rem;
   }
 
@@ -8909,7 +8968,8 @@ Media CSS-=-==
     border-radius: 0;
   }
 
-  .page--wrapper .attendance--excel--table th:first-child, .page--wrapper .attendance--excel--table td:first-child {
+  .page--wrapper .attendance--excel--table th:first-child,
+  .page--wrapper .attendance--excel--table td:first-child {
     position: relative;
   }
 
@@ -9048,7 +9108,9 @@ Media CSS-=-==
     flex: 1 1 100%;
   }
 
-  .dashboard--page .daily--star, .app--title, .dashboard--page .card--download {
+  .dashboard--page .daily--star,
+  .app--title,
+  .dashboard--page .card--download {
     padding: 1rem;
   }
 
@@ -9064,7 +9126,8 @@ Media CSS-=-==
     padding: 0;
   }
 
-  .image--title span, .today--card span {
+  .image--title span,
+  .today--card span {
     padding: .75rem;
     width: 3rem;
     height: 3rem;
@@ -9153,12 +9216,14 @@ Media CSS-=-==
     margin-bottom: 0;
   }
 
-  .rounded--box .card .card--img label, .team-members--page .rounded--box .card img.card-img-top {
+  .rounded--box .card .card--img label,
+  .team-members--page .rounded--box .card img.card-img-top {
     max-width: 100%;
     min-width: 100%;
   }
 
-  .client--box, .team-members--page .rounded--box {
+  .client--box,
+  .team-members--page .rounded--box {
     padding-top: 1.5rem;
   }
 
@@ -9171,12 +9236,13 @@ Media CSS-=-==
   .rounded--box {
     padding: 1rem;
   }
-  
+
   .activity--box {
     padding: 0;
   }
 
-  .rounded--box .contact--card .card-body .list-group-item, .rounded--box .work--card .card-body .list-group-item {
+  .rounded--box .contact--card .card-body .list-group-item,
+  .rounded--box .work--card .card-body .list-group-item {
     background: rgb(248 250 252);
   }
 
@@ -9208,10 +9274,6 @@ Media CSS-=-==
   .team--page .page--title h2 {
     font-size: 1.6rem;
   }
-
-  /* .wrapper--title h3 {
-    max-width: 115px;
-  } */
 }
 
 @media screen and (max-width:414px) {

@@ -150,8 +150,8 @@
 }
 
 .rules--card:hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
-    -webkit-box-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+    box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 0 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
 }
 
 .rules--card strong .badge {
@@ -421,7 +421,11 @@
 }
 
 .setting__modal .setting--page {
-    height: 100%;
+    height: auto;
+}
+
+.setting__modal .setting--page .form-floating>label {
+    display: none;
 }
 
 .file--preview--modal .modal-dialog {
@@ -840,14 +844,10 @@ ul#subtasks-ul li textarea.form-control+button {
 }
 
 .task--message .dropdown .dropdown-menu {
-    right: 0;
     margin-top: 10px;
     padding: 0;
-    box-shadow: none;
-    background: #0891B2;
     padding: 0;
     min-width: max-content;
-    border: 0;
 }
 
 .task--message .dropdown .dropdown-menu[data-popper-placement="top-end"] {
@@ -857,7 +857,7 @@ ul#subtasks-ul li textarea.form-control+button {
 
 .task--message .dropdown .dropdown-menu::before {
     border: 8px solid;
-    border-color: transparent transparent #0891B2;
+    border-color: transparent transparent #ededed;
     content: "";
     height: 0;
     right: 5px;
@@ -868,14 +868,14 @@ ul#subtasks-ul li textarea.form-control+button {
 }
 
 .task--message .dropdown .dropdown-menu[data-popper-placement="top-end"]:before {
-    border-color: #0891B2 transparent transparent;
+    border-color: #ededed transparent transparent;
     right: 5px;
     top: auto;
     bottom: -16px;
 }
 
 .task--message .dropdown .dropdown-item {
-    color: #ffffff;
+    color: initial;
     font-weight: 400;
     font-size: 1rem;
     background: none;
@@ -885,11 +885,14 @@ ul#subtasks-ul li textarea.form-control+button {
     text-decoration: none;
     cursor: pointer;
     text-align: left;
+    border-radius: var(--bs-border-radius);
+    overflow: hidden;
 }
 
 .task--message .dropdown .dropdown-item button {
     display: block;
-    color: #ffffff;
+    color: initial;
+    background: #fff;
     width: 100%;
     text-align: left;
     border-radius: 0;
@@ -1175,11 +1178,13 @@ select.form-error {
 .reports-section .single--project--stack p strong {
     font-weight: 600;
     font-size: .9rem;
+    line-height: 1.2;
 }
 
 .reports-section .single--project--stack p small {
     font-size: .85rem;
     font-weight: normal;
+    line-height: 1.2;
 }
 
 .reports-section .single--project--stack+.single--project--stack {

@@ -555,6 +555,7 @@ function ReportsPage() {
     today: "Today",
     yesterday: "Yesterday",
     "7days": "Last 7 days",
+    "this-week": "This week",
     "last-week": "Last week",
     "last2-weeks": "Last 2 weeks",
     "this-month": "This month",

@@ -611,120 +611,118 @@ const isPostLikedByMember = (likes = [], memberId) => {
                     return (
                     <Card key={post._id} className="mb-4 p-3 rounded-4 inner--card">
                       <Row className="mb-2">
-                        <Col xs="auto" className="update--image">
-                          <Image src={post.author?.avatar || '/images/default.jpg'} roundedCircle/>
-                        </Col>
-                        <Col>
-                          <strong>{post.author?.name || 'Unknown'}</strong>{' '}
-                          <span className="text-muted" style={{ fontSize: '0.875rem' }}>
-                            • {dayjs(post.createdAt).fromNow()}
-                          </span>
-                          {memberdata?._id === post.author?._id && 
-                            <Dropdown className="edit--dropdown">
-                              <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                <Dropdown.Item onClick={() => handleEdit(post)}>Edit</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleDelete(post?._id)}>Delete</Dropdown.Item>
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          }
-                          
-                          <div className="mt-2">
-                            {/* Text Post */}
-                            {post.post_type === 'text' && (
-                              <>
-                                {post.title && <h5>{post.title}</h5>}
-                                <p>{post.content}</p>
-                              </>
-                            )}
-
-                            {/* Image Post */}
-                            {post.post_type === 'image' && (
-                              <>
-                                {post.caption && <p>{post.caption}</p>}
-                                {Array.isArray(post.files) &&
-                                  post.files.map((img, i) => (
-                                    <Image
-                                      key={i}
-                                      src={img.url}
-                                      alt={img.file_name}
-                                      fluid
-                                      className="rounded"
-                                    />
-                                  ))}
-                              </>
-                            )}
-
-                            {/* Quote Post */}
-                            {post.post_type === 'quote' && (
-                              <blockquote className="blockquote p-3 rounded mt-3">
-                                <LuQuote className="me-2" />
-                                <p className="mb-0" style={{ fontStyle: 'italic' }}>
-                                {post.content}
-                                </p>
-                                {post?.quoteAuthor && (
-                                  <p><strong>- {post.quoteAuthor}</strong></p>
-                                )}
-                              </blockquote>
-                            )}
-
-                            {/* Video Post */}
-                            {post.post_type === 'video' && (
-                              <>
-                                {post.videoType === 'youtube' && (
-                                  <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
-                                    <iframe
-                                      key={`video-post-${post.content}-0`}
-                                      src={convertYouTubeToEmbed(post.content)}
-                                      title="YouTube Video"
-                                      allowFullScreen
-                                    ></iframe>
-                                  </div>
-                                )}
-                                {post.videoType === 'vimeo' && (
-                                  <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
-                                    <iframe
-                                      key={`video-post-${post.content}-0`}
-                                      src={post.content}
-                                      title="Vimeo Video"
-                                      allowFullScreen
-                                    ></iframe>
-                                  </div>
-                                )}
-                                {post.videoType === 'upload' && Array.isArray(post.files) && (
-                                  post.files.map((vid, i) => (
-                                    <video
-                                      key={`video-post-${vid.url}-${i}`}
-                                      controls
-                                      className="mb-2 rounded-3 w-100"
-                                    >
-                                      <source src={`${vid.url}?t=${Date.now()}`} type="video/mp4" />
-                                      Your browser does not support the video tag.
-                                    </video>
-                                  ))
-                                )}
-                                {post.description && <p>{post.description}</p>}
-                              </>
-                            )}
+                        <Col sm={12}>
+                          <div className="d-flex align-items-center gap-3">
+                            <div className="update--image"><Image src={post.author?.avatar || '/images/default.jpg'} roundedCircle/></div>
+                            <strong>{post.author?.name || 'Unknown'} <span className="text-muted d-block" style={{ fontSize: '0.875rem' }}>• {dayjs(post.createdAt).fromNow()}</span></strong>{' '}
+                            {memberdata?._id === post.author?._id && 
+                              <Dropdown className="edit--dropdown">
+                                <Dropdown.Toggle variant="dark"><FaEllipsisV /></Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                  <Dropdown.Item onClick={() => handleEdit(post)}>Edit</Dropdown.Item>
+                                  <Dropdown.Item onClick={() => handleDelete(post?._id)}>Delete</Dropdown.Item>
+                                </Dropdown.Menu>
+                              </Dropdown>
+                            }
                           </div>
-
-                          {/* Likes / Comments */}
-                          <div className="d-flex gap-3 text-muted mt-3 align-items-center">
-                            <span className="icon--heart">
-                              {isLiked ? (
-                                <BsHeartFill onClick={() => handleLike(post._id)} className="me-1 filled--heart" />
-                              ) : (
-                                <BsHeart onClick={() => handleLike(post._id)} className="me-1" />
+                          <div className="comment--body">
+                            <div className="mt-3">
+                              {/* Text Post */}
+                              {post.post_type === 'text' && (
+                                <>
+                                  {post.title && <h5>{post.title}</h5>}
+                                  <p>{post.content}</p>
+                                </>
                               )}
-                              {post.likes?.length || 0}
-                            </span>
-                            <span className="open--comment" onClick={() => {setShowCommentBox((prev) => !prev); setCommentPostId(post._id)}}>
-                              <BsChat className="me-1" /> {post?.comments?.length || 0}
-                            </span>
+
+                              {/* Image Post */}
+                              {post.post_type === 'image' && (
+                                <>
+                                  {post.caption && <p>{post.caption}</p>}
+                                  {Array.isArray(post.files) &&
+                                    post.files.map((img, i) => (
+                                      <Image
+                                        key={i}
+                                        src={img.url}
+                                        alt={img.file_name}
+                                        fluid
+                                        className="rounded"
+                                      />
+                                    ))}
+                                </>
+                              )}
+
+                              {/* Quote Post */}
+                              {post.post_type === 'quote' && (
+                                <blockquote className="blockquote p-3 rounded mt-3">
+                                  <LuQuote className="me-2" />
+                                  <p className="mb-0" style={{ fontStyle: 'italic' }}>
+                                  {post.content}
+                                  </p>
+                                  {post?.quoteAuthor && (
+                                    <p><strong>- {post.quoteAuthor}</strong></p>
+                                  )}
+                                </blockquote>
+                              )}
+
+                              {/* Video Post */}
+                              {post.post_type === 'video' && (
+                                <>
+                                  {post.videoType === 'youtube' && (
+                                    <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
+                                      <iframe
+                                        key={`video-post-${post.content}-0`}
+                                        src={convertYouTubeToEmbed(post.content)}
+                                        title="YouTube Video"
+                                        allowFullScreen
+                                      ></iframe>
+                                    </div>
+                                  )}
+                                  {post.videoType === 'vimeo' && (
+                                    <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
+                                      <iframe
+                                        key={`video-post-${post.content}-0`}
+                                        src={post.content}
+                                        title="Vimeo Video"
+                                        allowFullScreen
+                                      ></iframe>
+                                    </div>
+                                  )}
+                                  {post.videoType === 'upload' && Array.isArray(post.files) && (
+                                    post.files.map((vid, i) => (
+                                      <video
+                                        key={`video-post-${vid.url}-${i}`}
+                                        controls
+                                        className="mb-2 rounded-3 w-100"
+                                      >
+                                        <source src={`${vid.url}?t=${Date.now()}`} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                      </video>
+                                    ))
+                                  )}
+                                  {post.description && <p>{post.description}</p>}
+                                </>
+                              )}
+                            </div>
+
+                            {/* Likes / Comments */}
+                            <div className="d-flex gap-3 text-muted mt-3 align-items-center">
+                              <span className="icon--heart">
+                                {isLiked ? (
+                                  <BsHeartFill onClick={() => handleLike(post._id)} className="me-1 filled--heart" />
+                                ) : (
+                                  <BsHeart onClick={() => handleLike(post._id)} className="me-1" />
+                                )}
+                                {post.likes?.length || 0}
+                              </span>
+                              <span className="open--comment" onClick={() => {setShowCommentBox((prev) => !prev); setCommentPostId(post._id)}}>
+                                <BsChat className="me-1" /> {post?.comments?.length || 0}
+                              </span>
+                            </div>
+                            {showCommentBox && (
+                              <CommentThread comments={post?.comments} post={commentPostId} toggle={setShowCommentBox} />
+                            )}
                           </div>
-                          {showCommentBox && (
-                            <CommentThread comments={post?.comments} post={commentPostId} toggle={setShowCommentBox} />
-                          )}
                         </Col>
                       </Row>
                     </Card>
