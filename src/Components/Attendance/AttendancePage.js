@@ -358,7 +358,7 @@ useEffect(() => {
               <div className="attendance--table excel--view" id="excel--view">
                 <div className="d-sm-flex align-items-center gap-3 justify-content-between mb-4">
                   <h3 className="mb-0 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Attendance Matrix - {getMonthLabel(filters?.month)}</h3>
-                  <Button variant="primary" className="mt-3 mt-sm-0" onClick={() => downloadExcel(excelData)}><FiDownload /> Download Excel Excel</Button>
+                  <Button variant="primary" className="mt-3 mt-sm-0" onClick={() => downloadExcel(excelData)}><FiDownload /> Download Excel Sheet</Button>
                 </div>
                 <div className='attendance--excel--table new--project--rows table-responsive-xl'>
                     <Table>

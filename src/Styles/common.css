@@ -1264,6 +1264,12 @@ Add Project Modal CSS-=-=-
   overflow: hidden;
 }
 
+.assign--task--modal .status--list .list-group-item span img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .upload--status .file--upload {
   align-items: center;
   background: #eee;
@@ -1441,7 +1447,7 @@ ul#subtasks-ul .form-group .quill--editor svg {
     max-height: 100%;
   }
 
-  .modal-lg {
-    max-width: 800px;
+  .modal-lg, .modal-xl, .modal-sm, .modal-md {
+    max-width: 700px;
   }
 }

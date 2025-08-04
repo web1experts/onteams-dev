@@ -1478,12 +1478,11 @@ span.open--sidebar {
   color: #ffffff;
   cursor: pointer;
   margin-left: 0;
-  border: 1px solid rgb(17 24 39);
+  border: 1px solid rgba(var(--theme-primary), 1);
 }
 
 .wrapper--title .list-group-item:hover {
   background: linear-gradient(to right, rgba(var(--theme-secondary), 1), rgba(var(--theme-primary), 1));
-  border: 1px solid transparent;
   color: #ffffff;
 }
 
@@ -4124,7 +4123,7 @@ Project Task View CSS=-=-=
 
 .new--accordion--block .bg--blue--accordion {
   background-image: linear-gradient(to right, rgba(var(--theme-primary), .02), rgba(var(--theme-secondary), .08));
-  border: 1px solid rgba(var(--theme-secondary), .2);
+  border: 1px solid rgba(var(--theme-secondary), .05);
 }
 
 .form-check-input:checked {
@@ -8172,8 +8171,8 @@ Media CSS-=-==
     padding: 2rem;
   }
 
-  .wrapper--title .projecttitle {
-    flex: 1 1;
+  .clients--page .wrapper--title .projecttitle, .team-members--page .wrapper--title .projecttitle {
+    max-width: calc(100% - 76px);
   }
 
   .page--title .list-group {
@@ -8812,6 +8811,11 @@ Media CSS-=-==
 }
 
 @media screen and (max-width:767px) {
+  .attendance--stats h3,
+  .attendance--table h3 {
+    font-size: 1.2rem;
+  }
+
   .wrapper--title .projecttitle {
     flex: 1 1 100%;
     max-width: calc(100% - 156px);
@@ -8819,15 +8823,6 @@ Media CSS-=-==
 
   .attendance--page .wrapper--title .projecttitle {
     max-width: calc(100% - 250px);
-  }
-
-  .clients--page .wrapper--title .projecttitle, .team-members--page .wrapper--title .projecttitle {
-    max-width: calc(100% - 76px);
-  }
-
-  .attendance--stats h3,
-  .attendance--table h3 {
-    font-size: 1.2rem;
   }
 
   .project--form--actions .list-group+.list-group .list-group-item {
