@@ -5,9 +5,9 @@ import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
-import { BsArrowLeft, BsArrowLeftCircleFill, BsArrowRight, BsArrowRightCircleFill, BsClockHistory } from "react-icons/bs";
+import { BsArrowLeft, BsArrowRight, BsClockHistory } from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
-import { LuFolderOpen, LuUsers, LuTimer, LuClock } from "react-icons/lu";
+import { LuFolderOpen, LuUsers, LuTimer, LuClock, LuFileText } from "react-icons/lu";
 import { MdDragIndicator, MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdSearch, MdFilterList} from "react-icons/md";
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
 import { GoPulse } from "react-icons/go";
@@ -1316,32 +1316,16 @@ function ReportsPage() {
                     <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">
-                          <th
-                            scope="col"
-                            className="sticky pe-0 py-0"
-                            key="project-name-header"
-                          >
+                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
                             <LuFolderOpen className="me-1" /> Project
                           </th>
-                          <th
-                            scope="col"
-                            key="client-time-header"
-                            className="onHide ms-auto"
-                          >
+                          <th scope="col" key="client-time-header" className="onHide ms-auto">
                             <FiClock className="me-1" /> Total Hours
                           </th>
-                          <th
-                            scope="col"
-                            key="client-status-header"
-                            className="onHide"
-                          >
+                          <th scope="col" key="client-status-header" className="onHide">
                             <FiUsers className="me-1" /> Members
                           </th>
-                          <th
-                            scope="col"
-                            key="client-action-header"
-                            className="onHide"
-                          >
+                          <th scope="col" key="client-action-header" className="onHide">
                             <FiTarget className="me-1" /> Action
                           </th>
                         </tr>
@@ -1440,32 +1424,16 @@ function ReportsPage() {
                       <Table responsive="lg">
                         <thead className="onHide">
                           <tr key="project-table-header">
-                            <th
-                              scope="col"
-                              className="sticky pe-0 py-0"
-                              key="project-name-header"
-                            >
+                            <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
                               <FiUsers className="me-1" /> Member
                             </th>
-                            <th
-                              scope="col"
-                              key="client-time-header"
-                              className="onHide ms-auto"
-                            >
+                            <th scope="col" key="client-time-header" className="onHide ms-auto">
                               <FiClock className="me-1" /> Total Hours
                             </th>
-                            <th
-                              scope="col"
-                              key="client-status-header"
-                              className="onHide"
-                            >
+                            <th scope="col" key="client-status-header" className="onHide">
                               <LuFolderOpen className="me-1" /> Projects
                             </th>
-                            <th
-                              scope="col"
-                              key="client-action-header"
-                              className="onHide"
-                            >
+                            <th scope="col" key="client-action-header" className="onHide">
                               <FiTarget className="me-1" /> Action
                             </th>
                           </tr>
@@ -1737,25 +1705,7 @@ function ReportsPage() {
                         <div className="d-flex align-items-center justify-content-between gap-4">
                           <h4 className="d-flex align-items-center gap-3 justify-content-between">
                             <strong>
-                              <span>
-                                <svg
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  className="lucide lucide-building2 w-4 h-4 text-blue-600"
-                                >
-                                  <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path>
-                                  <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path>
-                                  <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path>
-                                  <path d="M10 6h4"></path>
-                                  <path d="M10 10h4"></path>
-                                  <path d="M10 14h4"></path>
-                                  <path d="M10 18h4"></path>
-                                </svg>
-                              </span>
+                              <span><LuFileText /></span>
                               {report?.project?.title}
                             </strong>
                           </h4>

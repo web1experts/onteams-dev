@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup, ButtonGroup} from "react-bootstrap";
-import { FaPlus, FaEllipsisV, FaTrashAlt } from "react-icons/fa";
-import { FiSidebar } from "react-icons/fi";
+import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup} from "react-bootstrap";
+import { FaPlus, FaTrashAlt } from "react-icons/fa";
+import { FiSidebar, FiUsers, FiTarget } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { MdDragIndicator } from "react-icons/md";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
@@ -99,58 +99,66 @@ function Workspace(props) {
             </Row>
           </Container>
         </div>
-        <div className='page--wrapper p-md-3 py-3'>
+        <div className='page--wrapper px-md-2 pb-4 pt-4'>
         {
-              spinner &&
-              <div class="loading-bar">
-                  <img src="images/OnTeam-icon.png" className="flipchar" />
-              </div>
-          }
+          spinner ?
+          <div class="loading-bar">
+              <img src="images/OnTeam-icon.png" className="flipchar" />
+          </div>
+          :
           <Container fluid>
-            <Table responsive="lg" className="project--table clients--table new--project--rows">
-              {/* <thead>
-                <tr>
-                  <th width={30}>#</th>
-                  <th>Name</th>
-                  <th width={30}>Action</th>
-                </tr>
-              </thead> */}
-              <tbody>
-                {
-                  !spinner && workspaces && workspaces.length > 0 ?
-                  workspaces.map((workspace, index) => (
-                    <tr key={`row-${index}`}>
-                      {/* <td width={30}>{index + 1 }</td> */}
-                      <td className="cursor--pointer project--title--td">
-                        <div className="d-flex justify-content-between">
-                          <div className="project--name d-flex gap-3 align-items-center">
-                              <div className="drag--indicator"><abbr>{index + 1 }</abbr><MdDragIndicator /></div>
-                              <div className="title--initial">{workspace.company?.name?.substring(0,1)}</div>
-                              <div className="title--span flex-column d-flex align-items-start gap-0">
-                                <span>{workspace.company?.name}</span>
-                              </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="d-flex gap-3 align-items-center p-3 justify-content-end">
-                          <Button variant="dark" className="px-3 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
-                          <Button variant="danger" className="px-3 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
-                        </div>
-                      </td>
+            <div className="attendance--table members--view">
+              <div className="attendance--table--list">
+                <Table responsive="lg">
+                  <thead className="onHide">
+                    <tr key="project-table-header">
+                      <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
+                        <FiUsers className="me-1" /> Name
+                      </th>
+                      <th scope="col" key="client-action-header" className="onHide">
+                        <FiTarget className="me-1" /> Actions
+                      </th>
                     </tr>
-                  ))
-                :
-                !spinner && workspaces && workspaces.length === 0 &&
-                <tr>
-                    <td colSpan={3}>
-                      <h2 className="mt-2 text-center">No workspace found.</h2>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </Table>
+                  </thead>
+                  <tbody>
+                    {
+                      !spinner && workspaces && workspaces.length > 0 ?
+                      workspaces.map((workspace, index) => (
+                        <tr key={`row-${index}`}>
+                          {/* <td width={30}>{index + 1 }</td> */}
+                          <td className="cursor--pointer project--title--td">
+                            <div className="d-flex justify-content-between">
+                              <div className="project--name d-flex gap-3 align-items-center">
+                                  <div className="drag--indicator"><abbr>{index + 1 }</abbr><MdDragIndicator /></div>
+                                  <div className="title--initial">{workspace.company?.name?.substring(0,1)}</div>
+                                  <div className="title--span flex-column d-flex align-items-start gap-0">
+                                    <span>{workspace.company?.name}</span>
+                                  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="d-flex gap-3 align-items-center justify-content-md-end">
+                              <Button variant="dark" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
+                              <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    :
+                    !spinner && workspaces && workspaces.length === 0 &&
+                    <tr>
+                        <td colSpan={3}>
+                          <h2 className="mt-2 text-center">No workspace found.</h2>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </Table>
+              </div>
+            </div>
           </Container>
+        }
         </div>
         <Modal show={show} onHide={handleClose} centered size="md" className="add--workspace--modal">
         <Modal.Header closeButton>

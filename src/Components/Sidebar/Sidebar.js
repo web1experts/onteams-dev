@@ -257,7 +257,7 @@ function SidebarPanel() {
                                         </>
                                     }
                                 </div>
-                                <Link className="dropdown-item create--space" to="/workspace" onClick={() => setShowDropdown(false)}><span className="initial--name"><LuBuilding /></span> Manage Workspace</Link>
+                                <Link className="dropdown-item create--space" to="/workspace" onClick={() => {if (window.innerWidth < 991) {handleSidebarSmall(false);}}}><span className="initial--name"><LuBuilding /></span> Manage Workspace</Link>
                             </Dropdown.Menu>
                         </Dropdown>
                     </div>

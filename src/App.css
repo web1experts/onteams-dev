@@ -805,7 +805,17 @@ body {
 .wrapper--title .members--list .list-group-item .team--initial span img,
 .page--wrapper table td.project--title--td .title--initial span,
 .page--wrapper table td .title--initial span img,
-.page--wrapper table td .title--initial span {
+.page--wrapper table td .title--initial span,
+.team--members--list .title--initial span,
+.wrapper--title .dropdown-toggle .title--initial span,
+.wrapper--title .dropdown-item .title--initial span,
+.comments--list .card .title--initial span,
+.modal .single--project--stack .title--initial span,
+.team--members--list .title--initial span img,
+.wrapper--title .dropdown-toggle .title--initial span img,
+.wrapper--title .dropdown-item .title--initial span img,
+.comments--list .card .title--initial span img,
+.modal .single--project--stack .title--initial span img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -8790,6 +8800,14 @@ Media CSS-=-==
   .activity--box {
     padding: 0;
     max-height: max-content;
+  }
+
+  .attendance--stats, .attendance--table {
+    padding: 1rem;
+  }
+
+  .attendance--excel--table {
+    margin: 0 -1rem;
   }
 }
 
