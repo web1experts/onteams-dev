@@ -1064,7 +1064,7 @@ function TeamMembersPage() {
       {activeTab === "Invitations" && (
         <Invitation activeTab={activeTab} topbar={pagetopbar} activeSubTab={isActiveView} searchTerm={searchTerm} listfor="company" handleIsActive={setIsActive} toggleActive={setIsActive}/>
       )}
-      {isActive && (
+      {isActive ? (
         <div className="details--member--view">
           <div className="wrapper--title py-2 bg-white border-bottom">
             <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
@@ -1443,7 +1443,7 @@ function TeamMembersPage() {
             </div>
           </>
         </div>
-      )}
+      ): <></>}
 
       <Modal show={show} onHide={handleClose} centered size="lg" className="add--team--member--modal add--member--modal theme--modal" onShow={() => selectboxObserver()}>
         <Modal.Header closeButton>
