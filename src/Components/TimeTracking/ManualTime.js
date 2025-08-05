@@ -63,22 +63,23 @@ function ManualTime() {
     handleManualTimeList();
   }, [dispatch]);
 
-  const handleReportSubmit = async (status,date, memberId, data) => {
-    let activityStatus = {}
-    for(const activity of data){
-      activityStatus[activity?._id] = {}
+  const handleReportSubmit = async (status, date, memberId, data) => {
+    let activityStatus = {};
+    for (const activity of data) {
+      activityStatus[activity?._id] = {};
       activityStatus[activity?._id] = {
         status: status,
         duration: activity.duration,
-      }
-    } 
-    console.log("activityStatus:: ", activityStatus)
-    dispatch(updateManualTimeStatus({
-      date: date,
-      memberId: memberId,
-      activityStatus: activityStatus
-    }));
+      };
+    }
 
+    dispatch(
+      updateManualTimeStatus({
+        date: date,
+        memberId: memberId,
+        activityStatus: activityStatus,
+      })
+    );
   };
 
   useEffect(() => {
@@ -116,13 +117,13 @@ function ManualTime() {
 
   function calculateManualTotalTime(data) {
     let totalSeconds = 0;
-    if(data?.length  === 0){
+    if (data?.length === 0) {
       return `00:00`;
     }
 
     for (const project of data) {
-      if(project?.activities && project?.activities.length > 0){
-        for(const activity of project?.activities){
+      if (project?.activities && project?.activities.length > 0) {
+        for (const activity of project?.activities) {
           totalSeconds += activity?.duration;
         }
       }
@@ -171,7 +172,9 @@ function ManualTime() {
                     </div>
                     <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
                       <div className="text-end">
-                        <div className="text-lg font-bold text--blue">{calculateManualTotalTime(member.projects)}</div>
+                        <div className="text-lg font-bold text--blue">
+                          {calculateManualTotalTime(member.projects)}
+                        </div>
                         <div className="text-slate-600">
                           Submitted{" "}
                           {new Date(date).toLocaleString("en-US", {
@@ -215,26 +218,49 @@ function ManualTime() {
                             (activity) =>
                               activity.tasks?.length > 0 &&
                               activity.tasks.map((taskdata, taskIndex) => (
-                                <p key={`${activity._id}-${taskIndex}`} className="d-flex align-items-center justify-content-between gap-2 bg-light px-3 py-2 border rounded-3 mb-0">
+                                <p
+                                  key={`${activity._id}-${taskIndex}`}
+                                  className="d-flex align-items-center justify-content-between gap-2 bg-light px-3 py-2 border rounded-3 mb-0"
+                                >
                                   <strong className="d-flex align-items-center gap-2">
                                     <FaRegListAlt /> {taskdata?.task?.title}
                                   </strong>
                                   <small>
                                     <LuClock />{" "}
-                                      {generateTimeRange(
-                                        activity?.createdAt,
-                                        activity?.duration
-                                      )}
+                                    {generateTimeRange(
+                                      activity?.createdAt,
+                                      activity?.duration
+                                    )}
                                   </small>
                                 </p>
                               ))
                           )}
                       </h4>
                       <div className="btns--set">
-                        <Button variant="primary" onClick={() => {handleReportSubmit('approved', date, member?._id, project.activities)}}>
-                          <FiCheckCircle className="me-1"  /> Approve
+                        <Button
+                          variant="primary"
+                          onClick={() => {
+                            handleReportSubmit(
+                              "approved",
+                              date,
+                              member?._id,
+                              project.activities
+                            );
+                          }}
+                        >
+                          <FiCheckCircle className="me-1" /> Approve
                         </Button>
-                        <Button variant="danger" onClick={() => {handleReportSubmit('disapproved', date, member?._id, project.activities)}} >
+                        <Button
+                          variant="danger"
+                          onClick={() => {
+                            handleReportSubmit(
+                              "disapproved",
+                              date,
+                              member?._id,
+                              project.activities
+                            );
+                          }}
+                        >
                           <AiOutlineCloseCircle className="me-1" /> Reject
                         </Button>
                       </div>
@@ -314,7 +340,13 @@ function ManualTime() {
         </div>
       </div>
       {show && (
-        <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal">
+        <Modal
+          show={show}
+          onHide={handleClose}
+          centered
+          size="lg"
+          className="AddReportModal AddTimeModal"
+        >
           <Modal.Header closeButton>
             <Modal.Title>
               {singleManualRecord?.length > 0 ? (
@@ -371,15 +403,12 @@ function ManualTime() {
                       </Col>
                     </Row>
                     <Row>
-                      <Col md={12} className="text-end">
-                       
-                      </Col>
+                      <Col md={12} className="text-end"></Col>
                     </Row>
                   </>
                 );
               })}
           </Modal.Body>
-          
         </Modal>
       )}
     </>

@@ -2,22 +2,63 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination} from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Form,
+  ListGroup,
+  Modal,
+  Card,
+  Dropdown,
+  CardGroup,
+  Badge,
+  Table,
+  ListGroupItem,
+  Pagination,
+} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeft, BsArrowRight, BsClockHistory } from "react-icons/bs";
-import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
-import { LuFolderOpen, LuUsers, LuTimer, LuClock, LuFileText } from "react-icons/lu";
-import { MdDragIndicator, MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdSearch, MdFilterList} from "react-icons/md";
+import {
+  showAmPmtime,
+  getMemberdata,
+  selectboxObserver,
+} from "../../helpers/commonfunctions";
+import {
+  LuFolderOpen,
+  LuUsers,
+  LuTimer,
+  LuClock,
+  LuFileText,
+} from "react-icons/lu";
+import {
+  MdDragIndicator,
+  MdOutlineClose,
+  MdOutlineVideoLibrary,
+  MdOutlineSearch,
+  MdSearch,
+  MdFilterList,
+} from "react-icons/md";
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
 import { GoPulse } from "react-icons/go";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";
 import { TbReport, TbScreenshot } from "react-icons/tb";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { getReportsByMember, gerReportsByProject, getSingleProjectReport, addRemarkstoProject } from "../../redux/actions/report.action";
+import {
+  getReportsByMember,
+  gerReportsByProject,
+  getSingleProjectReport,
+  addRemarkstoProject,
+  getActivityMeta,
+} from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
-import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/project.action";
+import {
+  ListProjectsByMembers,
+  ListMemberProjects,
+} from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
 import { ListTasks } from "../../redux/actions/task.action";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -25,148 +66,23 @@ import { Link } from "react-router-dom";
 import "media-chrome";
 import "media-chrome/dist/menu";
 
-const TaskList = ({ report }) => {
-  const [ViewReport, setViewReport] = useState(false);
+const TaskList = ({ report, handleView, setReport }) => {
+  const dispatch = useDispatch();
+  const selectedReport = report;
+  const reportState = useSelector((state) => state.reports);
+  // const [ViewReport, setViewReport] = useState(false);
   const [showRemarks, setShowRemarks] = useState(false);
-  const [activeTab, setActiveTab] = useState("screenshots");
-  const [reportopen, setReportOpen] = useState(false);
-  const [slideIndex, setSlideIndex] = useState(0);
-  const [lightboxMedia, setLightboxMedia] = useState([]);
-  const fullscreenrefrence = React.useRef(null);
-  const [taskId, setTaskId] = useState("");
-  const [currentVideoPage, setCurrentVideoPage] = useState({});
-  const videosPerPage = 12; // Adjust as needed
-
-  let screenshotsByTask = {};
-  let videosByTask = {};
-
-  if (Array.isArray(report?.activityMetas) && report.activityMetas.length > 0) {
-    const screenshots = {};
-    const videos = {};
-    report.activityMetas.forEach((meta) => {
-      if (meta.meta_key === "screenshots" && Array.isArray(meta.meta_value)) {
-        meta.meta_value.forEach((screenshot) => {
-          if (!screenshot.task) return;
-          if (!screenshots[screenshot.task]) screenshots[screenshot.task] = [];
-          screenshots[screenshot.task].push(screenshot);
-        });
-      }
-
-      if (meta.meta_key === "videos" && Array.isArray(meta.meta_value)) {
-        meta.meta_value.forEach((video) => {
-          if (!video.task) return;
-          if (!videos[video.task]) videos[video.task] = [];
-          videos[video.task].push(video);
-        });
-      }
-    });
-
-    // Sort screenshots by taken_time (ISO timestamp string)
-    Object.values(screenshots).forEach((arr) =>
-      arr.sort((a, b) => new Date(a.taken_time) - new Date(b.taken_time))
-    );
-
-    // Sort videos by parsing start_time (like "7:01 AM") into Date objects for sorting
-    Object.values(videos).forEach((arr) =>
-      arr.sort((a, b) => {
-        const parseTime = (timeStr) => {
-          const today = new Date();
-          const [hourMinute, ampm] = timeStr.split(" ");
-          let [h, m] = hourMinute.split(":").map(Number);
-          if (ampm === "PM" && h !== 12) h += 12;
-          if (ampm === "AM" && h === 12) h = 0;
-          return new Date(today.setHours(h, m, 0, 0));
-        };
-        return parseTime(a.start_time) - parseTime(b.start_time);
-      })
-    );
-
-    videosByTask = videos;
-    screenshotsByTask = screenshots;
-  }
-
-  const groupTasksById = (activities) => {
-    const groupedTasks = activities.reduce((acc, activity) => {
-      (activity.tasks || []).forEach((t) => {
-        if (!t.task || !t.task._id) return; // skip if task is missing
-
-        const taskId = t.task._id;
-
-        if (!acc[taskId]) {
-          acc[taskId] = {
-            taskId: taskId,
-            title: t.task.title,
-            tab: t.task.tab,
-            duration: 0,
-          };
-        }
-
-        if (t.duration) {
-          acc[taskId].duration += t.duration;
-        }
-      });
-
-      return acc;
-    }, {});
-
-    // Format durations into "Xh Ym" or "Z secs"
-    return Object.values(groupedTasks).map((task) => {
-      const totalSeconds = task.duration;
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-
-      task.duration =
-        totalSeconds < 60
-          ? `${seconds} secs`
-          : `${hours}h ${minutes.toString().padStart(2, "0")}m`;
-
-      return task;
-    });
-  };
-
-  const handleReportClose = () => setViewReport(false);
-
-  const handleViewReport = (taskId) => {
-    setTaskId(taskId);
-    setViewReport(true);
-  };
-
-  // Group tasks by title and calculate total durations
-  const groupedTasks = groupTasksById(report?.activities);
+  // const [activeTab, setActiveTab] = useState("screenshots");
+  // const [reportopen, setReportOpen] = useState(false);
+  // const [slideIndex, setSlideIndex] = useState(0);
+  // const [lightboxMedia, setLightboxMedia] = useState([]);
+  // const fullscreenrefrence = React.useRef(null);
+  // const [taskId, setTaskId] = useState("");
+  // const [currentVideoPage, setCurrentVideoPage] = useState({});
+  // const videosPerPage = 12; // Adjust as needed
 
   const handleRemarksClose = () => setShowRemarks(false);
   const handleShowRemarks = () => setShowRemarks(true);
-
-  const triggerLightBox = (type, mediaItems, index) => {
-    setSlideIndex(index);
-    const slides =
-      Array.isArray(mediaItems) && mediaItems.length > 0
-        ? mediaItems
-            .map((item) => {
-              if (type === "video" && item.task === taskId) {
-                return {
-                  type: "video",
-                  src: item.url,
-                  poster: null, // Optional, for a thumbnail or video preview
-                  videoProps: {
-                    controls: true,
-                    autoPlay: false, // Set to true if you want videos to start automatically
-                    style: { maxHeight: "90vh", maxWidth: "100%" },
-                  },
-                };
-              } else if (type === "screenshot" && item.task === taskId) {
-                return { type: "image", src: item.url }; // Default case for images
-              }
-              return null;
-            })
-            .filter(Boolean)
-        : [];
-
-    // const data = slides;
-    setLightboxMedia(slides);
-    setReportOpen(true);
-  };
 
   const gettaskTab = (tabid) => {
     if (report?.project?.workflow?.tabs?.length > 0) {
@@ -180,67 +96,7 @@ const TaskList = ({ report }) => {
 
   return (
     <>
-      <Lightbox
-        open={reportopen}
-        close={() => setReportOpen(false)}
-        slides={lightboxMedia}
-        plugins={[Fullscreen]}
-        fullscreen={{ ref: fullscreenrefrence }}
-        carousel={{ finite: lightboxMedia.length === 1 }}
-        index={slideIndex}
-        on={{
-          click: () => fullscreenrefrence.current?.enter(),
-        }}
-        render={{
-          slide: ({ slide }) => {
-            if (slide?.type === "video") {
-              return (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <media-controller>
-                    <video
-                      slot="media"
-                      src={slide.src}
-                      style={{ maxHeight: "90vh", maxWidth: "100%" }}
-                    ></video>
-                    <media-settings-menu hidden anchor="auto">
-                      <media-settings-menu-item>
-                        Speed
-                        <media-playback-rate-menu
-                          slot="submenu"
-                          hidden
-                          rates="1 1.25 1.5 1.75 2 2.50 3 3.50 4 4.50 5 6 7 8 9 10"
-                        >
-                          <div slot="title">Speed</div>
-                        </media-playback-rate-menu>
-                      </media-settings-menu-item>
-                      <media-settings-menu-item>
-                        Quality
-                        <media-rendition-menu slot="submenu" hidden>
-                          <div slot="title">Quality</div>
-                        </media-rendition-menu>
-                      </media-settings-menu-item>
-                    </media-settings-menu>
-                    <media-control-bar>
-                      <media-play-button></media-play-button>
-                      <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
-
-                      <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
-                      <media-time-display></media-time-display>
-                      <media-time-range slot="center-controls"></media-time-range>
-                      <media-duration-display></media-duration-display>
-                      <media-pip-button></media-pip-button>
-                      <media-fullscreen-button></media-fullscreen-button>
-                      <media-settings-menu-button></media-settings-menu-button>
-                    </media-control-bar>
-                  </media-controller>
-                </div>
-              );
-            }
-            return null; // Default render for images will be used
-          },
-        }}
-      />
-      <ul>
+      {/* <ul>
         {groupedTasks?.map((taskData, index) => (
           <li key={`grouped-task-${index}`}>
             <p className="mb-0">
@@ -257,188 +113,7 @@ const TaskList = ({ report }) => {
             </Button>
           </li>
         ))}
-      </ul>
-      {ViewReport && (
-        <Modal
-          show={ViewReport}
-          onHide={handleReportClose}
-          centered
-          size="lg"
-          key={`reports-${taskId}`}
-          className="timeSheetModal reports__Data__modal"
-        >
-          <Modal.Header closeButton>
-            <ListGroup horizontal>
-              <ListGroup.Item
-                action
-                active={activeTab === "screenshots"}
-                onClick={() => setActiveTab("screenshots")}
-              >
-                <TbScreenshot className="me-1" /> Screenshots
-              </ListGroup.Item>
-              <ListGroup.Item
-                action
-                active={activeTab === "videos"}
-                onClick={() => setActiveTab("videos")}
-              >
-                <MdOutlineVideoLibrary className="me-1" /> Videos
-              </ListGroup.Item>
-            </ListGroup>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="shots--list">
-              <CardGroup key={`card-group-${taskId}`} className="reports__card">
-                {activeTab === "screenshots" ? (
-                  screenshotsByTask?.[taskId]?.length > 0 ? (
-                    <>
-                      {screenshotsByTask[taskId].map((screenshotData, idx) => (
-                        <Card key={`screenshot-${taskId}-${idx}`}>
-                          <Card.Body>
-                            <img
-                              className="card-img-top"
-                              src={screenshotData?.url}
-                              alt="screenshot"
-                              onClick={() =>
-                                triggerLightBox(
-                                  "screenshot",
-                                  screenshotsByTask[taskId],
-                                  idx
-                                )
-                              }
-                              style={{ cursor: "pointer" }}
-                            />
-                            <p>
-                              <strong>Task Name:</strong>{" "}
-                              {screenshotData?.task_data?.title}
-                              <br />
-                              <strong>Time:</strong>{" "}
-                              {showAmPmtime(screenshotData?.taken_time)}
-                              <br />
-                              <strong>Date:</strong>{" "}{ screenshotData?.taken_time
-                                                ? new Date(screenshotData?.taken_time).toLocaleDateString('en-GB', {
-                                                    day: 'numeric',
-                                                    month: 'long',
-                                                    year: 'numeric'
-                                                  })
-                                                : ''
-                                              }
-                            </p>
-                          </Card.Body>
-                        </Card>
-                      ))}
-                    </>
-                  ) : (
-                    <h3 className="no__data">No Data Available</h3>
-                  )
-                ) : activeTab === "videos" ? (
-                  videosByTask?.[taskId]?.length > 0 ? (
-                    (() => {
-                      const taskVideos = videosByTask[taskId];
-                      const page =
-                        currentVideoPage[`single-${report?.project?._id}`] || 1;
-                      const start = (page - 1) * videosPerPage;
-                      const end = page * videosPerPage;
-                      const paginatedVideos = taskVideos.slice(start, end);
-
-                      return (
-                        <>
-                          {paginatedVideos.map((videoData, idx) => {
-                            const realIndex = start + idx;
-                            return (
-                              <Card
-                                key={`video-card-${report?.project?._id}-${page}-${idx}`}
-                              >
-                                <Card.Body
-                                  style={{ cursor: "pointer" }}
-                                  onClick={() =>
-                                    triggerLightBox(
-                                      "video",
-                                      taskVideos,
-                                      realIndex
-                                    )
-                                  }
-                                >
-                                  <video
-                                    height="175px"
-                                    style={{ width: "100%" }}
-                                    preload="metadata"
-                                    muted
-                                    onLoadedMetadata={(e) =>
-                                      (e.target.currentTime = 0.1)
-                                    }
-                                    controls={false}
-                                  >
-                                    <source
-                                      src={videoData?.url}
-                                      type="video/webm"
-                                    />
-                                    Your browser does not support the video tag.
-                                  </video>
-                                  <p>
-                                    <strong>Task Name:</strong>{" "}
-                                    {videoData?.task_data?.title}
-                                    <br />
-                                    <strong>Time:</strong>{" "}
-                                    {videoData?.start_time} to{" "}
-                                    {videoData?.end_time}
-                                    <br />
-                                    <strong>Date:</strong>{" "}{ videoData?.createdAt
-                                                      ? new Date(videoData.createdAt).toLocaleDateString('en-GB', {
-                                                          day: 'numeric',
-                                                          month: 'long',
-                                                          year: 'numeric'
-                                                        })
-                                                      : ''
-                                                    }
-                                  </p>
-                                </Card.Body>
-                              </Card>
-                            );
-                          })}
-
-                          {/* Pagination */}
-                          {taskVideos.length > videosPerPage && (
-                            <div className="d-flex align-items-center justify-content-between mt-3 w-100">
-                              <Button variant="secondary" className="px-2 py-1" disabled={page === 1} onClick={() =>
-                                  setCurrentVideoPage((prev) => ({
-                                    ...prev,
-                                    [`single-${report?.project?._id}`]:
-                                      page - 1,
-                                  }))
-                                }
-                              >
-                                <BsArrowLeft />
-                              </Button>
-
-                              <span style={{ margin: "0 10px" }}>
-                                Page {page} of{" "}
-                                {Math.ceil(taskVideos.length / videosPerPage)}
-                              </span>
-
-                              <Button variant="primary" className="px-2 py-1" disabled={page >= Math.ceil(taskVideos.length / videosPerPage)} onClick={() =>
-                                  setCurrentVideoPage((prev) => ({
-                                    ...prev,
-                                    [`single-${report?.project?._id}`]:
-                                      page + 1,
-                                  }))
-                                }
-                              >
-                                <BsArrowRight/>
-                              </Button>
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()
-                  ) : (
-                    <h3 className="no__data">No Data Available</h3>
-                  )
-                ) : null}
-              </CardGroup>
-            </div>
-          </Modal.Body>
-        </Modal>
-      )}
+      </ul> */}
 
       {showRemarks && (
         <Modal
@@ -604,6 +279,20 @@ function ReportsPage() {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const [ViewReport, setViewReport] = useState(false);
+  const [showRemarks, setShowRemarks] = useState(false);
+  const [activeTab, setActiveTab] = useState("screenshots");
+  const [reportopen, setReportOpen] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [lightboxMedia, setLightboxMedia] = useState([]);
+  const fullscreenrefrence = React.useRef(null);
+  const [taskId, setTaskId] = useState("");
+  const [currentVideoPage, setCurrentVideoPage] = useState({});
+  const videosPerPage = 12; // Adjust as needed
+  const [screenshotsByTask, setScreenshotsByTask] = useState([]);
+  const [videosByTask, setvideosByTask] = useState([]);
+  // const [groupedTasks, setGroupedTasks] = useState([])
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
   const [filters, setFilters] = useState({
@@ -738,6 +427,64 @@ function ReportsPage() {
   }, [filters]);
 
   useEffect(() => {
+    if (reportState.activityMetas) {
+      if (
+        Array.isArray(reportState?.activityMetas) &&
+        reportState.activityMetas.length > 0
+      ) {
+        const screenshots = {};
+        const videos = {};
+        reportState.activityMetas.forEach((meta) => {
+          if (
+            meta.meta_key === "screenshots" &&
+            Array.isArray(meta.meta_value)
+          ) {
+            meta.meta_value.forEach((screenshot) => {
+              if (!screenshot.task) return;
+              if (!screenshots[screenshot.task])
+                screenshots[screenshot.task] = [];
+              screenshots[screenshot.task].push(screenshot);
+            });
+          }
+
+          if (meta.meta_key === "videos" && Array.isArray(meta.meta_value)) {
+            meta.meta_value.forEach((video) => {
+              if (!video.task) return;
+              if (!videos[video.task]) videos[video.task] = [];
+              videos[video.task].push(video);
+            });
+          }
+        });
+
+        // Sort screenshots by taken_time (ISO timestamp string)
+        Object.values(screenshots).forEach((arr) =>
+          arr.sort((a, b) => new Date(a.taken_time) - new Date(b.taken_time))
+        );
+
+        // Sort videos by parsing start_time (like "7:01 AM") into Date objects for sorting
+        Object.values(videos).forEach((arr) =>
+          arr.sort((a, b) => {
+            const parseTime = (timeStr) => {
+              const today = new Date();
+              const [hourMinute, ampm] = timeStr.split(" ");
+              let [h, m] = hourMinute.split(":").map(Number);
+              if (ampm === "PM" && h !== 12) h += 12;
+              if (ampm === "AM" && h === 12) h = 0;
+              return new Date(today.setHours(h, m, 0, 0));
+            };
+            return parseTime(a.start_time) - parseTime(b.start_time);
+          })
+        );
+        setScreenshotsByTask(screenshots);
+        setvideosByTask(videos);
+      } else {
+        setScreenshotsByTask([]);
+        setvideosByTask([]);
+      }
+    }
+  }, [reportState]);
+
+  useEffect(() => {
     if (memberFeed && memberFeed.memberData) {
       setMembers(memberFeed.memberData);
     }
@@ -812,10 +559,6 @@ function ReportsPage() {
     }
   }, [reportState]);
 
-  useEffect(() => {
-    console.log("single member report: ", singleMemberReport);
-  }, [singleMemberReport]);
-
   const goToPrevious = () => {
     if (filters?.page > 1) {
       const newPage = filters?.page - 1;
@@ -828,6 +571,89 @@ function ReportsPage() {
       const newPage = filters?.page + 1;
       setFilters({ ...filters, ["page"]: newPage });
     }
+  };
+
+  const handleReportClose = () => setViewReport(false);
+
+  const groupTasksById = (activities) => {
+    const groupedTasks = activities.reduce((acc, activity) => {
+      (activity.tasks || []).forEach((t) => {
+        if (!t.task || !t.task._id) return; // skip if task is missing
+
+        const taskId = t.task._id;
+
+        if (!acc[taskId]) {
+          acc[taskId] = {
+            taskId: taskId,
+            title: t.task.title,
+            tab: t.task.tab,
+            duration: 0,
+          };
+        }
+
+        if (t.duration) {
+          acc[taskId].duration += t.duration;
+        }
+      });
+
+      return acc;
+    }, {});
+
+    // Format durations into "Xh Ym" or "Z secs"
+    const formattedTasks = Object.values(groupedTasks).map((task) => {
+      const totalSeconds = task.duration;
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      task.duration =
+        totalSeconds < 60
+          ? `${seconds} secs`
+          : `${hours}h ${minutes.toString().padStart(2, "0")}m`;
+
+      return task;
+    });
+    return formattedTasks;
+    // setGroupedTasks(formattedTasks);
+  };
+
+  const handleViewReport = (activities, taskId) => {
+    setTaskId(taskId);
+    setScreenshotsByTask([]);
+    setvideosByTask([]);
+    const activityIds = activities.map((activity) => activity._id);
+    dispatch(getActivityMeta({ activityIds, taskId }));
+    setViewReport(true);
+  };
+
+  const triggerLightBox = (type, mediaItems, index) => {
+    setSlideIndex(index);
+    const slides =
+      Array.isArray(mediaItems) && mediaItems.length > 0
+        ? mediaItems
+            .map((item) => {
+              if (type === "video" && item.task === taskId) {
+                return {
+                  type: "video",
+                  src: item.url,
+                  poster: null, // Optional, for a thumbnail or video preview
+                  videoProps: {
+                    controls: true,
+                    autoPlay: false, // Set to true if you want videos to start automatically
+                    style: { maxHeight: "90vh", maxWidth: "100%" },
+                  },
+                };
+              } else if (type === "screenshot" && item.task === taskId) {
+                return { type: "image", src: item.url }; // Default case for images
+              }
+              return null;
+            })
+            .filter(Boolean)
+        : [];
+
+    // const data = slides;
+    setLightboxMedia(slides);
+    setReportOpen(true);
   };
 
   const showRecordedTabs = () => {
@@ -1133,18 +959,16 @@ function ReportsPage() {
   const [projectToggle, setProjectToggle] = useState(false);
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
-      console.log("1");
       handleSidebarSmall();
     } else {
       setProjectToggle(false);
       handleSidebarSmall();
-      console.log("3");
     }
   };
 
   return (
     <>
-      <Lightbox
+      {/* <Lightbox
         open={open}
         close={() => setOpen(false)}
         slides={postMedia}
@@ -1173,9 +997,78 @@ function ReportsPage() {
             return null; // Default render for images will be used
           },
         }}
+      /> */}
+
+      <Lightbox
+        open={reportopen}
+        close={() => setReportOpen(false)}
+        slides={lightboxMedia}
+        plugins={[Fullscreen]}
+        fullscreen={{ ref: fullscreenrefrence }}
+        carousel={{ finite: lightboxMedia.length === 1 }}
+        index={slideIndex}
+        on={{
+          click: () => fullscreenrefrence.current?.enter(),
+        }}
+        render={{
+          slide: ({ slide }) => {
+            if (slide?.type === "video") {
+              return (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <media-controller>
+                    <video
+                      slot="media"
+                      src={slide.src}
+                      style={{ maxHeight: "90vh", maxWidth: "100%" }}
+                    ></video>
+                    <media-settings-menu hidden anchor="auto">
+                      <media-settings-menu-item>
+                        Speed
+                        <media-playback-rate-menu
+                          slot="submenu"
+                          hidden
+                          rates="1 1.25 1.5 1.75 2 2.50 3 3.50 4 4.50 5 6 7 8 9 10"
+                        >
+                          <div slot="title">Speed</div>
+                        </media-playback-rate-menu>
+                      </media-settings-menu-item>
+                      <media-settings-menu-item>
+                        Quality
+                        <media-rendition-menu slot="submenu" hidden>
+                          <div slot="title">Quality</div>
+                        </media-rendition-menu>
+                      </media-settings-menu-item>
+                    </media-settings-menu>
+                    <media-control-bar>
+                      <media-play-button></media-play-button>
+                      <media-seek-backward-button seekoffset="10"></media-seek-backward-button>
+
+                      <media-seek-forward-button seekoffset="10"></media-seek-forward-button>
+                      <media-time-display></media-time-display>
+                      <media-time-range slot="center-controls"></media-time-range>
+                      <media-duration-display></media-duration-display>
+                      <media-pip-button></media-pip-button>
+                      <media-fullscreen-button></media-fullscreen-button>
+                      <media-settings-menu-button></media-settings-menu-button>
+                    </media-control-bar>
+                  </media-controller>
+                </div>
+              );
+            }
+            return null; // Default render for images will be used
+          },
+        }}
       />
 
-      <div className={`${ isActive === 1 ? "show--details team--page project-collapse holidays--page" : isActive === 2 ? "view--project team--page project-collapse holidays--page" : "team--page holidays--page"} ${projectToggle === true ? "project-collapse" : ""}`}>
+      <div
+        className={`${
+          isActive === 1
+            ? "show--details team--page project-collapse holidays--page"
+            : isActive === 2
+            ? "view--project team--page project-collapse holidays--page"
+            : "team--page holidays--page"
+        } ${projectToggle === true ? "project-collapse" : ""}`}
+      >
         <div className="page--title px-md-2 py-3 bg-white border-bottom">
           <Container fluid>
             <Row>
@@ -1193,18 +1086,46 @@ function ReportsPage() {
                     </span>
                     Reports
                   </p>
-                  <ListGroup horizontal className={isActive ? "d-none" : "activity--tabs ms-auto"}>
+                  <ListGroup
+                    horizontal
+                    className={isActive ? "d-none" : "activity--tabs ms-auto"}
+                  >
                     <ListGroup horizontal className="d-none d-xxl-flex">
-                      <ListGroup.Item action onClick={() => { handlefilterchange("sort_by", "members"); setActiveViewTab("members");}} className={`${activeMemberTab === "members" ? "d-none d-xl-flex gap-2 active " : "d-none d-xl-flex gap-2"}`}>
+                      <ListGroup.Item
+                        action
+                        onClick={() => {
+                          handlefilterchange("sort_by", "members");
+                          setActiveViewTab("members");
+                        }}
+                        className={`${
+                          activeMemberTab === "members"
+                            ? "d-none d-xl-flex gap-2 active "
+                            : "d-none d-xl-flex gap-2"
+                        }`}
+                      >
                         <AiOutlineTeam /> Members
                       </ListGroup.Item>
-                      <ListGroup.Item action onClick={() => { handlefilterchange("sort_by", "projects"); setActiveViewTab("projects");}} className={`${activeMemberTab === "projects" ? "d-none d-xl-flex gap-2 active " : "d-none d-xl-flex gap-2"}`}>
+                      <ListGroup.Item
+                        action
+                        onClick={() => {
+                          handlefilterchange("sort_by", "projects");
+                          setActiveViewTab("projects");
+                        }}
+                        className={`${
+                          activeMemberTab === "projects"
+                            ? "d-none d-xl-flex gap-2 active "
+                            : "d-none d-xl-flex gap-2"
+                        }`}
+                      >
                         <LuFolderOpen /> Projects
                       </ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                   <ListGroup horizontal className="mx-2">
-                    <ListGroup.Item className={"d-none d-xxl-flex"} key="search-filter-list">
+                    <ListGroup.Item
+                      className={"d-none d-xxl-flex"}
+                      key="search-filter-list"
+                    >
                       <Form
                         className="search-filter-list"
                         onSubmit={(e) => {
@@ -1223,7 +1144,7 @@ function ReportsPage() {
                             onChange={(event) => {
                               const value = event.target.value;
                               if (value.length > 1 || value.length === 0) {
-                                setFilters({...filters, ['page']: 1})
+                                setFilters({ ...filters, ["page"]: 1 });
                                 handlefilterchange("search", value);
                               }
                             }}
@@ -1235,7 +1156,10 @@ function ReportsPage() {
                   <ListGroup horizontal>
                     {filters["sort_by"] === "projects" && (
                       <>
-                        <ListGroup.Item key="status-filter-list" className="progress--filter">
+                        <ListGroup.Item
+                          key="status-filter-list"
+                          className="progress--filter"
+                        >
                           <Form.Select
                             className="custom-selectbox"
                             onChange={(event) =>
@@ -1293,9 +1217,24 @@ function ReportsPage() {
                       </Form>
                     </ListGroup.Item>
 
-                    <ListGroup horizontal className="bg-white expand--icon d-flex">
-                      <ListGroup.Item className="d-flex d-xxl-none" onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
-                      <ListGroup.Item className="d-none d-lg-flex" onClick={() => { handleSidebarSmall(false); }}><GrExpand /></ListGroup.Item>
+                    <ListGroup
+                      horizontal
+                      className="bg-white expand--icon d-flex"
+                    >
+                      <ListGroup.Item
+                        className="d-flex d-xxl-none"
+                        onClick={handleFilterShow}
+                      >
+                        <MdFilterList />
+                      </ListGroup.Item>
+                      <ListGroup.Item
+                        className="d-none d-lg-flex"
+                        onClick={() => {
+                          handleSidebarSmall(false);
+                        }}
+                      >
+                        <GrExpand />
+                      </ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>
@@ -1304,28 +1243,47 @@ function ReportsPage() {
           </Container>
         </div>
         <div className="page--wrapper px-md-2 pb-4 pt-4 daily--reports">
-          {spinner ?
+          {spinner ? (
             <div className="loading-bar">
               <img src="images/OnTeam-icon.png" className="flipchar" />
             </div>
-          :
+          ) : (
             <Container fluid>
               {activeMemberTab === "projects" && (
-                <div className="attendance--table projects--view mb-0" id="projects--view">
+                <div
+                  className="attendance--table projects--view mb-0"
+                  id="projects--view"
+                >
                   <div className="attendance--table--list">
                     <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">
-                          <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
+                          <th
+                            scope="col"
+                            className="sticky pe-0 py-0"
+                            key="project-name-header"
+                          >
                             <LuFolderOpen className="me-1" /> Project
                           </th>
-                          <th scope="col" key="client-time-header" className="onHide ms-auto">
+                          <th
+                            scope="col"
+                            key="client-time-header"
+                            className="onHide ms-auto"
+                          >
                             <FiClock className="me-1" /> Total Hours
                           </th>
-                          <th scope="col" key="client-status-header" className="onHide">
+                          <th
+                            scope="col"
+                            key="client-status-header"
+                            className="onHide"
+                          >
                             <FiUsers className="me-1" /> Members
                           </th>
-                          <th scope="col" key="client-action-header" className="onHide">
+                          <th
+                            scope="col"
+                            key="client-action-header"
+                            className="onHide"
+                          >
                             <FiTarget className="me-1" /> Action
                           </th>
                         </tr>
@@ -1360,7 +1318,7 @@ function ReportsPage() {
                                   <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                     Total Hours
                                   </strong>
-                                  
+
                                   <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center">
                                     <FiClock className="me-1" />{" "}
                                     {result?.totalTime || 0}
@@ -1370,7 +1328,7 @@ function ReportsPage() {
                                   <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                     Members
                                   </strong>
-                                  
+
                                   <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center">
                                     <LuUsers className="me-1" />{" "}
                                     {reportData?.members?.length || 0}
@@ -1401,7 +1359,9 @@ function ReportsPage() {
                         />
                         <Pagination.Next
                           onClick={goToNext}
-                          disabled={filters?.page === projectReports?.totalPages}
+                          disabled={
+                            filters?.page === projectReports?.totalPages
+                          }
                         />
                       </Pagination>
                       // <ButtonGroup>
@@ -1419,21 +1379,40 @@ function ReportsPage() {
 
               {activeMemberTab === "members" && (
                 <>
-                  <div className="attendance--table members--view mb-0" id="members--view">
+                  <div
+                    className="attendance--table members--view mb-0"
+                    id="members--view"
+                  >
                     <div className="attendance--table--list">
                       <Table responsive="lg">
                         <thead className="onHide">
                           <tr key="project-table-header">
-                            <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
+                            <th
+                              scope="col"
+                              className="sticky pe-0 py-0"
+                              key="project-name-header"
+                            >
                               <FiUsers className="me-1" /> Member
                             </th>
-                            <th scope="col" key="client-time-header" className="onHide ms-auto">
+                            <th
+                              scope="col"
+                              key="client-time-header"
+                              className="onHide ms-auto"
+                            >
                               <FiClock className="me-1" /> Total Hours
                             </th>
-                            <th scope="col" key="client-status-header" className="onHide">
+                            <th
+                              scope="col"
+                              key="client-status-header"
+                              className="onHide"
+                            >
                               <LuFolderOpen className="me-1" /> Projects
                             </th>
-                            <th scope="col" key="client-action-header" className="onHide">
+                            <th
+                              scope="col"
+                              key="client-action-header"
+                              className="onHide"
+                            >
                               <FiTarget className="me-1" /> Action
                             </th>
                           </tr>
@@ -1455,16 +1434,23 @@ function ReportsPage() {
                                           <MdDragIndicator />
                                         </div>
                                         <div className="title--initial">
-                                          {
-                                            (report?.member?.avatar && report?.member?.avatar !== null ) ? 
-                                              <span><img src={report?.member?.avatar} alt={'member-avatar'} /></span>
-                                            :
+                                          {report?.member?.avatar &&
+                                          report?.member?.avatar !== null ? (
+                                            <span>
+                                              <img
+                                                src={report?.member?.avatar}
+                                                alt={"member-avatar"}
+                                              />
+                                            </span>
+                                          ) : (
                                             report?.member?.name.substring(0, 1)
-                                          }
+                                          )}
                                         </div>
                                         <div className="title--span flex-column d-flex align-items-start gap-0">
                                           <span>{report?.member?.name}</span>
-                                          <strong>{report?.member?.role}</strong>
+                                          <strong>
+                                            {report?.member?.role}
+                                          </strong>
                                         </div>
                                       </div>
                                     </div>
@@ -1473,7 +1459,7 @@ function ReportsPage() {
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                       Total Hours
                                     </strong>
-                                    
+
                                     <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex align-items-center">
                                       <FiClock className="me-1" />{" "}
                                       {result?.totalTime || 0}
@@ -1484,7 +1470,7 @@ function ReportsPage() {
                                     <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                       Projects
                                     </strong>
-                                    
+
                                     <div className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex align-items-center">
                                       <LuFolderOpen className="me-1" />{" "}
                                       {result?.totalProjects || 0}
@@ -1515,7 +1501,7 @@ function ReportsPage() {
                 </>
               )}
             </Container>
-          }
+          )}
         </div>
       </div>
       <div className="details--projects--grid projects--grid common--project--grid">
@@ -1660,8 +1646,22 @@ function ReportsPage() {
                 </Form>
               </ListGroup.Item>
             </ListGroup>
-            <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
-            <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => { setIsActive(0); dispatch(toggleSidebarSmall(false));}}><MdOutlineClose /></ListGroupItem>
+            <ListGroup.Item
+              onClick={handleToggles}
+              className="d-none d-lg-flex"
+            >
+              <GrExpand />
+            </ListGroup.Item>
+            <ListGroupItem
+              className="btn btn-primary"
+              key={`closekey`}
+              onClick={() => {
+                setIsActive(0);
+                dispatch(toggleSidebarSmall(false));
+              }}
+            >
+              <MdOutlineClose />
+            </ListGroupItem>
           </ListGroup>
         </div>
         {isActive === 1 && activeMemberTab === "members" ? (
@@ -1690,7 +1690,11 @@ function ReportsPage() {
                 </div>
               </div>
             </div>
-            <div className={`member--projects attendance--stats mb-0 ${activeMemberTab === "members" ? "" : "d-none"}`}>
+            <div
+              className={`member--projects attendance--stats mb-0 ${
+                activeMemberTab === "members" ? "" : "d-none"
+              }`}
+            >
               {singleMemberReport?.reports?.map((report, index) => {
                 return (
                   <>
@@ -1705,7 +1709,9 @@ function ReportsPage() {
                         <div className="d-flex align-items-center justify-content-between gap-4">
                           <h4 className="d-flex align-items-center gap-3 justify-content-between">
                             <strong>
-                              <span><LuFileText /></span>
+                              <span>
+                                <LuFileText />
+                              </span>
                               {report?.project?.title}
                             </strong>
                           </h4>
@@ -1756,7 +1762,29 @@ function ReportsPage() {
                           <Col sm={12}>
                             <div className="report--task--list">
                               <h4>Tasks</h4>
-                              <TaskList report={report} />
+                              <ul>
+                                {groupTasksById(report.activities)?.map(
+                                  (taskData, index) => (
+                                    <li key={`grouped-task-${index}`}>
+                                      <p className="mb-0">
+                                        <FaAngleRight /> {taskData.title}
+                                      </p>
+                                      <Button
+                                        variant="dark"
+                                        className="px-3 py-2"
+                                        onClick={() =>
+                                          handleViewReport(
+                                            report.activities,
+                                            taskData.taskId
+                                          )
+                                        }
+                                      >
+                                        <FaEye /> View Report
+                                      </Button>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
                             </div>
                           </Col>
                         </Row>
@@ -1779,7 +1807,11 @@ function ReportsPage() {
                 </h3>
               </div>
             </div>
-            <div className={`member--projects attendance--stats mb-0 team--members--list ${activeMemberTab === "projects" ? "" : "d-none"}`}>
+            <div
+              className={`member--projects attendance--stats mb-0 team--members--list ${
+                activeMemberTab === "projects" ? "" : "d-none"
+              }`}
+            >
               {singleMemberReport?.members?.map((member, index) => {
                 return (
                   <>
@@ -1790,12 +1822,16 @@ function ReportsPage() {
                       >
                         <div className="project--name d-flex gap-3 align-items-center">
                           <div className="title--initial">
-                            {
-                              (member?.avatar && member?.avatar !== null ) ? 
-                                <span><img src={member?.avatar} alt={'member-avatar'} /></span>
-                              :
+                            {member?.avatar && member?.avatar !== null ? (
+                              <span>
+                                <img
+                                  src={member?.avatar}
+                                  alt={"member-avatar"}
+                                />
+                              </span>
+                            ) : (
                               member?.name?.substring(0, 1)
-                            }
+                            )}
                           </div>
                           <div className="title--span flex-column d-flex align-items-start gap-0">
                             <span>{member?.name} </span>
@@ -1839,7 +1875,30 @@ function ReportsPage() {
                       <Col sm={12}>
                         <div className="report--task--list">
                           <h4>Tasks</h4>
-                          <TaskList report={member} />
+                          {/* <TaskList report={member} /> */}
+                          <ul>
+                            {groupTasksById(member.activities)?.map(
+                              (taskData, index) => (
+                                <li key={`grouped-task-${index}`}>
+                                  <p className="mb-0">
+                                    <FaAngleRight /> {taskData.title}
+                                  </p>
+                                  <Button
+                                    variant="dark"
+                                    className="px-3 py-2"
+                                    onClick={() =>
+                                      handleViewReport(
+                                        member.activities,
+                                        taskData.taskId
+                                      )
+                                    }
+                                  >
+                                    <FaEye /> View Report
+                                  </Button>
+                                </li>
+                              )
+                            )}
+                          </ul>
                         </div>
                       </Col>
                     </div>
@@ -1852,7 +1911,12 @@ function ReportsPage() {
       </div>
 
       {/*--=-=Filter Modal**/}
-      <Modal show={showFilter} onHide={handleFilterClose} centered size="md" className="filter--modal"
+      <Modal
+        show={showFilter}
+        onHide={handleFilterClose}
+        centered
+        size="md"
+        className="filter--modal"
       >
         <Modal.Header closeButton>
           <Modal.Title>Filters</Modal.Title>
@@ -1861,20 +1925,44 @@ function ReportsPage() {
           <ListGroup>
             <ListGroup.Item>
               <Dropdown className="select--dropdown manual--dropdown">
-                <Dropdown.Toggle variant="success">{activeMemberTab}</Dropdown.Toggle>
+                <Dropdown.Toggle variant="success">
+                  {activeMemberTab}
+                </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <div className="drop--scroll">
-                    <Dropdown.Item action onClick={() => { handlefilterchange("sort_by", "members");setActiveViewTab("members"); }} className={`${ activeMemberTab === "members" ? "d-md-flex gap-2 active " : " d-md-flex gap-2" }`}>
+                    <Dropdown.Item
+                      action
+                      onClick={() => {
+                        handlefilterchange("sort_by", "members");
+                        setActiveViewTab("members");
+                      }}
+                      className={`${
+                        activeMemberTab === "members"
+                          ? "d-md-flex gap-2 active "
+                          : " d-md-flex gap-2"
+                      }`}
+                    >
                       <AiOutlineTeam /> Members
                     </Dropdown.Item>
-                    <Dropdown.Item action onClick={() => { handlefilterchange("sort_by", "projects"); setActiveViewTab("projects");}} className={`${activeMemberTab === "projects" ? "d-md-flex gap-2 active " : " d-md-flex gap-2"}`}>
+                    <Dropdown.Item
+                      action
+                      onClick={() => {
+                        handlefilterchange("sort_by", "projects");
+                        setActiveViewTab("projects");
+                      }}
+                      className={`${
+                        activeMemberTab === "projects"
+                          ? "d-md-flex gap-2 active "
+                          : " d-md-flex gap-2"
+                      }`}
+                    >
                       <LuFolderOpen /> Projects
                     </Dropdown.Item>
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
             </ListGroup.Item>
-          
+
             <ListGroup.Item key="search-filter-list">
               <Form
                 className="search-filter-list"
@@ -1894,7 +1982,7 @@ function ReportsPage() {
                     onChange={(event) => {
                       const value = event.target.value;
                       if (value.length > 1 || value.length === 0) {
-                        setFilters({...filters, ['page']: 1})
+                        setFilters({ ...filters, ["page"]: 1 });
                         handlefilterchange("search", value);
                       }
                     }}
@@ -1902,17 +1990,14 @@ function ReportsPage() {
                 </Form.Group>
               </Form>
             </ListGroup.Item>
-          
+
             {filters["sort_by"] === "projects" && (
               <>
                 <ListGroup.Item key="status-filter-list">
                   <Form.Select
                     className="custom-selectbox"
                     onChange={(event) =>
-                      handlefilterchange(
-                        "project_status",
-                        event.target.value
-                      )
+                      handlefilterchange("project_status", event.target.value)
                     }
                     value={filters["project_status"] || "in-progress"}
                   >
@@ -1965,6 +2050,205 @@ function ReportsPage() {
           </ListGroup>
         </Modal.Body>
       </Modal>
+
+      {ViewReport && (
+        <Modal
+          show={ViewReport}
+          onHide={handleReportClose}
+          centered
+          size="lg"
+          key={`reports-${taskId}`}
+          className="timeSheetModal reports__Data__modal"
+        >
+          <Modal.Header closeButton>
+            <ListGroup horizontal>
+              <ListGroup.Item
+                action
+                active={activeTab === "screenshots"}
+                onClick={() => setActiveTab("screenshots")}
+              >
+                <TbScreenshot className="me-1" /> Screenshots
+              </ListGroup.Item>
+              <ListGroup.Item
+                action
+                active={activeTab === "videos"}
+                onClick={() => setActiveTab("videos")}
+              >
+                <MdOutlineVideoLibrary className="me-1" /> Videos
+              </ListGroup.Item>
+            </ListGroup>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="shots--list">
+              <CardGroup key={`card-group-${taskId}`} className="reports__card">
+                {activeTab === "screenshots" ? (
+                  screenshotsByTask?.[taskId]?.length > 0 ? (
+                    <>
+                      {screenshotsByTask[taskId].map((screenshotData, idx) => (
+                        <Card key={`screenshot-${taskId}-${idx}`}>
+                          <Card.Body>
+                            <img
+                              className="card-img-top"
+                              src={screenshotData?.url}
+                              alt="screenshot"
+                              onClick={() =>
+                                triggerLightBox(
+                                  "screenshot",
+                                  screenshotsByTask[taskId],
+                                  idx
+                                )
+                              }
+                              style={{ cursor: "pointer" }}
+                            />
+                            <p>
+                              <strong>Task Name:</strong>{" "}
+                              {screenshotData?.task_data?.title}
+                              <br />
+                              <strong>Time:</strong>{" "}
+                              {showAmPmtime(screenshotData?.taken_time)}
+                              <br />
+                              <strong>Date:</strong>{" "}
+                              {screenshotData?.taken_time
+                                ? new Date(
+                                    screenshotData?.taken_time
+                                  ).toLocaleDateString("en-GB", {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                  })
+                                : ""}
+                            </p>
+                          </Card.Body>
+                        </Card>
+                      ))}
+                    </>
+                  ) : (
+                    <h3 className="no__data">No Data Available</h3>
+                  )
+                ) : activeTab === "videos" ? (
+                  videosByTask?.[taskId]?.length > 0 ? (
+                    (() => {
+                      const taskVideos = videosByTask[taskId];
+                      const page =
+                        currentVideoPage[
+                          `single-${selectedReport?.project?._id}`
+                        ] || 1;
+                      const start = (page - 1) * videosPerPage;
+                      const end = page * videosPerPage;
+                      const paginatedVideos = taskVideos.slice(start, end);
+
+                      return (
+                        <>
+                          {paginatedVideos.map((videoData, idx) => {
+                            const realIndex = start + idx;
+                            return (
+                              <Card
+                                key={`video-card-${selectedReport?.project?._id}-${page}-${idx}`}
+                              >
+                                <Card.Body
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() =>
+                                    triggerLightBox(
+                                      "video",
+                                      taskVideos,
+                                      realIndex
+                                    )
+                                  }
+                                >
+                                  <video
+                                    height="175px"
+                                    style={{ width: "100%" }}
+                                    preload="metadata"
+                                    muted
+                                    onLoadedMetadata={(e) =>
+                                      (e.target.currentTime = 0.1)
+                                    }
+                                    controls={false}
+                                  >
+                                    <source
+                                      src={videoData?.url}
+                                      type="video/webm"
+                                    />
+                                    Your browser does not support the video tag.
+                                  </video>
+                                  <p>
+                                    <strong>Task Name:</strong>{" "}
+                                    {videoData?.task_data?.title}
+                                    <br />
+                                    <strong>Time:</strong>{" "}
+                                    {videoData?.start_time} to{" "}
+                                    {videoData?.end_time}
+                                    <br />
+                                    <strong>Date:</strong>{" "}
+                                    {videoData?.createdAt
+                                      ? new Date(
+                                          videoData.createdAt
+                                        ).toLocaleDateString("en-GB", {
+                                          day: "numeric",
+                                          month: "long",
+                                          year: "numeric",
+                                        })
+                                      : ""}
+                                  </p>
+                                </Card.Body>
+                              </Card>
+                            );
+                          })}
+
+                          {/* Pagination */}
+                          {taskVideos.length > videosPerPage && (
+                            <div className="d-flex align-items-center justify-content-between mt-3 w-100">
+                              <Button
+                                variant="secondary"
+                                className="px-2 py-1"
+                                disabled={page === 1}
+                                onClick={() =>
+                                  setCurrentVideoPage((prev) => ({
+                                    ...prev,
+                                    [`single-${selectedReport?.project?._id}`]:
+                                      page - 1,
+                                  }))
+                                }
+                              >
+                                <BsArrowLeft />
+                              </Button>
+
+                              <span style={{ margin: "0 10px" }}>
+                                Page {page} of{" "}
+                                {Math.ceil(taskVideos.length / videosPerPage)}
+                              </span>
+
+                              <Button
+                                variant="primary"
+                                className="px-2 py-1"
+                                disabled={
+                                  page >=
+                                  Math.ceil(taskVideos.length / videosPerPage)
+                                }
+                                onClick={() =>
+                                  setCurrentVideoPage((prev) => ({
+                                    ...prev,
+                                    [`single-${selectedReport?.project?._id}`]:
+                                      page + 1,
+                                  }))
+                                }
+                              >
+                                <BsArrowRight />
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()
+                  ) : (
+                    <h3 className="no__data">No Data Available</h3>
+                  )
+                ) : null}
+              </CardGroup>
+            </div>
+          </Modal.Body>
+        </Modal>
+      )}
     </>
   );
 }

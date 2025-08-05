@@ -412,7 +412,7 @@ function ProjectsPage() {
     }, [currentPage])
 
     useEffect(() => {
-        if (Object.keys(filters).length > 0 && !showFilter) {
+        if (Object.keys(filters).length > 0) {
             handleListProjects()
         }
     }, [filters])
@@ -493,6 +493,7 @@ function ProjectsPage() {
             setProjects(projectFeed.projectData)
             setTotal(projectFeed.total)
         }
+        handleFilterClose()
     }, [projectFeed])
 
     const showError = (name) => {
@@ -611,11 +612,11 @@ function ProjectsPage() {
             setIsActive(0)
             setCurrentPage({})
         }
-
+        handleClose()
         if (apiResult?.success === true && !apiResult.updatedProject) {
             setIsDescEditor(false)
             setFields({ title: '', status: 'in-progress', members: [] })
-            handleClose()
+            
             setSelectedFiles([]);
             setImagePreviews([]);
             setShowDialog(false)
@@ -873,7 +874,7 @@ function ProjectsPage() {
                                                 
                                             </Form.Select>
                                         </ListGroup.Item>
-                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-xl-flex'} key={`project-status-filter-list-desktop-${filters['status']}`}>
+                                        <ListGroup.Item className={isActive !== 0 ? 'd-none' : 'd-none d-xl-flex'} key={`project-status-filter-list-desktop`}>
                                             <Form.Select className="custom-selectbox"  onChange={(event) => handlefilterchange('status', event.target.value)} value={filters['status'] || 'all'}>
                                                 <option value="all">View All</option>
                                                 {/* <option value="in-progress">In Progress</option>
@@ -1666,7 +1667,6 @@ function ProjectsPage() {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleFilterClose}>Cancel</Button>
-                    <Button variant="primary" onClick={dofilters}>Save</Button>
                 </Modal.Footer>
             </Modal>
             {/*--=-=Search Modal**/}
