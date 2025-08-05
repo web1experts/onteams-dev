@@ -657,9 +657,9 @@ useEffect(() => {
                                     }
                                     </>
                                 }
-                                    { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
+                                    {/* { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
                                         <Button variant="light" onClick={handleClientShow}><FaPlus /> Clients</Button>
-                                    )}
+                                    )} */}
                                 </div>
                                 {/* <AddClient show={showClient} toggleshow={handleClientClose} /> */}
                             </Form.Group>

@@ -1274,7 +1274,7 @@ const handleProjectSelect = async (project) => {
                                       }} >
                                         <div className="d-flex justify-content-between">
                                           <div className="project--name d-flex gap-3 align-items-center">
-                                              <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
+                                              <div className="drag--indicator"><abbr>{index + 1}</abbr></div>
                                               <div className="title--initial">
                                                 {
                                                   (activity?.avatar && activity?.avatar !== null ) ? 
@@ -1395,7 +1395,7 @@ const handleProjectSelect = async (project) => {
                                       }} >
                                         <div className="d-flex justify-content-between">
                                           <div className="project--name d-flex gap-3 align-items-center">
-                                            <div className="drag--indicator"><abbr>{index + 1}</abbr><MdDragIndicator /></div>
+                                            <div className="drag--indicator"><abbr>{index + 1}</abbr></div>
                                             <div className="title--initial">
                                               {
                                                 (activity?.avatar && activity?.avatar !== null ) ? 

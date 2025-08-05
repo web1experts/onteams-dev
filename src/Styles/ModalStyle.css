@@ -1310,10 +1310,41 @@ select.form-error {
     .rules--modal .modal-title strong {
         font-size: 22px;
     }
+
+    .color--selection {
+        flex-flow: row wrap;
+        justify-content: space-between;
+    }
+
+    .color--selection input.form-control {
+        flex: 1 1 100%;
+    }
 }
 
 @media screen and (max-width:425px) {
     .add--member--modal form .form-group {
         flex: auto;
+    }
+
+    .theme--modal .modal-header {
+        flex-flow: row wrap;
+    }
+
+    .theme--modal .modal-title {
+        flex: 1 1;
+    }
+
+    .AddEntryModal .modal-header span.pending--badge {
+        margin-right: 0;
+        flex: 1 1 100%;
+        order: 2;
+    }
+
+    .reports-section .btns--set .btn {
+        flex: 1 1;
+    }
+
+    .theme--modal .modal-title strong {
+        font-size: 18px;
     }
 }

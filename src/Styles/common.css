@@ -132,7 +132,12 @@ fieldset:disabled .btn {
 .btn-primary {
   color: #ffffff;
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-  border: 0;
+  border: 1px solid transparent;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-image: 
+    linear-gradient(to right, rgba(var(--theme-primary), 0.1), rgba(var(--theme-secondary), 0.1)),
+    linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
 .btn-outline-primary {

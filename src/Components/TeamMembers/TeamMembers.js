@@ -1455,8 +1455,8 @@ function TeamMembersPage() {
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
             {/* {rows.map((row, index) => ( */}
-            <div className="form-row" key={`row-0`}>
-              <Form.Group className="mb-0 form-group d-flex gap-3 align-items-center">
+            <div className="form-row pb-3" key={`row-0`}>
+              <Form.Group className="mb-0 pb-0 form-group d-flex gap-3 align-items-center">
                 <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
                   <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
                     placeholder="Email address"

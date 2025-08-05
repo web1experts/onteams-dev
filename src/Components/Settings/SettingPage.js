@@ -418,8 +418,8 @@ function SettingPage() {
                 <h3 className="mb-3">Notifications</h3>
               <div className="new--accordion--block">
                 <div className="bg--blue--accordion mb-3">
-                  <div className="d-flex gap-5 align-items-center mb-3">
-                    <div className="d-flex gap-3 align-items-center mb-3">
+                  <div className="d-flex gap-2 gap-md-5 align-items-center mb-3">
+                    <div className="d-flex gap-3 align-items-center">
                       <MdOutlineEmail />
                       <h6 className="mb-0">Notifications</h6>
                     </div>
@@ -430,7 +430,7 @@ function SettingPage() {
                       <p className="mb-0 pe-2">Push</p>
                     </div>
                   </div>
-                  <div className="d-flex gap-5 align-items-center mb-3">
+                  <div className="d-flex gap-2 gap-md-5 align-items-center mb-3">
                     <p className="mb-0 bg-white px-2 py-1 rounded-3">Project Notifications</p>
                     <div className="d-flex gap-3 align-items-center ms-auto">
                       <Form.Check type="switch" className="ps-0 switch--small"/>
@@ -439,7 +439,7 @@ function SettingPage() {
                       <Form.Check type="switch" className="ps-0 switch--small"/>
                     </div>
                   </div>
-                  <div className="d-flex gap-5 align-items-center mb-3">
+                  <div className="d-flex gap-2 gap-md-5 align-items-center mb-3">
                     <p className="mb-0 bg-white px-2 py-1 rounded-3">Client Notifications</p>
                     <div className="d-flex gap-3 align-items-center ms-auto">
                       <Form.Check type="switch" className="ps-0 switch--small"/>
@@ -448,7 +448,7 @@ function SettingPage() {
                       <Form.Check type="switch" className="ps-0 switch--small"/>
                     </div>
                   </div>
-                  <div className="d-flex gap-5 align-items-center mb-3">
+                  <div className="d-flex gap-2 gap-md-5 align-items-center mb-3">
                     <p className="mb-0 bg-white px-2 py-1 rounded-3">Members Notifications</p>
                     <div className="d-flex gap-3 align-items-center ms-auto">
                       <Form.Check type="switch" className="ps-0 switch--small"/>

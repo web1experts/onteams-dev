@@ -4,13 +4,12 @@ import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
 import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaRegEdit, FaCheck, FaAngleRight, FaEye } from "react-icons/fa";
+import { FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeft, BsArrowRight, BsClockHistory } from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { LuFolderOpen, LuUsers, LuTimer, LuClock, LuFileText } from "react-icons/lu";
-import { MdDragIndicator, MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdSearch, MdFilterList} from "react-icons/md";
+import { MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdFilterList} from "react-icons/md";
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
-import { GoPulse } from "react-icons/go";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";
 import { TbReport, TbScreenshot } from "react-icons/tb";
@@ -1342,7 +1341,6 @@ function ReportsPage() {
                                     <div className="project--name d-flex gap-3 align-items-center">
                                       <div className="drag--indicator">
                                         <abbr>{i + 1}</abbr>
-                                        <MdDragIndicator />
                                       </div>
                                       <div className="title--initial">
                                         {reportData?.title?.substring(0, 1)}
@@ -1452,7 +1450,6 @@ function ReportsPage() {
                                       <div className="project--name d-flex gap-3 align-items-center">
                                         <div className="drag--indicator">
                                           <abbr>{index + 1}</abbr>
-                                          <MdDragIndicator />
                                         </div>
                                         <div className="title--initial">
                                           {

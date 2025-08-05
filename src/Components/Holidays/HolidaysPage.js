@@ -416,7 +416,7 @@ const getDaysLeft = (date) => {
                   }    
                   editable={false}      
                   className="form-control"
-                  placeholder="YYYY-MM-DD"
+                  placeholder="Date"
                 />
                 {showError('date')}
             </Form.Group>

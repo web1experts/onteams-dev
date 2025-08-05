@@ -1664,6 +1664,7 @@ span.open--sidebar {
   text-overflow: ellipsis;
   overflow: hidden;
   width: 100%;
+  white-space: normal;
 }
 
 .wrapper--title h3 span {
@@ -1677,6 +1678,7 @@ span.open--sidebar {
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   overflow: hidden;
+  white-space: normal;
   width: 100%;
 }
 
@@ -2419,12 +2421,13 @@ table tr.marked-project td {
   transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
   -webkit-transition: border-color .15s cubic-bezier(.4, 0, .2, 1), box-shadow .15s cubic-bezier(.4, 0, .2, 1);
   height: auto;
-  min-height: 40px;
+  min-height: 43px;
   width: auto;
   position: relative;
   margin: 0;
   text-align: left;
   min-width: 125px;
+  justify-content: flex-start;
 }
 
 .wrapper--title .select--dropdown .btn {
@@ -2647,6 +2650,7 @@ table tr.marked-project td {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   line-clamp: 1;
+   white-space: normal;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -3898,7 +3902,7 @@ Project Task View CSS=-=-=
 .new--accordion--block .accordion-button svg,
 .modal .new--accordion--block .bg--blue--accordion svg {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
-  border-radius: 1rem;
+  border-radius: .75rem;
   justify-content: center;
   align-items: center;
   width: 2.5rem;
@@ -4697,6 +4701,7 @@ pre {
   line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+   white-space: normal;
   max-width: 150px;
 }
 
@@ -5611,7 +5616,7 @@ ul#icon-tabs .nav-link.active,
 ul#icon-tabs .nav-link:hover {
   color: #ffffff;
   background: linear-gradient(to right, rgba(var(--theme-secondary), 1), rgba(var(--theme-primary), 1));
-  border-color: transparent;
+  border-color: rgba(var(--theme-primary), 1);
 }
 
 ul#icon-tabs .nav-link span {
@@ -6862,7 +6867,7 @@ ul#icon-tabs .nav-link span svg {
 .attendance--stats,
 .attendance--table {
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
-  padding: 2rem;
+  padding: 1.5rem;
   background-color: rgb(255 255 255);
   border-color: rgb(241 245 249);
   border-width: 1px;
@@ -6891,6 +6896,10 @@ ul#icon-tabs .nav-link span svg {
   border-radius: 0;
 }
 
+.activity--table--list table tr:hover abbr, .members--view table tr:hover abbr, .projects--view table tr:hover abbr {
+  opacity: 1;
+}
+
 .attendance--stats .change--date .btn {
   padding: 0;
   width: 40px;
@@ -6917,6 +6926,7 @@ ul#icon-tabs .nav-link span svg {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+   white-space: normal;
 }
 
 .attendance--excel--table {
@@ -7161,17 +7171,50 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .attendance--table table td .status--badge {
-  font-weight: 700;
-  border-radius: 100px;
-  -webkit-border-radius: 100px;
-  padding: .5rem .75rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    font-weight: 700;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    padding: .5rem .75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.attendance--table table td:last-child .status--badge {
+  min-width: 110px;
+}
+
+.attendance--table table td:last-child .status--empty {
+  min-width: 0px;
 }
 
 .attendance--table table td .status--badge svg {
-  font-size: 18px;
+  font-size: 15px;
+}
+
+.daily--attendance--top {
+    color: rgb(255 255 255);
+    padding: 1.25rem 1.5rem;
+    background-image: linear-gradient(to right, #1e293b, #1e293b);
+    margin: -1.5rem -1.5rem 0;
+}
+
+.daily--attendance--top .att--status--abbr {
+    font-size: .875rem;
+}
+
+.daily--attendance--top h3 strong {
+  font-weight: 600;
+}
+
+.daily--attendance--top h3 small{
+  display: block;
+  font-weight: normal;
+  color: rgb(203 213 225);
+  font-size: 0.875rem;
+    line-height: 1.25rem;
 }
 
 .attendance--excel--table table td .att--badge {
@@ -7209,6 +7252,27 @@ ul#icon-tabs .nav-link span svg {
 
 .daily--attendance--table th:first-child {
   min-width: 220px;
+}
+
+.daily--attendance--table h3 span {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  border-radius: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
+}
+
+.daily--attendance--table h3 span svg {
+  color: #ffffff;
+}
+
+.daily--attendance--top .att--status--abbr .att--status--span {
+    width: 10px;
+    height: 10px;
+    border-radius: 100px;
 }
 
 .page--wrapper .attendance--excel--table th:first-child,
@@ -7401,6 +7465,8 @@ ul#icon-tabs .nav-link span svg {
   -webkit-box-orient: vertical;
   overflow: hidden;
   max-width: 100%;
+   white-space: normal;
+  line-height: 1.1;
   text-overflow: ellipsis;
 }
 
@@ -7769,6 +7835,7 @@ Media CSS-=-==
     overflow: hidden;
     max-width: 100%;
     text-overflow: ellipsis;
+     white-space: normal;
   }
 
   .page--wrapper table td.project--title--td span,
@@ -8717,6 +8784,7 @@ Media CSS-=-==
     line-clamp: 1;
     -webkit-box-orient: vertical;
     white-space: normal;
+     white-space: normal;
   }
 
   .holiday--table tr+tr {
@@ -9216,7 +9284,11 @@ Media CSS-=-==
 
   .accordion .accordion-button {
     padding: 1rem;
-    padding-right: 2rem;
+    padding-right: 1rem;
+  }
+
+  .accordion-button::after {
+    right: 1rem;
   }
 
   .timeSheetModal .card {

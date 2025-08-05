@@ -671,15 +671,13 @@ useEffect(() => {
                       <div className="drop--scroll">
                           {members.map((member, index) => {
                               return (
-                                  <Dropdown.Item key={`drop-item-${member._id}`} value={member._id} onClick={() => { handleMemberAttendance(member) }}>
-                                    <div className="title--initial">{member?.name.charAt(0)}</div>
-                                      <div className="title--span flex-column align-items-start gap-0">
-                                      <strong>{member.name}</strong>
-                                      <span>{member.role?.name}</span>
-                                      
-                                      </div>
-                                  </Dropdown.Item>
-                              
+                                <Dropdown.Item key={`drop-item-${member._id}`} value={member._id} onClick={() => { handleMemberAttendance(member) }}>
+                                  <div className="title--initial">{member?.name.charAt(0)}</div>
+                                  <div className="title--span flex-column align-items-start gap-0">
+                                    <strong>{member.name}</strong>
+                                    <span>{member.role?.name}</span>
+                                  </div>
+                                </Dropdown.Item>
                               )
                           })}
                       </div>
@@ -726,18 +724,47 @@ useEffect(() => {
               </ListGroup>
           </div>
           <div className="bg-white attendance--table daily--attendance--table">
-            <h3 className="mb-4 d-flex align-items-center gap-3"><span><AiOutlineTeam /></span>Daily Attendance - {getMonthLabel(filters?.month)}</h3>
+            <div className="d-lg-flex align-items-center gap-3 daily--attendance--top">
+              <h3 className="d-flex align-items-center gap-3 mb-0"><span><AiOutlineTeam /></span><strong>Daily Attendance <small>{getMonthLabel(filters?.month)}</small></strong></h3>
+              <div className="d-flex align-items-center gap-3 gap-md-4 flex-wrap att--status--abbr ms-auto mt-3 mt-lg-0">
+                {
+                  attendanceStatus?.map((status, idx) => {
+                    const rgbaBg = hexToRgba(status?.color, 1);
+                    function hexToRgba(hex, alpha) {
+                      hex = hex.replace('#', '');
+
+                      if (hex.length === 3) {
+                        hex = hex.split('').map(c => c + c).join('');
+                      }
+
+                      const bigint = parseInt(hex, 16);
+                      const r = (bigint >> 16) & 255;
+                      const g = (bigint >> 8) & 255;
+                      const b = bigint & 255;
+
+                      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                    }
+                    return (
+                      <div key={idx} className="d-flex align-items-center gap-2 flex-column flex-md-row">
+                        <span className="d-flex align-items-center justify-content-center att--status--span" style={{ backgroundColor: rgbaBg,}}></span>
+                        <span className="text-slate-600">{status.label}</span>
+                      </div>
+                    );
+                  })
+                }
+              </div>
+            </div>
             <div className="overflow-x-auto">
                 <Table>
                   <thead>
                     <tr>
-                      <th className="px-3 text-uppercase py-3" scope="col"><FiCalendar className="me-1" /> Date & Day</th>
-                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiLogIn className="me-1 color--green" /> Check In</th>
-                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiLogOut className="me-1 color--red" /> Check Out</th>
-                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiClock className="me-1 color--blue" /> Logged Hours</th>
-                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiEdit3 className="me-1 color--purple" /> Manual Entry</th>
-                      <th className="px-3 text-uppercase py-3 text-center" scope="col"><FiClock className="me-1 color--moove" /> Total Hours</th>
-                      <th className="px-3 text-uppercase py-3 text-center" scope="col">Status</th>
+                      <th className="text-uppercase py-3" scope="col"><FiCalendar className="me-1" /> Date & Day</th>
+                      <th className="text-uppercase py-3 text-center" scope="col"><FiLogIn className="me-1 color--green" /> Check In</th>
+                      <th className="text-uppercase py-3 text-center" scope="col"><FiLogOut className="me-1 color--red" /> Check Out</th>
+                      <th className="text-uppercase py-3 text-center" scope="col"><FiClock className="me-1 color--blue" /> Logged Hours</th>
+                      <th className="text-uppercase py-3 text-center" scope="col"><FiEdit3 className="me-1 color--purple" /> Manual Entry</th>
+                      <th className="text-uppercase py-3 text-center" scope="col"><FiClock className="me-1 color--moove" /> Total Hours</th>
+                      <th className="text-uppercase py-3 text-center" scope="col">Status</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white">
@@ -745,50 +772,119 @@ useEffect(() => {
                       memberAttendance.map((attendanceDate, dateIndex) => (
                         attendanceDate.dailyAttendance.length === 0 ? (
                           <tr key={dateIndex}>
-                            <td className="px-3 py-3"><strong>{formatDateinString(attendanceDate.date)}</strong></td>
-                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
-                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
-                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
-                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
-                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><LuCircleDot /></span></td>
-                            <td className="px-3 py-3 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="py-2"><strong>{formatDateinString(attendanceDate.date)}</strong></td>
+                            <td className="py-2 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="py-2 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="py-2 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="py-2 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
+                            <td className="py-2 text-center"><span className="att--badge badge--gray"><LuCircleDot /></span></td>
+                            <td className="py-2 text-center"><span className="att--badge badge--gray"><BsDash /></span></td>
                           </tr>
                         ) : (
                           attendanceDate.dailyAttendance.map((attendance, attendanceIndex) => (
                             <tr key={`${dateIndex}-${attendanceIndex}`}>
-                              <td className="px-3 py-3"><strong>{attendanceIndex === 0 ? formatDateinString(attendanceDate.date) : ''}</strong></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--green" title="check In"> {(attendance.time_in !== "--" ? attendance.time_in : <GoDotFill />)}</span></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--red" title="check Out"> {(attendance.time_out !== "--" ? attendance.time_out : <GoDotFill />)}</span></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--blue" title="Logged Hours"> {(attendance.tracked_time !== '--' ? attendance.tracked_time : <GoDotFill />)}</span></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--purple" title="Manual Entry"> {(attendance.manual_time !== '--') ? attendance.manual_time : <FiEdit3 />}</span></td>
-                              <td className="px-3 py-3 text-center"><span className="d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--moove" title="Total Hours"> {(attendance.total_time !== "--") ? attendance.total_time : <GoDotFill />}</span></td>
-                              <td className="px-3 py-3 text-center">
+                              <td className="py-2">
+                                {attendanceIndex === 0 ? formatDateinString(attendanceDate.date) : ''}
+                              </td>
+
+                              <td className="py-2 text-center">
+                                <span
+                                  className={`d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--green ${
+                                    attendance.time_in === '--' ? 'status--empty' : ''
+                                  }`}
+                                  title="Check In"
+                                >
+                                  {attendance.time_in !== '--' ? attendance.time_in : <GoDotFill />}
+                                </span>
+                              </td>
+
+                              <td className="py-2 text-center">
+                                <span
+                                  className={`d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--red ${
+                                    attendance.time_out === '--' ? 'status--empty' : ''
+                                  }`}
+                                  title="Check Out"
+                                >
+                                  {attendance.time_out !== '--' ? attendance.time_out : <GoDotFill />}
+                                </span>
+                              </td>
+
+                              <td className="py-2 text-center">
+                                <span
+                                  className={`d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--blue ${
+                                    attendance.tracked_time === '--' ? 'status--empty' : ''
+                                  }`}
+                                  title="Logged Hours"
+                                >
+                                  {attendance.tracked_time !== '--' ? attendance.tracked_time : <GoDotFill />}
+                                </span>
+                              </td>
+
+                              <td className="py-2 text-center">
+                                <span
+                                  className={`d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--purple ${
+                                    attendance.manual_time === '--' ? 'status--empty' : ''
+                                  }`}
+                                  title="Manual Entry"
+                                >
+                                  {attendance.manual_time !== '--' ? attendance.manual_time : <FiEdit3 />}
+                                </span>
+                              </td>
+
+                              <td className="py-2 text-center">
+                                <span
+                                  className={`d-inline-flex mx-auto align-items-center gap-2 status--badge rounded-3 bg--moove ${
+                                    attendance.total_time === '--' ? 'status--empty' : ''
+                                  }`}
+                                  title="Total Hours"
+                                >
+                                  {attendance.total_time !== '--' ? attendance.total_time : <GoDotFill />}
+                                </span>
+                              </td><td className="py-2 text-center">
                                 {(() => {
                                   const key = attendance.status
                                     .toLowerCase()
                                     .replace(/\s+/g, '_')
                                     .replace(/[^a-z0-9_]/g, '');
 
-                                  const baseColor = statusObject?.[key]?.color || '#16a34a';
-                                  const lightBorderColor = lightenColor(baseColor, 40);
-                                  const lightBgColor = lightenColor(baseColor, 70);
+                                  const baseColor = statusObject?.[key]?.color || '#999999';
+
+                                  // Convert hex to rgba
+                                  const hexToRgba = (hex, opacity) => {
+                                    let c;
+                                    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+                                      c = hex.substring(1).split('');
+                                      if (c.length === 3) {
+                                        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+                                      }
+                                      c = '0x' + c.join('');
+                                      return `rgba(${(c >> 16) & 255}, ${(c >> 8) & 255}, ${c & 255}, ${opacity})`;
+                                    }
+                                    return hex;
+                                  };
+
+                                  const borderColor = hexToRgba(baseColor, 0.3);
+                                  const backgroundColor = hexToRgba(baseColor, 0.1);
+
+                                  const isEmptyStatus = attendance.status === '--';
 
                                   return (
-                                    <span
-                                      className="d-inline-flex mx-auto align-items-center gap-2"
-                                      title={attendance.status}
-                                    >
+                                    <span className="d-inline-flex mx-auto align-items-center gap-2" title={attendance.status}>
                                       <span
-                                        className="status--badge"
-                                        style={{ color: baseColor, border: `1px solid ${lightBorderColor}`, 'background-color': lightBgColor}}
+                                        className={`status--badge rounded-3 ${isEmptyStatus ? 'status--empty' : ''}`}
+                                        style={{
+                                          color: baseColor,
+                                          border: `1px solid ${borderColor}`,
+                                          backgroundColor: backgroundColor,
+                                        }}
                                       >
                                         {attendance.status}
                                       </span>
                                     </span>
                                   );
                                 })()}
-
                               </td>
+
                             </tr>
                           ))
                         )

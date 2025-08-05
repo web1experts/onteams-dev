@@ -320,7 +320,11 @@ const getDayWithSuffix = (day) => {
     const year = date.getFullYear();
   
     // Return the formatted string
-    return `${dayName}, ${monthName} ${day}, ${year}`;
+    return (
+      <>
+        <strong className="d-block">{dayName}</strong> <small>{monthName} {day}, {year}</small>
+      </>
+    );
   }
 
   export function generateTimeRange(createdAt, duration) {

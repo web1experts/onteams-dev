@@ -202,38 +202,38 @@ function DashboardPage() {
   }
 
   if (type === 'text' && !content.trim()) {
-    setError('Text content cannot be empty.');
+    setError('Fields marked with an asterisk (*) are mandatory.');
     return;
   }
 
   if (type === 'quote' && !quote.trim()) {
-    setError('Quote content cannot be empty.');
+    setError('Fields marked with an asterisk (*) are mandatory.');
     return;
   }
 
   if (type === 'image' && !fields.existing_file && (!files || files.length === 0)) {
-    setError('Please upload at least one image.');
+    setError('Fields marked with an asterisk (*) are mandatory.');
     return;
   }
 
   if (type === 'video') {
     if (!videoType) {
-      setError('Please select a video type.');
+      setError('Fields marked with an asterisk (*) are mandatory.');
       return;
     }
 
     if (videoType === 'youtube'  && !youtubeUrl.trim()) {
-      setError('Please provide a YouTube URL.');
+      setError('Fields marked with an asterisk (*) are mandatory.');
       return;
     }
 
     if (videoType === 'vimeo' && !vimeoUrl.trim()) {
-      setError('Please provide a Vimeo URL.');
+      setError('Fields marked with an asterisk (*) are mandatory.');
       return;
     }
 
     if (videoType === 'upload' && !fields.existing_file && (!files || files.length === 0)) {
-      setError('Please upload at least one video file.');
+      setError('Fields marked with an asterisk (*) are mandatory.');
       return;
     }
   }
@@ -322,38 +322,38 @@ function DashboardPage() {
   }
 
   if (type === 'text' && !content.trim()) {
-    setError('Text content cannot be empty.');
+    setError('Fields marked with an asterisk (*) are mandatory.');
     return;
   }
 
   if (type === 'quote' && !quote.trim()) {
-    setError('Quote content cannot be empty.');
+    setError('Fields marked with an asterisk (*) are mandatory.');
     return;
   }
 
   if (type === 'image' && (!files || files.length === 0)) {
-    setError('Please upload at least one image.');
+    setError('Fields marked with an asterisk (*) are mandatory.');
     return;
   }
 
   if (type === 'video') {
     if (!videoType) {
-      setError('Please select a video type.');
+      setError('Fields marked with an asterisk (*) are mandatory.');
       return;
     }
 
     if (videoType === 'youtube' && !youtubeUrl.trim()) {
-      setError('Please provide a YouTube URL.');
+      setError('Fields marked with an asterisk (*) are mandatory.');
       return;
     }
 
     if (videoType === 'vimeo' && !vimeoUrl.trim()) {
-      setError('Please provide a Vimeo URL.');
+      setError('Fields marked with an asterisk (*) are mandatory.');
       return;
     }
 
     if (videoType === 'upload' && (!files || files.length === 0)) {
-      setError('Please upload at least one video file.');
+      setError('Fields marked with an asterisk (*) are mandatory.');
       return;
     }
   }
@@ -819,8 +819,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-4">
-          <Tabs defaultActiveKey="text" id="icon-tabs" activeKey={fields?.type}
-          onSelect={(k) => handletypeChange(k)}>
+          <Tabs defaultActiveKey="text" id="icon-tabs" activeKey={fields?.type} onSelect={(k) => handletypeChange(k)}>
             <Tab eventKey="text" title={<span><FaRegFileAlt /> Text</span>}>
               <Form>
                 <Form.Group className="mb-3">
@@ -828,7 +827,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                   <Form.Control type="text" placeholder="Add a title to your post..." name="title" value={fields?.title} onChange={handleTextChange} />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                  <Form.Label>Content *</Form.Label>
+                  <Form.Label>Content <sup className="text-danger">*</sup></Form.Label>
                   <Form.Control required as="textarea" placeholder="What's happening with you work? Share updates, achievements, or insights..." rows={5} name="content" value={fields?.content} onChange={handleTextChange} />
                 </Form.Group>
               </Form>
@@ -848,7 +847,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
             <Tab eventKey="image" title={<span><FaImage /> Image</span>}>
               <Form>
                 <Form.Group className="mb-3">
-                  <Form.Label>Upload Image *</Form.Label>
+                  <Form.Label>Upload Image <sup className="text-danger">*</sup></Form.Label>
                   <label for="imageUpload" className="update--file--upload" onChange={handleFileChange} accept="image/*" >
                     <Form.Control type="file" multiple id="imageUpload" hidden />
                     <span><FiUpload /> Click to upload an image <small>PNG, JPG, GIF up to 10MB</small></span>
@@ -908,7 +907,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                   onSelect={(k) => handlevideoTypeChange(k)}>
                   <Tab eventKey="youtube" title={<span><FiYoutube /> Youtube</span>}>
                     <Form.Group className="mb-3">
-                        <Form.Label>YouTube URL *</Form.Label>
+                        <Form.Label>YouTube URL <sup className="text-danger">*</sup></Form.Label>
                         <Form.Control type="url" placeholder="https://www.youtube.com/watch?v=..." value={fields?.youtubeUrl} name="youtubeUrl" onChange={handleTextChange}  />
                       </Form.Group>
                       <Form.Group className="mb-3">
@@ -918,7 +917,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                   </Tab>
                   <Tab eventKey="vimeo" title={<span><LuVideo /> Vimeo</span>}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Vimeo URL *</Form.Label>
+                      <Form.Label>Vimeo URL <sup className="text-danger">*</sup></Form.Label>
                       <Form.Control type="url" placeholder="https://vimeo.com/..." value={fields?.vimeoUrl} name="vimeoUrl" onChange={handleTextChange}  />
                     </Form.Group>
                     <Form.Group className="mb-3">
@@ -928,7 +927,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                   </Tab>
                   <Tab eventKey="upload" title={<span><FiUpload /> Upload</span>}>
                       <Form.Group className="mb-3">
-                        <Form.Label>Upload Video *</Form.Label>
+                        <Form.Label>Upload Video <sup className="text-danger">*</sup></Form.Label>
                         <label for="videoUpload" className="update--file--upload">
                           <Form.Control type="file" id="videoUpload" hidden accept="video/mp4"  onChange={handleFileChange} />
                           <span><FiUpload /> Click to upload a video <small>MP4, MOV, AVI up to 100MB</small></span>
@@ -975,6 +974,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
               </Form>
             </Tab>
           </Tabs>
+          <p className="text-danger"><small>{error}</small></p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => {
@@ -984,7 +984,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
               handleSubmit()
             }
           }} disabled={loading}><FiSend /> { loading ? 'Sharing...' : 'Share Update '}</Button>
-          <p>{error}</p>
+          
         </Modal.Footer>
       </Modal>
     </>

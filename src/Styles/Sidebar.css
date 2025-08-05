@@ -652,6 +652,14 @@ Sidebar CSS-=-=
   background: var(--bs-modal-bg);
 }
 
+.modal-footer {
+  gap: 1rem;
+}
+
+.modal-footer>* {
+    margin: 0;
+}
+
 .theme--modal .modal-body {
   padding: 1.5rem;
   background: var(--bs-modal-bg);
