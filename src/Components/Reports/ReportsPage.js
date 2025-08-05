@@ -24,26 +24,6 @@ import { BsArrowLeft, BsArrowRight, BsClockHistory } from "react-icons/bs";
 import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
 import { LuFolderOpen, LuUsers, LuTimer, LuClock, LuFileText } from "react-icons/lu";
 import { MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdFilterList} from "react-icons/md";
-import {
-  showAmPmtime,
-  getMemberdata,
-  selectboxObserver,
-} from "../../helpers/commonfunctions";
-import {
-  LuFolderOpen,
-  LuUsers,
-  LuTimer,
-  LuClock,
-  LuFileText,
-} from "react-icons/lu";
-import {
-  MdDragIndicator,
-  MdOutlineClose,
-  MdOutlineVideoLibrary,
-  MdOutlineSearch,
-  MdSearch,
-  MdFilterList,
-} from "react-icons/md";
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";

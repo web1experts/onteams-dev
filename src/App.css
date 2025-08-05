@@ -7269,12 +7269,6 @@ ul#icon-tabs .nav-link span svg {
   color: #ffffff;
 }
 
-.daily--attendance--top .att--status--abbr .att--status--span {
-    width: 10px;
-    height: 10px;
-    border-radius: 100px;
-}
-
 .page--wrapper .attendance--excel--table th:first-child,
 .page--wrapper .attendance--excel--table td:first-child {
   width: auto;
@@ -7535,11 +7529,9 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .att--status--abbr .att--status--span {
-  width: 30px;
-  height: 30px;
-  font-size: .75rem;
-  font-weight: 700;
-  border-radius: .5rem;
+  width: 10px;
+    height: 10px;
+    border-radius: 100px;
 }
 
 .attendance--excel--table table .bg--blue {
