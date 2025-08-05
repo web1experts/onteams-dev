@@ -181,7 +181,7 @@ const getTotalMinutes = (hour, minute) => {
     setForm({ ...form, color });
   };
 
-  const showError = (field) => errors[field] ? <span className="form-error">{errors[field]}</span> : null;
+  const showError = (field) => errors[field] ? <><span className="form-error">{errors[field]}</span><br /></> : null;
 
   const handleSubmit = (e) => {
   e.preventDefault();
@@ -207,7 +207,7 @@ const getTotalMinutes = (hour, minute) => {
 const endMinutes = getTotalMinutes(form.endHour, form.endMinute);
 
 if (endMinutes - startMinutes < 1) {
-    newErrors.timeConflict = "Each status must be at least 1 minute long.";
+    newErrors.timeConflict = "Minimum slot duration is 1 minute.";
     hasError = true;
   }
 
@@ -398,6 +398,18 @@ if (endMinutes - startMinutes < 1) {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
+            {
+              Object.keys(errors).length > 0 ?
+              <>
+                <p className="form-errors">Please fix the following errors:</p> 
+                {showError("ruleName")}
+                {showError("startHour")}
+                {showError("endHour")}
+                {showError("timeConflict")}
+              </>
+              : <></>
+            }
+            
             <Form.Group className="mb-3">
               <Form.Label>Rule Name</Form.Label>
               <Form.Control
@@ -405,7 +417,7 @@ if (endMinutes - startMinutes < 1) {
                 value={form.ruleName}
                 onChange={(e) => handleRulesChange("ruleName", e.target.value)}
               />
-              {showError("ruleName")}
+              
             </Form.Group>
 
             
@@ -444,7 +456,7 @@ if (endMinutes - startMinutes < 1) {
                 </Form.Select>
 
               </Col>
-              {showError("startHour")}
+              
             </Row>
 
             <Row className="mb-3">
@@ -467,7 +479,7 @@ if (endMinutes - startMinutes < 1) {
                   {minutes.map((m) => <option key={m} value={m}>{m}</option>)}
                 </Form.Select>
               </Col>
-              {showError("endHour")}
+              
             </Row>
 
             <Form.Group className="mb-3">
@@ -489,7 +501,7 @@ if (endMinutes - startMinutes < 1) {
                 ))}
               </div>
             </Form.Group>
-            {showError("timeConflict")}
+            
           </Form>
         </Modal.Body>
         <Modal.Footer>
