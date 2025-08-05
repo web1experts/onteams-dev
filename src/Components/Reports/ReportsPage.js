@@ -1644,7 +1644,12 @@ function ReportsPage() {
             </ListGroupItem>
           </ListGroup>
         </div>
-        {isActive === 1 && activeMemberTab === "members" ? (
+        {spinner ? (
+            <div className="loading-bar">
+              <img src="images/OnTeam-icon.png" className="flipchar" />
+            </div>
+          ) : (
+        isActive === 1 && activeMemberTab === "members" ? (
           <div className="rounded--box activity--box">
             <div className="reports--heading">
               <div className="d-flex align-items-center gap-3 justify-content-between">
@@ -1887,7 +1892,8 @@ function ReportsPage() {
               })}
             </div>
           </div>
-        )}
+        )
+      )}
       </div>
 
       {/*--=-=Filter Modal**/}
