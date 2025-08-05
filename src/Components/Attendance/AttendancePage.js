@@ -523,7 +523,7 @@ useEffect(() => {
                           return `rgba(${r}, ${g}, ${b}, ${alpha})`;
                         }
                         return (
-                          <div key={idx} className="d-flex align-items-center gap-2 flex-column flex-md-row">
+                          <div key={idx} className="d-flex align-items-center gap-2">
                             <span className="d-flex align-items-center justify-content-center att--status--span" style={{ backgroundColor: rgbaBg,}}></span>
                             <span className="text-slate-600">{status.label}</span>
                           </div>
@@ -763,7 +763,7 @@ useEffect(() => {
                       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
                     }
                     return (
-                      <div key={idx} className="d-flex align-items-center gap-2 flex-column flex-md-row">
+                      <div key={idx} className="d-flex align-items-center gap-2">
                         <span className="d-flex align-items-center justify-content-center att--status--span" style={{ backgroundColor: rgbaBg,}}></span>
                         <span className="text-slate-600">{status.label}</span>
                       </div>

@@ -7227,6 +7227,7 @@ ul#icon-tabs .nav-link span svg {
   font-size: .75rem;
   line-height: 1rem;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .attendance--excel--table td strong,
@@ -7304,7 +7305,7 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .attendance--excel--table th strong {
-  font-size: 18px;
+  font-size: 1rem;
   margin-top: 0;
 }
 
