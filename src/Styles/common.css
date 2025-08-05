@@ -172,7 +172,7 @@ fieldset:disabled .btn {
 .show>.btn-primary.dropdown-toggle {
   color: #ffffff;
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-  border-color: transparent;
+  border-color: rgba(var(--theme-primary), 1);
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   outline: none;
@@ -612,6 +612,7 @@ textarea.form-control {
 
 .toast-container {
   position: fixed;
+  z-index: 999999;
 }
 
 
