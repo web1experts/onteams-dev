@@ -39,22 +39,23 @@ function ManualTime() {
     handleManualTimeList();
   }, [dispatch]);
 
-  const handleReportSubmit = async (status,date, memberId, data) => {
-    let activityStatus = {}
-    for(const activity of data){
-      activityStatus[activity?._id] = {}
+  const handleReportSubmit = async (status, date, memberId, data) => {
+    let activityStatus = {};
+    for (const activity of data) {
+      activityStatus[activity?._id] = {};
       activityStatus[activity?._id] = {
         status: status,
         duration: activity.duration,
-      }
-    } 
-    console.log("activityStatus:: ", activityStatus)
-    dispatch(updateManualTimeStatus({
-      date: date,
-      memberId: memberId,
-      activityStatus: activityStatus
-    }));
+      };
+    }
 
+    dispatch(
+      updateManualTimeStatus({
+        date: date,
+        memberId: memberId,
+        activityStatus: activityStatus,
+      })
+    );
   };
 
   useEffect(() => {
@@ -92,13 +93,13 @@ function ManualTime() {
 
   function calculateManualTotalTime(data) {
     let totalSeconds = 0;
-    if(data?.length  === 0){
+    if (data?.length === 0) {
       return `00:00`;
     }
 
     for (const project of data) {
-      if(project?.activities && project?.activities.length > 0){
-        for(const activity of project?.activities){
+      if (project?.activities && project?.activities.length > 0) {
+        for (const activity of project?.activities) {
           totalSeconds += activity?.duration;
         }
       }
@@ -181,20 +182,40 @@ function ManualTime() {
                                   </strong>
                                   <small>
                                     <LuClock />{" "}
-                                      {generateTimeRange(
-                                        activity?.createdAt,
-                                        activity?.duration
-                                      )}
+                                    {generateTimeRange(
+                                      activity?.createdAt,
+                                      activity?.duration
+                                    )}
                                   </small>
                                 </p>
                               ))
                           )}
                       </h4>
                       <div className="btns--set">
-                        <Button variant="primary" onClick={() => {handleReportSubmit('approved', date, member?._id, project.activities)}}>
-                          <FiCheckCircle className="me-1"  /> Approve
+                        <Button
+                          variant="primary"
+                          onClick={() => {
+                            handleReportSubmit(
+                              "approved",
+                              date,
+                              member?._id,
+                              project.activities
+                            );
+                          }}
+                        >
+                          <FiCheckCircle className="me-1" /> Approve
                         </Button>
-                        <Button variant="danger" onClick={() => {handleReportSubmit('disapproved', date, member?._id, project.activities)}} >
+                        <Button
+                          variant="danger"
+                          onClick={() => {
+                            handleReportSubmit(
+                              "disapproved",
+                              date,
+                              member?._id,
+                              project.activities
+                            );
+                          }}
+                        >
                           <AiOutlineCloseCircle className="me-1" /> Reject
                         </Button>
                       </div>
@@ -207,7 +228,13 @@ function ManualTime() {
       })}
       
       {show && (
-        <Modal show={show} onHide={handleClose} centered size="lg" className="AddReportModal AddTimeModal">
+        <Modal
+          show={show}
+          onHide={handleClose}
+          centered
+          size="lg"
+          className="AddReportModal AddTimeModal"
+        >
           <Modal.Header closeButton>
             <Modal.Title>
               {singleManualRecord?.length > 0 ? (
@@ -264,15 +291,12 @@ function ManualTime() {
                       </Col>
                     </Row>
                     <Row>
-                      <Col md={12} className="text-end">
-                       
-                      </Col>
+                      <Col md={12} className="text-end"></Col>
                     </Row>
                   </>
                 );
               })}
           </Modal.Body>
-          
         </Modal>
       )}
     </>

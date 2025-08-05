@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { useToast } from "../../context/ToastContext";
 import { renderDynamicField } from "../common/dynamicFields";
-import { convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY } from "../../helpers/commonfunctions";
+import { convertDDMMYYYYtoYYYYMMDD, formatDateToDDMMYYYY, selectboxObserver } from "../../helpers/commonfunctions";
 import { BadgesModal } from "../modals/badges";
 
 function AddClient(props) {
@@ -169,7 +169,7 @@ const showError = (name) => {
 
     return (
         <>
-            <Modal show={props.show} onHide={handleClose} centered size="md" className="add--member--modal theme--modal">
+            <Modal show={props.show} onHide={handleClose} centered size="md" className="add--member--modal theme--modal"  onShow={() => selectboxObserver()}>
                 <Modal.Header closeButton>
                   <Modal.Title>
                     <span className="nav--item--icon"><TbUsersPlus /></span>

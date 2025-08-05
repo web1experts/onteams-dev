@@ -461,7 +461,9 @@ useEffect(() => {
                                                 <span className={`att--badge ${getBadgeColor(atten?.status)}`}>
                                                   {
                                                     atten?.status && atten?.status !== '--'
-                                                      ? statusObject[atten?.status?.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.code || atten?.status
+                                                      ? 
+                                                      atten?.status
+                                                      //statusObject[atten?.status?.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.code || atten?.status
                                                       : <BsDash />
                                                   }
                                                 </span>
@@ -505,7 +507,10 @@ useEffect(() => {
                         return (
                           <div key={idx} className="d-flex align-items-center gap-2 flex-column flex-md-row">
                             <span className="d-flex align-items-center justify-content-center att--status--span" style={{ color: status.color, backgroundColor: rgbaBg,}}>
-                              {status.code}
+                              {
+                             // status.code
+                             status.label
+                              }
                             </span>
                             <span className="text-slate-600">{status.label}</span>
                           </div>

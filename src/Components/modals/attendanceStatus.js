@@ -19,7 +19,6 @@ const AttendanceStatusManager = ({ toggle, show }) => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     ruleName: "",
-    code: "",
     startHour: "00",
     startMinute: "00",
     endHour: "00",
@@ -99,7 +98,6 @@ const AttendanceStatusManager = ({ toggle, show }) => {
       const { hour, minute } = fromDecimal(newDecimal);
       setForm({
         ruleName: "",
-        code: "",
         startHour: hour,
         startMinute: minute,
         endHour: "00",
@@ -115,19 +113,25 @@ const AttendanceStatusManager = ({ toggle, show }) => {
   const startDecimal = toDecimal(updatedForm.startHour, updatedForm.startMinute);
   const endDecimal = toDecimal(updatedForm.endHour, updatedForm.endMinute);
 
+  const startMinutes = getTotalMinutes(updatedForm.startHour, updatedForm.startMinute);
+const endMinutes = getTotalMinutes(updatedForm.endHour, updatedForm.endMinute);
+
+
+
   if (EditIndex !== false) {
     const updatedStatuses = [...attendanceStatus];
     const oneMinute = 1 / 60;
-    const twoMinutes = 1.5 / 60;
+    const twoMinutes = 2 / 60;
     
     // ⏩ End time changes
     if (field === "endHour" || field === "endMinute") {
       const next = updatedStatuses[EditIndex + 1];
-      if (next) { console.log(`${endDecimal}::: ${(next.to - twoMinutes)}`)
-        const isTooCloseToNextEnd = endDecimal > (next.to - twoMinutes);
+      if (next) {
+       
+        const isTooCloseToNextEnd = endDecimal > (next.to - oneMinute);
         const isSameAsNextEnd = endDecimal === next.to;
         //const isSameAsNextStart = endDecimal === next.from;
-console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
+
         if (isTooCloseToNextEnd === true || isSameAsNextEnd === true) {
           setErrors({
             timeConflict: `End time must be at least 2 minutes before "${next.label}" ends.`,
@@ -168,9 +172,9 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
   
 };
 
-
-
-
+const getTotalMinutes = (hour, minute) => {
+  return parseInt(hour || 0, 10) * 60 + parseInt(minute || 0, 10);
+};
 
 
   const handleColorSelect = (color) => {
@@ -199,8 +203,10 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
     }
   }
 
-  // Must be at least 1-minute duration
-  if (endDecimal - startDecimal < oneMinute) {
+ const startMinutes = getTotalMinutes(form.startHour, form.startMinute);
+const endMinutes = getTotalMinutes(form.endHour, form.endMinute);
+
+if (endMinutes - startMinutes < 1) {
     newErrors.timeConflict = "Each status must be at least 1 minute long.";
     hasError = true;
   }
@@ -215,7 +221,7 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
       endDecimal >= nextTo ||           // must be less than next.to
       //endDecimal === nextFrom ||        // cannot match next start
       endDecimal === nextTo ||          // cannot match next end
-      endDecimal > nextTo - twoMinutes  // must be at least 2 mins before next.to
+      endDecimal > nextTo - oneMinute  // must be at least 2 mins before next.to
     ) {
       newErrors.timeConflict = `End time must be at least 2 minutes before "${next.label}" ends and not match its start/end.`;
       hasError = true;
@@ -241,7 +247,6 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
   // Prepare new rule
   const newRule = {
     label: form.ruleName.trim(),
-    code: form.code.trim(),
     from: startDecimal,
     to: endDecimal,
     color: form.color,
@@ -302,7 +307,6 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
 
     setForm({
       ruleName: status.label,
-      code: status.code,
       startHour,
       startMinute,
       endHour,
@@ -331,7 +335,7 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
     setAttendanceStatus(updatedStatuses);
   };
 
-  const AttendanceCard = ({ index, total, color, label, code, from, to }) => {
+  const AttendanceCard = ({ index, total, color, label, from, to }) => {
     const showTrashIcon = total > 2 && index !== 0 && index !== 1;
     return (
       <Card className="mb-3 rules--card">
@@ -342,7 +346,7 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
             </Col>
             <Col className="ps-0">
               <strong className="d-flex align-items-center gap-2">
-                {label} <Badge bg="light" text="dark">{code}</Badge>
+                {label}
               </strong>
               <p className="mb-0">{decimalToTimeRange(from, to)}</p>
             </Col>
@@ -404,16 +408,7 @@ console.log(`${isTooCloseToNextEnd}---${isSameAsNextEnd}`)
               {showError("ruleName")}
             </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Short Name (Max 2 characters)</Form.Label>
-              <Form.Control
-                type="text"
-                maxLength={2}
-                value={form.code}
-                onChange={(e) => handleRulesChange("code", e.target.value)}
-              />
-              {showError("code")}
-            </Form.Group>
+            
 
             <Row className="mb-3">
               <Form.Label>Start Time</Form.Label>
