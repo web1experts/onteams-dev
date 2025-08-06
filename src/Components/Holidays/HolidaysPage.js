@@ -274,7 +274,7 @@ const getDaysLeft = (date) => {
         {
           spinner ?
           <div className="loading-bar">
-            <img src="images/OnTeam-icon.png" className="flipchar" />
+            <img src="images/OnTeam-icon-gray.png" className="flipchar" />
           </div>
         :
           <Container fluid>
@@ -321,7 +321,7 @@ const getDaysLeft = (date) => {
                                     <h5 className="d-xl-flex gap-3 align-items-start" key={`occasion-td-${index}`} data-label="Occasion">
                                       {holiday.occasion} {getStatusBadge(holiday.date)}
                                     </h5>
-                                    <strong>{formatDateinString(holiday.date)}</strong>
+                                    {formatDateinString(holiday.date)}
                                     <p className="mb-0">
                                       <span className="me-3" key={`type-td-${index}`} data-label="Type">
                                         {holiday.type

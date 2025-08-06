@@ -2,86 +2,24 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Form,
-  ListGroup,
-  Table,
-  Badge,
-  CardGroup,
-  Card,
-  Modal,
-  Dropdown,
-  Accordion,
-} from "react-bootstrap";
+import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown, Accordion} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaEye, FaPlay, FaPlus } from "react-icons/fa";
 import { MdClose, MdFilterList } from "react-icons/md";
-import {
-  FiSidebar,
-  FiUserX,
-  FiMonitor,
-  FiCoffee,
-  FiClock,
-  FiVideo,
-  FiBriefcase,
-  FiTarget,
-  FiPause,
-  FiUsers,
-  FiCalendar,
-  FiUser,
-  FiTrash2,
-  FiCheckCircle,
-  FiCheck,
-} from "react-icons/fi";
+import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser, FiTrash2, FiCheckCircle, FiCheck } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 import { BsDash } from "react-icons/bs";
-import { LuTimer, LuUsers } from "react-icons/lu";
+import { LuTimer, LuUsers, LuFileText } from "react-icons/lu";
 import { GoPulse } from "react-icons/go";
-import {
-  BsArrowsFullscreen,
-  BsFullscreen,
-  BsFullscreenExit,
-  BsArrowClockwise,
-  BsArrowLeftCircleFill,
-  BsArrowRightCircleFill,
-  BsDashLg,
-} from "react-icons/bs";
-import {
-  MdOutlineClose,
-  MdOutlineSearch,
-  MdDragIndicator,
-  MdOutlineVideoLibrary,
-} from "react-icons/md";
-import {
-  toggleSidebar,
-  toggleSidebarSmall,
-} from "../../redux/actions/common.action";
-import {
-  getliveActivity,
-  getRecoredActivity,
-  deleteRecoredActivity,
-  getAllMembersRecordedActivity,
-  getMemberRecoredActivity,
-} from "../../redux/actions/activity.action";
+import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise, BsArrowLeftCircleFill, BsArrowRightCircleFill, BsDashLg } from "react-icons/bs";
+import { MdOutlineClose, MdOutlineSearch, MdOutlineVideoLibrary } from "react-icons/md";
+import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
+import { getliveActivity, getRecoredActivity, deleteRecoredActivity, getAllMembersRecordedActivity, getMemberRecoredActivity } from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
-import {
-  socket,
-  refreshSocket,
-  currentMemberProfile,
-} from "../../helpers/auth";
-import {
-  getMemberdata,
-  showAmPmtime,
-  generateTimeRange,
-  convertSecondstoTime,
-  timeStringToDate,
-} from "../../helpers/commonfunctions";
+import { socket, refreshSocket, currentMemberProfile } from "../../helpers/auth";
+import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime, timeStringToDate } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 import "media-chrome";
 import "media-chrome/dist/menu";
@@ -1503,7 +1441,7 @@ function TimeTrackingPage() {
         <div className="page--wrapper px-md-2 pb-4 pt-4 daily--reports activity--table">
           {spinner ? (
             <div className="loading-bar">
-              <img src="images/OnTeam-icon.png" className="flipchar" />
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           ) : (
             <Container fluid>
@@ -1653,7 +1591,6 @@ function TimeTrackingPage() {
                                           <div className="project--name d-flex gap-3 align-items-center">
                                             <div className="drag--indicator">
                                               <abbr>{index + 1}</abbr>
-                                              <MdDragIndicator />
                                             </div>
                                             <div className="title--initial">
                                               {activity?.avatar &&
@@ -1669,12 +1606,12 @@ function TimeTrackingPage() {
                                               )}
                                               {activity?.latestActivity
                                                 ?.status ? (
-                                                <small className="status--circle active--color"></small>
+                                                <p className="anim--circle"><small className="status--circle active--color"></small></p>
                                               ) : activity?.latestActivity
                                                   ?.status === false ? (
-                                                <small className="status--circle idle--color"></small>
+                                                <p className="anim--circle"><small className="status--circle idle--color"></small></p>
                                               ) : (
-                                                <small className="status--circle inactive--color"></small>
+                                                <p className="anim--circle"><small className="status--circle inactive--color"></small></p>
                                               )}
                                             </div>
                                             <div className="title--span flex-column d-flex align-items-start gap-0">
@@ -1881,10 +1818,6 @@ function TimeTrackingPage() {
                                         <div className="d-flex justify-content-between">
                                           <div className="project--name d-flex gap-3 align-items-center">
                                             <div className="drag--indicator"><abbr>{index + 1}</abbr></div>
-                                            <div className="drag--indicator">
-                                              <abbr>{index + 1}</abbr>
-                                              <MdDragIndicator />
-                                            </div>
                                             <div className="title--initial">
                                               {activity?.avatar &&
                                               activity?.avatar !== null ? (
@@ -1899,12 +1832,12 @@ function TimeTrackingPage() {
                                               )}
                                               {activity?.latestActivity
                                                 ?.status ? (
-                                                <small className="status--circle active--color"></small>
+                                                <p className="anim--circle"><small className="status--circle active--color"></small></p>
                                               ) : activity?.latestActivity
                                                   ?.status === false ? (
-                                                <small className="status--circle idle--color"></small>
+                                                <p className="anim--circle"><small className="status--circle idle--color"></small></p>
                                               ) : (
-                                                <small className="status--circle inactive--color"></small>
+                                                <p className="anim--circle"><small className="status--circle inactive--color"></small></p>
                                               )}
                                             </div>
                                             <div className="title--span flex-column d-flex align-items-start gap-0">
@@ -1987,11 +1920,11 @@ function TimeTrackingPage() {
                   <div className="title--initial">
                     {currentActivity?.name?.charAt(0)}
                     {currentActivity?.latestActivity?.status ? (
-                      <small className="status--circle active--color"></small>
+                      <p className="anim--circle"><small className="status--circle active--color"></small></p>
                     ) : currentActivity?.latestActivity?.status === false ? (
-                      <small className="status--circle idle--color"></small>
+                      <p className="anim--circle"><small className="status--circle idle--color"></small></p>
                     ) : (
-                      <small className="status--circle inactive--color"></small>
+                      <p className="anim--circle"><small className="status--circle inactive--color"></small></p>
                     )}
                   </div>
                   <div className="title--span flex-column align-items-start gap-0">
@@ -2117,7 +2050,7 @@ function TimeTrackingPage() {
           >
             {activityspinner && (
               <div className="loading-bar">
-                <img src="images/OnTeam-icon.png" className="flipchar" />
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
             )}
             {activeInnerTab === "InnerLive" && (
@@ -2223,23 +2156,7 @@ function TimeTrackingPage() {
                                 <h4 className="d-flex align-items-center gap-3 justify-content-between">
                                   <strong>
                                     <span>
-                                      <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        strokeLinejoin="round"
-                                        className="lucide lucide-building2 w-4 h-4 text-blue-600"
-                                      >
-                                        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path>
-                                        <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path>
-                                        <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path>
-                                        <path d="M10 6h4"></path>
-                                        <path d="M10 10h4"></path>
-                                        <path d="M10 14h4"></path>
-                                        <path d="M10 18h4"></path>
-                                      </svg>
+                                      <LuFileText />
                                     </span>
                                     {recording?.project?.title}
                                   </strong>

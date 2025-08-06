@@ -56,23 +56,21 @@ export const CustomFieldModal = (props) => {
         <Card.Body>
           <Row className="align-items-center">
             <Col sm={12} md={6}>
-              <div className="d-flex align-items-center gap-3">
+              <div className="d-flex align-items-center gap-3 position-relative">
                 <Badge pill bg="light" className="abbr--n" text="dark">#{idx}</Badge>
                 <div className="drag--indicator"><MdDragIndicator /></div>
                 <h5 className="mb-0 fw-bold">{label}</h5>
               </div>
             </Col>
-            {showInTable && (
-              <Col xs="auto" className="ms-md-auto">
-                <Badge pill bg="success" text="dark">
+            <Col xs="auto" className="ms-md-auto pe-0">
+              {showInTable && (
+                <Badge pill bg="success" className="me-2" text="dark">
                   In Columns
                 </Badge>
-              </Col>
-            )}
-            <Col xs="auto">
+              )}
               <Badge bg={typeColorMap[type] || "secondary"}>
                 {typeLabelMap[type] || type}
-              </Badge>
+              </Badge>              
             </Col>
             <Col xs="auto">
               <Button

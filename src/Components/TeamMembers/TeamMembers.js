@@ -830,14 +830,14 @@ function TeamMembersPage() {
                 {activeTab}
                 <ListGroup horizontal className={isActive ? "d-none" : "me-2 ms-auto d-none d-xl-flex" }>
                   <ListGroup horizontal>
-                    <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
+                    <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
+                      <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
                     )}
                   </ListGroup>
-                  <ListGroup.Item className="d-none d-xl-block ms-3">
+                  <ListGroup.Item className="d-none d-xl-flex ms-3">
                     <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                       <Form.Group className="mb-0 form-group">
                         <MdOutlineSearch />
@@ -891,7 +891,7 @@ function TeamMembersPage() {
           {pagetopbar()}
           <div className="page--wrapper px-md-2 pb-4 pt-4">
             {showloader ?
-              <div className="loading-bar"><img src="images/OnTeam-icon.png" className="flipchar" /></div>
+              <div className="loading-bar"><img src="images/OnTeam-icon-gray.png" className="flipchar" /></div>
             :
             <Container fluid>
               <>

@@ -302,7 +302,7 @@ Sidebar CSS-=-=
 .panel--sidebar .navbar {
   display: block !important;
   background: transparent;
-  height: calc(100dvh - 112px);
+  height: calc(100dvh - 111px);
 }
 
 .panel--sidebar .navbar-expand-lg .navbar-collapse {
@@ -727,6 +727,10 @@ Sidebar CSS-=-=
 
 .theme--modal .modal-header .btn-close:hover {
   background: #ffffff4d;
+}
+
+.btn-close:focus {
+	box-shadow: none;
 }
 
 .theme--modal .modal-title strong {

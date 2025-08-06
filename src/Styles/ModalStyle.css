@@ -774,7 +774,7 @@ ul#subtasks-ul li textarea.form-control+button {
     width: 100%;
 }
 
-.task--message .msg-member-info .team--initial {
+.task--message .msg-member-info .team--initial, .task--message .msg-member-info img {
     width: 28px;
     min-width: 28px;
     height: 28px;
@@ -782,19 +782,16 @@ ul#subtasks-ul li textarea.form-control+button {
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
 }
 
 .task--message .msg-member-info img {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     object-fit: cover;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
+}
+
+.task--message .msg-member-info .team--initial {
+    background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
 .task--message .msg-member-info p {

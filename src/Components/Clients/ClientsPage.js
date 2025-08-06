@@ -530,7 +530,7 @@ function ClientsPage() {
           {
             spinner ?
             <div className="loading-bar">
-                <img src="images/OnTeam-icon.png" className="flipchar" />
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           :
             <Container fluid>

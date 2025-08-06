@@ -350,7 +350,7 @@ useEffect(() => {
           {
             spinner ?
             <div className="loading-bar">
-                <img src="images/OnTeam-icon.png" className="flipchar" />
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           :
           <Container fluid>
@@ -476,15 +476,21 @@ useEffect(() => {
 
                                             return (
                                               <td className="text-center border-bottom border-end" key={ind}>
-                                                <span className={`att--badge`} style={{color: statusObject?.[key]?.color,backgroundColor: rgbaBg, borderColor: `1px solid ${rgbaBorder}`}}>
+                                                <span
+                                                  className={`att--badge${atten?.status === '--' ? ' dash--badge' : ''}`}
+                                                  style={{
+                                                    color: statusObject?.[key]?.color,
+                                                    backgroundColor: rgbaBg,
+                                                    borderColor: `1px solid ${rgbaBorder}`,
+                                                  }}
+                                                >
                                                   {
                                                     atten?.status && atten?.status !== '--'
-                                                      ? 
-                                                      atten?.status
-                                                      //statusObject[atten?.status?.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.code || atten?.status
+                                                      ? atten?.status
                                                       : <BsDash />
                                                   }
                                                 </span>
+
                                                 {
                                                   (atten?.total_time !== '--') &&
                                                   <strong>{ atten?.total_time }</strong>

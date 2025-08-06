@@ -164,7 +164,7 @@ function ManualTime() {
                   member.projects.map((project) => (
                     <div className="single--project--stack" key={project._id}>
                       <h4 className="d-flex flex-column gap-3">
-                        <strong className="d-flex align-items-center gap-2">
+                        <strong className="d-flex align-items-center">
                           <span>
                             <LuFileText />
                           </span>

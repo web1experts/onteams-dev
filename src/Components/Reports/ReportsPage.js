@@ -2,22 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Form,
-  ListGroup,
-  Modal,
-  Card,
-  Dropdown,
-  CardGroup,
-  Badge,
-  Table,
-  ListGroupItem,
-  Pagination,
-} from "react-bootstrap";
+import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeft, BsArrowRight, BsClockHistory } from "react-icons/bs";
@@ -29,18 +14,9 @@ import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";
 import { TbReport, TbScreenshot } from "react-icons/tb";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import {
-  getReportsByMember,
-  gerReportsByProject,
-  getSingleProjectReport,
-  addRemarkstoProject,
-  getActivityMeta,
-} from "../../redux/actions/report.action";
+import { getReportsByMember, gerReportsByProject, getSingleProjectReport, addRemarkstoProject, getActivityMeta} from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
-import {
-  ListProjectsByMembers,
-  ListMemberProjects,
-} from "../../redux/actions/project.action";
+import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
 import { ListTasks } from "../../redux/actions/task.action";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -1199,22 +1175,9 @@ function ReportsPage() {
                       </Form>
                     </ListGroup.Item>
 
-                    <ListGroup
-                      horizontal
-                      className="bg-white expand--icon d-flex"
-                    >
-                      <ListGroup.Item
-                        className="d-flex d-xxl-none"
-                        onClick={handleFilterShow}
-                      >
-                        <MdFilterList />
-                      </ListGroup.Item>
-                      <ListGroup.Item
-                        className="d-none d-lg-flex"
-                        onClick={() => {
-                          handleSidebarSmall(false);
-                        }}
-                      >
+                    <ListGroup horizontal className="bg-white expand--icon d-flex">
+                      <ListGroup.Item className="d-flex d-xxl-none" onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
+                      <ListGroup.Item className="d-none d-lg-flex ms-1" onClick={() => {handleSidebarSmall(false);}}>
                         <GrExpand />
                       </ListGroup.Item>
                     </ListGroup>
@@ -1227,7 +1190,7 @@ function ReportsPage() {
         <div className="page--wrapper px-md-2 pb-4 pt-4 daily--reports">
           {spinner ? (
             <div className="loading-bar">
-              <img src="images/OnTeam-icon.png" className="flipchar" />
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           ) : (
             <Container fluid>
@@ -1316,10 +1279,7 @@ function ReportsPage() {
                                   </div>
                                 </td>
                                 <td>
-                                  <Button
-                                    variant="dark"
-                                    className="ms-auto px-3 py-2 d-flex align-items-center gap-2"
-                                    onClick={() => {
+                                  <Button variant="dark" className="ms-auto px-3 py-2 d-flex align-items-center gap-2" onClick={() => {
                                       setSingleMemberReport(reportData);
                                       setIsActive(1);
                                     }}
@@ -1626,27 +1586,17 @@ function ReportsPage() {
                 </Form>
               </ListGroup.Item>
             </ListGroup>
-            <ListGroup.Item
-              onClick={handleToggles}
-              className="d-none d-lg-flex"
-            >
+            <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex ms-1">
               <GrExpand />
             </ListGroup.Item>
-            <ListGroupItem
-              className="btn btn-primary"
-              key={`closekey`}
-              onClick={() => {
-                setIsActive(0);
-                dispatch(toggleSidebarSmall(false));
-              }}
-            >
+            <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall(false));}}>
               <MdOutlineClose />
             </ListGroupItem>
           </ListGroup>
         </div>
         {spinner ? (
             <div className="loading-bar">
-              <img src="images/OnTeam-icon.png" className="flipchar" />
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           ) : (
         isActive === 1 && activeMemberTab === "members" ? (
@@ -1694,9 +1644,7 @@ function ReportsPage() {
                         <div className="d-flex align-items-center justify-content-between gap-4">
                           <h4 className="d-flex align-items-center gap-3 justify-content-between">
                             <strong>
-                              <span>
-                                <LuFileText />
-                              </span>
+                              <span><LuFileText /></span>
                               {report?.project?.title}
                             </strong>
                           </h4>
@@ -1754,10 +1702,7 @@ function ReportsPage() {
                                       <p className="mb-0">
                                         <FaAngleRight /> {taskData.title}
                                       </p>
-                                      <Button
-                                        variant="dark"
-                                        className="px-3 py-2"
-                                        onClick={() =>
+                                      <Button variant="dark" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() =>
                                           handleViewReport(
                                             report.activities,
                                             taskData.taskId
@@ -1870,7 +1815,7 @@ function ReportsPage() {
                                   </p>
                                   <Button
                                     variant="dark"
-                                    className="px-3 py-2"
+                                    className="px-3 py-2 d-flex align-items-center gap-2"
                                     onClick={() =>
                                       handleViewReport(
                                         member.activities,

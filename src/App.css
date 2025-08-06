@@ -603,6 +603,13 @@ body {
   top: -1px;
 }
 
+@-moz-document url-prefix() {
+  .page--wrapper .draggable--table tbody {
+    position: static;
+    top: auto;
+  }
+}
+
 .table {
   margin-bottom: 0;
   table-layout: auto;
@@ -639,7 +646,7 @@ body {
   min-width: 430px;
   position: sticky;
   position: -webkit-sticky;
-  left: 0;
+  left: -1px;
   background: #ffffff;
   z-index: 222;
   border-right: 0;
@@ -938,7 +945,7 @@ body {
 .new--project--rows .project--name strong {
   font-weight: normal;
   font-size: 14px;
-  line-height: 15px;
+  line-height: normal;
   color: rgb(71 85 105);
 }
 
@@ -3631,7 +3638,7 @@ Project Task View CSS=-=-=
 .holidays--page .card .card-title {
   font-weight: 700;
   font-size: 30px;
-  line-height: 1.75rem;
+  line-height: 1.5rem;
   margin-bottom: 0;
 }
 
@@ -4126,7 +4133,7 @@ Project Task View CSS=-=-=
 }
 
 .new--accordion--block .bg--blue--accordion {
-  background-image: linear-gradient(to right, rgba(var(--theme-primary), .02), rgba(var(--theme-secondary), .08));
+  background-image: linear-gradient(to right, #ededed70, #eeeeee);
   border: 1px solid rgba(var(--theme-secondary), .05);
 }
 
@@ -4579,20 +4586,30 @@ pre {
   border-top-right-radius: .5rem;
 }
 
-.page--wrapper.activity--table table .status--circle,
-.wrapper--title .title--initial .status--circle {
+.page--wrapper.activity--table table .anim--circle,
+.wrapper--title .title--initial .anim--circle {
   width: 12px;
   height: 12px;
   margin: auto;
   margin-left: 0;
-  border-radius: .5rem;
-  -webkit-border-radius: .5rem;
+  border-radius: 100px;
+  -webkit-border-radius: 100px;
   display: inline-block;
   vertical-align: middle;
   right: -2px;
   bottom: -2px;
   position: absolute;
-  border: 2px solid #ffffff;
+  background: #ffffff;
+  padding: 2px;
+}
+
+.page--wrapper.activity--table table .status--circle,
+.wrapper--title .title--initial .status--circle {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 100px;
+  -webkit-border-radius: 100px;
 }
 
 .activity--table table .active--color,
@@ -4745,7 +4762,7 @@ pre {
 
 .current--player .timer--task h5 small {
   font-size: 100%;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .current--player .task--timer strong {
@@ -6641,6 +6658,7 @@ ul#icon-tabs .nav-link span svg {
   /* flex: 1 1 100%; */
   max-width: 100%;
   min-height: 42px;
+  line-height: 1.2;
 }
 
 .project--grid--table tbody {
@@ -6933,8 +6951,8 @@ ul#icon-tabs .nav-link span svg {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  margin: 0 -2rem;
-  max-height: calc(100dvh - 315px);
+  margin: 0 -1.5rem;
+  max-height: calc(100dvh - 295px);
 }
 
 .page--wrapper .attendance--excel--table td:first-child {
@@ -6979,7 +6997,7 @@ ul#icon-tabs .nav-link span svg {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   margin-bottom: 0;
-  padding: 1.5rem;
+  padding: 1.2rem;
   border-radius: 1rem;
   -webkit-border-radius: 1rem;
 }
@@ -7218,16 +7236,21 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .attendance--excel--table table td .att--badge {
-  padding-top: .25rem;
-  padding-bottom: .25rem;
-  padding-left: .5rem;
-  padding-right: .5rem;
+  padding: .25rem .5rem;
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   font-size: .75rem;
   line-height: 1rem;
   text-transform: uppercase;
   white-space: nowrap;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attendance--excel--table table td .dash--badge {
+  padding: .5rem;
 }
 
 .attendance--excel--table td strong,
@@ -7236,9 +7259,13 @@ ul#icon-tabs .nav-link span svg {
   margin-top: .25rem;
 }
 
+.attendance--excel--table td .title--span strong {
+  margin-top: 0;
+}
+
 .attendance--excel--table td strong {
   font-size: .75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .daily--attendance--table th,
@@ -7535,6 +7562,11 @@ ul#icon-tabs .nav-link span svg {
     border-radius: 100px;
 }
 
+.att--status--abbr span {
+  font-size: .875rem;
+  line-height: 15px;
+}
+
 .attendance--excel--table table .bg--blue {
   color: rgb(30 64 175);
   background-color: rgb(239 246 255);
@@ -7611,8 +7643,9 @@ ul#icon-tabs .nav-link span svg {
   border: 0;
 }
 
-.projects--page .table .list-group-item .team--initial span {
+.projects--page .table .list-group-item .team--initial span, .projects--page .table .list-group-item .team--initial span img {
   width: 100%;
+  object-fit: cover;
   height: 100%;
 }
 
@@ -7796,7 +7829,8 @@ Media CSS-=-==
   }
 
   .holiday--table--grid tr {
-    max-width: 100%
+    max-width: 100%;
+    padding: 1rem;
   }
 
   .activity--table .draggable--table th:nth-child(1),
@@ -7853,6 +7887,12 @@ Media CSS-=-==
   .project--grid--table .task--last--buttons,
   .project--grid--new--table .member--circles {
     flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+
+  .page--wrapper .holiday--table--grid td .title--span,
+  .page--wrapper .holiday--table--grid td.project--title--td .title--span {
+    flex: 1 1;
     justify-content: flex-start;
   }
 }
@@ -8029,6 +8069,12 @@ Media CSS-=-==
     max-width: 100%;
     max-height: max-content;
     overflow: visible;
+    height: auto;
+  }
+
+  .project--form--inputs, .modalbox .project--form--inputs {
+    max-height: max-content;
+    overflow-y: visible;
     height: auto;
   }
 

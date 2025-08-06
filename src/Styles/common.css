@@ -6,6 +6,15 @@
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
+svg {
+  vertical-align: baseline;
+}
+
+b, strong {
+	font-weight: 700;
+}
+
+/* For WebKit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -19,6 +28,12 @@
 ::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin; /* "auto" or "thin" */
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent; /* thumb color and track color */
 }
 
 img {
@@ -132,7 +147,7 @@ fieldset:disabled .btn {
 .btn-primary {
   color: #ffffff;
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-  border: 1px solid transparent;
+  border: 0;
   background-origin: border-box;
   background-clip: padding-box, border-box;
   background-image: 
@@ -172,7 +187,7 @@ fieldset:disabled .btn {
 .show>.btn-primary.dropdown-toggle {
   color: #ffffff;
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-  border-color: rgba(var(--theme-primary), 1);
+  border: 0;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   outline: none;
@@ -191,9 +206,11 @@ fieldset:disabled .btn {
 .btn.active:focus-visible,
 .btn.show:focus-visible,
 .btn:first-child:active:focus-visible,
+.btn:focus-visible,
 :not(.btn-check)+.btn:active:focus-visible {
   box-shadow: none !important;
   outline: none;
+  background-color: transparent !important;
 }
 
 .btn-warning {
@@ -313,19 +330,11 @@ Login Forms CSS-=-=
   object-position: center;
 }
 
-.btn-check:checked+.btn:focus-visible,
-.btn.active:focus-visible,
-.btn.show:focus-visible,
-.btn:first-child:active:focus-visible,
-:not(.btn-check)+.btn:active:focus-visible {
-  box-shadow: none;
-}
-
 .form-control,
 .form-select {
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
-  min-height: 40px;
+  min-height: 43px;
   padding: .5rem 1.2rem;
   font-size: 15px;
 }
@@ -637,7 +646,10 @@ Add Project Modal CSS-=-=-
 
 .modalbox .project--form--inputs {
   max-height: calc(100dvh - 200px);
-  padding-top: 0;
+}
+
+.modalbox .project--form--inputs, .modalbox .project--form--actions {
+  padding-top: .5rem;
 }
 
 .project--form--inputs form .form-group {
@@ -1001,8 +1013,9 @@ Add Project Modal CSS-=-=-
 }
 
 .status--modal .status--list .list-group-item p svg {
-  color: var(--as-teal);
+  color: rgba(var(--theme-primary), 1);
   margin-left: auto;
+  font-size: .875rem;
   opacity: 0;
 }
 
@@ -1181,6 +1194,10 @@ Add Project Modal CSS-=-=-
 
 .added--fields .card .card-body {
   padding: 0;
+}
+
+.added--fields .card .card-body h5 {
+  font-size: 1rem;
 }
 
 .col-auto {
