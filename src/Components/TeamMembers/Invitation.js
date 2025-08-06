@@ -8,8 +8,7 @@ import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.acti
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import { LuFolderOpen } from "react-icons/lu";
 import { GrExpand } from "react-icons/gr";
-import { BsEye, BsBriefcase } from "react-icons/bs";
-import { TbArrowsSort } from "react-icons/tb";
+import { BsEye, BsBriefcase, BsEyeSlash } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
 import { FiMail, FiBriefcase, FiShield, FiPhone, FiCalendar, FiSidebar, FiCheck } from "react-icons/fi";
 import { acceptCompanyinvite, listCompanyinvite, deleteInvite, resendInvite, Listmembers, updateInvite} from "../../redux/actions/members.action";
@@ -30,6 +29,7 @@ function Invitation(props) {
   const [showPasswordFields, setShowPasswordFields] = useState({});
     const [isEditing, setIsEditing] = useState(false);
   const [showBadges, setShowBadges] = useState(null);
+  const [visiblePasswords, setVisiblePasswords] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(0);
@@ -55,6 +55,13 @@ function Invitation(props) {
   const [expanded, setExpanded] = useState({});
   const workspaceState = useSelector((state) => state.workspace);
   const [roles, setRoles] = useState([]);
+
+   const toggleVisibility = (key) => {
+        setVisiblePasswords((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+        }));
+    };
   const handleInvitationList = async () => {
     if (props.activeTab === "Invitations") {
       setInvitationsFeed([])
@@ -595,6 +602,13 @@ function Invitation(props) {
                           <th scope="col" className="sticky p-0 border-bottom-0" key="client-name-header">
                             <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">Member <span key="client-action-header" className="onHide">Actions</span></div>
                           </th>
+                           <th scope="col" key="client-email-header" className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">Email{" "}</div>{" "}</th>
+                            {Array.isArray(customFields) &&
+                              customFields
+                                .filter((field) => field?.showInTable !== false)
+                                .map((field, idx) => (
+                                  <th scope="col" key={`member-field-${idx}-header`} className="onHide p-0 border-bottom-0"><div className="border-bottom padd--x">{field.label}</div></th>
+                                ))}
                         </tr>
                     </thead>
                     <tbody>
@@ -625,6 +639,66 @@ function Invitation(props) {
                                     </div>
                                   </div>
                                 </td>
+                                {Array.isArray(customFields) &&
+                                  customFields
+                                    .filter(
+                                      (field) => field?.showInTable !== false
+                                    )
+                                    .map((field, idx) => {
+                                      const fieldname = field.name;
+                                      let mvalue =
+                                        invitation?.custom_fields?.[fieldname] || '';
+                                      const fieldType = field.type;
+                                      const uniqueKey = `${fieldname || idx}-${mvalue}`;
+                                      if (
+                                        field.type === "badge" &&
+                                        Array.isArray(field.options)
+                                      ) {
+                                        const matchedOption = field.options.find(
+                                          (opt) => opt.value === mvalue
+                                        );
+                                        if (matchedOption) {
+                                          mvalue = (
+                                            <span
+                                              className="priority--badge"
+                                              style={{
+                                                backgroundColor: matchedOption.color,
+                                                color: "#fff",
+                                                display: "inline-block",
+                                                borderColor: matchedOption.color,
+                                                borderWidth: '1px',
+                                                borderStyle: 'solid'
+                                              }}
+                                              onClick={() => toggleBadges(field)}
+                                            >
+                                              {
+                                                invitation?.custom_fields?.[fieldname]
+                                                  ?.meta_value
+                                              }
+                                            </span>
+                                          );
+                                        }
+                                      }
+                                      else if(fieldType === 'password'){
+                                          return (
+                                              <span className="d-flex align-items-center gap-2">
+                                                  {visiblePasswords[uniqueKey] ? mvalue : '*****'}
+                                                  <span
+                                                      style={{ cursor: 'pointer' }}
+                                                      onClick={() => toggleVisibility(uniqueKey)}
+                                                  >
+                                                      {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
+                                                  </span>
+                                              </span>
+                                          )
+                                      }
+                                      return (
+                                        <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
+                                          <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-flex d-lg-none text-uppercase fs-small mb-1' : 'd-flex d-lg-none text-uppercase fs-small mb-1'}>{field.label}</strong>
+                                          {mvalue}
+                                        </td>
+                                      );
+                                    })}
                                 <td className="task--last--buttons mt-auto">
                                   <div className="d-flex justify-content-between flex-wrap">
                                     <div className="onHide">
