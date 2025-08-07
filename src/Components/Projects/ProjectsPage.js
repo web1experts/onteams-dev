@@ -1022,9 +1022,9 @@ function ProjectsPage() {
                                                                                             }
                                                                                             return hex;
                                                                                         };
-                                                                                        const statusOption = systemFields?.status?.options.find(opt => opt.value.toLowerCase() === project.status.toLowerCase());
+                                                                                        const statusOption = systemFields?.status?.options.find(opt => opt.value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') === project.status.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''));
                                                                                         const baseColor = statusOption?.color;
-                                                                                        console.log('color:: ', baseColor)
+                                                                                        console.log('systemFields?.status:: ', systemFields?.status)
                                                                                         const borderColor = hexToRgba(baseColor, 0.3);
                                                                                         const backgroundColor = hexToRgba(baseColor, 0.1);
                                                                                     return (<Dropdown className="select--dropdown" key='status-key'>
