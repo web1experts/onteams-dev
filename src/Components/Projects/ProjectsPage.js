@@ -1693,9 +1693,6 @@ function ProjectsPage() {
                         </ListGroup.Item>
                     </ListGroup>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleFilterClose}>Cancel</Button>
-                </Modal.Footer>
             </Modal>
             {/*--=-=Search Modal**/}
             <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">

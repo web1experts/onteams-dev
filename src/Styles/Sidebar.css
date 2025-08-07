@@ -881,6 +881,7 @@ Sidebar CSS-=-=
 .theme--modal .form-label {
   font-weight: 500;
   margin: 0 0 0.15rem;
+  width: 100%;
 }
 
 .theme--modal .btn--group .btn {
@@ -935,7 +936,7 @@ Sidebar CSS-=-=
     border-radius: 100px;
     width: 60px;
     height: 60px;
-    z-index: 999999;
+    z-index: 888888;
     transform: translate(0px, -70px);
     -webkit-transform: translate(0px, -70px);
   }
@@ -950,7 +951,7 @@ Sidebar CSS-=-=
     bottom: 0;
     transition: all .5s ease-in-out;
     -webkit-transition: all .5s ease-in-out;
-    z-index: 999999;
+    z-index: 888888;
   }
 
   .team--page {

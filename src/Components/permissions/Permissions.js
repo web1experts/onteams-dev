@@ -624,7 +624,7 @@ function PermissionsPage() {
                     })}
 
                     <div className="mt-4 text-end">
-                      <Button variant="primary" onClick={handleSave}>Save Permissions</Button>
+                      <Button variant="primary" onClick={handleSave}>Save</Button>
                     </div>
                   </Accordion>
                 </>

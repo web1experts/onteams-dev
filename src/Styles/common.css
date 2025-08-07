@@ -7,7 +7,7 @@
 }
 
 svg {
-  vertical-align: baseline;
+  vertical-align: inherit;
 }
 
 b, strong {
@@ -294,7 +294,7 @@ strong.activity-type-text {
 
 .btn-secondary {
   --bs-btn-color: rgba(51, 65, 85, 1);
-  --bs-btn-bg: rgba(241, 245, 249, 1);
+  --bs-btn-bg: rgba(51, 65, 85, .08);
   --bs-btn-border-color: rgba(51, 65, 85, 0);
 }
 
@@ -334,9 +334,26 @@ Login Forms CSS-=-=
 .form-select {
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
-  min-height: 43px;
+  min-height: 40px;
   padding: .5rem 1.2rem;
   font-size: 15px;
+}
+
+media-control-bar * {
+    background: none;
+}
+
+media-control-bar {
+  display: flex;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0 .5rem;
+}
+
+media-control-bar slot, media-control-bar img {
+  width: 30px;
+  height: auto;
+  font-size: 28px;
 }
 
 .wrapper--title .form-select,
@@ -664,7 +681,8 @@ Add Project Modal CSS-=-=-
   padding-top: 15px;
 }
 
-.add--member--modal form .form-control, .add--member--modal form .form-select {
+.add--member--modal form .form-control, .add--member--modal form .form-select,
+.modal form .form-control, .modal form .form-select {
   min-height: 43px;
 }
 
@@ -989,6 +1007,43 @@ Add Project Modal CSS-=-=-
   border: 0;
 }
 
+.status--modal .status--list .list-group-item span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.contact--card .list-group-item .status--modal, .theme--modal .status--modal {
+    text-transform: capitalize;
+    padding: .3rem .75rem;
+    width: 100%;
+    margin: 0;
+    font-weight: normal;
+    font-size: 15px;
+    min-height: max-content;
+    color: rgba(148, 163, 184, 1);
+    min-height: 33px;
+    margin-top: .25rem;
+    border-radius: .25rem;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.theme--modal .status--modal {
+    padding: .55rem .55rem .55rem 1.2rem;
+    color: #454545;
+}
+
+.contact--card .list-group-item .status--modal svg, .theme--modal .status--modal svg {
+  width: 12px;
+  height: auto;
+}
+
 .status--modal .status--list .status--active {
   background: rgb(233 241 249);
   color: rgb(15 23 42);
@@ -1109,8 +1164,11 @@ Add Project Modal CSS-=-=-
 
 .add--workflow--modal .workflow--list .drag--icon {
   margin-right: .5rem;
-  font-size: 18px;
+  font-size: 15px;
   cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .add--workflow--modal .workflow--list .list-group-item:first-child .drag--icon,
@@ -1218,6 +1276,21 @@ Add Project Modal CSS-=-=-
 
 .added--fields .card:hover .abbr--n {
   opacity: 0;
+}
+
+.added--fields .card .card-body .btn:focus,
+.added--fields .card .card-body .btn:hover, .added--fields .card .card-body .btn:focus-visible,
+.added--fields .card .card-body .btn:focus-within, .added--fields .card .card-body .btn:active {
+  background: none;
+}
+
+.added--fields .card .card-body .btn-outline-danger {
+    --bs-btn-color: #dc3545;
+    --bs-btn-hover-color: #dc3545;
+    --bs-btn-hover-bg: transparent;
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-color: #dc3545;
+    --bs-btn-active-bg: transparent;
 }
 
 .add--workflow--modal .nav-tabs .nav-link {

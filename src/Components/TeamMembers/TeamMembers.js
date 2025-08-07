@@ -851,21 +851,8 @@ function TeamMembersPage() {
                     <ListGroup.Item action className="view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                     <ListGroup.Item action className="view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
-                  <ListGroup horizontal className="d-flex d-xl-none bg-white shadow-none p-0 border-0">
-                    <Dropdown className="select--dropdown manual--dropdown">
-                      <Dropdown.Toggle variant="success" id="dropdown-basic" className="border-0"><MdFilterList /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
-                        {(memberProfile?.permissions?.members
-                          ?.create_edit_delete === true ||
-                          memberProfile?.role?.slug === "owner") && (
-                          <Dropdown.Item action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</Dropdown.Item>
-                        )}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </ListGroup>
                   <ListGroup horizontal className={isActive ? "d-none" : "d-flex bg-white expand--icon"}>
-                    <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdSearch /></ListGroup.Item>
+                    <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdFilterList /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
                     <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
@@ -1802,7 +1789,7 @@ function TeamMembersPage() {
           </Modal.Body>
           <Modal.Footer>
             <div className="m-0 text-end">
-              <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save Permissions"}</Button>
+              <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save"}</Button>
             </div>
           </Modal.Footer>
         </Modal>)
@@ -1855,22 +1842,23 @@ function TeamMembersPage() {
       {/*--=-=Search Modal**/}
       <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
         <Modal.Header closeButton>
-          <Modal.Title>Search</Modal.Title>
+          <Modal.Title>Filters</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <ListGroup className="manual--dropdown">
+            <ListGroup.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
+            {(memberProfile?.permissions?.members
+              ?.create_edit_delete === true ||
+              memberProfile?.role?.slug === "owner") && (
+              <ListGroup.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
+            )}
+          </ListGroup> 
           <ListGroup>
-            <ListGroup.Item className="border-0 p-0">
-              <Form>
+            <ListGroup.Item className="border-0 p-0 mt-3">
+              <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                 <Form.Group className="mb-0 form-group">
-                  <Form.Control
-                    type="text"
-                    placeholder={
-                      activeTab === "Members"
-                        ? "Search Member.."
-                        : "Search Invitations.."
-                    }
-                    onChange={(e) => setsearchTerm(e.target.value)}
-                  />
+                  <MdOutlineSearch />
+                  <Form.Control type="text" placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)}/>
                 </Form.Group>
               </Form>
             </ListGroup.Item>

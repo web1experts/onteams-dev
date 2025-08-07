@@ -2437,6 +2437,11 @@ table tr.marked-project td {
   justify-content: flex-start;
 }
 
+.team--page .page--title .select--dropdown .btn,
+.wrapper--title .select--dropdown .btn {
+  min-height: 40px;
+}
+
 .wrapper--title .select--dropdown .btn {
   width: 100%;
 }
@@ -2752,6 +2757,7 @@ table tr.marked-project td {
 .modal .manual--dropdown .dropdown-item svg {
   position: relative;
   right: auto;
+  vertical-align: bottom;
 }
 
 .page--wrapper table td .select--dropdown .form-group {
@@ -3633,6 +3639,7 @@ Project Task View CSS=-=-=
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
 }
 
 .holidays--page .card .card-title {
@@ -3652,7 +3659,7 @@ Project Task View CSS=-=-=
   letter-spacing: .025em;
   text-transform: uppercase;
   font-size: .875rem;
-  line-height: 1.25rem;
+  line-height: 1rem;
 }
 
 .holidays--page .card .card-text {
@@ -3967,7 +3974,7 @@ Project Task View CSS=-=-=
 .setting--page .card {
   padding: 1.5rem;
   border-radius: 1rem;
-  background: linear-gradient(to right, rgba(var(--theme-primary), .08), rgba(var(--theme-secondary), .08));
+  background: linear-gradient(to right, #ededed70, #eeeeee);
 }
 
 .modal .setting--page .bg--blue--accordion p {
@@ -4005,8 +4012,8 @@ Project Task View CSS=-=-=
 }
 
 .modal .team--card--grid .selected--card {
-  border: 1px solid rgba(var(--theme-primary), .4);
-  background-color: rgba(var(--theme-primary), .08);
+  border: 1px solid rgba(var(--theme-primary), .2);
+  background-color: rgba(var(--theme-primary), .03);
 }
 
 .modal .switch--big .form-check-input {
@@ -4082,7 +4089,7 @@ Project Task View CSS=-=-=
 }
 
 .new--accordion--block .bg--blue--accordion .accordion-button::after {
-  color: rgba(var(--theme-primary), 1);
+  color: rgba(148, 163, 184, 1);
 }
 
 .new--accordion--block .bg--blue--accordion .accordion-button svg,
@@ -4133,7 +4140,7 @@ Project Task View CSS=-=-=
 }
 
 .new--accordion--block .bg--blue--accordion {
-  background-image: linear-gradient(to right, #ededed70, #eeeeee);
+  background-image: linear-gradient(to right, #ededed70, #ededed);
   border: 1px solid rgba(var(--theme-secondary), .05);
 }
 
@@ -5140,6 +5147,7 @@ pre {
   max-width: 100%;
   object-fit: cover;
   height: 180px;
+  width: 100%;
 }
 
 .activity--box .card .card-body p {
@@ -6952,7 +6960,7 @@ ul#icon-tabs .nav-link span svg {
   border-radius: 0;
   box-shadow: none;
   margin: 0 -1.5rem;
-  max-height: calc(100dvh - 295px);
+  max-height: calc(100dvh - 245px);
 }
 
 .page--wrapper .attendance--excel--table td:first-child {
@@ -7395,7 +7403,7 @@ ul#icon-tabs .nav-link span svg {
   border-radius: .75rem;
 }
 
-.report--task--list ul li {
+.report--task--list ul li, .report--task--list ul li p {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -9403,6 +9411,12 @@ Media CSS-=-==
 @media screen and (max-width:414px) {
   .team--page .page--title h2 {
     flex-flow: row wrap;
+    font-size: 1.3rem;
+  }
+
+  .page--title .list-group, .page--title .list-group .list-group {
+    grid-gap: .35rem;
+    gap: .35rem;
   }
 
   .daily--welcome .card--icon h6 {

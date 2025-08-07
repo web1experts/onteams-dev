@@ -509,7 +509,7 @@ useEffect(() => {
                         </tbody>
                     </Table>
                 </div>
-                <div className="pt-4">
+                {/* <div className="pt-4">
                   <div className="d-flex align-items-center gap-3 gap-md-4 flex-wrap att--status--abbr">
                     {
                       attendanceStatus?.map((status, idx) => {
@@ -537,7 +537,7 @@ useEffect(() => {
                       })
                     }
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
 
@@ -750,33 +750,6 @@ useEffect(() => {
           <div className="bg-white attendance--table daily--attendance--table">
             <div className="d-lg-flex align-items-center gap-3 daily--attendance--top">
               <h3 className="d-flex align-items-center gap-3 mb-0"><span><AiOutlineTeam /></span><strong>Daily Attendance <small>{getMonthLabel(filters?.month)}</small></strong></h3>
-              <div className="d-flex align-items-center gap-3 gap-md-4 flex-wrap att--status--abbr ms-auto mt-3 mt-lg-0">
-                {
-                  attendanceStatus?.map((status, idx) => {
-                    const rgbaBg = hexToRgba(status?.color, 1);
-                    function hexToRgba(hex, alpha) {
-                      hex = hex.replace('#', '');
-
-                      if (hex.length === 3) {
-                        hex = hex.split('').map(c => c + c).join('');
-                      }
-
-                      const bigint = parseInt(hex, 16);
-                      const r = (bigint >> 16) & 255;
-                      const g = (bigint >> 8) & 255;
-                      const b = bigint & 255;
-
-                      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                    }
-                    return (
-                      <div key={idx} className="d-flex align-items-center gap-2">
-                        <span className="d-flex align-items-center justify-content-center att--status--span" style={{ backgroundColor: rgbaBg,}}></span>
-                        <span className="text-slate-600">{status.label}</span>
-                      </div>
-                    );
-                  })
-                }
-              </div>
             </div>
             <div className="overflow-x-auto">
                 <Table>
