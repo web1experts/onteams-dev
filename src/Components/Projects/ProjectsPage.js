@@ -1008,7 +1008,26 @@ function ProjectsPage() {
                                                                                 </td>
                                                                                 
                                                                                 <td key={`status-index-${index}`} data-label="Status" className="onHide status__key">
-                                                                                    <Dropdown className="select--dropdown" key='status-key'>
+                                                                                    {(() => {
+                                                                                        // Convert hex to rgba
+                                                                                        const hexToRgba = (hex, opacity) => {
+                                                                                            let c;
+                                                                                            if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+                                                                                            c = hex.substring(1).split('');
+                                                                                            if (c.length === 3) {
+                                                                                                c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+                                                                                            }
+                                                                                            c = '0x' + c.join('');
+                                                                                            return `rgba(${(c >> 16) & 255}, ${(c >> 8) & 255}, ${c & 255}, ${opacity})`;
+                                                                                            }
+                                                                                            return hex;
+                                                                                        };
+                                                                                        const statusOption = systemFields?.status?.options.find(opt => opt.value.toLowerCase() === project.status.toLowerCase());
+                                                                                        const baseColor = statusOption?.color;
+                                                                                        console.log('color:: ', baseColor)
+                                                                                        const borderColor = hexToRgba(baseColor, 0.3);
+                                                                                        const backgroundColor = hexToRgba(baseColor, 0.1);
+                                                                                    return (<Dropdown className="select--dropdown" key='status-key'>
                                                                                         <Dropdown.Toggle onClick={() => { 
                                                                                             if (memberProfile?.permissions?.projects?.create_edit_delete_project === true || memberProfile?.role?.slug === 'owner') {
                                                                                                 dispatch(updateStateData(DIRECT_UPDATE, true));
@@ -1016,8 +1035,17 @@ function ProjectsPage() {
                                                                                             } else {
                                                                                                 console.log('Not allowed');
                                                                                             }
-                                                                                        }} variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}>{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
+                                                                                        }} 
+                                                                                        style={{
+                                                                                            color: baseColor,
+                                                                                            border: `1px solid ${borderColor}`,
+                                                                                            background: backgroundColor,
+                                                                                        }}
+                                                                                        // variant={`${project.status === 'in-progress' ? 'warning' : project.status === 'on-hold' ? 'danger' : project.status === 'completed' ? 'success' : ''}`}
+                                                                                        >{formatStatus(project.status || "in-progress")}</Dropdown.Toggle>
                                                                                     </Dropdown>
+                                                                                     );
+                                                                                    })()}
                                                                                 </td>
                                                                                 {/* <td key={`cname-index-${index}`} data-label="Client Name" className="onHide project--title--td"><span>{project.client?.name || <span className='text-muted'>__</span>}</span></td> */}
                                                                                 <hr className={isActiveView === 1 ? 'd-flex' : isActiveView === 2 ? 'd-none' : 'd-none'} />
