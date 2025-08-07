@@ -17,11 +17,19 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case WORKFLOW_CREATE_SUCCESS :
-        return {
-            ...state,
-            success: action.payload.message,
-            workflows: action.payload.workflows
-        };
+        if(action.payload?.update === false){
+            return {
+                ...state,
+                success: action.payload.message,
+                savedworkflow: action.payload.savedworkflow
+            };
+        }else{
+            return {
+                ...state,
+                success: action.payload.message,
+                updatedWorkflow: action.payload.updatedWorkflow
+            };
+        }
     case WORKFLOW_ERROR :
         return {
             ...state,
