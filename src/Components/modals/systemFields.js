@@ -60,7 +60,7 @@ export const SystemFieldModal = (props) => {
               <h5 className="mb-0 fw-bold">{label}</h5>
             </Col>
             
-            <Col xs="auto">
+            <Col xs="auto" className="pe-0">
               <Badge bg={typeColorMap[type] || "secondary"}>
                 {typeLabelMap[type] || type}
               </Badge>
@@ -479,13 +479,11 @@ export const SystemFieldModal = (props) => {
           
             <div className="added--fields">
               <h5>Systen Fields</h5>
-             
-                  <div >
+                  <div>
                     {systemFields?.length === 0 ? (
                       <p className="text-muted">No system fields.</p>
                     ) : (
                       systemFields?.map((field, index) => (
-                        
                             <div>
                               <FieldCard idx={index + 1} field={field} />
                             </div>

@@ -2797,7 +2797,7 @@ function TimeTrackingPage() {
         show={showNew}
         onHide={handleCloseNew}
         centered
-        size="xl"
+        size="lg"
         className="AddEntryModal AddTimeModal theme--modal"
       >
         <Modal.Header closeButton>

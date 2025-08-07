@@ -881,6 +881,7 @@ Sidebar CSS-=-=
 .theme--modal .form-label {
   font-weight: 500;
   margin: 0 0 0.15rem;
+  width: 100%;
 }
 
 .theme--modal .btn--group .btn {

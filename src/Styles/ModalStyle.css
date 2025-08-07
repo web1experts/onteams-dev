@@ -421,7 +421,7 @@
 }
 
 .setting__modal .setting--page {
-    height: auto;
+    height: 100%;
 }
 
 .setting__modal .setting--page .form-floating>label {
@@ -922,6 +922,36 @@ input.form-error,
 select.form-error {
     color: red;
     border: 1px solid red;
+}
+
+.error--stack {
+    margin-bottom: 1.5rem;
+    padding: .75rem;
+    background-color: rgb(254 242 242);
+    border: 1px solid rgb(254 202 202);
+   border-radius: .5rem;
+   -webkit-border-radius: .5rem;
+}
+
+.error--stack .form-errors {
+    color: rgb(153 27 27);
+    font-weight: 500;
+   font-size: .875rem;
+    line-height: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    margin-bottom: .25rem;
+}
+
+.error--stack .form-error {
+    color: rgb(185 28 28);
+    font-size: .875rem;
+    line-height: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    margin-bottom: .15rem;
 }
 
 .rmdp-header {
