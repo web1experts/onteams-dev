@@ -2757,6 +2757,7 @@ table tr.marked-project td {
 .modal .manual--dropdown .dropdown-item svg {
   position: relative;
   right: auto;
+  vertical-align: bottom;
 }
 
 .page--wrapper table td .select--dropdown .form-group {
@@ -9410,6 +9411,12 @@ Media CSS-=-==
 @media screen and (max-width:414px) {
   .team--page .page--title h2 {
     flex-flow: row wrap;
+    font-size: 1.3rem;
+  }
+
+  .page--title .list-group, .page--title .list-group .list-group {
+    grid-gap: .35rem;
+    gap: .35rem;
   }
 
   .daily--welcome .card--icon h6 {

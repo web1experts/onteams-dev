@@ -53,7 +53,7 @@
     border-top-left-radius: 0;
 }
 
-.theme--modal .modal-body .field__tabs {
+.modal-body .field__tabs {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
     background: rgb(255, 255, 255);
     border-radius: 0.5rem;
@@ -66,7 +66,7 @@
     margin-bottom: 1rem;
 }
 
-.theme--modal .modal-body .field__tabs .btn--view {
+.modal-body .field__tabs .btn--view {
     width: auto;
     height: auto;
     display: flex;
@@ -80,22 +80,32 @@
     --bs-btn-color: transparent;
     font-size: 1rem;
     border-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    border-top-left-radius: .5rem;
+    border-bottom-left-radius: .5rem;
+    border-bottom-right-radius: .5rem;
     padding: 0.35rem 0.65rem;
     background: transparent;
     border: 0px;
 }
 
-.theme--modal .modal-body .field__tabs .btn--view.active,
-.theme--modal .modal-body .field__tabs .btn--view:focus-visible,
-.theme--modal .modal-body .field__tabs .btn--view:hover,
-.theme--modal .modal-body .field__tabs .btn-primary:not(:disabled):not(.disabled).active {
+.modal-body .field__tabs .btn--view:first-child:not(:last-child),
+.modal-body .field__tabs .btn--view:last-child:not(:first-child) {
+    border-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    border-top-left-radius: .5rem;
+    border-bottom-left-radius: .5rem;
+    border-bottom-right-radius: .5rem;
+}
+
+.modal-body .field__tabs .btn--view.active,
+.modal-body .field__tabs .btn--view:focus-visible,
+.modal-body .field__tabs .btn--view:hover,
+.modal-body .field__tabs .btn-primary:not(:disabled):not(.disabled).active {
     color: rgb(255, 255, 255);
     box-shadow: none !important;
     background: linear-gradient(90deg, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-    border-width: 0px;
-    border-style: initial;
-    border-color: initial;
-    border-image: initial;
+    border: 0px;
 }
 
 .rules--modal .modal-header .btn-primary {
@@ -389,7 +399,7 @@
 }
 
 .modal.show {
-    z-index: 77777;
+    z-index: 888888;
 }
 
 .reports__Data__modal .modal-content {
@@ -1234,7 +1244,7 @@ select.form-error {
     gap: 1rem;
 }
 
-.color--selection input.form-control {
+.color--selection input.form-control, .color--selection .form--input {
     flex: 1 1;
 }
 
@@ -1246,11 +1256,11 @@ select.form-error {
     background: #ffffff;
     border: 1px solid rgb(0 0 0 / .1);
     border-radius: .5rem;
-    padding: 4px 8px 4px 4px;
+    padding: 6px 10px 6px 6px;
     margin: 0;
 }
 
-.theme--modal .color--selection .form-control-color {
+.color--selection .selected-badge-color .form-control-color {
     flex: none;
     border-radius: .25rem;
     width: 30px;
@@ -1326,12 +1336,9 @@ select.form-error {
         margin-bottom: .5rem;
     }
 
-    .added--fields .card .card-body .col-auto {
-        flex: 1 1;
-    }
-
     .added--fields .card .card-body .col-auto:last-child {
         text-align: right;
+        margin-left: auto;
     }
 
     .rules--modal .modal-title strong {
@@ -1343,7 +1350,7 @@ select.form-error {
         justify-content: space-between;
     }
 
-    .color--selection input.form-control {
+    .color--selection input.form-control, .color--selection .form--input {
         flex: 1 1 100%;
     }
 }

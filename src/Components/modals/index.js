@@ -856,7 +856,7 @@ export const  WorkFlowModal =  (props) => {
     <>      
       <Modal show={modalstate} onHide={handleWorkflowClose} centered size="lg" className="add--workflow--modal">
                 <Modal.Header closeButton>
-                    <Modal.Title>Settings</Modal.Title>
+                    <Modal.Title>Workflow Settings</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {commonState.active_formtype === "edit_project" &&
@@ -1065,14 +1065,19 @@ export const  WorkFlowModal =  (props) => {
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                   <Form.Label>Tabs *</Form.Label>
-                                  <div className="d-flex color--selection">
-                                    <Form.Control
-                                      type="text"
-                                      placeholder="Add tab..."
-                                      value={newOption}
-                                      onChange={(e) => setNewOption(e.target.value)}
-                                      isInvalid={!!workflowErrors.tabs}
-                                    />
+                                  <div className="d-flex color--selection align-items-start">
+                                    <div className='form--input'>
+                                      <Form.Control
+                                        type="text"
+                                        placeholder="Add tab..."
+                                        value={newOption}
+                                        onChange={(e) => setNewOption(e.target.value)}
+                                        isInvalid={!!workflowErrors.tabs}
+                                      />
+                                      <Form.Control.Feedback type="invalid">
+                                        {workflowErrors.tabs}
+                                      </Form.Control.Feedback>
+                                    </div>
                                     <p className="selected-badge-color">
                                       <Form.Control
                                         type="color"
@@ -1084,11 +1089,7 @@ export const  WorkFlowModal =  (props) => {
                                     </p>
                                     <Button type="button" onClick={handleAddOption}>Add</Button>
                                   </div>
-                                  <Form.Control.Feedback type="invalid">
-                                    {workflowErrors.tabs}
-                                  </Form.Control.Feedback>
                                 </Form.Group>
-          
                                 <div className="mb-3 d-flex flex-wrap gap-2">
                                   {workflow_fields?.tabs?.map((opt, idx) => (
                                     <div

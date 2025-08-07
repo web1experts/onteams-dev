@@ -716,8 +716,8 @@ function RolesPage() {
                     })}
 
                   <div className="mt-4 text-end fixed--bottom">
-                    <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete Role</Button>
-                    <Button variant="primary" className="ms-3" onClick={handleSave}>Save Permissions</Button>
+                    <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete</Button>
+                    <Button variant="primary" className="ms-3" onClick={handleSave}>Save</Button>
                   </div>
                 </div>
             </>

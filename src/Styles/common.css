@@ -7,7 +7,7 @@
 }
 
 svg {
-  vertical-align: baseline;
+  vertical-align: inherit;
 }
 
 b, strong {
