@@ -46,4 +46,20 @@ export const ListWorkflows = (currentPage = 0, searchterm = "") => {
             errorRequest(error, dispatch);
         }
     }
+
+}
+
+export const saveNewWorkflow = (payload) => {
+    return async (dispatch) => {
+        try{
+            const response = await API.apiPost('workflow', payload);
+            if(response.data && response.data.success){
+            await dispatch({ type: WORKFLOW_CREATE_SUCCESS, payload: response.data })
+            }else{
+            await dispatch({ type: WORKFLOW_ERROR, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { updateOwnership } from '../../redux/actions/workspace.action';
 import useFilledClass from "../customHooks/useFilledclass";
@@ -7,20 +7,17 @@ import { Button, Modal, Form, ListGroup, FloatingLabel, Dropdown , Alert, Tabs, 
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { FaCheck,FaCircle, FaPlusCircle, FaTimesCircle, FaUpload, FaRegTrashAlt, FaEllipsisV, FaTrashAlt, FaRegTimesCircle, FaRegEdit } from "react-icons/fa";
 import fileIcon from './../../images/file-icon-image.jpg'
-import { ListWorkflows } from '../../redux/actions/workflow.action';
+import { ListWorkflows, saveNewWorkflow } from '../../redux/actions/workflow.action';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { updateStateData, togglePopups } from '../../redux/actions/common.action';
 import { updateTask } from '../../redux/actions/task.action';
 import { PROJECT_FORM, EDIT_PROJECT_FORM } from '../../redux/actions/types';
 import { MdFileDownload } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
-import { FiPlus } from "react-icons/fi";
-import { LuSettings } from "react-icons/lu";
 import { MdArrowDownward } from "react-icons/md";
 import { GrDrag } from "react-icons/gr";
 import { dataObject } from '../../helpers/objectdata';
 import { useDropzone } from 'react-dropzone'
-import { useToast } from '../../context/ToastContext';
 export function AlertDialog(props) {
   const [open, setOpen] = useState(false);
   const [ loader, setLoader ] = useState(false);
@@ -463,14 +460,19 @@ export function MemberModal( props){
 }
 
 export const  WorkFlowModal =  (props) => {
-  const addToast = useToast();
+  const formRef = useRef();
   const dispatch = useDispatch()
   const modalstate = useSelector(state => state.common.workflowmodal);
   const commonState = useSelector( state => state.common)
   const [formtype, setFormType] = useState(commonState.active_formtype || false)
+  const [ activeTab, setActiveTab ] = useState('current')
   const [showWorkflow, setWorkflowShow] = useState(false);
   const [fields, setFields] = useState({})
   const [ error, setErrors ] = useState({})
+  const [workflowErrors, setWorkflowErrors] =  useState({})
+  const [workflow_fields ,setWorkflowFields] = useState({})
+  const [newOption, setNewOption] = useState("");
+  const [badgeColor, setBadgeColor] = useState("#28a745");
   const [showEdit, setEditShow] = useState(false);
   const [showAdd, setAddShow] = useState(false);
   const [ workflows, setWorkflows] = useState([])
@@ -536,16 +538,98 @@ export const  WorkFlowModal =  (props) => {
   }, [modalstate])
 
   useEffect(() => {
+    setWorkflowFields({name: '', tabs: []});
+    setSelectedWorkflow({})
     if( workflowstate && workflowstate.workflows && workflowstate.workflows.length > 0){
       setWorkflows( workflowstate.workflows )
       setFilteredWorkflows(workflowstate.workflows)
     }
+
+    if( workflowstate && workflowstate.savedworkflow){ console.log('here to updated')
+       setWorkflows((prevWorkflows) => [
+        workflowstate.savedworkflow,
+        ...prevWorkflows,
+      ]);
+
+       setFilteredWorkflows((prevfilteredWorkflows) => [
+        workflowstate.savedworkflow,
+        ...prevfilteredWorkflows,
+      ]);
+    }
+
+    if (workflowstate.updatedWorkflow) {
+        const workflowFeeds = workflows.map((w) =>
+          w._id.toString() === workflowstate.updatedWorkflow._id.toString()
+            ? workflowstate.updatedWorkflow
+            : w
+        );
+
+        setWorkflows(workflowFeeds);
+        setFilteredWorkflows(workflowFeeds);
+      }
   }, [ workflowstate ])
 
   const handleChange = ({ target: { name, value} }) => {
     setFields({ ...fields, [name]: value });
     setErrors({ ...error, [name]: '' })
   };  
+
+  const handleInputChange = ({ target: { name, value}}) => {
+    setWorkflowFields({ ...workflow_fields, [name]: value });
+  };  
+
+   const removeOption = (index) => {
+    const newOpts = (workflow_fields.tabs || []).filter((_, i) => i !== index);
+    setWorkflowFields({
+      ...workflow_fields,
+      tabs: newOpts,
+    });
+  };
+
+  const handleWorkflowEdit = (workflow) => {
+    setSelectedWorkflow(workflow);
+    setWorkflowFields({name: workflow.title, tabs: workflow.tabs || []});
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleCancelClick = () => {
+    setWorkflowFields({name: '', tabs: []});
+  };
+
+  const saveWorkflow = () => {
+     const newErrors = {};
+      if (!workflow_fields?.name.trim()) newErrors.fieldName = "Workflow name is required";
+      if (
+        workflow_fields?.tabs.length === 0
+      ) {
+        newErrors.tabs = "At least one tab is required";
+      }
+
+      setWorkflowErrors(newErrors);
+
+      if (Object.keys(newErrors).length > 0) return;
+      let fieldsData = {...workflow_fields}
+      if(selectedWorkflow){
+        fieldsData['workflow_id'] =  selectedWorkflow?._id
+      }
+      dispatch(saveNewWorkflow(fieldsData))
+  };
+
+
+  const handleAddOption = () => {
+    if (newOption.trim()) {
+      const label = newOption.trim();
+      
+      setWorkflowFields({
+        ...workflow_fields,
+        tabs: [...(workflow_fields.tabs || []), label],
+      });
+
+      setNewOption("");
+    }
+  };
 
   const handleSelectworkflow = (workflow) => {
     setWorkflowModalState(prevWorkflowModalState => {
@@ -699,6 +783,7 @@ export const  WorkFlowModal =  (props) => {
     return null
   }
 
+
   const handleDragEnd = (result) => {
     const { source, destination } = result;
   
@@ -735,6 +820,7 @@ export const  WorkFlowModal =  (props) => {
     
     });
   };
+  
 
   const removetab = (indexToRemove) => {
     // Update workflow modal state
@@ -773,8 +859,13 @@ export const  WorkFlowModal =  (props) => {
                     <Modal.Title>Settings</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  
-                      { commonState.active_formtype !== "edit_project" &&
+                    {commonState.active_formtype === "edit_project" &&
+                      <ListGroup horizontal className="field__tabs">
+                          <ListGroup.Item className={`btn--view ${activeTab === 'current' ? 'active' : ''}`} onClick={() => setActiveTab('current')}>Selected Workflow</ListGroup.Item>
+                          <ListGroup.Item className={`btn--view ${activeTab === 'new' ? 'active' : ''}`} onClick={() => setActiveTab('new')}>Add New</ListGroup.Item>
+                      </ListGroup>
+                    }
+                      { activeTab === 'current' && commonState.active_formtype !== "edit_project" &&
                         <Form.Group className="mb-3 form-group">
                             <Form.Label>Select Workflow</Form.Label>
                             <Dropdown className="select--dropdown">
@@ -816,6 +907,8 @@ export const  WorkFlowModal =  (props) => {
                             
                         </Form.Group>
                       }
+                      { activeTab === 'current' ?
+                      <>
                       <Form.Group className="mb-0 form-group" >
                           {
                             showAlert &&
@@ -947,7 +1040,154 @@ export const  WorkFlowModal =  (props) => {
                         <Button variant="secondary" onClick={handleWorkflowClose}>Cancel</Button>
                         <Button variant="primary" onClick={handleSelect}>Select</Button>
                       </Form.Group>
+                      </>
+                      :
+                      <>
+                      <div className="field--options">
+                        <div className="add--new--field">
+                          <h5>Edit Workflow</h5>
+                          <Form ref={formRef}>
+                            <Row>
+                              <Col>
+                                <Form.Group className="mb-3 col">
+                                  <Form.Label>Workflow Name *</Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="name"
+                                    placeholder="Enter workflow name"
+                                    value={workflow_fields?.name}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!workflowErrors.fieldName}
+                                  />
+                                  <Form.Control.Feedback type="invalid">
+                                    {workflowErrors.fieldName}
+                                  </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>Tabs *</Form.Label>
+                                  <div className="d-flex color--selection">
+                                    <Form.Control
+                                      type="text"
+                                      placeholder="Add tab..."
+                                      value={newOption}
+                                      onChange={(e) => setNewOption(e.target.value)}
+                                      isInvalid={!!workflowErrors.tabs}
+                                    />
+                                    <p className="selected-badge-color">
+                                      <Form.Control
+                                        type="color"
+                                        placeholder="#000DDD"
+                                        value={badgeColor}
+                                        onChange={(e) => setBadgeColor(e.target.value)}
+                                      />{" "}
+                                      <span style={{ badgeColor }}>{badgeColor}</span>
+                                    </p>
+                                    <Button type="button" onClick={handleAddOption}>Add</Button>
+                                  </div>
+                                  <Form.Control.Feedback type="invalid">
+                                    {workflowErrors.tabs}
+                                  </Form.Control.Feedback>
+                                </Form.Group>
+          
+                                <div className="mb-3 d-flex flex-wrap gap-2">
+                                  {workflow_fields?.tabs?.map((opt, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="text-xs bg-white text-secondary px-2 py-1 rounded border d-flex align-items-center"
+                                      style={{
+                                        fontSize: '0.75rem'
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          marginRight: "10px",
+                                          fontWeight: 500,
+                                        }}
+                                      >
+                                        {opt}
+                                      </span>
+                                      
+                                      {( workflow_fields?.tabs?.length > 2) && (
+                                          <span style={{ cursor: "pointer" }} onClick={() => removeOption(idx)}>×</span>
+                                      )}
+          
+                                    </div>
+                                  ))}
+                                </div>
+                              </Col>
+                              </Row>
+                              <Row>             
+                                <Col className="text-end">
+                                  <Button
+                                    variant="secondary"
+                                    type="button"
+                                    onClick={handleCancelClick}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  
+                                    <Button
+                                      variant="info"
+                                      type="button"
+                                      className="add--new--btn ms-3"
+                                      onClick={saveWorkflow}
+                                    >
+                                      Save
+                                    </Button>
+                                </Col>
+                              </Row>
+                              </Form>
+                              </div>
+                              </div>
+                      {
+                        filteredWorkflows.length > 0 &&
+                        filteredWorkflows.map((workflow, idx) => (
+                          <Card className="mb-3">
+                            <Card.Body>
+                              <Row className="align-items-center">
+                                <Col xs="auto">
+                                  <Badge pill bg="light" className="abbr--n" text="dark">#{idx + 1}</Badge>
+                                </Col>
+                                <Col>
+                                  <h5 className="mb-0 fw-bold">{workflow.title}</h5>
+                                </Col>
+                                <Col xs="auto">
+                                  <Button
+                                    variant="outline-primary"
+                                    className="me-2 border-0 p-0 text-info"
+                                    onClick={() => {
+                                      handleWorkflowEdit(workflow);
+                                    }}
+                                  >
+                                    <FaRegEdit />
+                                  </Button>
+                                  
+                                </Col>
+                              </Row>
                     
+                                  <Badge bg="info" className="mt-2">
+                                    {workflow.tabs.length} options
+                                  </Badge>
+                                  <Row>
+                                    <div className="mt-2">
+                                      <div className="d-flex flex-wrap gap-1">
+                                        {workflow.tabs.map((tab, i) => (
+                                          <span
+                                            key={i}
+                                            className="text-xs bg-white text-secondary px-2 py-1 rounded border"
+                                            style={{ fontSize: "0.75rem" }} // Bootstrap doesn't have `text-xs` natively
+                                          >
+                                            {tab}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </Row>
+                            </Card.Body>
+                          </Card>
+                        ))}
+                      </>
+                    }
                 </Modal.Body>
             </Modal>
             <Modal show={showEdit} onHide={handleEditClose} centered size="md" className="add--workflow--modal">
