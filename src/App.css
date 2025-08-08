@@ -892,7 +892,7 @@ body {
   color: rgb(71 85 105);
   font-size: 0.9rem;
   line-height: 1.25rem;
-  background: rgb(248 250 252);
+  background: rgba(51, 65, 85, .08);
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   padding: .5rem;
@@ -1655,7 +1655,7 @@ span.open--sidebar {
   left: auto;
   opacity: .5;
   font-size: 15px;
-  transition: all .4s ease-in-out;
+  transition: all .3s ease-in-out;
 }
 
 .wrapper--title .show::before {
@@ -1921,7 +1921,7 @@ span.open--sidebar {
 }
 
 .rounded--box .contact--card {
-  background: rgb(248 250 252);
+  background: rgba(51, 65, 85, .08);
   margin-bottom: 2rem;
   border-radius: .75rem;
   padding: 1.5rem;
@@ -2745,6 +2745,11 @@ table tr.marked-project td {
   border-radius: .5rem .5rem 0 0;
 }
 
+.modal .manual--dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+}
+
 .team--page .page--title .manual--dropdown .dropdown-item:last-child,
 .manual--dropdown .dropdown-item:last-child {
   border-radius: 0 0 .5rem .5rem;
@@ -2869,7 +2874,7 @@ table tr.marked-project td {
 }
 
 .projects--page .table .list-group {
-  gap: 10px;
+  gap: 0;
 }
 
 .projects--page .table .list-group-item {
@@ -2878,7 +2883,7 @@ table tr.marked-project td {
   width: auto;
   position: relative;
   background: none;
-  margin-right: -10px;
+  margin-right: 0;
 }
 
 .projects--page .table .more--member .dropdown-menu,
@@ -3543,7 +3548,7 @@ Project Task View CSS=-=-=
 .wrapper--title .members--list .list-group-item {
   background: none;
   margin-left: 0;
-  margin-right: -5px;
+  margin-right: -4px;
   color: rgb(17 24 39);
   width: auto;
   height: auto;
@@ -6790,7 +6795,7 @@ ul#icon-tabs .nav-link span svg {
 
 .project--grid--table td.new__td,
 .project--grid--table tr.marked-project td.new__td {
-  background: rgb(248 250 252);
+  background: rgba(51, 65, 85, .08);
   padding: .5rem .75rem;
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
@@ -7634,7 +7639,7 @@ ul#icon-tabs .nav-link span svg {
 .project--grid--table tr.project--active td.new__td,
 .project--grid--table tr.project--active td.new--td,
 .clients--grid--table .project--active td.new--td {
-  background: rgb(248 250 252);
+  background: rgba(51, 65, 85, .08);
   order: 1;
 }
 
@@ -8358,10 +8363,10 @@ Media CSS-=-==
     color: rgb(71 85 105);
     font-size: 0.875rem;
     line-height: 1.25rem;
-    background: rgb(248 250 252);
+    background: rgba(51, 65, 85, .08);
     border-radius: .5rem;
     -webkit-border-radius: .5rem;
-    padding: .5rem;
+    padding: .75rem;
     min-height: 52px;
   }
 
@@ -8693,7 +8698,7 @@ Media CSS-=-==
 
   .page--wrapper .draggable--table td.new__td,
   .page--wrapper .draggable--table tr.marked-project td.new__td {
-    background: rgb(248 250 252);
+    background: rgba(51, 65, 85, .08);
     padding: .5rem .75rem;
     border-radius: .5rem;
     -webkit-border-radius: .5rem;
@@ -8946,7 +8951,7 @@ Media CSS-=-==
   }
 
   .attendance--page .wrapper--title .projecttitle {
-    max-width: calc(100% - 250px);
+    max-width: calc(100% - 120px);
   }
 
   .project--form--actions .list-group+.list-group .list-group-item {
@@ -9089,6 +9094,10 @@ Media CSS-=-==
   .attendance--stats,
   .attendance--table {
     padding: 1rem;
+  }
+
+  .daily--attendance--top {
+    margin: -1.5rem -1rem 0;
   }
 
   .member--projects {
@@ -9388,7 +9397,7 @@ Media CSS-=-==
 
   .rounded--box .contact--card .card-body .list-group-item,
   .rounded--box .work--card .card-body .list-group-item {
-    background: rgb(248 250 252);
+    background: rgba(51, 65, 85, .08);
   }
 
   .rounded--box .card .card--img h3 {
@@ -9433,12 +9442,16 @@ Media CSS-=-==
   }
 
   .daily--welcome .card--icon h6 {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .daily--welcome .card--icon h6 small {
-    font-size: 1rem;
+    font-size: .875rem;
     line-height: 1rem;
+  }
+
+  .daily--welcome .card-body {
+    padding: 1.2rem;
   }
 
   .daily--welcome .card--icon h6 small svg {
@@ -9455,6 +9468,23 @@ Media CSS-=-==
 
   .theme--modal .modal-header, .theme--modal .modal-body {
     padding: 1rem;
+  }
+
+  .timeSheetModal .card {
+    max-width: calc(100% - 0px);
+  }
+
+  .single--project--stack {
+    padding: 1rem;
+  }
+
+  .rules--modal .modal-header {
+    flex-flow: row wrap;
+  }
+
+  .rules--modal .modal-header .btn-close {
+    top: 22px;
+    bottom: auto;
   }
 }
 
@@ -9499,5 +9529,57 @@ Media CSS-=-==
   .new--entry h4 {
     margin: 0;
     font-size: 1rem;
+  }
+
+  .holiday--table tbody tr {
+    padding: 1.2rem;
+  }
+
+  .reports-section .reports--heading .title--span strong {
+    font-size: .875rem;
+  }
+
+  .reports-section .reports--heading {
+    padding: 1rem;
+  }
+
+  .AddTimeModal .btn {
+    font-size: 15px;
+  }
+
+  .screens--tabs .accordion-button .list-group {
+    grid-gap: .5rem;
+    gap: .5rem;
+  }
+
+  .single--project--stack h4 {
+    flex: 1 1;
+    max-width: calc(100% - 120px);
+  }
+
+  .single--project--stack h4 strong {
+    display: block;
+    overflow: hidden;
+    max-width: 100%;
+    white-space: nowrap;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+  }
+
+  .report--task--list ul {
+    padding: .75rem;
+  }
+
+  .report--task--list ul li p {
+    line-height: 1;
+    gap: .25rem;
+  }
+
+  .daily--attendance--table th:first-child {
+    min-width: 130px;
+  }
+
+  .daily--attendance--table th, .daily--attendance--table td {
+    line-height: 1.1;
   }
 }

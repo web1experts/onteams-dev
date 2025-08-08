@@ -538,7 +538,7 @@ function DesktopPage() {
                       </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="3">
-                      <Accordion.Header>OnTeams</Accordion.Header>
+                      <Accordion.Header>PrimeTeams</Accordion.Header>
                       <Accordion.Body>
                         <Accordion defaultActiveKey="03" className="p-3">
                           <Accordion.Item eventKey="0001">
@@ -1283,7 +1283,7 @@ function DesktopPage() {
                       </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="3">
-                      <Accordion.Header>OnTeams</Accordion.Header>
+                      <Accordion.Header>PrimeTeams</Accordion.Header>
                       <Accordion.Body>
                         <Accordion defaultActiveKey="03" className="p-3">
                           <Accordion.Item eventKey="0001">
@@ -2028,7 +2028,7 @@ function DesktopPage() {
                       </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="3">
-                      <Accordion.Header>OnTeams</Accordion.Header>
+                      <Accordion.Header>PrimeTeams</Accordion.Header>
                       <Accordion.Body>
                         <Accordion defaultActiveKey="03" className="p-3">
                           <Accordion.Item eventKey="0001">

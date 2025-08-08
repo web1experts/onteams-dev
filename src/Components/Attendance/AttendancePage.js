@@ -69,6 +69,9 @@ function AttendancePage() {
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
+  const [showDateFilter, setDateFilterShow] = useState(false);
+  const handleDateFilterClose = () => setDateFilterShow(false);
+  const handleDateFilterShow = () => setDateFilterShow(true);
   const [spinner, setSpinner] = useState(false);
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const commonState = useSelector(state => state.common)
@@ -696,7 +699,7 @@ useEffect(() => {
                 </Dropdown>
               </div>
               <ListGroup horizontal className="expand--icon ms-auto">
-                <ListGroup.Item className="day--dropdown w-auto h-auto">
+                <ListGroup.Item className="day--dropdown w-auto h-auto d-none d-xxl-flex">
                   <Dropdown className="select--dropdown">
                     <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
                     <Dropdown.Menu>
@@ -730,8 +733,9 @@ useEffect(() => {
 
                   </Dropdown>
                 </ListGroup.Item>
-                  <ListGroup.Item key={'toggle-handle'} onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
-                  <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
+                <ListGroup.Item className="d-flex d-xxl-none" onClick={handleDateFilterShow}><MdFilterList /></ListGroup.Item>
+                <ListGroup.Item key={'toggle-handle'} onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
+                <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
               </ListGroup>
           </div>
           <div className="bg-white attendance--table daily--attendance--table">
@@ -881,8 +885,8 @@ useEffect(() => {
                 <Dropdown.Toggle variant="success">{activeTab}</Dropdown.Toggle>
                 <Dropdown.Menu>
                   <div className="drop--scroll">
-                    <Dropdown.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam /> Team View</Dropdown.Item>
-                    <Dropdown.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar /> Excel View</Dropdown.Item>
+                    <Dropdown.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam className="me-1" /> Team View</Dropdown.Item>
+                    <Dropdown.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar className="me-1" /> Excel View</Dropdown.Item>
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
@@ -918,6 +922,49 @@ useEffect(() => {
                     })}
                   </div>
                 </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
+          </ListGroup>
+        </Modal.Body>
+      </Modal>
+      <Modal show={showDateFilter} onHide={handleDateFilterClose} centered size="md" className="filter--modal">
+        <Modal.Header closeButton>
+            <Modal.Title>Select Month</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ListGroup>
+            <ListGroup.Item className="day--dropdown w-auto h-auto p-0">
+              <Dropdown className="select--dropdown">
+                <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    {monthsArray.map((month) => {
+                      const isFuture =
+                        parseInt(month.value.split('/')[1]) > today.getFullYear() ||
+                        (parseInt(month.value.split('/')[1]) === today.getFullYear() &&
+                          parseInt(month.value.split('/')[0]) > today.getMonth() + 1);
+                        return (
+                      <Dropdown.Item
+                        key={month.value}
+                        className={`dropdown-item ${filters.month === month.value ? 'selected--option' : ''}`}
+                        as="button"
+                        disabled={isFuture}
+                        style={{ pointerEvents: isFuture ? 'none' : 'auto', opacity: isFuture ? 0.5 : 1 }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!isFuture) {
+                            setFilters((prev) => ({ ...prev, month: month.value }));
+                          }
+                        }}
+                      >
+                        {month.label}
+                        {filters.month === month.value && <MdOutlineCheck />}
+                      </Dropdown.Item>
+                        )
+                      })}
+                  </div>
+                </Dropdown.Menu>
+
               </Dropdown>
             </ListGroup.Item>
           </ListGroup>

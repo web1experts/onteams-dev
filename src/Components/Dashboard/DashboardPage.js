@@ -764,7 +764,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                     </div>
                     <CardGroup className="card--download">
                       <Card className="win--download app--download">
-                        <Card.Link href='/downloads/onteams-win32-ia32.zip' download>
+                        <Card.Link href='/downloads/primeteams-win32-ia32.zip' download>
                           <CardTitle>
                             <span><FaDesktop /></span>
                             <h4>Windows App <small>Windows 10/11</small></h4>
@@ -772,8 +772,8 @@ const isPostLikedByMember = (likes = [], memberId) => {
                           <CardBody><FiDownload /></CardBody>
                         </Card.Link>
                       </Card>
-                      <Card className="mac--download app--download" href='/downloads/onteams-darwin-x64.zip' download>
-                        <Card.Link href='/downloads/onteams-darwin-x64.zip' download>
+                      <Card className="mac--download app--download">
+                        <Card.Link href='/downloads/primeteams-darwin-x64.zip' download>
                           <CardTitle>
                             <span><MdLaptopMac /></span>
                             <h4>macOS App <small>macOS Monterey and later</small></h4>
@@ -795,7 +795,7 @@ const isPostLikedByMember = (likes = [], memberId) => {
                             <h5 className="fw-bold mb-3"><FaRegEnvelope /> Email Support</h5>
                             <ListGroup variant="flush">
                               <ListGroup.Item className="border-0 ps-0">Get help via email within 24 hours</ListGroup.Item>
-                              <ListGroup.Item className="border-0 ps-0"><strong><a href="mailto:support@onteams.ai">support@onteams.ai</a></strong></ListGroup.Item>
+                              <ListGroup.Item className="border-0 ps-0"><strong><a href="mailto:support@primeteams.ai">support@primeteams.ai</a></strong></ListGroup.Item>
                             </ListGroup>
                           </Card.Body>
                         </Card>

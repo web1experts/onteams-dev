@@ -58,8 +58,8 @@ h6 {
 a {
   text-decoration: none;
   outline: none;
-  transition: all 0.5s cubic-bezier(.4, 0, .2, 1);
-  -webkit-transition: all 0.5s cubic-bezier(.4, 0, .2, 1);
+  transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+  -webkit-transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
 }
 
 a:hover,
@@ -1030,7 +1030,7 @@ Add Project Modal CSS-=-=-
     display: flex;
     align-items: center;
     gap: .25rem;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     cursor: pointer;
 }
 
@@ -1188,8 +1188,8 @@ Add Project Modal CSS-=-=-
   justify-content: center;
   color: #777777;
   font-size: 1.4rem;
-  transition: all 0.4s cubic-bezier(.4, 0, .2, 1);
-  -webkit-transition: all 0.4s cubic-bezier(.4, 0, .2, 1);
+  transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+  -webkit-transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
 }
 
 .add--workflow--modal .workflow--list .list-group-item .delete--workstep {
@@ -1396,8 +1396,8 @@ Add Project Modal CSS-=-=-
   height: 70px;
   justify-content: center;
   margin-bottom: 1rem;
-  transition: all .5s cubic-bezier(.4, 0, .2, 1);
-  -webkit-transition: all .5s cubic-bezier(.4, 0, .2, 1);
+  transition: all .3s cubic-bezier(.4, 0, .2, 1);
+  -webkit-transition: all .3s cubic-bezier(.4, 0, .2, 1);
   width: 70px;
 }
 

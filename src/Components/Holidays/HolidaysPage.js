@@ -315,7 +315,7 @@ const getDaysLeft = (date) => {
                           return (
                             <tr key={`holiday-row-${index}`} className={isUpcoming ? 'upcoming-holiday' : ''}>
                               <td key={`date-td-${index}`} data-label="Date">
-                                <div className="project--name d-flex align-items-center gap-4">
+                                <div className="project--name d-flex align-items-center gap-2 gap-md-4">
                                   <span className="bank">🏛️</span>
                                   <div className="title--span d-flex align-items-start gap-1 flex-column">
                                     <h5 className="d-xl-flex gap-3 align-items-start" key={`occasion-td-${index}`} data-label="Occasion">

@@ -232,7 +232,7 @@ function SidebarPanel() {
                 <Navbar expand="lg">
                     <Navbar.Brand>
                         <span><img src="images/OnTeam-white-icon.png" alt="" /></span>
-                        <img src="images/OnTeam-Logo-white.png" alt="" />
+                        <img src="images/primeTeam-Logo.png" alt="" />
                     </Navbar.Brand>
                     <div className="current--workspace">
                         <Dropdown>

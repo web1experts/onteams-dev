@@ -1602,14 +1602,14 @@ function ReportsPage() {
         isActive === 1 && activeMemberTab === "members" ? (
           <div className="rounded--box activity--box">
             <div className="reports--heading">
-              <div className="d-flex align-items-center gap-3 justify-content-between">
+              <div className="d-flex flex-column flex-sm-row align-sm-items-center gap-1 gap-sm-3 justify-content-between">
                 <h3 className="mb-0 d-flex align-items-center gap-3">
                   <span>
                     <LuFolderOpen />
                   </span>
                   Projects ({singleMemberReport?.reports?.length || 0})
                 </h3>
-                <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+                <div className="d-flex align-items-center gap-2 gap-xl-4 mt-2 mt-xl-0 text-sm">
                   <div className="text-center">
                     <div className="text-lg font-bold text--blue">
                       {getProjectSummary(singleMemberReport?.reports, "time")}

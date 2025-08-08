@@ -2371,7 +2371,7 @@ function TimeTrackingPage() {
                                                     <Card.Body>
                                                       <img
                                                         className="card-img-top"
-                                                        src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
+                                                        src="https://primeteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
                                                         alt="screenshot"
                                                       />
                                                       <p>

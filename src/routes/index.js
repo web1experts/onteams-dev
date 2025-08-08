@@ -92,10 +92,10 @@ const publicRoutes = [
     },
     {
         type: 'page',
-        name: 'Onteams',
-        key: 'ONTEAMS',
+        name: 'Primeteams',
+        key: 'PRIMETEAMS',
         component: <DesktopPage/>,
-        route: '/onteamsio',
+        route: '/primeteamsio',
     },
 ];
 
@@ -224,10 +224,10 @@ const privateRoutes = [
     },
     {
         type: 'page',
-        name: 'Onteams',
-        key: 'ONTEAMS',
+        name: 'Primeteams',
+        key: 'PRIMETEAMS',
         component: <DesktopPage/>,
-        route: '/onteamsio',
+        route: '/primeteamsio',
     },
     {
         type: 'page',

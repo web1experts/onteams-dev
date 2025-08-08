@@ -112,7 +112,7 @@ Sidebar CSS-=-=
   -webkit-border-radius: .75rem;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
-  padding: 20px;
+  padding: .85rem;
 }
 
 .panel--sidebar .user--dropdown .dropdown-item {
@@ -302,7 +302,7 @@ Sidebar CSS-=-=
 .panel--sidebar .navbar {
   display: block !important;
   background: transparent;
-  height: calc(100dvh - 111px);
+  height: calc(100dvh - 98px);
 }
 
 .panel--sidebar .navbar-expand-lg .navbar-collapse {
@@ -949,8 +949,8 @@ Sidebar CSS-=-=
     min-width: 100%;
     border: 0;
     bottom: 0;
-    transition: all .5s ease-in-out;
-    -webkit-transition: all .5s ease-in-out;
+    transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-in-out;
     z-index: 888888;
   }
 
