@@ -526,6 +526,7 @@ export const  WorkFlowModal =  (props) => {
 
   useEffect(() => {
     setSelectedWorkflow({})
+    setWorkflowFields({name: '', tabs: []});
   },[activeTab])
 
   useEffect(() => { 
