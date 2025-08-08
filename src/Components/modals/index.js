@@ -892,28 +892,44 @@ export const  WorkFlowModal =  (props) => {
   
 
   const removetab = (indexToRemove) => {
-    // Update workflow modal state
-    setWorkflowModalState((prevWorkflowModalState) => {
-      // Filter out the tab that matches the provided index
-      const updatedTabs = prevWorkflowModalState?.workflow?.tabs
-        .filter((_, index) => index !== indexToRemove) // Remove the tab with the matching index
-        .map((tab, index) => {
-          // Reorder the remaining tabs, ensuring correct order sequence
-          if (typeof tab === 'object' && tab !== null) {
-            return { ...tab, order: index };
-          }
-          return tab; // Return the tab unchanged if it's not an object
-        });
-  
-      // Return the new state with updated and reordered tabs
-      return {
-        ...prevWorkflowModalState,
-        workflow: {
-          ...prevWorkflowModalState?.workflow,
-          tabs: updatedTabs, // Set the reordered tabs array
-        },
-      };
-    });
+    if(Object.keys(selectedWorkflow).length > 0 || activeTab === 'new'){
+      setWorkflowFields((prevWorkflowFields) => {
+        const updatedTabs = (prevWorkflowFields?.tabs || [])
+          .filter((_, index) => index !== indexToRemove) // remove the matching tab
+          .map((tab, index) => ({
+            ...tab,
+            order: index, // reassign order after removal
+          }));
+
+        return {
+          ...prevWorkflowFields,
+          tabs: updatedTabs,
+        };
+      });
+    }else{
+      // Update workflow modal state
+      setWorkflowModalState((prevWorkflowModalState) => {
+        // Filter out the tab that matches the provided index
+        const updatedTabs = prevWorkflowModalState?.workflow?.tabs
+          .filter((_, index) => index !== indexToRemove) // Remove the tab with the matching index
+          .map((tab, index) => {
+            // Reorder the remaining tabs, ensuring correct order sequence
+            if (typeof tab === 'object' && tab !== null) {
+              return { ...tab, order: index };
+            }
+            return tab; // Return the tab unchanged if it's not an object
+          });
+    
+        // Return the new state with updated and reordered tabs
+        return {
+          ...prevWorkflowModalState,
+          workflow: {
+            ...prevWorkflowModalState?.workflow,
+            tabs: updatedTabs, // Set the reordered tabs array
+          },
+        };
+      });
+    }
   };
   
 
@@ -1038,7 +1054,7 @@ export const  WorkFlowModal =  (props) => {
                                                       <CiEdit />
                                                     </small>
                                                     {
-                                                    index !== 0 && index !==  workflowModalState?.workflow?.tabs.length - 1 &&
+                                                    workflowModalState?.workflow?.tabs.length > 1 &&
                                                       <span className="delete--workstep ms-2" onClick={() => {
                                                         if( commonState?.currentProject?._id && commonState?.currentProject.workflow?.tabs){
                                                           const tabdata = commonState?.currentProject.workflow?.tabs.find(t => t._id === tab._id);
