@@ -352,7 +352,7 @@ const TasksList = React.memo((props) => {
                         {currentProject && Object.keys(currentProject).length > 0 && currentProject?.workflow?.tabs?.length > 0 &&
                             currentProject?.workflow?.tabs.map((tab, index) => (
                                 //workflow--color-${index}
-                                <div key={tab._id} className={`task--grid`} style={{background: hexToRgba(tab?.color || '#3b82f6', 0.4)}}>
+                                <div key={tab._id} className={`task--grid`} style={{background: hexToRgba(tab?.color || '#3b82f6', 0.1)}}>
                                     <h5>
                                         {tab.title}
                                         {( memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) && (
