@@ -467,7 +467,7 @@ export const  WorkFlowModal =  (props) => {
   const [formtype, setFormType] = useState(commonState.active_formtype || false)
   const [ activeTab, setActiveTab ] = useState('current')
   const [showWorkflow, setWorkflowShow] = useState(false);
-  const [fields, setFields] = useState({})
+  const [fields, setFields] = useState({color: '#3b82f6'})
   const [ error, setErrors ] = useState({})
   const [workflowErrors, setWorkflowErrors] =  useState({})
   const [workflow_fields ,setWorkflowFields] = useState({})
@@ -516,13 +516,17 @@ export const  WorkFlowModal =  (props) => {
     
   const handleWorkflowShow = useCallback(() => setWorkflowShow(true), []);
   const handleEditClose = useCallback(() => setEditShow(false), []);
-  const handleEditShow = useCallback((index,tab) => { setSelectedTab({index, tab}); setFields({...fields, 'workspace_title': tab}); setEditShow(true)}, []);
+  const handleEditShow = useCallback((index,tab) => { setSelectedTab({index, tab}); setFields({...fields, 'workspace_title': tab?.title, 'color': tab?.color || '#3b82f6'}); setEditShow(true)}, []);
   const handleAddClose = useCallback(() => setAddShow(false), []);
   const handleAddShow = useCallback(() => setAddShow(true), []);
 
   useEffect( () => {
     dispatch(ListWorkflows())
   }, [])
+
+  useEffect(() => {
+    setSelectedWorkflow({})
+  },[activeTab])
 
   useEffect(() => { 
     if( modalstate === true ){ 
@@ -676,54 +680,69 @@ export const  WorkFlowModal =  (props) => {
         setErrors({ ...error, ['workspace_title']: 'Title is required' });
         return; // Exit the function if the title is not valid
       }
+
+      if(Object.keys(selectedWorkflow).length > 0 || activeTab === 'new'){
+       
+         setWorkflowFields({
+          ...workflow_fields, // keep existing keys in workflow_fields
+          tabs: [
+            ...(workflow_fields.tabs || []), // take the existing tabs array (or empty array if undefined)
+            { title: fields['workspace_title'], color: fields['color'] } // append a new tab object
+          ],
+        });
+
+        
+      }else{
     
-      // Get the last tab and its order based on the type (object or simple array)
-      const lastTab = workflowModalState?.workflow?.tabs.length 
-        ? workflowModalState?.workflow?.tabs[workflowModalState?.workflow?.tabs.length - 1] 
-        : null;
-    
-      const lastOrder = (typeof lastTab === 'object' && lastTab?.order !== undefined)
-        ? lastTab.order
-        : workflowModalState?.workflow?.tabs.length - 1; // Fallback to length-based index if tabs are a simple array
-    
-      const newOrder = lastTab ? lastOrder + 1 : 0; // Set the order for the new tab
-    
-      // Create the new tab object
-      const newTab = (typeof lastTab === 'object' && lastTab !== null) ? {
-        title: fields['workspace_title'],
-        _id: false,
-        order: newOrder,
-      } : fields['workspace_title']; // Use simple title if tabs is a simple array
-    
-      // Insert the new tab before the last tab
-      const updatedTabs = Array.isArray(workflowModalState?.workflow?.tabs)
-        ? [
-            ...workflowModalState?.workflow?.tabs.slice(0, -1), // All tabs except the last one
-            newTab, // Insert the new tab
-            lastTab // Add the last tab
-          ]
-        : [newTab]; // If tabs is empty, start with just the new tab
-    
+        // Get the last tab and its order based on the type (object or simple array)
+        const lastTab = workflowModalState?.workflow?.tabs.length 
+          ? workflowModalState?.workflow?.tabs[workflowModalState?.workflow?.tabs.length - 1] 
+          : null;
       
-    
-      // Update the state with the new array
-      setWorkflowModalState(prevWorkflowModalState => ({
-        ...prevWorkflowModalState,
-        workflow: {
-          ...prevWorkflowModalState?.workflow,
-          tabs: updatedTabs.map((tab, index) => {
-            // If tab is an object, update its order; otherwise, return simple tab
-            return typeof tab === 'object'
-              ? { ...tab, order: index }
-              : tab;
-          }) // Ensure correct order sequence
-        }
-      }));
+        const lastOrder = (typeof lastTab === 'object' && lastTab?.order !== undefined)
+          ? lastTab.order
+          : workflowModalState?.workflow?.tabs.length - 1; // Fallback to length-based index if tabs are a simple array
+      
+        const newOrder = lastTab ? lastOrder + 1 : 0; // Set the order for the new tab
+      
+        // Create the new tab object
+        const newTab = (typeof lastTab === 'object' && lastTab !== null) ? {
+          title: fields['workspace_title'],
+          _id: false,
+          order: newOrder,
+        } : fields['workspace_title']; // Use simple title if tabs is a simple array
+      
+        // Insert the new tab before the last tab
+        const updatedTabs = Array.isArray(workflowModalState?.workflow?.tabs)
+          ? [
+              ...workflowModalState?.workflow?.tabs.slice(0, -1), // All tabs except the last one
+              newTab, // Insert the new tab
+              lastTab // Add the last tab
+            ]
+          : [newTab]; // If tabs is empty, start with just the new tab
+      
+        
+      
+        // Update the state with the new array
+        setWorkflowModalState(prevWorkflowModalState => ({
+          ...prevWorkflowModalState,
+          workflow: {
+            ...prevWorkflowModalState?.workflow,
+            tabs: updatedTabs.map((tab, index) => {
+              // If tab is an object, update its order; otherwise, return simple tab
+              return typeof tab === 'object'
+                ? { ...tab, order: index }
+                : tab;
+            }) // Ensure correct order sequence
+          }
+        }));
+      }
     
       // Reset modal state
       setAddShow(false);
-      setFields({});
+      setFields({color: '#3b82f6'});
       setErrors({});
+      setBadgeColor("#28a745");
     };
     
 
@@ -735,45 +754,72 @@ export const  WorkFlowModal =  (props) => {
         setErrors({ ...error, ['workspace_title']: 'Title is required' });
         return; // Exit if title is missing
       }
-    
-      // Update workflow modal state
-      setWorkflowModalState((prevWorkflowModalState) => {
-        // Update the tabs by mapping through the current ones
-        const updatedTabs = prevWorkflowModalState?.workflow?.tabs.map((tab, index) => {
-          // If the index matches the selected tab, update the title
-          if (index === selectedTab?.index) {
-            if (typeof tab === 'object' && tab !== null) {
-              // Return updated object with the new title
-              return { ...tab, title: fields['workspace_title'] };
-            } else {
-              // Return updated simple value (for string or non-object tabs)
-              return fields['workspace_title'];
+      if(Object.keys(selectedWorkflow).length > 0 || activeTab === 'new'){
+       
+         setWorkflowFields((prevWorkflowFields) => {
+          const updatedTabs = (prevWorkflowFields?.tabs || []).map((tab, index) => {
+            if (index === selectedTab?.index) {
+              return {
+                ...tab,
+                title: fields['workspace_title'],
+                color: fields['color'], // update color as well
+              };
             }
-          }
-          // Return the original tab if not the selected one
-          return tab;
+            return tab;
+          });
+
+          return {
+            ...prevWorkflowFields,
+            tabs: updatedTabs.map((tab, index) => ({
+              ...tab,
+              order: index, // ensure correct order sequence
+            })),
+          };
         });
-    
-        // Return the new state with updated tabs
-        return {
-          ...prevWorkflowModalState,
-          workflow: {
-            ...prevWorkflowModalState?.workflow,
-            tabs: updatedTabs.map((tab, index) => {
-              // Ensure correct order sequence, but only for object tabs
+
+
+
+        
+      }else{
+        // Update workflow modal state
+        setWorkflowModalState((prevWorkflowModalState) => {
+          // Update the tabs by mapping through the current ones
+          const updatedTabs = prevWorkflowModalState?.workflow?.tabs.map((tab, index) => {
+            // If the index matches the selected tab, update the title
+            if (index === selectedTab?.index) {
               if (typeof tab === 'object' && tab !== null) {
-                return { ...tab, order: index };
+                // Return updated object with the new title
+                return { ...tab, title: fields['workspace_title'],color: fields['color'] };
+              } else {
+                // Return updated simple value (for string or non-object tabs)
+                return fields['workspace_title'];
               }
-              // Return the tab unchanged if it's not an object
-              return tab;
-            }),
-          },
-        };
-      });
-    
+            }
+            // Return the original tab if not the selected one
+            return tab;
+          });
+      
+          // Return the new state with updated tabs
+          return {
+            ...prevWorkflowModalState,
+            workflow: {
+              ...prevWorkflowModalState?.workflow,
+              tabs: updatedTabs.map((tab, index) => {
+                // Ensure correct order sequence, but only for object tabs
+                if (typeof tab === 'object' && tab !== null) {
+                  return { ...tab, order: index };
+                }
+                // Return the tab unchanged if it's not an object
+                return tab;
+              }),
+            },
+          };
+        });
+      }
+      setBadgeColor("#28a745")
       // Reset state and errors
       setEditShow(false);
-      setFields({});
+      setFields({color: '#3b82f6'});
       setErrors({});
     };
     
@@ -790,35 +836,58 @@ export const  WorkFlowModal =  (props) => {
     // Do nothing if dropped outside the list
     if (!destination || destination.index === source.index) return;
 
-    const isDropInvalid =
-      destination.index === 0 || destination.index === workflowModalState?.workflow.tabs.length - 1;
+    if(Object.keys(selectedWorkflow).length > 0 || activeTab === 'new'){
+      
+    
+      // Rearrange the array based on drag result
+      const reorderedTabs = Array.from(workflow_fields.tabs);
+      const [removed] = reorderedTabs.splice(source.index, 1);
+      reorderedTabs.splice(destination.index, 0, removed);
+      console.log(typeof reorderedTabs[0])
+      // Check if reorderedTabs is an array of objects
+      if (typeof reorderedTabs[0] === 'object' && reorderedTabs[0] !== null) {
+        // Update the order key for each tab
+        reorderedTabs.forEach((tab, index) => {
+          tab.order = index; // Update the order key based on position
+        });
+      }
 
-    if (isDropInvalid) return;
-  
-    // Rearrange the array based on drag result
-    const reorderedTabs = Array.from(workflowModalState?.workflow.tabs);
-    const [removed] = reorderedTabs.splice(source.index, 1);
-    reorderedTabs.splice(destination.index, 0, removed);
-  
-    // Check if reorderedTabs is an array of objects
-    if (typeof reorderedTabs[0] === 'object' && reorderedTabs[0] !== null) {
-      // Update the order key for each tab
-      reorderedTabs.forEach((tab, index) => {
-        tab.order = index; // Update the order key based on position
+      setWorkflowFields({
+        ...workflow_fields,
+        tabs: reorderedTabs,
+      });
+    }else{
+
+      // const isDropInvalid =
+      //   destination.index === 0 || destination.index === workflowModalState?.workflow.tabs.length - 1;
+
+      // if (isDropInvalid) return;
+    
+      // Rearrange the array based on drag result
+      const reorderedTabs = Array.from(workflowModalState?.workflow.tabs);
+      const [removed] = reorderedTabs.splice(source.index, 1);
+      reorderedTabs.splice(destination.index, 0, removed);
+    
+      // Check if reorderedTabs is an array of objects
+      if (typeof reorderedTabs[0] === 'object' && reorderedTabs[0] !== null) {
+        // Update the order key for each tab
+        reorderedTabs.forEach((tab, index) => {
+          tab.order = index; // Update the order key based on position
+        });
+      }
+    
+      setWorkflowModalState(prevWorkflowModalState => {
+      
+        return {
+          ...prevWorkflowModalState,
+          workflow: {
+            ...prevWorkflowModalState?.workflow,
+            tabs: reorderedTabs // Update all orders to ensure correct order sequence
+          }
+        };
+      
       });
     }
-  
-    setWorkflowModalState(prevWorkflowModalState => {
-     
-      return {
-        ...prevWorkflowModalState,
-        workflow: {
-          ...prevWorkflowModalState?.workflow,
-          tabs: reorderedTabs // Update all orders to ensure correct order sequence
-        }
-      };
-    
-    });
   };
   
 
@@ -925,6 +994,12 @@ export const  WorkFlowModal =  (props) => {
                             workflowModalState?.workflow && Object.keys(workflowModalState?.workflow).length > 0 && showWorkflow &&
                           <>
                             <ListGroup className='workflow--list'>
+                              <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0' key={`addflow-btn`}>
+                                <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
+                              </ListGroup.Item>
+                              <ListGroup.Item className='border-0 justify-content-center pt-0 pt-0 pb-0 arrow--icon'>
+                                <MdArrowDownward />
+                              </ListGroup.Item>
                               <DragDropContext onDragEnd={handleDragEnd}>
                                 <Droppable droppableId="droppabletabs" type="droppableTabsItem" direction="vertical">
                                   {(provided) => (
@@ -936,28 +1011,12 @@ export const  WorkFlowModal =  (props) => {
                                       {Object.keys(workflowModalState?.workflow).length > 0 && workflowModalState?.workflow?._id && workflowModalState?.workflow?.tabs?.length > 0 &&
                                         workflowModalState?.workflow?.tabs.map((tab, index) => (
                                           <>
-                                          {index == 1 && (
-                                            <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0 arrow--icon'>
-                                              <MdArrowDownward />
-                                            </ListGroup.Item>
-                                          )}
-                                          {index === workflowModalState?.workflow?.tabs.length - 1 && (
-                                            <>
-                                            <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0' key={`addflow-btn`}>
-                                              <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
-                                            </ListGroup.Item>
-                                            <ListGroup.Item className='border-0 justify-content-center pt-0 pt-0 pb-0 arrow--icon'>
-                                              <MdArrowDownward />
-                                            </ListGroup.Item>
-                                            </>
-                                          )}
+                                          
+                                          
                                           <Draggable
                                             key={`tabitem-${index}`}
                                             draggableId={`tab-${index}`} // Unique draggableId
                                             index={index}
-                                            isDragDisabled={
-                                              index === 0 || index === workflowModalState?.workflow?.tabs.length - 1
-                                            } // Disable drag for first and last items
                                           >
                                             {(provided) => (
                                               <ListGroup.Item
@@ -969,12 +1028,12 @@ export const  WorkFlowModal =  (props) => {
                                                 {typeof tab === 'object' && tab !== null ? (
                                                   <>
                                                     <span className='drag--icon'><GrDrag /></span>
-                                                    <span className={`flow--circle workflow--color-${index}`}></span> {tab.title}
+                                                    <span className={`flow--circle`} style={{background: tab?.color || '#3b82f6'}}></span> {tab.title}
                                                     <small
                                                       className='ms-auto'
                                                       type="button"
                                                       title={tab.title}
-                                                      onClick={() => handleEditShow(index, tab.title)}
+                                                      onClick={() => handleEditShow(index, tab)}
                                                     >
                                                       <CiEdit />
                                                     </small>
@@ -1004,7 +1063,7 @@ export const  WorkFlowModal =  (props) => {
                                                 ) : (
                                                   <>
                                                     <span className='drag--icon'><GrDrag /></span>
-                                                    <span className={`flow--circle workflow--color-${index}`}></span> {tab}
+                                                    <span className={`flow--circle workflow--color-${index}`}></span> {tab.title}
                                                     <small
                                                       className='ms-auto'
                                                       type="button"
@@ -1059,62 +1118,81 @@ export const  WorkFlowModal =  (props) => {
                                     onChange={handleInputChange}
                                     isInvalid={!!workflowErrors.fieldName}
                                   />
-                                  <Form.Control.Feedback type="invalid">
-                                    {workflowErrors.fieldName}
-                                  </Form.Control.Feedback>
+                                  
+                                    <Form.Control.Feedback type="invalid">
+                                      {workflowErrors.fieldName}
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                  <Form.Label>Tabs *</Form.Label>
-                                  <div className="d-flex color--selection align-items-start">
-                                    <div className='form--input'>
-                                      <Form.Control
-                                        type="text"
-                                        placeholder="Add tab..."
-                                        value={newOption}
-                                        onChange={(e) => setNewOption(e.target.value)}
-                                        isInvalid={!!workflowErrors.tabs}
-                                      />
-                                      <Form.Control.Feedback type="invalid">
-                                        {workflowErrors.tabs}
-                                      </Form.Control.Feedback>
-                                    </div>
-                                    <p className="selected-badge-color">
-                                      <Form.Control
-                                        type="color"
-                                        placeholder="#000DDD"
-                                        value={badgeColor}
-                                        onChange={(e) => setBadgeColor(e.target.value)}
-                                      />{" "}
-                                      <span style={{ badgeColor }}>{badgeColor}</span>
-                                    </p>
-                                    <Button type="button" onClick={handleAddOption}>Add</Button>
-                                  </div>
-                                </Form.Group>
-                                <div className="mb-3 d-flex flex-wrap gap-2">
-                                  {workflow_fields?.tabs?.map((opt, idx) => (
-                                    <div
-                                      key={idx}
-                                      className="text-xs bg-white text-secondary px-2 py-1 rounded border d-flex align-items-center"
-                                      style={{
-                                        fontSize: '0.75rem'
-                                      }}
-                                    >
-                                      <span
-                                        style={{
-                                          marginRight: "10px",
-                                          fontWeight: 500,
-                                        }}
-                                      >
-                                        {opt}
-                                      </span>
-                                      
-                                      {( workflow_fields?.tabs?.length > 2) && (
-                                          <span style={{ cursor: "pointer" }} onClick={() => removeOption(idx)}>×</span>
-                                      )}
-          
-                                    </div>
-                                  ))}
-                                </div>
+                                <Form.Label><strong>Taskboard setup</strong></Form.Label>
+                                <p>Add, remove, reorder and rename the worksteps to reflect the way you work.</p>
+                                <Form.Control.Feedback type="invalid">
+                                {workflowErrors.tabs}
+                                </Form.Control.Feedback>
+                                {
+                                  
+                                <>
+                                <ListGroup.Item className='border-0 justify-content-center pt-0 pb-0' key={`addflow-btn`}>
+                                                    <Button variant="primary" onClick={handleAddShow}><FaPlusCircle /> Add New</Button>
+                                                  </ListGroup.Item>
+                                  <ListGroup className='workflow--list'>
+                                    <DragDropContext onDragEnd={handleDragEnd}>
+                                      <Droppable droppableId="droppablenewtabs" type="droppableTabsItem" direction="vertical">
+                                        {(provided) => (
+                                          <ListGroup
+                                            className="workflow--list"
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                          >
+                                            { workflow_fields?.tabs?.length > 0 &&
+                                              workflow_fields?.tabs.map((tab, index) => (
+                                                
+                                                <Draggable
+                                                  key={`tabitem-${index}`}
+                                                  draggableId={`tab-${index}`} // Unique draggableId
+                                                  index={index}
+                                                >
+                                                  {(provided) => (
+                                                    <ListGroup.Item
+                                                      key={`tab-item-${index}`}
+                                                      ref={provided.innerRef}
+                                                      {...provided.draggableProps}
+                                                      {...provided.dragHandleProps}
+                                                    >
+                                                      {typeof tab === 'object' && tab !== null && (
+                                                        <>
+                                                          <span className='drag--icon'><GrDrag /></span>
+                                                          <span className={`flow--circle`} style={{background: tab?.color}}></span> {tab.title}
+                                                          <small
+                                                            className='ms-auto'
+                                                            type="button"
+                                                            title={tab.title}
+                                                            onClick={() => handleEditShow(index, tab)}
+                                                          >
+                                                            <CiEdit />
+                                                          </small>
+                                                          {
+                                                          workflow_fields?.tabs.length > 2 &&
+                                                            <span className="delete--workstep ms-2" onClick={() => {
+                                                              
+                                                                  removetab(index)
+                                                            }}><FaRegTimesCircle /></span>
+                                                          }
+                                                        </>
+                                                        
+                                                      )}
+                                                    </ListGroup.Item>
+                                                  )}
+                                                </Draggable>
+                                              ))}
+                                            {provided.placeholder}
+                                          </ListGroup>
+                                        )}
+                                      </Droppable>
+                                    </DragDropContext>
+                                  </ListGroup>
+                                </>
+                            }</Form.Group>
                               </Col>
                               </Row>
                               <Row>             
@@ -1178,7 +1256,7 @@ export const  WorkFlowModal =  (props) => {
                                             className="text-xs bg-white text-secondary px-2 py-1 rounded border"
                                             style={{ fontSize: "0.75rem" }} // Bootstrap doesn't have `text-xs` natively
                                           >
-                                            {tab}
+                                            {tab?.title}
                                           </span>
                                         ))}
                                       </div>
@@ -1202,6 +1280,17 @@ export const  WorkFlowModal =  (props) => {
                             <Form.Control type="text" name='workspace_title' value={fields['workspace_title'] || ''}  onChange={handleChange} />
                             {showError('workspace_title')}
                         </Form.Group>
+                        <Form.Group className="mb-3 form-group">
+                            <Form.Label>Color</Form.Label>
+                            <Form.Control
+                              type="color"
+                              name="color"
+                              placeholder="#3b82f6"
+                              value={fields?.color}
+                              onChange={handleChange}
+                            />{" "}
+                            <span>{fields?.color}</span>
+                        </Form.Group>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
@@ -1220,6 +1309,17 @@ export const  WorkFlowModal =  (props) => {
                             <Form.Label>Workstep Title</Form.Label>
                             <Form.Control type="text" name="workspace_title" placeholder="Name your workstep" onChange={handleChange} />
                             {showError('workspace_title')}
+                        </Form.Group>
+                        <Form.Group className="mb-3 form-group">
+                            <Form.Label>Color</Form.Label>
+                            <Form.Control
+                              type="color"
+                              name='color'
+                              placeholder="#3b82f6"
+                              value={fields?.color}
+                              onChange={handleChange}
+                            />{" "}
+                            <span>{fields?.color}</span>
                         </Form.Group>
                     </Form>
                 </Modal.Body>

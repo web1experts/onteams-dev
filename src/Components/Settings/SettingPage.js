@@ -474,7 +474,7 @@ function SettingPage() {
                     <h6 className="mb-0">Timezone</h6>
                   </div>
                   <Form>
-                    <div class="d-flex gap-3 mt-3">
+                    <div className="d-flex gap-3 mt-3">
                       <Form.Group className="mb-0 form-group w-100 w-md-50">
                         <Form.Label>Timezone</Form.Label>
                         <Form.Select className="custom-selectbox">

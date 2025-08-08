@@ -1171,10 +1171,10 @@ Add Project Modal CSS-=-=-
   justify-content: center;
 }
 
-.add--workflow--modal .workflow--list .list-group-item:first-child .drag--icon,
+/* .add--workflow--modal .workflow--list .list-group-item:first-child .drag--icon,
 .add--workflow--modal .workflow--list .list-group-item:last-child .drag--icon {
   display: none;
-}
+} */
 
 .add--workflow--modal .workflow--list .list-group-item:first-child,
 .add--workflow--modal .workflow--list .list-group-item:last-child {

@@ -305,7 +305,7 @@ const getDaysLeft = (date) => {
               </Col>
             </Row>
             <div className={isActiveView === 1 ? 'project--grid--table holiday--table--grid' : isActiveView === 2 ? 'project--table holiday--table holidays--list bg-white' : 'project--table holiday--table holidays--list bg-white'}>
-              <h3 class="mb-4 d-flex align-items-center gap-3"><span><FiCalendar /></span>Holiday Calendar - {filters['year']}</h3>
+              <h3 className="mb-4 d-flex align-items-center gap-3"><span><FiCalendar /></span>Holiday Calendar - {filters['year']}</h3>
               <Table>
                 <tbody>
                   {

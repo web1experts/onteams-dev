@@ -1024,7 +1024,6 @@ function ProjectsPage() {
                                                                                         };
                                                                                         const statusOption = systemFields?.status?.options.find(opt => opt.value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') === project.status.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''));
                                                                                         const baseColor = statusOption?.color;
-                                                                                        console.log('systemFields?.status:: ', systemFields?.status)
                                                                                         const borderColor = hexToRgba(baseColor, 0.3);
                                                                                         const backgroundColor = hexToRgba(baseColor, 0.1);
                                                                                     return (<Dropdown className="select--dropdown" key='status-key'>
@@ -1122,11 +1121,11 @@ function ProjectsPage() {
                                                                                         // }
                                                                                         
                                                                                         mvalue = (
-                                                                                            <div class="flex items-center space-x-2 w-full" key={`project-${fieldname || idx}-${mvalue}`}>
-                                                                                                <div class="flex-1 bg-slate-200 rounded-full h-2">
-                                                                                                    <div class="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{width: `65%`}}></div>
+                                                                                            <div className="flex items-center space-x-2 w-full" key={`project-${fieldname || idx}-${mvalue}`}>
+                                                                                                <div className="flex-1 bg-slate-200 rounded-full h-2">
+                                                                                                    <div className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{width: `65%`}}></div>
                                                                                                 </div>
-                                                                                                <span class="text-sm font-bold text-slate-700">{mvalue}</span>
+                                                                                                <span className="text-sm font-bold text-slate-700">{mvalue}</span>
                                                                                             </div>
                                                                                         )
                                                                                     }
@@ -1314,11 +1313,11 @@ function ProjectsPage() {
                                                             // }
                                                             
                                                             mvalue = (
-                                                                <div key={`project-${fieldname || idx}-${mvalue}`} class="flex items-center space-x-2 w-full">
-                                                                    <div class="flex-1 bg-slate-200 rounded-full h-2">
-                                                                        <div class="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{width: `65%`}}></div>
+                                                                <div key={`project-${fieldname || idx}-${mvalue}`} className="flex items-center space-x-2 w-full">
+                                                                    <div className="flex-1 bg-slate-200 rounded-full h-2">
+                                                                        <div className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500" style={{width: `65%`}}></div>
                                                                     </div>
-                                                                    <span class="text-sm font-bold text-slate-700">{mvalue}</span>
+                                                                    <span className="text-sm font-bold text-slate-700">{mvalue}</span>
                                                                 </div>
                                                             )
                                                         }

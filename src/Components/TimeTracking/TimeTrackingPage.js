@@ -2840,9 +2840,9 @@ function TimeTrackingPage() {
         </Modal.Header>
         <Modal.Body>
           <div className="new--entry">
-            <div class="d-flex align-items-center justify-content-between mb-3">
+            <div className="d-flex align-items-center justify-content-between mb-3">
               <h4>Added Entries ({entries?.length || 0})</h4>
-              <span class="bg-success px-2 py-1 rounded-3">
+              <span className="bg-success px-2 py-1 rounded-3">
                 Total: {convertSecondstoTime(totalTaskDuration)}
               </span>
             </div>
