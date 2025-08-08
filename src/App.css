@@ -1664,14 +1664,11 @@ span.open--sidebar {
 }
 
 .wrapper--title h3 strong {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
+  display: block;
   text-overflow: ellipsis;
   overflow: hidden;
   width: 100%;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .wrapper--title h3 span {
@@ -8289,6 +8286,14 @@ Media CSS-=-==
     max-width: calc(100% - 76px);
   }
 
+  .time-tracking--page .wrapper--title .projecttitle {
+    max-width: calc(100% - 112px);
+  }
+
+  .reports--page .wrapper--title .projecttitle {
+    max-width: calc(100% - 80px);
+  }
+
   .page--title .list-group {
     justify-content: flex-end;
     margin-top: 0;
@@ -8923,6 +8928,10 @@ Media CSS-=-==
   .attendance--excel--table {
     margin: 0 -1rem;
   }
+
+  .rounded--box .contact--card.card .card-title .dropdown {
+    opacity: 1;
+  }
 }
 
 @media screen and (max-width:767px) {
@@ -9331,11 +9340,15 @@ Media CSS-=-==
 
   .accordion .accordion-button {
     padding: 1rem;
-    padding-right: 1rem;
+    padding-right: 2rem;
   }
 
   .accordion-button::after {
-    right: 1rem;
+    right: 0;
+  }
+
+  .screens--tabs .accordion-button .list-group .list-group-item {
+    font-size: .875rem;
   }
 
   .timeSheetModal .card {
@@ -9431,5 +9444,60 @@ Media CSS-=-==
   .daily--welcome .card--icon h6 small svg {
     width: 18px;
     height: auto;
+  }
+
+  .theme--modal .modal-title span.nav--item--icon {
+     border-radius: .5rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    min-width: 2.2rem;
+  }
+
+  .theme--modal .modal-header, .theme--modal .modal-body {
+    padding: 1rem;
+  }
+}
+
+@media screen and (max-width:320px) {
+  .theme--modal .modal-title strong small {
+    display: none;
+  }
+
+  .navbar-light .navbar-nav .nav-link,
+  .navbar-light .navbar-nav .active>.nav-link, 
+  .navbar-light .navbar-nav .nav-link.active, 
+  .navbar-light .navbar-nav .nav-link.show, 
+  .navbar-light .navbar-nav .show>.nav-link, .navbar-light .navbar-nav .nav-link:focus {
+    padding: 1rem;
+  }
+
+  .form-switch {
+    padding-left: 1em;
+  }
+
+  .modal .setting--page .bg--blue--accordion p {
+    line-height: 1;
+    font-size: 14px;
+  }
+
+  .rounded--box .card .card--img h3 {
+    font-size: 18px;
+  }
+
+  .rounded--box .contact--card.card .card-title {
+    font-size: 1.1rem;
+  }
+
+  .rounded--box .permission--card .card-body, .rounded--box .work--card .card-body {
+    padding: 0;
+  }
+
+  .rounded--box .permission--card .card-body .card-body, .rounded--box .work--card .card-body .card-body {
+    padding: 1rem;
+  }
+
+  .new--entry h4 {
+    margin: 0;
+    font-size: 1rem;
   }
 }

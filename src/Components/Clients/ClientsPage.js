@@ -773,7 +773,6 @@ function ClientsPage() {
                     (isEditing === false) ? 
                     <>
                       <ListGroup.Item>
-                        <span className="info--icon"><FiMail /></span>
                         <p>
                           <small>Client Name</small>
                           {selectedClient?.name}

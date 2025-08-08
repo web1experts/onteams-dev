@@ -1443,7 +1443,7 @@ function TeamMembersPage() {
           <Form onSubmit={handleSubmit}>
             {/* {rows.map((row, index) => ( */}
             <div className="form-row pb-3" key={`row-0`}>
-              <Form.Group className="mb-0 pb-0 form-group d-flex gap-3 align-items-center">
+              <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
                 <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
                   <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
                     placeholder="Email address"
@@ -1453,7 +1453,7 @@ function TeamMembersPage() {
                   />
                 </FloatingLabel>
                 {showError("email")}
-                <span className="badge bg-success">{fields?.rolename || ''}</span>
+                <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
               </Form.Group>
 
               <Button
@@ -1845,15 +1845,24 @@ function TeamMembersPage() {
           <Modal.Title>Filters</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ListGroup className="manual--dropdown">
-            <ListGroup.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
-            {(memberProfile?.permissions?.members
-              ?.create_edit_delete === true ||
-              memberProfile?.role?.slug === "owner") && (
-              <ListGroup.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
-            )}
-          </ListGroup> 
           <ListGroup>
+            <ListGroup.Item className="p-0 border-0">
+              <Dropdown className="select--dropdown manual--dropdown">
+                <Dropdown.Toggle variant="success">
+                  {activeTab}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    <Dropdown.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
+                    {(memberProfile?.permissions?.members
+                      ?.create_edit_delete === true ||
+                      memberProfile?.role?.slug === "owner") && (
+                      <Dropdown.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</Dropdown.Item>
+                    )}
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
             <ListGroup.Item className="border-0 p-0 mt-3">
               <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                 <Form.Group className="mb-0 form-group">

@@ -1218,6 +1218,10 @@ select.form-error {
     line-height: 1.2;
 }
 
+.reports-section .single--project--stack p strong svg {
+    min-width: 18px;
+}
+
 .reports-section .single--project--stack p small {
     font-size: .85rem;
     font-weight: normal;
@@ -1377,8 +1381,23 @@ select.form-error {
     .reports-section .btns--set .btn {
         flex: 1 1;
     }
+}
 
+@media screen and (max-width:320px) {
     .theme--modal .modal-title strong {
         font-size: 18px;
+    }
+
+    .reports-section .single--project--stack p strong {
+        font-size: .875rem;
+    }
+
+    .reports-section .single--project--stack p small {
+        font-size: .8rem;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-top: .5rem;
     }
 }

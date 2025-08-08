@@ -1642,7 +1642,7 @@ function TimeTrackingPage() {
                                           )}
                                         </span>
                                       </td>
-                                      <td className="ms-auto text-start text-xl-center">
+                                      <td className="ms-md-auto text-start text-xl-center">
                                         <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
                                           Project Time
                                         </strong>
@@ -1857,7 +1857,7 @@ function TimeTrackingPage() {
                                       
                                     </td> */}
                                       <td
-                                        className="text-start text-xl-center ms-auto"
+                                        className="text-start text-xl-center ms-md-auto"
                                         key={`total-time-${activity?._id}`}
                                       >
                                         <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
@@ -1963,10 +1963,7 @@ function TimeTrackingPage() {
                 </Dropdown.Menu>
               </Dropdown>
             </div>
-            <ListGroup
-              horizontal
-              className="live--tabs ms-auto d-none d-xxl-flex"
-            >
+            <ListGroup horizontal className="live--tabs ms-auto d-none d-xxl-flex">
               <ListGroup horizontal>
                 <Button
                   variant="secondary"
@@ -2676,13 +2673,7 @@ function TimeTrackingPage() {
         </Modal.Body>
       </Modal>
       {/*--=-=Inner Filter Modal**/}
-      <Modal
-        show={showInnerFilter}
-        onHide={handleInnerFilterClose}
-        centered
-        size="md"
-        className="filter--modal"
-      >
+      <Modal show={showInnerFilter} onHide={handleInnerFilterClose} centered size="md" className="filter--modal">
         <Modal.Header closeButton>
           <Modal.Title>Filter</Modal.Title>
         </Modal.Header>
