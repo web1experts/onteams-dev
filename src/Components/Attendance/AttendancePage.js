@@ -11,7 +11,7 @@ import { GoDotFill } from "react-icons/go";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
 import { FaCog } from "react-icons/fa";
-import { formatDateinString, selectboxObserver, getAttendanceBadges } from "../../helpers/commonfunctions";
+import { formatDateinString, selectboxObserver, getAttendanceBadges, hexToRgba } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { ListAttendance,getAttendanceByMember, getAttendanceSummary, getMonthlyAttendanceExcelView, ListAttendanceStatuses } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
@@ -118,7 +118,7 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
 
   useEffect(() => {
     const statusMap = attendanceStatus?.reduce((acc, status) => {
-      const key = status.label.toLowerCase().replace(/\s+/g, '_');
+      const key = status?.label?.toLowerCase()?.replace(/\s+/g, '_');
       acc[key] = status;
       return acc;
     }, {});
@@ -191,7 +191,7 @@ useEffect(() => {
 
   const lightenColor = (hex, percent = 30) => {
   // Remove '#' if present
-  hex = hex.replace(/^#/, '');
+  hex = hex?.replace(/^#/, '');
 
   // Parse the hex components
   const num = parseInt(hex, 16);
@@ -376,20 +376,7 @@ useEffect(() => {
                                   attendanceStatus?.map((status, idx) => {
                                     const rgbaBorder = hexToRgba(status?.color, 0.4);
                                     const rgbaBg = hexToRgba(status?.color, 0.1);
-                                    function hexToRgba(hex, alpha) {
-                                      hex = hex.replace('#', '');
-
-                                      if (hex.length === 3) {
-                                        hex = hex.split('').map(c => c + c).join('');
-                                      }
-
-                                      const bigint = parseInt(hex, 16);
-                                      const r = (bigint >> 16) & 255;
-                                      const g = (bigint >> 8) & 255;
-                                      const b = bigint & 255;
-
-                                      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                                    }
+                                    
 
                                     return (
                                       <th key={idx} className="text-center p-0" style={{color: status.color,backgroundColor: rgbaBg}}>
@@ -456,7 +443,7 @@ useEffect(() => {
                                               </td>
                                             );
                                           } else {
-                                              const key = atten.status.toLowerCase().replace(/\s+/g, '_');
+                                              const key = atten?.status?.toLowerCase()?.replace(/\s+/g, '_');
                                               const rgbaBorder = hexToRgba(statusObject?.[key]?.color, 0.3);
                                               const rgbaBg = hexToRgba(statusObject?.[key]?.color, 0.1);
                                               function hexToRgba(hex, alpha) {
@@ -596,7 +583,7 @@ useEffect(() => {
                       </Card> */}
                       {Object.entries(attendanceSummary).map(([key, count], index) => {
                         const config = { color: 'blue', icon: <FiCoffee /> };
-                        const label = key.replace(/_/g, ' ')  // e.g. short_leave => short leave
+                        const label = key?.replace(/_/g, ' ')  // e.g. short_leave => short leave
                                         .replace(/\b\w/g, char => char.toUpperCase()); // capitalize words
                         
                         return (
@@ -642,7 +629,7 @@ useEffect(() => {
                                 <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                                   {attendanceStatus.map((status, index) => (
                                     <div className="text-center">
-                                      <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center" style={{color: statusObject?.[status?.label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.color || '#16a34a'}}>
+                                      <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center" style={{color: statusObject?.[status?.label?.toLowerCase()?.replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.color || '#16a34a'}}>
                                         {
                                           attendanceData?.attendance?.[status?.label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')] || 0
                                         } <small>{status?.label}</small></h4>
@@ -847,18 +834,7 @@ useEffect(() => {
                                   const baseColor = statusObject?.[key]?.color || '#999999';
 
                                   // Convert hex to rgba
-                                  const hexToRgba = (hex, opacity) => {
-                                    let c;
-                                    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-                                      c = hex.substring(1).split('');
-                                      if (c.length === 3) {
-                                        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-                                      }
-                                      c = '0x' + c.join('');
-                                      return `rgba(${(c >> 16) & 255}, ${(c >> 8) & 255}, ${c & 255}, ${opacity})`;
-                                    }
-                                    return hex;
-                                  };
+                                  
 
                                   const borderColor = hexToRgba(baseColor, 0.3);
                                   const backgroundColor = hexToRgba(baseColor, 0.1);

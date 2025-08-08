@@ -1533,7 +1533,7 @@ const renderSubtasks = () => {
                                     await dispatch(updateTask(currentTask._id, { tab: status._id }))
 
                                 }}>
-                                    <p><span class={`workflow--color-${index} status--circle`}></span> {status.title} {commonState?.taskForm?.tab === status._id && <FaCheck />}</p>
+                                    <p><span className={`workflow--color-${index} status--circle`}></span> {status.title} {commonState?.taskForm?.tab === status._id && <FaCheck />}</p>
                                 </ListGroup.Item>
                             ))}
 

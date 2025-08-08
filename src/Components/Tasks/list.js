@@ -11,6 +11,7 @@ import { getFieldRules, validateField } from '../../helpers/rules';
 import { TiInputChecked } from "react-icons/ti";
 import { MemberInitials } from "../common/memberInitials";
 import { socket } from "../../helpers/auth";
+import { hexToRgba } from "../../helpers/commonfunctions";
 const TasksList = React.memo((props) => {
     const dispatch = useDispatch()
     const memberProfile = props.memberProfile || {}
@@ -350,7 +351,8 @@ const TasksList = React.memo((props) => {
                     <div className="task--list">
                         {currentProject && Object.keys(currentProject).length > 0 && currentProject?.workflow?.tabs?.length > 0 &&
                             currentProject?.workflow?.tabs.map((tab, index) => (
-                                <div key={tab._id} className={`task--grid workflow--color-${index}`}>
+                                //workflow--color-${index}
+                                <div key={tab._id} className={`task--grid`} style={{background: hexToRgba(tab?.color || '#3b82f6', 0.4)}}>
                                     <h5>
                                         {tab.title}
                                         {( memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) && (

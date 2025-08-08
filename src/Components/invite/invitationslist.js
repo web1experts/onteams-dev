@@ -96,7 +96,7 @@ function InvitationList(props) {
           <div className="page--wrapper px-md-2 pb-4 pt-4">
           {
               showloader &&
-              <div class="loading-bar">
+              <div className="loading-bar">
                   <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
           }
