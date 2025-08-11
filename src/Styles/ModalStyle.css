@@ -51,6 +51,11 @@
 .modal-header {
     border-bottom: 0;
     border-top-left-radius: 0;
+    padding-right: 2rem;
+}
+
+.modal-header .modal-title {
+    line-height: 1;
 }
 
 .modal-body .field__tabs {
@@ -134,6 +139,8 @@
   position: relative;
   padding-right: 3rem;
 }
+
+
 
 .rules--modal .modal-header .btn-close {
     position: absolute;

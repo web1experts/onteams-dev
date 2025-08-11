@@ -926,6 +926,9 @@ function ProjectsPage() {
                                 (memberProfile?.permissions?.projects?.update_projects_order === true || memberProfile?.role?.slug === "owner") ? 
                                 <DragDropContext onDragEnd={handleDragEnd}>
                                     <div className={isActiveView === 1 ? 'project--grid--table project--grid--new--table table-responsive-xl' : isActiveView === 2 ? 'project--table draggable--table new--project--rows table-responsive-xl' : 'project--table new--project--rows table-responsive-xl'}>
+                                        {
+                                            (!spinner && projects && projects.length > 0)
+                                            ?
                                         <Table>
                                             <thead className="onHide">
                                                 <tr key="project-table-header">
@@ -952,9 +955,8 @@ function ProjectsPage() {
                                                         ref={provided.innerRef}
                                                         {...provided.droppableProps}
                                                     >
-                                                        {
-                                                            (!spinner && projects && projects.length > 0)
-                                                            ? projects.map((project, index) => {
+                                                        
+                                                        { projects.map((project, index) => {
                                                                 return (<>
                                                                     <Draggable
                                                                         key={project?._id}
@@ -1142,21 +1144,17 @@ function ProjectsPage() {
                                                                     </Draggable>
                                                                 </>)
                                                             })
-                                                            :
-
-                                                            !spinner && isActiveView === 2 &&
-                                                            <>
-                                                                <tr key={`noresults-row`} className="no--invite">
-                                                                    <td key={`empty-index`} colSpan={9} className="text-center">
-                                                                        <h2 className="mt-2 text-center">No Projects Found</h2>
-                                                                    </td>
-                                                                </tr>
-                                                            </>
-                                                        }
+                                                        }            
                                                     </tbody>
                                                 )}
                                             </Droppable>
                                         </Table>
+                                        :
+                                        !spinner && isActiveView === 2 &&
+                                        <div className="text-center py-3">
+                                            <h2>No Projects Found</h2>
+                                        </div>
+                                    }
                                     </div>
                                 </DragDropContext>
                             :
@@ -1348,7 +1346,7 @@ function ProjectsPage() {
                             }
                             {
                                 isActiveView === 1 && !spinner && projects && projects.length == 0 &&
-                                <div className="text-center mt-5">
+                                <div className="text-center">
                                     <h2>No Projects Found</h2>
                                 </div>
                             }

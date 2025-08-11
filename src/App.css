@@ -3378,6 +3378,7 @@ Project Task View CSS=-=-=
   padding: 0;
   text-align: center;
   width: 40px;
+  min-width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -3503,6 +3504,7 @@ Project Task View CSS=-=-=
   display: flex;
   width: 30px;
   height: 30px;
+  min-width: 30px;
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
   background: #ff585880;
@@ -3561,6 +3563,7 @@ Project Task View CSS=-=-=
 .wrapper--title .members--list .list-group-item .btn {
   width: 35px;
   height: 35px;
+  min-width: 35px;
   border-radius: 100px;
   -webkit-border-radius: 100px;
   display: flex;
@@ -3593,6 +3596,7 @@ Project Task View CSS=-=-=
 .projects--page .table .more--member {
   width: 35px;
   height: 35px;
+  min-width: 35px;
   background: #999999;
   color: #ffffff;
   font-size: 13px;
@@ -3711,6 +3715,7 @@ Project Task View CSS=-=-=
   color: #ffffff;
   border-radius: 1rem;
   width: 2.5rem;
+  min-width: 2.5rem;
   height: 2.5rem;
   font-size: 20px;
 }
@@ -3854,6 +3859,7 @@ Project Task View CSS=-=-=
   align-items: center;
   justify-content: center;
   width: 38px;
+  min-width: 38px;
   height: 38px;
   cursor: pointer;
   background-position: center center;
@@ -3872,6 +3878,7 @@ Project Task View CSS=-=-=
   -webkit-border-radius: .5rem;
   text-align: center;
   width: 30px;
+  min-width: 30px;
   height: 30px;
   background: rgb(17 24 39);
   color: #ffffff;
@@ -3966,6 +3973,7 @@ Project Task View CSS=-=-=
   justify-content: center;
   align-items: center;
   width: 2rem;
+  min-width: 2rem;
   height: 2rem;
   display: flex;
   color: #ffffff;
@@ -4020,6 +4028,7 @@ Project Task View CSS=-=-=
 
 .modal .switch--big .form-check-input {
   width: 3.5rem;
+  min-width: 3.5rem;
   height: 2rem;
   margin-left: 0;
   cursor: pointer;
@@ -4027,6 +4036,7 @@ Project Task View CSS=-=-=
 
 .modal .switch--small .form-check-input {
   width: 2.75rem;
+  min-width: 2.75rem;
   height: 1.5rem;
   margin-left: 0;
   cursor: pointer;
@@ -4065,6 +4075,7 @@ Project Task View CSS=-=-=
   justify-content: center;
   align-items: center;
   width: 2rem;
+  min-width: 2rem;
   height: 2rem;
   display: flex
 }
@@ -4585,6 +4596,7 @@ pre {
   z-index: 1;
   background: #ffffff;
   width: 50px;
+  min-width: 50px;
   height: 50px;
   border-radius: .5rem;
   -webkit-border-radius: .5rem;
@@ -4971,6 +4983,7 @@ pre {
   padding: 0;
   width: 35px;
   height: 35px;
+  min-width: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5141,6 +5154,7 @@ pre {
 .activity--box .card .card-body .card--checkbox input {
   width: 22px;
   height: 22px;
+  min-width: 22px;
 }
 
 .activity--box .card .card-body video,
@@ -5321,6 +5335,7 @@ pre {
   justify-content: center;
   padding: 0;
   width: 35px;
+  min-width: 35px;
   height: 32px;
 }
 

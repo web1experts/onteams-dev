@@ -1739,6 +1739,8 @@ function TimeTrackingPage() {
                   {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
                   <div className="attendance--table activity--table--list mb-0">
                     <div className="attendance--table--list">
+                      {liveactivities.length > 0
+                      ?
                       <Table>
                         <thead className="onHide">
                           <tr key="project-table-header-recordings">
@@ -1767,8 +1769,7 @@ function TimeTrackingPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {liveactivities.length > 0
-                            ? liveactivities.map((activity, index) => {
+                          { liveactivities.map((activity, index) => {
                                 totalhours += Number(
                                   activity?.totalTaskDuration || 0
                                 );
@@ -1884,16 +1885,16 @@ function TimeTrackingPage() {
                                   </>
                                 );
                               })
-                            : !spinner &&
-                              liveactivities.length === 0 && (
-                                <tr key={`noresults-row`}>
-                                  <td colSpan={8} className="text-center">
-                                    <h3>No Results</h3>{" "}
-                                  </td>
-                                </tr>
-                              )}
+                            }
+                            
                         </tbody>
                       </Table>
+                      : !spinner &&
+                      liveactivities.length === 0 && (
+                        <div className="text-center">
+                          <h2>No Results</h2>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </>

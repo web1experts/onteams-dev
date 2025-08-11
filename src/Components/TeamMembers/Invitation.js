@@ -475,6 +475,8 @@ function Invitation(props) {
                       : "project--table new--project--rows table-responsive-xl"
                   }
                 >
+                  {invitationsFeeds && invitationsFeeds.length > 0
+                  ?
                   <Table>
                     <thead className="onHide">
                       <tr key="project-table-header">
@@ -507,8 +509,7 @@ function Invitation(props) {
                       </tr>
                     </thead>
                     <tbody>
-                      {invitationsFeeds && invitationsFeeds.length > 0
-                        ? invitationsFeeds.map((invitation, index) => {
+                      { invitationsFeeds.map((invitation, index) => {
                             return (
                               <>
                                 <tr
@@ -676,19 +677,14 @@ function Invitation(props) {
                               </>
                             );
                           })
-                        : !showloader &&
-                          invitationsFeeds &&
-                          invitationsFeeds.length === 0 && (
-                            <tr className="no--invite">
-                              <td colSpan={4}>
-                                <h2 className="mt-2 text-center">
-                                  There are no invitations.
-                                </h2>
-                              </td>
-                            </tr>
-                          )}
+                        }
                     </tbody>
                   </Table>
+                  : !showloader && invitationsFeeds && invitationsFeeds.length === 0 && (
+                    <div className="text-center">
+                        <h2>No Invitations Found</h2>
+                    </div>
+                  )}
                 </div>
               </>
             )}
