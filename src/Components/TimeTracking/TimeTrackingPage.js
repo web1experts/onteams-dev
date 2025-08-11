@@ -1500,6 +1500,8 @@ function TimeTrackingPage() {
                   {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
                   <div className="attendance--table activity--table--list mb-0">
                     <div className="attendance--table--list">
+                      {liveactivities.length > 0
+                      ?
                       <Table>
                         <thead className="onHide">
                           <tr key="project-table-header">
@@ -1548,8 +1550,7 @@ function TimeTrackingPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {liveactivities.length > 0
-                            ? liveactivities.map((activity, index) => {
+                          { liveactivities.map((activity, index) => {
                                 // totalhours += Number(activity?.totalTaskDuration || 0)
                                 // totalProjecthours += Number(activity?.latestActivity?.duration || 0)
                                 return (
@@ -1707,29 +1708,15 @@ function TimeTrackingPage() {
                                   </>
                                 );
                               })
-                            : !spinner &&
-                              liveactivities.length === 0 && (
-                                <tr key={`noresults-row`}>
-                                  <td colSpan={8} className="text-center">
-                                    <h3>No Results</h3>{" "}
-                                  </td>
-                                </tr>
-                              )}
-                          {/* <tr className="onHide bg-light mobile--hide" key={'hiddenkey'}>
-                          <td></td>
-                          <td></td>
-                          <td><strong>Total Hours</strong></td>
-                          <td><strong>
-                            { formatTime(totalProjecthours) || '00:00'}
-                            </strong></td>
-                          <td><strong>
-                           { formatTime(totalhours) || '00:00'}
-                            </strong></td>
-                          <td></td>
-                          <td></td>
-                        </tr> */}
+                            }
                         </tbody>
                       </Table>
+                      : !spinner &&
+                        liveactivities.length === 0 && (
+                          <div className="text-center">
+                            <h2>No Results</h2>{" "}
+                          </div>
+                        )}
                     </div>
                   </div>
                 </>

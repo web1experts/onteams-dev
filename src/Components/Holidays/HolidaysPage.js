@@ -377,7 +377,7 @@ const getDaysLeft = (date) => {
               </Table>
               {
                 holidays && holidays.length == 0 &&
-                <div className="text-center mt-5">
+                <div className="text-center">
                     <h2>No Holidays Found</h2>
                 </div>
               }

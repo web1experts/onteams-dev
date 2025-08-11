@@ -237,7 +237,7 @@ function SidebarPanel() {
                     <div className="current--workspace">
                         <Dropdown>
                             <Dropdown.Toggle variant="primary" id="dropdown-workspace">
-                                <span className="initial--name"><LuBuilding /></span> <strong>{companyname !== "" ? companyname : currentLoggedUser?.name} <small>Current Workspace</small></strong>
+                                <span className="initial--name"><LuBuilding /></span> <strong><span>{companyname !== "" ? companyname : currentLoggedUser?.name}</span> <small>Current Workspace</small></strong>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
                                 <h3>Switch Workspace</h3>
