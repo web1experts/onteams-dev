@@ -223,6 +223,7 @@ function ClientsPage() {
     if( deleteSuccess ){
       setIsActive( false )
       setSelectedClient({})
+      handleListClients()
     }
   }, [deleteSuccess])
 
@@ -779,9 +780,9 @@ function ClientsPage() {
                       </ListGroup.Item>
                       {customFields?.length > 0 && (
                         <>
-                          {customFields.map((field, index) => (
+                          {customFields?.map((field, index) => (
                             <ListGroup.Item key={index}>
-                              <p><small>{field.label}</small>{selectedClient?.customFields[field.name]?.meta_value || ''}</p>
+                              <p><small>{field.label}</small>{selectedClient?.customFields?.[field.name]?.meta_value || ''}</p>
                             </ListGroup.Item>
                           ))}
                         </>
