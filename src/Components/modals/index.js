@@ -622,28 +622,12 @@ export const  WorkFlowModal =  (props) => {
       dispatch(saveNewWorkflow(fieldsData))
   };
 
-
-  const handleAddOption = () => {
-    if (newOption.trim()) {
-      const label = newOption.trim();
-      
-      setWorkflowFields({
-        ...workflow_fields,
-        tabs: [...(workflow_fields.tabs || []), label],
-      });
-
-      setNewOption("");
-    }
-  };
-
   const handleSelectworkflow = (workflow) => {
     setWorkflowModalState(prevWorkflowModalState => {
-     
         return {
           ...prevWorkflowModalState,
           workflow: workflow
         };
-      
     });
   }
 
@@ -722,8 +706,6 @@ export const  WorkFlowModal =  (props) => {
             ]
           : [newTab]; // If tabs is empty, start with just the new tab
       
-        
-      
         // Update the state with the new array
         setWorkflowModalState(prevWorkflowModalState => ({
           ...prevWorkflowModalState,
@@ -778,9 +760,6 @@ export const  WorkFlowModal =  (props) => {
           };
         });
 
-
-
-        
       }else{
         // Update workflow modal state
         setWorkflowModalState((prevWorkflowModalState) => {
@@ -830,7 +809,6 @@ export const  WorkFlowModal =  (props) => {
     return null
   }
 
-
   const handleDragEnd = (result) => {
     const { source, destination } = result;
   
@@ -839,7 +817,6 @@ export const  WorkFlowModal =  (props) => {
 
     if(Object.keys(selectedWorkflow).length > 0 || activeTab === 'new'){
       
-    
       // Rearrange the array based on drag result
       const reorderedTabs = Array.from(workflow_fields.tabs);
       const [removed] = reorderedTabs.splice(source.index, 1);
@@ -852,18 +829,12 @@ export const  WorkFlowModal =  (props) => {
           tab.order = index; // Update the order key based on position
         });
       }
-
       setWorkflowFields({
         ...workflow_fields,
         tabs: reorderedTabs,
       });
     }else{
 
-      // const isDropInvalid =
-      //   destination.index === 0 || destination.index === workflowModalState?.workflow.tabs.length - 1;
-
-      // if (isDropInvalid) return;
-    
       // Rearrange the array based on drag result
       const reorderedTabs = Array.from(workflowModalState?.workflow.tabs);
       const [removed] = reorderedTabs.splice(source.index, 1);

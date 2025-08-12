@@ -2,21 +2,60 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import { Container, Row, Col, Button, Form, ListGroup, Modal, Card, Dropdown, CardGroup, Badge, Table, ListGroupItem, Pagination} from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Form,
+  ListGroup,
+  Modal,
+  Card,
+  Dropdown,
+  CardGroup,
+  Badge,
+  Table,
+  ListGroupItem,
+  Pagination,
+} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeft, BsArrowRight, BsClockHistory } from "react-icons/bs";
-import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
-import { LuFolderOpen, LuUsers, LuTimer, LuClock, LuFileText } from "react-icons/lu";
-import { MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdFilterList} from "react-icons/md";
+import {
+  showAmPmtime,
+  getMemberdata,
+  selectboxObserver,
+} from "../../helpers/commonfunctions";
+import {
+  LuFolderOpen,
+  LuUsers,
+  LuTimer,
+  LuClock,
+  LuFileText,
+} from "react-icons/lu";
+import {
+  MdOutlineClose,
+  MdOutlineVideoLibrary,
+  MdOutlineSearch,
+  MdFilterList,
+} from "react-icons/md";
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";
 import { TbReport, TbScreenshot } from "react-icons/tb";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
-import { getReportsByMember, gerReportsByProject, getSingleProjectReport, addRemarkstoProject, getActivityMeta} from "../../redux/actions/report.action";
+import {
+  getReportsByMember,
+  gerReportsByProject,
+  getSingleProjectReport,
+  addRemarkstoProject,
+  getActivityMeta,
+} from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
-import { ListProjectsByMembers, ListMemberProjects } from "../../redux/actions/project.action";
+import {
+  ListProjectsByMembers,
+  ListMemberProjects,
+} from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
 import { ListTasks } from "../../redux/actions/task.action";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -28,17 +67,7 @@ const TaskList = ({ report, handleView, setReport }) => {
   const dispatch = useDispatch();
   const selectedReport = report;
   const reportState = useSelector((state) => state.reports);
-  // const [ViewReport, setViewReport] = useState(false);
   const [showRemarks, setShowRemarks] = useState(false);
-  // const [activeTab, setActiveTab] = useState("screenshots");
-  // const [reportopen, setReportOpen] = useState(false);
-  // const [slideIndex, setSlideIndex] = useState(0);
-  // const [lightboxMedia, setLightboxMedia] = useState([]);
-  // const fullscreenrefrence = React.useRef(null);
-  // const [taskId, setTaskId] = useState("");
-  // const [currentVideoPage, setCurrentVideoPage] = useState({});
-  // const videosPerPage = 12; // Adjust as needed
-
   const handleRemarksClose = () => setShowRemarks(false);
   const handleShowRemarks = () => setShowRemarks(true);
 
@@ -54,25 +83,6 @@ const TaskList = ({ report, handleView, setReport }) => {
 
   return (
     <>
-      {/* <ul>
-        {groupedTasks?.map((taskData, index) => (
-          <li key={`grouped-task-${index}`}>
-            <p className="mb-0">
-              <FaAngleRight /> {taskData.title}
-            </p>
-            <Button
-              variant="dark"
-              className="px-3 py-2"
-              onClick={() => {
-                handleViewReport(taskData?.taskId);
-              }}
-            >
-              <FaEye /> View Report
-            </Button>
-          </li>
-        ))}
-      </ul> */}
-
       {showRemarks && (
         <Modal
           show={showRemarks}
@@ -926,37 +936,6 @@ function ReportsPage() {
 
   return (
     <>
-      {/* <Lightbox
-        open={open}
-        close={() => setOpen(false)}
-        slides={postMedia}
-        plugins={[Fullscreen]}
-        fullscreen={{ ref: fullscreenRef }}
-        index={currentIndex}
-        on={{
-          click: () => fullscreenRef.current?.enter(),
-        }}
-        render={{
-          slide: ({ slide }) => {
-            if (slide?.type === "video") {
-              return (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <video
-                    controls
-                    autoPlay={false}
-                    style={{ maxHeight: "90vh", maxWidth: "100%" }}
-                  >
-                    <source src={slide.src} type="video/webm" />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              );
-            }
-            return null; // Default render for images will be used
-          },
-        }}
-      /> */}
-
       <Lightbox
         open={reportopen}
         close={() => setReportOpen(false)}
@@ -1175,9 +1154,22 @@ function ReportsPage() {
                       </Form>
                     </ListGroup.Item>
 
-                    <ListGroup horizontal className="bg-white expand--icon d-flex">
-                      <ListGroup.Item className="d-flex d-xxl-none" onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
-                      <ListGroup.Item className="d-none d-lg-flex ms-1" onClick={() => {handleSidebarSmall(false);}}>
+                    <ListGroup
+                      horizontal
+                      className="bg-white expand--icon d-flex"
+                    >
+                      <ListGroup.Item
+                        className="d-flex d-xxl-none"
+                        onClick={handleFilterShow}
+                      >
+                        <MdFilterList />
+                      </ListGroup.Item>
+                      <ListGroup.Item
+                        className="d-none d-lg-flex ms-1"
+                        onClick={() => {
+                          handleSidebarSmall(false);
+                        }}
+                      >
                         <GrExpand />
                       </ListGroup.Item>
                     </ListGroup>
@@ -1279,7 +1271,10 @@ function ReportsPage() {
                                   </div>
                                 </td>
                                 <td>
-                                  <Button variant="dark" className="ms-auto px-3 py-2 d-flex align-items-center gap-2" onClick={() => {
+                                  <Button
+                                    variant="dark"
+                                    className="ms-auto px-3 py-2 d-flex align-items-center gap-2"
+                                    onClick={() => {
                                       setSingleMemberReport(reportData);
                                       setIsActive(1);
                                     }}
@@ -1305,14 +1300,6 @@ function ReportsPage() {
                           }
                         />
                       </Pagination>
-                      // <ButtonGroup>
-                      //   <Button variant="light" onClick={goToPrevious} disabled={filters?.page === 1}>
-                      //     ◀
-                      //   </Button>
-                      //   <Button variant="light" onClick={goToNext} disabled={filters?.page === projectReports?.totalPages}>
-                      //     ▶
-                      //   </Button>
-                      // </ButtonGroup>
                     )}
                   </div>
                 </div>
@@ -1586,20 +1573,29 @@ function ReportsPage() {
                 </Form>
               </ListGroup.Item>
             </ListGroup>
-            <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex ms-1">
+            <ListGroup.Item
+              onClick={handleToggles}
+              className="d-none d-lg-flex ms-1"
+            >
               <GrExpand />
             </ListGroup.Item>
-            <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall(false));}}>
+            <ListGroupItem
+              className="btn btn-primary"
+              key={`closekey`}
+              onClick={() => {
+                setIsActive(0);
+                dispatch(toggleSidebarSmall(false));
+              }}
+            >
               <MdOutlineClose />
             </ListGroupItem>
           </ListGroup>
         </div>
         {spinner ? (
-            <div className="loading-bar">
-              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
-            </div>
-          ) : (
-        isActive === 1 && activeMemberTab === "members" ? (
+          <div className="loading-bar">
+            <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+          </div>
+        ) : isActive === 1 && activeMemberTab === "members" ? (
           <div className="rounded--box activity--box">
             <div className="reports--heading">
               <div className="d-flex flex-column flex-sm-row align-sm-items-center gap-1 gap-sm-3 justify-content-between">
@@ -1644,7 +1640,9 @@ function ReportsPage() {
                         <div className="d-flex align-items-center justify-content-between gap-4">
                           <h4 className="d-flex align-items-center gap-3 justify-content-between">
                             <strong>
-                              <span><LuFileText /></span>
+                              <span>
+                                <LuFileText />
+                              </span>
                               {report?.project?.title}
                             </strong>
                           </h4>
@@ -1702,7 +1700,10 @@ function ReportsPage() {
                                       <p className="mb-0">
                                         <FaAngleRight /> {taskData.title}
                                       </p>
-                                      <Button variant="dark" className="px-3 py-2 d-flex align-items-center gap-2" onClick={() =>
+                                      <Button
+                                        variant="dark"
+                                        className="px-3 py-2 d-flex align-items-center gap-2"
+                                        onClick={() =>
                                           handleViewReport(
                                             report.activities,
                                             taskData.taskId
@@ -1837,8 +1838,7 @@ function ReportsPage() {
               })}
             </div>
           </div>
-        )
-      )}
+        )}
       </div>
 
       {/*--=-=Filter Modal**/}

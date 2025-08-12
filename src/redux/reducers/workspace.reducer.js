@@ -74,7 +74,8 @@ export default (state = initialState, action) => {
         case UPDATE_OWNERSHIP_SUCCESS : 
             return {
                 message_variant: 'success',
-                message: action.payload.message
+                message: action.payload.message,
+                ownershipUpdate: true
             }
         case UPDATE_OWNERSHIP_FAILED : 
             return {

@@ -309,7 +309,7 @@ function SidebarPanel() {
                     <Dropdown.Toggle variant="primary" id="dropdown-basic">
                         <div className="user--info">
                             <img src={ currentLoggedUser?.avatar || "images/default.jpg"} alt="..." />
-                            <h4>{memberProfile?.name} <small>{memberProfile?.role?.name}</small></h4>
+                            <h4>{memberProfile?.name || currentLoggedUser?.name} <small>{memberProfile?.role?.name || ''}</small></h4>
                         </div>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>

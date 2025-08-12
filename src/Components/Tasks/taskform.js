@@ -20,7 +20,7 @@ import { updateTask, deleteTask } from '../../redux/actions/task.action';
 import { socket, SendComment, DeleteComment, UpdateComment } from '../../helpers/auth';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { MemberInitials } from '../common/memberInitials';
-import { DatePicker, Calendar } from "react-multi-date-picker";
+import { Calendar } from "react-multi-date-picker";
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import AutoLinks from "quill-auto-links";
