@@ -657,6 +657,7 @@ function DashboardPage() {
                         post.likes,
                         memberdata?._id
                       );
+                      const isCommentBoxOpen = commentPostId === post._id;
                       return (
                         <Card
                           key={post._id}
@@ -823,13 +824,21 @@ function DashboardPage() {
                                     {post?.comments?.length || 0}
                                   </span>
                                 </div>
-                                {showCommentBox && (
+                                {isCommentBoxOpen && (
+                                  <CommentThread
+                                    comments={post?.comments}
+                                    post={commentPostId}
+                                    toggle={() => setCommentPostId(null)}
+                                  />
+                                )}
+
+                                {/* {showCommentBox && (
                                   <CommentThread
                                     comments={post?.comments}
                                     post={commentPostId}
                                     toggle={setShowCommentBox}
                                   />
-                                )}
+                                )} */}
                               </div>
                             </Col>
                           </Row>
