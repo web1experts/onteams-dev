@@ -462,20 +462,60 @@ function DashboardPage() {
   };
 
   const handleFileChange = (e) => {
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
     const fileList = Array.from(e.target.files);
-    const accepted =
-      fields.type === "image"
-        ? fileList.filter((f) => f.type.startsWith("image/"))
-        : fileList.filter((f) => f.type.startsWith("video/"));
-    setFields({ ...fields, files: accepted });
-    setError("");
+    // const accepted =
+    //   fields.type === "image"
+    //     ? fileList.filter((f) => f.type.startsWith("image/"))
+    //     : fileList.filter((f) => f.type.startsWith("video/"));
+    let typeError = false;
+  let sizeError = false;
 
-    if (isEdit) {
-      setFields((prev) => {
-        const updated = { ...prev };
-        delete updated["existing_file"];
-        return updated;
-      });
+  const accepted =
+    fields.type === "image"
+      ? fileList.filter((f) => {
+          if (!f.type.startsWith("image/")) {
+            typeError = true;
+            return false;
+          }
+          if (f.size > maxSize) {
+            sizeError = true;
+            return false;
+          }
+          return true;
+        })
+      : fileList.filter((f) => {
+          if (!f.type.startsWith("video/")) {
+            typeError = true;
+            return false;
+          }
+          if (f.size > maxSize) {
+            sizeError = true;
+            return false;
+          }
+          return true;
+        });
+
+  if (typeError && sizeError) {
+    setError(`Some files are of the wrong type and exceed 10MB.`);
+  } else if (typeError) {
+    setError(`Only ${fields.type} files are allowed.`);
+  } else if (sizeError) {
+    setError(`File size must be 10MB or less.`);
+  } else {
+      setError("");
+    
+
+      setFields({ ...fields, files: accepted });
+      setError("");
+
+      if (isEdit) {
+        setFields((prev) => {
+          const updated = { ...prev };
+          delete updated["existing_file"];
+          return updated;
+        });
+      }
     }
   };
   const handlePosts = async () => {

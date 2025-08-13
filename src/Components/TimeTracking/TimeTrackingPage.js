@@ -1403,8 +1403,8 @@ function TimeTrackingPage() {
                           <Dropdown.Item onClick={handleShow}>
                             Manual Time
                           </Dropdown.Item>
-                          {memberProfile?.permissions?.reports
-                            ?.update_manual_time && (
+                          {(memberProfile?.permissions?.reports
+                            ?.update_manual_time === true )&& (
                             <Dropdown.Item
                               onClick={handleNewShow}
                               to="/manual-time"
