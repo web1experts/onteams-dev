@@ -62,15 +62,9 @@ function Workspace(props) {
     setShowDialog(true)
   }
   const handledeleteWorkspace = async (id) => {
-    
     await dispatch(
       deleteWorkspace(id)
     );
-  };
-
-
-  const handleownership = async () => {
-    console.log("transfer ownership");
   };
 
   const handleEdit = (workspace) => {
@@ -181,11 +175,8 @@ function Workspace(props) {
             callback={() => handledeleteWorkspace( editworkspace._id)}
           />
         </>
-      
       )}
       </div>
-      
-
   );
 }
 

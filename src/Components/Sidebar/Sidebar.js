@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Navbar, Nav, Dropdown, Modal, Row, Col, Button, Card, Form} from "react-bootstrap";
 import { LuFolderOpen, LuTimer, LuBuilding } from "react-icons/lu";
-import { RxDashboard } from "react-icons/rx";
 import { AiOutlineTeam } from "react-icons/ai";
 import { TbReport } from "react-icons/tb";
 import { BsCalendar2Week } from "react-icons/bs";
 import { CgCalendarDates} from "react-icons/cg";
 import { RiSettingsLine } from "react-icons/ri";
 import { FiLogOut, FiUserCheck, FiHome } from "react-icons/fi";
-import { MdOutlineColorLens, MdOutlineManageAccounts, MdCheck, MdArrowBack } from "react-icons/md";
+import { MdOutlineColorLens, MdCheck, MdArrowBack } from "react-icons/md";
 import { getloggedInUser, currentMemberProfile} from '../../helpers/auth';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import { transformString, parseIfValidJSON, getMemberdata, mergePermissions } from '../../helpers/commonfunctions';
-import { toggleSidebar, toggleTheme } from "../../redux/actions/common.action";
+import { parseIfValidJSON } from '../../helpers/commonfunctions';
+import { toggleTheme } from "../../redux/actions/common.action";
 import { saveTheme } from "../../helpers/auth";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { logout } from '../../redux/actions/auth.actions';
 import { updateWorkSpaceTheme } from "../../redux/actions/workspace.action";
 import SettingPage from "../Settings/SettingPage";
-import { FaCogs } from "react-icons/fa";
 
 function SidebarPanel() {
     const secretKey = process.env.REACT_APP_SECRET_KEY
@@ -50,11 +48,6 @@ function SidebarPanel() {
         setShowDropdown(isOpen);
     };
 
-    // const handleItemClick = (companyId) => {
-    //     handleClick(companyId);
-    //     setShowDropdown(false);
-    // };
-    
     const encryptedCompany = localStorage.getItem('current_dashboard');
     if (encryptedCompany && encryptedCompany !== "") {
         const decryptedCompany = parseIfValidJSON(encryptedCompany);
@@ -78,7 +71,6 @@ function SidebarPanel() {
         if( updateDashboard ){
             refreshWorskspacelist()
         }
-     
     }, [updateDashboard])
 
     useEffect(() => {
@@ -104,16 +96,6 @@ function SidebarPanel() {
         dispatch(toggleTheme(theme));
         dispatch(updateWorkSpaceTheme({theme}))
     }
-
-    // const onChange = (selectedvalue) => {
-    //     const selected = companies.find(company => company.company._id === selectedvalue);
-    //     localStorage.setItem('current_dashboard', JSON.stringify({ name: selected.company.name, id: selected.company._id }));
-    //     localStorage.setItem('mt_featureSwitches', JSON.stringify(selected?.memberData || null))
-    //     // setAuthorization()
-    //     setTimeout(function () {
-    //         window.location.reload();
-    //     }, 1000)
-    // }
 
     const handleClick = (selectedvalue) => {
         const selected = companies.find(company => company.company._id === selectedvalue);
@@ -145,7 +127,6 @@ function SidebarPanel() {
     function hexToRgb(hex) {
         // Remove the # if present
         hex = hex.replace(/^#/, '');
-
         // Handle 3-digit hex like #0af
         if (hex.length === 3) {
             hex = hex.split('').map((c) => c + c).join('');
@@ -155,14 +136,12 @@ function SidebarPanel() {
         const r = (bigint >> 16) & 255;
         const g = (bigint >> 8) & 255;
         const b = bigint & 255;
-
         return `${r}, ${g}, ${b}`;
     }
 
     function hexToRgbString(hex) {
   // Remove leading "#" if present
         hex = hex.replace(/^#/, '');
-
         // Expand short hex like "#abc" to "#aabbcc"
         if (hex.length === 3) {
             hex = hex.split('').map((c) => c + c).join('');
@@ -173,7 +152,7 @@ function SidebarPanel() {
         const b = parseInt(hex.substring(4, 6), 16);
 
         return `${r}, ${g}, ${b}`;
-        }
+    }
 
 
    const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' }
