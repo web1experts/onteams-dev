@@ -808,7 +808,7 @@ function ProjectsPage() {
             if (project._id === ProjectData.project_id) {
               return {
                 ...project,
-                marked_by: ProjectData.marked_by || []
+                marked_by: ProjectData.marked_by || [],
               };
             }
             return project;
@@ -816,7 +816,6 @@ function ProjectsPage() {
           .filter((project) => project.status === filters["status"])
       );
     }
-
   }, [apiResult]);
 
   const handleRemovefiles = (id) => {
@@ -1044,10 +1043,10 @@ function ProjectsPage() {
 
   const handleRowDoubleClick = (project, index) => {
     if (project.marked_by && project.marked_by.includes(memberdata._id)) {
-      MarkProject(project._id, false , memberdata._id)
+      MarkProject(project._id, false, memberdata._id);
       //dispatch(updateProject(project._id, { marked: false }));
     } else {
-       MarkProject(project._id, true , memberdata._id)
+      MarkProject(project._id, true, memberdata._id);
       //dispatch(updateProject(project._id, { marked: true }));
     }
   };
