@@ -68,7 +68,6 @@ export const TaskForm = (props) => {
     const [currentProject, setCurrentProject] = useState({})
     const [imagePreviews, setImagePreviews] = useState([]);
     const [loader, setLoader] = useState(false);
-    const [fields, setFields] = useState({ title: apiResult?.currentTask?.title || '', members: [], description: apiResult?.currentTask?.description || '' })
     const [errors, setErrors] = useState({})
     const [subtasks, setSubtasks] = useState([]);
     const [issubopen, setissubopen] = useState(false)
@@ -78,6 +77,7 @@ export const TaskForm = (props) => {
     const [showPreview, setPreviewShow] = useState(false);
     const handlePreviewClose = () => setPreviewShow(false);
     const [currentTask, setCurrentTask] = useState(apiResult.currentTask || {})
+    const [fields, setFields] = useState({ title: apiResult?.currentTask?.title || '', members: [], description: apiResult?.currentTask?.description || '' })
     const [enablesubtaskedit, setEnableSubtaskEdit] = useState({})
     const [ShowCommentModel, setShowCommentModel] = useState(false);
     const handleCloseCommentModel = () => setShowCommentModel(false);
@@ -113,6 +113,9 @@ export const TaskForm = (props) => {
         setPreviewShow(true)
     };
 
+    useEffect(() => {
+        dispatch(fetchCustomFields({module: 'tasks'}))
+    },[])
     useEffect(() => {
         if (modalstate === true) {
             dispatch(updateStateData(TASK_FORM, { title: '' }))
@@ -207,7 +210,7 @@ export const TaskForm = (props) => {
             // }, 150)
             dispatch(updateStateData(TASK_FORM, fieldsSetup))
         }
-        dispatch(fetchCustomFields({module: 'tasks'}))
+        
     }, [currentTask]);
 
     useEffect(() => { 
@@ -320,6 +323,30 @@ export const TaskForm = (props) => {
         dispatch(updateStateData(TASK_FORM, { images: updatedSelectedFiles }))
         setImagePreviews(updatedImagePreviews);
     };
+
+    const clearTaskForm = (form) => {
+        const cleared = {};
+        for (const key in form) {
+            if (Array.isArray(form[key])) {
+            cleared[key] = []; // empty array
+            } else if (typeof form[key] === "object" && form[key] !== null) {
+            cleared[key] = {}; // empty object
+            } else {
+            cleared[key] = ""; // empty string for scalars
+            }
+        }
+        return cleared;
+    };
+
+    const handleTaskClose = () => {
+        const cf = clearTaskForm(taskForm)
+        console.log('cleared form:: ', cf)
+        dispatch(updateStateData(TASK_FORM, cf));
+
+        setDatePickerModal(false);
+        setCurrentTask({});
+        
+    }
 
     const renderPreview = (type, preview, index) => {
 
@@ -863,6 +890,7 @@ const renderSubtasks = () => {
                 
                 dispatch(updateStateData(CURRENT_TASK, {})); dispatch(updateStateData(ACTIVE_FORM_TYPE, 'edit_project')); 
                 dispatch(togglePopups('taskform', false));
+                handleTaskClose()
             }
             } centered size="lg" className="add--member--modal edit--task--modal modalbox" 
             //onShow={() => selectboxObserver()}
@@ -991,6 +1019,9 @@ const renderSubtasks = () => {
                                             showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
                                             toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
                                             toggleBadges: () => toggleBadges(field),
+                                            fieldId: currentTask && typeof currentTask === "object" && currentTask._id
+                                            ? `edit-${currentTask._id}-${field.name}-${index}`
+                                            : `new-${field.name}-${index}`
                                         })
                                     )}
                                     </>
@@ -1494,7 +1525,7 @@ const renderSubtasks = () => {
                     </div>
                 </Modal.Body>
             </Modal>
-            <Modal show={datePickerModal} onHide={() => { setDatePickerModal(false) }}  centered size="md" className="date--picker--modal">
+            <Modal show={datePickerModal} onHide={() => { setDatePickerModal(false);}}  centered size="md" className="date--picker--modal">
                 <Modal.Header closeButton>
                     {/* <Modal.Title>Workflow status</Modal.Title> */}
                 </Modal.Header>

@@ -280,7 +280,7 @@ const TasksList = React.memo((props) => {
             {currentProject &&
               Object.keys(currentProject).length > 0 &&
               currentProject?.workflow?.tabs?.length > 0 &&
-              currentProject?.workflow?.tabs.map((tab, index) => (
+              currentProject?.workflow?.tabs?.map((tab, index) => (
                 //workflow--color-${index}
                 <div
                   key={tab._id}

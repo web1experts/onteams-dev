@@ -1338,6 +1338,7 @@ export const FilesModal = () => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [ showfileModal, setShowfilemodal] = useState( false )
   const [fields, setFields] = useState({ images: [] });
+  const [ errors, setErrors ] = useState({})
   const [filetoPreview, setFiletoPreview] = useState(null);
   const [showPreview, setPreviewShow] = useState(false);
 
@@ -1386,25 +1387,55 @@ export const FilesModal = () => {
     dispatch( togglePopups('files', false))
   }
 
-  const handleSelectedFiles = (acceptedFiles) => {
+  // const handleSelectedFiles = (acceptedFiles) => {
  
+  //   setFilesModalState((prevFilesModalState) => {
+  //     const allFiles = [...prevFilesModalState?.selectedFiles || [], ...acceptedFiles];
+    
+  //     // Filter out duplicate files based on a unique property (e.g., file.name)
+  //     const uniqueFiles = allFiles.filter(
+  //       (file, index, self) => 
+  //         index === self.findIndex(f => f.name === file.name) // Use `file.name` for uniqueness
+  //     );
+    
+  //     // Return the updated state, preserving the previous state structure
+  //     return {
+  //       ...prevFilesModalState,
+  //       selectedFiles: uniqueFiles
+  //     };
+  //   });
+    
+  // };
+
+  const handleSelectedFiles = (acceptedFiles) => {
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  const oversizedFiles = acceptedFiles.filter(file => file.size > maxSize);
+
+  if (oversizedFiles.length > 0) {
+    setErrors({'file_error':`Some files exceed 10MB and were not added: ${oversizedFiles.map(f => f.name).join(', ')}`})
+  }else{
+    setErrors({})
     setFilesModalState((prevFilesModalState) => {
-      const allFiles = [...prevFilesModalState?.selectedFiles || [], ...acceptedFiles];
-    
-      // Filter out duplicate files based on a unique property (e.g., file.name)
+      const validFiles = acceptedFiles.filter(file => file.size <= maxSize);
+
+      const allFiles = [
+        ...(prevFilesModalState?.selectedFiles || []),
+        ...validFiles
+      ];
+
       const uniqueFiles = allFiles.filter(
-        (file, index, self) => 
-          index === self.findIndex(f => f.name === file.name) // Use `file.name` for uniqueness
+        (file, index, self) =>
+          index === self.findIndex(f => f.name === file.name)
       );
-    
-      // Return the updated state, preserving the previous state structure
+
       return {
         ...prevFilesModalState,
         selectedFiles: uniqueFiles
       };
     });
-    
-  };
+  }
+};
+
 
   useEffect(() => {
     if (filesModalState?.selectedFiles && filesModalState.selectedFiles?.length > 0) {
@@ -1452,7 +1483,7 @@ export const FilesModal = () => {
 
   const handleattachfiles = () => {
     setImagePreviews([]); 
-    if( commonState.active_formtype === "task_edit" && filesModalState.selectedFiles.length > 0 && currentTask && Object.keys(currentTask).length > 0){
+    if( commonState.active_formtype === "task_edit" && filesModalState?.selectedFiles.length > 0 && currentTask && Object.keys(currentTask).length > 0){
       const formData = new FormData();
       for (const attach of filesModalState.selectedFiles){
         formData.append('images[]', attach);
@@ -1460,7 +1491,7 @@ export const FilesModal = () => {
       dispatch(updateTask(currentTask._id, formData))
     }else{
       if( dataObject[commonState.active_formtype]){
-        dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], { images: filesModalState.selectedFiles || []} ));
+        dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], { images: filesModalState?.selectedFiles || []} ));
       }
     }
     
@@ -1545,6 +1576,11 @@ export const FilesModal = () => {
                         <span><FaUpload /></span>
                         <p>Drop your files here or <strong>browse</strong></p>
                     </Form.Label>
+                    {
+                      (Object.keys(errors).length > 0) && (
+                        <span className='error'>{ errors['file_error']}</span>
+                      )
+                    }
                 </Form.Group>
 
             </Form>

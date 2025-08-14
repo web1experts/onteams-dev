@@ -184,8 +184,6 @@ function ReportsPage() {
   const datePickerRef = useRef(null);
   const manuldatePickerRef = useRef(null);
   const memberdata = getMemberdata();
-  const fullscreenRef = React.useRef(null);
-
   const [remarksActive, setremarksActive] = useState(false);
   const [remarks, setRemarks] = useState("");
   const [loader, setLoader] = useState(false);
@@ -228,8 +226,6 @@ function ReportsPage() {
   const [projects, setProjects] = useState([]);
 
   const [singleMemberReport, setSingleMemberReport] = useState({});
-  const taskFeed = useSelector((state) => state.task.tasks);
-  const [taskslists, setTasksLists] = useState([]);
   const [members, setMembers] = useState([]);
   const reportState = useSelector((state) => state.reports);
   const [memberReports, setMemberReports] = useState([]);
@@ -259,8 +255,6 @@ function ReportsPage() {
   const videosPerPage = 12; // Adjust as needed
   const [screenshotsByTask, setScreenshotsByTask] = useState([]);
   const [videosByTask, setvideosByTask] = useState([]);
-  // const [groupedTasks, setGroupedTasks] = useState([])
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
   const [filters, setFilters] = useState({
@@ -269,8 +263,7 @@ function ReportsPage() {
     project_status: "in-progress",
     page: 1,
   });
-  const [selectedproject, setSelectedProject] = useState("");
-  const [selectedTask, setSelectedTask] = useState("");
+  
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -343,12 +336,7 @@ function ReportsPage() {
       totalMembers: membersCount,
       totalTime: formattedTime,
     };
-    // }
-    // else if(arg === 'project_count'){
-    //   return projectCount
-    // }else if(arg === 'time'){
-    //   return formattedTime
-    // }
+
   }
 
   const handleListProjects = async () => {
@@ -468,9 +456,7 @@ function ReportsPage() {
         new Date().toISOString().split("T")[0],
       ]);
     }
-    // setTimeout(() => {
-    // handleReports()
-    // },100)
+ 
   }, [view]);
 
   useEffect(() => {

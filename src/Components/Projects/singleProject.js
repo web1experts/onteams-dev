@@ -309,13 +309,21 @@ function SingleProject(props) {
   };
 
   const handleSelectedFiles = (acceptedFiles) => {
-    setSelectedFiles((prevSelectedFiles) => {
-      // Filter out duplicates by comparing file names or other unique properties
-      const uniqueFiles = Array.from(
-        new Set([...prevSelectedFiles, ...acceptedFiles])
-      );
-      return uniqueFiles;
-    });
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const oversizedFiles = acceptedFiles.filter(file => file.size > maxSize);
+
+  if (oversizedFiles.length > 0) {
+    setErrors({ ...errors, ['file_error']:`Some files exceed 10MB and were not added: ${oversizedFiles.map(f => f.name).join(', ')}`})
+  }else{
+      setErrors({...errors, ['file_error']: ''})
+      setSelectedFiles((prevSelectedFiles) => {
+        // Filter out duplicates by comparing file names or other unique properties
+        const uniqueFiles = Array.from(
+          new Set([...prevSelectedFiles, ...acceptedFiles])
+        );
+        return uniqueFiles;
+      });
+    }
   };
 
   const handleclientSearch = (e) => {
@@ -1221,6 +1229,11 @@ function SingleProject(props) {
                       </p>
                     </Form.Label>
                   </Form.Group>
+                  {
+                      
+                        <span className='error'>{ errors['file_error'] || ''}</span>
+                      
+                    }
                 </Form>
                 <div className="preview--grid">
                   {imagePreviews.map((preview, index) => (

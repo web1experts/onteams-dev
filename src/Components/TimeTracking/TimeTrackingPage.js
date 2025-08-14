@@ -2,24 +2,85 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
-import { Container, Row, Col, Button, Form, ListGroup, Table, Badge, CardGroup, Card, Modal, Dropdown, Accordion} from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Form,
+  ListGroup,
+  Table,
+  Badge,
+  CardGroup,
+  Card,
+  Modal,
+  Dropdown,
+  Accordion,
+} from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaEye, FaPlay, FaPlus } from "react-icons/fa";
 import { MdClose, MdFilterList } from "react-icons/md";
-import { FiSidebar, FiUserX, FiMonitor, FiCoffee, FiClock, FiVideo, FiBriefcase, FiTarget, FiPause, FiUsers, FiCalendar, FiUser, FiTrash2, FiCheckCircle, FiCheck } from "react-icons/fi";
+import {
+  FiSidebar,
+  FiUserX,
+  FiMonitor,
+  FiCoffee,
+  FiClock,
+  FiVideo,
+  FiBriefcase,
+  FiTarget,
+  FiPause,
+  FiUsers,
+  FiCalendar,
+  FiUser,
+  FiTrash2,
+  FiCheckCircle,
+  FiCheck,
+} from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 import { BsDash } from "react-icons/bs";
 import { LuTimer, LuUsers, LuFileText } from "react-icons/lu";
 import { GoPulse } from "react-icons/go";
-import { BsArrowsFullscreen, BsFullscreen, BsFullscreenExit, BsArrowClockwise, BsArrowLeftCircleFill, BsArrowRightCircleFill, BsDashLg } from "react-icons/bs";
-import { MdOutlineClose, MdOutlineSearch, MdOutlineVideoLibrary } from "react-icons/md";
-import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
-import { getliveActivity, getRecoredActivity, deleteRecoredActivity, getAllMembersRecordedActivity, getMemberRecoredActivity } from "../../redux/actions/activity.action";
+import {
+  BsArrowsFullscreen,
+  BsFullscreen,
+  BsFullscreenExit,
+  BsArrowClockwise,
+  BsArrowLeftCircleFill,
+  BsArrowRightCircleFill,
+  BsDashLg,
+} from "react-icons/bs";
+import {
+  MdOutlineClose,
+  MdOutlineSearch,
+  MdOutlineVideoLibrary,
+} from "react-icons/md";
+import {
+  toggleSidebar,
+  toggleSidebarSmall,
+} from "../../redux/actions/common.action";
+import {
+  getliveActivity,
+  getRecoredActivity,
+  deleteRecoredActivity,
+  getAllMembersRecordedActivity,
+  getMemberRecoredActivity,
+} from "../../redux/actions/activity.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
-import { socket, refreshSocket, currentMemberProfile } from "../../helpers/auth";
-import { getMemberdata, showAmPmtime, generateTimeRange, convertSecondstoTime, timeStringToDate } from "../../helpers/commonfunctions";
+import {
+  socket,
+  refreshSocket,
+  currentMemberProfile,
+} from "../../helpers/auth";
+import {
+  getMemberdata,
+  showAmPmtime,
+  generateTimeRange,
+  convertSecondstoTime,
+  timeStringToDate,
+} from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 import "media-chrome";
 import "media-chrome/dist/menu";
@@ -1403,8 +1464,8 @@ function TimeTrackingPage() {
                           <Dropdown.Item onClick={handleShow}>
                             Manual Time
                           </Dropdown.Item>
-                          {(memberProfile?.permissions?.reports
-                            ?.update_manual_time === true )&& (
+                          {memberProfile?.permissions?.reports
+                            ?.update_manual_time === true && (
                             <Dropdown.Item
                               onClick={handleNewShow}
                               to="/manual-time"
@@ -1500,223 +1561,229 @@ function TimeTrackingPage() {
                   {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
                   <div className="attendance--table activity--table--list mb-0">
                     <div className="attendance--table--list">
-                      {liveactivities.length > 0
-                      ?
-                      <Table>
-                        <thead className="onHide">
-                          <tr key="project-table-header">
-                            <th
-                              scope="col"
-                              className="sticky pe-0 py-0"
-                              key="project-name-header"
-                            >
-                              <FiUsers className="me-1" /> Member
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-pname-header"
-                              className="onHide text-start"
-                            >
-                              <FiBriefcase className="me-1" /> Project Name
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-project-header"
-                              className="onHide ms-auto"
-                            >
-                              <LuTimer className="me-1" /> Project Time
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-time-header"
-                              className="onHide"
-                            >
-                              <FiClock className="me-1" /> Total Time
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-status-header"
-                              className="onHide"
-                            >
-                              <GoPulse className="me-1" /> Status
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-action-header"
-                              className="onHide"
-                            >
-                              <FiTarget className="me-1" /> Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          { liveactivities.map((activity, index) => {
-                                // totalhours += Number(activity?.totalTaskDuration || 0)
-                                // totalProjecthours += Number(activity?.latestActivity?.duration || 0)
-                                return (
-                                  <>
-                                    <tr
-                                      key={`activity-row-${index}`}
-                                      className={
-                                        currentActivity &&
-                                        currentActivity?._id === activity._id
-                                          ? "project--active"
-                                          : ""
-                                      }
+                      {liveactivities.length > 0 ? (
+                        <Table>
+                          <thead className="onHide">
+                            <tr key="project-table-header">
+                              <th
+                                scope="col"
+                                className="sticky pe-0 py-0"
+                                key="project-name-header"
+                              >
+                                <FiUsers className="me-1" /> Member
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-pname-header"
+                                className="onHide text-start"
+                              >
+                                <FiBriefcase className="me-1" /> Project Name
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-project-header"
+                                className="onHide ms-auto"
+                              >
+                                <LuTimer className="me-1" /> Project Time
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-time-header"
+                                className="onHide"
+                              >
+                                <FiClock className="me-1" /> Total Time
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-status-header"
+                                className="onHide"
+                              >
+                                <GoPulse className="me-1" /> Status
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-action-header"
+                                className="onHide"
+                              >
+                                <FiTarget className="me-1" /> Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {liveactivities.map((activity, index) => {
+                              // totalhours += Number(activity?.totalTaskDuration || 0)
+                              // totalProjecthours += Number(activity?.latestActivity?.duration || 0)
+                              return (
+                                <>
+                                  <tr
+                                    key={`activity-row-${index}`}
+                                    className={
+                                      currentActivity &&
+                                      currentActivity?._id === activity._id
+                                        ? "project--active"
+                                        : ""
+                                    }
+                                  >
+                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                    <td
+                                      data-label="Member Name"
+                                      className="project--title--td"
+                                      onClick={() => {
+                                        if (
+                                          isActive &&
+                                          activeInnerTab !== "InnerRecorded"
+                                        ) {
+                                          leaveRoom(currentActivity?._id);
+                                          socket.emit(
+                                            "get-tracker-status-update",
+                                            { userID: activity._id }
+                                          );
+                                          setCurrentActivity(activity);
+                                        } else if (
+                                          activeInnerTab === "InnerRecorded"
+                                        ) {
+                                          setRecordedRefresh(true);
+                                          setCurrentActivity(activity);
+                                          // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
+                                        }
+                                      }}
                                     >
-                                      {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                      <td
-                                        data-label="Member Name"
-                                        className="project--title--td"
-                                        onClick={() => {
-                                          if (
-                                            isActive &&
-                                            activeInnerTab !== "InnerRecorded"
-                                          ) {
-                                            leaveRoom(currentActivity?._id);
-                                            socket.emit(
-                                              "get-tracker-status-update",
-                                              { userID: activity._id }
-                                            );
-                                            setCurrentActivity(activity);
-                                          } else if (
-                                            activeInnerTab === "InnerRecorded"
-                                          ) {
-                                            setRecordedRefresh(true);
-                                            setCurrentActivity(activity);
-                                            // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
-                                          }
-                                        }}
-                                      >
-                                        <div className="d-flex justify-content-between">
-                                          <div className="project--name d-flex gap-3 align-items-center">
-                                            <div className="drag--indicator">
-                                              <abbr>{index + 1}</abbr>
-                                            </div>
-                                            <div className="title--initial">
-                                              {activity?.avatar &&
-                                              activity?.avatar !== null ? (
-                                                <span>
-                                                  <img
-                                                    src={activity?.avatar}
-                                                    alt={"member-avatar"}
-                                                  />
-                                                </span>
-                                              ) : (
-                                                activity.name.charAt(0)
+                                      <div className="d-flex justify-content-between">
+                                        <div className="project--name d-flex gap-3 align-items-center">
+                                          <div className="drag--indicator">
+                                            <abbr>{index + 1}</abbr>
+                                          </div>
+                                          <div className="title--initial">
+                                            {activity?.avatar &&
+                                            activity?.avatar !== null ? (
+                                              <span>
+                                                <img
+                                                  src={activity?.avatar}
+                                                  alt={"member-avatar"}
+                                                />
+                                              </span>
+                                            ) : (
+                                              activity.name.charAt(0)
+                                            )}
+                                            {activity?.latestActivity
+                                              ?.status ? (
+                                              <p className="anim--circle">
+                                                <small className="status--circle active--color"></small>
+                                              </p>
+                                            ) : activity?.latestActivity
+                                                ?.status === false ? (
+                                              <p className="anim--circle">
+                                                <small className="status--circle idle--color"></small>
+                                              </p>
+                                            ) : (
+                                              <p className="anim--circle">
+                                                <small className="status--circle inactive--color"></small>
+                                              </p>
+                                            )}
+                                          </div>
+                                          <div className="title--span flex-column d-flex align-items-start gap-0">
+                                            <span>{activity.name}</span>
+                                            <strong
+                                              key={`project-title-${activity?._id}`}
+                                              className="project--title--td"
+                                            >
+                                              {activity?.role?.name || (
+                                                <FiClock className="text-muted" />
                                               )}
-                                              {activity?.latestActivity
-                                                ?.status ? (
-                                                <p className="anim--circle"><small className="status--circle active--color"></small></p>
-                                              ) : activity?.latestActivity
-                                                  ?.status === false ? (
-                                                <p className="anim--circle"><small className="status--circle idle--color"></small></p>
-                                              ) : (
-                                                <p className="anim--circle"><small className="status--circle inactive--color"></small></p>
-                                              )}
-                                            </div>
-                                            <div className="title--span flex-column d-flex align-items-start gap-0">
-                                              <span>{activity.name}</span>
-                                              <strong
-                                                key={`project-title-${activity?._id}`}
-                                                className="project--title--td"
-                                              >
-                                                {activity?.role?.name || (
-                                                  <FiClock className="text-muted" />
-                                                )}
-                                              </strong>
-                                            </div>
+                                            </strong>
                                           </div>
                                         </div>
-                                      </td>
-                                      <td className="text-start">
-                                        <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                          Project Name
-                                        </strong>
-                                        <span
-                                          key={`project-title-${activity?._id}`}
-                                          className="project--title--td"
-                                        >
-                                          {activity?.latestActivity?.project
-                                            ?.title || (
-                                            <FiClock className="text-muted" />
-                                          )}
-                                        </span>
-                                      </td>
-                                      <td className="ms-md-auto text-start text-xl-center">
-                                        <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                          Project Time
-                                        </strong>
-                                        <div
-                                          key={`task-time-${activity?._id}`}
-                                          className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"
-                                        >
-                                          <LuTimer className="me-1" />{" "}
-                                          {convertSecondstoTime(
-                                            activity?.latestActivity
-                                              ?.duration || 0
-                                          ) || "00:00"}
-                                        </div>
-                                      </td>
-                                      <td
-                                        className="text-start text-xl-center"
-                                        key={`total-time-${activity?._id}`}
+                                      </div>
+                                    </td>
+                                    <td className="text-start">
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                        Project Name
+                                      </strong>
+                                      <span
+                                        key={`project-title-${activity?._id}`}
+                                        className="project--title--td"
                                       >
-                                        <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                          Total Time
-                                        </strong>
-                                        <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
-                                          <FiClock className="me-1" />{" "}
-                                          {convertSecondstoTime(
-                                            activity?.totalDuration || 0
-                                          ) || "00:00"}
-                                        </span>
-                                      </td>
-                                      <td
-                                        key={`status-title-${activity?._id}`}
-                                        className="onHide"
-                                      >
-                                        {activity?.latestActivity?.status ? (
-                                          <Badge bg="success">
-                                            <FaPlay /> Active
-                                          </Badge>
-                                        ) : activity?.latestActivity?.status ===
-                                          false ? (
-                                          <Badge bg="warning">
-                                            <FiCoffee /> Break
-                                          </Badge>
-                                        ) : (
-                                          <Badge bg="secondary">
-                                            <FiPause /> Inactive
-                                          </Badge>
+                                        {activity?.latestActivity?.project
+                                          ?.title || (
+                                          <FiClock className="text-muted" />
                                         )}
-                                      </td>
-                                      <td
-                                        key={`view-act-${activity?._id}`}
-                                        className="onHide text-lg-end"
+                                      </span>
+                                    </td>
+                                    <td className="ms-md-auto text-start text-xl-center">
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                        Project Time
+                                      </strong>
+                                      <div
+                                        key={`task-time-${activity?._id}`}
+                                        className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"
                                       >
-                                        <Button
-                                          variant="dark"
-                                          onClick={() => {
-                                            handleClick(activity);
-                                          }}
-                                        >
-                                          <FaEye /> Details
-                                        </Button>
-                                      </td>
-                                    </tr>
-                                  </>
-                                );
-                              })
-                            }
-                        </tbody>
-                      </Table>
-                      : !spinner &&
+                                        <LuTimer className="me-1" />{" "}
+                                        {convertSecondstoTime(
+                                          activity?.latestActivity?.duration ||
+                                            0
+                                        ) || "00:00"}
+                                      </div>
+                                    </td>
+                                    <td
+                                      className="text-start text-xl-center"
+                                      key={`total-time-${activity?._id}`}
+                                    >
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                        Total Time
+                                      </strong>
+                                      <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
+                                        <FiClock className="me-1" />{" "}
+                                        {convertSecondstoTime(
+                                          activity?.totalDuration || 0
+                                        ) || "00:00"}
+                                      </span>
+                                    </td>
+                                    <td
+                                      key={`status-title-${activity?._id}`}
+                                      className="onHide"
+                                    >
+                                      {activity?.latestActivity?.status ? (
+                                        <Badge bg="success">
+                                          <FaPlay /> Active
+                                        </Badge>
+                                      ) : activity?.latestActivity?.status ===
+                                        false ? (
+                                        <Badge bg="warning">
+                                          <FiCoffee /> Break
+                                        </Badge>
+                                      ) : (
+                                        <Badge bg="secondary">
+                                          <FiPause /> Inactive
+                                        </Badge>
+                                      )}
+                                    </td>
+                                    <td
+                                      key={`view-act-${activity?._id}`}
+                                      className="onHide text-lg-end"
+                                    >
+                                      <Button
+                                        variant="dark"
+                                        onClick={() => {
+                                          handleClick(activity);
+                                        }}
+                                      >
+                                        <FaEye /> Details
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                </>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      ) : (
+                        !spinner &&
                         liveactivities.length === 0 && (
                           <div className="text-center">
                             <h2>No Results</h2>{" "}
                           </div>
-                        )}
+                        )
+                      )}
                     </div>
                   </div>
                 </>
@@ -1726,161 +1793,167 @@ function TimeTrackingPage() {
                   {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
                   <div className="attendance--table activity--table--list mb-0">
                     <div className="attendance--table--list">
-                      {liveactivities.length > 0
-                      ?
-                      <Table>
-                        <thead className="onHide">
-                          <tr key="project-table-header-recordings">
-                            <th
-                              scope="col"
-                              className="sticky pe-0 py-0"
-                              key="record-project-name-header"
-                            >
-                              <FiUsers className="me-1" /> Member
-                            </th>
-                            {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
-                            <th
-                              scope="col"
-                              key="record-client-time-header"
-                              className="onHide ms-auto"
-                            >
-                              <FiClock className="me-1" /> Total Time
-                            </th>
-                            <th
-                              scope="col"
-                              key="record-client-action-header"
-                              className="onHide"
-                            >
-                              <FiTarget className="me-1" /> Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          { liveactivities.map((activity, index) => {
-                                totalhours += Number(
-                                  activity?.totalTaskDuration || 0
-                                );
+                      {liveactivities.length > 0 ? (
+                        <Table>
+                          <thead className="onHide">
+                            <tr key="project-table-header-recordings">
+                              <th
+                                scope="col"
+                                className="sticky pe-0 py-0"
+                                key="record-project-name-header"
+                              >
+                                <FiUsers className="me-1" /> Member
+                              </th>
+                              {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
+                              <th
+                                scope="col"
+                                key="record-client-time-header"
+                                className="onHide ms-auto"
+                              >
+                                <FiClock className="me-1" /> Total Time
+                              </th>
+                              <th
+                                scope="col"
+                                key="record-client-action-header"
+                                className="onHide"
+                              >
+                                <FiTarget className="me-1" /> Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {liveactivities.map((activity, index) => {
+                              totalhours += Number(
+                                activity?.totalTaskDuration || 0
+                              );
 
-                                return (
-                                  <>
-                                    <tr
-                                      key={`activity-row-${index}`}
-                                      className={
-                                        currentActivity &&
-                                        currentActivity?._id === activity._id
-                                          ? "active"
-                                          : ""
-                                      }
+                              return (
+                                <>
+                                  <tr
+                                    key={`activity-row-${index}`}
+                                    className={
+                                      currentActivity &&
+                                      currentActivity?._id === activity._id
+                                        ? "active"
+                                        : ""
+                                    }
+                                  >
+                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                    <td
+                                      data-label="Member Name"
+                                      className="project--title--td"
+                                      onClick={() => {
+                                        // if (isActive) {
+                                        //   setCurrentActivity(activity);
+                                        // }
+                                        if (
+                                          (isActive &&
+                                            activeInnerTab !==
+                                              "InnerRecorded") ||
+                                          (isActive &&
+                                            activeTab !== "Recordings")
+                                        ) {
+                                          leaveRoom(currentActivity?._id);
+                                          socket.emit(
+                                            "get-tracker-status-update",
+                                            { userID: activity._id }
+                                          );
+                                          setCurrentActivity(activity);
+                                        } else if (
+                                          activeInnerTab === "InnerRecorded" ||
+                                          activeTab === "Recordings"
+                                        ) {
+                                          setRecordedRefresh(true);
+                                          setCurrentActivity(activity);
+                                        }
+                                      }}
                                     >
-                                      {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                      <td
-                                        data-label="Member Name"
-                                        className="project--title--td"
-                                        onClick={() => {
-                                          // if (isActive) {
-                                          //   setCurrentActivity(activity);
-                                          // }
-                                          if (
-                                            (isActive &&
-                                              activeInnerTab !==
-                                                "InnerRecorded") ||
-                                            (isActive &&
-                                              activeTab !== "Recordings")
-                                          ) {
-                                            leaveRoom(currentActivity?._id);
-                                            socket.emit(
-                                              "get-tracker-status-update",
-                                              { userID: activity._id }
-                                            );
-                                            setCurrentActivity(activity);
-                                          } else if (
-                                            activeInnerTab ===
-                                              "InnerRecorded" ||
-                                            activeTab === "Recordings"
-                                          ) {
-                                            setRecordedRefresh(true);
-                                            setCurrentActivity(activity);
-                                          }
-                                        }}
-                                      >
-                                        <div className="d-flex justify-content-between">
-                                          <div className="project--name d-flex gap-3 align-items-center">
-                                            <div className="drag--indicator"><abbr>{index + 1}</abbr></div>
-                                            <div className="title--initial">
-                                              {activity?.avatar &&
-                                              activity?.avatar !== null ? (
-                                                <span>
-                                                  <img
-                                                    src={activity?.avatar}
-                                                    alt={"member-avatar"}
-                                                  />
-                                                </span>
-                                              ) : (
-                                                activity.name.charAt(0)
-                                              )}
-                                              {activity?.latestActivity
-                                                ?.status ? (
-                                                <p className="anim--circle"><small className="status--circle active--color"></small></p>
-                                              ) : activity?.latestActivity
-                                                  ?.status === false ? (
-                                                <p className="anim--circle"><small className="status--circle idle--color"></small></p>
-                                              ) : (
-                                                <p className="anim--circle"><small className="status--circle inactive--color"></small></p>
-                                              )}
-                                            </div>
-                                            <div className="title--span flex-column d-flex align-items-start gap-0">
-                                              <span>{activity.name}</span>
-                                              <strong
-                                                key={`project-title-${activity?._id}`}
-                                                className="project--title--td"
-                                              >
-                                                {activity?.role?.name || ""}
-                                              </strong>
-                                            </div>
+                                      <div className="d-flex justify-content-between">
+                                        <div className="project--name d-flex gap-3 align-items-center">
+                                          <div className="drag--indicator">
+                                            <abbr>{index + 1}</abbr>
+                                          </div>
+                                          <div className="title--initial">
+                                            {activity?.avatar &&
+                                            activity?.avatar !== null ? (
+                                              <span>
+                                                <img
+                                                  src={activity?.avatar}
+                                                  alt={"member-avatar"}
+                                                />
+                                              </span>
+                                            ) : (
+                                              activity.name.charAt(0)
+                                            )}
+                                            {activity?.latestActivity
+                                              ?.status ? (
+                                              <p className="anim--circle">
+                                                <small className="status--circle active--color"></small>
+                                              </p>
+                                            ) : activity?.latestActivity
+                                                ?.status === false ? (
+                                              <p className="anim--circle">
+                                                <small className="status--circle idle--color"></small>
+                                              </p>
+                                            ) : (
+                                              <p className="anim--circle">
+                                                <small className="status--circle inactive--color"></small>
+                                              </p>
+                                            )}
+                                          </div>
+                                          <div className="title--span flex-column d-flex align-items-start gap-0">
+                                            <span>{activity.name}</span>
+                                            <strong
+                                              key={`project-title-${activity?._id}`}
+                                              className="project--title--td"
+                                            >
+                                              {activity?.role?.name || ""}
+                                            </strong>
                                           </div>
                                         </div>
-                                      </td>
-                                      {/* <td className="text-start">
+                                      </div>
+                                    </td>
+                                    {/* <td className="text-start">
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Project Name</strong>
                                       
                                     </td> */}
-                                      <td
-                                        className="text-start text-xl-center ms-md-auto"
-                                        key={`total-time-${activity?._id}`}
+                                    <td
+                                      className="text-start text-xl-center ms-md-auto"
+                                      key={`total-time-${activity?._id}`}
+                                    >
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                        Total Time
+                                      </strong>
+                                      <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
+                                        <FiClock className="me-1" />{" "}
+                                        {convertSecondstoTime(
+                                          activity?.totalTaskDuration || 0
+                                        ) || "00:00"}
+                                      </span>
+                                    </td>
+                                    <td className="onHide text-lg-end">
+                                      <Button
+                                        variant="dark"
+                                        onClick={() => {
+                                          handleClick(activity);
+                                        }}
                                       >
-                                        <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                          Total Time
-                                        </strong>
-                                        <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
-                                          <FiClock className="me-1" />{" "}
-                                          {convertSecondstoTime(
-                                            activity?.totalTaskDuration || 0
-                                          ) || "00:00"}
-                                        </span>
-                                      </td>
-                                      <td className="onHide text-lg-end">
-                                        <Button
-                                          variant="dark"
-                                          onClick={() => {
-                                            handleClick(activity);
-                                          }}
-                                        >
-                                          <FaEye /> Details
-                                        </Button>
-                                      </td>
-                                    </tr>
-                                  </>
-                                );
-                              })
-                            }
-                            
-                        </tbody>
-                      </Table>
-                      : !spinner &&
-                      liveactivities.length === 0 && (
-                        <div className="text-center">
-                          <h2>No Results</h2>
-                        </div>
+                                        <FaEye /> Details
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                </>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      ) : (
+                        !spinner &&
+                        liveactivities.length === 0 && (
+                          <div className="text-center">
+                            <h2>No Results</h2>
+                          </div>
+                        )
                       )}
                     </div>
                   </div>
@@ -1908,11 +1981,17 @@ function TimeTrackingPage() {
                   <div className="title--initial">
                     {currentActivity?.name?.charAt(0)}
                     {currentActivity?.latestActivity?.status ? (
-                      <p className="anim--circle"><small className="status--circle active--color"></small></p>
+                      <p className="anim--circle">
+                        <small className="status--circle active--color"></small>
+                      </p>
                     ) : currentActivity?.latestActivity?.status === false ? (
-                      <p className="anim--circle"><small className="status--circle idle--color"></small></p>
+                      <p className="anim--circle">
+                        <small className="status--circle idle--color"></small>
+                      </p>
                     ) : (
-                      <p className="anim--circle"><small className="status--circle inactive--color"></small></p>
+                      <p className="anim--circle">
+                        <small className="status--circle inactive--color"></small>
+                      </p>
                     )}
                   </div>
                   <div className="title--span flex-column align-items-start gap-0">
@@ -1951,7 +2030,10 @@ function TimeTrackingPage() {
                 </Dropdown.Menu>
               </Dropdown>
             </div>
-            <ListGroup horizontal className="live--tabs ms-auto d-none d-xxl-flex">
+            <ListGroup
+              horizontal
+              className="live--tabs ms-auto d-none d-xxl-flex"
+            >
               <ListGroup horizontal>
                 <Button
                   variant="secondary"
@@ -2661,7 +2743,13 @@ function TimeTrackingPage() {
         </Modal.Body>
       </Modal>
       {/*--=-=Inner Filter Modal**/}
-      <Modal show={showInnerFilter} onHide={handleInnerFilterClose} centered size="md" className="filter--modal">
+      <Modal
+        show={showInnerFilter}
+        onHide={handleInnerFilterClose}
+        centered
+        size="md"
+        className="filter--modal"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Filter</Modal.Title>
         </Modal.Header>

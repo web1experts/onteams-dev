@@ -131,6 +131,7 @@ function ClientsPage() {
       remove_avatar: false,
     });
     setIsActive(false);
+    setIsEditing( false )
   };
 
   const handleDragEnd = (result) => {
@@ -842,7 +843,7 @@ function ClientsPage() {
                     !spinner &&
                     clientFeeds &&
                     clientFeeds.length == 0 && (
-                      <div className="text-center">
+                      <div className="text-center py-3">
                         <h2>No Clients Found</h2>
                       </div>
                     )}
@@ -925,17 +926,19 @@ function ClientsPage() {
           <div className="rounded--box client--box">
             <Card className="contact--card">
               <div className="card--img">
-                <Form.Control
+                {/* <Form.Control
                   type="file"
                   id="upload--img"
                   hidden
                   onChange={(e) => handleFieldChange("avatar", e)}
                   accept=".jpg, .jpeg, .png, .gif"
-                />
+                /> */}
                 {memberProfile?.permissions?.clients?.create_edit_delete ===
                   true || memberProfile?.role?.slug === "owner" ? (
                   <>
-                    <Form.Label htmlFor="upload--img">
+                    <Form.Label 
+                    // htmlFor="upload--img"
+                    >
                       {avatarPreview ? (
                         <Card.Img variant="top" src={avatarPreview} />
                       ) : fields?.remove_avatar === false &&
@@ -949,12 +952,12 @@ function ClientsPage() {
                       )}
                     </Form.Label>
                     <h3>{selectedClient?.name}</h3>
-                    {selectedClient?.avatar &&
+                    {/* {selectedClient?.avatar &&
                       fields?.remove_avatar === false && (
                         <span className="remove--photo" onClick={removeAvatar}>
                           <FaTrashAlt />
                         </span>
-                      )}
+                      )} */}
                   </>
                 ) : (
                   <Form.Label htmlFor="upload--img">
