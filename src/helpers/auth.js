@@ -219,6 +219,10 @@ export function logout() {
   return true;
 }
 
+export const MarkProject = (projectId, isMarked, member) => {
+  socket.emit('mark_project', { projectId, isMarked, member});
+};
+
 export const SendComment = (type = 'task', text, postId, userId,parentCommentId) => {
   socket.emit('comment', { text, postId, userId,parentCommentId, type });
 };

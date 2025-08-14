@@ -76,7 +76,7 @@ import "react-quill/dist/quill.snow.css";
 import "react-quill/dist/quill.snow.css";
 import AutoLinks from "quill-auto-links";
 import { CustomFieldModal } from "../modals/customFields";
-import { socket, currentMemberProfile } from "../../helpers/auth";
+import { socket, currentMemberProfile, MarkProject } from "../../helpers/auth";
 import ProjectDatePicker from "../Datepickers/projectDatepicker";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -799,6 +799,24 @@ function ProjectsPage() {
         }
       }
     }
+
+    if (apiResult.marked_projectData) {
+      const ProjectData = apiResult.marked_projectData;
+      setProjects((prevProjects) =>
+        prevProjects
+          .map((project) => {
+            if (project._id === ProjectData.project_id) {
+              return {
+                ...project,
+                marked_by: ProjectData.marked_by || []
+              };
+            }
+            return project;
+          })
+          .filter((project) => project.status === filters["status"])
+      );
+    }
+
   }, [apiResult]);
 
   const handleRemovefiles = (id) => {
@@ -1026,9 +1044,11 @@ function ProjectsPage() {
 
   const handleRowDoubleClick = (project, index) => {
     if (project.marked_by && project.marked_by.includes(memberdata._id)) {
-      dispatch(updateProject(project._id, { marked: false }));
+      MarkProject(project._id, false , memberdata._id)
+      //dispatch(updateProject(project._id, { marked: false }));
     } else {
-      dispatch(updateProject(project._id, { marked: true }));
+       MarkProject(project._id, true , memberdata._id)
+      //dispatch(updateProject(project._id, { marked: true }));
     }
   };
 

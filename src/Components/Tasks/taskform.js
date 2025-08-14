@@ -137,6 +137,38 @@ export const TaskForm = (props) => {
     }, [apiResult.UpdatedTask])
 
     useEffect(() => {
+    if (apiResult.comment) { 
+        setCurrentTask(prevTask => {
+        if (!prevTask) return prevTask; // if currentTask is null or undefined
+
+        return {
+            ...prevTask,
+            comments: [...(prevTask.comments || []), apiResult.comment]
+        };
+        });
+    }
+    }, [apiResult.comment]);
+
+    useEffect(() => {
+  if (apiResult.updatedcomment) {
+    setCurrentTask(prevTask => {
+      if (!prevTask) return prevTask; // if currentTask is null or undefined
+
+      return {
+        ...prevTask,
+        comments: (prevTask.comments || []).map(comment =>
+          comment._id === apiResult.updatedcomment._id
+            ? { ...comment, ...apiResult.updatedcomment }
+            : comment
+        )
+      };
+    });
+  }
+}, [apiResult.updatedcomment]);
+
+
+
+    useEffect(() => {
         if (apiResult.tasks?.taskData && Object.keys(apiResult.tasks.taskData).length > 0) {
             if (currentTask && currentTask._id && apiResult.tasks?.taskData?.[currentTask?.tab] && apiResult.tasks?.taskData?.[currentTask?.tab].tasks) {
                 const taskToUpdate = apiResult.tasks.taskData[currentTask.tab].tasks.find(task => task._id === currentTask?._id);

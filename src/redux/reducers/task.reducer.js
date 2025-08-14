@@ -15,7 +15,8 @@ import {
     CURRENT_TASK,
     DELETE_COMMENT,
     TASK_REORDER_ERROR,
-    TASK_REORDER
+    TASK_REORDER,
+    UPDATE_POST_LIST_COMMENT
 
 } from "../actions/types";
     
@@ -112,7 +113,8 @@ import {
                 message: null,
                 message_variant: null,
                 UpdatedTask: null,
-                newTask: null
+                newTask: null,
+                comment: null
             };
         case CURRENT_TASK: 
             return {
@@ -123,9 +125,16 @@ import {
                 if(action.payload.type !== 'task'){return {...state}}
                 return {
                     ...state,
-                    UpdatedTask: action.payload.updatedTask
+                    comment: action.payload.comment
                 }
                 
+            }
+            case UPDATE_POST_LIST_COMMENT: {
+                if(action.payload.type !== 'task'){return {...state}}
+                return {
+                    ...state,
+                    updatedcomment: action.payload.updatedComment
+                }
             }
             
             

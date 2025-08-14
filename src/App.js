@@ -17,7 +17,7 @@ import './Styles/Sidebar.css';
 import './Styles/ModalStyle.css';
 import './App.css';
 import { toggleTheme } from "./redux/actions/common.action";
-import {CREATE_POST_LIST_COMMENT, CREATE_LIST_COMMENT, DELETE_COMMENT, DELETE_POST } from "./redux/actions/types";
+import {CREATE_POST_LIST_COMMENT, CREATE_LIST_COMMENT,UPDATE_POST_LIST_COMMENT, DELETE_COMMENT, DELETE_POST, PROJECT_MARK } from "./redux/actions/types";
 
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function App(props) {
@@ -110,6 +110,40 @@ function App(props) {
 
     
   }, [props.createComment]);
+
+  useEffect(() => {
+    const handleUpdatedCommentReceived = (data) => {
+      if (data.success) {
+        props.updateComment(data);
+      }
+    };
+
+    socket.on('update_comment_received', handleUpdatedCommentReceived);
+
+    // Cleanup function to remove the socket listener when the component unmounts
+    return () => {
+      socket.off('update_comment_received', handleUpdatedCommentReceived);
+    };
+
+    
+  }, [props.updateComment]);
+
+  useEffect(() => {
+    const handleMarkProject = (data) => {
+      if (data.success) {
+        props.markeProject(data);
+      }
+    };
+
+    socket.on('mark_project_received', handleMarkProject);
+
+    // Cleanup function to remove the socket listener when the component unmounts
+    return () => {
+      socket.off('mark_project_received', handleMarkProject);
+    };
+
+    
+  }, [props.markeProject]);
 
   useEffect(() => {
     const handlePostDelete = (data) => {
@@ -265,9 +299,10 @@ function App(props) {
 
 const mapDispatchToProps = (dispatch) => ({
   createComment: async payload => { await dispatch({ type: CREATE_POST_LIST_COMMENT, payload }) },
+  updateComment: async payload => { await dispatch({ type: UPDATE_POST_LIST_COMMENT, payload }) },
   deleteComment: async payload => { await dispatch({ type: DELETE_COMMENT, payload }) },
-  deletePost: async payload => { await dispatch({type: DELETE_POST, payload})}
-  //trackingStatus: async payload => { await dispatch({ type: TIME_TRACKING_STATUS, payload }) }
+  deletePost: async payload => { await dispatch({type: DELETE_POST, payload})},
+  markeProject: async payload => { await dispatch({type: PROJECT_MARK, payload})}
 });
 
 const mapStateToProps = (state) => {
