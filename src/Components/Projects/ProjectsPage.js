@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import debounce from "lodash.debounce";
 import {
   Container,
   Row,
@@ -96,6 +97,7 @@ import { fetchSystemFields } from "../../redux/actions/systemfield.action";
 Quill.register("modules/autoLinks", AutoLinks);
 
 function ProjectsPage() {
+  const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
   const [isActiveView, setIsActiveView] = useState(2);
   const [customFields, setCustomFields] = useState([]);
@@ -579,13 +581,32 @@ function ProjectsPage() {
     }
   };
 
-  const handlefilterchange = (name, value) => {
-    if (
-      (name === "search" && value === "") ||
-      (name === "search" && value.length > 1) ||
-      name !== "search"
-    ) {
-      setFilters({ ...filters, [name]: value });
+  // const handlefilterchange = (name, value) => {
+  //   if (
+  //     (name === "search" && value === "") ||
+  //     (name === "search" && value.length > 1) ||
+  //     name !== "search"
+  //   ) {
+  //     setFilters({ ...filters, [name]: value });
+  //   }
+  // };
+
+   // Debounced search handler
+  const debouncedUpdateSearch = useMemo(
+    () =>
+      debounce((value) => {
+        setFilters((prev) => ({ ...prev, search: value }));
+      }, 1000), // 1 sec debounce
+    []
+  );
+
+    const handlefilterchange = (name, value) => {
+    if (name === "search") {
+      // only debounce search
+      debouncedUpdateSearch(value);
+    } else {
+      // instant update for other filters
+      setFilters((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -1200,6 +1221,8 @@ function ProjectsPage() {
                           <MdOutlineSearch />
                           <Form.Control
                             type="text"
+                            ref={inputRef}
+                            readOnly={spinner}
                             placeholder="Search by Project or Client"
                             onChange={(event) =>
                               handlefilterchange("search", event.target.value)
@@ -2895,6 +2918,8 @@ function ProjectsPage() {
                   <MdOutlineSearch />
                   <Form.Control
                     type="text"
+                    ref={inputRef}
+                    readOnly={spinner}
                     placeholder="Search by Project or Client"
                     onChange={(event) =>
                       handlefilterchange("search", event.target.value)
@@ -2923,7 +2948,9 @@ function ProjectsPage() {
                 <Form.Group className="mb-0 form-group">
                   <Form.Control
                     type="text"
+                    ref={inputRef}
                     placeholder="Search by Project or Client"
+                    readOnly={spinner}
                     onChange={(event) =>
                       handlefilterchange("search", event.target.value)
                     }

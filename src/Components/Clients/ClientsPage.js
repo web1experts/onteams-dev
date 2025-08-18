@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Container,
   Row,
@@ -11,6 +11,7 @@ import {
   Table,
   Dropdown,
 } from "react-bootstrap";
+import debounce from "lodash.debounce";
 import { FaList, FaPlus, FaTrashAlt, FaEllipsisV } from "react-icons/fa";
 import { LuSettings2 } from "react-icons/lu";
 import { FiEdit, FiMail, FiSidebar, FiTrash2 } from "react-icons/fi";
@@ -51,6 +52,7 @@ import { BadgesModal } from "../modals/badges";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 function ClientsPage() {
+  const inputRef = useRef(null);
   const [spinner, setSpinner] = useState(false);
   const inputs = document.querySelectorAll(".form-floating .form-control");
   const handleSidebar = () =>
@@ -180,6 +182,15 @@ function ClientsPage() {
   const handleEditClick = (fieldName) => {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
+
+   // Debounced search handler
+    const debouncedUpdateSearch = useMemo(
+    () =>
+      debounce((value) => {
+        setSearch(value)
+      }, 1000), // 1 sec debounce
+    []
+  );
 
   const toggleBadges = (fieldIndex) => {
     setShowBadges(fieldIndex);
@@ -513,8 +524,10 @@ function ClientsPage() {
                           <MdOutlineSearch />
                           <Form.Control
                             type="text"
+                            ref={inputRef}
+                            readOnly={spinner}
                             placeholder="Search Client.."
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => debouncedUpdateSearch(e.target.value)}
                           />
                         </Form.Group>
                       </Form>
@@ -1152,8 +1165,10 @@ function ClientsPage() {
                 <Form.Group className="mb-0 form-group">
                   <Form.Control
                     type="text"
+                    ref={inputRef}
+                    readOnly={spinner}
                     placeholder="Search Client.."
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => debouncedUpdateSearch(e.target.value)}
                   />
                 </Form.Group>
               </Form>

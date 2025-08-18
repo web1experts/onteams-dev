@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import debounce from "lodash.debounce";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
 import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
@@ -32,6 +33,7 @@ import RolesPage from "../Settings/RolesPage";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function TeamMembersPage() {
+  const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
   const currentMember = getMemberdata();
   //const addToast = useToast();
@@ -375,6 +377,15 @@ function TeamMembersPage() {
   const handleEditClick = (fieldName) => {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
+
+  // Debounced search handler
+      const debouncedUpdateSearch = useMemo(
+      () =>
+        debounce((value) => {
+          setsearchTerm(value)
+        }, 1000), // 1 sec debounce
+      []
+    );
 
   const toggleVisibility = (key) => {
         setVisiblePasswords((prev) => ({
@@ -841,7 +852,7 @@ function TeamMembersPage() {
                     <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                       <Form.Group className="mb-0 form-group">
                         <MdOutlineSearch />
-                        <Form.Control type="text" placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)}/>
+                        <Form.Control type="text" readOnly={showloader} ref={inputRef} placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => debouncedUpdateSearch(e.target.value)}/>
                       </Form.Group>
                     </Form>
                   </ListGroup.Item>
@@ -1861,7 +1872,7 @@ function TeamMembersPage() {
               <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                 <Form.Group className="mb-0 form-group">
                   <MdOutlineSearch />
-                  <Form.Control type="text" placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)}/>
+                  <Form.Control type="text" readOnly={showloader} ref={inputRef} placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => debouncedUpdateSearch(e.target.value)}/>
                 </Form.Group>
               </Form>
             </ListGroup.Item>

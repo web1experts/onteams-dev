@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
@@ -18,6 +18,7 @@ import {
   ListGroupItem,
   Pagination,
 } from "react-bootstrap";
+import debounce from "lodash.debounce";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeft, BsArrowRight, BsClockHistory } from "react-icons/bs";
@@ -174,6 +175,7 @@ const TaskList = ({ report, handleView, setReport }) => {
 };
 
 function ReportsPage() {
+  const inputRef = useRef(null);
   const handleSidebarSmall = () =>
     dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
   const [isActive, setIsActive] = useState(false);
@@ -338,6 +340,18 @@ function ReportsPage() {
     };
 
   }
+
+    // Debounced search handler
+    const debouncedUpdateSearch = useMemo(
+      () =>
+        debounce((value) => {
+          if (value.length > 1 || value.length === 0) {
+            setFilters({ ...filters, ["page"]: 1 });
+            handlefilterchange("search", value);
+          }
+        }, 1000), // 1 sec debounce
+      []
+    );
 
   const handleListProjects = async () => {
     if (memberProfile?.role?.slug === "owner") {
@@ -1059,6 +1073,8 @@ function ReportsPage() {
                           <MdOutlineSearch />
                           <Form.Control
                             type="text"
+                            ref={inputRef}
+                            readOnly={spinner}
                             placeholder={
                               activeMemberTab === "members"
                                 ? "Search by member"
@@ -1066,10 +1082,7 @@ function ReportsPage() {
                             }
                             onChange={(event) => {
                               const value = event.target.value;
-                              if (value.length > 1 || value.length === 0) {
-                                setFilters({ ...filters, ["page"]: 1 });
-                                handlefilterchange("search", value);
-                              }
+                              debouncedUpdateSearch(value)
                             }}
                           />
                         </Form.Group>
@@ -1891,6 +1904,8 @@ function ReportsPage() {
                   <MdOutlineSearch />
                   <Form.Control
                     type="text"
+                    ref={inputRef}
+                    readOnly={spinner}
                     placeholder={
                       activeMemberTab === "members"
                         ? "Search by member"
@@ -1898,10 +1913,11 @@ function ReportsPage() {
                     }
                     onChange={(event) => {
                       const value = event.target.value;
-                      if (value.length > 1 || value.length === 0) {
-                        setFilters({ ...filters, ["page"]: 1 });
-                        handlefilterchange("search", value);
-                      }
+                      debouncedUpdateSearch(value)
+                      // if (value.length > 1 || value.length === 0) {
+                      //   setFilters({ ...filters, ["page"]: 1 });
+                      //   handlefilterchange("search", value);
+                      // }
                     }}
                   />
                 </Form.Group>

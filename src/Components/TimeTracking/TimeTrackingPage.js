@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
@@ -92,8 +92,10 @@ import {
   ListProjectsByMembers,
   ListMemberProjects,
 } from "../../redux/actions/project.action";
+import debounce from "lodash.debounce";
 
 function TimeTrackingPage() {
+  const inputRef = useRef(null);
   const filterDisplayLabels = {
     today: "Today",
     yesterday: "Yesterday",
@@ -829,12 +831,20 @@ function TimeTrackingPage() {
     });
   }, [liveactivities]);
 
+  // Debounced search handler
+    const debouncedUpdateSearch = useMemo(
+    () =>
+      debounce((value) => {
+        setFilters((prev) => ({ ...prev, search: value }));
+      }, 1000), // 1 sec debounce
+    []
+  );
+
   const handlefilterchange = (name, value) => {
-    if (
-      (name === "search" && value === "") ||
-      (name === "search" && value.length > 1) ||
-      name !== "search"
-    ) {
+    if (name === "search") {
+      // only debounce search
+      debouncedUpdateSearch(value);
+    } else  {
       setFilters({ ...filters, [name]: value });
     }
   };
@@ -1444,6 +1454,8 @@ function TimeTrackingPage() {
                           <MdOutlineSearch />
                           <Form.Control
                             type="text"
+                            ref={inputRef}
+                            readOnly={spinner}
                             name="search"
                             placeholder="Search by name"
                             onChange={(event) =>
@@ -2731,6 +2743,8 @@ function TimeTrackingPage() {
                   <Form.Control
                     type="text"
                     name="search"
+                    ref={inputRef}
+                    readOnly={spinner}
                     placeholder="Search by name"
                     onChange={(event) =>
                       handlefilterchange("search", event.target.value)
