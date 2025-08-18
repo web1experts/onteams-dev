@@ -1569,6 +1569,7 @@ const renderSubtasks = () => {
                         onChange={async (value) => {
                             const formattedDate = value.format("YYYY-MM-DD")
                             dispatch(updateStateData(TASK_FORM, { ['due_date']: formattedDate }));
+                            await dispatch(updateTask(currentTask._id, { due_date: formattedDate }))
                             setDatePickerModal(false)
                         }
                         }
