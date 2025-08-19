@@ -147,7 +147,7 @@ function TimeTrackingPage() {
   const [open, setOpen] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [entries, setEntries] = useState([]);
-  const [timings, setTimings] = useState({ start_time: "", end_time: "" });
+  const [timings, setTimings] = useState({ start_time: "", end_time: "", date: "" });
   const [memberprojects, setMemberProjects] = useState([]);
   const [occupiedRanges, setOccupiedRanges] = useState([]);
   const [timeSlots, setTimeslots] = useState([]);
@@ -179,6 +179,7 @@ function TimeTrackingPage() {
   const [showInnerFilter, setInnerFilterShow] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("today");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [ reportPickerOpen, setReportPickerOpen] = useState(false)
   const [showSearch, setSearchShow] = useState(false);
   const [selectedScreenshots, setSelectedScreenshots] = useState({});
   const activitystate = useSelector((state) => state.activity);
@@ -212,7 +213,7 @@ function TimeTrackingPage() {
     setEntries([]);
     setSelectedProject("");
     setErrors([]);
-    setTimings({ start_time: "", end_time: "" });
+    setTimings({ start_time: "", end_time: "", date: ""  });
   };
   const commonState = useSelector((state) => state.common);
 
@@ -220,7 +221,7 @@ function TimeTrackingPage() {
     setWorkflow("");
     setSelectedProject("");
     setFilteredTasks([]);
-    setTimings({ start_time: "", end_time: "" });
+    setTimings({ start_time: "", end_time: "", date: ""  });
     setProjectShow(false);
   };
 
@@ -361,8 +362,9 @@ function TimeTrackingPage() {
     setActSpinner(false);
   };
 
-  const memberTodaysActivity = async () => {
-    await dispatch(getMemberRecoredActivity(memberProfile._id, "recorded"));
+  const memberTodaysActivity = async (date = null) => {
+    setOccupiedRanges([])
+    await dispatch(getMemberRecoredActivity(memberProfile._id, "recorded", date));
   };
 
   useEffect(() => {
@@ -531,34 +533,67 @@ function TimeTrackingPage() {
   };
 
   // Check if a time slot is occupied
+  // const isTimeSlotOccupied = (time, ranges) => {
+  //   if (!ranges || ranges.length === 0) {
+  //     // If ranges is null, undefined, or empty, return false (time slot is not occupied)
+  //     return false;
+  //   }
+
+  //   // Convert time string (HH:mm) to a Date object on the same day
+  //   const timeDate = new Date();
+  //   const [hours, minutes] = time.split(":");
+  //   timeDate.setHours(hours, minutes, 0, 0); // Set time based on HH:mm
+
+  //   return ranges.some(({ start, end }) => {
+  //     // Convert start time from ISO string to Date object
+  //     const startDate = new Date(start);
+
+  //     // If end time exists, convert it to Date; otherwise, set endDate to null
+  //     const endDate = end ? new Date(end) : null;
+
+  //     // Check if the time falls within the range
+  //     if (endDate) {
+  //       // If there is an end time, check if time is between start and end
+  //       return timeDate >= startDate && timeDate < endDate;
+  //     }
+
+  //     // If there's no end time, check if the time is after the start time
+  //     return timeDate >= startDate;
+  //   });
+  // };
+
   const isTimeSlotOccupied = (time, ranges) => {
-    if (!ranges || ranges.length === 0) {
-      // If ranges is null, undefined, or empty, return false (time slot is not occupied)
-      return false;
+  if (!ranges || ranges.length === 0) {
+    return false; // no ranges → slot is free
+  }
+
+  // Determine base date: timings.date or today
+  const baseDate = timings?.date ? new Date(timings.date) : new Date();
+
+  // Create timeDate from baseDate + HH:mm
+  const [hours, minutes] = time.split(":");
+  const timeDate = new Date(baseDate);
+  timeDate.setHours(hours, minutes, 0, 0);
+
+  return ranges.some(({ start, end }) => {
+    const startTime = new Date(start);
+    const endTime = end ? new Date(end) : null;
+
+    // Normalize start and end to the baseDate
+    const startDate = new Date(baseDate);
+    startDate.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+
+    const endDate = endTime
+      ? new Date(baseDate).setHours(endTime.getHours(), endTime.getMinutes(), 0, 0)
+      : null;
+
+    if (endDate) {
+      return timeDate >= startDate && timeDate < endDate;
     }
+    return timeDate >= startDate;
+  });
+};
 
-    // Convert time string (HH:mm) to a Date object on the same day
-    const timeDate = new Date();
-    const [hours, minutes] = time.split(":");
-    timeDate.setHours(hours, minutes, 0, 0); // Set time based on HH:mm
-
-    return ranges.some(({ start, end }) => {
-      // Convert start time from ISO string to Date object
-      const startDate = new Date(start);
-
-      // If end time exists, convert it to Date; otherwise, set endDate to null
-      const endDate = end ? new Date(end) : null;
-
-      // Check if the time falls within the range
-      if (endDate) {
-        // If there is an end time, check if time is between start and end
-        return timeDate >= startDate && timeDate < endDate;
-      }
-
-      // If there's no end time, check if the time is after the start time
-      return timeDate >= startDate;
-    });
-  };
 
   useEffect(() => {
     const totalTaskDuration = entries.reduce((total, entry) => {
@@ -571,8 +606,85 @@ function TimeTrackingPage() {
     setTotalTaskDuration(totalTaskDuration);
   }, [entries]);
 
+// Helper: normalize any date-like to "YYYY-MM-DD"
+const ymd = (dateLike) => {
+  if (!dateLike) return null;
+  const str = String(dateLike);
+  const m = str.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (m) return m[1]; // already YYYY-MM-DD
+  const d = new Date(dateLike);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString().slice(0, 10);
+};
+
+// Helper: HH:mm on a given date → Date (local)
+const parseTimeOnDate = (time, dateLike) => {
+  const day = ymd(dateLike);
+  if (!day) return null;
+  const [Y, M, D] = day.split("-").map(Number);
+  const [h, m] = time.split(":").map(Number);
+  return new Date(Y, M - 1, D, h, m, 0, 0);
+};
+
+
   const handleReportSubmit = async (e) => {
     e.preventDefault();
+    // const errors = entries.map((entry, index) => {
+    //   const entryErrors = {};
+
+    //   // Validation 1: Task is required
+    //   if (!entry.task) entryErrors.task = "Task is required";
+
+    //   // Validation 2: Start and End Time are required
+    //   if (!entry.start_time) {
+    //     entryErrors.start_time = "Start time is required.";
+    //   }
+    //   if (!entry.end_time) {
+    //     entryErrors.end_time = "End time is required.";
+    //   }
+
+    //   // Helper function to convert HH:mm to Date object
+    //   const parseTime = (time) => {
+    //     const [hours, minutes] = time.split(":").map(Number);
+    //     const date = new Date();
+    //     date.setHours(hours, minutes, 0, 0);
+    //     return date;
+    //   };
+
+    //   if (entry.start_time && entry.end_time) {
+    //     const currentStart = parseTime(entry.start_time);
+    //     const currentEnd = parseTime(entry.end_time);
+
+    //     // Validation 3: End time must be greater than start time
+    //     if (currentStart >= currentEnd) {
+    //       entryErrors.end_time = "End time must be greater than start time.";
+    //     }
+
+    //     // Validation 4: Start and End times should not overlap with other entries
+    //     entries.forEach((otherEntry, otherIndex) => {
+    //       if (
+    //         index !== otherIndex &&
+    //         otherEntry.start_time &&
+    //         otherEntry.end_time
+    //       ) {
+    //         const otherStart = parseTime(otherEntry.start_time);
+    //         const otherEnd = parseTime(otherEntry.end_time);
+
+    //         if (
+    //           currentStart < otherEnd &&
+    //           currentEnd > otherStart // Overlap condition
+    //         ) {
+    //           entryErrors.start_time =
+    //             "Time range overlaps with another entry.";
+    //           entryErrors.end_time = "Time range overlaps with another entry.";
+    //         }
+    //       }
+    //     });
+    //   }
+
+    //   return entryErrors;
+    // });
+
     const errors = entries.map((entry, index) => {
       const entryErrors = {};
 
@@ -587,47 +699,44 @@ function TimeTrackingPage() {
         entryErrors.end_time = "End time is required.";
       }
 
-      // Helper function to convert HH:mm to Date object
-      const parseTime = (time) => {
-        const [hours, minutes] = time.split(":").map(Number);
-        const date = new Date();
-        date.setHours(hours, minutes, 0, 0);
-        return date;
-      };
+      // Helper function to convert HH:mm + entry.date → Date object
+      // const parseTime = (time, dateString) => {
+      //   const [hours, minutes] = time.split(":").map(Number);
+      //   const baseDate = dateString ? new Date(dateString) : new Date();
+      //   baseDate.setHours(hours, minutes, 0, 0);
+      //   return baseDate;
+      // };
 
-      if (entry.start_time && entry.end_time) {
-        const currentStart = parseTime(entry.start_time);
-        const currentEnd = parseTime(entry.end_time);
+    const entryDay = ymd(entry.date);
+    if (entry.start_time && entry.end_time && entryDay) {
+      const currentStart = parseTimeOnDate(entry.start_time, entry.date);
+      const currentEnd   = parseTimeOnDate(entry.end_time, entry.date);
 
-        // Validation 3: End time must be greater than start time
-        if (currentStart >= currentEnd) {
-          entryErrors.end_time = "End time must be greater than start time.";
-        }
-
-        // Validation 4: Start and End times should not overlap with other entries
-        entries.forEach((otherEntry, otherIndex) => {
-          if (
-            index !== otherIndex &&
-            otherEntry.start_time &&
-            otherEntry.end_time
-          ) {
-            const otherStart = parseTime(otherEntry.start_time);
-            const otherEnd = parseTime(otherEntry.end_time);
-
-            if (
-              currentStart < otherEnd &&
-              currentEnd > otherStart // Overlap condition
-            ) {
-              entryErrors.start_time =
-                "Time range overlaps with another entry.";
-              entryErrors.end_time = "Time range overlaps with another entry.";
-            }
-          }
-        });
+      if (currentStart >= currentEnd) {
+        entryErrors.end_time = "End time must be greater than start time.";
       }
 
-      return entryErrors;
-    });
+      // ✅ Only compare with entries on the same YYYY-MM-DD
+      entries.forEach((otherEntry, otherIndex) => {
+        if (
+          otherIndex !== index &&
+          otherEntry.start_time &&
+          otherEntry.end_time &&
+          ymd(otherEntry.date) === entryDay
+        ) {
+          const otherStart = parseTimeOnDate(otherEntry.start_time, otherEntry.date);
+          const otherEnd   = parseTimeOnDate(otherEntry.end_time, otherEntry.date);
+
+          if (otherStart && otherEnd && currentStart < otherEnd && currentEnd > otherStart) {
+            entryErrors.start_time = "Time range overlaps with another entry.";
+            entryErrors.end_time   = "Time range overlaps with another entry.";
+          }
+        }
+      });
+    }
+
+    return entryErrors;
+  });
 
     const hasErrors = errors.some(
       (entryErrors) => Object.keys(entryErrors).length > 0
@@ -640,6 +749,7 @@ function TimeTrackingPage() {
     setErrors([]);
     setLoader(true);
     const payload = { entries };
+    
     dispatch(addManualTime({ ...payload, ...fields }));
   };
 
@@ -865,6 +975,7 @@ function TimeTrackingPage() {
       project_title: selectedproject?.title,
       start_time: timings?.start_time,
       end_time: timings?.end_time,
+      date: timings?.date
     });
 
     setEntries(updatedEntries);
@@ -2057,10 +2168,12 @@ function TimeTrackingPage() {
                     if (currentActivity && Object.keys(currentActivity)) {
                       const cact = currentActivity;
                       leaveRoom(currentActivity?._id);
-                      startsharing(
-                        currentActivity?._id,
-                        currentActivity?.latestActivity?.status
-                      );
+                      setTimeout(() => {
+                        startsharing(
+                          currentActivity?._id,
+                          currentActivity?.latestActivity?.status
+                        );
+                      }, 700);
                     }
                   }}
                 >
@@ -2444,7 +2557,7 @@ function TimeTrackingPage() {
                                                   <Card
                                                     key={`blank-card-${
                                                       recording?._id
-                                                    }-${
+                                                    }-${           
                                                       currentVideoPage[
                                                         recording?._id
                                                       ] || 1
@@ -2453,7 +2566,7 @@ function TimeTrackingPage() {
                                                     <Card.Body>
                                                       <img
                                                         className="card-img-top"
-                                                        src="https://primeteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
+                                                        src="https://app.primeteams.ai/images/5H2J6.jpg"
                                                         alt="screenshot"
                                                       />
                                                       <p>
@@ -2952,21 +3065,23 @@ function TimeTrackingPage() {
                         {entry?.task_title}
                       </Card.Text>
                       <Card.Text className="text-muted mb-0">
+                        {entry?.date} <br />
                         {entry?.start_time} - {entry?.end_time}
                       </Card.Text>
                       <Card.Text className="text-success mb-0">
                         <strong>{convertSecondstoTime(taskDuration)}</strong>
                       </Card.Text>
+                      
                       {errors[i]?.start_time && (
-                        <span className="form-error">
+                        <span className="error">
                           {errors[i].start_time}
                         </span>
                       )}
                       {errors[i]?.end_time && (
-                        <span className="form-error">{errors[i].end_time}</span>
+                        <span className="error">{errors[i].end_time}</span>
                       )}
                       {errors[i]?.task && (
-                        <span className="form-error">{errors[i].task}</span>
+                        <span className="error">{errors[i].task}</span>
                       )}
                     </Card.Body>
                   </Card>
@@ -2982,7 +3097,38 @@ function TimeTrackingPage() {
                     <FaPlus /> Add New Entry
                   </h6>
                 </Col>
+                <Col md={12} className="mb-3">
+                  <DatePicker
+                    key={"date-filter-report"}
+                    name="date"
+                    weekStartDayIndex={1}
+                    id="datepicker-report"
+                    value={timings?.date || ""}
+                    format="YYYY-MM-DD"
+                    multiple={false}
+                    dateSeparator=" - "
+                    onChange={async (value) => {
+                      const formatDate = (date) => {
+                        const d = new Date(date);
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+                        const day = String(d.getDate()).padStart(2, "0");
+                        return `${year}-${month}-${day}`;
+                      };
+                      const formatted = formatDate(value);
+                      memberTodaysActivity([formatted])
+                      handleTimeChange("date", formatted)
+                      
+                    }}
+                    className="form-control"
+                    placeholder="YYYY-MM-DD"
+                    open={reportPickerOpen} // Control visibility with state
+                    onOpen={() => setReportPickerOpen(true)} // Update state when opened
+                    onClose={() => setReportPickerOpen(false)} // Update state when closed
+                  />
+                </Col>
                 <Col md={6} className="mb-3 mb-md-0">
+                  
                   <Dropdown className="select--dropdown">
                     <Dropdown.Toggle variant="success">
                       {timings?.start_time || "Start Time"}
@@ -2994,32 +3140,24 @@ function TimeTrackingPage() {
                                       <Form.Control type="text" placeholder="Search here.."  value={timings?.start_time} onChange={(e) => {handleSearchChange('start_time', 0, e.target.value)}} />
                                   </Form.Group>
                               </Form> */}
-                        {timeSlots.map((slot) => {
+                        {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
                             slot,
                             occupiedRanges
                           );
-                          if (!isOccupied) {
-                            isOccupied = entries.some((entry) => {
-                              return (
-                                (slot >= entry.start_time &&
-                                  slot <= entry.end_time) || // Between
-                                slot === entry.start_time || // Equal to start
-                                slot === entry.end_time // Equal to end
-                              );
-                            });
-                          }
-                          // if( searchEntries[0]?.start_time && searchEntries[0]?.start_time !== ""){
-                          //   if (slot?.toLowerCase().includes(searchEntries[0]?.start_time?.toLowerCase())) {
-                          //     return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleTimeChange("start_time", slot)} >{slot}</Dropdown.Item>
-                          //   }else{
-                          //     return null;
-                          //   }
-
-                          // }else{
+                          // if (!isOccupied) {
+                          //   isOccupied = entries.some((entry) => {
+                          //     return (
+                          //       (slot >= entry.start_time &&
+                          //         slot <= entry.end_time) || // Between
+                          //       slot === entry.start_time || // Equal to start
+                          //       slot === entry.end_time // Equal to end
+                          //     );
+                          //   });
+                          // }
                           return (
                             <Dropdown.Item
-                              key={`slot-${slot}-${0}`}
+                              key={`slot-${slot}-${idx}`}
                               onClick={() =>
                                 handleTimeChange("start_time", slot)
                               }
@@ -3051,32 +3189,24 @@ function TimeTrackingPage() {
                                       <Form.Control type="text" placeholder="Search here.."  value={timings?.end_time} onChange={(e) => {handleSearchChange('end_time', 0, e.target.value)}} />
                                   </Form.Group>
                               </Form> */}
-                        {timeSlots.map((slot) => {
+                        {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
                             slot,
                             occupiedRanges
                           );
-                          if (!isOccupied) {
-                            isOccupied = entries.some((entry) => {
-                              return (
-                                (slot >= entry.start_time &&
-                                  slot <= entry.end_time) || // Between
-                                slot === entry.start_time || // Equal to start
-                                slot === entry.end_time // Equal to end
-                              );
-                            });
-                          }
-                          // if( searchEntries[0]?.end_time && searchEntries[0]?.end_time !== ""){
-                          //   if (slot?.toLowerCase().includes(searchEntries[0]?.end_time?.toLowerCase())) {
-                          //     return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleTimeChange("end_time", slot)} >{slot} </Dropdown.Item>
-                          //   }else{
-                          //     return null;
-                          //   }
-
-                          // }else{
+                          // if (!isOccupied) {
+                          //   isOccupied = entries.some((entry) => {
+                          //     return (
+                          //       (slot >= entry.start_time &&
+                          //         slot <= entry.end_time) || // Between
+                          //       slot === entry.start_time || // Equal to start
+                          //       slot === entry.end_time // Equal to end
+                          //     );
+                          //   });
+                          // }
                           return (
                             <Dropdown.Item
-                              key={`slot-${slot}-${0}`}
+                              key={`end-slot-${slot}-${idx}`}
                               onClick={() => handleTimeChange("end_time", slot)}
                               disabled={isOccupied}
                               style={{
@@ -3099,7 +3229,11 @@ function TimeTrackingPage() {
             }
             <Row>
               <Col md={12} className="mt-3 text-end">
-                <Button variant="dark" onClick={handleProjectShow}>
+                <Button variant="dark" onClick={handleProjectShow} disabled={
+                    !timings?.start_time ||
+                    !timings?.end_time ||
+                    timings.end_time === "00:00"
+                  }>
                   Select Project
                 </Button>
               </Col>
@@ -3111,7 +3245,7 @@ function TimeTrackingPage() {
           <Button
             variant="primary"
             onClick={handleReportSubmit}
-            disabled={loader}
+            disabled={loader || entries.length === 0}
           >
             {loader === true ? "Please wait..." : "Submit"}
           </Button>
