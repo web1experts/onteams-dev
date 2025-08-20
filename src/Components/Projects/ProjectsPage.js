@@ -408,9 +408,9 @@ function ProjectsPage() {
         let membersdrop = {};
 
         currentProject.members.forEach((member) => {
-          const { _id, name } = member;
+          const { _id, name, avatar } = member;
           projectMembers.push(_id);
-          membersdrop[_id] = name;
+          membersdrop[_id] = {name, avatar, id: _id};
         });
 
         fieldsSetup.members = membersdrop;

@@ -453,7 +453,7 @@ function TimeTrackingPage() {
         recordedRefresh === true)
     ) {
       // setActiveInnerTab("InnerRecorded")
-
+      setRecordedActivities([])
       handleRecordedActivity();
     }
     if (currentActivity?.latestActivity?.status === false) {
@@ -487,7 +487,8 @@ function TimeTrackingPage() {
 
   useEffect(() => {
     if (memberActivities) {
-      setOccupiedRanges(calculateOccupiedRanges(memberActivities));
+      const data = calculateOccupiedRanges(memberActivities)
+      setOccupiedRanges(data);
     }
   }, [memberActivities]);
 

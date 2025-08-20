@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { debounce } from 'lodash';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import debounce from "lodash.debounce";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Form, ListGroup, Row, Col, InputGroup, Dropdown, Image } from "react-bootstrap";
 import { MdFileDownload } from "react-icons/md";
@@ -131,7 +131,8 @@ export const TaskForm = (props) => {
     useEffect(() => {
         
         if (apiResult.UpdatedTask) {
-            setCurrentTask(apiResult.UpdatedTask)
+            dispatch(updateStateData(CURRENT_TASK, apiResult.UpdatedTask));
+            // setCurrentTask(apiResult.UpdatedTask)
         }
 
     }, [apiResult.UpdatedTask])
@@ -180,7 +181,7 @@ export const TaskForm = (props) => {
         }
     }, [apiResult.tasks, dispatch])
 
-    useEffect(() => {
+    useEffect(() => { 
         if (currentTask && Object.keys(currentTask).length > 0) {
             setImagePreviews([]);
             let fieldsSetup = {
@@ -226,9 +227,9 @@ export const TaskForm = (props) => {
                 let membersdrop = {};
 
                 currentTask.members.forEach(member => {
-                    const { _id, name } = member;
+                    const { _id, name, avatar } = member;
                     taskMembers.push(_id);
-                    membersdrop[_id] = name;
+                    membersdrop[_id] = {name, avatar, id: _id};
                 });
 
                 fieldsSetup.members = membersdrop;
@@ -372,7 +373,7 @@ export const TaskForm = (props) => {
 
     const handleTaskClose = () => {
         const cf = clearTaskForm(taskForm)
-        console.log('cleared form:: ', cf)
+        
         dispatch(updateStateData(TASK_FORM, cf));
 
         setDatePickerModal(false);
@@ -885,13 +886,24 @@ const renderSubtasks = () => {
     };
 
     const handleDescBlur = debounce(async () => {
-        if (pasteOccurred.current) {
-            pasteOccurred.current = false; // Reset the flag after handling paste
-            return;
-        }
+        // if (pasteOccurred.current) {
+        //     pasteOccurred.current = false; // Reset the flag after handling paste
+        //     return;
+        // }
         await dispatch(updateTask(currentTask._id, { description: fields['description'] }));
 
-    }, 2000)
+    }, 100)
+
+      const debouncedUpdateDesc = useMemo(
+        () =>
+          debounce(async (fieldName, value) => {
+            if(currentTask._id){
+                 await dispatch(updateTask(currentTask._id, { [fieldName]: value }));
+            }
+           
+          }, 700), // 1 sec debounce
+        [dispatch, currentTask._id]
+      );
 
     const Initials = ({ id, children, title }) => {
         return (
@@ -972,6 +984,7 @@ const renderSubtasks = () => {
                                                     description: value,
                                                 }));
                                                 setErrors((prevErrors) => ({ ...prevErrors, description: '' }));
+                                                debouncedUpdateDesc('description', value);
                                             }}
                                             onKeyDown={handleKeyDown}
                                             ref={quillRef}

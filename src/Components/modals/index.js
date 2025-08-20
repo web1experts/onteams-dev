@@ -358,7 +358,7 @@ export function MemberModal( props){
     if( commonState.active_formtype === "edit_project" && currentProject && Object.keys(currentProject).length > 0 && isEdit === true){
       const memberIds = Object.keys(membersModalState.selectedMembers);
       dispatch(updateProject(currentProject._id, { members: memberIds }))
-    }else if( commonState.active_formtype === "task_edit" && currentTask && Object.keys(currentTask).length > 0){ 
+    }else if( commonState.active_formtype === "task_edit" && currentTask && Object.keys(currentTask).length > 0){ console.log(commonState.active_formtype)
       const memberIds = Object.keys(membersModalState.selectedMembers);
       dispatch(updateTask(currentTask._id, { members: memberIds }))
     }else{
@@ -389,7 +389,11 @@ export function MemberModal( props){
       ...prevMembersModalState,
       selectedMembers: {
         ...prevMembersModalState?.selectedMembers,
-        [member._id]: member.name
+        [member._id]: {
+          id: member._id,
+          name: member.name,
+          avatar: member?.avatar
+        }
       }
     }));
   };
@@ -423,10 +427,10 @@ export function MemberModal( props){
           </Form>
           <ListGroup className="added--list">
           {membersModalState?.selectedMembers && Object.keys(membersModalState?.selectedMembers).length > 0 &&
-            Object.entries(membersModalState.selectedMembers).map(([id, name], index) => (
-                <ListGroup.Item key={`listkey-${index}`} onClick={() => handleRemove(id)}>
+            Object.entries(membersModalState.selectedMembers).map(([memberInfo], index) => (
+                <ListGroup.Item key={`listkey-${index}`} onClick={() => handleRemove(memberInfo.id)}>
                     <span><img src="../images/default.jpg" alt="" /></span>
-                    <p>{name} <FaTimesCircle /></p>
+                    <p>{memberInfo.name} <FaTimesCircle /></p>
                 </ListGroup.Item>
             ))
           }
