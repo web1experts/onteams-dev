@@ -222,12 +222,12 @@ function ProjectsPage() {
     if (systemFields?.status) {
       setFilters({
         ...filters,
-        ["status"]: systemFields?.status?.options[0]?.value,
+        ["status"]: systemFields?.status?.options[0]?.value || 'in-progress',
         member: memberdata?._id,
       });
       setFields({
         ...fields,
-        ["status"]: systemFields?.status?.options[0]?.value,
+        ["status"]: systemFields?.status?.options[0]?.value || 'in-progress',
       });
     }
   }, [systemFields]);
@@ -500,7 +500,7 @@ function ProjectsPage() {
 
   useEffect(() => {
     if (currentPage > 0) {
-      setProjects([]);
+      setProjects([]); console.log('I am here')
       handleListProjects();
       setSpinner(true);
     }
@@ -740,7 +740,7 @@ function ProjectsPage() {
   useEffect(() => {
     if (apiResult.deletedProject) {
       setIsActive(0);
-      setCurrentPage({});
+      setCurrentPage(0);
     }
     handleClose();
     if (apiResult?.success === true && !apiResult.updatedProject) {
@@ -1949,7 +1949,6 @@ function ProjectsPage() {
                                         <abbr key={`index-${index}`}>
                                           {index + 1}
                                         </abbr>
-                                        <MdDragIndicator />
                                       </div>
                                       <div className="title--initial">
                                         {project.title.charAt(0)}
@@ -2245,8 +2244,8 @@ function ProjectsPage() {
                             </>
                           );
                         })
-                      : spinner &&
-                        isActiveView === 2 && (
+                      : 
+                        (isActiveView === 2) && (
                           <>
                             <tr key={`noresults-row`} className="no--invite">
                               <td
@@ -2264,10 +2263,10 @@ function ProjectsPage() {
                   </tbody>
                 </Table>
               )}
-              {isActiveView === 1 &&
+              {(isActiveView === 1 &&
                 !spinner &&
                 projects &&
-                projects.length == 0 && (
+                projects.length === 0) && (
                   <div className="text-center">
                     <h2>No Projects Found</h2>
                   </div>

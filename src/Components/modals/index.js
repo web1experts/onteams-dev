@@ -177,8 +177,6 @@ export function StatusModal(props){
        return stateObject
        
       case 'edit_project':
-        
-        
         const editstateObject = {}
         editstateObject['status'] = commonState.editProjectForm.status
         editstateObject['title'] = commonState.editProjectForm.title
@@ -189,8 +187,6 @@ export function StatusModal(props){
   }
 
   const [statusModalState, setStatusModalState] = useState({})
-
-
 
   const filteredStatuses = statuses.filter(status => 
     status.label.toLowerCase().includes(search.toLowerCase())
@@ -206,8 +202,6 @@ export function StatusModal(props){
       setStatusModalState(updatedState);
     }
   },[ commonState.projectForm, commonState.editProjectForm])
-
-  
 
   return (
     <>
@@ -317,7 +311,6 @@ export function MemberModal( props){
 
   const [membersModalState, setMembersModalState] = useState(refreshstates(commonState.active_formtype || false))
 
-
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
   };
@@ -333,7 +326,6 @@ export function MemberModal( props){
     setMembersModalState(refreshstates(commonState.active_formtype))
   },[ commonState?.projectForm?.members, commonState?.editProjectForm?.members])
 
-  
   let filteredMembers = commonState.allmembers
 
     if(commonState.allmembers && commonState.allmembers.length > 0){
@@ -346,8 +338,6 @@ export function MemberModal( props){
     setAssignShow(modalstate)
   }, [modalstate])
 
-
-
   useEffect(() => {
     setIsEdit(commonState.assign_members_direct)
 },[commonState.assign_members_direct])
@@ -358,7 +348,7 @@ export function MemberModal( props){
     if( commonState.active_formtype === "edit_project" && currentProject && Object.keys(currentProject).length > 0 && isEdit === true){
       const memberIds = Object.keys(membersModalState.selectedMembers);
       dispatch(updateProject(currentProject._id, { members: memberIds }))
-    }else if( commonState.active_formtype === "task_edit" && currentTask && Object.keys(currentTask).length > 0){ console.log(commonState.active_formtype)
+    }else if( commonState.active_formtype === "task_edit" && currentTask && Object.keys(currentTask).length > 0){ 
       const memberIds = Object.keys(membersModalState.selectedMembers);
       dispatch(updateTask(currentTask._id, { members: memberIds }))
     }else{

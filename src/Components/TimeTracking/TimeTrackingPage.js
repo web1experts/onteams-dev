@@ -289,8 +289,11 @@ function TimeTrackingPage() {
   function leaveRoom(room) {
     socket.emit("leaveRoom", socket.id, room);
   }
-  const handleLiveActivityList = async () => {
+
+  const handleLiveActivityListInterval = async () => {
+    setSpinner(true);
     const currentFilters = filtersRef.current;
+    
     if (currentFilters.status === "recordings") {
       return;
     }
@@ -323,7 +326,44 @@ function TimeTrackingPage() {
     setSpinner(false);
   };
 
+  const handleLiveActivityList = async () => {
+    setSpinner(true);
+    const currentFilters = filtersRef.current;
+    
+    // if (currentFilters.status === "recordings") {
+    //   return;
+    // }
+    let selectedfilters = {
+      currentPage: currentPage,
+      status: currentFilters.status,
+    };
+
+    if (Object.keys(currentFilters).length > 0) {
+      selectedfilters = { ...selectedfilters, ...currentFilters };
+    }
+
+    if (
+      memberProfile?.permissions?.tracking?.view_others === true &&
+      memberProfile?.permissions?.tracking?.selected_members?.length > 0
+    ) {
+      selectedfilters = {
+        ...selectedfilters,
+        ["selected_members"]:
+          memberProfile?.permissions?.tracking?.selected_members,
+      };
+    } else {
+      selectedfilters = {
+        ...selectedfilters,
+        ["selected_members"]: [memberProfile?._id],
+      };
+    }
+
+    await dispatch(getliveActivity(selectedfilters));
+    setSpinner(false);
+  };
+
   const handleFilteredLiveActivityList = async () => {
+    setSpinner(true)
     const currentFilters = filtersRef.current;
     let selectedfilters = {
       currentPage: currentPage,
@@ -439,7 +479,7 @@ function TimeTrackingPage() {
   }
 
   useEffect(() => {
-    setActSpinner(false);
+    //setActSpinner(false);
     setLiveStreaming(
       currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"
     );
@@ -459,22 +499,14 @@ function TimeTrackingPage() {
     if (currentActivity?.latestActivity?.status === false) {
       setActSpinner(false);
     }
+    // else{
+    //   updateStream()
+    // }
   }, [currentActivity]);
 
   useEffect(() => {
-    if (
-      (currentActivity !== false &&
-        activeTab === "Live" &&
-        liveStreaming === "enable") ||
-      (currentActivity !== false &&
-        activeInnerTab === "InnerLive" &&
-        liveStreaming === "enable")
-    ) {
-      setSpinner(false);
-      startsharing(
-        currentActivity._id,
-        currentActivity?.latestActivity?.status
-      );
+    if(liveStreaming !== 'disabled'){
+      updateStream()
     }
   }, [liveStreaming]);
 
@@ -491,6 +523,24 @@ function TimeTrackingPage() {
       setOccupiedRanges(data);
     }
   }, [memberActivities]);
+
+  const updateStream = () => {
+    if (
+      (currentActivity !== false &&
+        activeTab === "Live" &&
+        liveStreaming === "enable") ||
+      (currentActivity !== false &&
+        activeInnerTab === "InnerLive" &&
+        liveStreaming === "enable")
+    ) {
+      leaveRoom(currentActivity?._id);
+      setSpinner(false);
+      startsharing(
+        currentActivity._id,
+        currentActivity?.latestActivity?.status
+      );
+    }
+  }
 
   const calculateOccupiedRanges = (data) => {
     return data.map((item) => {
@@ -887,7 +937,7 @@ const parseTimeOnDate = (time, dateLike) => {
     setSpinner(true);
 
     setInterval(function () {
-      handleLiveActivityList();
+      handleLiveActivityListInterval();
     }, 60000);
 
     memberTodaysActivity();
@@ -1036,9 +1086,9 @@ const parseTimeOnDate = (time, dateLike) => {
   useEffect(() => {
     selectboxObserver();
     setFilters({ ...filters, ["status"]: activeTab.toLowerCase() });
-    if (activeTab !== "Recordings") {
-      handleLiveActivityList();
-    }
+    // if (activeTab.toLowerCase() !== "recordings") {
+    //   handleLiveActivityList();
+    // }
   }, [activeTab]);
 
   useEffect(() => {
@@ -1105,6 +1155,7 @@ const parseTimeOnDate = (time, dateLike) => {
       setWorkflow(project.workflow.tabs[0]?._id);
     }
     setFilteredTasks([]);
+    setSelectedTask({})
     await dispatch(ListTasks(project?._id));
     await dispatch(getSingleProjectReport(project?._id));
   };
@@ -1954,7 +2005,7 @@ const parseTimeOnDate = (time, dateLike) => {
                               return (
                                 <>
                                   <tr
-                                    key={`activity-row-${index}`}
+                                    key={`recording-activity-row-${index}`}
                                     className={
                                       currentActivity &&
                                       currentActivity?._id === activity._id
@@ -2322,13 +2373,13 @@ const parseTimeOnDate = (time, dateLike) => {
                       autoPlay
                       muted
                     >
-                      video not available
+                      Live video is not available right now.
                     </video>
                   ) : currentActivity?.latestActivity?.status === false ? (
-                    <p className="text-center">The member is paused</p>
+                    <p className="text-center">The member is on break.</p>
                   ) : (
                     <p className="text-center">
-                      Member is not currently active
+                      The member is not currently active.
                     </p>
                   )}
                 </div>

@@ -102,8 +102,6 @@ function SidebarPanel() {
         localStorage.setItem('current_dashboard', JSON.stringify({name: selected.company.name, id: selected.company._id, theme: selected.company?.theme || false}));
         localStorage.setItem('mt_featureSwitches', JSON.stringify(selected?.memberData || null))
         saveTheme(selected.company?.theme || defaultTheme );
-        // dispatch(toggleTheme(selected.company?.theme || defaultTheme));
-        // setAuthorization()
         setTimeout(function(){
             window.location.reload();
         }, 1000)
@@ -154,9 +152,7 @@ function SidebarPanel() {
         return `${r}, ${g}, ${b}`;
     }
 
-
    const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' }
-
     const themes = [
         { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' },
         { name: 'Purple Dream', color: 'linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))', primaryColor: '168, 85, 247', secondaryColor: '236, 72, 153' },
@@ -176,7 +172,6 @@ function SidebarPanel() {
     ];
 
     const [selectedTheme, setSelectedTheme] = useState('Ocean Blue');
-
     const [primaryColor, setPrimaryColor] = useState('#3b82f6');
     const [secondaryColor, setSecondaryColor] = useState('#06b6d4');
     const [themeName, setThemeName] = useState('Custom Theme');
@@ -194,8 +189,7 @@ function SidebarPanel() {
         localStorage.setItem('theme', JSON.stringify({ primaryColor, secondaryColor, themeName, color }));
         dispatch(updateWorkSpaceTheme({theme: { primaryColor, secondaryColor, themeName , color}}))
          dispatch(toggleTheme({ primaryColor, secondaryColor, themeName , color}));
-         handleClose()
-        console.log('Applied theme:', primaryColor, secondaryColor, themeName, color);
+         handleClose();
     };
 
     const handleApply = () => {
