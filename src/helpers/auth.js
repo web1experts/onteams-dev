@@ -124,6 +124,7 @@ export function setupDashboards( companies ){
   if( companies.length > 0){ 
     localStorage.setItem('mt_dashboards', JSON.stringify(companies));
     const current_dashboard = localStorage.getItem('current_dashboard');
+    const default_dashboard = localStorage.getItem('default_dashboard');
     
     if (current_dashboard) {
       const parsedata = JSON.parse(current_dashboard)
@@ -131,7 +132,7 @@ export function setupDashboards( companies ){
       // const companyExists = companies.some(company => company._id === current_dashboard.id);
       let companyExists = false
       for( let i = 0; i < companies.length; i++){
-        if(companies[i].company._id === parsedata.id){
+        if(companies[i].company._id === parsedata.id || companies[i].company._id === default_dashboard){
           companyExists = companies[i];
         }
       }

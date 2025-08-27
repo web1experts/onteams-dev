@@ -129,7 +129,7 @@ function TimeTrackingPage() {
     (state) => state.project.memberProjects
   );
   const [isActiveView, setIsActiveView] = useState(2);
-  const [liveStreaming, setLiveStreaming] = useState("disabled");
+  const [liveStreaming, setLiveStreaming] = useState({});
   const [isScreenActive, setIsScreenActive] = useState(false);
   const [recordedRefresh, setRecordedRefresh] = useState(true);
   const handleSidebar = () =>
@@ -199,6 +199,12 @@ function TimeTrackingPage() {
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
   const [projectToggle, setProjectToggle] = useState(false);
+  const activeTabRef = useRef(activeTab);
+
+useEffect(() => {
+  activeTabRef.current = activeTab;
+}, [activeTab]);
+
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
       handleSidebarSmall();
@@ -291,12 +297,13 @@ function TimeTrackingPage() {
   }
 
   const handleLiveActivityListInterval = async () => {
-    setSpinner(true);
-    const currentFilters = filtersRef.current;
     
-    if (currentFilters.status === "recordings") {
+    const currentFilters = filtersRef.current;
+    console.log("activeTabRef.current::: ", activeTabRef.current)
+    if (activeTabRef.current !== 'Live') {
       return;
     }
+    // setSpinner(true);
     let selectedfilters = {
       currentPage: currentPage,
       status: currentFilters.status,
@@ -395,6 +402,7 @@ function TimeTrackingPage() {
   };
 
   const handleRecordedActivity = async () => {
+    setRecordedActivities([])
     setActSpinner(true);
     await dispatch(
       getRecoredActivity(currentActivity._id, "recorded", filtereddate)
@@ -480,9 +488,7 @@ function TimeTrackingPage() {
 
   useEffect(() => {
     //setActSpinner(false);
-    setLiveStreaming(
-      currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"
-    );
+    setLiveStreaming({...liveStreaming, [currentActivity?._id] : currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"});
 
     if (
       (currentActivity !== false &&
@@ -505,7 +511,7 @@ function TimeTrackingPage() {
   }, [currentActivity]);
 
   useEffect(() => {
-    if(liveStreaming !== 'disabled'){
+    if(liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] !== 'disabled'){
       updateStream()
     }
   }, [liveStreaming]);
@@ -528,11 +534,12 @@ function TimeTrackingPage() {
     if (
       (currentActivity !== false &&
         activeTab === "Live" &&
-        liveStreaming === "enable") ||
+        liveStreaming[currentActivity?._id] &&
+        liveStreaming[currentActivity?._id] === "enable") ||
       (currentActivity !== false &&
         activeInnerTab === "InnerLive" &&
-        liveStreaming === "enable")
-    ) {
+        liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "enable")
+    ) { console.log('here')
       leaveRoom(currentActivity?._id);
       setSpinner(false);
       startsharing(
@@ -811,7 +818,8 @@ const parseTimeOnDate = (time, dateLike) => {
 
     socket.on("receive_record_types", async (record_types = {}) => {
       if (activeTab === "Live") {
-        setLiveStreaming(record_types?.live_streaming || "disabled");
+        // setLiveStreaming(record_types?.live_streaming || "disabled");
+         setLiveStreaming({...liveStreaming, [currentActivity?._id] : record_types?.live_streaming || "disabled"});
       }
     });
 
@@ -2102,7 +2110,7 @@ const parseTimeOnDate = (time, dateLike) => {
                                       <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
                                         <FiClock className="me-1" />{" "}
                                         {convertSecondstoTime(
-                                          activity?.totalTaskDuration || 0
+                                          activity?.totalDuration || 0
                                         ) || "00:00"}
                                       </span>
                                     </td>
@@ -2193,6 +2201,19 @@ const parseTimeOnDate = (time, dateLike) => {
                           >
                             <div className="title--initial">
                               {activity?.name.charAt(0)}
+                               {activity?.latestActivity?.status ? (
+                                  <p className="anim--circle">
+                                    <small className="status--circle active--color"></small>
+                                  </p>
+                                ) : activity?.latestActivity?.status === false ? (
+                                  <p className="anim--circle">
+                                    <small className="status--circle idle--color"></small>
+                                  </p>
+                                ) : (
+                                  <p className="anim--circle">
+                                    <small className="status--circle inactive--color"></small>
+                                  </p>
+                                )}
                             </div>
                             <div className="title--span flex-column align-items-start gap-0">
                               <strong>{activity?.name}</strong>
@@ -2278,6 +2299,11 @@ const parseTimeOnDate = (time, dateLike) => {
                     setCurrentActivity(false);
                     setIsActive(false);
                     dispatch(toggleSidebarSmall(false));
+                    if(activeInnerTab === "InnerLive"){
+                      setActiveTab('Live')
+                    }else{
+                      setActiveTab("Recordings");
+                    }
                   }}
                 >
                   <MdOutlineClose />
@@ -2292,7 +2318,7 @@ const parseTimeOnDate = (time, dateLike) => {
                 : "rounded--box activity--box"
             }
           >
-            {activityspinner && (
+            {(activityspinner) && (
               <div className="loading-bar">
                 <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
@@ -2358,7 +2384,7 @@ const parseTimeOnDate = (time, dateLike) => {
                       </Button>
                     </div>
                   </div>
-                  {liveStreaming === "disabled" ? (
+                  {liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "disabled" ? (
                     <p className="text-center">Live streaming is disabled.</p>
                   ) : currentActivity?.latestActivity?.status ? (
                     <video

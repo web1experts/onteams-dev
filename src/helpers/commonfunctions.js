@@ -327,27 +327,54 @@ const getDayWithSuffix = (day) => {
     );
   }
 
-  export function generateTimeRange(createdAt, duration) {
-    // Create a Date object from createdAt
-    const startTime = new Date(createdAt);
-    const options = { 
-      timeZone: 'Asia/Kolkata', 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: true 
+//   export function generateTimeRange(createdAt, duration) {
+//     // Create a Date object from createdAt
+//     const startTime = new Date(createdAt);
+//     const options = { 
+//       timeZone: 'Asia/Kolkata', 
+//       hour: '2-digit', 
+//       minute: '2-digit',
+//       hour12: true 
+//     };
+
+//     // Calculate the endTime by adding duration (in seconds) to the startTime
+//     const endTime = new Date(startTime.getTime() + duration * 1000); // Convert seconds to milliseconds
+
+//     // Format the start and end times using local time zone
+//     const startTimeFormatted = startTime.toLocaleTimeString('en-IN', options);
+
+//     const endTimeFormatted = endTime.toLocaleTimeString('en-IN', options);
+//     const totaltime = convertSecondstoTime(duration)
+//     // Return the formatted time range in the desired format
+//     return `${startTimeFormatted} - ${endTimeFormatted} (${totaltime})`;
+// }
+
+export function generateTimeRange(createdAt, duration) {
+  const startTime = new Date(createdAt);
+  const options = { 
+    timeZone: 'Asia/Kolkata', 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: true 
   };
 
-    // Calculate the endTime by adding duration (in seconds) to the startTime
-    const endTime = new Date(startTime.getTime() + duration * 1000); // Convert seconds to milliseconds
+  const endTime = new Date(startTime.getTime() + duration * 1000);
 
-    // Format the start and end times using local time zone
-    const startTimeFormatted = startTime.toLocaleTimeString('en-IN', options);
+  const startTimeFormatted = startTime.toLocaleTimeString('en-IN', options);
+  const endTimeFormatted = endTime.toLocaleTimeString('en-IN', options);
 
-    const endTimeFormatted = endTime.toLocaleTimeString('en-IN', options);
-    const totaltime = convertSecondstoTime(duration)
-    // Return the formatted time range in the desired format
-    return `${startTimeFormatted} - ${endTimeFormatted} (${totaltime})`;
+  // format duration into hh:mm:ss
+  const hours = Math.floor(duration / 3600);
+  const minutes = Math.floor((duration % 3600) / 60);
+  const seconds = duration % 60;
+  const totalTimeFormatted =
+    `${hours.toString().padStart(2, '0')}:` +
+    `${minutes.toString().padStart(2, '0')}:` +
+    `${seconds.toString().padStart(2, '0')}`;
+
+  return `${startTimeFormatted} - ${endTimeFormatted} (${totalTimeFormatted})`;
 }
+
 
 
 export function secondstoMinutes(seconds) {
@@ -367,7 +394,25 @@ export function secondstoMinutes(seconds) {
     }
   }
   
-  export function convertSecondstoTime(totalSeconds) { 
+//   export function convertSecondstoTime(totalSeconds) { 
+//     if (totalSeconds === 0 || totalSeconds == null) {
+//         return `00:00`;
+//     } else if (totalSeconds < 60) {
+//         return `${totalSeconds} seconds`;
+//     }
+
+//     const hours = Math.floor(totalSeconds / 3600);
+//     const remainingSecondsAfterHours = totalSeconds % 3600;
+//     const minutes = Math.floor(remainingSecondsAfterHours / 60);
+//     const seconds = remainingSecondsAfterHours % 60;
+//     // Pad hours and minutes to ensure two-digit format
+//     const paddedHours = hours.toString().padStart(2, '0');
+//     const paddedMinutes = minutes.toString().padStart(2, '0');
+
+//     return `${paddedHours}:${paddedMinutes}`;
+// }
+
+export function convertSecondstoTime(totalSeconds) { 
     if (totalSeconds === 0 || totalSeconds == null) {
         return `00:00`;
     } else if (totalSeconds < 60) {
@@ -376,14 +421,23 @@ export function secondstoMinutes(seconds) {
 
     const hours = Math.floor(totalSeconds / 3600);
     const remainingSecondsAfterHours = totalSeconds % 3600;
-    const minutes = Math.floor(remainingSecondsAfterHours / 60);
-    const seconds = remainingSecondsAfterHours % 60;
-    // Pad hours and minutes to ensure two-digit format
-    const paddedHours = hours.toString().padStart(2, '0');
+    
+    // ✅ Round minutes instead of flooring
+    let minutes = Math.round(remainingSecondsAfterHours / 60);
+
+    // If rounding minutes makes it 60, roll over to next hour
+    let finalHours = hours;
+    if (minutes === 60) {
+        finalHours += 1;
+        minutes = 0;
+    }
+
+    const paddedHours = finalHours.toString().padStart(2, '0');
     const paddedMinutes = minutes.toString().padStart(2, '0');
 
     return `${paddedHours}:${paddedMinutes}`;
 }
+
 
 export const timeStringToDate = (time, baseDate = new Date()) => {
     const [hours, minutes] = time.split(':').map(Number);

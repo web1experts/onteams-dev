@@ -302,9 +302,17 @@ function ReportsPage() {
     }
 
     const hours = Math.floor(totalDuration / 3600);
-    const minutes = Math.floor((totalDuration % 3600) / 60);
+    const minutes = Math.round((totalDuration % 3600) / 60);
 
-    const formattedTime = `${hours}h ${minutes}m`;
+    let displayHours = hours;
+    let displayMinutes = minutes;
+
+    if (minutes === 60) {
+      displayHours += 1;
+      displayMinutes = 0;
+    }
+
+    const formattedTime = `${displayHours}h ${displayMinutes}m`;
     if (arg === "both") {
       return {
         totalProjects: projectCount,
@@ -873,19 +881,24 @@ function ReportsPage() {
     }
     // If the total time is less than 60 seconds, return the number of seconds
     if (totalSeconds === 0) {
-      return `00:00`;
-    } else if (totalSeconds < 60) {
-      return `${totalSeconds} seconds`;
-    }
+    return `00:00`;
+  } else if (totalSeconds < 60) {
+    return `${totalSeconds} seconds`;
+  }
 
-    const hours = Math.floor(totalSeconds / 3600)
-      .toString()
-      .padStart(2, "0");
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
+  let hours = Math.floor(totalSeconds / 3600);
+  let minutes = Math.round((totalSeconds % 3600) / 60);
 
-    return `${hours}h ${minutes}m`;
+  // Handle case where rounding pushes minutes to 60
+  if (minutes === 60) {
+    hours += 1;
+    minutes = 0;
+  }
+
+  hours = hours.toString().padStart(2, "0");
+  minutes = minutes.toString().padStart(2, "0");
+
+  return `${hours}h ${minutes}m`;
   }
 
   const handleLightBox = (type, mediaItems, index) => {

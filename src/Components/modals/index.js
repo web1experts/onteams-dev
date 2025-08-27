@@ -274,7 +274,7 @@ export function MemberModal( props){
          
           if (curerntmembers.includes(member._id)) {
             // Add the member to the result object with `id` as key and `name` as value
-            acc[member._id] = member.name;
+            acc[member._id] = {name: member?.name, avatar: member?.avatar, id: member?._id};
           }
           return acc;
         }, {});
@@ -287,7 +287,7 @@ export function MemberModal( props){
           
             if (editcurerntmembers.includes(member._id)) {
               // Add the member to the result object with `id` as key and `name` as value
-              acc[member._id] = member.name;
+              acc[member._id] = {name: member?.name, avatar: member?.avatar, id: member?._id};
             }
             return acc;
           }, {});
@@ -300,7 +300,7 @@ export function MemberModal( props){
          
           if (curernttaskmembers.includes(member._id)) {
             // Add the member to the result object with `id` as key and `name` as value
-            acc[member._id] = member.name;
+            acc[member._id] = {name: member?.name, avatar: member?.avatar, id: member?._id};
           }
           return acc;
         }, {});
@@ -310,6 +310,7 @@ export function MemberModal( props){
   }
 
   const [membersModalState, setMembersModalState] = useState(refreshstates(commonState.active_formtype || false))
+
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -324,6 +325,7 @@ export function MemberModal( props){
 
   useEffect(() => {
     setMembersModalState(refreshstates(commonState.active_formtype))
+    
   },[ commonState?.projectForm?.members, commonState?.editProjectForm?.members])
 
   let filteredMembers = commonState.allmembers
@@ -341,6 +343,7 @@ export function MemberModal( props){
   useEffect(() => {
     setIsEdit(commonState.assign_members_direct)
 },[commonState.assign_members_direct])
+
 
   useFilledClass('.form-floating .form-control');
   const handleDone = () => {
@@ -416,11 +419,12 @@ export function MemberModal( props){
               </Form.Group>
           </Form>
           <ListGroup className="added--list">
-          {membersModalState?.selectedMembers && Object.keys(membersModalState?.selectedMembers).length > 0 &&
-            Object.entries(membersModalState.selectedMembers).map(([memberInfo], index) => (
+          {membersModalState?.selectedMembers &&
+            Object.keys(membersModalState.selectedMembers).length > 0 &&
+            Object.entries(membersModalState.selectedMembers).map(([id, memberInfo], index) => (
                 <ListGroup.Item key={`listkey-${index}`} onClick={() => handleRemove(memberInfo.id)}>
-                    <span><img src="../images/default.jpg" alt="" /></span>
-                    <p>{memberInfo.name} <FaTimesCircle /></p>
+                    <span><img src={memberInfo?.avatar || '../images/default.jpg'} alt="" /></span>
+                    <p>{memberInfo?.name} <FaTimesCircle /></p>
                 </ListGroup.Item>
             ))
           }
