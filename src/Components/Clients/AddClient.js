@@ -26,6 +26,7 @@ function AddClient(props) {
   const inputs = document.querySelectorAll(".form-floating .form-control");
   const [showBadges, setShowBadges] = useState(null);
   const customFields = props.customFields;
+  
   inputs.forEach((input) => {
     input.addEventListener("input", function () {
       if (this.value) {
@@ -120,7 +121,7 @@ function AddClient(props) {
 
       // Validate the field
       const error = await validateField("clients", fieldName, value, rules);
-      console.log("error:", error);
+     
 
       // If error exists, store it
       if (error) {
@@ -231,7 +232,7 @@ function AddClient(props) {
                         false,
                       toggleShowPassword: () =>
                         toggleShowPassword(`custom_field[${field.name}]`),
-                      toggleBadges: () => toggleBadges(index),
+                      toggleBadges: () => toggleBadges(field),
                     })
                   )}
                 </>

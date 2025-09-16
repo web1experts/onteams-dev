@@ -56,6 +56,7 @@ import {
 import { ListClients } from "../../redux/actions/client.action";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
+import AddClient from "../Clients/AddClient";
 import {
   selectboxObserver,
   getMemberdata,
@@ -101,6 +102,8 @@ function ProjectsPage() {
   const memberProfile = currentMemberProfile();
   const [isActiveView, setIsActiveView] = useState(2);
   const [customFields, setCustomFields] = useState([]);
+  const [clientcustomFields, setClientCustomFields] = useState([]);
+  const [show, setShow] = useState(false);
   const dispatch = useDispatch();
   const memberdata = getMemberdata();
   const [projects, setProjects] = useState([]);
@@ -144,6 +147,9 @@ function ProjectsPage() {
   const pasteOccurred = useRef(false);
   let active = 2;
   const workflowstate = useSelector((state) => state.workflow);
+  const [isdescEditor, setIsDescEditor] = useState(false);
+  const [activeTab, setActiveTab] = useState("GridView");
+  
   const modules = {
     toolbar: [
       [{ header: "1" }, { header: "2" }],
@@ -223,7 +229,7 @@ function ProjectsPage() {
       setFilters({
         ...filters,
         ["status"]: systemFields?.status?.options[0]?.value || 'in-progress',
-        member: memberdata?._id,
+        member: (memberProfile?.permissions?.projects?.view_others === true || memberProfile?.role?.slug === "owner") ? 'all' : memberdata?._id,
       });
       setFields({
         ...fields,
@@ -269,6 +275,14 @@ function ProjectsPage() {
         )
       );
     }
+
+    if (
+      apiCustomfields.customFields &&
+      apiCustomfields?.fieldModule === "clients"
+    ) {
+      setClientCustomFields(apiCustomfields.customFields);
+    }
+
   }, [apiCustomfields]);
 
   useEffect(() => {
@@ -289,6 +303,7 @@ function ProjectsPage() {
     }
   }, [commonState.selectedMembers]);
 
+
   useEffect(() => {
     if (commonState.projectForm) {
       setFields((prevFields) => {
@@ -307,10 +322,7 @@ function ProjectsPage() {
     }
   }, [commonState.editProjectForm]);
 
-  const [isdescEditor, setIsDescEditor] = useState(false);
-  const [activeTab, setActiveTab] = useState("GridView");
-
-  const [show, setShow] = useState(false);
+  
   const handleClose = () => {
     setFields({ title: "", status: "in-progress", members: [] });
     if (isActive === 2 || isActive === 1) {
@@ -351,7 +363,10 @@ function ProjectsPage() {
   const handleSidebarSmall = () =>
     dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
   const selectedStatus = useSelector((state) => state.common.selectedStatus);
+  const [showClient, setClientShow] = useState(false);
   const handleWorkflowShow = () => dispatch(togglePopups("workflow", true));
+  const handleClientClose = () => setClientShow(false);
+    const handleClientShow = () => setClientShow(true);
   const handleUploadShow = () => dispatch(togglePopups("files", true)); //setUploadShow(true);
   const [showDelete, setDeleteShow] = useState(false);
   const handleDeleteClose = () => setDeleteShow(false);
@@ -441,7 +456,7 @@ function ProjectsPage() {
     // }
     if (Object.keys(filters).length > 0) {
       selectedfilters = { ...selectedfilters, ...filters };
-    }
+    } 
     await dispatch(ListProjects(selectedfilters));
     setSpinner(false);
   };
@@ -496,6 +511,7 @@ function ProjectsPage() {
 
   useEffect(() => {
     dispatch(fetchCustomFields({ module: "projects" }));
+     dispatch(fetchCustomFields({ module: "clients" }));
   }, []);
 
   useEffect(() => {
@@ -742,8 +758,10 @@ function ProjectsPage() {
       setIsActive(0);
       setCurrentPage(0);
     }
-    handleClose();
+    
+    
     if (apiResult?.success === true && !apiResult.updatedProject) {
+      handleClose();
       setIsDescEditor(false);
       setFields({ title: "", status: "in-progress", members: [] });
 
@@ -1136,6 +1154,7 @@ function ProjectsPage() {
                           handlefilterchange("member", event.target.value)
                         }
                         value={filters["member"] || "all"}
+                        
                       >
                         <option
                           value={memberdata?._id}
@@ -2560,11 +2579,14 @@ function ProjectsPage() {
                           <small>None</small>
                         </Form.Label>
                       )}
-                      {/* { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
+                      { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
                                                 <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
-                                            )} */}
+                                            )}
                     </div>
-                    {/* <AddClient show={showClient} toggleshow={handleClientClose} /> */}
+                    {
+                      showClient && (<AddClient show={showClient} toggleshow={handleClientClose} customFields={clientcustomFields} />)
+                    }
+                    
                   </Form.Group>
                   <Form.Group className="mb-0 form-group">
                     <Form.Label>

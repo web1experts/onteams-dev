@@ -349,7 +349,10 @@ const getDayWithSuffix = (day) => {
 //     return `${startTimeFormatted} - ${endTimeFormatted} (${totaltime})`;
 // }
 
-export function generateTimeRange(createdAt, duration) {
+export function generateTimeRange(createdAt, duration = 0) {
+  if(typeof duration === 'undefined'){
+    duration = 0;
+  }
   const startTime = new Date(createdAt);
   const options = { 
     timeZone: 'Asia/Kolkata', 

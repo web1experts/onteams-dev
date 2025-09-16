@@ -564,6 +564,8 @@ function RolesPage() {
     }
   }, [workspace]);
 
+  
+
   return (
     <>
         <div className="page--wrapper setting--page">
@@ -578,7 +580,7 @@ function RolesPage() {
                   <Col lg={6}>
                     <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
                     <FloatingLabel label="Select Role">
-                        <Form.Select className="custom-selectbox"  onChange={(e) => {
+                        <Form.Select className="custom-selectbox" key={`rolelist`}  onChange={(e) => {
                           const selectedRole = roles.find((role) => role._id === e.target.value);
                           setActiveRole(selectedRole);
                         }}>
@@ -728,7 +730,11 @@ function RolesPage() {
         )}
       </div>
       {show && (
-        <Modal show={show} onHide={() => setShow(false)} size="lg">
+        <Modal show={show} onHide={() => {setShow(false);
+          setTimeout(() => {
+            selectboxObserver()
+          },650)
+        }} size="lg">
             <Modal.Header closeButton>
                 <Modal.Title>Add New Role</Modal.Title>
             </Modal.Header>

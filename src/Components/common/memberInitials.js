@@ -58,31 +58,20 @@ export const MemberInitials = React.memo(( props ) => {
                     }
                     
                     const currentMembers = members;
+                   
+                    const updatedMembers = Object.values(currentMembers) // convert object to array
+                        .filter(member => (member.id || member._id) !== memberId) // remove the one you want
+                        .map(member => member.id || member._id); // return always the id
 
-                    // if( props.postId !== "new"){
-                        // const updatedMembers = currentMembers
-                        // .filter(member => member._id !== memberId)
-                        // .map(member => member._id);
-                        const updatedMembers = Object.values(currentMembers) // convert object to array
-                                                .filter(member => member.id !== memberId)         // remove the one you want
-                                                .map(member => member.id);                        // keep only the IDs
 
-                        await dispatch(updateProject(props?.postId, { members: updatedMembers, remove_member: true }));
-                    // }else{
-                    //     const updatedMembers = currentMembers
-                    //     .filter(member => member._id !== memberId)
-                    //     .map(member => member._id);
-                    //     await dispatch(updateProject(props?.postId, { members: updatedMembers, remove_member: true }));
-                    // }
-            
+                    await dispatch(updateProject(props?.postId, { members: updatedMembers, remove_member: true }));
+                
                     if (targetElement) {
                         // Re-enable the button or make it interactive again
                         targetElement.classList.remove('disabled-pointer');
                     }
             
                 } catch (error) {
-                    console.error("Error removing member:", error);
-            
                     // Ensure target element is re-enabled even if there's an error
                     const targetElement = document.getElementById(targetelement);
                     if (targetElement) {

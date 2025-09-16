@@ -1337,8 +1337,14 @@ function TeamMembersPage() {
                 <Card.Body>
                   <Card.Title>
                     <FiShield /> Permissions & Access{" "}
-                    <Button variant="primary" className="ms-auto d-flex align-items-center gap-1" onClick={() => {setAdjustPermissions(true);}}><FaCog /> Manage Permissions</Button>
-                  </Card.Title>
+                    {
+                      (memberProfile &&
+                      Object.keys(memberProfile).length > 0 &&
+                      memberProfile?.permissions?.members?.create_edit_delete === true ||
+                      memberProfile?.role?.slug !== "owner") ? (
+                        <Button variant="primary" className="ms-auto d-flex align-items-center gap-1" onClick={() => {setAdjustPermissions(true);}}><FaCog /> Manage Permissions</Button>) : <></>                    
+                      }
+                    </Card.Title>
                   <Card.Text>
                    
                     {/* /*New Accordion Design*/}
@@ -1350,7 +1356,9 @@ function TeamMembersPage() {
                         const truePermissionCount = Object.values(
                           modPerms
                         ).filter((val) => val === true).length;
-
+                        if(truePermissionCount === 0){
+                          return;
+                        }
                         return (
                           <Accordion.Item eventKey={ind} className="bg--blue--accordion">
                             <Accordion.Header>
@@ -1806,7 +1814,7 @@ function TeamMembersPage() {
       (selectedMember?._id !== memberProfile?._id &&
         memberProfile &&
         Object.keys(memberProfile).length > 0 &&
-        memberProfile?.permissions?.members?.create_edit_delete === true &&
+        memberProfile?.permissions?.members?.create_edit_delete === true ||
         memberProfile?.role?.slug !== "owner") ? (
         <>
           <AlertDialog

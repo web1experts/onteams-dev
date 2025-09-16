@@ -322,7 +322,7 @@ function SettingPage() {
             >
               <MdLockOutline /> Security
             </ListGroup.Item>
-            <ListGroup.Item
+            {/* <ListGroup.Item
               action
               active={activeTab === "Notifications"}
               onClick={() => setActiveTab("Notifications")}
@@ -337,7 +337,7 @@ function SettingPage() {
               }}
             >
               <FiGlobe /> Preferences
-            </ListGroup.Item>
+            </ListGroup.Item> */}
           </ListGroup>
         </div>
         {activeTab === "Profile" && (

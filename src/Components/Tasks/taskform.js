@@ -130,7 +130,7 @@ export const TaskForm = (props) => {
     }, [apiResult.currentTask])
     useEffect(() => {
         
-        if (apiResult.UpdatedTask) {
+        if (apiResult.UpdatedTask && !apiResult.reorder && apiResult.UpdatedTask?._id === currentTask._id) {
             dispatch(updateStateData(CURRENT_TASK, apiResult.UpdatedTask));
             // setCurrentTask(apiResult.UpdatedTask)
         }
@@ -196,6 +196,9 @@ export const TaskForm = (props) => {
 
             if (currentTask.customFields && Object.keys(currentTask.customFields).length > 0) {
                 Object.values(currentTask.customFields).forEach(field => {
+                    if(field.meta_key === 'task_created_updated' || field.meta_key === 'timeline'){
+                        return;
+                    }
                     fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
                 });
             }else{
@@ -279,18 +282,40 @@ export const TaskForm = (props) => {
         setComments('');
     };
 
+    // useEffect(() => {
+    //     if (taskForm) { 
+    //         setFields(prevFields => {
+    //             const updatedFields = {
+    //                 ...prevFields, // Retain the existing properties of fields
+    //                 ...taskForm // Merge properties from commonState.taskForm
+    //             };
+    //             return updatedFields; // Return the new state
+    //         });
+
+    //     }
+    // }, [taskForm]);
+
     useEffect(() => {
         if (taskForm) {
             setFields(prevFields => {
-                const updatedFields = {
-                    ...prevFields, // Retain the existing properties of fields
-                    ...taskForm // Merge properties from commonState.taskForm
-                };
-                return updatedFields; // Return the new state
-            });
+                const updatedFields = { ...prevFields };
+                let hasChanges = false;
 
+                for (const key in taskForm) {
+                    if (taskForm.hasOwnProperty(key)) {
+                        // Add if not exist OR update if value is different
+                        if (!(key in prevFields) || prevFields[key] !== taskForm[key]) {
+                            updatedFields[key] = taskForm[key];
+                            hasChanges = true;
+                        }
+                    }
+                }
+
+                return hasChanges ? updatedFields : prevFields;
+            });
         }
     }, [taskForm]);
+
 
 
     useEffect(() => {
@@ -541,11 +566,21 @@ export const TaskForm = (props) => {
         }
     };
 
+    const debouncedDispatch = useMemo(
+        () =>
+            debounce((taskId, subtasks) => {
+            dispatch(updateTask(taskId, { subtasks }));
+            }, 1000), // wait 500ms after last change
+        [dispatch]
+    );
+
     const updateSubtask = (ischecked, index) => {
         const newSubtasks = [...subtasks];
         newSubtasks[index] = { ...newSubtasks[index], ['status']: ischecked }; // Update the specific subtask
         setSubtasks(newSubtasks);
-        dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
+        // Debounced API update
+        debouncedDispatch(currentTask._id, newSubtasks);
+        // dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
     }
 
     const handleDragEnd = (result) => {
@@ -557,7 +592,7 @@ export const TaskForm = (props) => {
         }
 
         // Create a new array to update subtasks
-        const newSubtasks = Array.from(subtasks);
+        const newSubtasks = Array.from(subtasks).filter(Boolean);
         // Move the dragged subtask to the new position
         const [removed] = newSubtasks.splice(source.index, 1);
         newSubtasks.splice(destination.index, 0, removed);
@@ -567,7 +602,6 @@ export const TaskForm = (props) => {
             ...subtask,
             order: index // Set the order to the current index
         }));
-
         // Update the state with the new order
         setSubtasks(updatedSubtasks);
         dispatch(updateTask(currentTask._id, { subtasks: updatedSubtasks }))
@@ -618,11 +652,14 @@ const renderSubtasks = () => {
                                         }))
                                     }
                                     onBlur={(e) => {
-                                        handlesubtaskChange(index, subtask, e.target.value, true);
-                                        setEnableSubtaskEdit((prev) => ({
-                                            ...prev,
-                                            [subtask._id]: false,
-                                        }));
+                                        if(e.target.value !== ""){
+                                            handlesubtaskChange(index, subtask, e.target.value, true);
+                                            setEnableSubtaskEdit((prev) => ({
+                                                ...prev,
+                                                [subtask._id]: false,
+                                            }));
+                                        }
+                                        
                                     }}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' && !e.shiftKey) {
@@ -901,7 +938,7 @@ const renderSubtasks = () => {
                  await dispatch(updateTask(currentTask._id, { [fieldName]: value }));
             }
            
-          }, 700), // 1 sec debounce
+          }, 1000), // 1 sec debounce
         [dispatch, currentTask._id]
       );
 
@@ -946,10 +983,10 @@ const renderSubtasks = () => {
                         { (memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) ?
                         <>
                         <div className="project--form--inputs" data-tabid={fields['tab']}>
-                            <Form onSubmit={() => { return false }} key={`taskform-${commonState?.taskForm?.tab}`}>
+                            <Form onSubmit={() => { return false }} key={`taskform-${currentTask?.tab}`}>
                                 <Form.Group className="mb-0 form-group task--title">
                                     <Form.Label><small>Title</small></Form.Label>
-                                    <Form.Control type="text" key={`task-title-${commonState?.taskForm?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || ""} onChange={handleChange} onBlur={(e) => {
+                                    <Form.Control type="text" key={`task-title-${currentTask?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || currentTask?.title || ""} onChange={handleChange} onBlur={(e) => {
                                         if (currentTask.title !== fields['title']) {
                                             if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
                                                 dispatch(updateTask(currentTask._id, { title: fields['title'] }))
@@ -984,7 +1021,15 @@ const renderSubtasks = () => {
                                                     description: value,
                                                 }));
                                                 setErrors((prevErrors) => ({ ...prevErrors, description: '' }));
-                                                debouncedUpdateDesc('description', value);
+                                                //debouncedUpdateDesc('description', value);
+                                            }}
+                                            onBlur={(previousRange, source, editor) => { 
+                                                const quill = quillRef.current?.getEditor();
+                                               setTimeout(() => {
+                                                if (quill && !quill.hasFocus()) { 
+                                                    TaskUpdate();
+                                                }
+                                                }, 300);
                                             }}
                                             onKeyDown={handleKeyDown}
                                             ref={quillRef}

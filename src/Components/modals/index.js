@@ -677,46 +677,83 @@ export const  WorkFlowModal =  (props) => {
         
       }else{
     
-        // Get the last tab and its order based on the type (object or simple array)
-        const lastTab = workflowModalState?.workflow?.tabs.length 
-          ? workflowModalState?.workflow?.tabs[workflowModalState?.workflow?.tabs.length - 1] 
-          : null;
+        // // Get the last tab and its order based on the type (object or simple array)
+        // const lastTab = workflowModalState?.workflow?.tabs.length 
+        //   ? workflowModalState?.workflow?.tabs[workflowModalState?.workflow?.tabs.length - 1] 
+        //   : null;
       
-        const lastOrder = (typeof lastTab === 'object' && lastTab?.order !== undefined)
-          ? lastTab.order
-          : workflowModalState?.workflow?.tabs.length - 1; // Fallback to length-based index if tabs are a simple array
+        // const lastOrder = (typeof lastTab === 'object' && lastTab?.order !== undefined)
+        //   ? lastTab.order
+        //   : workflowModalState?.workflow?.tabs.length - 1; // Fallback to length-based index if tabs are a simple array
       
-        const newOrder = lastTab ? lastOrder + 1 : 0; // Set the order for the new tab
+        // const newOrder = lastTab ? lastOrder + 1 : 0; // Set the order for the new tab
       
-        // Create the new tab object
-        const newTab = (typeof lastTab === 'object' && lastTab !== null) ? {
-          title: fields['workspace_title'],
-          _id: false,
-          order: newOrder,
-        } : fields['workspace_title']; // Use simple title if tabs is a simple array
+        // // Create the new tab object
+        // const newTab = (typeof lastTab === 'object' && lastTab !== null) ? {
+        //   title: fields['workspace_title'],
+        //   _id: false,
+        //   order: newOrder,
+        // } : fields['workspace_title']; // Use simple title if tabs is a simple array
       
-        // Insert the new tab before the last tab
-        const updatedTabs = Array.isArray(workflowModalState?.workflow?.tabs)
-          ? [
-              ...workflowModalState?.workflow?.tabs.slice(0, -1), // All tabs except the last one
-              newTab, // Insert the new tab
-              lastTab // Add the last tab
-            ]
-          : [newTab]; // If tabs is empty, start with just the new tab
+        // // Insert the new tab before the last tab
+        // const updatedTabs = Array.isArray(workflowModalState?.workflow?.tabs)
+        //   ? [
+        //       ...workflowModalState?.workflow?.tabs.slice(0, -1), // All tabs except the last one
+        //       newTab, // Insert the new tab
+        //       lastTab // Add the last tab
+        //     ]
+        //   : [newTab]; // If tabs is empty, start with just the new tab
       
-        // Update the state with the new array
-        setWorkflowModalState(prevWorkflowModalState => ({
-          ...prevWorkflowModalState,
+        // // Update the state with the new array
+        // setWorkflowModalState(prevWorkflowModalState => ({
+        //   ...prevWorkflowModalState,
+        //   workflow: {
+        //     ...prevWorkflowModalState?.workflow,
+        //     tabs: updatedTabs.map((tab, index) => {
+        //       // If tab is an object, update its order; otherwise, return simple tab
+        //       return typeof tab === 'object'
+        //         ? { ...tab, order: index }
+        //         : tab;
+        //     }) // Ensure correct order sequence
+        //   }
+        // }));
+        // Get last tab (if any)
+        const tabs = workflowModalState?.workflow?.tabs || [];
+        const lastTab = tabs.length ? tabs[tabs.length - 1] : null;
+
+        // Figure out the next order
+        const lastOrder =
+          typeof lastTab === "object" && lastTab?.order !== undefined
+            ? lastTab.order
+            : tabs.length - 1;
+
+        const newOrder = tabs.length ? lastOrder + 1 : 0;
+
+        // Create the new tab
+        const newTab =
+          typeof lastTab === "object"
+            ? {
+                title: fields["workspace_title"],
+                _id: false,
+                order: newOrder,
+                color: fields['color']
+              }
+            : fields["workspace_title"];
+
+        // Append new tab at the end
+        const updatedTabs = [...tabs, newTab];
+
+        // Update state
+        setWorkflowModalState((prev) => ({
+          ...prev,
           workflow: {
-            ...prevWorkflowModalState?.workflow,
-            tabs: updatedTabs.map((tab, index) => {
-              // If tab is an object, update its order; otherwise, return simple tab
-              return typeof tab === 'object'
-                ? { ...tab, order: index }
-                : tab;
-            }) // Ensure correct order sequence
-          }
+            ...prev?.workflow,
+            tabs: updatedTabs.map((tab, index) =>
+              typeof tab === "object" ? { ...tab, order: index } : tab
+            ),
+          },
         }));
+
       }
     
       // Reset modal state

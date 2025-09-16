@@ -18,6 +18,7 @@ import {
   ListGroupItem,
   Pagination,
 } from "react-bootstrap";
+import { FaRegEdit } from "react-icons/fa";
 import debounce from "lodash.debounce";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaAngleRight, FaEye } from "react-icons/fa";
@@ -358,7 +359,7 @@ function ReportsPage() {
             handlefilterchange("search", value);
           }
         }, 1000), // 1 sec debounce
-      []
+      [filters]
     );
 
   const handleListProjects = async () => {
@@ -1239,7 +1240,7 @@ function ReportsPage() {
                       </thead>
                       <tbody>
                         {projectReports?.reports &&
-                          projectReports?.reports?.length > 0 &&
+                          projectReports?.reports?.length > 0 ?
                           projectReports?.reports?.map((reportData, i) => {
                             const result = getProjectTabSummary(reportData);
                             return (
@@ -1295,8 +1296,14 @@ function ReportsPage() {
                                   </Button>
                                 </td>
                               </tr>
-                            );
-                          })}
+                            )})
+                            :
+                            <>
+                              <div className="text-center">
+                                <h2>No Data Found</h2>
+                              </div>
+                            </>
+                          }
                       </tbody>
                     </Table>
                     {projectReports?.totalPages > 1 && (
@@ -1431,7 +1438,10 @@ function ReportsPage() {
                               );
                             })
                           ) : (
-                            <></>
+                            <>
+                            <div className="text-center">
+                              <h2>No Data Found</h2>
+                            </div></>
                           )}
                         </tbody>
                       </Table>
@@ -1731,6 +1741,57 @@ function ReportsPage() {
                             </div>
                           </Col>
                         </Row>
+                        {/* <Row>
+                          { memberdata?._id === filters?.member ?
+                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                                <label>Remarks</label>
+                                
+                                {
+                                  remarksActive === true ? 
+                                  <>
+                                    <Form.Group className="mb-0 form-group">
+                                      
+                                      <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
+                                        
+                                      </textarea>
+                                    </Form.Group>
+                                    <Button variant="primary" onClick={() => {
+                                      saveRemarks(report?.project?._id)
+                                    }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
+                                    <Button variant="danger" onClick={handleRemarks}>Cancel</Button>
+                                  </>
+                                  :
+                                  <>
+                                    <FaRegEdit onClick={handleRemarks} />
+                                    {
+                                    report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                    report?.project?.projectmeta.map((meta) => {
+                                      if(meta.meta_key === 'remarks'){
+                                        return <pre>{meta.meta_value}</pre>
+                                      }else{
+                                        return null
+                                      }
+                                    })
+                                  }
+                                  </>
+                                }
+                              </Col>
+                              :
+                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                                <label>Remarks</label>
+                                    {
+                                    report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
+                                    report?.project?.projectmeta.map((meta) => {
+                                      if(meta.meta_key === 'remarks'){
+                                        return <pre>{meta.meta_value}</pre>
+                                      }else{
+                                        return null
+                                      }
+                                    })
+                                  }
+                              </Col>
+                            }
+                        </Row> */}
                       </div>
                     </div>
                   </>

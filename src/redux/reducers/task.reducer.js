@@ -94,13 +94,15 @@ import {
         case TASK_REORDER:
             return {
                 successfull: true,
-                UpdatedTask: action.payload.UpdatedTask,
-                reorder: 'pass'
+                UpdatedTask: action.payload.tabChange,
+                tabChangefrom: action.payload.tabChangefrom,
+                reorder: true
             }
         case TASK_REORDER_ERROR:
             return{
                 successfull: false,
-                reorder: 'fail'
+                reorder: 'fail',
+                reorder: false
             }
         case TASK_COMMON_ERROR: 
             return {
@@ -114,7 +116,8 @@ import {
                 message_variant: null,
                 UpdatedTask: null,
                 newTask: null,
-                comment: null
+                comment: null,
+                reorder: false,
             };
         case CURRENT_TASK: 
             return {

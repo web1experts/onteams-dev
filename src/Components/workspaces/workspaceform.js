@@ -10,29 +10,39 @@ import useFilledClass from "../customHooks/useFilledclass";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 const secretKey = process.env.REACT_APP_SECRET_KEY
 
+const tzMap = {
+  "Asia/Kolkata": "IST",
+  "Asia/Dubai": "GST",
+  "America/New_York": "EST",
+  "America/Chicago": "CST",
+  "America/Denver": "MST",
+  "America/Los_Angeles": "PST",
+  "Europe/London": "GMT",
+  "Europe/Paris": "CET",
+  "Europe/Moscow": "MSK",
+  "Asia/Singapore": "SGT",
+  "Asia/Tokyo": "JST",
+  "Australia/Sydney": "AEST"
+};
+
+
 function WorkspaceForm(props) {
   useFilledClass('.form-floating .form-control');
-
-
   const location = useLocation();
   const { pathname } = location;
-  const [fields, setFields] = useState({ name: props.editworkspace?.name || '', industry: props.editworkspace?.industry || "" });
+    const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const [fields, setFields] = useState({ name: props.editworkspace?.name || '', industry: props.editworkspace?.industry || "", timezone: tzMap[userTZ] || userTZ });
   /** -- Form Fields Errors -- */
   const [errors, setErrors] = useState({ name: '', industry: "" });
   const [loader, setLoader] = useState(false);
+
+  
   const navigate = useNavigate()
   const dispatch = useDispatch();
   const check = [null, undefined, 'null', 'undefined', ''];
   const workspace = useSelector(state => state.workspace)
   let fieldErrors = {};
   let hasError = false;
-
-  // useEffect(() => {
-
-  //   if( props.editworkspace){
-  //       setLoader(false)
-  //   }
-  // },[props.editworkspace])
 
   const handleChange = ({ target: { name, value } }) => {
 
@@ -119,6 +129,25 @@ function WorkspaceForm(props) {
           <option value="it">IT</option>
         </Form.Select>
         {showError('industry')}
+      </Form.Group>
+      <Form.Group className="mb-0 form-group">
+        <Form.Select aria-label="Select Timezone" placeholder="Select Timezone" 
+          className={errors['timezone'] && errors['timezone'] !== "" ? "form-control input-error filled custom-selectbox" : 'form-control filled custom-selectbox'} 
+          onChange={handleChange} value={fields['timezone'] || ""} name="timezone">
+          <option value="IST">IST (India Standard Time)</option>
+          <option value="EST">EST (Eastern Standard Time)</option>
+          <option value="CST">CST (Central Standard Time)</option>
+          <option value="MST">MST (Mountain Standard Time)</option>
+          <option value="PST">PST (Pacific Standard Time)</option>
+          <option value="GMT">GMT (Greenwich Mean Time)</option>
+          <option value="CET">CET (Central European Time)</option>
+          <option value="MSK">MSK (Moscow Standard Time)</option>
+          <option value="GST">GST (Gulf Standard Time)</option>
+          <option value="JST">JST (Singapore Time)</option>
+          <option value="JST">JST (Japan Standard Time)</option>
+          <option value="JST">JST (Australian Eastern Standard Time)</option>
+        </Form.Select>
+        {showError('timezone')}
       </Form.Group>
       <Button variant="primary" className="mb-3" type="submit" disabled={loader}>
         {loader ? 'Please Wait...' : 'Create Workspace'}

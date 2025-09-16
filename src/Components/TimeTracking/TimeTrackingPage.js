@@ -18,7 +18,7 @@ import {
   Accordion,
 } from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaEye, FaPlay, FaPlus } from "react-icons/fa";
+import { FaEye, FaPlay, FaPlus, FaCheck, FaHistory } from "react-icons/fa";
 import { MdClose, MdFilterList } from "react-icons/md";
 import {
   FiSidebar,
@@ -141,6 +141,7 @@ function TimeTrackingPage() {
   const dispatch = useDispatch();
   const fullscreenRef = React.useRef(null);
   const datePickerRef = useRef(null);
+  const datePickerRefto = useRef(null)
   const [activeTab, setActiveTab] = useState("Live");
   const [screenshotTab, setScreenshotTab] = useState("Screenshots");
   const [activeInnerTab, setActiveInnerTab] = useState("InnerLive");
@@ -183,6 +184,7 @@ function TimeTrackingPage() {
   const [showSearch, setSearchShow] = useState(false);
   const [selectedScreenshots, setSelectedScreenshots] = useState({});
   const activitystate = useSelector((state) => state.activity);
+  const [manualListCount, setManualListCount] = useState(0);
 
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -299,38 +301,38 @@ useEffect(() => {
   const handleLiveActivityListInterval = async () => {
     
     const currentFilters = filtersRef.current;
-    console.log("activeTabRef.current::: ", activeTabRef.current)
-    if (activeTabRef.current !== 'Live') {
-      return;
-    }
-    // setSpinner(true);
-    let selectedfilters = {
-      currentPage: currentPage,
-      status: currentFilters.status,
-    };
-
-    if (Object.keys(currentFilters).length > 0) {
-      selectedfilters = { ...selectedfilters, ...currentFilters };
-    }
-
-    if (
-      memberProfile?.permissions?.tracking?.view_others === true &&
-      memberProfile?.permissions?.tracking?.selected_members?.length > 0
-    ) {
-      selectedfilters = {
-        ...selectedfilters,
-        ["selected_members"]:
-          memberProfile?.permissions?.tracking?.selected_members,
+    
+    if (activeTabRef.current === 'Live') {
+        
+      // setSpinner(true);
+      let selectedfilters = {
+        currentPage: currentPage,
+        status: currentFilters.status,
       };
-    } else {
-      selectedfilters = {
-        ...selectedfilters,
-        ["selected_members"]: [memberProfile?._id],
-      };
-    }
 
-    await dispatch(getliveActivity(selectedfilters));
-    setSpinner(false);
+      if (Object.keys(currentFilters).length > 0) {
+        selectedfilters = { ...selectedfilters, ...currentFilters };
+      }
+
+      if (
+        memberProfile?.permissions?.tracking?.view_others === true &&
+        memberProfile?.permissions?.tracking?.selected_members?.length > 0
+      ) {
+        selectedfilters = {
+          ...selectedfilters,
+          ["selected_members"]:
+            memberProfile?.permissions?.tracking?.selected_members,
+        };
+      } else {
+        selectedfilters = {
+          ...selectedfilters,
+          ["selected_members"]: [memberProfile?._id],
+        };
+      }
+
+      await dispatch(getliveActivity(selectedfilters));
+      setSpinner(false);
+    }
   };
 
   const handleLiveActivityList = async () => {
@@ -343,6 +345,9 @@ useEffect(() => {
     let selectedfilters = {
       currentPage: currentPage,
       status: currentFilters.status,
+      date_range: [
+        new Date().toISOString().split("T")[0],
+      ],
     };
 
     if (Object.keys(currentFilters).length > 0) {
@@ -369,12 +374,13 @@ useEffect(() => {
     setSpinner(false);
   };
 
-  const handleFilteredLiveActivityList = async () => {
+  const handleFilteredLiveActivityList = async () => { 
     setSpinner(true)
     const currentFilters = filtersRef.current;
+    const cleanedFilteredDate = filtereddate.filter(d => d && d.trim() !== "");
     let selectedfilters = {
       currentPage: currentPage,
-      date_range: filtereddate,
+      date_range: cleanedFilteredDate,
     };
 
     if (Object.keys(currentFilters).length > 0) {
@@ -396,16 +402,17 @@ useEffect(() => {
         ["selected_members"]: [memberProfile?._id],
       };
     }
-    selectedfilters = { ...selectedfilters, ["status"]: "live" };
+    selectedfilters = { ...selectedfilters, ["status"]: "recordings" };
     await dispatch(getliveActivity(selectedfilters));
     setSpinner(false);
   };
 
-  const handleRecordedActivity = async () => {
+  const handleRecordedActivity = async () => { 
     setRecordedActivities([])
     setActSpinner(true);
+    const cleanedFilteredDate = filtereddate.filter(d => d && d.trim() !== "");
     await dispatch(
-      getRecoredActivity(currentActivity._id, "recorded", filtereddate)
+      getRecoredActivity(currentActivity._id, "recorded", cleanedFilteredDate)
     );
     setActSpinner(false);
   };
@@ -415,13 +422,32 @@ useEffect(() => {
     await dispatch(getMemberRecoredActivity(memberProfile._id, "recorded", date));
   };
 
+  // useEffect(() => {
+  //   // if (selectedFilter !== "custom" && isActive === true) {
+  //   if ( isActive === true) {
+  //     handleRecordedActivity();
+  //   } else {
+  //     handleFilteredLiveActivityList();
+  //   }
+  // }, [filtereddate]);
   useEffect(() => {
-    if (selectedFilter !== "custom" && isActive === true) {
-      handleRecordedActivity();
-    } else {
-      handleFilteredLiveActivityList();
+    const [fromDate, toDate] = filtereddate;
+
+    // condition: at least one date OR both dates are different
+    const hasValidDates =
+      (fromDate && fromDate.trim() !== "") ||
+      (toDate && toDate.trim() !== "") ||
+      (fromDate && toDate && fromDate !== toDate);
+
+    if (hasValidDates) {
+      if (isActive === true) {
+        handleRecordedActivity();
+      } else {
+        handleFilteredLiveActivityList();
+      }
     }
   }, [filtereddate]);
+
 
   useEffect(() => {
     handleListProjects();
@@ -443,6 +469,13 @@ useEffect(() => {
     if (reportState.success) {
       setFields({ date: new Date() });
       handleClose();
+    }
+
+    if (
+      reportState.manualTimeList &&
+      Object.keys(reportState.manualTimeList)?.length > 0
+    ) {
+      setManualListCount(Object.keys(reportState.manualTimeList)?.length);
     }
   }, [reportState]);
 
@@ -518,12 +551,13 @@ useEffect(() => {
 
   useEffect(() => {
     if (Object.keys(filters).length > 0 && !showFilter) {
+      
       filtersRef.current = filters;
       handleLiveActivityList();
     }
   }, [filters]);
 
-  useEffect(() => {
+  useEffect(() => { 
     if (memberActivities) {
       const data = calculateOccupiedRanges(memberActivities)
       setOccupiedRanges(data);
@@ -584,7 +618,8 @@ useEffect(() => {
     while (current <= endOfDay) {
       const hours = current.getHours().toString().padStart(2, "0"); // Format hours
       const minutes = current.getMinutes().toString().padStart(2, "0"); // Format minutes
-      slots.push(`${hours}:${minutes}`); // Add formatted time
+      const ampm = hours >= 12 ? "PM" : "AM";
+      slots.push(`${hours}:${minutes} ${ampm}`); // Add formatted time
       current.setMinutes(current.getMinutes() + intervalMinutes); // Increment by interval
     }
     return slots;
@@ -676,72 +711,18 @@ const ymd = (dateLike) => {
 };
 
 // Helper: HH:mm on a given date → Date (local)
-const parseTimeOnDate = (time, dateLike) => {
-  const day = ymd(dateLike);
-  if (!day) return null;
-  const [Y, M, D] = day.split("-").map(Number);
-  const [h, m] = time.split(":").map(Number);
-  return new Date(Y, M - 1, D, h, m, 0, 0);
-};
+  const parseTimeOnDate = (time, dateLike) => {
+    const day = ymd(dateLike);
+    if (!day) return null;
+    const [Y, M, D] = day.split("-").map(Number);
+    const [h, m] = time.split(":").map(Number);
+    return new Date(Y, M - 1, D, h, m, 0, 0);
+  };
 
 
   const handleReportSubmit = async (e) => {
     e.preventDefault();
-    // const errors = entries.map((entry, index) => {
-    //   const entryErrors = {};
-
-    //   // Validation 1: Task is required
-    //   if (!entry.task) entryErrors.task = "Task is required";
-
-    //   // Validation 2: Start and End Time are required
-    //   if (!entry.start_time) {
-    //     entryErrors.start_time = "Start time is required.";
-    //   }
-    //   if (!entry.end_time) {
-    //     entryErrors.end_time = "End time is required.";
-    //   }
-
-    //   // Helper function to convert HH:mm to Date object
-    //   const parseTime = (time) => {
-    //     const [hours, minutes] = time.split(":").map(Number);
-    //     const date = new Date();
-    //     date.setHours(hours, minutes, 0, 0);
-    //     return date;
-    //   };
-
-    //   if (entry.start_time && entry.end_time) {
-    //     const currentStart = parseTime(entry.start_time);
-    //     const currentEnd = parseTime(entry.end_time);
-
-    //     // Validation 3: End time must be greater than start time
-    //     if (currentStart >= currentEnd) {
-    //       entryErrors.end_time = "End time must be greater than start time.";
-    //     }
-
-    //     // Validation 4: Start and End times should not overlap with other entries
-    //     entries.forEach((otherEntry, otherIndex) => {
-    //       if (
-    //         index !== otherIndex &&
-    //         otherEntry.start_time &&
-    //         otherEntry.end_time
-    //       ) {
-    //         const otherStart = parseTime(otherEntry.start_time);
-    //         const otherEnd = parseTime(otherEntry.end_time);
-
-    //         if (
-    //           currentStart < otherEnd &&
-    //           currentEnd > otherStart // Overlap condition
-    //         ) {
-    //           entryErrors.start_time =
-    //             "Time range overlaps with another entry.";
-    //           entryErrors.end_time = "Time range overlaps with another entry.";
-    //         }
-    //       }
-    //     });
-    //   }
-
-    //   return entryErrors;
-    // });
+    
 
     const errors = entries.map((entry, index) => {
       const entryErrors = {};
@@ -757,41 +738,33 @@ const parseTimeOnDate = (time, dateLike) => {
         entryErrors.end_time = "End time is required.";
       }
 
-      // Helper function to convert HH:mm + entry.date → Date object
-      // const parseTime = (time, dateString) => {
-      //   const [hours, minutes] = time.split(":").map(Number);
-      //   const baseDate = dateString ? new Date(dateString) : new Date();
-      //   baseDate.setHours(hours, minutes, 0, 0);
-      //   return baseDate;
-      // };
+      const entryDay = ymd(entry.date);
+      if (entry.start_time && entry.end_time && entryDay) {
+        const currentStart = parseTimeOnDate(entry.start_time, entry.date);
+        const currentEnd   = parseTimeOnDate(entry.end_time, entry.date);
 
-    const entryDay = ymd(entry.date);
-    if (entry.start_time && entry.end_time && entryDay) {
-      const currentStart = parseTimeOnDate(entry.start_time, entry.date);
-      const currentEnd   = parseTimeOnDate(entry.end_time, entry.date);
-
-      if (currentStart >= currentEnd) {
-        entryErrors.end_time = "End time must be greater than start time.";
-      }
-
-      // ✅ Only compare with entries on the same YYYY-MM-DD
-      entries.forEach((otherEntry, otherIndex) => {
-        if (
-          otherIndex !== index &&
-          otherEntry.start_time &&
-          otherEntry.end_time &&
-          ymd(otherEntry.date) === entryDay
-        ) {
-          const otherStart = parseTimeOnDate(otherEntry.start_time, otherEntry.date);
-          const otherEnd   = parseTimeOnDate(otherEntry.end_time, otherEntry.date);
-
-          if (otherStart && otherEnd && currentStart < otherEnd && currentEnd > otherStart) {
-            entryErrors.start_time = "Time range overlaps with another entry.";
-            entryErrors.end_time   = "Time range overlaps with another entry.";
-          }
+        if (currentStart >= currentEnd) {
+          entryErrors.end_time = "End time must be greater than start time.";
         }
-      });
-    }
+
+        // ✅ Only compare with entries on the same YYYY-MM-DD
+        entries.forEach((otherEntry, otherIndex) => {
+          if (
+            otherIndex !== index &&
+            otherEntry.start_time &&
+            otherEntry.end_time &&
+            ymd(otherEntry.date) === entryDay
+          ) {
+            const otherStart = parseTimeOnDate(otherEntry.start_time, otherEntry.date);
+            const otherEnd   = parseTimeOnDate(otherEntry.end_time, otherEntry.date);
+
+            if (otherStart && otherEnd && currentStart < otherEnd && currentEnd > otherStart) {
+              entryErrors.start_time = "Time range overlaps with another entry.";
+              entryErrors.end_time   = "Time range overlaps with another entry.";
+            }
+          }
+        });
+      }
 
     return entryErrors;
   });
@@ -803,18 +776,20 @@ const parseTimeOnDate = (time, dateLike) => {
     if (hasErrors) {
       setErrors(errors); // Update the errors state to show errors below each field
       return false; // Prevent form submission
-    } //return false;
-    setErrors([]);
-    setLoader(true);
-    const payload = { entries };
-    
-    dispatch(addManualTime({ ...payload, ...fields }));
+    }else{
+       setErrors([]);
+        setLoader(true);
+        const payload = { entries };
+        
+        dispatch(addManualTime({ ...payload, ...fields }));
+    }
+   
   };
 
   useEffect(() => {
     refreshSocket();
     selectboxObserver();
-    handleLiveActivityList();
+    // handleLiveActivityList();
 
     socket.on("receive_record_types", async (record_types = {}) => {
       if (activeTab === "Live") {
@@ -948,7 +923,7 @@ const parseTimeOnDate = (time, dateLike) => {
       handleLiveActivityListInterval();
     }, 60000);
 
-    memberTodaysActivity();
+    memberTodaysActivity([new Date().toISOString().split("T")[0]]);
   }, []);
 
   useEffect(() => {
@@ -1100,7 +1075,10 @@ const parseTimeOnDate = (time, dateLike) => {
   }, [activeTab]);
 
   useEffect(() => {
+    setActSpinner( false );
+    setSpinner( false)
     if (activeInnerTab === "InnerRecorded" && currentActivity) {
+      setRecordedActivities([])
       handleRecordedActivity();
     }
   }, [activeInnerTab]);
@@ -1371,6 +1349,7 @@ const parseTimeOnDate = (time, dateLike) => {
               className={selectedFilter === "custom" ? "selected--option" : ""}
               key={"date-custom"}
               onClick={(e) => {
+                setFilteredDate([])
                 setSelectedFilter("custom");
               }}
             >
@@ -1397,7 +1376,8 @@ const parseTimeOnDate = (time, dateLike) => {
               />
             </Form.Group>
             {selectedFilter === "custom" && (
-              <Form.Group className="mb-0 form-group ms-2">
+              <>
+              {/* <Form.Group className="mb-0 form-group ms-2">
                 <DatePicker
                   key={"date-filter"}
                   ref={datePickerRef}
@@ -1406,9 +1386,9 @@ const parseTimeOnDate = (time, dateLike) => {
                   id="datepicker-filter"
                   value={filtereddate}
                   format="YYYY-MM-DD"
-                  range
+                  //range
                   multiple={false}
-                  numberOfMonths={2}
+                  numberOfMonths={1}
                   dateSeparator=" - "
                   onChange={async (value) => {
                     const formatDate = (date) => {
@@ -1434,7 +1414,75 @@ const parseTimeOnDate = (time, dateLike) => {
                   onClose={() => setIsPickerOpen(false)} // Update state when closed
                   plugins={[<FilterButton position="bottom" />]}
                 />
+              </Form.Group> */}
+              <Form.Group className="mb-0 form-group ms-2">
+                <DatePicker
+                  key={"date-filter-from"}
+                  ref={datePickerRef}
+                  name="from_date"
+                  weekStartDayIndex={1}
+                  id="datepicker-filter-from"
+                  value={filtereddate[0] || ""}
+                  format="YYYY-MM-DD"
+                  multiple={false}
+                  editable={false}
+                  numberOfMonths={1}
+                  onChange={(value) => {
+                    const formatDate = (date) => {
+                      const d = new Date(date);
+                      const year = d.getFullYear();
+                      const month = String(d.getMonth() + 1).padStart(2, "0");
+                      const day = String(d.getDate()).padStart(2, "0");
+                      return `${year}-${month}-${day}`;
+                    };
+
+                    const fromDate = formatDate(value);
+                    setFilteredDate([fromDate, filtereddate[1] || ""]);
+                  }}
+                  className="form-control"
+                  placeholder="From date"
+                  open={isPickerOpen}
+                  onOpen={() => setIsPickerOpen(true)}
+                  onClose={() => setIsPickerOpen(false)}
+                  plugins={[<FilterButton position="bottom" />]}
+                />
               </Form.Group>
+
+              <Form.Group className="mb-0 form-group ms-2">
+                <DatePicker
+                  key={"date-filter-to"}
+                  ref={datePickerRefto}
+                  name="to_date"
+                  weekStartDayIndex={1}
+                  id="datepicker-filter-to"
+                  value={filtereddate[1] || ""}
+                  format="YYYY-MM-DD"
+                  multiple={false}
+                  numberOfMonths={1}
+                  editable={false}
+                  minDate={filtereddate[0] || null} // ✅ To-date cannot be before from-date
+                  onChange={(value) => {
+                    const formatDate = (date) => {
+                      const d = new Date(date);
+                      const year = d.getFullYear();
+                      const month = String(d.getMonth() + 1).padStart(2, "0");
+                      const day = String(d.getDate()).padStart(2, "0");
+                      return `${year}-${month}-${day}`;
+                    };
+
+                    const toDate = formatDate(value);
+                    setFilteredDate([filtereddate[0] || "", toDate]);
+                  }}
+                  className="form-control"
+                  placeholder="To date"
+                  open={isPickerOpen}
+                  onOpen={() => setIsPickerOpen(true)}
+                  onClose={() => setIsPickerOpen(false)}
+                  plugins={[<FilterButton position="bottom" />]}
+                />
+              </Form.Group>
+
+              </>
             )}
           </Form>
         </ListGroup.Item>
@@ -1586,6 +1634,8 @@ const parseTimeOnDate = (time, dateLike) => {
                         action
                         active={activeTab === "Recordings"}
                         onClick={() => {
+                          setActSpinner(false);
+                          setSpinner(false)
                           setActiveTab("Recordings");
                         }}
                       >
@@ -1673,7 +1723,7 @@ const parseTimeOnDate = (time, dateLike) => {
                         <GrExpand />
                       </ListGroup.Item>
                       <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
-                        <BsArrowClockwise onClick={handleLiveActivityList} />
+                        <BsArrowClockwise onClick={() => {handleLiveActivityList()}} />
                       </ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
@@ -1767,7 +1817,7 @@ const parseTimeOnDate = (time, dateLike) => {
                                 key="live-client-project-header"
                                 className="onHide ms-auto"
                               >
-                                <LuTimer className="me-1" /> Project Time
+                                <LuTimer className="me-1" /> Current Session Time
                               </th>
                               <th
                                 scope="col"
@@ -2289,7 +2339,7 @@ const parseTimeOnDate = (time, dateLike) => {
                   <GrExpand />
                 </ListGroup.Item>
                 <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
-                  <BsArrowClockwise onClick={handleRecordedActivity} />
+                  <BsArrowClockwise onClick={() => {handleRecordedActivity()}} />
                 </ListGroup.Item>
                 <ListGroup.Item
                   className="btn btn-primary"
@@ -2344,14 +2394,14 @@ const parseTimeOnDate = (time, dateLike) => {
                         )}
                       </small>
                     </h5>
-                    <span className="ms-md-3">
+                    {/* <span className="ms-md-3">
                       {currentActivity?.latestActivity?.app_version}
-                    </span>
+                    </span> */}
                     <p className="task--timer">
                       <span>
                         <strong>
                           {convertSecondstoTime(
-                            currentActivity?.totalTaskDuration
+                            currentActivity?.totalDuration
                           ) || "00:00"}
                         </strong>
                       </span>
@@ -2431,7 +2481,22 @@ const parseTimeOnDate = (time, dateLike) => {
                                     {recording?.project?.title}
                                   </strong>
                                   <strong className="activity-type-text d-flex align-items-center gap-2">
+                                    
                                     <HiOutlineLightningBolt /> {recording?.type}
+                                    {
+                                      recording?.type === 'manual' && recording.is_approved === true ? 
+                                      (
+                                        <>
+                                          <FaCheck /> Approved
+                                        </>
+                                      )
+                                      :
+                                      recording?.type === 'manual' &&  recording.is_approved === false ?
+                                      <>
+                                        <FaCheck /> Pending
+                                      </>
+                                      : <></>
+                                    }
                                   </strong>
                                 </h4>
                                 <p>
@@ -2451,8 +2516,12 @@ const parseTimeOnDate = (time, dateLike) => {
                                     <FiClock className="me-2" />{" "}
                                     {generateTimeRange(
                                       recording?.createdAt,
-                                      recording?.duration
+                                      recording?.duration || 0
                                     )}
+                                  </ListGroup.Item>
+                                  <ListGroup.Item>
+                                    <FaHistory className="me-2" />{" "}
+                                    Version: {recording?.app_version}
                                   </ListGroup.Item>
                                 </ListGroup>
                               </Accordion.Header>
@@ -3082,7 +3151,7 @@ const parseTimeOnDate = (time, dateLike) => {
               <small>Review and approve manual time entries</small>
             </strong>
           </Modal.Title>
-          <span className="pending--badge">Pending (4)</span>
+          <span className="pending--badge">Pending ({manualListCount})</span>
         </Modal.Header>
         <Modal.Body>
           <ManualTime />
@@ -3195,7 +3264,14 @@ const parseTimeOnDate = (time, dateLike) => {
                       };
                       const formatted = formatDate(value);
                       memberTodaysActivity([formatted])
-                      handleTimeChange("date", formatted)
+                      setTimings({
+                        ...timings, // keep other fields if any
+                        date: formatted,
+                        start_time: "", // reset start_time
+                        end_time: "",   // reset end_time
+                      });
+
+                      // handleTimeChange("date", formatted)
                       
                     }}
                     className="form-control"
@@ -3207,37 +3283,33 @@ const parseTimeOnDate = (time, dateLike) => {
                 </Col>
                 <Col md={6} className="mb-3 mb-md-0">
                   
-                  <Dropdown className="select--dropdown">
-                    <Dropdown.Toggle variant="success">
+                  <Dropdown className="select--dropdown" datattimeeee={timings?.start_time} key={`dropdown-${timings?.start_time || 'start'}`}>
+                    <Dropdown.Toggle variant="success" key={'start-timing'}>
                       {timings?.start_time || "Start Time"}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       <div className="drop--scroll">
-                        {/* <Form>
-                                  <Form.Group className="form-group mb-3">
-                                      <Form.Control type="text" placeholder="Search here.."  value={timings?.start_time} onChange={(e) => {handleSearchChange('start_time', 0, e.target.value)}} />
-                                  </Form.Group>
-                              </Form> */}
+                       
                         {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
-                            slot,
+                            slot.replace(/\s?(AM|PM)$/i, ""),
                             occupiedRanges
                           );
-                          // if (!isOccupied) {
-                          //   isOccupied = entries.some((entry) => {
-                          //     return (
-                          //       (slot >= entry.start_time &&
-                          //         slot <= entry.end_time) || // Between
-                          //       slot === entry.start_time || // Equal to start
-                          //       slot === entry.end_time // Equal to end
-                          //     );
-                          //   });
-                          // }
+                          if (!isOccupied) {
+                            isOccupied = entries.some((entry) => {
+                              return (
+                                (slot.replace(/\s?(AM|PM)$/i, "") >= entry.start_time &&
+                                  slot.replace(/\s?(AM|PM)$/i, "") <= entry.end_time) || // Between
+                                slot.replace(/\s?(AM|PM)$/i, "") === entry.start_time || // Equal to start
+                                slot.replace(/\s?(AM|PM)$/i, "") === entry.end_time // Equal to end
+                              );
+                            });
+                          }
                           return (
                             <Dropdown.Item
                               key={`slot-${slot}-${idx}`}
                               onClick={() =>
-                                handleTimeChange("start_time", slot)
+                                handleTimeChange("start_time", slot.replace(/\s?(AM|PM)$/i, ""))
                               }
                               disabled={isOccupied}
                               style={{
@@ -3269,23 +3341,21 @@ const parseTimeOnDate = (time, dateLike) => {
                               </Form> */}
                         {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
-                            slot,
+                            slot.replace(/\s?(AM|PM)$/i, ""),
                             occupiedRanges
                           );
-                          // if (!isOccupied) {
-                          //   isOccupied = entries.some((entry) => {
-                          //     return (
-                          //       (slot >= entry.start_time &&
-                          //         slot <= entry.end_time) || // Between
-                          //       slot === entry.start_time || // Equal to start
-                          //       slot === entry.end_time // Equal to end
-                          //     );
-                          //   });
-                          // }
+                          if (!isOccupied) {
+                            isOccupied = (
+                                (
+                                  slot.replace(/\s?(AM|PM)$/i, "") <= timings?.start_time) || // Between
+                                slot.replace(/\s?(AM|PM)$/i, "") === timings?.start_time
+                              );
+                            
+                          }
                           return (
                             <Dropdown.Item
                               key={`end-slot-${slot}-${idx}`}
-                              onClick={() => handleTimeChange("end_time", slot)}
+                              onClick={() => handleTimeChange("end_time", slot.replace(/\s?(AM|PM)$/i, ""))}
                               disabled={isOccupied}
                               style={{
                                 pointerEvents: isOccupied ? "none" : "auto",
@@ -3453,7 +3523,7 @@ const parseTimeOnDate = (time, dateLike) => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleEntryChange}>
+          <Button variant="primary" disabled={Object.keys(selectedTask).length === 0} onClick={handleEntryChange}>
             Save
           </Button>
         </Modal.Footer>

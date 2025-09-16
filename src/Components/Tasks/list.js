@@ -86,19 +86,73 @@ const TasksList = React.memo((props) => {
       setShowtaskform(false);
     }
 
-    if (apiResult.UpdatedTask) {
-      setTasksLists((prev) => ({
-        ...prev,
-        [apiResult.UpdatedTask.tab]: {
-          ...prev[apiResult.UpdatedTask.tab],
-          tasks: prev[apiResult.UpdatedTask.tab]?.tasks?.map((task) =>
-            task._id === apiResult.UpdatedTask._id
-              ? apiResult.UpdatedTask
-              : task
-          ),
-        },
-      }));
+    if (apiResult.UpdatedTask && apiResult.reorder) {
+      setTasksLists((prev) => {
+        const newTab = apiResult.UpdatedTask.tab;
+        const oldTab = apiResult.tabChangeFrom || null;
+        const taskId = apiResult.UpdatedTask._id;
+
+        // Tasks in new tab
+        const existingTasksNewTab = prev[newTab]?.tasks || [];
+        const taskExistsInNewTab = existingTasksNewTab.some(
+          (task) => task._id === taskId
+        );
+
+        // Always update/add in the new tab
+        let updatedState = {
+          ...prev,
+          [newTab]: {
+            ...prev[newTab],
+            tasks: taskExistsInNewTab
+              ? existingTasksNewTab.map((task) =>
+                  task._id === taskId ? apiResult.UpdatedTask : task
+                )
+              : [...existingTasksNewTab, apiResult.UpdatedTask],
+          },
+        };
+
+        // If moved from another tab → remove from old tab
+        if (oldTab && oldTab !== newTab) {
+          const existingTasksOldTab = prev[oldTab]?.tasks || [];
+          updatedState = {
+            ...updatedState,
+            [oldTab]: {
+              ...prev[oldTab],
+              tasks: existingTasksOldTab.filter((task) => task._id !== taskId),
+            },
+          };
+        }
+
+        return updatedState;
+      });
     }
+
+    // if (apiResult.UpdatedTask) {
+    //   setTasksLists((prev) => {
+    //     const tab = apiResult.UpdatedTask.tab;
+    //     const oldTab = apiResult.tabChangeFrom || null;
+    //     const existingTasks = prev[tab]?.tasks || [];
+
+    //     const taskExists = existingTasks.some(
+    //       (task) => task._id === apiResult.UpdatedTask._id
+    //     );
+
+    //     return {
+    //       ...prev,
+    //       [tab]: {
+    //         ...prev[tab],
+    //         tasks: taskExists
+    //           ? existingTasks.map((task) =>
+    //               task._id === apiResult.UpdatedTask._id
+    //                 ? apiResult.UpdatedTask
+    //                 : task
+    //             )
+    //           : [...existingTasks, apiResult.UpdatedTask], // add new task if not exists
+    //       },
+    //     };
+    //   });
+    // }
+
   }, [apiResult]);
 
   const handleDragEnd = async (result) => {
@@ -144,7 +198,7 @@ const TasksList = React.memo((props) => {
           return;
         }
 
-        await dispatch(reorderTasks({ tasks: tasksToUpdate }));
+        await dispatch(reorderTasks({ tasks: tasksToUpdate, updatedTaskID: taskId }));
       } else {
         const sourceTasks = Array.from(taskslists[sourceTabId]?.tasks);
         const destinationTasks = Array.from(
@@ -183,7 +237,7 @@ const TasksList = React.memo((props) => {
           setTasksLists(prevState);
           return;
         }
-        await dispatch(reorderTasks({ tasks: tasksToUpdate }));
+        await dispatch(reorderTasks({ tasks: tasksToUpdate, updatedTaskID: taskId }));
       }
     } catch (error) {
       console.error("Reorder failed, rolling back...", error);
@@ -381,6 +435,7 @@ const TasksList = React.memo((props) => {
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
+                                    key={`${task._id}--item`}
                                     className="task--button"
                                     onClick={async () => {
                                       await dispatch(
