@@ -17,6 +17,7 @@ import './Styles/Sidebar.css';
 import './Styles/ModalStyle.css';
 import './App.css';
 import { toggleTheme } from "./redux/actions/common.action";
+import SubscriptionGuard from "./Components/wrapper/subscription";
 import {CREATE_POST_LIST_COMMENT, CREATE_LIST_COMMENT,UPDATE_POST_LIST_COMMENT, DELETE_COMMENT, DELETE_POST, PROJECT_MARK } from "./redux/actions/types";
 
 const secretKey = process.env.REACT_APP_SECRET_KEY;
@@ -181,7 +182,7 @@ function App(props) {
  useEffect(() => {
   let themecolor = localStorage.getItem('theme')
   
-  if( !themecolor){console.log("themecolor:: ", themecolor)
+  if( !themecolor){
     themecolor = JSON.stringify({
       color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))',
       primaryColor: '59, 130, 246', 
@@ -236,8 +237,8 @@ function App(props) {
   const userdata = currentLoggedInUser;
   /*******************************************************************************/
   /*****************************    using for dynamic routing  *******************/
-  const getRoutes = (routes, _privateRoute) => {
-    return routes.map((route, _privateRoute) => {
+  const getRoutes = (routes, _privateRoute= false) => {
+    return routes.map((route) => {
       // If the route has a 'module' key, check permissions
       if (route.module) {
         const hasPermission =
@@ -246,12 +247,30 @@ function App(props) {
   
         if (!hasPermission) return null;
       }
+      // if (route.route) {
+      //   return (
+      //     <Route
+      //       exact
+      //       path={route.route}
+      //       element={route.component}
+      //       key={route.key}
+      //     />
+      //   );
+      // }
       if (route.route) {
+        // Wrap private routes (except /plans) in SubscriptionGuard
+        const element =
+          _privateRoute && route.route !== "/plans"
+            ? <SubscriptionGuard>{route.component}</SubscriptionGuard>
+            : route.component;
+
+            
+
         return (
           <Route
             exact
             path={route.route}
-            element={route.component}
+            element={element}
             key={route.key}
           />
         );
@@ -288,9 +307,9 @@ function App(props) {
         }
         <ToastAlerts />
         {(loggedIn) ? (
-          <Routes>{getRoutes(privateRoutes)}</Routes>
+          <Routes>{getRoutes(privateRoutes, true)}</Routes>
         ) : (
-          <Routes>{getRoutes(publicRoutes)}</Routes>
+          <Routes>{getRoutes(publicRoutes, false )}</Routes>
         )}
       </section>
     </div>

@@ -41,7 +41,7 @@ import {
   MdOutlineSearch,
   MdFilterList,
 } from "react-icons/md";
-import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
+import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser, FiCheckCircle, FiTrash2, FiEdit } from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";
 import { TbReport, TbScreenshot } from "react-icons/tb";
@@ -52,6 +52,9 @@ import {
   getSingleProjectReport,
   addRemarkstoProject,
   getActivityMeta,
+  getRemarks,
+  deleteRemarks,
+  updateremark
 } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import {
@@ -65,115 +68,6 @@ import { Link } from "react-router-dom";
 import "media-chrome";
 import "media-chrome/dist/menu";
 
-const TaskList = ({ report, handleView, setReport }) => {
-  const dispatch = useDispatch();
-  const selectedReport = report;
-  const reportState = useSelector((state) => state.reports);
-  const [showRemarks, setShowRemarks] = useState(false);
-  const handleRemarksClose = () => setShowRemarks(false);
-  const handleShowRemarks = () => setShowRemarks(true);
-
-  const gettaskTab = (tabid) => {
-    if (report?.project?.workflow?.tabs?.length > 0) {
-      const matchedTabTitle = report.project.workflow.tabs.find(
-        (tab) => tab._id === tabid
-      )?.title;
-      return <Badge bg="warning">{matchedTabTitle}</Badge>;
-    }
-    return null;
-  };
-
-  return (
-    <>
-      {showRemarks && (
-        <Modal
-          show={showRemarks}
-          onHide={handleRemarksClose}
-          centered
-          size="lg"
-          className="theme--modal"
-        >
-          <Modal.Header closeButton className="py-3">
-            <Modal.Title>
-              <span className="nav--item--icon">
-                <TbReport />
-              </span>
-              <strong>
-                Project Remarks <small>E-commerce Platform</small>
-              </strong>
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="p-4">
-            <div className="single--project--stack">
-              <div className="d-flex justify-content-between mb-2 align-items-start">
-                <div className="project--name d-flex gap-3 align-items-center">
-                  <div className="title--initial">1</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                    <span>Progress Update</span>
-                    <strong>Monday, January 15, 2024</strong>
-                  </div>
-                </div>
-                <Badge bg="secondary">Day 1</Badge>
-              </div>
-              <p className="mb-0">
-                Started authentication module development. Initial setup
-                completed successfully.
-              </p>
-            </div>
-            <div className="single--project--stack">
-              <div className="d-flex justify-content-between mb-2 align-items-start">
-                <div className="project--name d-flex gap-3 align-items-center">
-                  <div className="title--initial">2</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                    <span>Progress Update</span>
-                    <strong>Monday, January 15, 2024</strong>
-                  </div>
-                </div>
-                <Badge bg="secondary">Day 2</Badge>
-              </div>
-              <p className="mb-0">
-                Started authentication module development. Initial setup
-                completed successfully.
-              </p>
-            </div>
-            <div className="single--project--stack">
-              <div className="d-flex justify-content-between mb-2 align-items-start">
-                <div className="project--name d-flex gap-3 align-items-center">
-                  <div className="title--initial">3</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                    <span>Progress Update</span>
-                    <strong>Monday, January 15, 2024</strong>
-                  </div>
-                </div>
-                <Badge bg="secondary">Day 3</Badge>
-              </div>
-              <p className="mb-0">
-                Started authentication module development. Initial setup
-                completed successfully.
-              </p>
-            </div>
-            <div className="single--project--stack">
-              <div className="d-flex justify-content-between mb-2 align-items-start">
-                <div className="project--name d-flex gap-3 align-items-center">
-                  <div className="title--initial">4</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                    <span>Progress Update</span>
-                    <strong>Monday, January 15, 2024</strong>
-                  </div>
-                </div>
-                <Badge bg="secondary">Day 4</Badge>
-              </div>
-              <p className="mb-0">
-                Started authentication module development. Initial setup
-                completed successfully.
-              </p>
-            </div>
-          </Modal.Body>
-        </Modal>
-      )}
-    </>
-  );
-};
 
 function ReportsPage() {
   const inputRef = useRef(null);
@@ -188,9 +82,12 @@ function ReportsPage() {
   const manuldatePickerRef = useRef(null);
   const memberdata = getMemberdata();
   const [remarksActive, setremarksActive] = useState(false);
+  const [addEditRemarks, setAddEditRemarks] = useState(false)
+  const [editRemark, setEditRemark] = useState({})
   const [remarks, setRemarks] = useState("");
+  const [projectRemarks, setProjectRemarks] = useState([])
   const [loader, setLoader] = useState(false);
-
+  const [remarkDate, setRemarkDate] = useState(new Date().toLocaleDateString("en-CA"))
   const [showNew, setShowNew] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -207,18 +104,34 @@ function ReportsPage() {
     custom: "Custom",
   };
 
-  const handleRemarks = () => {
-    setremarksActive((current) => !current);
-    if (selectedReport?.projectmeta && selectedReport.projectmeta.length > 0) {
-      const remarksMeta = selectedReport.projectmeta.find(
-        (meta) => meta.meta_key === "remarks"
-      );
 
-      if (remarksMeta) {
-        setRemarks(remarksMeta.meta_value);
+  const handleEditRemarks = (remark) => {
+    setEditRemark(remark)
+    setRemarks(remark.meta_value);
+    setAddEditRemarks(true)
+  }
+
+  const handleRemoveRemarks = (id) => {
+    if(filters['sort_by'] === 'projects'){
+        dispatch(deleteRemarks({
+          member:  selectedReport?._id,
+          project_id: selectedReport?.project?._id,
+          sort_by: filters["sort_by"],
+          date_range: filters['date_range'],
+          id: id
+        }))
+      }else{
+        dispatch(deleteRemarks({
+          member: singleMemberReport?.member?._id,
+          project_id: selectedReport?.project?._id,
+          sort_by: filters["sort_by"],
+          date_range: filters['date_range'],
+          id: id
+        }))
+        
       }
-    }
-  };
+    
+  }
   const handleRemarksChange = (e) => {
     setRemarks(e.target.value);
   };
@@ -277,9 +190,28 @@ function ReportsPage() {
       project_id: project_id,
       remarks: remarks,
       date: filtereddate,
+      remark_date: remarkDate
     };
     dispatch(addRemarkstoProject(payload));
   };
+
+  const updateRemarks = () => {
+    setLoader(true);
+    let payload = {
+      remark_id: editRemark?._id,
+      remarks: remarks,
+      project_id: selectedReport?.project?._id,
+      sort_by: filters["sort_by"],
+      date_range: filters['date_range']
+    };
+    if(filters['sort_by'] === 'projects'){
+        payload['member'] =  selectedReport?._id
+    }else{
+        payload['member'] = singleMemberReport?.member?._id;
+    }
+
+    dispatch(updateremark(payload));
+  }
 
   const handlefilterchange = (name, value) => {
     setFilters({ ...filters, [name]: value });
@@ -333,7 +265,9 @@ function ReportsPage() {
     if (projectReport?.members?.length > 0) {
       projectReport.members.forEach((report) => {
         report.activities.forEach((activity) => {
-          totalDuration += activity.duration || 0;
+          // totalDuration += activity.duration || 0;
+          const duration = Number(activity.duration) || 0;
+          totalDuration += duration;
         });
       });
     }
@@ -399,6 +333,28 @@ function ReportsPage() {
     selectboxObserver();
   }, [dispatch]);
 
+  useEffect(() => {
+    if(remarksActive === true){
+      setLoader( true)
+      if(filters['sort_by'] === 'projects'){
+        dispatch(getRemarks({
+          member: selectedReport?._id,
+          project_id: selectedReport?.project?._id,
+          sort_by: filters["sort_by"],
+          date_range: filters['date_range']
+        }))
+      }else{
+        dispatch(getRemarks({
+          member: singleMemberReport?.member?._id,
+          project_id: selectedReport?.project?._id,
+          sort_by: filters["sort_by"],
+          date_range: filters['date_range']
+        }))
+      }
+      setLoader(false)
+    }
+  },[remarksActive])
+
   // Helper function to calculate time ranges
 
   useEffect(() => {
@@ -461,6 +417,14 @@ function ReportsPage() {
         setvideosByTask([]);
       }
     }
+
+
+    if(reportState.remarks){
+      setAddEditRemarks(false);
+      setRemarks("")
+      setEditRemark({})
+      setProjectRemarks(reportState.remarks)
+    }
   }, [reportState]);
 
   useEffect(() => {
@@ -471,12 +435,12 @@ function ReportsPage() {
 
   useEffect(() => {
     if (view === "single") {
-      setFilteredDate(new Date().toISOString().split("T")[0]);
-      handlefilterchange("date_range", new Date().toISOString().split("T")[0]);
+      setFilteredDate(new Date().toLocaleDateString("en-CA"));
+      handlefilterchange("date_range", new Date().toLocaleDateString("en-CA"));
     } else {
-      setFilteredDate([new Date().toISOString().split("T")[0]]);
+      setFilteredDate([new Date().toLocaleDateString("en-CA")]);
       handlefilterchange("date_range", [
-        new Date().toISOString().split("T")[0],
+        new Date().toLocaleDateString("en-CA"),
       ]);
     }
  
@@ -684,6 +648,17 @@ function ReportsPage() {
       </>
     );
   };
+
+const formattedDate = (date) => {
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "long", 
+    year: "numeric", 
+    month: "long",   
+    day: "numeric",  
+  });
+}
+  
+
 
   const FiltersDate = ({
     position,
@@ -934,7 +909,8 @@ function ReportsPage() {
       // setFields({date: new Date()})
       handleReports();
       // handleClose()
-      setremarksActive(false);
+      // setremarksActive(false);
+      setAddEditRemarks(false)
     }
   }, [reportState]);
 
@@ -1092,7 +1068,7 @@ function ReportsPage() {
                             placeholder={
                               activeMemberTab === "members"
                                 ? "Search by member"
-                                : "Search by project"
+                                : "Search by project or client name"
                             }
                             onChange={(event) => {
                               const value = event.target.value;
@@ -1306,7 +1282,7 @@ function ReportsPage() {
                           }
                       </tbody>
                     </Table>
-                    {projectReports?.totalPages > 1 && (
+                    {/* {projectReports?.totalPages > 1 && (
                       <Pagination>
                         <Pagination.Prev
                           onClick={goToPrevious}
@@ -1319,7 +1295,7 @@ function ReportsPage() {
                           }
                         />
                       </Pagination>
-                    )}
+                    )} */}
                   </div>
                 </div>
               )}
@@ -1741,57 +1717,18 @@ function ReportsPage() {
                             </div>
                           </Col>
                         </Row>
-                        {/* <Row>
-                          { memberdata?._id === filters?.member ?
+                        
+                          { memberProfile?.role?.slug === 'owner' || memberProfile?.permissions?.reports?.view_others && memberProfile?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.permissions?.reports?.selected_members.includes(singleMemberReport?.member?._id) || memberdata?._id === singleMemberReport?.member?._id ?
+              
+                          <Row>
                               <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
-                                <label>Remarks</label>
-                                
-                                {
-                                  remarksActive === true ? 
-                                  <>
-                                    <Form.Group className="mb-0 form-group">
-                                      
-                                      <textarea class="form-control mt-4" rows={7}  data-r={remarks} defaultValue={remarks} onChange={handleRemarksChange}>
-                                        
-                                      </textarea>
-                                    </Form.Group>
-                                    <Button variant="primary" onClick={() => {
-                                      saveRemarks(report?.project?._id)
-                                    }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
-                                    <Button variant="danger" onClick={handleRemarks}>Cancel</Button>
-                                  </>
-                                  :
-                                  <>
-                                    <FaRegEdit onClick={handleRemarks} />
-                                    {
-                                    report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                    report?.project?.projectmeta.map((meta) => {
-                                      if(meta.meta_key === 'remarks'){
-                                        return <pre>{meta.meta_value}</pre>
-                                      }else{
-                                        return null
-                                      }
-                                    })
-                                  }
-                                  </>
-                                }
-                              </Col>
+                                <Button variant="primary" onClick={() => {setProjectRemarks([]);setremarksActive(true); setSelectedReport(report)}}>View Remarks</Button>
+                                </Col>
+                              </Row>
                               :
-                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
-                                <label>Remarks</label>
-                                    {
-                                    report?.project?.projectmeta && report?.project?.projectmeta?.length > 0 &&
-                                    report?.project?.projectmeta.map((meta) => {
-                                      if(meta.meta_key === 'remarks'){
-                                        return <pre>{meta.meta_value}</pre>
-                                      }else{
-                                        return null
-                                      }
-                                    })
-                                  }
-                              </Col>
+                              <></>
                             }
-                        </Row> */}
+                        
                       </div>
                     </div>
                   </>
@@ -1903,6 +1840,19 @@ function ReportsPage() {
                               )
                             )}
                           </ul>
+                            {
+                              memberProfile?.role?.slug === 'owner'  || memberProfile?.permissions?.reports?.view_others === true && memberProfile?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.permissions?.reports?.selected_members.includes(member?._id) 
+                              || memberdata?._id === member?._id ?
+
+                              <Row>
+                                <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                                  <Button variant="primary" onClick={() => {setProjectRemarks([]);setremarksActive(true); setSelectedReport(member)}}>View Remarks</Button>
+                                  </Col>
+                                </Row>
+                                :
+                                <></>
+                            }
+                          
                         </div>
                       </Col>
                     </div>
@@ -2057,6 +2007,151 @@ function ReportsPage() {
           </ListGroup>
         </Modal.Body>
       </Modal>
+
+      <Modal
+          show={remarksActive}
+          onHide={() => setremarksActive(false)}
+          centered
+          size="lg"
+          className="add--workflow--modal theme--modal"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+             <span className="nav--item--icon">
+                <FiCheckCircle />
+              </span>
+              <strong>
+                Project Remarks
+                {
+                  filters['sort_by'] === 'projects' ? 
+                  <small>{selectedReport?.name}</small>
+                  :
+                  <small>{singleMemberReport?.member?.name}</small>
+                }
+              </strong>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {
+              addEditRemarks === true ? 
+              <>
+              <Form.Group className="mb-0 form-group">
+                <DatePicker
+                  key={"remarks-date"}
+                  name="date"
+                  weekStartDayIndex={1}
+                  id="datepicker-remarks"
+                  value={remarkDate || ""}
+                  format="YYYY-MM-DD"
+                  multiple={false}
+                  dateSeparator=" - "
+                  editable={Object.keys(editRemark).length === 0}
+                  disabled={Object.keys(editRemark).length > 0}
+                  onChange={async (value) => {
+                    const formatDate = (date) => {
+                      const d = new Date(date);
+                      const year = d.getFullYear();
+                      const month = String(d.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+                      const day = String(d.getDate()).padStart(2, "0");
+                      return `${year}-${month}-${day}`;
+                    };
+                    const formatted = formatDate(value);
+                    setRemarkDate(formatted)
+                  }}
+                  className="form-control"
+                  placeholder="YYYY-MM-DD"
+                />
+              </Form.Group>
+                <Form.Group className="mb-0 form-group">
+                  
+                  <textarea className="form-control mt-4" rows={7} defaultValue={remarks} onChange={handleRemarksChange}>
+                    
+                  </textarea>
+                </Form.Group>
+                {
+                  editRemark?._id ?
+                    <Button variant="primary" onClick={() => {
+                      updateRemarks()
+                    }} disabled={loader}>{loader === true ? 'Please wait...': 'Update'}</Button>
+                    :
+                    <Button variant="primary" onClick={() => {
+                      saveRemarks(selectedReport?.project?._id)
+                    }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
+
+                }
+                
+                <Button variant="danger" onClick={() => setAddEditRemarks( false )}>Cancel</Button>
+              </>
+              :
+              <></>
+            }
+            {
+              (memberdata?._id === singleMemberReport?.member?._id && addEditRemarks === false) && (
+                <Button variant="primary" onClick={() => setAddEditRemarks(true)}>Add Remarks</Button>
+              )
+               
+            }
+             {/* <FaRegEdit onClick={handleRemarks} /> */}
+             {loader && (
+                <div className="loading-bar">
+                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                </div>
+              )
+            }
+            {
+              projectRemarks && projectRemarks?.length > 0 ?
+              projectRemarks?.map((remark, index) => {
+                
+                return (
+                  <div className="reports-section">
+                    <div className="reports--heading">
+                      <div className="align-items-center gap-3 justify-content-between">
+                        <div className="mb-0 d-flex align-items-center gap-3">
+                          <div className="title--initial">
+                            {index + 1}
+                          </div>
+                          <div className="title--span flex-column d-flex align-items-start gap-0">
+                            <span>{selectedReport?.project?.title}</span>
+                            <small>
+                              <LuClock />{" "}{formattedDate(remark.createdAt)}
+                              </small>
+                              {
+                                (memberdata?._id === singleMemberReport?.member?._id) && (
+                                 <>
+                                   <FiEdit
+                                    className="text-danger"
+                                    onClick={() => handleEditRemarks(remark)}
+                                  />
+                                  <FiTrash2
+                                    className="text-danger"
+                                    onClick={() => handleRemoveRemarks(remark._id)}
+                                  />
+                                 </>
+                                )
+                              }
+                            
+                          </div>
+                        </div>
+                        <div className="align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+                          <div className="text-md-start">
+                            <div className="text-slate-600">
+                              {remark?.meta_value}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    </div>
+                  
+                )
+                
+              })
+              :
+              <p> No data available.</p>
+            }
+                    
+          </Modal.Body>
+        </Modal>
 
       {ViewReport && (
         <Modal

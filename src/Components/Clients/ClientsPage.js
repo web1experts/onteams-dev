@@ -311,12 +311,24 @@ function ClientsPage() {
       setCustomFields(apiCustomfields.customFields);
     }
 
-    if (apiCustomfields.newField) {
-      setCustomFields((prevCustomFields) => [
-        apiCustomfields.newField,
-        ...prevCustomFields,
-      ]);
-    }
+    // if (apiCustomfields.newField) {
+    //   setCustomFields((prevCustomFields) => [
+    //     apiCustomfields.newField,
+    //     ...prevCustomFields,
+    //   ]);
+    // }
+
+      if (
+      apiCustomfields.newField &&
+        apiCustomfields.newField?.module === "clients"
+      ) {
+        setCustomFields((prevCustomFields) => [
+          ...prevCustomFields.filter(
+            (field) => field._id !== apiCustomfields.newField._id
+          ),
+          apiCustomfields.newField
+        ]);
+      }
 
     if (apiCustomfields.updatedField) {
       setCustomFields((prevCustomFields) =>

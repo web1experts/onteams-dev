@@ -65,6 +65,7 @@ export default (state = initialState, action) => {
                 message: action.payload.message,
                 message_variant: 'success',
                 success: true,
+                ownershipUpdate: true
             };
         case LEAVE_WORKSPACE_FAILED:
             return {

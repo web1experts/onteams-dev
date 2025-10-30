@@ -18,6 +18,7 @@ import { MdArrowDownward } from "react-icons/md";
 import { GrDrag } from "react-icons/gr";
 import { dataObject } from '../../helpers/objectdata';
 import { useDropzone } from 'react-dropzone'
+import { useToast } from '../../context/ToastContext';
 export function AlertDialog(props) {
   const [open, setOpen] = useState(false);
   const [ loader, setLoader ] = useState(false);
@@ -63,6 +64,7 @@ export function AlertDialog(props) {
 }
 
 export function TransferOnwerShip(props) { 
+  // const addToast = useToast();
   useFilledClass('.form-floating .form-control');
   const [open, setOpen] = React.useState(false );
   const [selectedmember, setSelectedmember] = useState(false )
@@ -90,12 +92,15 @@ export function TransferOnwerShip(props) {
 
   useEffect(() => {
     if( workspace.success ){ 
+      setLoader(false)
       handleClose()
     }
   },[workspace])
 
   const saveOwnership = () => {
+    setLoader(true)
     dispatch( updateOwnership({ memberId: selectedmember, companyId: currentMember?.company?._id, removeMemberId: currentMember._id}))
+    setLoader(false)
   }
 
   return (
@@ -125,16 +130,24 @@ export function TransferOnwerShip(props) {
                         <label id="demo-simple-select-required-label">Select a member</label>
                         <Form.Select className="form-control custom-selectbox" id="members"
                           value={selectedmember} onChange={handleMemberChange} name="member">
-                        
-                          {
-                            props.members.map(member => (
-                              <option value={member._id}>{member.name}</option>
-                            ))
+                            <option key='defaultkey' value={false}>
+                                  Select a member
+                                </option>
+                         {
+                            props.members.map((member) =>
+                              member._id !==currentMember._id ? (   // 👈 your condition here
+                                <option key={member._id} value={member._id}>
+                                  {member.name}
+                                </option>
+                              ) : null
+                            )
                           }
+
+
                         </Form.Select>
                         </div>
                         <div>
-                        <Button className='primary btn' onClick={saveOwnership} disabled={loader} >{ loader ? 'Please wait..' : 'Transfer'}</Button>
+                        <Button className='primary btn' onClick={saveOwnership} disabled={loader || selectedmember === false} >{ loader ? 'Please wait..' : 'Transfer'}</Button>
                         </div>
                         </>
                         :
@@ -1604,9 +1617,14 @@ export const FilesModal = () => {
             <Modal.Title>Attach Files</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <Form {...getRootProps()}>
+            <Form {...getRootProps({ className: "dropzone" })}>
+              <input 
+                {...getInputProps({
+                  onChange: (e) => handleSelectedFiles(Array.from(e.target.files))
+                })} 
+              />
                 <Form.Group>
-                    <Form.Control type="file" multiple name="images[]" onChange={(e) => {handleSelectedFiles(Array.from(e.target.files))} } {...getInputProps()} id="attachments-new" />
+                    {/* <Form.Control type="file" multiple name="images[]" onChange={(e) => {handleSelectedFiles(Array.from(e.target.files))} } {...getInputProps()} id="attachments-new" /> */}
                     <Form.Label className="file--upload" htmlFor="attachments-new">
                         <span><FaUpload /></span>
                         <p>Drop your files here or <strong>browse</strong></p>

@@ -5,12 +5,13 @@ import { FaPlus, FaRegTimesCircle } from "react-icons/fa";
 import { ACTIVE_FORM_TYPE, CURRENT_TASK } from "../../redux/actions/types";
 import {
   togglePopups,
-  updateStateData,
+  updateStateData
 } from "../../redux/actions/common.action";
 import {
   ListTasks,
   createTask,
   reorderTasks,
+  getTaskById
 } from "../../redux/actions/task.action";
 import { GrAttachment } from "react-icons/gr";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -24,6 +25,7 @@ const TasksList = React.memo((props) => {
   const memberProfile = props.memberProfile || {};
   const [fields, setFields] = useState({ title: "" });
   const [errors, setErrors] = useState({});
+  const [selectedTask, setSelectedTask] = useState({})
   const commonState = useSelector((state) => state.common);
   const apiResult = useSelector((state) => state.task);
   const [showtaskform, setShowtaskform] = useState({});
@@ -86,33 +88,35 @@ const TasksList = React.memo((props) => {
       setShowtaskform(false);
     }
 
-    if (apiResult.UpdatedTask && apiResult.reorder) {
-      setTasksLists((prev) => {
-        const newTab = apiResult.UpdatedTask.tab;
-        const oldTab = apiResult.tabChangeFrom || null;
-        const taskId = apiResult.UpdatedTask._id;
+  }, [apiResult.newTask]);
 
-        // Tasks in new tab
-        const existingTasksNewTab = prev[newTab]?.tasks || [];
-        const taskExistsInNewTab = existingTasksNewTab.some(
-          (task) => task._id === taskId
-        );
+  useEffect(() => {
+    if (apiResult.UpdatedTask) { 
+      setSelectedTask(apiResult.UpdatedTask)
+      const newTab = apiResult.UpdatedTask.tab;
+      const oldTab = apiResult.tabChangefrom || null;
+      const taskId = apiResult.UpdatedTask._id;
+      // if (oldTab !== null && oldTab !== false && oldTab !== newTab) {
+        setTasksLists((prev) => {
+          const existingTasksNewTab = prev[newTab]?.tasks || [];
+          const taskExistsInNewTab = existingTasksNewTab.some(
+            (task) => task._id === taskId
+          );
 
-        // Always update/add in the new tab
-        let updatedState = {
-          ...prev,
-          [newTab]: {
-            ...prev[newTab],
-            tasks: taskExistsInNewTab
-              ? existingTasksNewTab.map((task) =>
-                  task._id === taskId ? apiResult.UpdatedTask : task
-                )
-              : [...existingTasksNewTab, apiResult.UpdatedTask],
-          },
-        };
+          let updatedState = {
+            ...prev,
+            [newTab]: {
+              ...prev[newTab],
+              tasks: taskExistsInNewTab
+                ? existingTasksNewTab.map((task) =>
+                    task._id === taskId ? apiResult.UpdatedTask : task
+                  )
+                : [...existingTasksNewTab, apiResult.UpdatedTask],
+            },
+          };
 
-        // If moved from another tab → remove from old tab
-        if (oldTab && oldTab !== newTab) {
+          updatedState[newTab].tasks.sort((a, b) => a.order - b.order);
+
           const existingTasksOldTab = prev[oldTab]?.tasks || [];
           updatedState = {
             ...updatedState,
@@ -121,39 +125,58 @@ const TasksList = React.memo((props) => {
               tasks: existingTasksOldTab.filter((task) => task._id !== taskId),
             },
           };
-        }
 
-        return updatedState;
+          return updatedState;
+        });
+     
+    }
+  },[apiResult.UpdatedTask])
+
+  useEffect(() => {
+    if (apiResult.comment) {
+      setTasksLists((prev) => {
+        const oldTab = selectedTask?.tab;
+        const taskId = selectedTask?._id;
+
+        if (!oldTab || !taskId) return prev;
+
+        const existingTasksOldTab = prev[oldTab]?.tasks || [];
+
+        return {
+          ...prev,
+          [oldTab]: {
+            ...prev[oldTab],
+            tasks: existingTasksOldTab.map((task) => {
+              if (task._id === taskId) {
+                return {
+                  ...task,
+                  comments: [...(task.comments || []), apiResult.comment],
+                };
+              }
+              return task;
+            }),
+          },
+        };
       });
     }
+  },[apiResult.comment])
 
-    // if (apiResult.UpdatedTask) {
-    //   setTasksLists((prev) => {
-    //     const tab = apiResult.UpdatedTask.tab;
-    //     const oldTab = apiResult.tabChangeFrom || null;
-    //     const existingTasks = prev[tab]?.tasks || [];
+  useEffect(() => {
+    if(apiResult.singleTask && Object.keys(apiResult.singleTask)?.length > 0){
+      // setSelectedTask(apiResult.singleTask);
+       dispatch(
+        updateStateData(
+          ACTIVE_FORM_TYPE,
+          "task_edit"
+        )
+      );
+       dispatch(
+        updateStateData(CURRENT_TASK, apiResult.singleTask)
+      );
+      handleTaskShow();
+    }
+  },[apiResult.singleTask])
 
-    //     const taskExists = existingTasks.some(
-    //       (task) => task._id === apiResult.UpdatedTask._id
-    //     );
-
-    //     return {
-    //       ...prev,
-    //       [tab]: {
-    //         ...prev[tab],
-    //         tasks: taskExists
-    //           ? existingTasks.map((task) =>
-    //               task._id === apiResult.UpdatedTask._id
-    //                 ? apiResult.UpdatedTask
-    //                 : task
-    //             )
-    //           : [...existingTasks, apiResult.UpdatedTask], // add new task if not exists
-    //       },
-    //     };
-    //   });
-    // }
-
-  }, [apiResult]);
 
   const handleDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
@@ -181,6 +204,10 @@ const TasksList = React.memo((props) => {
           (task, idx) => task._id !== taskslists[sourceTabId]?.tasks[idx]?._id
         );
         if (!hasChanged) return;
+      //   const updatedTasks = reorderedTasks.map((task, index) => ({
+      //   ...task,
+      //   order: index,
+      // }));
 
         setTasksLists({
           ...taskslists,
@@ -217,7 +244,18 @@ const TasksList = React.memo((props) => {
         ) {
           return;
         }
-        setTasksLists({
+         // Update order field for both tabs
+        // const updatedSourceTasks = sourceTasks.map((task, index) => ({
+        //   ...task,
+        //   order: index,
+        // }));
+
+        // const updatedDestinationTasks = destinationTasks.map((task, index) => ({
+        //   ...task,
+        //   order: index,
+        // }));
+        
+         setTasksLists({
           ...taskslists,
           [sourceTabId]: { ...taskslists[sourceTabId], tasks: sourceTasks },
           [destinationTabId]: {
@@ -435,19 +473,23 @@ const TasksList = React.memo((props) => {
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
-                                    key={`${task._id}--item`}
+                                    key={`${task._id}--item-${index}-${tab._id}`}
                                     className="task--button"
                                     onClick={async () => {
-                                      await dispatch(
-                                        updateStateData(
-                                          ACTIVE_FORM_TYPE,
-                                          "task_edit"
-                                        )
-                                      );
-                                      await dispatch(
-                                        updateStateData(CURRENT_TASK, task)
-                                      );
-                                      handleTaskShow();
+                                      setSpinner(true)
+                                      dispatch(getTaskById(task?._id))
+                                      setSpinner(false)
+                                      setSelectedTask(task)
+                                      // await dispatch(
+                                      //   updateStateData(
+                                      //     ACTIVE_FORM_TYPE,
+                                      //     "task_edit"
+                                      //   )
+                                      // );
+                                      // await dispatch(
+                                      //   updateStateData(CURRENT_TASK, task)
+                                      // );
+                                      // handleTaskShow();
                                     }}
                                     style={getStyle(
                                       provided.draggableProps.style,
@@ -558,6 +600,7 @@ const TasksList = React.memo((props) => {
                           <li
                             className="task--button"
                             onClick={async () => {
+                              setSelectedTask(task)
                               await dispatch(
                                 updateStateData(ACTIVE_FORM_TYPE, "task_edit")
                               );
@@ -641,6 +684,7 @@ const TasksList = React.memo((props) => {
                                 {(provided, snapshot) => (
                                   <li
                                     onClick={async () => {
+                                      setSelectedTask(task)
                                       await dispatch(
                                         updateStateData(
                                           ACTIVE_FORM_TYPE,
@@ -652,6 +696,7 @@ const TasksList = React.memo((props) => {
                                       );
                                       handleTaskShow();
                                     }}
+                                    key={`${task._id}--item-${index}-${tab._id}`}
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
@@ -730,6 +775,7 @@ const TasksList = React.memo((props) => {
                           <li
                             className="task--button"
                             onClick={async () => {
+                              setSelectedTask(task)
                               await dispatch(
                                 updateStateData(ACTIVE_FORM_TYPE, "task_edit")
                               );

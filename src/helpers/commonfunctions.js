@@ -173,15 +173,15 @@ export function parseDateWithoutTimezone(dateString) {
 
     // Pattern for URLs starting with http://, https://, or ftp://
     const replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
-    replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    replacedText = inputText?.replace(replacePattern1, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 
     // Pattern for URLs starting with "www." (without // before it)
     const replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gi;
-    replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank" rel="noopener noreferrer">$2</a>');
+    replacedText = replacedText?.replace(replacePattern2, '$1<a href="http://$2" target="_blank" rel="noopener noreferrer">$2</a>');
 
     // Pattern for email addresses
     const replacePattern3 = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-    replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+    replacedText = replacedText?.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
 
     return replacedText;
 };
@@ -248,42 +248,42 @@ const getDayWithSuffix = (day) => {
   // Helper function to format the time ago
   export const timeAgo = (dateString) => {
     const date = new Date(dateString);
-  const now = new Date();
+    const now = new Date();
   
-  // Calculate the difference in milliseconds
-  const diff = now - date;
+    // Calculate the difference in milliseconds
+    const diff = now - date;
   
-  // Calculate time differences
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+    // Calculate time differences
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
   
-  if (seconds < 60) {
-    return `${seconds} seconds ago`;
-  } else if (minutes < 60) {
-    return `${minutes} minutes ago`;
-  } else if (hours < 24) {
-    return `${hours} hours ago`;
-  } else {
-    // If it's more than 24 hours, return the date in 'ddth Month YYYY' format
-    const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'long' });
-    const year = date.getFullYear();
+    if (seconds < 60) {
+      return `${seconds} seconds ago`;
+    } else if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    } else if (hours < 24) {
+      return `${hours} hours ago`;
+    } else {
+      // If it's more than 24 hours, return the date in 'ddth Month YYYY' format
+      const day = date.getDate();
+      const month = date.toLocaleString('default', { month: 'long' });
+      const year = date.getFullYear();
+      
+      // Format the day with a suffix like 1st, 2nd, 3rd, etc.
+      const suffix = (day) => {
+        if (day > 3 && day < 21) return 'th'; // Suffix for 4-20
+        switch (day % 10) {
+          case 1: return 'st';
+          case 2: return 'nd';
+          case 3: return 'rd';
+          default: return 'th';
+        }
+      };
     
-    // Format the day with a suffix like 1st, 2nd, 3rd, etc.
-    const suffix = (day) => {
-      if (day > 3 && day < 21) return 'th'; // Suffix for 4-20
-      switch (day % 10) {
-        case 1: return 'st';
-        case 2: return 'nd';
-        case 3: return 'rd';
-        default: return 'th';
-      }
-    };
-    
-    return `${day}${suffix(day)} ${month} ${year}`;
-  }
+      return `${day}${suffix(day)} ${month} ${year}`;
+    }
   };
 
   export const showAmPmtime = (timestamp) => {

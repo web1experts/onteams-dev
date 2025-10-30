@@ -100,12 +100,14 @@ Quill.register("modules/autoLinks", AutoLinks);
 function ProjectsPage() {
   const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
+  
   const [isActiveView, setIsActiveView] = useState(2);
   const [customFields, setCustomFields] = useState([]);
   const [clientcustomFields, setClientCustomFields] = useState([]);
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
   const memberdata = getMemberdata();
+  
   const [projects, setProjects] = useState([]);
   const [filters, setFilters] = useState({});
   const [fields, setFields] = useState({
@@ -246,15 +248,28 @@ function ProjectsPage() {
       setCustomFields(apiCustomfields.customFields);
     }
 
+    // if (
+    //   apiCustomfields.newField &&
+    //   apiCustomfields.newField?.module === "projects"
+    // ) {
+    //   setCustomFields((prevCustomFields) => [
+    //     apiCustomfields.newField,
+    //     ...prevCustomFields,
+    //   ]);
+    // }
+
     if (
-      apiCustomfields.newField &&
-      apiCustomfields.newField?.module === "projects"
-    ) {
-      setCustomFields((prevCustomFields) => [
-        apiCustomfields.newField,
-        ...prevCustomFields,
-      ]);
-    }
+  apiCustomfields.newField &&
+    apiCustomfields.newField?.module === "projects"
+  ) {
+    setCustomFields((prevCustomFields) => [
+      ...prevCustomFields.filter(
+        (field) => field._id !== apiCustomfields.newField._id
+      ),
+      apiCustomfields.newField
+    ]);
+  }
+
 
     if (
       apiCustomfields.updatedField &&
@@ -1188,7 +1203,7 @@ function ProjectsPage() {
                             )}
                           </>
                         )}
-                        {(memberProfile?.permissions?.projects?.selected_members?.includes(
+                        {(memberProfile?.permissions?.projects?.view_others === true && memberProfile?.permissions?.projects?.selected_members?.includes(
                           "unassigned"
                         ) ||
                           memberProfile?.role?.slug === "owner") && (

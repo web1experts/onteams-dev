@@ -25,6 +25,7 @@ import {
     CREATE_POST_LIST_COMMENT,
     THEME_COLOR
 } from "../actions/types";
+import isEqual from "lodash/isEqual";
 
 const initialState = {
     error: null,
@@ -120,12 +121,82 @@ export default (state = initialState, action) => {
             ...state,
             projectForm: { ...state.projectForm, ...action.payload }
         }
-    case TASK_FORM: 
+    // case TASK_FORM: 
       
-        return {
-            ...state,
-            taskForm: { ...state.taskForm, ...action.payload }
-        }
+    //     return {
+    //         ...state,
+    //         taskForm: { ...state.taskForm, ...action.payload }
+    //     }
+
+
+// case TASK_FORM: {
+//   const mergedForm = { ...state.taskForm };
+// console.log('task payload::', action.payload)
+//   for (const key in action.payload) {
+//     if (!Object.prototype.hasOwnProperty.call(action.payload, key)) continue;
+
+//     const newVal = action.payload[key];
+//     const oldVal = state.taskForm?.[key];
+
+//     if (Array.isArray(newVal)) {
+//       // ✅ Replace array with unique values (avoids duplicates)
+//       mergedForm[key] = [...new Set(newVal)];
+//     } else if (
+//       typeof newVal === "object" &&
+//       newVal !== null &&
+//       !Array.isArray(newVal)
+//     ) {
+//       // ✅ Deep merge for nested objects
+//       mergedForm[key] = { ...oldVal, ...newVal };
+//     } else {
+//       // ✅ Primitive values: overwrite directly
+//       if (!isEqual(oldVal, newVal)) {
+//         mergedForm[key] = newVal;
+//       }
+//     }
+//   }
+
+//   console.log("Task Form data:: ", mergedForm);
+
+//   return {
+//     ...state,
+//     taskForm: mergedForm,
+//   };
+// }
+case TASK_FORM: {
+  const mergedForm = { ...state.taskForm };
+
+  for (const key in action.payload) {
+    if (!Object.prototype.hasOwnProperty.call(action.payload, key)) continue;
+
+    const newVal = action.payload[key];
+    const oldVal = state.taskForm?.[key];
+
+    if (Array.isArray(newVal)) {
+      // ✅ Replace arrays completely (avoid lingering items)
+      mergedForm[key] = [...newVal];
+    } else if (
+      typeof newVal === "object" &&
+      newVal !== null &&
+      !Array.isArray(newVal)
+    ) {
+      // ✅ Replace objects completely (avoid lingering keys)
+      mergedForm[key] = { ...newVal };
+    } else {
+      // ✅ Primitives: overwrite only if changed
+      if (!isEqual(oldVal, newVal)) {
+        mergedForm[key] = newVal;
+      }
+    }
+  }
+
+  return {
+    ...state,
+    taskForm: mergedForm,
+  };
+}
+
+
     case EDIT_PROJECT_FORM: 
         return {
             ...state,

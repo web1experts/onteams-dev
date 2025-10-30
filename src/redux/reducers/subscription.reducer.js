@@ -2,7 +2,8 @@ import {
     SUBSCRIPTION_ERROR,
     SUBSCRIPTION_SUCCESS,
     CLEAR_MESSAGES,
-    AUTHORIZE_PAYMENT_SUCCESS
+    AUTHORIZE_PAYMENT_SUCCESS,
+    ACTIVE_PLAN
 } from "../actions/types";
 
 const initialState = {
@@ -19,18 +20,25 @@ export default (state = initialState, action) => {
             ...state,
             message: action.payload.message,
             message_variant: 'success',
-            success: true
+            success: true,
+            activeSubscription: action.payload.updatedSubsciption
         };
     case AUTHORIZE_PAYMENT_SUCCESS: 
         return {
             ...state,
+            success: 'success',
             authorizeData: action.payload.authorizeData
         }
     case SUBSCRIPTION_ERROR :
         return {
             ...state,
-            message: action.payload.message ? action.payload.message : action.payload,
+            message: action.payload?.message ? action.payload.message : action.payload,
             message_variant: 'danger',
+        }
+    case ACTIVE_PLAN: 
+        return {
+            ...state,
+            activeSubscription: action.payload.subscription
         }
     case CLEAR_MESSAGES:
         return {

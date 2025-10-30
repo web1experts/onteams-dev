@@ -433,7 +433,7 @@ function RolesPage() {
   }, [activeRole]);
 
   const handleDeleteRole = async (e) => {
-    setLoader(true); console.log(activeRole._id)
+    setLoader(true); 
     dispatch(deleteRole(activeRole._id))
   }
 
@@ -509,6 +509,7 @@ function RolesPage() {
       }
       if( apiPermission.deletedRole){
         setRoles((prev) => prev.filter((role) => role._id !== apiPermission.deletedRole?._id));
+        setFields({name: ""})
       }
       if (apiPermission.updatedMeta) {
         const meta = apiPermission.updatedMeta?.meta_value;

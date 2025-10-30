@@ -31,6 +31,7 @@ import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
 import RolesPage from "../Settings/RolesPage";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { logout } from "../../redux/actions/auth.actions";
 
 function TeamMembersPage() {
   const inputRef = useRef(null);
@@ -145,9 +146,7 @@ function TeamMembersPage() {
     );
   };
 
-  const handleownership = async () => {
-    console.log("transfer ownership");
-  };
+  
 
   const toggleCustomFields = () => {
     setShowCustomFields((prev) => !prev);
@@ -183,7 +182,7 @@ function TeamMembersPage() {
       handleListMember();
     }
     dispatch(fetchCustomFields({ module: "members" }));
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, activeTab]);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -192,6 +191,19 @@ function TeamMembersPage() {
       selectboxObserver();
     }
   }, [isEditing]);
+  
+  useEffect(() => {
+  if (!fields?.role && roles?.length > 0) {
+    const defaultRoleId = roles[0]._id;
+
+    // Simulate handleChange for default role
+    handleChange({ target: { name: "role", value: defaultRoleId } });
+
+    // Set permissions for default role
+    setPermissions(roles[0].permissions || []);
+  }
+}, [fields?.role, roles]);
+
 
   useEffect(() => {
     if (apiResult.success) {
@@ -227,6 +239,13 @@ function TeamMembersPage() {
       setIsActive(false);
       setShowDialog(false);
     }
+
+    if( workspaceState.ownershipUpdate === true){
+      setShowDialog(false)
+      setTimeout(function(){
+        dispatch(logout())
+      },1000)
+    }
   }, [apiResult, workspaceState]);
 
   useEffect(() => {
@@ -258,12 +277,24 @@ function TeamMembersPage() {
       setCustomFields(apiCustomfields.customFields);
     }
 
-    if (apiCustomfields.newField) {
-      setCustomFields((prevCustomFields) => [
-        apiCustomfields.newField,
-        ...prevCustomFields,
-      ]);
-    }
+    // if (apiCustomfields.newField) {
+    //   setCustomFields((prevCustomFields) => [
+    //     apiCustomfields.newField,
+    //     ...prevCustomFields,
+    //   ]);
+    // }
+
+    if (
+      apiCustomfields.newField &&
+        apiCustomfields.newField?.module === "members"
+      ) {
+        setCustomFields((prevCustomFields) => [
+          ...prevCustomFields.filter(
+            (field) => field._id !== apiCustomfields.newField._id
+          ),
+          apiCustomfields.newField
+        ]);
+      }
 
     if (apiCustomfields.updatedField) {
       setCustomFields((prevCustomFields) =>
@@ -1114,7 +1145,15 @@ function TeamMembersPage() {
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
-                          <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> Delete</Dropdown.Item>
+                          <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> 
+                          {
+                            memberProfile?._id === selectedMember?._id ? 
+                            'Leave'
+                            :
+                            'Delete'
+                          }
+                          
+                          </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown>
                     )}
@@ -1537,7 +1576,7 @@ function TeamMembersPage() {
                   name="role"
                   controlId="floatingSelect"
                   className={"form-control custom-selectbox"}
-                  defaultValue={fields?.role}
+                  value={fields?.role || roles?.[0]?._id || ""}
                   onChange={(e) => {
                     handleChange(e);
                     const matchedRole = roles.find(
@@ -1550,7 +1589,7 @@ function TeamMembersPage() {
                     setPermissions(matchedPermissions);
                   }}
                 >
-                  <option value="role">Select role</option>
+                  {/* <option value="role">Select role</option> */}
                   {roles.map((role, roleIndex) => (
                     <option key={`role-${roleIndex}`} value={role._id}>
                       {role.name}
@@ -1824,7 +1863,8 @@ function TeamMembersPage() {
             callback={handledeleteMember}
           />
         </>
-      ) : memberProfile &&
+      ) 
+      : memberProfile &&
         Object.keys(memberProfile).length > 0 &&
         memberProfile.role?.slug !== "owner" &&
         selectedMember?._id === memberProfile._id ? (
@@ -1836,7 +1876,8 @@ function TeamMembersPage() {
             callback={handleleavecompany}
           />
         </>
-      ) : (memberProfile &&
+      ) 
+      : (memberProfile &&
           Object.keys(memberProfile).length > 0 &&
           memberProfile?.role?.permissions?.members?.create_edit_delete ===
             true) ||

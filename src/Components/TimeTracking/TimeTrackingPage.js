@@ -114,6 +114,7 @@ function TimeTrackingPage() {
   const currentMember = getMemberdata();
   const [spinner, setSpinner] = useState(false);
   const [activityspinner, setActSpinner] = useState(false);
+  const [ streamError, setStreamError] = useState('')
   const [cardNumbers, setCardNumbers] = useState({
     activeCount: 0,
     pauseCount: 0,
@@ -152,7 +153,7 @@ function TimeTrackingPage() {
   const [memberprojects, setMemberProjects] = useState([]);
   const [occupiedRanges, setOccupiedRanges] = useState([]);
   const [timeSlots, setTimeslots] = useState([]);
-  const [fields, setFields] = useState({ date: new Date() });
+  const [fields, setFields] = useState({ date: new Date().toLocaleDateString("en-CA") });
   const [searchEntries, setSearchEntries] = useState([]);
   const [show, setShow] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -202,10 +203,15 @@ function TimeTrackingPage() {
   const handleSearchShow = () => setSearchShow(true);
   const [projectToggle, setProjectToggle] = useState(false);
   const activeTabRef = useRef(activeTab);
+  const currentActivityTabRef = useRef(currentActivity)
 
 useEffect(() => {
   activeTabRef.current = activeTab;
 }, [activeTab]);
+
+useEffect(() => {
+  currentActivityTabRef.current = currentActivity;
+},[currentActivity])
 
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
@@ -283,6 +289,7 @@ useEffect(() => {
     if (status === true) {
       setActSpinner(true);
       setTimeout(function () {
+        setStreamError("")
         socket.emit(
           "watcher",
           socket.id,
@@ -302,7 +309,7 @@ useEffect(() => {
     
     const currentFilters = filtersRef.current;
     
-    if (activeTabRef.current === 'Live') {
+    if (activeTabRef.current === 'Live' && currentActivityTabRef.current === false ) {
         
       // setSpinner(true);
       let selectedfilters = {
@@ -346,7 +353,7 @@ useEffect(() => {
       currentPage: currentPage,
       status: currentFilters.status,
       date_range: [
-        new Date().toISOString().split("T")[0],
+        new Date().toLocaleDateString("en-CA"),
       ],
     };
 
@@ -422,31 +429,32 @@ useEffect(() => {
     await dispatch(getMemberRecoredActivity(memberProfile._id, "recorded", date));
   };
 
-  // useEffect(() => {
-  //   // if (selectedFilter !== "custom" && isActive === true) {
-  //   if ( isActive === true) {
-  //     handleRecordedActivity();
-  //   } else {
-  //     handleFilteredLiveActivityList();
-  //   }
-  // }, [filtereddate]);
   useEffect(() => {
-    const [fromDate, toDate] = filtereddate;
-
-    // condition: at least one date OR both dates are different
-    const hasValidDates =
-      (fromDate && fromDate.trim() !== "") ||
-      (toDate && toDate.trim() !== "") ||
-      (fromDate && toDate && fromDate !== toDate);
-
-    if (hasValidDates) {
-      if (isActive === true) {
-        handleRecordedActivity();
-      } else {
-        handleFilteredLiveActivityList();
-      }
+    // if (selectedFilter !== "custom" && isActive === true) { 
+    
+    if (selectedFilter !== "custom" &&  isActive === true) {
+      handleRecordedActivity();
+    }else if(selectedFilter !== 'custom' && activeTab === "Recordings") {
+      handleFilteredLiveActivityList();
     }
   }, [filtereddate]);
+  // useEffect(() => {
+  //   const [fromDate, toDate] = filtereddate;
+
+  //   // condition: at least one date OR both dates are different
+  //   const hasValidDates =
+  //     (fromDate && fromDate.trim() !== "") ||
+  //     (toDate && toDate.trim() !== "") ||
+  //     (fromDate && toDate && fromDate !== toDate);
+
+  //   if (hasValidDates) {
+  //     if (isActive === true) {
+  //       handleRecordedActivity();
+  //     } else {
+  //       handleFilteredLiveActivityList();
+  //     }
+  //   }
+  // }, [filtereddate]);
 
 
   useEffect(() => {
@@ -573,7 +581,7 @@ useEffect(() => {
       (currentActivity !== false &&
         activeInnerTab === "InnerLive" &&
         liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "enable")
-    ) { console.log('here')
+    ) { 
       leaveRoom(currentActivity?._id);
       setSpinner(false);
       startsharing(
@@ -786,6 +794,8 @@ const ymd = (dateLike) => {
    
   };
 
+  
+
   useEffect(() => {
     refreshSocket();
     selectboxObserver();
@@ -798,57 +808,84 @@ const ymd = (dateLike) => {
       }
     });
 
+    socket.on('streamingError', (roomId, message) => {
+      if(roomId === currentActivity?._id){
+        setStreamError(message)
+      }
+    })
+
     socket.on("trackerstateUpdate", (memberData, status = false) => {
       setRecordedRefresh(false);
+      // setLiveactivities((prevActivities) => {
+      //   if (
+      //     memberData &&
+      //     memberData._id &&
+      //     prevActivities &&
+      //     prevActivities.length > 0
+      //   ) {
+      //     const updatedActivities = prevActivities.map((activity) => {
+      //       if (activity._id === memberData._id) {
+      //         const updatedMemberData = {
+      //           ...memberData,
+      //           latestActivity: {
+      //             ...memberData.latestActivity,
+      //             status: status, // Update the status here
+      //           },
+      //         };
+
+      //         // Merge updatedMemberData with the activity
+      //         return { ...activity, ...updatedMemberData };
+      //       }
+      //       return activity; // Return unchanged activity if no match
+      //     });
+
+      //     return updatedActivities;
+      //   }
+
+      //   // If no update is needed, return the previous state
+      //   return prevActivities;
+      // });
+
       setLiveactivities((prevActivities) => {
-        if (
-          memberData &&
-          memberData._id &&
-          prevActivities &&
-          prevActivities.length > 0
-        ) {
-          const updatedActivities = prevActivities.map((activity) => {
-            if (activity._id === memberData._id) {
-              const updatedMemberData = {
-                ...memberData,
-                latestActivity: {
-                  ...memberData.latestActivity,
-                  status: status, // Update the status here
-                },
-              };
+      if (memberData?._id && prevActivities?.length > 0) {
+        return prevActivities.map((activity) => {
+          if (activity._id === memberData._id) {
+            return {
+              ...activity,
+              ...memberData,
+              latestActivity: {
+                ...activity.latestActivity,
+                ...memberData.latestActivity,
+                status, // always update status
+              },
+            };
+          }
+          return activity;
+        });
+      }
+      return prevActivities;
+    });
 
-              // Merge updatedMemberData with the activity
-              return { ...activity, ...updatedMemberData };
-            }
+    setCurrentActivity((prev) => {
+      if (prev && prev._id === memberData._id) {
+        return {
+          ...prev,
+          ...memberData,
+          latestActivity: {
+            ...prev.latestActivity,
+            ...memberData.latestActivity,
+            status,
+          },
+        };
+      }
+      return prev;
+    });
 
-            setCurrentActivity((prev) => {
-              if (prev && prev._id === memberData._id) {
-                return {
-                  ...prev,
-                  ...memberData,
-                  latestActivity: {
-                    ...prev.latestActivity,
-                    status: status,
-                  },
-                };
-              }
-              return prev; // Return unchanged `currentActivity` if `_id` doesn't match
-            });
-
-            return activity; // Return unchanged activity if no match
-          });
-
-          return updatedActivities;
-        }
-
-        // If no update is needed, return the previous state
-        return prevActivities;
-      });
 
       // handleLiveActivityList() if required
     });
 
-    socket.on("offer", function (id, description, roomId) {
+    socket.on("offer", function (id, description, roomId) { 
       if (peerConnections[id]) {
         peerConnections[id].close();
         delete peerConnections[id];
@@ -891,21 +928,50 @@ const ymd = (dateLike) => {
         }
       };
 
-      peerConnections[id].addEventListener("iceconnectionstatechange", () => {
-        if (
-          peerConnections[id].iceConnectionState === "connected" ||
-          peerConnections[id].iceConnectionState === "completed" ||
-          peerConnections[id].iceConnectionState === "disconnected" ||
-          peerConnections[id].iceConnectionState === "failed"
-        ) {
-          if (
-            peerConnections[id].iceConnectionState === "disconnected" ||
-            peerConnections[id].iceConnectionState === "failed"
-          ) {
-            setActSpinner(false);
-          }
+      // peerConnections[id].addEventListener("iceconnectionstatechange", () => {
+      //   if (
+      //     peerConnections[id].iceConnectionState === "connected" ||
+      //     peerConnections[id].iceConnectionState === "completed" ||
+      //     peerConnections[id].iceConnectionState === "disconnected" ||
+      //     peerConnections[id].iceConnectionState === "failed"
+      //   ) {
+      //     if (
+      //       peerConnections[id].iceConnectionState === "disconnected" ||
+      //       peerConnections[id].iceConnectionState === "failed"
+      //     ) {
+      //       setActSpinner(false);
+      //       setSpinner( false)
+      //     }
+      //   }
+      // });
+
+      peerConnections[id].onconnectionstatechange = () => {
+        console.log('Connection state changed:', peerConnections[id].connectionState);
+        if( peerConnections[id].connectionState === 'failed' || peerConnections[id].connectionState === 'disconnected'){
+          setStreamError("Unable to connect with the desktop app. Please try later.");
+          setActSpinner( false )
+          socket.emit('tracker-status-update', {userID: currentActivity?._id, status: false });
+        }else if(peerConnections[id].connectionState === 'connected'){
+          setStreamError("");
         }
-      });
+      };
+      // peerConnections[id].addEventListener("iceconnectionstatechange", () => {
+      //   const state = peerConnections[id].iceConnectionState;
+      //   console.log('current state:: ', state)
+      //   // Handle all relevant states
+      //   if (["connected", "completed", "disconnected", "failed"].includes(state)) {
+      //     // Stop spinners if disconnected or failed
+      //     if (["disconnected", "failed","completed"].includes(state)) {
+      //       setActSpinner(false);
+      //       setSpinner(false);
+      //     }
+      //   }
+      // });
+
+      peerConnections[id].oniceconnectionstatechange = () => {
+          console.log('ICE connection state changed:', peerConnections[id].iceConnectionState);
+      };
+
     });
 
     socket.on("candidate", function (id, candidate, roomId) {
@@ -917,7 +983,17 @@ const ymd = (dateLike) => {
       }
     });
 
-    setSpinner(true);
+    // Fires if connection fails
+    socket.on("connect_error", (err) => {
+      console.error("❌ Connection failed:", err.message);
+    });
+
+    // Fires when disconnected
+    socket.on("disconnect", (reason) => {
+      console.log("⚡ Disconnected:", reason);
+    });
+
+    // setSpinner(true);
 
     setInterval(function () {
       handleLiveActivityListInterval();
@@ -927,9 +1003,14 @@ const ymd = (dateLike) => {
   }, []);
 
   useEffect(() => {
+    setTimeout(() => {
+      setActSpinner(false);
+      setSpinner( false )
+    }, 1000);
+    
     if (activitystate?.liveactivities?.memberData) {
       setLiveactivities(activitystate.liveactivities.memberData);
-      if (currentActivity && activeTab === "Live") {
+      if (currentActivity && activeTab === "Live" && activeInnerTab !== 'InnerLive') {
         const updatedActivity = activitystate.liveactivities.memberData.find(
           (m) => m._id.toString() === currentActivity._id.toString()
         );
@@ -1115,9 +1196,12 @@ const ymd = (dateLike) => {
     }
   };
 
-  // useEffect(() => {
-  //   handleRecordedActivity();
-  // }, [screenshotTab])
+  useEffect(() => {
+    setTimeout(() => {
+      setActSpinner(false);
+      setSpinner( false )
+    }, 700);
+  }, [screenshotTab])
 
   const handleRemoveEntry = (index) => {
     setEntries(entries.filter((_, i) => i !== index));
@@ -1179,11 +1263,11 @@ const ymd = (dateLike) => {
           <Button
             variant="primary"
             onClick={() => {
-              if (isActive) {
+              if (isActive === true) {
                 handleRecordedActivity();
               } else {
                 setIsPickerOpen(false);
-                handleLiveActivityList();
+                handleFilteredLiveActivityList();
               }
             }}
             className="date-filter-btn me-1"
@@ -1349,8 +1433,10 @@ const ymd = (dateLike) => {
               className={selectedFilter === "custom" ? "selected--option" : ""}
               key={"date-custom"}
               onClick={(e) => {
-                setFilteredDate([])
                 setSelectedFilter("custom");
+                setTimeout(() => {
+                  setFilteredDate([])
+                }, 700);
               }}
             >
               Custom
@@ -1377,7 +1463,7 @@ const ymd = (dateLike) => {
             </Form.Group>
             {selectedFilter === "custom" && (
               <>
-              {/* <Form.Group className="mb-0 form-group ms-2">
+              <Form.Group className="mb-0 form-group ms-2">
                 <DatePicker
                   key={"date-filter"}
                   ref={datePickerRef}
@@ -1386,9 +1472,9 @@ const ymd = (dateLike) => {
                   id="datepicker-filter"
                   value={filtereddate}
                   format="YYYY-MM-DD"
-                  //range
+                  range
                   multiple={false}
-                  numberOfMonths={1}
+                  numberOfMonths={2}
                   dateSeparator=" - "
                   onChange={async (value) => {
                     const formatDate = (date) => {
@@ -1414,8 +1500,8 @@ const ymd = (dateLike) => {
                   onClose={() => setIsPickerOpen(false)} // Update state when closed
                   plugins={[<FilterButton position="bottom" />]}
                 />
-              </Form.Group> */}
-              <Form.Group className="mb-0 form-group ms-2">
+              </Form.Group>
+              {/* <Form.Group className="mb-0 form-group ms-2">
                 <DatePicker
                   key={"date-filter-from"}
                   ref={datePickerRef}
@@ -1480,7 +1566,7 @@ const ymd = (dateLike) => {
                   onClose={() => setIsPickerOpen(false)}
                   plugins={[<FilterButton position="bottom" />]}
                 />
-              </Form.Group>
+              </Form.Group> */}
 
               </>
             )}
@@ -1626,6 +1712,7 @@ const ymd = (dateLike) => {
                             setCurrentActivity(cact);
                           }
                           setActiveTab("Live");
+                          setActiveInnerTab('InnerLive')
                         }}
                       >
                         <FiMonitor className="me-1" /> Live
@@ -1637,6 +1724,7 @@ const ymd = (dateLike) => {
                           setActSpinner(false);
                           setSpinner(false)
                           setActiveTab("Recordings");
+                          setActiveInnerTab('InnerRecorded')
                         }}
                       >
                         <FiVideo className="me-1" /> Recorded
@@ -1817,7 +1905,7 @@ const ymd = (dateLike) => {
                                 key="live-client-project-header"
                                 className="onHide ms-auto"
                               >
-                                <LuTimer className="me-1" /> Current Session Time
+                                <LuTimer className="me-1" /> Current Session
                               </th>
                               <th
                                 scope="col"
@@ -1896,7 +1984,7 @@ const ymd = (dateLike) => {
                                                 />
                                               </span>
                                             ) : (
-                                              activity.name.charAt(0)
+                                              activity?.name?.charAt(0)
                                             )}
                                             {activity?.latestActivity
                                               ?.status ? (
@@ -1997,6 +2085,7 @@ const ymd = (dateLike) => {
                                       <Button
                                         variant="dark"
                                         onClick={() => {
+                                          setActiveInnerTab("InnerLive");
                                           handleClick(activity);
                                         }}
                                       >
@@ -2116,7 +2205,7 @@ const ymd = (dateLike) => {
                                                 />
                                               </span>
                                             ) : (
-                                              activity.name.charAt(0)
+                                              activity?.name?.charAt(0)
                                             )}
                                             {activity?.latestActivity
                                               ?.status ? (
@@ -2250,7 +2339,7 @@ const ymd = (dateLike) => {
                             }
                           >
                             <div className="title--initial">
-                              {activity?.name.charAt(0)}
+                              {activity?.name?.charAt(0)}
                                {activity?.latestActivity?.status ? (
                                   <p className="anim--circle">
                                     <small className="status--circle active--color"></small>
@@ -2434,7 +2523,17 @@ const ymd = (dateLike) => {
                       </Button>
                     </div>
                   </div>
-                  {liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "disabled" ? (
+                 
+                  {
+                    currentActivity?.latestActivity?.status === false ? (
+                      <p className="text-center">The member is on break.</p>
+                    )
+                    :
+                    (streamError !== "") ? (
+                        <p className="text-center">{streamError}</p>
+                      )
+                    :
+                  liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "disabled" ? (
                     <p className="text-center">Live streaming is disabled.</p>
                   ) : currentActivity?.latestActivity?.status ? (
                     <video
@@ -2444,10 +2543,12 @@ const ymd = (dateLike) => {
                       className="video"
                       onLoadedData={() => {
                         setActSpinner(false);
+                        setStreamError("")
                       }}
                       preload="auto"
                       autoPlay
                       muted
+                      onError={() => setStreamError("Live stream failed to load")}
                     >
                       Live video is not available right now.
                     </video>
@@ -2519,10 +2620,14 @@ const ymd = (dateLike) => {
                                       recording?.duration || 0
                                     )}
                                   </ListGroup.Item>
-                                  <ListGroup.Item>
-                                    <FaHistory className="me-2" />{" "}
-                                    Version: {recording?.app_version}
-                                  </ListGroup.Item>
+                                  {
+                                    (recording?.type === 'tracker') && (
+                                      <ListGroup.Item>
+                                        <FaHistory className="me-2" />{" "}
+                                        Version: {recording?.app_version}
+                                      </ListGroup.Item>
+                                    )
+                                  }
                                 </ListGroup>
                               </Accordion.Header>
                             </div>

@@ -93,7 +93,7 @@ export const MemberInitials = React.memo(( props ) => {
     };
 
     useEffect(() => {
-        if( props.members ){ 
+        if( props.members ){
             setMembers( props.members)
         }
     }, [props ])

@@ -55,6 +55,9 @@ export const TaskForm = (props) => {
 
     const dispatch = useDispatch()
     const quillRef = useRef(null);
+    const SubtaskswrapperRef = useRef(null);
+    const skipOutsideRef = useRef(false);
+    const [activeInside, setActiveInside] = useState(false);
     const pasteOccurred = useRef(false);
     const memberdata = getMemberdata()
     const [workflowstatus, setWorkflowStatus] = useState(false)
@@ -72,11 +75,12 @@ export const TaskForm = (props) => {
     const [subtasks, setSubtasks] = useState([]);
     const [issubopen, setissubopen] = useState(false)
     const handleUploadShow = () => dispatch(togglePopups('files', true))
+    const isdescEditorRef = useRef(false);
     const [isdescEditor, setIsDescEditor] = useState(false);
     const [filetoPreview, setFiletoPreview] = useState(null);
     const [showPreview, setPreviewShow] = useState(false);
     const handlePreviewClose = () => setPreviewShow(false);
-    const [currentTask, setCurrentTask] = useState(apiResult.currentTask || {})
+    const [currentTask, setCurrentTask] = useState({})
     const [fields, setFields] = useState({ title: apiResult?.currentTask?.title || '', members: [], description: apiResult?.currentTask?.description || '' })
     const [enablesubtaskedit, setEnableSubtaskEdit] = useState({})
     const [ShowCommentModel, setShowCommentModel] = useState(false);
@@ -88,6 +92,8 @@ export const TaskForm = (props) => {
     const [showPasswordFields, setShowPasswordFields] = useState({});
     const [showBadges, setShowBadges] = useState(null);
     const [customFields, setCustomFields] = useState([]);
+    const [spinner, setSpinner] = useState(true)
+    const latestDataRef = useRef({ subtasks, currentTask });
     const handleNewComment = (event) => {
         setComments(event.target.value);
     }
@@ -116,13 +122,53 @@ export const TaskForm = (props) => {
     useEffect(() => {
         dispatch(fetchCustomFields({module: 'tasks'}))
     },[])
-    useEffect(() => {
-        if (modalstate === true) {
-            dispatch(updateStateData(TASK_FORM, { title: '' }))
-        }
-    }, [modalstate])
+    useEffect(() => { 
+        latestDataRef.current = { subtasks, currentTask };
+     }, [subtasks, currentTask]);
 
     useEffect(() => {
+    function handleClickOutside(event) {
+        if (SubtaskswrapperRef.current?.contains(event.target)) {
+            console.log("user clicked inside subtasks")
+            setActiveInside(true);
+        } else {
+            
+            // user clicked outside
+            if (activeInside === true) {
+                if (skipOutsideRef.current) {
+                // ✅ Skip this one
+                skipOutsideRef.current = false;
+                } else {
+                const { subtasks: latestSubtasks, currentTask: latestTask } =
+                    latestDataRef.current;
+
+                    dispatch(updateTask(latestTask?._id, { subtasks: latestSubtasks }));
+                    console.log("User left the subtasks area!", activeInside);
+                    // dispatch(updateTask(currentTask?._id, { cc }));
+                }
+            }
+            setActiveInside(false); // reset
+        }
+    //   if (SubtaskswrapperRef.current && !SubtaskswrapperRef.current.contains(event.target)) {
+    //     console.log("Clicked outside of subtasks list or dragDrop context!");
+    //     // 👉 call your handler here
+    //   }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeInside]);
+
+    // useEffect(() => {
+    //     if (modalstate === true) {
+    //         dispatch(updateStateData(TASK_FORM, { title: '' }))
+    //     }
+    // }, [modalstate])
+
+    useEffect(() => {
+        setSpinner(false)
         if (apiResult.currentTask) {
             setCurrentTask(apiResult.currentTask)
         }
@@ -130,24 +176,28 @@ export const TaskForm = (props) => {
     }, [apiResult.currentTask])
     useEffect(() => {
         
-        if (apiResult.UpdatedTask && !apiResult.reorder && apiResult.UpdatedTask?._id === currentTask._id) {
+        if (apiResult.UpdatedTask &&  apiResult.UpdatedTask?._id === currentTask._id) {
             dispatch(updateStateData(CURRENT_TASK, apiResult.UpdatedTask));
-            // setCurrentTask(apiResult.UpdatedTask)
         }
 
     }, [apiResult.UpdatedTask])
 
     useEffect(() => {
-    if (apiResult.comment) { 
-        setCurrentTask(prevTask => {
-        if (!prevTask) return prevTask; // if currentTask is null or undefined
+        if (apiResult.comment) {
+            setCurrentTask(prevTask => {
+                if (!prevTask) return prevTask; // guard check
+                // Ensure prevTask.comments is always an array
+                const updatedComments = Array.isArray(prevTask.comments)
+                ? [...prevTask.comments, apiResult.comment]
+                : [apiResult.comment];
 
-        return {
-            ...prevTask,
-            comments: [...(prevTask.comments || []), apiResult.comment]
-        };
-        });
-    }
+                return {
+                ...prevTask,
+                comments: updatedComments
+                };
+            });
+        }
+
     }, [apiResult.comment]);
 
     useEffect(() => {
@@ -182,7 +232,9 @@ export const TaskForm = (props) => {
     }, [apiResult.tasks, dispatch])
 
     useEffect(() => { 
+       
         if (currentTask && Object.keys(currentTask).length > 0) {
+       
             setImagePreviews([]);
             let fieldsSetup = {
                 title: currentTask.title,
@@ -220,8 +272,10 @@ export const TaskForm = (props) => {
 
             if (currentTask.description && currentTask.description !== "") {
                 setIsDescEditor(true);
-            } else {
-                setIsDescEditor(false);
+            } 
+            else {
+                setIsDescEditor(isdescEditorRef.current);
+                // setIsDescEditor(false);
             }
 
             // Set members if present
@@ -244,10 +298,117 @@ export const TaskForm = (props) => {
             // setTimeout(function () {
             //     selectboxObserver()
             // }, 150)
+            
             dispatch(updateStateData(TASK_FORM, fieldsSetup))
         }
         
     }, [currentTask]);
+
+    useEffect(() => {
+        // whenever state changes, sync it to ref
+        isdescEditorRef.current = isdescEditor;
+    }, [isdescEditor]);
+
+//     useEffect(() => {
+//   if (!(currentTask && Object.keys(currentTask).length > 0)) return;
+
+//   // keep original behaviour
+//   setImagePreviews([]);
+
+//   const fieldsSetup = {
+//     title: currentTask.title,
+//     tab: currentTask.tab,
+//     description: currentTask.description || '',
+//     files: currentTask.files ? currentTask.files.map(image => image._id) : [],
+//     order: currentTask.order ? currentTask.order : '',
+//     subtasks: currentTask.subtasks ? currentTask.subtasks : [],
+//     due_date: currentTask.due_date ? new Date(currentTask.due_date).toISOString().split('T')[0] : ''
+//   };
+
+//   // custom fields - same as before
+//   if (currentTask.customFields && Object.keys(currentTask.customFields).length > 0) {
+//     Object.values(currentTask.customFields).forEach(field => {
+//       if (field.meta_key === 'task_created_updated' || field.meta_key === 'timeline') {
+//         return;
+//       }
+//       fieldsSetup[`custom_field[${field.meta_key}]`] = field.meta_value;
+//     });
+//   } else {
+//     customFields.forEach(field => {
+//       fieldsSetup[`custom_field[${field.name}]`] = '';
+//     });
+//   }
+
+//   // subtasks local state (preserve your issubopen behaviour)
+//   setSubtasks(() => {
+//   const subtasks = currentTask.subtasks ? [...currentTask.subtasks] : [];
+  
+//   if (issubopen) {
+//     // add empty string only if not already present at the end
+//     if (subtasks.length === 0 || subtasks[subtasks.length - 1] !== "") {
+//       subtasks.push("");
+//     }
+//   }
+
+//   return subtasks;
+// });
+
+//   // description editor flag
+//   setIsDescEditor(!!(currentTask.description && currentTask.description !== ""));
+
+//   // members handling (same as before)
+//   if (currentTask.members && currentTask.members.length > 0) {
+//     let membersdrop = {};
+//     currentTask.members.forEach(member => {
+//       const { _id, name, avatar } = member;
+//       membersdrop[_id] = { name, avatar, id: _id };
+//     });
+//     fieldsSetup.members = membersdrop;
+//   } else {
+//     fieldsSetup.members = [];
+//   }
+
+//   // ---------- only dispatch keys that actually changed ----------
+//   // helper shallow/deep equality check
+//   const isEqual = (a, b) => {
+//     if (a === b) return true;
+//     if (typeof a !== typeof b) return false;
+//     if (a && b && (typeof a === 'object' || Array.isArray(a))) {
+//       try {
+//         return JSON.stringify(a) === JSON.stringify(b);
+//       } catch (e) {
+//         return false;
+//       }
+//     }
+//     return a === b;
+//   };
+
+//   // taskForm should be the current TASK_FORM from redux (may be undefined initially)
+//   const base = taskForm || {}; // taskForm expected from useSelector
+
+//   const diffPayload = {};
+//   Object.keys(fieldsSetup).forEach(key => {
+//     const newVal = fieldsSetup[key];
+//     const oldVal = base[key];
+
+//     if (!isEqual(oldVal, newVal)) {
+//       diffPayload[key] = newVal;
+//     }
+//   });
+
+//   // ensure we also consider custom_field keys which may not exist in base
+//   // (the above loop already handles dynamic keys created in fieldsSetup)
+
+//   if (Object.keys(diffPayload).length > 0) {
+//     // IMPORTANT: your reducer for TASK_FORM must MERGE payload instead of replacing
+//     // e.g. case TASK_FORM: return { ...state, taskForm: { ...state.taskForm, ...action.payload } }
+//     console.log('diffPayload', diffPayload)
+//     dispatch(updateStateData(TASK_FORM, diffPayload));
+//   }
+//   // ----------------------------------------------------------------
+
+// }, [currentTask, dispatch]);
+
 
     useEffect(() => { 
         if( apiCustomfields.customFields  && apiCustomfields?.fieldModule === 'tasks'){
@@ -295,26 +456,87 @@ export const TaskForm = (props) => {
     //     }
     // }, [taskForm]);
 
-    useEffect(() => {
-        if (taskForm) {
-            setFields(prevFields => {
-                const updatedFields = { ...prevFields };
-                let hasChanges = false;
+    // useEffect(() => {
+    //     if (taskForm) {
+    //         setFields(prevFields => {
+    //             const updatedFields = { ...prevFields };
+    //             let hasChanges = false;
 
-                for (const key in taskForm) {
-                    if (taskForm.hasOwnProperty(key)) {
-                        // Add if not exist OR update if value is different
-                        if (!(key in prevFields) || prevFields[key] !== taskForm[key]) {
-                            updatedFields[key] = taskForm[key];
-                            hasChanges = true;
-                        }
-                    }
-                }
+    //             for (const key in taskForm) {
+    //                 if (taskForm.hasOwnProperty(key)) {
+    //                     // Add if not exist OR update if value is different
+    //                     if (!(key in prevFields) || prevFields[key] !== taskForm[key]) {
+    //                         updatedFields[key] = taskForm[key];
+    //                         hasChanges = true;
+    //                     }
+    //                 }
+    //             }
 
-                return hasChanges ? updatedFields : prevFields;
-            });
+    //             return hasChanges ? updatedFields : prevFields;
+    //         });
+    //     }
+    // }, [taskForm]);
+
+    const isEqual = (a, b) => {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  try {
+    return JSON.stringify(a) === JSON.stringify(b);
+  } catch {
+    return false;
+  }
+};
+
+//     useEffect(() => {
+//   if (taskForm) {
+//     setFields(prevFields => {
+//       let hasChanges = false;
+
+//       // Start with a copy of the old state so no keys are lost
+//       const updatedFields = { ...prevFields };
+
+//       for (const key in taskForm) {
+//         if (Object.prototype.hasOwnProperty.call(taskForm, key)) {
+//           // Add if missing, or update if different
+//           if (!(key in prevFields) || prevFields[key] !== taskForm[key]) {
+//             updatedFields[key] = taskForm[key];
+//             hasChanges = true;
+//           }
+//         }
+//       }
+
+//       // ✅ Keys not in taskForm will remain in updatedFields,
+//       // so nothing gets removed
+//       return hasChanges ? updatedFields : prevFields;
+//     });
+//   }
+// }, [taskForm]);
+
+useEffect(() => {
+  if (taskForm) {
+    setFields(prevFields => {
+      let hasChanges = false;
+
+      const updatedFields = { ...prevFields };
+
+      for (const key in taskForm) {
+        if (Object.prototype.hasOwnProperty.call(taskForm, key)) {
+          const newVal = taskForm[key];
+          const oldVal = prevFields[key];
+
+          // update only if value really changed
+          if (!isEqual(oldVal, newVal)) {
+            updatedFields[key] = newVal;
+            hasChanges = true;
+          }
         }
-    }, [taskForm]);
+      }
+
+      return hasChanges ? updatedFields : prevFields;
+    });
+  }
+}, [taskForm]);
+
 
 
 
@@ -378,6 +600,7 @@ export const TaskForm = (props) => {
         const updatedSelectedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
         const updatedImagePreviews = imagePreviews.filter((_, index) => index !== indexToRemove);
         // setSelectedFiles(updatedSelectedFiles);
+       
         dispatch(updateStateData(TASK_FORM, { images: updatedSelectedFiles }))
         setImagePreviews(updatedImagePreviews);
     };
@@ -398,7 +621,7 @@ export const TaskForm = (props) => {
 
     const handleTaskClose = () => {
         const cf = clearTaskForm(taskForm)
-        
+        setIsDescEditor(false)
         dispatch(updateStateData(TASK_FORM, cf));
 
         setDatePickerModal(false);
@@ -471,11 +694,13 @@ export const TaskForm = (props) => {
 
     const handlesubtaskChange = (index, oldval, newval, directupdate = false) => {
         if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+            skipOutsideRef.current = true;
             const newSubtasks = [...subtasks];
             newSubtasks[index] = (typeof oldval === "object" && oldval._id) ? { ...oldval, ['title']: newval } : newval; // Update the specific subtask
             setSubtasks(newSubtasks); // Update the local state with the new subtasks array
             setFields({ ...fields, ['subtasks']: newSubtasks })
             // Dispatch the updated subtasks to global state
+          
             dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks }));
             if (directupdate === true) {
                 dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
@@ -492,7 +717,7 @@ export const TaskForm = (props) => {
         setShowBadges(fieldIndex);
     };
 
-    const handleDateChange = (value, name) =>{ console.log(new Date(value))
+    const handleDateChange = (value, name) =>{ 
         setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
         dispatch(updateStateData(TASK_FORM, { [name]: value }));
         setErrors({ ...errors, [name]: '' })
@@ -520,7 +745,7 @@ export const TaskForm = (props) => {
         } else {
             finalValue = value;
         }
-        setFields({ ...fields, [name]: finalValue })
+        setFields({ ...fields, [name]: finalValue });
         dispatch(updateStateData(TASK_FORM, { [name]: value }));
         setErrors({ ...errors, [name]: '' });
         // }
@@ -532,13 +757,29 @@ export const TaskForm = (props) => {
         }
     }
 
+    // const removeSubtask = (index) => {
+        
+    //     const newSubtasks = subtasks.filter((_, i) => i !== index); // Remove the subtask at the given index
+    //     setSubtasks(newSubtasks); // Update local state
+     
+    //     dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks })); // Dispatch the updated subtasks
+    //     dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
+    // };
+
     const removeSubtask = (index) => {
-        console.log('index:: ', index)
-        const newSubtasks = subtasks.filter((_, i) => i !== index); // Remove the subtask at the given index
-        setSubtasks(newSubtasks); // Update local state
-        dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks })); // Dispatch the updated subtasks
-        dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
+        // Remove the subtask at the given index
+        const newSubtasks = subtasks
+            .filter((_, i) => i !== index) // Remove selected subtask
+            .filter(subtask => subtask !== "" && subtask !== null && subtask !== undefined); // Remove empty values
+
+        // Update local state
+        setSubtasks(newSubtasks);
+
+        // Dispatch the updated subtasks
+        dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks }));
+        dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }));
     };
+
 
     // Function to handle blur event on subtask input
     const handleBlur = (index) => {
@@ -570,7 +811,7 @@ export const TaskForm = (props) => {
         () =>
             debounce((taskId, subtasks) => {
             dispatch(updateTask(taskId, { subtasks }));
-            }, 1000), // wait 500ms after last change
+            }, 2000), // wait 500ms after last change
         [dispatch]
     );
 
@@ -579,7 +820,7 @@ export const TaskForm = (props) => {
         newSubtasks[index] = { ...newSubtasks[index], ['status']: ischecked }; // Update the specific subtask
         setSubtasks(newSubtasks);
         // Debounced API update
-        debouncedDispatch(currentTask._id, newSubtasks);
+        // debouncedDispatch(currentTask._id, newSubtasks);
         // dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }))
     }
 
@@ -626,6 +867,7 @@ const renderSubtasks = () => {
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
+                        key={`subtask-li-${index}`}
                     >
                         <Form.Group className="mb-0 form-group pb-0" key={`subtask-${index}`}>
                             {typeof subtask === 'object' && !isEditing && (
@@ -840,7 +1082,7 @@ const renderSubtasks = () => {
 
                                     onBlur={(e) => {
                                         if (typeof subtask === 'object') {
-                                            console.log('On blur')
+                                           
                                             setEnableSubtaskEdit({ [subtask._id]: false });
                                             // Save content, converting <br> to \n
                                             let content = e.target.innerHTML
@@ -850,7 +1092,7 @@ const renderSubtasks = () => {
                                                 .replace(/&nbsp;/g, ' ')                              // Convert non-breaking spaces to regular spaces
                                                 .replace(/(?:\r\n|\r|\n)/g, '\n');                    // Normalize newlines
 
-                                            console.log('content is:: ', content)
+                                            
                                             handlesubtaskChange(index, subtask, content, true);
                                         }
                                     }}
@@ -915,7 +1157,7 @@ const renderSubtasks = () => {
 
     const handlePaste = (e) => {
         const pastedData = e.clipboardData.getData('text');
-        console.log('Pasted content:', pastedData);
+      
         pasteOccurred.current = true; // Set the paste flag to true
         setTimeout(function () {
             pasteOccurred.current = false;
@@ -979,6 +1221,11 @@ const renderSubtasks = () => {
                 <Modal.Header closeButton>
                 </Modal.Header>
                 <Modal.Body>
+                    {spinner && (
+                        <div className="loading-bar">
+                        <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                        </div>
+                    )}
                     <div className="project--form">
                         { (memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) ?
                         <>
@@ -1021,7 +1268,8 @@ const renderSubtasks = () => {
                                                     description: value,
                                                 }));
                                                 setErrors((prevErrors) => ({ ...prevErrors, description: '' }));
-                                                //debouncedUpdateDesc('description', value);
+                                                // dispatch(updateStateData(TASK_FORM, { description: value }));
+                                                // debouncedUpdateDesc('description', value);
                                             }}
                                             onBlur={(previousRange, source, editor) => { 
                                                 const quill = quillRef.current?.getEditor();
@@ -1044,7 +1292,7 @@ const renderSubtasks = () => {
                                         <small>Subtasks</small>
                                     </Form.Label>
                                 </Form.Group>
-
+                                            <div ref={SubtaskswrapperRef}>
                                 <DragDropContext onDragEnd={handleDragEnd}>
                                     <Droppable droppableId={`droppable-subtasks-List-${currentTask?._id}`} type="SUBTASKS">
                                         {(provided) => (
@@ -1063,7 +1311,7 @@ const renderSubtasks = () => {
                                         )}
                                     </Droppable>
                                 </DragDropContext>
-
+                                        </div>
 
                                 <small
                                     className="add-subtasks"
@@ -1123,7 +1371,7 @@ const renderSubtasks = () => {
                                     </Form.Label>
                                     {
                                         currentTask && currentTask.comments && currentTask.comments.length > 0 &&
-                                        <Row key={`task-comments-${currentTask?._idß}`}>
+                                        <Row key={`task-comments-${currentTask?._id}---${currentTask.comments.length}`}>
                                             <Col sm={12}>
                                                 {
                                                     currentTask.comments.map((comment, index) => {
@@ -1507,56 +1755,43 @@ const renderSubtasks = () => {
                                             
                                         </Form.Group>
 
-                                        {currentTask?.taskmeta?.length > 0 &&
+                                        { currentTask?.customFields?.['timeline'] &&
+                                                <Form.Group className="mb-0 mt-3 form-group">
+                                                    <Form.Label className="w-100 m-0">
+                                                        <small>Timeline</small>
+                                                    </Form.Label>
+                                                    <div className='timeline--container' key={`timeline-area-${currentTask?._id}`}>
+                                                        {
+                                                            currentTask?.customFields?.['timeline']?.meta_value?.length > 0 &&
+                                                            currentTask?.customFields?.['timeline'].meta_value.map((timeline, index) => {
+                                                                return (
+                                                                    <div className='timeline--blip'>
+                                                                        <div className='timeline--blip--line'></div>
+                                                                        <div className={`timeline--blip--status workflow--color-${index}`}></div>
+                                                                        <div className='blip--container'>
+                                                                            <small>{formatDate(timeline?.createdAt)}</small>
+                                                                            <p dangerouslySetInnerHTML={{ __html: timeline.message }}></p>
+                                                                            {/* <p>Status changed to <strong>in review</strong> by <strong>Php Web1 Experts</strong></p> */}
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            })
 
-                                            currentTask.taskmeta.sort((a, b) => {
-                                                // Sort such that 'timeline' comes before 'task_created_updated'
-                                                const order = ['timeline', 'task_created_updated'];
-                                                return order.indexOf(a.meta_key) - order.indexOf(b.meta_key);
-                                            }).map((meta, index) => {
-                                                // Conditionally render based on the meta_key value
-                                                if (meta.meta_key === 'timeline') {
-                                                    return (
-                                                        <Form.Group className="mb-0 mt-3 form-group">
-                                                            <Form.Label className="w-100 m-0">
-                                                                <small>Timeline</small>
-                                                            </Form.Label>
-                                                            <div className='timeline--container' key={`timeline-area-${currentTask?._id}`}>
-                                                                {
-                                                                    meta?.meta_value?.length > 0 &&
-                                                                    meta.meta_value.map((timeline, index) => {
-                                                                        return (
-                                                                            <div className='timeline--blip'>
-                                                                                <div className='timeline--blip--line'></div>
-                                                                                <div className={`timeline--blip--status workflow--color-${index}`}></div>
-                                                                                <div className='blip--container'>
-                                                                                    <small>{formatDate(timeline?.createdAt)}</small>
-                                                                                    <p dangerouslySetInnerHTML={{ __html: timeline.message }}></p>
-                                                                                    {/* <p>Status changed to <strong>in review</strong> by <strong>Php Web1 Experts</strong></p> */}
-                                                                                </div>
-                                                                            </div>
-                                                                        )
-                                                                    })
+                                                        }
 
-                                                                }
+                                                    </div>
+                                                </Form.Group>
+                                            }
+                                            { currentTask?.customFields?.['task_created_updated'] &&
+                                                <div className='task--cr--status'>
+                                                    <p className='mb-0'>Created on: <strong>{timeAgo(currentTask?.customFields?.['task_created_updated']?.createdAt)} by {currentTask?.customFields?.['task_created_updated'].meta_value?.created_by}</strong></p>
+                                                    {
+                                                        currentTask?.customFields?.['task_created_updated'].meta_value?.updated_by && currentTask?.customFields?.['task_created_updated'].meta_value?.updated_by !== "" &&
+                                                        <p className='mb-0'>Last update: <strong>{timeAgo(currentTask?.customFields?.['task_created_updated']?.updatedAt)} by {currentTask?.customFields?.['task_created_updated'].meta_value?.updated_by}</strong></p>
+                                                    }
 
-                                                            </div>
-                                                        </Form.Group>
-                                                    );
-                                                } else if (meta.meta_key === 'task_created_updated') {
-                                                    return (
-                                                        <div className='task--cr--status'>
-                                                            <p className='mb-0'>Created on: <strong>{timeAgo(meta?.createdAt)} by {meta.meta_value?.created_by}</strong></p>
-                                                            {
-                                                                meta.meta_value?.updated_by && meta.meta_value?.updated_by !== "" &&
-                                                                <p className='mb-0'>Last update: <strong>{timeAgo(meta?.updatedAt)} by {meta.meta_value?.updated_by}</strong></p>
-                                                            }
-
-                                                        </div>
-                                                    );
-                                                }
-                                            })
-                                        }
+                                                </div>
+                                            }
                                     </Form>
                                 </div> 
                                 <div className="project--form--actions">

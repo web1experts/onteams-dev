@@ -19,6 +19,7 @@ import {
     UPDATE_POST_LIST_COMMENT
 
 } from "../actions/types";
+import isEqual from "lodash/isEqual";
     
     const initialState = {
         error: null,
@@ -72,10 +73,11 @@ import {
         
         case GET_SINGLE_TASK_SUCCESS:
             return {
-                singleTask: action.payload.taskData,
+                singleTask: action.payload.singleTask,
             }
         case GET_SINGLE_TASK_FAILED:
             return {
+                success: false,
                 error: action.payload
             }
         
@@ -94,7 +96,7 @@ import {
         case TASK_REORDER:
             return {
                 successfull: true,
-                UpdatedTask: action.payload.tabChange,
+                UpdatedTask: action.payload.UpdatedTask,
                 tabChangefrom: action.payload.tabChangefrom,
                 reorder: true
             }
@@ -102,7 +104,6 @@ import {
             return{
                 successfull: false,
                 reorder: 'fail',
-                reorder: false
             }
         case TASK_COMMON_ERROR: 
             return {
@@ -118,12 +119,29 @@ import {
                 newTask: null,
                 comment: null,
                 reorder: false,
+                singleTask: {}
             };
-        case CURRENT_TASK: 
-            return {
-                ...state,
-                currentTask: action.payload
+       
+        case CURRENT_TASK: {
+            const updated = { ...state.currentTask };
+
+            for (const key in action.payload) {
+                if (key === "subtasks" && Array.isArray(action.payload.subtasks)) {
+                // replace only if changed (avoid re-adding duplicates)
+                if (!isEqual(updated.subtasks, action.payload.subtasks)) {
+                    updated.subtasks = [...action.payload.subtasks];
+                }
+                } else {
+                updated[key] = action.payload[key];
+                }
             }
+
+                    return {
+                        ...state,
+                        currentTask: updated,
+                    };
+            }
+
             case CREATE_POST_LIST_COMMENT: {
                 if(action.payload.type !== 'task'){return {...state}}
                 return {

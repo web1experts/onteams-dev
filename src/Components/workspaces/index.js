@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getloggedInUser } from "../../helpers/auth";
 import { AlertDialog, TransferOnwerShip } from "../modals";
 import { getMemberdata } from "../../helpers/commonfunctions";
-import { deleteWorkspace } from "../../redux/actions/workspace.action";
+import { deleteWorkspace, leaveCompany } from "../../redux/actions/workspace.action";
 import Spinner from 'react-bootstrap/Spinner';
 import { BsTrash2, BsEye } from "react-icons/bs";
 function Workspace(props) {
@@ -21,10 +21,18 @@ function Workspace(props) {
   const commonState = useSelector(state => state.common)
   const dispatch = useDispatch();
   const currentMember = getMemberdata();
+  const currentUser = getloggedInUser();
+  
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
+  const [showLeaveWarning, setShowLeaveWarning] = useState(false);
+  const handleCloseWarning = () => {
+     setShowLeaveWarning(false);
+     setSpinner(false)
+  }
   const handleShow = () => setShow(true);
   const [ editworkspace, setEditWorkspace] = useState('')
+  const [selectedWorkspace, setSelectedWorkspace] = useState(false)
   const workspacefeed = useSelector(state => state.auth.userCompanies);
   const [workspaces, setWorkspaces] = useState([])
   const apiResult = useSelector((state) => state.member);
@@ -61,11 +69,25 @@ function Workspace(props) {
     setEditWorkspace( company )
     setShowDialog(true)
   }
+  const leaveWorkspace = (workspace) => {
+    setSelectedWorkspace( workspace )
+    setShowLeaveWarning(true)
+  }
   const handledeleteWorkspace = async (id) => {
     await dispatch(
       deleteWorkspace(id)
     );
   };
+
+  const handleLeave = async () => {
+    setSpinner(true)
+    await dispatch(
+      leaveCompany({
+        companyId: selectedWorkspace?.company._id,
+        memberId: selectedWorkspace.memberData._id,
+      })
+    );
+  }
 
   const handleEdit = (workspace) => {
     setEditWorkspace( workspace )
@@ -96,7 +118,7 @@ function Workspace(props) {
         <div className='page--wrapper px-md-2 pb-4 pt-4'>
         {
           spinner ?
-          <div class="loading-bar">
+          <div className="loading-bar">
               <img src="images/OnTeam-icon-gray.png" className="flipchar" />
           </div>
           :
@@ -134,8 +156,15 @@ function Workspace(props) {
                             </td>
                             <td>
                               <div className="d-flex gap-3 align-items-center justify-content-md-end">
-                                <Button variant="dark" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
-                                <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
+                                {(currentUser &&
+                                    currentUser._id === workspace?.company?.owner) ?
+                                    <>
+                                    <Button variant="dark" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
+                                    <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
+                                    </>
+                                    :
+                                    <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => leaveWorkspace( workspace)}><FaTrashAlt /> Leave</Button>
+                                }
                               </div>
                             </td>
                           </tr>
@@ -164,8 +193,8 @@ function Workspace(props) {
         </Modal.Body>
       </Modal>
 
-      {(currentMember &&
-        currentMember.role?.slug === "owner" &&
+      {(currentUser &&
+          currentUser._id === editworkspace?.owner &&
         
         <>
           <AlertDialog
@@ -176,6 +205,30 @@ function Workspace(props) {
           />
         </>
       )}
+
+      {
+        showLeaveWarning && 
+        <Modal
+          show={showLeaveWarning}
+          onHide={handleCloseWarning}
+          centered
+          size="md"
+          className="add--member--modal"
+      >
+          <Modal.Header closeButton>
+            <Modal.Title>Are you sure you want to leave?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>This action cannot be undone.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-primary" onClick={handleCloseWarning}>Disagree</Button>
+            <Button variant="primary" disabled={spinner} onClick={() => handleLeave()}>
+              { spinner ? 'Please wait...' : 'Agree' }
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      }
       </div>
   );
 }

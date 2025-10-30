@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, act } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import {useNavigate} from "react-router-dom";
 import {
   Button,
   Form,
@@ -7,7 +8,7 @@ import {
   Card,
   FloatingLabel,
   Dropdown,
-  Row,
+  Modal,
   Col,
 } from "react-bootstrap";
 import {
@@ -23,9 +24,12 @@ import {
   getUserProfile,
   updateProfile,
   updatePassword,
+  closeAccount,
+  logout
 } from "../../redux/actions/auth.actions";
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { selectboxObserver } from "../../helpers/commonfunctions";
+import ManagePlan from "../subscriptions/ManagePlan";
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function EditableField({
   field,
@@ -92,8 +96,9 @@ function EditableField({
   );
 }
 
-function SettingPage() {
+function SettingPage(props) {
   const dispatch = useDispatch();
+  const navigate = useNavigate()
   const fileInputRef = useRef();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isActive, setIsActive] = useState(false);
@@ -102,12 +107,21 @@ function SettingPage() {
   const [profileFields, setProfileFields] = useState({});
   const authprofile = useSelector((state) => state.auth.profile);
   const authAPI = useSelector((state) => state.auth);
+  const activeSubscription = useSelector(
+      (state) => state.subscription?.activeSubscription
+  );
+  const [currentSubscription, setCurrentSubscription] = useState(false)
   const [userProfile, setUserProfile] = useState({});
   const [loader, setLoader] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [securityFields, setSecurityFields] = useState({});
   const [secutiryErrors, setSecutiryErrors] = useState({});
+  const [showAlert, setShowAlert] = useState(false);
+  const handleAlertClose = () => {
+     setShowAlert(false);
+     setSpinner(false)
+  }
   const [errors, setErrors] = useState({});
   let fieldErrors = {};
   let hasError = false;
@@ -123,6 +137,12 @@ function SettingPage() {
   const handleSecurityFields = ({ target: { name, type, value } }) => {
     setSecurityFields({ ...securityFields, [name]: value });
   };
+
+  const handleCloseAccount = () => {
+    setSpinner(true)
+    dispatch(closeAccount())
+    setSpinner(false)
+  }
 
   const handleSecurityUpdate = async (e) => {
     e.preventDefault();
@@ -162,6 +182,10 @@ function SettingPage() {
     refreshProfile();
   }, []);
 
+   useEffect(() => {
+      setCurrentSubscription(activeSubscription)
+  },[activeSubscription])
+
   useEffect(() => {
     if (activeTab === "Preferences") {
       selectboxObserver();
@@ -172,7 +196,13 @@ function SettingPage() {
     if (authAPI.success) {
       setSecurityFields({});
     }
+
+    if(authAPI.accountDelete && authAPI.accountDelete === true){
+      dispatch(logout())
+    }
   }, [authAPI]);
+
+
 
   const handleFieldChange = (field, value) => {
     if (field === "avatar") {
@@ -322,14 +352,35 @@ function SettingPage() {
             >
               <MdLockOutline /> Security
             </ListGroup.Item>
-            {/* <ListGroup.Item
-              action
-              active={activeTab === "Notifications"}
-              onClick={() => setActiveTab("Notifications")}
-            >
-              <FaRegBell /> Notifications
+            {
+              currentSubscription === false || currentSubscription?.status === 'active' && currentSubscription?.planId == 'trial' ? 
+                <ListGroup.Item
+                 
+                  onClick={() => {
+                    if(props.close){
+                      props.close()
+                    }
+                    navigate('/subscription-plans', { replace: true })
+                  }}
+                >
+                  <MdLockOutline /> Billing
+                  </ListGroup.Item>
+              :
+              <ListGroup.Item
+                action
+                active={activeTab === "billing"}
+                onClick={() => {
+                  setActiveTab("billing");
+                }}
+              >
+                <MdLockOutline /> Billing
+              </ListGroup.Item>
+            }
+            
+             <ListGroup.Item onClick={() => setShowAlert(true)}>
+              <FaRegBell /> Close Account
             </ListGroup.Item>
-            <ListGroup.Item
+            {/*<ListGroup.Item
               action
               active={activeTab === "Preferences"}
               onClick={() => {
@@ -471,96 +522,31 @@ function SettingPage() {
             </div>
           </div>
         )}
-        {activeTab === "Notifications" && (
-          <div className="rounded--box p-4">
-            <h3 className="mb-3">Notifications</h3>
-            <div className="new--accordion--block">
-              <div className="bg--blue--accordion mb-3">
-                <div className="d-flex gap-2 gap-md-5 align-items-center mb-3">
-                  <div className="d-flex gap-3 align-items-center">
-                    <MdOutlineEmail />
-                    <h6 className="mb-0">Notifications</h6>
-                  </div>
-                  <div className="d-flex gap-3 align-items-center ms-auto">
-                    <p className="mb-0">Email</p>
-                  </div>
-                  <div className="d-flex gap-3 align-items-center">
-                    <p className="mb-0 pe-2">Push</p>
-                  </div>
-                </div>
-                <div className="d-flex gap-2 gap-md-5 align-items-center mb-3">
-                  <p className="mb-0 bg-white px-2 py-1 rounded-3">
-                    Project Notifications
-                  </p>
-                  <div className="d-flex gap-3 align-items-center ms-auto">
-                    <Form.Check type="switch" className="ps-0 switch--small" />
-                  </div>
-                  <div className="d-flex gap-3 align-items-center">
-                    <Form.Check type="switch" className="ps-0 switch--small" />
-                  </div>
-                </div>
-                <div className="d-flex gap-2 gap-md-5 align-items-center mb-3">
-                  <p className="mb-0 bg-white px-2 py-1 rounded-3">
-                    Client Notifications
-                  </p>
-                  <div className="d-flex gap-3 align-items-center ms-auto">
-                    <Form.Check type="switch" className="ps-0 switch--small" />
-                  </div>
-                  <div className="d-flex gap-3 align-items-center">
-                    <Form.Check type="switch" className="ps-0 switch--small" />
-                  </div>
-                </div>
-                <div className="d-flex gap-2 gap-md-5 align-items-center mb-3">
-                  <p className="mb-0 bg-white px-2 py-1 rounded-3">
-                    Members Notifications
-                  </p>
-                  <div className="d-flex gap-3 align-items-center ms-auto">
-                    <Form.Check type="switch" className="ps-0 switch--small" />
-                  </div>
-                  <div className="d-flex gap-3 align-items-center">
-                    <Form.Check type="switch" className="ps-0 switch--small" />
-                  </div>
-                </div>
-              </div>
-              <div className="text-end">
-                <Button variant="primary" type="submit">
-                  Save Changes
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-        {activeTab === "Preferences" && (
-          <div className="rounded--box p-4">
-            <h3 className="mb-3">Preferences</h3>
-            <div className="new--accordion--block">
-              <div className="bg--blue--accordion mb-3">
-                <div className="d-flex gap-3 align-items-center">
-                  <FiGlobe />
-                  <h6 className="mb-0">Timezone</h6>
-                </div>
-                <Form>
-                  <div className="d-flex gap-3 mt-3">
-                    <Form.Group className="mb-0 form-group w-100 w-md-50">
-                      <Form.Label>Timezone</Form.Label>
-                      <Form.Select className="custom-selectbox">
-                        <option>Pacific Time (PT)</option>
-                        <option>Mountain Time (MT)</option>
-                        <option>Central Time (CT)</option>
-                        <option>Eastern Time (ET)</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </div>
-                </Form>
-              </div>
-              <div className="text-end">
-                <Button variant="primary" type="submit">
-                  Save Changes
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {
+          activeTab === "billing" && (
+            <ManagePlan />
+          )
+        }
+        {
+        showAlert && 
+      
+        <Modal show={showAlert} onHide={handleAlertClose} size="md" centered className="theme--modal">
+          <Modal.Header closeButton>
+              <Modal.Title>
+                  <strong>Are you sure you want to close you account.</strong>
+              </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="pb-0">
+              <p>You will lost all you account data. This action cannot be undone.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-primary" onClick={handleAlertClose}>Disagree</Button>
+            <Button variant="primary" disabled={spinner} onClick={() => handleCloseAccount()}>
+              { spinner ? 'Please wait...' : 'Agree' }
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      }
       </div>
     </>
   );

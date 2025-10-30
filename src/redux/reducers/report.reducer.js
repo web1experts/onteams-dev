@@ -9,6 +9,7 @@ import {
   MEMBER_REPORTS_LIST_SUCCESS,
   PROJECT_REPORTS_LIST_SUCCESS,
   CLEAR_MESSAGES,
+  REPORTS_REMARKS_SUCCESS
 } from "../actions/types";
 
 const initialState = {
@@ -83,6 +84,11 @@ export default (state = initialState, action) => {
         message_variant: "danger",
         activityMetas: [],
       };
+    case REPORTS_REMARKS_SUCCESS: 
+      return {
+        ...state,
+        remarks: action.payload.remarks
+      }
     default:
       return state;
   }

@@ -4,6 +4,7 @@
 const apiKeys = {
     login: "/auth/login",
     register: "/auth/register",
+    close_account: "auth/close-account",
     updatePassword: "/auth/update-password",
     memberRegister: "/auth/member-register",
     account_setup: "/auth/account_setup",
@@ -33,6 +34,7 @@ const apiKeys = {
     permissions: 'permissions',
     subscription: 'subscription',
     payment: 'payment',
+    subscription: 'subscription',
     post: 'post',
     custom_field: 'custom_field',
     quote: '/workspace/getQuote',

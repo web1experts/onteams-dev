@@ -7,6 +7,7 @@ import {
   PROJECT_REPORTS_LIST_SUCCESS,
   MEMBER_REPORTS_LIST_SUCCESS,
   REPORTS_SUCCESS,
+  REPORTS_REMARKS_SUCCESS,
   MANUAL_TIME_SUCCESS,
   SINGLE_PROJECT_REPORT,
   MANUAL_TIME_LIST,
@@ -98,7 +99,7 @@ export const addRemarkstoProject = (payload) => {
     try {
       const response = await API.apiPostUrl("reports", "/add_remarks", payload);
       if (response.data && response.data.success) {
-        await dispatch({ type: REPORTS_SUCCESS, payload: response.data });
+        await dispatch({ type: REPORTS_REMARKS_SUCCESS, payload: response.data });
       } else {
         await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
       }
@@ -107,6 +108,21 @@ export const addRemarkstoProject = (payload) => {
     }
   };
 };
+
+export const updateremark = (payload) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPutUrl('reports', `/remarks/update`, payload);
+      if(response.data && response.data.success){
+        await dispatch({ type: REPORTS_REMARKS_SUCCESS, payload: response.data});
+      } else {
+        await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
+      }
+    } catch (error) {
+      errorRequest(error, dispatch);
+    }
+  }
+}
 
 export const getActivityMeta = (payload) => {
   return async (dispatch) => {
@@ -118,6 +134,45 @@ export const getActivityMeta = (payload) => {
       );
       if (response.data && response.data.success) {
         await dispatch({ type: REPORTS_META_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+};
+
+
+export const getRemarks = (payload) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGetByKey(
+        "reports",
+        "/remarks",
+        payload
+      );
+      if (response.data && response.data.success) {
+        await dispatch({ type: REPORTS_REMARKS_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+};
+
+export const deleteRemarks = (payload) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiDeleteUrl(
+        "reports",
+        "/remarks-delete",
+        payload
+      );
+      if (response.data && response.data.success) {
+        await dispatch({ type: REPORTS_REMARKS_SUCCESS, payload: response.data });
       } else {
         await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
       }

@@ -37,6 +37,10 @@ const env = {
         publishKey: process.env.STRIPE_PUBLISH_KEY,
         secretKey: process.env.STRIPE_SECRET_KEY
     },
+    razorpay: {
+        key: process.env.RAZORPAY_KEY,
+        secret: process.env.RAZORPAY_SECRET
+    },
     linkedIn: {
         redirectUri: process.env.LINKEDIN_CALLBACK_REDIRECT_URI,
         clientId: process.env.LINKEDIN_CLIENTID,

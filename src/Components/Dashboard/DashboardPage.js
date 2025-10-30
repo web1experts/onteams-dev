@@ -70,7 +70,7 @@ function DashboardPage() {
   const dispatch = useDispatch();
   const memberdata = getMemberdata();
   const [showCommentBox, setShowCommentBox] = useState(false);
-  const [commentPostId, setCommentPostId] = useState("");
+  const [commentPostIds, setCommentPostIds] = useState([]);
   const memberstate = useSelector((state) => state.member);
   const invitationsFeed = useSelector((state) => state.member.invitations);
   const postFeed = useSelector((state) => state.post.posts);
@@ -83,7 +83,7 @@ function DashboardPage() {
   const commonState = useSelector((state) => state.common);
   const [show, setShow] = useState(false);
   const [posts, setPosts] = useState([]);
-
+  const [loader, setLoader] = useState(false)
   const [loading, setLoading] = useState(false);
   const [fields, setFields] = useState({
     type: "text",
@@ -569,6 +569,7 @@ function DashboardPage() {
 
   const acceptInvite = (token) => {
     dispatch(acceptCompanyinvite({ token: token }));
+    setLoader(false)
   };
 
   const rejectInvite = (inviteId) => {
@@ -582,9 +583,11 @@ function DashboardPage() {
   }, [memberstate]);
 
   useEffect(() => {
-    handleInvitationList();
-    handlePosts();
-    getQuote();
+    setTimeout(function(){
+      handleInvitationList();
+      handlePosts();
+      getQuote();
+    },1500)
   }, []);
 
   const handleLike = async (postId) => {
@@ -641,11 +644,18 @@ function DashboardPage() {
                               </Button>
                               <Button
                                 onClick={() =>
+                                {
+                                  setLoader(true)
                                   acceptInvite(invitation.inviteToken)
                                 }
+                                  
+                                }
+                                disabled={loader}
                                 variant="primary"
                               >
-                                Accept
+                                {
+                                  loader ? 'Please wait...' : 'Accept'
+                                }
                               </Button>
                             </div>
                           </ListGroup.Item>
@@ -697,7 +707,7 @@ function DashboardPage() {
                         post.likes,
                         memberdata?._id
                       );
-                      const isCommentBoxOpen = commentPostId === post._id;
+                      const isCommentBoxOpen = commentPostIds.includes(post._id);
                       return (
                         <Card
                           key={post._id}
@@ -856,9 +866,17 @@ function DashboardPage() {
                                   <span
                                     className="open--comment"
                                     onClick={() => {
-                                      setShowCommentBox((prev) => !prev);
-                                      setCommentPostId(post._id);
+                                      setCommentPostIds((prev) => {
+                                        if (prev.includes(post._id)) {
+                                          // remove id if it already exists
+                                          return prev.filter((id) => id !== post._id);
+                                        } else {
+                                          // add id if it doesn't exist
+                                          return [...prev, post._id];
+                                        }
+                                      });
                                     }}
+
                                   >
                                     <BsChat className="me-1" />{" "}
                                     {post?.comments?.length || 0}
@@ -867,8 +885,15 @@ function DashboardPage() {
                                 {isCommentBoxOpen && (
                                   <CommentThread
                                     comments={post?.comments}
-                                    post={commentPostId}
-                                    toggle={() => setCommentPostId(null)}
+                                    post={post._id}
+                                    toggle={() => {
+                                       setCommentPostIds((prev) => {
+                                        if (prev.includes(post._id)) {
+                                          // remove id if it already exists
+                                          return prev.filter((id) => id !== post._id);
+                                        }
+                                      });
+                                    }}
                                   />
                                 )}
 
