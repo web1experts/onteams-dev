@@ -392,6 +392,46 @@
     z-index: 77777;
 }
 
+.error--box {
+    padding: .75rem;
+    background-color: rgb(254 242 242);
+    border: 1px solid rgb(254 202 202);
+    border-radius: .5rem;
+    margin-bottom: 1rem;
+}
+
+p.form-errors {
+    align-items: center;
+    display: flex;   
+    margin-bottom: .5rem;
+    color: rgb(153 27 27);
+    font-weight: 500;
+    font-size: .875rem;
+    line-height: 1.25rem;
+}
+
+.form-errors svg {
+    color: rgb(220 38 38);
+    width: 1rem;
+    height: 1rem;
+    margin-right: .5rem;
+}
+
+span.form-error {
+    color: rgb(185 28 28);
+    font-size: .875rem;
+    line-height: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+}
+
+.form-error svg {
+    width: auto;
+    font-size: .7  5rem;
+    height: auto;
+}
+
 .reports__Data__modal .modal-content {
     height: calc(100% - 20px);
 }
