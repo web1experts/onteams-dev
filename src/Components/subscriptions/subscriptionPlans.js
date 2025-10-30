@@ -4,7 +4,7 @@ import { Container, Row, Col, Card, Button, Form, Badge, ButtonGroup, ToggleButt
 import { useDispatch, useSelector } from "react-redux";
 import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan } from "../../redux/actions/subscription.action";
 
-function PlansPage() {
+function SubscriptionPlans() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
@@ -90,13 +90,13 @@ const [priceDetails, setPriceDetails] = useState(null);
     }
   },[subscriptionState])
 
-  useEffect(() => {
-    if(subscriptionState.activeSubscription){
-      setActiveSubscription(subscriptionState.activeSubscription)
-      navigate('/dashboard', { replace: true })
+//   useEffect(() => {
+//     if(subscriptionState.activeSubscription){
+//       setActiveSubscription(subscriptionState.activeSubscription)
+//       navigate('/dashboard', { replace: true })
      
-    }
-  }, [subscriptionState.activeSubscription])
+//     }
+//   }, [subscriptionState.activeSubscription])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -635,6 +635,7 @@ const [priceDetails, setPriceDetails] = useState(null);
               required
             />
           </div>
+
         </Form>
       </>
     )}
@@ -665,4 +666,4 @@ const [priceDetails, setPriceDetails] = useState(null);
   );
 }
 
-export default PlansPage;
+export default SubscriptionPlans;

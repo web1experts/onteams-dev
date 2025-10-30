@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
@@ -18,7 +18,7 @@ import {
   Accordion,
 } from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaEye, FaPlay, FaPlus } from "react-icons/fa";
+import { FaEye, FaPlay, FaPlus, FaCheck, FaHistory } from "react-icons/fa";
 import { MdClose, MdFilterList } from "react-icons/md";
 import {
   FiSidebar,
@@ -41,7 +41,7 @@ import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 import { BsDash } from "react-icons/bs";
-import { LuTimer, LuUsers } from "react-icons/lu";
+import { LuTimer, LuUsers, LuFileText } from "react-icons/lu";
 import { GoPulse } from "react-icons/go";
 import {
   BsArrowsFullscreen,
@@ -55,7 +55,6 @@ import {
 import {
   MdOutlineClose,
   MdOutlineSearch,
-  MdDragIndicator,
   MdOutlineVideoLibrary,
 } from "react-icons/md";
 import {
@@ -93,8 +92,10 @@ import {
   ListProjectsByMembers,
   ListMemberProjects,
 } from "../../redux/actions/project.action";
+import debounce from "lodash.debounce";
 
 function TimeTrackingPage() {
+  const inputRef = useRef(null);
   const filterDisplayLabels = {
     today: "Today",
     yesterday: "Yesterday",
@@ -113,6 +114,7 @@ function TimeTrackingPage() {
   const currentMember = getMemberdata();
   const [spinner, setSpinner] = useState(false);
   const [activityspinner, setActSpinner] = useState(false);
+  const [ streamError, setStreamError] = useState('')
   const [cardNumbers, setCardNumbers] = useState({
     activeCount: 0,
     pauseCount: 0,
@@ -128,7 +130,7 @@ function TimeTrackingPage() {
     (state) => state.project.memberProjects
   );
   const [isActiveView, setIsActiveView] = useState(2);
-  const [liveStreaming, setLiveStreaming] = useState("disabled");
+  const [liveStreaming, setLiveStreaming] = useState({});
   const [isScreenActive, setIsScreenActive] = useState(false);
   const [recordedRefresh, setRecordedRefresh] = useState(true);
   const handleSidebar = () =>
@@ -140,17 +142,18 @@ function TimeTrackingPage() {
   const dispatch = useDispatch();
   const fullscreenRef = React.useRef(null);
   const datePickerRef = useRef(null);
+  const datePickerRefto = useRef(null)
   const [activeTab, setActiveTab] = useState("Live");
   const [screenshotTab, setScreenshotTab] = useState("Screenshots");
   const [activeInnerTab, setActiveInnerTab] = useState("InnerLive");
   const [open, setOpen] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [entries, setEntries] = useState([]);
-  const [timings, setTimings] = useState({ start_time: "", end_time: "" });
+  const [timings, setTimings] = useState({ start_time: "", end_time: "", date: "" });
   const [memberprojects, setMemberProjects] = useState([]);
   const [occupiedRanges, setOccupiedRanges] = useState([]);
   const [timeSlots, setTimeslots] = useState([]);
-  const [fields, setFields] = useState({ date: new Date() });
+  const [fields, setFields] = useState({ date: new Date().toLocaleDateString("en-CA") });
   const [searchEntries, setSearchEntries] = useState([]);
   const [show, setShow] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -178,9 +181,11 @@ function TimeTrackingPage() {
   const [showInnerFilter, setInnerFilterShow] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("today");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [ reportPickerOpen, setReportPickerOpen] = useState(false)
   const [showSearch, setSearchShow] = useState(false);
   const [selectedScreenshots, setSelectedScreenshots] = useState({});
   const activitystate = useSelector((state) => state.activity);
+  const [manualListCount, setManualListCount] = useState(0);
 
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -197,6 +202,17 @@ function TimeTrackingPage() {
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
   const [projectToggle, setProjectToggle] = useState(false);
+  const activeTabRef = useRef(activeTab);
+  const currentActivityTabRef = useRef(currentActivity)
+
+useEffect(() => {
+  activeTabRef.current = activeTab;
+}, [activeTab]);
+
+useEffect(() => {
+  currentActivityTabRef.current = currentActivity;
+},[currentActivity])
+
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
       handleSidebarSmall();
@@ -211,7 +227,7 @@ function TimeTrackingPage() {
     setEntries([]);
     setSelectedProject("");
     setErrors([]);
-    setTimings({ start_time: "", end_time: "" });
+    setTimings({ start_time: "", end_time: "", date: ""  });
   };
   const commonState = useSelector((state) => state.common);
 
@@ -219,7 +235,7 @@ function TimeTrackingPage() {
     setWorkflow("");
     setSelectedProject("");
     setFilteredTasks([]);
-    setTimings({ start_time: "", end_time: "" });
+    setTimings({ start_time: "", end_time: "", date: ""  });
     setProjectShow(false);
   };
 
@@ -273,6 +289,7 @@ function TimeTrackingPage() {
     if (status === true) {
       setActSpinner(true);
       setTimeout(function () {
+        setStreamError("")
         socket.emit(
           "watcher",
           socket.id,
@@ -287,14 +304,57 @@ function TimeTrackingPage() {
   function leaveRoom(room) {
     socket.emit("leaveRoom", socket.id, room);
   }
-  const handleLiveActivityList = async () => {
+
+  const handleLiveActivityListInterval = async () => {
+    
     const currentFilters = filtersRef.current;
-    if (currentFilters.status === "recordings") {
-      return;
+    
+    if (activeTabRef.current === 'Live' && currentActivityTabRef.current === false ) {
+        
+      // setSpinner(true);
+      let selectedfilters = {
+        currentPage: currentPage,
+        status: currentFilters.status,
+      };
+
+      if (Object.keys(currentFilters).length > 0) {
+        selectedfilters = { ...selectedfilters, ...currentFilters };
+      }
+
+      if (
+        memberProfile?.permissions?.tracking?.view_others === true &&
+        memberProfile?.permissions?.tracking?.selected_members?.length > 0
+      ) {
+        selectedfilters = {
+          ...selectedfilters,
+          ["selected_members"]:
+            memberProfile?.permissions?.tracking?.selected_members,
+        };
+      } else {
+        selectedfilters = {
+          ...selectedfilters,
+          ["selected_members"]: [memberProfile?._id],
+        };
+      }
+
+      await dispatch(getliveActivity(selectedfilters));
+      setSpinner(false);
     }
+  };
+
+  const handleLiveActivityList = async () => {
+    setSpinner(true);
+    const currentFilters = filtersRef.current;
+    
+    // if (currentFilters.status === "recordings") {
+    //   return;
+    // }
     let selectedfilters = {
       currentPage: currentPage,
       status: currentFilters.status,
+      date_range: [
+        new Date().toLocaleDateString("en-CA"),
+      ],
     };
 
     if (Object.keys(currentFilters).length > 0) {
@@ -321,11 +381,13 @@ function TimeTrackingPage() {
     setSpinner(false);
   };
 
-  const handleFilteredLiveActivityList = async () => {
+  const handleFilteredLiveActivityList = async () => { 
+    setSpinner(true)
     const currentFilters = filtersRef.current;
+    const cleanedFilteredDate = filtereddate.filter(d => d && d.trim() !== "");
     let selectedfilters = {
       currentPage: currentPage,
-      date_range: filtereddate,
+      date_range: cleanedFilteredDate,
     };
 
     if (Object.keys(currentFilters).length > 0) {
@@ -347,30 +409,53 @@ function TimeTrackingPage() {
         ["selected_members"]: [memberProfile?._id],
       };
     }
-    selectedfilters = { ...selectedfilters, ["status"]: "live" };
+    selectedfilters = { ...selectedfilters, ["status"]: "recordings" };
     await dispatch(getliveActivity(selectedfilters));
     setSpinner(false);
   };
 
-  const handleRecordedActivity = async () => {
+  const handleRecordedActivity = async () => { 
+    setRecordedActivities([])
     setActSpinner(true);
+    const cleanedFilteredDate = filtereddate.filter(d => d && d.trim() !== "");
     await dispatch(
-      getRecoredActivity(currentActivity._id, "recorded", filtereddate)
+      getRecoredActivity(currentActivity._id, "recorded", cleanedFilteredDate)
     );
     setActSpinner(false);
   };
 
-  const memberTodaysActivity = async () => {
-    await dispatch(getMemberRecoredActivity(memberProfile._id, "recorded"));
+  const memberTodaysActivity = async (date = null) => {
+    setOccupiedRanges([])
+    await dispatch(getMemberRecoredActivity(memberProfile._id, "recorded", date));
   };
 
   useEffect(() => {
-    if (selectedFilter !== "custom" && isActive === true) {
+    // if (selectedFilter !== "custom" && isActive === true) { 
+    
+    if (selectedFilter !== "custom" &&  isActive === true) {
       handleRecordedActivity();
-    } else {
+    }else if(selectedFilter !== 'custom' && activeTab === "Recordings") {
       handleFilteredLiveActivityList();
     }
   }, [filtereddate]);
+  // useEffect(() => {
+  //   const [fromDate, toDate] = filtereddate;
+
+  //   // condition: at least one date OR both dates are different
+  //   const hasValidDates =
+  //     (fromDate && fromDate.trim() !== "") ||
+  //     (toDate && toDate.trim() !== "") ||
+  //     (fromDate && toDate && fromDate !== toDate);
+
+  //   if (hasValidDates) {
+  //     if (isActive === true) {
+  //       handleRecordedActivity();
+  //     } else {
+  //       handleFilteredLiveActivityList();
+  //     }
+  //   }
+  // }, [filtereddate]);
+
 
   useEffect(() => {
     handleListProjects();
@@ -392,6 +477,13 @@ function TimeTrackingPage() {
     if (reportState.success) {
       setFields({ date: new Date() });
       handleClose();
+    }
+
+    if (
+      reportState.manualTimeList &&
+      Object.keys(reportState.manualTimeList)?.length > 0
+    ) {
+      setManualListCount(Object.keys(reportState.manualTimeList)?.length);
     }
   }, [reportState]);
 
@@ -436,10 +528,8 @@ function TimeTrackingPage() {
   }
 
   useEffect(() => {
-    setActSpinner(false);
-    setLiveStreaming(
-      currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"
-    );
+    //setActSpinner(false);
+    setLiveStreaming({...liveStreaming, [currentActivity?._id] : currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"});
 
     if (
       (currentActivity !== false &&
@@ -450,43 +540,56 @@ function TimeTrackingPage() {
         recordedRefresh === true)
     ) {
       // setActiveInnerTab("InnerRecorded")
-
+      setRecordedActivities([])
       handleRecordedActivity();
     }
     if (currentActivity?.latestActivity?.status === false) {
       setActSpinner(false);
     }
+    // else{
+    //   updateStream()
+    // }
   }, [currentActivity]);
 
   useEffect(() => {
+    if(liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] !== 'disabled'){
+      updateStream()
+    }
+  }, [liveStreaming]);
+
+  useEffect(() => {
+    if (Object.keys(filters).length > 0 && !showFilter) {
+      
+      filtersRef.current = filters;
+      handleLiveActivityList();
+    }
+  }, [filters]);
+
+  useEffect(() => { 
+    if (memberActivities) {
+      const data = calculateOccupiedRanges(memberActivities)
+      setOccupiedRanges(data);
+    }
+  }, [memberActivities]);
+
+  const updateStream = () => {
     if (
       (currentActivity !== false &&
         activeTab === "Live" &&
-        liveStreaming === "enable") ||
+        liveStreaming[currentActivity?._id] &&
+        liveStreaming[currentActivity?._id] === "enable") ||
       (currentActivity !== false &&
         activeInnerTab === "InnerLive" &&
-        liveStreaming === "enable")
-    ) {
+        liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "enable")
+    ) { 
+      leaveRoom(currentActivity?._id);
       setSpinner(false);
       startsharing(
         currentActivity._id,
         currentActivity?.latestActivity?.status
       );
     }
-  }, [liveStreaming]);
-
-  useEffect(() => {
-    if (Object.keys(filters).length > 0 && !showFilter) {
-      filtersRef.current = filters;
-      handleLiveActivityList();
-    }
-  }, [filters]);
-
-  useEffect(() => {
-    if (memberActivities) {
-      setOccupiedRanges(calculateOccupiedRanges(memberActivities));
-    }
-  }, [memberActivities]);
+  }
 
   const calculateOccupiedRanges = (data) => {
     return data.map((item) => {
@@ -523,41 +626,75 @@ function TimeTrackingPage() {
     while (current <= endOfDay) {
       const hours = current.getHours().toString().padStart(2, "0"); // Format hours
       const minutes = current.getMinutes().toString().padStart(2, "0"); // Format minutes
-      slots.push(`${hours}:${minutes}`); // Add formatted time
+      const ampm = hours >= 12 ? "PM" : "AM";
+      slots.push(`${hours}:${minutes} ${ampm}`); // Add formatted time
       current.setMinutes(current.getMinutes() + intervalMinutes); // Increment by interval
     }
     return slots;
   };
 
   // Check if a time slot is occupied
+  // const isTimeSlotOccupied = (time, ranges) => {
+  //   if (!ranges || ranges.length === 0) {
+  //     // If ranges is null, undefined, or empty, return false (time slot is not occupied)
+  //     return false;
+  //   }
+
+  //   // Convert time string (HH:mm) to a Date object on the same day
+  //   const timeDate = new Date();
+  //   const [hours, minutes] = time.split(":");
+  //   timeDate.setHours(hours, minutes, 0, 0); // Set time based on HH:mm
+
+  //   return ranges.some(({ start, end }) => {
+  //     // Convert start time from ISO string to Date object
+  //     const startDate = new Date(start);
+
+  //     // If end time exists, convert it to Date; otherwise, set endDate to null
+  //     const endDate = end ? new Date(end) : null;
+
+  //     // Check if the time falls within the range
+  //     if (endDate) {
+  //       // If there is an end time, check if time is between start and end
+  //       return timeDate >= startDate && timeDate < endDate;
+  //     }
+
+  //     // If there's no end time, check if the time is after the start time
+  //     return timeDate >= startDate;
+  //   });
+  // };
+
   const isTimeSlotOccupied = (time, ranges) => {
-    if (!ranges || ranges.length === 0) {
-      // If ranges is null, undefined, or empty, return false (time slot is not occupied)
-      return false;
+  if (!ranges || ranges.length === 0) {
+    return false; // no ranges → slot is free
+  }
+
+  // Determine base date: timings.date or today
+  const baseDate = timings?.date ? new Date(timings.date) : new Date();
+
+  // Create timeDate from baseDate + HH:mm
+  const [hours, minutes] = time.split(":");
+  const timeDate = new Date(baseDate);
+  timeDate.setHours(hours, minutes, 0, 0);
+
+  return ranges.some(({ start, end }) => {
+    const startTime = new Date(start);
+    const endTime = end ? new Date(end) : null;
+
+    // Normalize start and end to the baseDate
+    const startDate = new Date(baseDate);
+    startDate.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+
+    const endDate = endTime
+      ? new Date(baseDate).setHours(endTime.getHours(), endTime.getMinutes(), 0, 0)
+      : null;
+
+    if (endDate) {
+      return timeDate >= startDate && timeDate < endDate;
     }
+    return timeDate >= startDate;
+  });
+};
 
-    // Convert time string (HH:mm) to a Date object on the same day
-    const timeDate = new Date();
-    const [hours, minutes] = time.split(":");
-    timeDate.setHours(hours, minutes, 0, 0); // Set time based on HH:mm
-
-    return ranges.some(({ start, end }) => {
-      // Convert start time from ISO string to Date object
-      const startDate = new Date(start);
-
-      // If end time exists, convert it to Date; otherwise, set endDate to null
-      const endDate = end ? new Date(end) : null;
-
-      // Check if the time falls within the range
-      if (endDate) {
-        // If there is an end time, check if time is between start and end
-        return timeDate >= startDate && timeDate < endDate;
-      }
-
-      // If there's no end time, check if the time is after the start time
-      return timeDate >= startDate;
-    });
-  };
 
   useEffect(() => {
     const totalTaskDuration = entries.reduce((total, entry) => {
@@ -570,8 +707,31 @@ function TimeTrackingPage() {
     setTotalTaskDuration(totalTaskDuration);
   }, [entries]);
 
+// Helper: normalize any date-like to "YYYY-MM-DD"
+const ymd = (dateLike) => {
+  if (!dateLike) return null;
+  const str = String(dateLike);
+  const m = str.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (m) return m[1]; // already YYYY-MM-DD
+  const d = new Date(dateLike);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString().slice(0, 10);
+};
+
+// Helper: HH:mm on a given date → Date (local)
+  const parseTimeOnDate = (time, dateLike) => {
+    const day = ymd(dateLike);
+    if (!day) return null;
+    const [Y, M, D] = day.split("-").map(Number);
+    const [h, m] = time.split(":").map(Number);
+    return new Date(Y, M - 1, D, h, m, 0, 0);
+  };
+
+
   const handleReportSubmit = async (e) => {
     e.preventDefault();
+    
+
     const errors = entries.map((entry, index) => {
       const entryErrors = {};
 
@@ -586,47 +746,36 @@ function TimeTrackingPage() {
         entryErrors.end_time = "End time is required.";
       }
 
-      // Helper function to convert HH:mm to Date object
-      const parseTime = (time) => {
-        const [hours, minutes] = time.split(":").map(Number);
-        const date = new Date();
-        date.setHours(hours, minutes, 0, 0);
-        return date;
-      };
+      const entryDay = ymd(entry.date);
+      if (entry.start_time && entry.end_time && entryDay) {
+        const currentStart = parseTimeOnDate(entry.start_time, entry.date);
+        const currentEnd   = parseTimeOnDate(entry.end_time, entry.date);
 
-      if (entry.start_time && entry.end_time) {
-        const currentStart = parseTime(entry.start_time);
-        const currentEnd = parseTime(entry.end_time);
-
-        // Validation 3: End time must be greater than start time
         if (currentStart >= currentEnd) {
           entryErrors.end_time = "End time must be greater than start time.";
         }
 
-        // Validation 4: Start and End times should not overlap with other entries
+        // ✅ Only compare with entries on the same YYYY-MM-DD
         entries.forEach((otherEntry, otherIndex) => {
           if (
-            index !== otherIndex &&
+            otherIndex !== index &&
             otherEntry.start_time &&
-            otherEntry.end_time
+            otherEntry.end_time &&
+            ymd(otherEntry.date) === entryDay
           ) {
-            const otherStart = parseTime(otherEntry.start_time);
-            const otherEnd = parseTime(otherEntry.end_time);
+            const otherStart = parseTimeOnDate(otherEntry.start_time, otherEntry.date);
+            const otherEnd   = parseTimeOnDate(otherEntry.end_time, otherEntry.date);
 
-            if (
-              currentStart < otherEnd &&
-              currentEnd > otherStart // Overlap condition
-            ) {
-              entryErrors.start_time =
-                "Time range overlaps with another entry.";
-              entryErrors.end_time = "Time range overlaps with another entry.";
+            if (otherStart && otherEnd && currentStart < otherEnd && currentEnd > otherStart) {
+              entryErrors.start_time = "Time range overlaps with another entry.";
+              entryErrors.end_time   = "Time range overlaps with another entry.";
             }
           }
         });
       }
 
-      return entryErrors;
-    });
+    return entryErrors;
+  });
 
     const hasErrors = errors.some(
       (entryErrors) => Object.keys(entryErrors).length > 0
@@ -635,75 +784,108 @@ function TimeTrackingPage() {
     if (hasErrors) {
       setErrors(errors); // Update the errors state to show errors below each field
       return false; // Prevent form submission
-    } //return false;
-    setErrors([]);
-    setLoader(true);
-    const payload = { entries };
-    dispatch(addManualTime({ ...payload, ...fields }));
+    }else{
+       setErrors([]);
+        setLoader(true);
+        const payload = { entries };
+        
+        dispatch(addManualTime({ ...payload, ...fields }));
+    }
+   
   };
+
+  
 
   useEffect(() => {
     refreshSocket();
     selectboxObserver();
-    handleLiveActivityList();
+    // handleLiveActivityList();
 
     socket.on("receive_record_types", async (record_types = {}) => {
       if (activeTab === "Live") {
-        setLiveStreaming(record_types?.live_streaming || "disabled");
+        // setLiveStreaming(record_types?.live_streaming || "disabled");
+         setLiveStreaming({...liveStreaming, [currentActivity?._id] : record_types?.live_streaming || "disabled"});
       }
     });
 
+    socket.on('streamingError', (roomId, message) => {
+      if(roomId === currentActivity?._id){
+        setStreamError(message)
+      }
+    })
+
     socket.on("trackerstateUpdate", (memberData, status = false) => {
       setRecordedRefresh(false);
+      // setLiveactivities((prevActivities) => {
+      //   if (
+      //     memberData &&
+      //     memberData._id &&
+      //     prevActivities &&
+      //     prevActivities.length > 0
+      //   ) {
+      //     const updatedActivities = prevActivities.map((activity) => {
+      //       if (activity._id === memberData._id) {
+      //         const updatedMemberData = {
+      //           ...memberData,
+      //           latestActivity: {
+      //             ...memberData.latestActivity,
+      //             status: status, // Update the status here
+      //           },
+      //         };
+
+      //         // Merge updatedMemberData with the activity
+      //         return { ...activity, ...updatedMemberData };
+      //       }
+      //       return activity; // Return unchanged activity if no match
+      //     });
+
+      //     return updatedActivities;
+      //   }
+
+      //   // If no update is needed, return the previous state
+      //   return prevActivities;
+      // });
+
       setLiveactivities((prevActivities) => {
-        if (
-          memberData &&
-          memberData._id &&
-          prevActivities &&
-          prevActivities.length > 0
-        ) {
-          const updatedActivities = prevActivities.map((activity) => {
-            if (activity._id === memberData._id) {
-              const updatedMemberData = {
-                ...memberData,
-                latestActivity: {
-                  ...memberData.latestActivity,
-                  status: status, // Update the status here
-                },
-              };
+      if (memberData?._id && prevActivities?.length > 0) {
+        return prevActivities.map((activity) => {
+          if (activity._id === memberData._id) {
+            return {
+              ...activity,
+              ...memberData,
+              latestActivity: {
+                ...activity.latestActivity,
+                ...memberData.latestActivity,
+                status, // always update status
+              },
+            };
+          }
+          return activity;
+        });
+      }
+      return prevActivities;
+    });
 
-              // Merge updatedMemberData with the activity
-              return { ...activity, ...updatedMemberData };
-            }
+    setCurrentActivity((prev) => {
+      if (prev && prev._id === memberData._id) {
+        return {
+          ...prev,
+          ...memberData,
+          latestActivity: {
+            ...prev.latestActivity,
+            ...memberData.latestActivity,
+            status,
+          },
+        };
+      }
+      return prev;
+    });
 
-            setCurrentActivity((prev) => {
-              if (prev && prev._id === memberData._id) {
-                return {
-                  ...prev,
-                  ...memberData,
-                  latestActivity: {
-                    ...prev.latestActivity,
-                    status: status,
-                  },
-                };
-              }
-              return prev; // Return unchanged `currentActivity` if `_id` doesn't match
-            });
-
-            return activity; // Return unchanged activity if no match
-          });
-
-          return updatedActivities;
-        }
-
-        // If no update is needed, return the previous state
-        return prevActivities;
-      });
 
       // handleLiveActivityList() if required
     });
 
-    socket.on("offer", function (id, description, roomId) {
+    socket.on("offer", function (id, description, roomId) { 
       if (peerConnections[id]) {
         peerConnections[id].close();
         delete peerConnections[id];
@@ -746,21 +928,50 @@ function TimeTrackingPage() {
         }
       };
 
-      peerConnections[id].addEventListener("iceconnectionstatechange", () => {
-        if (
-          peerConnections[id].iceConnectionState === "connected" ||
-          peerConnections[id].iceConnectionState === "completed" ||
-          peerConnections[id].iceConnectionState === "disconnected" ||
-          peerConnections[id].iceConnectionState === "failed"
-        ) {
-          if (
-            peerConnections[id].iceConnectionState === "disconnected" ||
-            peerConnections[id].iceConnectionState === "failed"
-          ) {
-            setActSpinner(false);
-          }
+      // peerConnections[id].addEventListener("iceconnectionstatechange", () => {
+      //   if (
+      //     peerConnections[id].iceConnectionState === "connected" ||
+      //     peerConnections[id].iceConnectionState === "completed" ||
+      //     peerConnections[id].iceConnectionState === "disconnected" ||
+      //     peerConnections[id].iceConnectionState === "failed"
+      //   ) {
+      //     if (
+      //       peerConnections[id].iceConnectionState === "disconnected" ||
+      //       peerConnections[id].iceConnectionState === "failed"
+      //     ) {
+      //       setActSpinner(false);
+      //       setSpinner( false)
+      //     }
+      //   }
+      // });
+
+      peerConnections[id].onconnectionstatechange = () => {
+        console.log('Connection state changed:', peerConnections[id].connectionState);
+        if( peerConnections[id].connectionState === 'failed' || peerConnections[id].connectionState === 'disconnected'){
+          setStreamError("Unable to connect with the desktop app. Please try later.");
+          setActSpinner( false )
+          socket.emit('tracker-status-update', {userID: currentActivity?._id, status: false });
+        }else if(peerConnections[id].connectionState === 'connected'){
+          setStreamError("");
         }
-      });
+      };
+      // peerConnections[id].addEventListener("iceconnectionstatechange", () => {
+      //   const state = peerConnections[id].iceConnectionState;
+      //   console.log('current state:: ', state)
+      //   // Handle all relevant states
+      //   if (["connected", "completed", "disconnected", "failed"].includes(state)) {
+      //     // Stop spinners if disconnected or failed
+      //     if (["disconnected", "failed","completed"].includes(state)) {
+      //       setActSpinner(false);
+      //       setSpinner(false);
+      //     }
+      //   }
+      // });
+
+      peerConnections[id].oniceconnectionstatechange = () => {
+          console.log('ICE connection state changed:', peerConnections[id].iceConnectionState);
+      };
+
     });
 
     socket.on("candidate", function (id, candidate, roomId) {
@@ -772,19 +983,34 @@ function TimeTrackingPage() {
       }
     });
 
-    setSpinner(true);
+    // Fires if connection fails
+    socket.on("connect_error", (err) => {
+      console.error("❌ Connection failed:", err.message);
+    });
+
+    // Fires when disconnected
+    socket.on("disconnect", (reason) => {
+      console.log("⚡ Disconnected:", reason);
+    });
+
+    // setSpinner(true);
 
     setInterval(function () {
-      handleLiveActivityList();
+      handleLiveActivityListInterval();
     }, 60000);
 
-    memberTodaysActivity();
+    memberTodaysActivity([new Date().toISOString().split("T")[0]]);
   }, []);
 
   useEffect(() => {
+    setTimeout(() => {
+      setActSpinner(false);
+      setSpinner( false )
+    }, 1000);
+    
     if (activitystate?.liveactivities?.memberData) {
       setLiveactivities(activitystate.liveactivities.memberData);
-      if (currentActivity && activeTab === "Live") {
+      if (currentActivity && activeTab === "Live" && activeInnerTab !== 'InnerLive') {
         const updatedActivity = activitystate.liveactivities.memberData.find(
           (m) => m._id.toString() === currentActivity._id.toString()
         );
@@ -830,12 +1056,20 @@ function TimeTrackingPage() {
     });
   }, [liveactivities]);
 
+  // Debounced search handler
+    const debouncedUpdateSearch = useMemo(
+    () =>
+      debounce((value) => {
+        setFilters((prev) => ({ ...prev, search: value }));
+      }, 1000), // 1 sec debounce
+    []
+  );
+
   const handlefilterchange = (name, value) => {
-    if (
-      (name === "search" && value === "") ||
-      (name === "search" && value.length > 1) ||
-      name !== "search"
-    ) {
+    if (name === "search") {
+      // only debounce search
+      debouncedUpdateSearch(value);
+    } else  {
       setFilters({ ...filters, [name]: value });
     }
   };
@@ -856,6 +1090,7 @@ function TimeTrackingPage() {
       project_title: selectedproject?.title,
       start_time: timings?.start_time,
       end_time: timings?.end_time,
+      date: timings?.date
     });
 
     setEntries(updatedEntries);
@@ -915,13 +1150,16 @@ function TimeTrackingPage() {
   useEffect(() => {
     selectboxObserver();
     setFilters({ ...filters, ["status"]: activeTab.toLowerCase() });
-    if (activeTab !== "Recordings") {
-      handleLiveActivityList();
-    }
+    // if (activeTab.toLowerCase() !== "recordings") {
+    //   handleLiveActivityList();
+    // }
   }, [activeTab]);
 
   useEffect(() => {
+    setActSpinner( false );
+    setSpinner( false)
     if (activeInnerTab === "InnerRecorded" && currentActivity) {
+      setRecordedActivities([])
       handleRecordedActivity();
     }
   }, [activeInnerTab]);
@@ -958,9 +1196,12 @@ function TimeTrackingPage() {
     }
   };
 
-  // useEffect(() => {
-  //   handleRecordedActivity();
-  // }, [screenshotTab])
+  useEffect(() => {
+    setTimeout(() => {
+      setActSpinner(false);
+      setSpinner( false )
+    }, 700);
+  }, [screenshotTab])
 
   const handleRemoveEntry = (index) => {
     setEntries(entries.filter((_, i) => i !== index));
@@ -984,6 +1225,7 @@ function TimeTrackingPage() {
       setWorkflow(project.workflow.tabs[0]?._id);
     }
     setFilteredTasks([]);
+    setSelectedTask({})
     await dispatch(ListTasks(project?._id));
     await dispatch(getSingleProjectReport(project?._id));
   };
@@ -1021,11 +1263,11 @@ function TimeTrackingPage() {
           <Button
             variant="primary"
             onClick={() => {
-              if (isActive) {
+              if (isActive === true) {
                 handleRecordedActivity();
               } else {
                 setIsPickerOpen(false);
-                handleLiveActivityList();
+                handleFilteredLiveActivityList();
               }
             }}
             className="date-filter-btn me-1"
@@ -1192,6 +1434,9 @@ function TimeTrackingPage() {
               key={"date-custom"}
               onClick={(e) => {
                 setSelectedFilter("custom");
+                setTimeout(() => {
+                  setFilteredDate([])
+                }, 700);
               }}
             >
               Custom
@@ -1217,6 +1462,7 @@ function TimeTrackingPage() {
               />
             </Form.Group>
             {selectedFilter === "custom" && (
+              <>
               <Form.Group className="mb-0 form-group ms-2">
                 <DatePicker
                   key={"date-filter"}
@@ -1255,6 +1501,74 @@ function TimeTrackingPage() {
                   plugins={[<FilterButton position="bottom" />]}
                 />
               </Form.Group>
+              {/* <Form.Group className="mb-0 form-group ms-2">
+                <DatePicker
+                  key={"date-filter-from"}
+                  ref={datePickerRef}
+                  name="from_date"
+                  weekStartDayIndex={1}
+                  id="datepicker-filter-from"
+                  value={filtereddate[0] || ""}
+                  format="YYYY-MM-DD"
+                  multiple={false}
+                  editable={false}
+                  numberOfMonths={1}
+                  onChange={(value) => {
+                    const formatDate = (date) => {
+                      const d = new Date(date);
+                      const year = d.getFullYear();
+                      const month = String(d.getMonth() + 1).padStart(2, "0");
+                      const day = String(d.getDate()).padStart(2, "0");
+                      return `${year}-${month}-${day}`;
+                    };
+
+                    const fromDate = formatDate(value);
+                    setFilteredDate([fromDate, filtereddate[1] || ""]);
+                  }}
+                  className="form-control"
+                  placeholder="From date"
+                  open={isPickerOpen}
+                  onOpen={() => setIsPickerOpen(true)}
+                  onClose={() => setIsPickerOpen(false)}
+                  plugins={[<FilterButton position="bottom" />]}
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-0 form-group ms-2">
+                <DatePicker
+                  key={"date-filter-to"}
+                  ref={datePickerRefto}
+                  name="to_date"
+                  weekStartDayIndex={1}
+                  id="datepicker-filter-to"
+                  value={filtereddate[1] || ""}
+                  format="YYYY-MM-DD"
+                  multiple={false}
+                  numberOfMonths={1}
+                  editable={false}
+                  minDate={filtereddate[0] || null} // ✅ To-date cannot be before from-date
+                  onChange={(value) => {
+                    const formatDate = (date) => {
+                      const d = new Date(date);
+                      const year = d.getFullYear();
+                      const month = String(d.getMonth() + 1).padStart(2, "0");
+                      const day = String(d.getDate()).padStart(2, "0");
+                      return `${year}-${month}-${day}`;
+                    };
+
+                    const toDate = formatDate(value);
+                    setFilteredDate([filtereddate[0] || "", toDate]);
+                  }}
+                  className="form-control"
+                  placeholder="To date"
+                  open={isPickerOpen}
+                  onOpen={() => setIsPickerOpen(true)}
+                  onClose={() => setIsPickerOpen(false)}
+                  plugins={[<FilterButton position="bottom" />]}
+                />
+              </Form.Group> */}
+
+              </>
             )}
           </Form>
         </ListGroup.Item>
@@ -1398,6 +1712,7 @@ function TimeTrackingPage() {
                             setCurrentActivity(cact);
                           }
                           setActiveTab("Live");
+                          setActiveInnerTab('InnerLive')
                         }}
                       >
                         <FiMonitor className="me-1" /> Live
@@ -1406,7 +1721,10 @@ function TimeTrackingPage() {
                         action
                         active={activeTab === "Recordings"}
                         onClick={() => {
+                          setActSpinner(false);
+                          setSpinner(false)
                           setActiveTab("Recordings");
+                          setActiveInnerTab('InnerRecorded')
                         }}
                       >
                         <FiVideo className="me-1" /> Recorded
@@ -1445,6 +1763,8 @@ function TimeTrackingPage() {
                           <MdOutlineSearch />
                           <Form.Control
                             type="text"
+                            ref={inputRef}
+                            readOnly={spinner}
                             name="search"
                             placeholder="Search by name"
                             onChange={(event) =>
@@ -1466,7 +1786,7 @@ function TimeTrackingPage() {
                             Manual Time
                           </Dropdown.Item>
                           {memberProfile?.permissions?.reports
-                            ?.update_manual_time && (
+                            ?.update_manual_time === true && (
                             <Dropdown.Item
                               onClick={handleNewShow}
                               to="/manual-time"
@@ -1491,7 +1811,7 @@ function TimeTrackingPage() {
                         <GrExpand />
                       </ListGroup.Item>
                       <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
-                        <BsArrowClockwise onClick={handleLiveActivityList} />
+                        <BsArrowClockwise onClick={() => {handleLiveActivityList()}} />
                       </ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
@@ -1503,7 +1823,7 @@ function TimeTrackingPage() {
         <div className="page--wrapper px-md-2 pb-4 pt-4 daily--reports activity--table">
           {spinner ? (
             <div className="loading-bar">
-              <img src="images/OnTeam-icon.png" className="flipchar" />
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           ) : (
             <Container fluid>
@@ -1562,237 +1882,230 @@ function TimeTrackingPage() {
                   {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
                   <div className="attendance--table activity--table--list mb-0">
                     <div className="attendance--table--list">
-                      <Table>
-                        <thead className="onHide">
-                          <tr key="project-table-header">
-                            <th
-                              scope="col"
-                              className="sticky pe-0 py-0"
-                              key="project-name-header"
-                            >
-                              <FiUsers className="me-1" /> Member
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-pname-header"
-                              className="onHide text-start"
-                            >
-                              <FiBriefcase className="me-1" /> Project Name
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-project-header"
-                              className="onHide ms-auto"
-                            >
-                              <LuTimer className="me-1" /> Project Time
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-time-header"
-                              className="onHide"
-                            >
-                              <FiClock className="me-1" /> Total Time
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-status-header"
-                              className="onHide"
-                            >
-                              <GoPulse className="me-1" /> Status
-                            </th>
-                            <th
-                              scope="col"
-                              key="live-client-action-header"
-                              className="onHide"
-                            >
-                              <FiTarget className="me-1" /> Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {liveactivities.length > 0
-                            ? liveactivities.map((activity, index) => {
-                                // totalhours += Number(activity?.totalTaskDuration || 0)
-                                // totalProjecthours += Number(activity?.latestActivity?.duration || 0)
-                                return (
-                                  <>
-                                    <tr
-                                      key={`activity-row-${index}`}
-                                      className={
-                                        currentActivity &&
-                                        currentActivity?._id === activity._id
-                                          ? "project--active"
-                                          : ""
-                                      }
+                      {liveactivities.length > 0 ? (
+                        <Table>
+                          <thead className="onHide">
+                            <tr key="project-table-header">
+                              <th
+                                scope="col"
+                                className="sticky pe-0 py-0"
+                                key="project-name-header"
+                              >
+                                <FiUsers className="me-1" /> Member
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-pname-header"
+                                className="onHide text-start"
+                              >
+                                <FiBriefcase className="me-1" /> Project Name
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-project-header"
+                                className="onHide ms-auto"
+                              >
+                                <LuTimer className="me-1" /> Current Session
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-time-header"
+                                className="onHide"
+                              >
+                                <FiClock className="me-1" /> Total Time
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-status-header"
+                                className="onHide"
+                              >
+                                <GoPulse className="me-1" /> Status
+                              </th>
+                              <th
+                                scope="col"
+                                key="live-client-action-header"
+                                className="onHide"
+                              >
+                                <FiTarget className="me-1" /> Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {liveactivities.map((activity, index) => {
+                              // totalhours += Number(activity?.totalTaskDuration || 0)
+                              // totalProjecthours += Number(activity?.latestActivity?.duration || 0)
+                              return (
+                                <>
+                                  <tr
+                                    key={`activity-row-${index}`}
+                                    className={
+                                      currentActivity &&
+                                      currentActivity?._id === activity._id
+                                        ? "project--active"
+                                        : ""
+                                    }
+                                  >
+                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                    <td
+                                      data-label="Member Name"
+                                      className="project--title--td"
+                                      onClick={() => {
+                                        if (
+                                          isActive &&
+                                          activeInnerTab !== "InnerRecorded"
+                                        ) {
+                                          leaveRoom(currentActivity?._id);
+                                          socket.emit(
+                                            "get-tracker-status-update",
+                                            { userID: activity._id }
+                                          );
+                                          setCurrentActivity(activity);
+                                        } else if (
+                                          activeInnerTab === "InnerRecorded"
+                                        ) {
+                                          setRecordedRefresh(true);
+                                          setCurrentActivity(activity);
+                                          // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
+                                        }
+                                      }}
                                     >
-                                      {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                      <td
-                                        data-label="Member Name"
-                                        className="project--title--td"
-                                        onClick={() => {
-                                          if (
-                                            isActive &&
-                                            activeInnerTab !== "InnerRecorded"
-                                          ) {
-                                            leaveRoom(currentActivity?._id);
-                                            socket.emit(
-                                              "get-tracker-status-update",
-                                              { userID: activity._id }
-                                            );
-                                            setCurrentActivity(activity);
-                                          } else if (
-                                            activeInnerTab === "InnerRecorded"
-                                          ) {
-                                            setRecordedRefresh(true);
-                                            setCurrentActivity(activity);
-                                            // await dispatch(getRecoredActivity(currentActivity._id, 'recorded'))
-                                          }
-                                        }}
-                                      >
-                                        <div className="d-flex justify-content-between">
-                                          <div className="project--name d-flex gap-3 align-items-center">
-                                            <div className="drag--indicator">
-                                              <abbr>{index + 1}</abbr>
-                                              <MdDragIndicator />
-                                            </div>
-                                            <div className="title--initial">
-                                              {activity?.avatar &&
-                                              activity?.avatar !== null ? (
-                                                <span>
-                                                  <img
-                                                    src={activity?.avatar}
-                                                    alt={"member-avatar"}
-                                                  />
-                                                </span>
-                                              ) : (
-                                                activity.name.charAt(0)
-                                              )}
-                                              {activity?.latestActivity
-                                                ?.status ? (
+                                      <div className="d-flex justify-content-between">
+                                        <div className="project--name d-flex gap-3 align-items-center">
+                                          <div className="drag--indicator">
+                                            <abbr>{index + 1}</abbr>
+                                          </div>
+                                          <div className="title--initial">
+                                            {activity?.avatar &&
+                                            activity?.avatar !== null ? (
+                                              <span>
+                                                <img
+                                                  src={activity?.avatar}
+                                                  alt={"member-avatar"}
+                                                />
+                                              </span>
+                                            ) : (
+                                              activity?.name?.charAt(0)
+                                            )}
+                                            {activity?.latestActivity
+                                              ?.status ? (
+                                              <p className="anim--circle">
                                                 <small className="status--circle active--color"></small>
-                                              ) : activity?.latestActivity
-                                                  ?.status === false ? (
+                                              </p>
+                                            ) : activity?.latestActivity
+                                                ?.status === false ? (
+                                              <p className="anim--circle">
                                                 <small className="status--circle idle--color"></small>
-                                              ) : (
+                                              </p>
+                                            ) : (
+                                              <p className="anim--circle">
                                                 <small className="status--circle inactive--color"></small>
+                                              </p>
+                                            )}
+                                          </div>
+                                          <div className="title--span flex-column d-flex align-items-start gap-0">
+                                            <span>{activity.name}</span>
+                                            <strong
+                                              key={`project-title-${activity?._id}`}
+                                              className="project--title--td"
+                                            >
+                                              {activity?.role?.name || (
+                                                <FiClock className="text-muted" />
                                               )}
-                                            </div>
-                                            <div className="title--span flex-column d-flex align-items-start gap-0">
-                                              <span>{activity.name}</span>
-                                              <strong
-                                                key={`project-title-${activity?._id}`}
-                                                className="project--title--td"
-                                              >
-                                                {activity?.role?.name || (
-                                                  <FiClock className="text-muted" />
-                                                )}
-                                              </strong>
-                                            </div>
+                                            </strong>
                                           </div>
                                         </div>
-                                      </td>
-                                      <td className="text-start">
-                                        <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                          Project Name
-                                        </strong>
-                                        <span
-                                          key={`project-title-${activity?._id}`}
-                                          className="project--title--td"
-                                        >
-                                          {activity?.latestActivity?.project
-                                            ?.title || (
-                                            <FiClock className="text-muted" />
-                                          )}
-                                        </span>
-                                      </td>
-                                      <td className="ms-auto text-start text-xl-center">
-                                        <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                          Project Time
-                                        </strong>
-                                        <div
-                                          key={`task-time-${activity?._id}`}
-                                          className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"
-                                        >
-                                          <LuTimer className="me-1" />{" "}
-                                          {convertSecondstoTime(
-                                            activity?.latestActivity
-                                              ?.duration || 0
-                                          ) || "00:00"}
-                                        </div>
-                                      </td>
-                                      <td
-                                        className="text-start text-xl-center"
-                                        key={`total-time-${activity?._id}`}
+                                      </div>
+                                    </td>
+                                    <td className="text-start">
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                        Project Name
+                                      </strong>
+                                      <span
+                                        key={`project-title-${activity?._id}`}
+                                        className="project--title--td"
                                       >
-                                        <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                          Total Time
-                                        </strong>
-                                        <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
-                                          <FiClock className="me-1" />{" "}
-                                          {convertSecondstoTime(
-                                            activity?.totalDuration || 0
-                                          ) || "00:00"}
-                                        </span>
-                                      </td>
-                                      <td
-                                        key={`status-title-${activity?._id}`}
-                                        className="onHide"
-                                      >
-                                        {activity?.latestActivity?.status ? (
-                                          <Badge bg="success">
-                                            <FaPlay /> Active
-                                          </Badge>
-                                        ) : activity?.latestActivity?.status ===
-                                          false ? (
-                                          <Badge bg="warning">
-                                            <FiCoffee /> Break
-                                          </Badge>
-                                        ) : (
-                                          <Badge bg="secondary">
-                                            <FiPause /> Inactive
-                                          </Badge>
+                                        {activity?.latestActivity?.project
+                                          ?.title || (
+                                          <FiClock className="text-muted" />
                                         )}
-                                      </td>
-                                      <td
-                                        key={`view-act-${activity?._id}`}
-                                        className="onHide text-lg-end"
+                                      </span>
+                                    </td>
+                                    <td className="ms-md-auto text-start text-xl-center">
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                        Project Time
+                                      </strong>
+                                      <div
+                                        key={`task-time-${activity?._id}`}
+                                        className="onHide project--time--badge px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center"
                                       >
-                                        <Button
-                                          variant="dark"
-                                          onClick={() => {
-                                            handleClick(activity);
-                                          }}
-                                        >
-                                          <FaEye /> Details
-                                        </Button>
-                                      </td>
-                                    </tr>
-                                  </>
-                                );
-                              })
-                            : !spinner &&
-                              liveactivities.length === 0 && (
-                                <tr key={`noresults-row`}>
-                                  <td colSpan={8} className="text-center">
-                                    <h3>No Results</h3>{" "}
-                                  </td>
-                                </tr>
-                              )}
-                          {/* <tr className="onHide bg-light mobile--hide" key={'hiddenkey'}>
-                          <td></td>
-                          <td></td>
-                          <td><strong>Total Hours</strong></td>
-                          <td><strong>
-                            { formatTime(totalProjecthours) || '00:00'}
-                            </strong></td>
-                          <td><strong>
-                           { formatTime(totalhours) || '00:00'}
-                            </strong></td>
-                          <td></td>
-                          <td></td>
-                        </tr> */}
-                        </tbody>
-                      </Table>
+                                        <LuTimer className="me-1" />{" "}
+                                        {convertSecondstoTime(
+                                          activity?.latestActivity?.duration ||
+                                            0
+                                        ) || "00:00"}
+                                      </div>
+                                    </td>
+                                    <td
+                                      className="text-start text-xl-center"
+                                      key={`total-time-${activity?._id}`}
+                                    >
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                        Total Time
+                                      </strong>
+                                      <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
+                                        <FiClock className="me-1" />{" "}
+                                        {convertSecondstoTime(
+                                          activity?.totalDuration || 0
+                                        ) || "00:00"}
+                                      </span>
+                                    </td>
+                                    <td
+                                      key={`status-title-${activity?._id}`}
+                                      className="onHide"
+                                    >
+                                      {activity?.latestActivity?.status ? (
+                                        <Badge bg="success">
+                                          <FaPlay /> Active
+                                        </Badge>
+                                      ) : activity?.latestActivity?.status ===
+                                        false ? (
+                                        <Badge bg="warning">
+                                          <FiCoffee /> Break
+                                        </Badge>
+                                      ) : (
+                                        <Badge bg="secondary">
+                                          <FiPause /> Inactive
+                                        </Badge>
+                                      )}
+                                    </td>
+                                    <td
+                                      key={`view-act-${activity?._id}`}
+                                      className="onHide text-lg-end"
+                                    >
+                                      <Button
+                                        variant="dark"
+                                        onClick={() => {
+                                          setActiveInnerTab("InnerLive");
+                                          handleClick(activity);
+                                        }}
+                                      >
+                                        <FaEye /> Details
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                </>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      ) : (
+                        !spinner &&
+                        liveactivities.length === 0 && (
+                          <div className="text-center">
+                            <h2>No Results</h2>{" "}
+                          </div>
+                        )
+                      )}
                     </div>
                   </div>
                 </>
@@ -1802,165 +2115,168 @@ function TimeTrackingPage() {
                   {/* <p className="d-flex d-lg-none">Total Hours <strong className="ms-auto">50 Hrs</strong></p> */}
                   <div className="attendance--table activity--table--list mb-0">
                     <div className="attendance--table--list">
-                      <Table>
-                        <thead className="onHide">
-                          <tr key="project-table-header-recordings">
-                            <th
-                              scope="col"
-                              className="sticky pe-0 py-0"
-                              key="record-project-name-header"
-                            >
-                              <FiUsers className="me-1" /> Member
-                            </th>
-                            {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
-                            <th
-                              scope="col"
-                              key="record-client-time-header"
-                              className="onHide ms-auto"
-                            >
-                              <FiClock className="me-1" /> Total Time
-                            </th>
-                            <th
-                              scope="col"
-                              key="record-client-action-header"
-                              className="onHide"
-                            >
-                              <FiTarget className="me-1" /> Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {liveactivities.length > 0
-                            ? liveactivities.map((activity, index) => {
-                                totalhours += Number(
-                                  activity?.totalTaskDuration || 0
-                                );
+                      {liveactivities.length > 0 ? (
+                        <Table>
+                          <thead className="onHide">
+                            <tr key="project-table-header-recordings">
+                              <th
+                                scope="col"
+                                className="sticky pe-0 py-0"
+                                key="record-project-name-header"
+                              >
+                                <FiUsers className="me-1" /> Member
+                              </th>
+                              {/* <th scope="col" key="client-time-header" className="onHide text-start"><FiBriefcase className="me-1" /> Project Name</th> */}
+                              <th
+                                scope="col"
+                                key="record-client-time-header"
+                                className="onHide ms-auto"
+                              >
+                                <FiClock className="me-1" /> Total Time
+                              </th>
+                              <th
+                                scope="col"
+                                key="record-client-action-header"
+                                className="onHide"
+                              >
+                                <FiTarget className="me-1" /> Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {liveactivities.map((activity, index) => {
+                              totalhours += Number(
+                                activity?.totalTaskDuration || 0
+                              );
 
-                                return (
-                                  <>
-                                    <tr
-                                      key={`activity-row-${index}`}
-                                      className={
-                                        currentActivity &&
-                                        currentActivity?._id === activity._id
-                                          ? "active"
-                                          : ""
-                                      }
+                              return (
+                                <>
+                                  <tr
+                                    key={`recording-activity-row-${index}`}
+                                    className={
+                                      currentActivity &&
+                                      currentActivity?._id === activity._id
+                                        ? "active"
+                                        : ""
+                                    }
+                                  >
+                                    {/* <td key={`index-${index}`}>{index + 1} </td> */}
+                                    <td
+                                      data-label="Member Name"
+                                      className="project--title--td"
+                                      onClick={() => {
+                                        // if (isActive) {
+                                        //   setCurrentActivity(activity);
+                                        // }
+                                        if (
+                                          (isActive &&
+                                            activeInnerTab !==
+                                              "InnerRecorded") ||
+                                          (isActive &&
+                                            activeTab !== "Recordings")
+                                        ) {
+                                          leaveRoom(currentActivity?._id);
+                                          socket.emit(
+                                            "get-tracker-status-update",
+                                            { userID: activity._id }
+                                          );
+                                          setCurrentActivity(activity);
+                                        } else if (
+                                          activeInnerTab === "InnerRecorded" ||
+                                          activeTab === "Recordings"
+                                        ) {
+                                          setRecordedRefresh(true);
+                                          setCurrentActivity(activity);
+                                        }
+                                      }}
                                     >
-                                      {/* <td key={`index-${index}`}>{index + 1} </td> */}
-                                      <td
-                                        data-label="Member Name"
-                                        className="project--title--td"
-                                        onClick={() => {
-                                          // if (isActive) {
-                                          //   setCurrentActivity(activity);
-                                          // }
-                                          if (
-                                            (isActive &&
-                                              activeInnerTab !==
-                                                "InnerRecorded") ||
-                                            (isActive &&
-                                              activeTab !== "Recordings")
-                                          ) {
-                                            leaveRoom(currentActivity?._id);
-                                            socket.emit(
-                                              "get-tracker-status-update",
-                                              { userID: activity._id }
-                                            );
-                                            setCurrentActivity(activity);
-                                          } else if (
-                                            activeInnerTab ===
-                                              "InnerRecorded" ||
-                                            activeTab === "Recordings"
-                                          ) {
-                                            setRecordedRefresh(true);
-                                            setCurrentActivity(activity);
-                                          }
-                                        }}
-                                      >
-                                        <div className="d-flex justify-content-between">
-                                          <div className="project--name d-flex gap-3 align-items-center">
-                                            <div className="drag--indicator"><abbr>{index + 1}</abbr></div>
-                                            <div className="drag--indicator">
-                                              <abbr>{index + 1}</abbr>
-                                              <MdDragIndicator />
-                                            </div>
-                                            <div className="title--initial">
-                                              {activity?.avatar &&
-                                              activity?.avatar !== null ? (
-                                                <span>
-                                                  <img
-                                                    src={activity?.avatar}
-                                                    alt={"member-avatar"}
-                                                  />
-                                                </span>
-                                              ) : (
-                                                activity.name.charAt(0)
-                                              )}
-                                              {activity?.latestActivity
-                                                ?.status ? (
+                                      <div className="d-flex justify-content-between">
+                                        <div className="project--name d-flex gap-3 align-items-center">
+                                          <div className="drag--indicator">
+                                            <abbr>{index + 1}</abbr>
+                                          </div>
+                                          <div className="title--initial">
+                                            {activity?.avatar &&
+                                            activity?.avatar !== null ? (
+                                              <span>
+                                                <img
+                                                  src={activity?.avatar}
+                                                  alt={"member-avatar"}
+                                                />
+                                              </span>
+                                            ) : (
+                                              activity?.name?.charAt(0)
+                                            )}
+                                            {activity?.latestActivity
+                                              ?.status ? (
+                                              <p className="anim--circle">
                                                 <small className="status--circle active--color"></small>
-                                              ) : activity?.latestActivity
-                                                  ?.status === false ? (
+                                              </p>
+                                            ) : activity?.latestActivity
+                                                ?.status === false ? (
+                                              <p className="anim--circle">
                                                 <small className="status--circle idle--color"></small>
-                                              ) : (
+                                              </p>
+                                            ) : (
+                                              <p className="anim--circle">
                                                 <small className="status--circle inactive--color"></small>
-                                              )}
-                                            </div>
-                                            <div className="title--span flex-column d-flex align-items-start gap-0">
-                                              <span>{activity.name}</span>
-                                              <strong
-                                                key={`project-title-${activity?._id}`}
-                                                className="project--title--td"
-                                              >
-                                                {activity?.role?.name || ""}
-                                              </strong>
-                                            </div>
+                                              </p>
+                                            )}
+                                          </div>
+                                          <div className="title--span flex-column d-flex align-items-start gap-0">
+                                            <span>{activity.name}</span>
+                                            <strong
+                                              key={`project-title-${activity?._id}`}
+                                              className="project--title--td"
+                                            >
+                                              {activity?.role?.name || ""}
+                                            </strong>
                                           </div>
                                         </div>
-                                      </td>
-                                      {/* <td className="text-start">
+                                      </div>
+                                    </td>
+                                    {/* <td className="text-start">
                                       <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">Project Name</strong>
                                       
                                     </td> */}
-                                      <td
-                                        className="text-start text-xl-center ms-auto"
-                                        key={`total-time-${activity?._id}`}
+                                    <td
+                                      className="text-start text-xl-center ms-md-auto"
+                                      key={`total-time-${activity?._id}`}
+                                    >
+                                      <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
+                                        Total Time
+                                      </strong>
+                                      <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
+                                        <FiClock className="me-1" />{" "}
+                                        {convertSecondstoTime(
+                                          activity?.totalDuration || 0
+                                        ) || "00:00"}
+                                      </span>
+                                    </td>
+                                    <td className="onHide text-lg-end">
+                                      <Button
+                                        variant="dark"
+                                        onClick={() => {
+                                          handleClick(activity);
+                                        }}
                                       >
-                                        <strong className="d-inline-flex text-uppercase fs-small d-xl-none mb-1">
-                                          Total Time
-                                        </strong>
-                                        <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
-                                          <FiClock className="me-1" />{" "}
-                                          {convertSecondstoTime(
-                                            activity?.totalTaskDuration || 0
-                                          ) || "00:00"}
-                                        </span>
-                                      </td>
-                                      <td className="onHide text-lg-end">
-                                        <Button
-                                          variant="dark"
-                                          onClick={() => {
-                                            handleClick(activity);
-                                          }}
-                                        >
-                                          <FaEye /> Details
-                                        </Button>
-                                      </td>
-                                    </tr>
-                                  </>
-                                );
-                              })
-                            : !spinner &&
-                              liveactivities.length === 0 && (
-                                <tr key={`noresults-row`}>
-                                  <td colSpan={8} className="text-center">
-                                    <h3>No Results</h3>{" "}
-                                  </td>
-                                </tr>
-                              )}
-                        </tbody>
-                      </Table>
+                                        <FaEye /> Details
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                </>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      ) : (
+                        !spinner &&
+                        liveactivities.length === 0 && (
+                          <div className="text-center">
+                            <h2>No Results</h2>
+                          </div>
+                        )
+                      )}
                     </div>
                   </div>
                 </>
@@ -1987,11 +2303,17 @@ function TimeTrackingPage() {
                   <div className="title--initial">
                     {currentActivity?.name?.charAt(0)}
                     {currentActivity?.latestActivity?.status ? (
-                      <small className="status--circle active--color"></small>
+                      <p className="anim--circle">
+                        <small className="status--circle active--color"></small>
+                      </p>
                     ) : currentActivity?.latestActivity?.status === false ? (
-                      <small className="status--circle idle--color"></small>
+                      <p className="anim--circle">
+                        <small className="status--circle idle--color"></small>
+                      </p>
                     ) : (
-                      <small className="status--circle inactive--color"></small>
+                      <p className="anim--circle">
+                        <small className="status--circle inactive--color"></small>
+                      </p>
                     )}
                   </div>
                   <div className="title--span flex-column align-items-start gap-0">
@@ -2017,7 +2339,20 @@ function TimeTrackingPage() {
                             }
                           >
                             <div className="title--initial">
-                              {activity?.name.charAt(0)}
+                              {activity?.name?.charAt(0)}
+                               {activity?.latestActivity?.status ? (
+                                  <p className="anim--circle">
+                                    <small className="status--circle active--color"></small>
+                                  </p>
+                                ) : activity?.latestActivity?.status === false ? (
+                                  <p className="anim--circle">
+                                    <small className="status--circle idle--color"></small>
+                                  </p>
+                                ) : (
+                                  <p className="anim--circle">
+                                    <small className="status--circle inactive--color"></small>
+                                  </p>
+                                )}
                             </div>
                             <div className="title--span flex-column align-items-start gap-0">
                               <strong>{activity?.name}</strong>
@@ -2045,10 +2380,12 @@ function TimeTrackingPage() {
                     if (currentActivity && Object.keys(currentActivity)) {
                       const cact = currentActivity;
                       leaveRoom(currentActivity?._id);
-                      startsharing(
-                        currentActivity?._id,
-                        currentActivity?.latestActivity?.status
-                      );
+                      setTimeout(() => {
+                        startsharing(
+                          currentActivity?._id,
+                          currentActivity?.latestActivity?.status
+                        );
+                      }, 700);
                     }
                   }}
                 >
@@ -2091,7 +2428,7 @@ function TimeTrackingPage() {
                   <GrExpand />
                 </ListGroup.Item>
                 <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
-                  <BsArrowClockwise onClick={handleRecordedActivity} />
+                  <BsArrowClockwise onClick={() => {handleRecordedActivity()}} />
                 </ListGroup.Item>
                 <ListGroup.Item
                   className="btn btn-primary"
@@ -2101,6 +2438,11 @@ function TimeTrackingPage() {
                     setCurrentActivity(false);
                     setIsActive(false);
                     dispatch(toggleSidebarSmall(false));
+                    if(activeInnerTab === "InnerLive"){
+                      setActiveTab('Live')
+                    }else{
+                      setActiveTab("Recordings");
+                    }
                   }}
                 >
                   <MdOutlineClose />
@@ -2115,9 +2457,9 @@ function TimeTrackingPage() {
                 : "rounded--box activity--box"
             }
           >
-            {activityspinner && (
+            {(activityspinner) && (
               <div className="loading-bar">
-                <img src="images/OnTeam-icon.png" className="flipchar" />
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
             )}
             {activeInnerTab === "InnerLive" && (
@@ -2141,14 +2483,14 @@ function TimeTrackingPage() {
                         )}
                       </small>
                     </h5>
-                    <span className="ms-md-3">
+                    {/* <span className="ms-md-3">
                       {currentActivity?.latestActivity?.app_version}
-                    </span>
+                    </span> */}
                     <p className="task--timer">
                       <span>
                         <strong>
                           {convertSecondstoTime(
-                            currentActivity?.totalTaskDuration
+                            currentActivity?.totalDuration
                           ) || "00:00"}
                         </strong>
                       </span>
@@ -2181,7 +2523,17 @@ function TimeTrackingPage() {
                       </Button>
                     </div>
                   </div>
-                  {liveStreaming === "disabled" ? (
+                 
+                  {
+                    currentActivity?.latestActivity?.status === false ? (
+                      <p className="text-center">The member is on break.</p>
+                    )
+                    :
+                    (streamError !== "") ? (
+                        <p className="text-center">{streamError}</p>
+                      )
+                    :
+                  liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "disabled" ? (
                     <p className="text-center">Live streaming is disabled.</p>
                   ) : currentActivity?.latestActivity?.status ? (
                     <video
@@ -2191,18 +2543,20 @@ function TimeTrackingPage() {
                       className="video"
                       onLoadedData={() => {
                         setActSpinner(false);
+                        setStreamError("")
                       }}
                       preload="auto"
                       autoPlay
                       muted
+                      onError={() => setStreamError("Live stream failed to load")}
                     >
-                      video not available
+                      Live video is not available right now.
                     </video>
                   ) : currentActivity?.latestActivity?.status === false ? (
-                    <p className="text-center">The member is paused</p>
+                    <p className="text-center">The member is on break.</p>
                   ) : (
                     <p className="text-center">
-                      Member is not currently active
+                      The member is not currently active.
                     </p>
                   )}
                 </div>
@@ -2223,28 +2577,27 @@ function TimeTrackingPage() {
                                 <h4 className="d-flex align-items-center gap-3 justify-content-between">
                                   <strong>
                                     <span>
-                                      <svg
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        strokeLinejoin="round"
-                                        className="lucide lucide-building2 w-4 h-4 text-blue-600"
-                                      >
-                                        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path>
-                                        <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path>
-                                        <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path>
-                                        <path d="M10 6h4"></path>
-                                        <path d="M10 10h4"></path>
-                                        <path d="M10 14h4"></path>
-                                        <path d="M10 18h4"></path>
-                                      </svg>
+                                      <LuFileText />
                                     </span>
                                     {recording?.project?.title}
                                   </strong>
                                   <strong className="activity-type-text d-flex align-items-center gap-2">
+                                    
                                     <HiOutlineLightningBolt /> {recording?.type}
+                                    {
+                                      recording?.type === 'manual' && recording.is_approved === true ? 
+                                      (
+                                        <>
+                                          <FaCheck /> Approved
+                                        </>
+                                      )
+                                      :
+                                      recording?.type === 'manual' &&  recording.is_approved === false ?
+                                      <>
+                                        <FaCheck /> Pending
+                                      </>
+                                      : <></>
+                                    }
                                   </strong>
                                 </h4>
                                 <p>
@@ -2264,9 +2617,17 @@ function TimeTrackingPage() {
                                     <FiClock className="me-2" />{" "}
                                     {generateTimeRange(
                                       recording?.createdAt,
-                                      recording?.duration
+                                      recording?.duration || 0
                                     )}
                                   </ListGroup.Item>
+                                  {
+                                    (recording?.type === 'tracker') && (
+                                      <ListGroup.Item>
+                                        <FaHistory className="me-2" />{" "}
+                                        Version: {recording?.app_version}
+                                      </ListGroup.Item>
+                                    )
+                                  }
                                 </ListGroup>
                               </Accordion.Header>
                             </div>
@@ -2448,7 +2809,7 @@ function TimeTrackingPage() {
                                                   <Card
                                                     key={`blank-card-${
                                                       recording?._id
-                                                    }-${
+                                                    }-${           
                                                       currentVideoPage[
                                                         recording?._id
                                                       ] || 1
@@ -2457,7 +2818,7 @@ function TimeTrackingPage() {
                                                     <Card.Body>
                                                       <img
                                                         className="card-img-top"
-                                                        src="https://onteams-bucket.s3.eu-north-1.amazonaws.com/images/5H2J6.jpg"
+                                                        src="https://app.primeteams.ai/images/5H2J6.jpg"
                                                         alt="screenshot"
                                                       />
                                                       <p>
@@ -2747,6 +3108,8 @@ function TimeTrackingPage() {
                   <Form.Control
                     type="text"
                     name="search"
+                    ref={inputRef}
+                    readOnly={spinner}
                     placeholder="Search by name"
                     onChange={(event) =>
                       handlefilterchange("search", event.target.value)
@@ -2880,7 +3243,7 @@ function TimeTrackingPage() {
         show={showNew}
         onHide={handleCloseNew}
         centered
-        size="xl"
+        size="lg"
         className="AddEntryModal AddTimeModal theme--modal"
       >
         <Modal.Header closeButton>
@@ -2893,7 +3256,7 @@ function TimeTrackingPage() {
               <small>Review and approve manual time entries</small>
             </strong>
           </Modal.Title>
-          <span className="pending--badge">Pending (4)</span>
+          <span className="pending--badge">Pending ({manualListCount})</span>
         </Modal.Header>
         <Modal.Body>
           <ManualTime />
@@ -2923,9 +3286,9 @@ function TimeTrackingPage() {
         </Modal.Header>
         <Modal.Body>
           <div className="new--entry">
-            <div class="d-flex align-items-center justify-content-between mb-3">
+            <div className="d-flex align-items-center justify-content-between mb-3">
               <h4>Added Entries ({entries?.length || 0})</h4>
-              <span class="bg-success px-2 py-1 rounded-3">
+              <span className="bg-success px-2 py-1 rounded-3">
                 Total: {convertSecondstoTime(totalTaskDuration)}
               </span>
             </div>
@@ -2954,21 +3317,23 @@ function TimeTrackingPage() {
                         {entry?.task_title}
                       </Card.Text>
                       <Card.Text className="text-muted mb-0">
+                        {entry?.date} <br />
                         {entry?.start_time} - {entry?.end_time}
                       </Card.Text>
                       <Card.Text className="text-success mb-0">
                         <strong>{convertSecondstoTime(taskDuration)}</strong>
                       </Card.Text>
+                      
                       {errors[i]?.start_time && (
-                        <span className="form-error">
+                        <span className="error">
                           {errors[i].start_time}
                         </span>
                       )}
                       {errors[i]?.end_time && (
-                        <span className="form-error">{errors[i].end_time}</span>
+                        <span className="error">{errors[i].end_time}</span>
                       )}
                       {errors[i]?.task && (
-                        <span className="form-error">{errors[i].task}</span>
+                        <span className="error">{errors[i].task}</span>
                       )}
                     </Card.Body>
                   </Card>
@@ -2984,46 +3349,72 @@ function TimeTrackingPage() {
                     <FaPlus /> Add New Entry
                   </h6>
                 </Col>
+                <Col md={12} className="mb-3">
+                  <DatePicker
+                    key={"date-filter-report"}
+                    name="date"
+                    weekStartDayIndex={1}
+                    id="datepicker-report"
+                    value={timings?.date || ""}
+                    format="YYYY-MM-DD"
+                    multiple={false}
+                    dateSeparator=" - "
+                    onChange={async (value) => {
+                      const formatDate = (date) => {
+                        const d = new Date(date);
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+                        const day = String(d.getDate()).padStart(2, "0");
+                        return `${year}-${month}-${day}`;
+                      };
+                      const formatted = formatDate(value);
+                      memberTodaysActivity([formatted])
+                      setTimings({
+                        ...timings, // keep other fields if any
+                        date: formatted,
+                        start_time: "", // reset start_time
+                        end_time: "",   // reset end_time
+                      });
+
+                      // handleTimeChange("date", formatted)
+                      
+                    }}
+                    className="form-control"
+                    placeholder="YYYY-MM-DD"
+                    open={reportPickerOpen} // Control visibility with state
+                    onOpen={() => setReportPickerOpen(true)} // Update state when opened
+                    onClose={() => setReportPickerOpen(false)} // Update state when closed
+                  />
+                </Col>
                 <Col md={6} className="mb-3 mb-md-0">
-                  <Dropdown className="select--dropdown">
-                    <Dropdown.Toggle variant="success">
+                  
+                  <Dropdown className="select--dropdown" datattimeeee={timings?.start_time} key={`dropdown-${timings?.start_time || 'start'}`}>
+                    <Dropdown.Toggle variant="success" key={'start-timing'}>
                       {timings?.start_time || "Start Time"}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       <div className="drop--scroll">
-                        {/* <Form>
-                                  <Form.Group className="form-group mb-3">
-                                      <Form.Control type="text" placeholder="Search here.."  value={timings?.start_time} onChange={(e) => {handleSearchChange('start_time', 0, e.target.value)}} />
-                                  </Form.Group>
-                              </Form> */}
-                        {timeSlots.map((slot) => {
+                       
+                        {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
-                            slot,
+                            slot.replace(/\s?(AM|PM)$/i, ""),
                             occupiedRanges
                           );
                           if (!isOccupied) {
                             isOccupied = entries.some((entry) => {
                               return (
-                                (slot >= entry.start_time &&
-                                  slot <= entry.end_time) || // Between
-                                slot === entry.start_time || // Equal to start
-                                slot === entry.end_time // Equal to end
+                                (slot.replace(/\s?(AM|PM)$/i, "") >= entry.start_time &&
+                                  slot.replace(/\s?(AM|PM)$/i, "") <= entry.end_time) || // Between
+                                slot.replace(/\s?(AM|PM)$/i, "") === entry.start_time || // Equal to start
+                                slot.replace(/\s?(AM|PM)$/i, "") === entry.end_time // Equal to end
                               );
                             });
                           }
-                          // if( searchEntries[0]?.start_time && searchEntries[0]?.start_time !== ""){
-                          //   if (slot?.toLowerCase().includes(searchEntries[0]?.start_time?.toLowerCase())) {
-                          //     return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleTimeChange("start_time", slot)} >{slot}</Dropdown.Item>
-                          //   }else{
-                          //     return null;
-                          //   }
-
-                          // }else{
                           return (
                             <Dropdown.Item
-                              key={`slot-${slot}-${0}`}
+                              key={`slot-${slot}-${idx}`}
                               onClick={() =>
-                                handleTimeChange("start_time", slot)
+                                handleTimeChange("start_time", slot.replace(/\s?(AM|PM)$/i, ""))
                               }
                               disabled={isOccupied}
                               style={{
@@ -3053,33 +3444,23 @@ function TimeTrackingPage() {
                                       <Form.Control type="text" placeholder="Search here.."  value={timings?.end_time} onChange={(e) => {handleSearchChange('end_time', 0, e.target.value)}} />
                                   </Form.Group>
                               </Form> */}
-                        {timeSlots.map((slot) => {
+                        {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
-                            slot,
+                            slot.replace(/\s?(AM|PM)$/i, ""),
                             occupiedRanges
                           );
                           if (!isOccupied) {
-                            isOccupied = entries.some((entry) => {
-                              return (
-                                (slot >= entry.start_time &&
-                                  slot <= entry.end_time) || // Between
-                                slot === entry.start_time || // Equal to start
-                                slot === entry.end_time // Equal to end
+                            isOccupied = (
+                                (
+                                  slot.replace(/\s?(AM|PM)$/i, "") <= timings?.start_time) || // Between
+                                slot.replace(/\s?(AM|PM)$/i, "") === timings?.start_time
                               );
-                            });
+                            
                           }
-                          // if( searchEntries[0]?.end_time && searchEntries[0]?.end_time !== ""){
-                          //   if (slot?.toLowerCase().includes(searchEntries[0]?.end_time?.toLowerCase())) {
-                          //     return <Dropdown.Item key={`slot-${slot}-${0}`} onClick={() => handleTimeChange("end_time", slot)} >{slot} </Dropdown.Item>
-                          //   }else{
-                          //     return null;
-                          //   }
-
-                          // }else{
                           return (
                             <Dropdown.Item
-                              key={`slot-${slot}-${0}`}
-                              onClick={() => handleTimeChange("end_time", slot)}
+                              key={`end-slot-${slot}-${idx}`}
+                              onClick={() => handleTimeChange("end_time", slot.replace(/\s?(AM|PM)$/i, ""))}
                               disabled={isOccupied}
                               style={{
                                 pointerEvents: isOccupied ? "none" : "auto",
@@ -3101,7 +3482,11 @@ function TimeTrackingPage() {
             }
             <Row>
               <Col md={12} className="mt-3 text-end">
-                <Button variant="dark" onClick={handleProjectShow}>
+                <Button variant="dark" onClick={handleProjectShow} disabled={
+                    !timings?.start_time ||
+                    !timings?.end_time ||
+                    timings.end_time === "00:00"
+                  }>
                   Select Project
                 </Button>
               </Col>
@@ -3113,7 +3498,7 @@ function TimeTrackingPage() {
           <Button
             variant="primary"
             onClick={handleReportSubmit}
-            disabled={loader}
+            disabled={loader || entries.length === 0}
           >
             {loader === true ? "Please wait..." : "Submit"}
           </Button>
@@ -3243,7 +3628,7 @@ function TimeTrackingPage() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleEntryChange}>
+          <Button variant="primary" disabled={Object.keys(selectedTask).length === 0} onClick={handleEntryChange}>
             Save
           </Button>
         </Modal.Footer>

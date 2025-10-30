@@ -599,108 +599,108 @@ function Stats() {
         <Modal.Body>
           {activeTab === "Screenshots" && (
             <>
-              <h6 class="mb-2">09:00 AM - 10:00 AM</h6>
-              <div class="shots--list">
+              <h6 className="mb-2">09:00 AM - 10:00 AM</h6>
+              <div className="shots--list">
                 <CardGroup>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                 </CardGroup>
               </div>
               <hr />
-              <h6 class="mb-2">10:01 AM - 11:00 AM</h6>
-              <div class="shots--list">
+              <h6 className="mb-2">10:01 AM - 11:00 AM</h6>
+              <div className="shots--list">
                 <CardGroup>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                      <img className="card-img-top" src="images/Screenshot1.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
                   <Card>
                     <Card.Body>
-                      <img class="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                      <img className="card-img-top" src="images/Screenshot2.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                       <p>create dynamic gallery, 09:30 AM</p>
                     </Card.Body>
                   </Card>
@@ -709,61 +709,61 @@ function Stats() {
             </>
           )}
           {activeTab === "Videos" && (
-            <div class="shots--list">
+            <div className="shots--list">
               <CardGroup>
                 <Card>
                   <Card.Body>
-                    <span class="video--icon"><FaPlay /></span>
-                    <img class="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                    <span className="video--icon"><FaPlay /></span>
+                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                     <p>create dynamic gallery, 09:30 AM</p>
                   </Card.Body>
                 </Card>
                 <Card>
                   <Card.Body>
-                    <span class="video--icon"><FaPlay /></span>
-                    <img class="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                    <span className="video--icon"><FaPlay /></span>
+                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                     <p>create dynamic gallery, 09:30 AM</p>
                   </Card.Body>
                 </Card>
                 <Card>
                   <Card.Body>
-                    <span class="video--icon"><FaPlay /></span>
-                    <img class="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                    <span className="video--icon"><FaPlay /></span>
+                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                     <p>create dynamic gallery, 09:30 AM</p>
                   </Card.Body>
                 </Card>
                 <Card>
                   <Card.Body>
-                    <span class="video--icon"><FaPlay /></span>
-                    <img class="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                    <span className="video--icon"><FaPlay /></span>
+                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                     <p>create dynamic gallery, 09:30 AM</p>
                   </Card.Body>
                 </Card>
                 <Card>
                   <Card.Body>
-                    <span class="video--icon"><FaPlay /></span>
-                    <img class="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                    <span className="video--icon"><FaPlay /></span>
+                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                     <p>create dynamic gallery, 09:30 AM</p>
                   </Card.Body>
                 </Card>
                 <Card>
                   <Card.Body>
-                    <span class="video--icon"><FaPlay /></span>
-                    <img class="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                    <span className="video--icon"><FaPlay /></span>
+                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                     <p>create dynamic gallery, 09:30 AM</p>
                   </Card.Body>
                 </Card>
                 <Card>
                   <Card.Body>
-                    <span class="video--icon"><FaPlay /></span>
-                    <img class="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
+                    <span className="video--icon"><FaPlay /></span>
+                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot1.png')} />
                     <p>create dynamic gallery, 09:30 AM</p>
                   </Card.Body>
                 </Card>
                 <Card>
                   <Card.Body>
-                    <span class="video--icon"><FaPlay /></span>
-                    <img class="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
+                    <span className="video--icon"><FaPlay /></span>
+                    <img className="card-img-top" src="images/Screenshot3.png" alt="Card image cap" onClick={() => handleLightBox('images/Screenshot2.png')} />
                     <p>create dynamic gallery, 09:30 AM</p>
                   </Card.Body>
                 </Card>

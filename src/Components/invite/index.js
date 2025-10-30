@@ -62,7 +62,7 @@ function Invite() {
                 <div className="common--form">
                   <img
                     className="logo--sm"
-                    src="../images/OnTeam-Logo.png"
+                    src="../images/primeTeam-Logo.png"
                     alt="MyTeams"
                   />
                   <h6>

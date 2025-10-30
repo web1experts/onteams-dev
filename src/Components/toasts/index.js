@@ -12,6 +12,7 @@ export default function ToastAlerts() {
     const apiResultProject = useSelector(state => state.project);
     const apiResultClient = useSelector(state => state.client);
     const workspace = useSelector(state => state.workspace)
+    const workflow = useSelector(state => state.workflow)
     const apiResultTask = useSelector(state => state.task);
     const apiResultHoliday = useSelector( state => state.holiday);
     const apiPermission = useSelector( state => state.permissions)
@@ -21,6 +22,7 @@ export default function ToastAlerts() {
     const reportState = useSelector((state) => state.reports)
     const activityState = useSelector((state) => state.activity)
     const attendance = useSelector((state) => state.attendance)
+    const subscription = useSelector((state) => state.subscription)
     const [loggedIn, setLoggedIn] = useState(false);
 
     const refreshDashboards = () => ({
@@ -43,6 +45,11 @@ export default function ToastAlerts() {
           handleClearMessages()
       }
 
+      if(subscription.message ){ 
+          addToast(subscription.message, subscription.message_variant);
+          handleClearMessages()
+      }
+
       if( apiResultAuth.message ){ 
           addToast(apiResultAuth.message, apiResultAuth.message_variant);
         handleClearMessages()
@@ -59,6 +66,12 @@ export default function ToastAlerts() {
           setAuthorization()
           dispatch(Listmembers())
           dispatch(getSingleMemberByUserAndCompanyId())
+        }
+
+        if( workflow.message ){ 
+            addToast(workspace.message, workspace.message_variant);
+            handleClearMessages()
+            
         }
         
       
@@ -98,6 +111,7 @@ export default function ToastAlerts() {
           addToast(apiResultTask.message, apiResultTask.message_variant);
           handleClearMessages()
         }
+        
         if(apiResultHoliday.message){
           addToast(apiResultHoliday.message, apiResultHoliday.message_variant);
           handleClearMessages()
@@ -107,7 +121,7 @@ export default function ToastAlerts() {
           handleClearMessages()
         }
     
-      },[apiResultMember,reportState,attendance, activityState, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask,apiResultHoliday,apiPermission,postResult, dispatch]);
+      },[apiResultMember,workflow, reportState,attendance,subscription, activityState, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask,apiResultHoliday,apiPermission,postResult, dispatch]);
 
       const clearMessages = () => ({
         type: CLEAR_MESSAGES,

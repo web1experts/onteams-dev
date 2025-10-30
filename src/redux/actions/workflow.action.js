@@ -4,10 +4,7 @@ import API from '../../helpers/api';
 import { 
    WORKFLOW_CREATE_SUCCESS,
    WORKFLOW_ERROR,
-   WORKFLOW_GET_SUCCESS,
-   WORKFLOW_SUCCESS,
-   WORKFLOW_UPDATE_SUCESS,
-   WORKFLOW_DELETE_SUCCESS
+   WORKFLOW_GET_SUCCESS
 } from "./types";
 
 const config = {
@@ -39,6 +36,22 @@ export const ListWorkflows = (currentPage = 0, searchterm = "") => {
             const response = await API.apiGet('workflow', { search: searchterm, currentPage:currentPage });
             if(response.data && response.data.success){
             await dispatch({ type: WORKFLOW_GET_SUCCESS, payload: response.data })
+            }else{
+            await dispatch({ type: WORKFLOW_ERROR, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+
+}
+
+export const saveNewWorkflow = (payload) => {
+    return async (dispatch) => {
+        try{
+            const response = await API.apiPost('workflow', payload);
+            if(response.data && response.data.success){
+            await dispatch({ type: WORKFLOW_CREATE_SUCCESS, payload: response.data })
             }else{
             await dispatch({ type: WORKFLOW_ERROR, payload: response.data.message });
             }

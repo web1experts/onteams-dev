@@ -373,8 +373,8 @@ function PermissionsPage() {
       <div className="team--page">
         <div className="page--wrapper setting--page">
           {spinner && (
-            <div class="loading-bar">
-              <img src="images/OnTeam-icon.png" className="flipchar" />
+            <div className="loading-bar">
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           )}
           <div className="setting--tabs">
@@ -624,7 +624,7 @@ function PermissionsPage() {
                     })}
 
                     <div className="mt-4 text-end">
-                      <Button variant="primary" onClick={handleSave}>Save Permissions</Button>
+                      <Button variant="primary" onClick={handleSave}>Save</Button>
                     </div>
                   </Accordion>
                 </>

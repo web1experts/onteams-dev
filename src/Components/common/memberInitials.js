@@ -58,28 +58,20 @@ export const MemberInitials = React.memo(( props ) => {
                     }
                     
                     const currentMembers = members;
-                    
+                   
+                    const updatedMembers = Object.values(currentMembers) // convert object to array
+                        .filter(member => (member.id || member._id) !== memberId) // remove the one you want
+                        .map(member => member.id || member._id); // return always the id
 
-                    // if( props.postId !== "new"){
-                        const updatedMembers = currentMembers
-                        .filter(member => member._id !== memberId)
-                        .map(member => member._id);
-                        await dispatch(updateProject(props?.postId, { members: updatedMembers, remove_member: true }));
-                    // }else{
-                    //     const updatedMembers = currentMembers
-                    //     .filter(member => member._id !== memberId)
-                    //     .map(member => member._id);
-                    //     await dispatch(updateProject(props?.postId, { members: updatedMembers, remove_member: true }));
-                    // }
-            
+
+                    await dispatch(updateProject(props?.postId, { members: updatedMembers, remove_member: true }));
+                
                     if (targetElement) {
                         // Re-enable the button or make it interactive again
                         targetElement.classList.remove('disabled-pointer');
                     }
             
                 } catch (error) {
-                    console.error("Error removing member:", error);
-            
                     // Ensure target element is re-enabled even if there's an error
                     const targetElement = document.getElementById(targetelement);
                     if (targetElement) {
@@ -132,7 +124,7 @@ export const MemberInitials = React.memo(( props ) => {
                                             (member?.avatar && member?.avatar !== null ) ? 
                                             <span><img src={member?.avatar} alt={'member-avatar'} /></span>
                                             :
-                                            member.name?.substring(0, 1).toUpperCase()
+                                            member?.name?.substring(0, 1).toUpperCase()
                                         }
                                     </span>
                                 </Initials>
@@ -143,7 +135,7 @@ export const MemberInitials = React.memo(( props ) => {
                                          onClick={() => 
                                             // props.onMemberClick(member._id)
                                             {
-                                                if( props.postId === "new" || !props.directUpdate){
+                                                if( props.postId === "new" || props.directUpdate === false){
                                                     removeMember(member._id)
                                                 }else if( props.postId !== "new" && props.directUpdate === true){
                                                     handleRemoveMember(member._id)
@@ -162,7 +154,7 @@ export const MemberInitials = React.memo(( props ) => {
                         <>
                             {members.slice(0, members.length > 5 ? 4 : 5).map((member, memberIndex) => (
                                 <ListGroup.Item action key={`member-${memberIndex}`}>
-                                    <Initials title={member.name} id={`member-${member._id}`}>
+                                    <Initials title={member?.name} id={`member-${member._id}`}>
                                         <span className={`team--initial nm-${member.name?.substring(0, 1).toLowerCase()}`}>
                                             {
                                                 (member?.avatar && member?.avatar !== null ) ? 
@@ -211,20 +203,29 @@ export const MemberInitials = React.memo(( props ) => {
                 <>
                 {
                     (props.showall && props.showall === true) ? (
-                        Object.entries(members).map(([id, name], memberindex) => (
+                        Object.entries(members).map(([memberKey, memberInfo], memberindex) => (
                             <ListGroup.Item action key={`member-${props.postId}-${memberindex}`}>
-                                <Initials title={name} id={`member-${id}-${memberindex}`}>
-                                    <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
+                                <Initials title={memberInfo?.name} id={`member-${memberInfo?.id}-${memberindex}`}>
+                                    
+                                        <span className={`team--initial nm-${memberInfo?.name?.substring(0, 1).toLowerCase()}`}>
+                                            {
+                                        (memberInfo?.avatar && memberInfo?.avatar !== null ) ? 
+                                        <span><img src={memberInfo?.avatar} alt={'member-avatar'} /></span>
+                                        :
+                                        memberInfo?.name?.substring(0, 1).toUpperCase()
+                                            }
+                                        </span>
+                                    
                                 </Initials>
                                 {props.showRemove && (
                                     <span
                                         className="remove-icon"
-                                        id={`member-${props.postId}-${id}`}
+                                        id={`member-${props.postId}-${memberInfo?.id}`}
                                         onClick={() =>{ 
                                             if( props.postId === "new" || props.directUpdate === false){
-                                                removeMember(id)
+                                                removeMember(memberInfo?.id)
                                             }else{
-                                                handleRemoveMember(id)
+                                                handleRemoveMember(memberInfo?.id)
                                                 // props.onMemberClick(id, true)
                                               }  
                                             }
@@ -238,20 +239,28 @@ export const MemberInitials = React.memo(( props ) => {
                         ))
                     ) : (
                         <>
-                        {Object.entries(members).slice(0, Object.entries(members).length > 6 ? 5 : 6).map(([id, name], memberindex) => (
+                        {Object.entries(members).slice(0, Object.entries(members).length > 6 ? 5 : 6).map(([memberKey, memberInfo], memberindex) => {
+                            return (
                             <ListGroup.Item action key={`member-${props.postId}-${memberindex}`}>
-                                <Initials title={name} id={`member-${id}-${memberindex}`}>
-                                    <span className={`team--initial nm-${name.substring(0, 1).toLowerCase()}`}>{name?.substring(0, 1).toUpperCase()}</span>
+                                <Initials title={memberInfo?.name} id={`member-${memberInfo?.id}-${memberindex}`}>
+                                    <span className={`team--initial nm-${memberInfo?.name?.substring(0, 1).toLowerCase()}`}>
+                                        {
+                                        (memberInfo?.avatar && memberInfo?.avatar !== null ) ? 
+                                        <span><img src={memberInfo?.avatar} alt={'member-avatar'} /></span>
+                                        :
+                                        memberInfo?.name?.substring(0, 1).toUpperCase()
+                                        }
+                                        </span>
                                 </Initials>
                                 {props.showRemove && (
                                     <span
                                         className="remove-icon"
-                                        id={`member-${props.postId}-${id}`}
+                                        id={`member-${props.postId}-${memberInfo?.id}`}
                                         onClick={() => { 
                                             if( props.postId === "new" || props.directUpdate === false){
-                                                removeMember(id)
+                                                removeMember(memberInfo?.id)
                                             }else{
-                                                handleRemoveMember(id)
+                                                handleRemoveMember(memberInfo?.id)
                                                 // props.onMemberClick(id, true)
                                               }  
                                             }
@@ -261,7 +270,7 @@ export const MemberInitials = React.memo(( props ) => {
                                     </span>
                                 )}
                             </ListGroup.Item>
-                        ))}
+                        )})}
                         {Object.entries(members).length > 6 && (
                             <ListGroup.Item key={`more-member-${props.postId}`} className="more--member">
                                 <span>+{Object.entries(members).slice(5).length}</span>

@@ -14,7 +14,7 @@ import commonReducer from "./common.reducer";
 import holidayReducer from "./holiday.reducer";
 import attendanceReducer from "./attendance.reducer";
 import reportReducer from "./report.reducer";
-import paymentReducer from "./payment.reducer";
+import subscriptionReducer from "./subscription.reducer";
 import postReducer from "./post.reducer";
 import customfieldReducer from "./customfield.reducer";
 import systemfieldReducer from "./systemfield.reducer";
@@ -34,7 +34,7 @@ export default combineReducers({
   attendance: attendanceReducer,
   reports: reportReducer,
   permissions: permissionReducer,
-  payment: paymentReducer,
+  subscription: subscriptionReducer,
   post: postReducer,
   customfields: customfieldReducer,
   systemfields: systemfieldReducer

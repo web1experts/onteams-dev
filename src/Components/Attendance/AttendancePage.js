@@ -11,7 +11,7 @@ import { GoDotFill } from "react-icons/go";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
 import { FaCog } from "react-icons/fa";
-import { formatDateinString, selectboxObserver, getAttendanceBadges } from "../../helpers/commonfunctions";
+import { formatDateinString, selectboxObserver, getAttendanceBadges, hexToRgba } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { ListAttendance,getAttendanceByMember, getAttendanceSummary, getMonthlyAttendanceExcelView, ListAttendanceStatuses } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
@@ -69,6 +69,9 @@ function AttendancePage() {
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
+  const [showDateFilter, setDateFilterShow] = useState(false);
+  const handleDateFilterClose = () => setDateFilterShow(false);
+  const handleDateFilterShow = () => setDateFilterShow(true);
   const [spinner, setSpinner] = useState(false);
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
   const commonState = useSelector(state => state.common)
@@ -118,7 +121,7 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
 
   useEffect(() => {
     const statusMap = attendanceStatus?.reduce((acc, status) => {
-      const key = status.label.toLowerCase().replace(/\s+/g, '_');
+      const key = status?.label?.toLowerCase()?.replace(/\s+/g, '_');
       acc[key] = status;
       return acc;
     }, {});
@@ -191,7 +194,7 @@ useEffect(() => {
 
   const lightenColor = (hex, percent = 30) => {
   // Remove '#' if present
-  hex = hex.replace(/^#/, '');
+  hex = hex?.replace(/^#/, '');
 
   // Parse the hex components
   const num = parseInt(hex, 16);
@@ -350,7 +353,7 @@ useEffect(() => {
           {
             spinner ?
             <div className="loading-bar">
-                <img src="images/OnTeam-icon.png" className="flipchar" />
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           :
           <Container fluid>
@@ -376,20 +379,7 @@ useEffect(() => {
                                   attendanceStatus?.map((status, idx) => {
                                     const rgbaBorder = hexToRgba(status?.color, 0.4);
                                     const rgbaBg = hexToRgba(status?.color, 0.1);
-                                    function hexToRgba(hex, alpha) {
-                                      hex = hex.replace('#', '');
-
-                                      if (hex.length === 3) {
-                                        hex = hex.split('').map(c => c + c).join('');
-                                      }
-
-                                      const bigint = parseInt(hex, 16);
-                                      const r = (bigint >> 16) & 255;
-                                      const g = (bigint >> 8) & 255;
-                                      const b = bigint & 255;
-
-                                      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                                    }
+                                    
 
                                     return (
                                       <th key={idx} className="text-center p-0" style={{color: status.color,backgroundColor: rgbaBg}}>
@@ -400,28 +390,6 @@ useEffect(() => {
                                     );
                                   })
                                 }
-
-                                
-                                {/* <th className="bg--red text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Absent</strong>
-                                  </div>
-                                </th>
-                                <th className="bg--purple text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Half Day</strong>
-                                  </div>
-                                </th>
-                                <th className="bg--blue text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Short Leave (6h)</strong>
-                                  </div>
-                                </th>
-                                <th className="bg--orange text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Short (2h)</strong>
-                                  </div>
-                                </th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -456,7 +424,7 @@ useEffect(() => {
                                               </td>
                                             );
                                           } else {
-                                              const key = atten.status.toLowerCase().replace(/\s+/g, '_');
+                                              const key = atten?.status?.toLowerCase()?.replace(/\s+/g, '_');
                                               const rgbaBorder = hexToRgba(statusObject?.[key]?.color, 0.3);
                                               const rgbaBg = hexToRgba(statusObject?.[key]?.color, 0.1);
                                               function hexToRgba(hex, alpha) {
@@ -476,15 +444,21 @@ useEffect(() => {
 
                                             return (
                                               <td className="text-center border-bottom border-end" key={ind}>
-                                                <span className={`att--badge`} style={{color: statusObject?.[key]?.color,backgroundColor: rgbaBg, borderColor: `1px solid ${rgbaBorder}`}}>
+                                                <span
+                                                  className={`att--badge${atten?.status === '--' ? ' dash--badge' : ''}`}
+                                                  style={{
+                                                    color: statusObject?.[key]?.color,
+                                                    backgroundColor: rgbaBg,
+                                                    borderColor: `1px solid ${rgbaBorder}`,
+                                                  }}
+                                                >
                                                   {
                                                     atten?.status && atten?.status !== '--'
-                                                      ? 
-                                                      atten?.status
-                                                      //statusObject[atten?.status?.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.code || atten?.status
+                                                      ? atten?.status
                                                       : <BsDash />
                                                   }
                                                 </span>
+
                                                 {
                                                   (atten?.total_time !== '--') &&
                                                   <strong>{ atten?.total_time }</strong>
@@ -502,35 +476,6 @@ useEffect(() => {
                           }
                         </tbody>
                     </Table>
-                </div>
-                <div className="pt-4">
-                  <div className="d-flex align-items-center gap-3 gap-md-4 flex-wrap att--status--abbr">
-                    {
-                      attendanceStatus?.map((status, idx) => {
-                        const rgbaBg = hexToRgba(status?.color, 1);
-                        function hexToRgba(hex, alpha) {
-                          hex = hex.replace('#', '');
-
-                          if (hex.length === 3) {
-                            hex = hex.split('').map(c => c + c).join('');
-                          }
-
-                          const bigint = parseInt(hex, 16);
-                          const r = (bigint >> 16) & 255;
-                          const g = (bigint >> 8) & 255;
-                          const b = bigint & 255;
-
-                          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                        }
-                        return (
-                          <div key={idx} className="d-flex align-items-center gap-2">
-                            <span className="d-flex align-items-center justify-content-center att--status--span" style={{ backgroundColor: rgbaBg,}}></span>
-                            <span className="text-slate-600">{status.label}</span>
-                          </div>
-                        );
-                      })
-                    }
-                  </div>
                 </div>
               </div>
             )}
@@ -558,39 +503,10 @@ useEffect(() => {
                   </div>
                   <Row>
                     <Col className="card--stack">
-                      {/* <Card className="card--green">
-                        <Card.Body>
-                          <Card.Title><span>Present</span>{attendanceSummary?.present}</Card.Title>
-                          <Card.Text><FiCheckCircle /></Card.Text>
-                        </Card.Body>
-                      </Card>
-                      <Card className="card--red">
-                        <Card.Body>
-                          <Card.Title><span>Absent</span>{attendanceSummary?.absent}</Card.Title>
-                          <Card.Text><AiOutlineCloseCircle /></Card.Text>
-                        </Card.Body>
-                      </Card>
-                      <Card className="card--orange">
-                        <Card.Body>
-                          <Card.Title><span>Short (2h)</span>{attendanceSummary?.other}</Card.Title>
-                          <Card.Text><FiCoffee /></Card.Text>
-                        </Card.Body>
-                      </Card>
-                      <Card className="card--blue">
-                        <Card.Body>
-                          <Card.Title><span>Half Day</span>{attendanceSummary?.half_day}</Card.Title>
-                          <Card.Text><FiClock /></Card.Text>
-                        </Card.Body>
-                      </Card>
-                      <Card className="card--purple">
-                        <Card.Body>
-                          <Card.Title><span>Short Leave (6h)</span>{attendanceSummary?.short_leave}</Card.Title>
-                          <Card.Text><LuTimer /></Card.Text>
-                        </Card.Body>
-                      </Card> */}
+                      
                       {Object.entries(attendanceSummary).map(([key, count], index) => {
                         const config = { color: 'blue', icon: <FiCoffee /> };
-                        const label = key.replace(/_/g, ' ')  // e.g. short_leave => short leave
+                        const label = key?.replace(/_/g, ' ')  // e.g. short_leave => short leave
                                         .replace(/\b\w/g, char => char.toUpperCase()); // capitalize words
                         
                         return (
@@ -636,27 +552,13 @@ useEffect(() => {
                                 <div className="d-flex align-items-center gap-3 gap-xl-4 mt-3 mt-xl-0 flex-wrap">
                                   {attendanceStatus.map((status, index) => (
                                     <div className="text-center">
-                                      <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center" style={{color: statusObject?.[status?.label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.color || '#16a34a'}}>
+                                      <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center" style={{color: statusObject?.[status?.label?.toLowerCase()?.replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')]?.color || '#16a34a'}}>
                                         {
                                           attendanceData?.attendance?.[status?.label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')] || 0
                                         } <small>{status?.label}</small></h4>
                                     </div>
                                   ))}
-                                  {/* <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">{attendanceData?.attendance?.present || 0} <small>Present</small></h4>
-                                  </div>
-                                  <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">{attendanceData?.attendance?.other || 0} <small>Short (2h)</small></h4>
-                                  </div>
-                                  <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">{attendanceData?.attendance?.short_leave || 0} <small>Short Leave (6h)</small></h4>
-                                  </div>
-                                  <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">{attendanceData?.attendance?.half_day || 0} <small>Half Day</small></h4>
-                                  </div>
-                                  <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">{attendanceData?.attendance?.absent || 0} <small>Absent</small></h4>
-                                  </div> */}
+                                  
                                   <Button variant="dark" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {handleMemberAttendance(attendanceData);setIsActive(1)}}><FaEye/> Details</Button>
                                 </div>
                               </td>
@@ -703,7 +605,7 @@ useEffect(() => {
                 </Dropdown>
               </div>
               <ListGroup horizontal className="expand--icon ms-auto">
-                <ListGroup.Item className="day--dropdown w-auto h-auto">
+                <ListGroup.Item className="day--dropdown w-auto h-auto d-none d-xxl-flex">
                   <Dropdown className="select--dropdown">
                     <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
                     <Dropdown.Menu>
@@ -737,40 +639,14 @@ useEffect(() => {
 
                   </Dropdown>
                 </ListGroup.Item>
-                  <ListGroup.Item key={'toggle-handle'} onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
-                  <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
+                <ListGroup.Item className="d-flex d-xxl-none" onClick={handleDateFilterShow}><MdFilterList /></ListGroup.Item>
+                <ListGroup.Item key={'toggle-handle'} onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
+                <ListGroupItem className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0);dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroupItem>
               </ListGroup>
           </div>
           <div className="bg-white attendance--table daily--attendance--table">
             <div className="d-lg-flex align-items-center gap-3 daily--attendance--top">
               <h3 className="d-flex align-items-center gap-3 mb-0"><span><AiOutlineTeam /></span><strong>Daily Attendance <small>{getMonthLabel(filters?.month)}</small></strong></h3>
-              <div className="d-flex align-items-center gap-3 gap-md-4 flex-wrap att--status--abbr ms-auto mt-3 mt-lg-0">
-                {
-                  attendanceStatus?.map((status, idx) => {
-                    const rgbaBg = hexToRgba(status?.color, 1);
-                    function hexToRgba(hex, alpha) {
-                      hex = hex.replace('#', '');
-
-                      if (hex.length === 3) {
-                        hex = hex.split('').map(c => c + c).join('');
-                      }
-
-                      const bigint = parseInt(hex, 16);
-                      const r = (bigint >> 16) & 255;
-                      const g = (bigint >> 8) & 255;
-                      const b = bigint & 255;
-
-                      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                    }
-                    return (
-                      <div key={idx} className="d-flex align-items-center gap-2">
-                        <span className="d-flex align-items-center justify-content-center att--status--span" style={{ backgroundColor: rgbaBg,}}></span>
-                        <span className="text-slate-600">{status.label}</span>
-                      </div>
-                    );
-                  })
-                }
-              </div>
             </div>
             <div className="overflow-x-auto">
                 <Table>
@@ -868,18 +744,7 @@ useEffect(() => {
                                   const baseColor = statusObject?.[key]?.color || '#999999';
 
                                   // Convert hex to rgba
-                                  const hexToRgba = (hex, opacity) => {
-                                    let c;
-                                    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-                                      c = hex.substring(1).split('');
-                                      if (c.length === 3) {
-                                        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-                                      }
-                                      c = '0x' + c.join('');
-                                      return `rgba(${(c >> 16) & 255}, ${(c >> 8) & 255}, ${c & 255}, ${opacity})`;
-                                    }
-                                    return hex;
-                                  };
+                                  
 
                                   const borderColor = hexToRgba(baseColor, 0.3);
                                   const backgroundColor = hexToRgba(baseColor, 0.1);
@@ -926,8 +791,8 @@ useEffect(() => {
                 <Dropdown.Toggle variant="success">{activeTab}</Dropdown.Toggle>
                 <Dropdown.Menu>
                   <div className="drop--scroll">
-                    <Dropdown.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam /> Team View</Dropdown.Item>
-                    <Dropdown.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar /> Excel View</Dropdown.Item>
+                    <Dropdown.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam className="me-1" /> Team View</Dropdown.Item>
+                    <Dropdown.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar className="me-1" /> Excel View</Dropdown.Item>
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
@@ -963,6 +828,49 @@ useEffect(() => {
                     })}
                   </div>
                 </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
+          </ListGroup>
+        </Modal.Body>
+      </Modal>
+      <Modal show={showDateFilter} onHide={handleDateFilterClose} centered size="md" className="filter--modal">
+        <Modal.Header closeButton>
+            <Modal.Title>Select Month</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ListGroup>
+            <ListGroup.Item className="day--dropdown w-auto h-auto p-0">
+              <Dropdown className="select--dropdown">
+                <Dropdown.Toggle variant="link" id="dropdown-basic"><FiCalendar /> {getMonthLabel(filters?.month)}</Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    {monthsArray.map((month) => {
+                      const isFuture =
+                        parseInt(month.value.split('/')[1]) > today.getFullYear() ||
+                        (parseInt(month.value.split('/')[1]) === today.getFullYear() &&
+                          parseInt(month.value.split('/')[0]) > today.getMonth() + 1);
+                        return (
+                      <Dropdown.Item
+                        key={month.value}
+                        className={`dropdown-item ${filters.month === month.value ? 'selected--option' : ''}`}
+                        as="button"
+                        disabled={isFuture}
+                        style={{ pointerEvents: isFuture ? 'none' : 'auto', opacity: isFuture ? 0.5 : 1 }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!isFuture) {
+                            setFilters((prev) => ({ ...prev, month: month.value }));
+                          }
+                        }}
+                      >
+                        {month.label}
+                        {filters.month === month.value && <MdOutlineCheck />}
+                      </Dropdown.Item>
+                        )
+                      })}
+                  </div>
+                </Dropdown.Menu>
+
               </Dropdown>
             </ListGroup.Item>
           </ListGroup>

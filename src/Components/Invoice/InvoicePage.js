@@ -280,12 +280,12 @@ function InvoicePage() {
                       <td data-label="Project Name">$100</td>
                     </tr>
                     <tr>
-                      <td data-label="Project Name" colspan="7" class="text-center">
-                        <button type="button" class="btn btn-success" onClick={handleShow} title="Add Item"><FaPlus /> Add Item</button>
+                      <td data-label="Project Name" colspan="7" className="text-center">
+                        <button type="button" className="btn btn-success" onClick={handleShow} title="Add Item"><FaPlus /> Add Item</button>
                       </td>
                     </tr>
                     <tr>
-                      <td data-label="Project Name" colspan="6" class="text-right"><strong>Total</strong></td>
+                      <td data-label="Project Name" colspan="6" className="text-right"><strong>Total</strong></td>
                       <td data-label="Project Name"><strong>$130</strong></td>
                     </tr>
                   </tbody>

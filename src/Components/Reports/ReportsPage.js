@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Lightbox } from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/dist/styles.css";
@@ -18,13 +18,30 @@ import {
   ListGroupItem,
   Pagination,
 } from "react-bootstrap";
+import { FaRegEdit } from "react-icons/fa";
+import debounce from "lodash.debounce";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaAngleRight, FaEye } from "react-icons/fa";
 import { BsArrowLeft, BsArrowRight, BsClockHistory } from "react-icons/bs";
-import { showAmPmtime, getMemberdata, selectboxObserver } from "../../helpers/commonfunctions";
-import { LuFolderOpen, LuUsers, LuTimer, LuClock, LuFileText } from "react-icons/lu";
-import { MdOutlineClose, MdOutlineVideoLibrary, MdOutlineSearch, MdFilterList} from "react-icons/md";
-import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser } from "react-icons/fi";
+import {
+  showAmPmtime,
+  getMemberdata,
+  selectboxObserver,
+} from "../../helpers/commonfunctions";
+import {
+  LuFolderOpen,
+  LuUsers,
+  LuTimer,
+  LuClock,
+  LuFileText,
+} from "react-icons/lu";
+import {
+  MdOutlineClose,
+  MdOutlineVideoLibrary,
+  MdOutlineSearch,
+  MdFilterList,
+} from "react-icons/md";
+import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser, FiCheckCircle, FiTrash2, FiEdit } from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";
 import { TbReport, TbScreenshot } from "react-icons/tb";
@@ -35,6 +52,9 @@ import {
   getSingleProjectReport,
   addRemarkstoProject,
   getActivityMeta,
+  getRemarks,
+  deleteRemarks,
+  updateremark
 } from "../../redux/actions/report.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import {
@@ -48,146 +68,9 @@ import { Link } from "react-router-dom";
 import "media-chrome";
 import "media-chrome/dist/menu";
 
-const TaskList = ({ report, handleView, setReport }) => {
-  const dispatch = useDispatch();
-  const selectedReport = report;
-  const reportState = useSelector((state) => state.reports);
-  // const [ViewReport, setViewReport] = useState(false);
-  const [showRemarks, setShowRemarks] = useState(false);
-  // const [activeTab, setActiveTab] = useState("screenshots");
-  // const [reportopen, setReportOpen] = useState(false);
-  // const [slideIndex, setSlideIndex] = useState(0);
-  // const [lightboxMedia, setLightboxMedia] = useState([]);
-  // const fullscreenrefrence = React.useRef(null);
-  // const [taskId, setTaskId] = useState("");
-  // const [currentVideoPage, setCurrentVideoPage] = useState({});
-  // const videosPerPage = 12; // Adjust as needed
-
-  const handleRemarksClose = () => setShowRemarks(false);
-  const handleShowRemarks = () => setShowRemarks(true);
-
-  const gettaskTab = (tabid) => {
-    if (report?.project?.workflow?.tabs?.length > 0) {
-      const matchedTabTitle = report.project.workflow.tabs.find(
-        (tab) => tab._id === tabid
-      )?.title;
-      return <Badge bg="warning">{matchedTabTitle}</Badge>;
-    }
-    return null;
-  };
-
-  return (
-    <>
-      {/* <ul>
-        {groupedTasks?.map((taskData, index) => (
-          <li key={`grouped-task-${index}`}>
-            <p className="mb-0">
-              <FaAngleRight /> {taskData.title}
-            </p>
-            <Button
-              variant="dark"
-              className="px-3 py-2"
-              onClick={() => {
-                handleViewReport(taskData?.taskId);
-              }}
-            >
-              <FaEye /> View Report
-            </Button>
-          </li>
-        ))}
-      </ul> */}
-
-      {showRemarks && (
-        <Modal
-          show={showRemarks}
-          onHide={handleRemarksClose}
-          centered
-          size="lg"
-          className="theme--modal"
-        >
-          <Modal.Header closeButton className="py-3">
-            <Modal.Title>
-              <span className="nav--item--icon">
-                <TbReport />
-              </span>
-              <strong>
-                Project Remarks <small>E-commerce Platform</small>
-              </strong>
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="p-4">
-            <div className="single--project--stack">
-              <div className="d-flex justify-content-between mb-2 align-items-start">
-                <div className="project--name d-flex gap-3 align-items-center">
-                  <div className="title--initial">1</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                    <span>Progress Update</span>
-                    <strong>Monday, January 15, 2024</strong>
-                  </div>
-                </div>
-                <Badge bg="secondary">Day 1</Badge>
-              </div>
-              <p className="mb-0">
-                Started authentication module development. Initial setup
-                completed successfully.
-              </p>
-            </div>
-            <div className="single--project--stack">
-              <div className="d-flex justify-content-between mb-2 align-items-start">
-                <div className="project--name d-flex gap-3 align-items-center">
-                  <div className="title--initial">2</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                    <span>Progress Update</span>
-                    <strong>Monday, January 15, 2024</strong>
-                  </div>
-                </div>
-                <Badge bg="secondary">Day 2</Badge>
-              </div>
-              <p className="mb-0">
-                Started authentication module development. Initial setup
-                completed successfully.
-              </p>
-            </div>
-            <div className="single--project--stack">
-              <div className="d-flex justify-content-between mb-2 align-items-start">
-                <div className="project--name d-flex gap-3 align-items-center">
-                  <div className="title--initial">3</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                    <span>Progress Update</span>
-                    <strong>Monday, January 15, 2024</strong>
-                  </div>
-                </div>
-                <Badge bg="secondary">Day 3</Badge>
-              </div>
-              <p className="mb-0">
-                Started authentication module development. Initial setup
-                completed successfully.
-              </p>
-            </div>
-            <div className="single--project--stack">
-              <div className="d-flex justify-content-between mb-2 align-items-start">
-                <div className="project--name d-flex gap-3 align-items-center">
-                  <div className="title--initial">4</div>
-                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                    <span>Progress Update</span>
-                    <strong>Monday, January 15, 2024</strong>
-                  </div>
-                </div>
-                <Badge bg="secondary">Day 4</Badge>
-              </div>
-              <p className="mb-0">
-                Started authentication module development. Initial setup
-                completed successfully.
-              </p>
-            </div>
-          </Modal.Body>
-        </Modal>
-      )}
-    </>
-  );
-};
 
 function ReportsPage() {
+  const inputRef = useRef(null);
   const handleSidebarSmall = () =>
     dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
   const [isActive, setIsActive] = useState(false);
@@ -198,12 +81,13 @@ function ReportsPage() {
   const datePickerRef = useRef(null);
   const manuldatePickerRef = useRef(null);
   const memberdata = getMemberdata();
-  const fullscreenRef = React.useRef(null);
-
   const [remarksActive, setremarksActive] = useState(false);
+  const [addEditRemarks, setAddEditRemarks] = useState(false)
+  const [editRemark, setEditRemark] = useState({})
   const [remarks, setRemarks] = useState("");
+  const [projectRemarks, setProjectRemarks] = useState([])
   const [loader, setLoader] = useState(false);
-
+  const [remarkDate, setRemarkDate] = useState(new Date().toLocaleDateString("en-CA"))
   const [showNew, setShowNew] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -220,18 +104,34 @@ function ReportsPage() {
     custom: "Custom",
   };
 
-  const handleRemarks = () => {
-    setremarksActive((current) => !current);
-    if (selectedReport?.projectmeta && selectedReport.projectmeta.length > 0) {
-      const remarksMeta = selectedReport.projectmeta.find(
-        (meta) => meta.meta_key === "remarks"
-      );
 
-      if (remarksMeta) {
-        setRemarks(remarksMeta.meta_value);
+  const handleEditRemarks = (remark) => {
+    setEditRemark(remark)
+    setRemarks(remark.meta_value);
+    setAddEditRemarks(true)
+  }
+
+  const handleRemoveRemarks = (id) => {
+    if(filters['sort_by'] === 'projects'){
+        dispatch(deleteRemarks({
+          member:  selectedReport?._id,
+          project_id: selectedReport?.project?._id,
+          sort_by: filters["sort_by"],
+          date_range: filters['date_range'],
+          id: id
+        }))
+      }else{
+        dispatch(deleteRemarks({
+          member: singleMemberReport?.member?._id,
+          project_id: selectedReport?.project?._id,
+          sort_by: filters["sort_by"],
+          date_range: filters['date_range'],
+          id: id
+        }))
+        
       }
-    }
-  };
+    
+  }
   const handleRemarksChange = (e) => {
     setRemarks(e.target.value);
   };
@@ -242,8 +142,6 @@ function ReportsPage() {
   const [projects, setProjects] = useState([]);
 
   const [singleMemberReport, setSingleMemberReport] = useState({});
-  const taskFeed = useSelector((state) => state.task.tasks);
-  const [taskslists, setTasksLists] = useState([]);
   const [members, setMembers] = useState([]);
   const reportState = useSelector((state) => state.reports);
   const [memberReports, setMemberReports] = useState([]);
@@ -273,8 +171,6 @@ function ReportsPage() {
   const videosPerPage = 12; // Adjust as needed
   const [screenshotsByTask, setScreenshotsByTask] = useState([]);
   const [videosByTask, setvideosByTask] = useState([]);
-  // const [groupedTasks, setGroupedTasks] = useState([])
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
   const [filters, setFilters] = useState({
@@ -283,8 +179,7 @@ function ReportsPage() {
     project_status: "in-progress",
     page: 1,
   });
-  const [selectedproject, setSelectedProject] = useState("");
-  const [selectedTask, setSelectedTask] = useState("");
+  
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -295,9 +190,28 @@ function ReportsPage() {
       project_id: project_id,
       remarks: remarks,
       date: filtereddate,
+      remark_date: remarkDate
     };
     dispatch(addRemarkstoProject(payload));
   };
+
+  const updateRemarks = () => {
+    setLoader(true);
+    let payload = {
+      remark_id: editRemark?._id,
+      remarks: remarks,
+      project_id: selectedReport?.project?._id,
+      sort_by: filters["sort_by"],
+      date_range: filters['date_range']
+    };
+    if(filters['sort_by'] === 'projects'){
+        payload['member'] =  selectedReport?._id
+    }else{
+        payload['member'] = singleMemberReport?.member?._id;
+    }
+
+    dispatch(updateremark(payload));
+  }
 
   const handlefilterchange = (name, value) => {
     setFilters({ ...filters, [name]: value });
@@ -321,9 +235,17 @@ function ReportsPage() {
     }
 
     const hours = Math.floor(totalDuration / 3600);
-    const minutes = Math.floor((totalDuration % 3600) / 60);
+    const minutes = Math.round((totalDuration % 3600) / 60);
 
-    const formattedTime = `${hours}h ${minutes}m`;
+    let displayHours = hours;
+    let displayMinutes = minutes;
+
+    if (minutes === 60) {
+      displayHours += 1;
+      displayMinutes = 0;
+    }
+
+    const formattedTime = `${displayHours}h ${displayMinutes}m`;
     if (arg === "both") {
       return {
         totalProjects: projectCount,
@@ -343,7 +265,9 @@ function ReportsPage() {
     if (projectReport?.members?.length > 0) {
       projectReport.members.forEach((report) => {
         report.activities.forEach((activity) => {
-          totalDuration += activity.duration || 0;
+          // totalDuration += activity.duration || 0;
+          const duration = Number(activity.duration) || 0;
+          totalDuration += duration;
         });
       });
     }
@@ -357,13 +281,20 @@ function ReportsPage() {
       totalMembers: membersCount,
       totalTime: formattedTime,
     };
-    // }
-    // else if(arg === 'project_count'){
-    //   return projectCount
-    // }else if(arg === 'time'){
-    //   return formattedTime
-    // }
+
   }
+
+    // Debounced search handler
+    const debouncedUpdateSearch = useMemo(
+      () =>
+        debounce((value) => {
+          if (value.length > 1 || value.length === 0) {
+            setFilters({ ...filters, ["page"]: 1 });
+            handlefilterchange("search", value);
+          }
+        }, 1000), // 1 sec debounce
+      [filters]
+    );
 
   const handleListProjects = async () => {
     if (memberProfile?.role?.slug === "owner") {
@@ -401,6 +332,28 @@ function ReportsPage() {
     handleListProjects();
     selectboxObserver();
   }, [dispatch]);
+
+  useEffect(() => {
+    if(remarksActive === true){
+      setLoader( true)
+      if(filters['sort_by'] === 'projects'){
+        dispatch(getRemarks({
+          member: selectedReport?._id,
+          project_id: selectedReport?.project?._id,
+          sort_by: filters["sort_by"],
+          date_range: filters['date_range']
+        }))
+      }else{
+        dispatch(getRemarks({
+          member: singleMemberReport?.member?._id,
+          project_id: selectedReport?.project?._id,
+          sort_by: filters["sort_by"],
+          date_range: filters['date_range']
+        }))
+      }
+      setLoader(false)
+    }
+  },[remarksActive])
 
   // Helper function to calculate time ranges
 
@@ -464,6 +417,14 @@ function ReportsPage() {
         setvideosByTask([]);
       }
     }
+
+
+    if(reportState.remarks){
+      setAddEditRemarks(false);
+      setRemarks("")
+      setEditRemark({})
+      setProjectRemarks(reportState.remarks)
+    }
   }, [reportState]);
 
   useEffect(() => {
@@ -474,17 +435,15 @@ function ReportsPage() {
 
   useEffect(() => {
     if (view === "single") {
-      setFilteredDate(new Date().toISOString().split("T")[0]);
-      handlefilterchange("date_range", new Date().toISOString().split("T")[0]);
+      setFilteredDate(new Date().toLocaleDateString("en-CA"));
+      handlefilterchange("date_range", new Date().toLocaleDateString("en-CA"));
     } else {
-      setFilteredDate([new Date().toISOString().split("T")[0]]);
+      setFilteredDate([new Date().toLocaleDateString("en-CA")]);
       handlefilterchange("date_range", [
-        new Date().toISOString().split("T")[0],
+        new Date().toLocaleDateString("en-CA"),
       ]);
     }
-    // setTimeout(() => {
-    // handleReports()
-    // },100)
+ 
   }, [view]);
 
   useEffect(() => {
@@ -690,6 +649,17 @@ function ReportsPage() {
     );
   };
 
+const formattedDate = (date) => {
+  return new Date(date).toLocaleDateString("en-US", {
+    weekday: "long", 
+    year: "numeric", 
+    month: "long",   
+    day: "numeric",  
+  });
+}
+  
+
+
   const FiltersDate = ({
     position,
     setFilteredDate,
@@ -887,19 +857,24 @@ function ReportsPage() {
     }
     // If the total time is less than 60 seconds, return the number of seconds
     if (totalSeconds === 0) {
-      return `00:00`;
-    } else if (totalSeconds < 60) {
-      return `${totalSeconds} seconds`;
-    }
+    return `00:00`;
+  } else if (totalSeconds < 60) {
+    return `${totalSeconds} seconds`;
+  }
 
-    const hours = Math.floor(totalSeconds / 3600)
-      .toString()
-      .padStart(2, "0");
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
+  let hours = Math.floor(totalSeconds / 3600);
+  let minutes = Math.round((totalSeconds % 3600) / 60);
 
-    return `${hours}h ${minutes}m`;
+  // Handle case where rounding pushes minutes to 60
+  if (minutes === 60) {
+    hours += 1;
+    minutes = 0;
+  }
+
+  hours = hours.toString().padStart(2, "0");
+  minutes = minutes.toString().padStart(2, "0");
+
+  return `${hours}h ${minutes}m`;
   }
 
   const handleLightBox = (type, mediaItems, index) => {
@@ -934,7 +909,8 @@ function ReportsPage() {
       // setFields({date: new Date()})
       handleReports();
       // handleClose()
-      setremarksActive(false);
+      // setremarksActive(false);
+      setAddEditRemarks(false)
     }
   }, [reportState]);
 
@@ -950,37 +926,6 @@ function ReportsPage() {
 
   return (
     <>
-      {/* <Lightbox
-        open={open}
-        close={() => setOpen(false)}
-        slides={postMedia}
-        plugins={[Fullscreen]}
-        fullscreen={{ ref: fullscreenRef }}
-        index={currentIndex}
-        on={{
-          click: () => fullscreenRef.current?.enter(),
-        }}
-        render={{
-          slide: ({ slide }) => {
-            if (slide?.type === "video") {
-              return (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <video
-                    controls
-                    autoPlay={false}
-                    style={{ maxHeight: "90vh", maxWidth: "100%" }}
-                  >
-                    <source src={slide.src} type="video/webm" />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              );
-            }
-            return null; // Default render for images will be used
-          },
-        }}
-      /> */}
-
       <Lightbox
         open={reportopen}
         close={() => setReportOpen(false)}
@@ -1118,17 +1063,16 @@ function ReportsPage() {
                           <MdOutlineSearch />
                           <Form.Control
                             type="text"
+                            ref={inputRef}
+                            readOnly={spinner}
                             placeholder={
                               activeMemberTab === "members"
                                 ? "Search by member"
-                                : "Search by project"
+                                : "Search by project or client name"
                             }
                             onChange={(event) => {
                               const value = event.target.value;
-                              if (value.length > 1 || value.length === 0) {
-                                setFilters({ ...filters, ["page"]: 1 });
-                                handlefilterchange("search", value);
-                              }
+                              debouncedUpdateSearch(value)
                             }}
                           />
                         </Form.Group>
@@ -1210,7 +1154,7 @@ function ReportsPage() {
                         <MdFilterList />
                       </ListGroup.Item>
                       <ListGroup.Item
-                        className="d-none d-lg-flex"
+                        className="d-none d-lg-flex ms-1"
                         onClick={() => {
                           handleSidebarSmall(false);
                         }}
@@ -1227,7 +1171,7 @@ function ReportsPage() {
         <div className="page--wrapper px-md-2 pb-4 pt-4 daily--reports">
           {spinner ? (
             <div className="loading-bar">
-              <img src="images/OnTeam-icon.png" className="flipchar" />
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
             </div>
           ) : (
             <Container fluid>
@@ -1272,7 +1216,7 @@ function ReportsPage() {
                       </thead>
                       <tbody>
                         {projectReports?.reports &&
-                          projectReports?.reports?.length > 0 &&
+                          projectReports?.reports?.length > 0 ?
                           projectReports?.reports?.map((reportData, i) => {
                             const result = getProjectTabSummary(reportData);
                             return (
@@ -1328,11 +1272,17 @@ function ReportsPage() {
                                   </Button>
                                 </td>
                               </tr>
-                            );
-                          })}
+                            )})
+                            :
+                            <>
+                              <div className="text-center">
+                                <h2>No Data Found</h2>
+                              </div>
+                            </>
+                          }
                       </tbody>
                     </Table>
-                    {projectReports?.totalPages > 1 && (
+                    {/* {projectReports?.totalPages > 1 && (
                       <Pagination>
                         <Pagination.Prev
                           onClick={goToPrevious}
@@ -1345,15 +1295,7 @@ function ReportsPage() {
                           }
                         />
                       </Pagination>
-                      // <ButtonGroup>
-                      //   <Button variant="light" onClick={goToPrevious} disabled={filters?.page === 1}>
-                      //     ◀
-                      //   </Button>
-                      //   <Button variant="light" onClick={goToNext} disabled={filters?.page === projectReports?.totalPages}>
-                      //     ▶
-                      //   </Button>
-                      // </ButtonGroup>
-                    )}
+                    )} */}
                   </div>
                 </div>
               )}
@@ -1472,7 +1414,10 @@ function ReportsPage() {
                               );
                             })
                           ) : (
-                            <></>
+                            <>
+                            <div className="text-center">
+                              <h2>No Data Found</h2>
+                            </div></>
                           )}
                         </tbody>
                       </Table>
@@ -1628,7 +1573,7 @@ function ReportsPage() {
             </ListGroup>
             <ListGroup.Item
               onClick={handleToggles}
-              className="d-none d-lg-flex"
+              className="d-none d-lg-flex ms-1"
             >
               <GrExpand />
             </ListGroup.Item>
@@ -1645,21 +1590,20 @@ function ReportsPage() {
           </ListGroup>
         </div>
         {spinner ? (
-            <div className="loading-bar">
-              <img src="images/OnTeam-icon.png" className="flipchar" />
-            </div>
-          ) : (
-        isActive === 1 && activeMemberTab === "members" ? (
+          <div className="loading-bar">
+            <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+          </div>
+        ) : isActive === 1 && activeMemberTab === "members" ? (
           <div className="rounded--box activity--box">
             <div className="reports--heading">
-              <div className="d-flex align-items-center gap-3 justify-content-between">
+              <div className="d-flex flex-column flex-sm-row align-sm-items-center gap-1 gap-sm-3 justify-content-between">
                 <h3 className="mb-0 d-flex align-items-center gap-3">
                   <span>
                     <LuFolderOpen />
                   </span>
                   Projects ({singleMemberReport?.reports?.length || 0})
                 </h3>
-                <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+                <div className="d-flex align-items-center gap-2 gap-xl-4 mt-2 mt-xl-0 text-sm">
                   <div className="text-center">
                     <div className="text-lg font-bold text--blue">
                       {getProjectSummary(singleMemberReport?.reports, "time")}
@@ -1756,7 +1700,7 @@ function ReportsPage() {
                                       </p>
                                       <Button
                                         variant="dark"
-                                        className="px-3 py-2"
+                                        className="px-3 py-2 d-flex align-items-center gap-2"
                                         onClick={() =>
                                           handleViewReport(
                                             report.activities,
@@ -1773,6 +1717,18 @@ function ReportsPage() {
                             </div>
                           </Col>
                         </Row>
+                        
+                          { memberProfile?.role?.slug === 'owner' || memberProfile?.permissions?.reports?.view_others && memberProfile?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.permissions?.reports?.selected_members.includes(singleMemberReport?.member?._id) || memberdata?._id === singleMemberReport?.member?._id ?
+              
+                          <Row>
+                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                                <Button variant="primary" onClick={() => {setProjectRemarks([]);setremarksActive(true); setSelectedReport(report)}}>View Remarks</Button>
+                                </Col>
+                              </Row>
+                              :
+                              <></>
+                            }
+                        
                       </div>
                     </div>
                   </>
@@ -1870,7 +1826,7 @@ function ReportsPage() {
                                   </p>
                                   <Button
                                     variant="dark"
-                                    className="px-3 py-2"
+                                    className="px-3 py-2 d-flex align-items-center gap-2"
                                     onClick={() =>
                                       handleViewReport(
                                         member.activities,
@@ -1884,6 +1840,19 @@ function ReportsPage() {
                               )
                             )}
                           </ul>
+                            {
+                              memberProfile?.role?.slug === 'owner'  || memberProfile?.permissions?.reports?.view_others === true && memberProfile?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.permissions?.reports?.selected_members.includes(member?._id) 
+                              || memberdata?._id === member?._id ?
+
+                              <Row>
+                                <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                                  <Button variant="primary" onClick={() => {setProjectRemarks([]);setremarksActive(true); setSelectedReport(member)}}>View Remarks</Button>
+                                  </Col>
+                                </Row>
+                                :
+                                <></>
+                            }
+                          
                         </div>
                       </Col>
                     </div>
@@ -1892,8 +1861,7 @@ function ReportsPage() {
               })}
             </div>
           </div>
-        )
-      )}
+        )}
       </div>
 
       {/*--=-=Filter Modal**/}
@@ -1960,6 +1928,8 @@ function ReportsPage() {
                   <MdOutlineSearch />
                   <Form.Control
                     type="text"
+                    ref={inputRef}
+                    readOnly={spinner}
                     placeholder={
                       activeMemberTab === "members"
                         ? "Search by member"
@@ -1967,10 +1937,11 @@ function ReportsPage() {
                     }
                     onChange={(event) => {
                       const value = event.target.value;
-                      if (value.length > 1 || value.length === 0) {
-                        setFilters({ ...filters, ["page"]: 1 });
-                        handlefilterchange("search", value);
-                      }
+                      debouncedUpdateSearch(value)
+                      // if (value.length > 1 || value.length === 0) {
+                      //   setFilters({ ...filters, ["page"]: 1 });
+                      //   handlefilterchange("search", value);
+                      // }
                     }}
                   />
                 </Form.Group>
@@ -2036,6 +2007,151 @@ function ReportsPage() {
           </ListGroup>
         </Modal.Body>
       </Modal>
+
+      <Modal
+          show={remarksActive}
+          onHide={() => setremarksActive(false)}
+          centered
+          size="lg"
+          className="add--workflow--modal theme--modal"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+             <span className="nav--item--icon">
+                <FiCheckCircle />
+              </span>
+              <strong>
+                Project Remarks
+                {
+                  filters['sort_by'] === 'projects' ? 
+                  <small>{selectedReport?.name}</small>
+                  :
+                  <small>{singleMemberReport?.member?.name}</small>
+                }
+              </strong>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {
+              addEditRemarks === true ? 
+              <>
+              <Form.Group className="mb-0 form-group">
+                <DatePicker
+                  key={"remarks-date"}
+                  name="date"
+                  weekStartDayIndex={1}
+                  id="datepicker-remarks"
+                  value={remarkDate || ""}
+                  format="YYYY-MM-DD"
+                  multiple={false}
+                  dateSeparator=" - "
+                  editable={Object.keys(editRemark).length === 0}
+                  disabled={Object.keys(editRemark).length > 0}
+                  onChange={async (value) => {
+                    const formatDate = (date) => {
+                      const d = new Date(date);
+                      const year = d.getFullYear();
+                      const month = String(d.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+                      const day = String(d.getDate()).padStart(2, "0");
+                      return `${year}-${month}-${day}`;
+                    };
+                    const formatted = formatDate(value);
+                    setRemarkDate(formatted)
+                  }}
+                  className="form-control"
+                  placeholder="YYYY-MM-DD"
+                />
+              </Form.Group>
+                <Form.Group className="mb-0 form-group">
+                  
+                  <textarea className="form-control mt-4" rows={7} defaultValue={remarks} onChange={handleRemarksChange}>
+                    
+                  </textarea>
+                </Form.Group>
+                {
+                  editRemark?._id ?
+                    <Button variant="primary" onClick={() => {
+                      updateRemarks()
+                    }} disabled={loader}>{loader === true ? 'Please wait...': 'Update'}</Button>
+                    :
+                    <Button variant="primary" onClick={() => {
+                      saveRemarks(selectedReport?.project?._id)
+                    }} disabled={loader}>{loader === true ? 'Please wait...': 'Save'}</Button>
+
+                }
+                
+                <Button variant="danger" onClick={() => setAddEditRemarks( false )}>Cancel</Button>
+              </>
+              :
+              <></>
+            }
+            {
+              (memberdata?._id === singleMemberReport?.member?._id && addEditRemarks === false) && (
+                <Button variant="primary" onClick={() => setAddEditRemarks(true)}>Add Remarks</Button>
+              )
+               
+            }
+             {/* <FaRegEdit onClick={handleRemarks} /> */}
+             {loader && (
+                <div className="loading-bar">
+                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+                </div>
+              )
+            }
+            {
+              projectRemarks && projectRemarks?.length > 0 ?
+              projectRemarks?.map((remark, index) => {
+                
+                return (
+                  <div className="reports-section">
+                    <div className="reports--heading">
+                      <div className="align-items-center gap-3 justify-content-between">
+                        <div className="mb-0 d-flex align-items-center gap-3">
+                          <div className="title--initial">
+                            {index + 1}
+                          </div>
+                          <div className="title--span flex-column d-flex align-items-start gap-0">
+                            <span>{selectedReport?.project?.title}</span>
+                            <small>
+                              <LuClock />{" "}{formattedDate(remark.createdAt)}
+                              </small>
+                              {
+                                (memberdata?._id === singleMemberReport?.member?._id) && (
+                                 <>
+                                   <FiEdit
+                                    className="text-danger"
+                                    onClick={() => handleEditRemarks(remark)}
+                                  />
+                                  <FiTrash2
+                                    className="text-danger"
+                                    onClick={() => handleRemoveRemarks(remark._id)}
+                                  />
+                                 </>
+                                )
+                              }
+                            
+                          </div>
+                        </div>
+                        <div className="align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
+                          <div className="text-md-start">
+                            <div className="text-slate-600">
+                              {remark?.meta_value}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    </div>
+                  
+                )
+                
+              })
+              :
+              <p> No data available.</p>
+            }
+                    
+          </Modal.Body>
+        </Modal>
 
       {ViewReport && (
         <Modal

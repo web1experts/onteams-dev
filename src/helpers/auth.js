@@ -124,6 +124,7 @@ export function setupDashboards( companies ){
   if( companies.length > 0){ 
     localStorage.setItem('mt_dashboards', JSON.stringify(companies));
     const current_dashboard = localStorage.getItem('current_dashboard');
+    const default_dashboard = localStorage.getItem('default_dashboard');
     
     if (current_dashboard) {
       const parsedata = JSON.parse(current_dashboard)
@@ -131,25 +132,27 @@ export function setupDashboards( companies ){
       // const companyExists = companies.some(company => company._id === current_dashboard.id);
       let companyExists = false
       for( let i = 0; i < companies.length; i++){
-        if(companies[i].company._id === parsedata.id){
+        if(companies[i].company._id === parsedata.id || companies[i].company._id === default_dashboard){
           companyExists = companies[i];
         }
       }
 
       if (!companyExists) { 
-        localStorage.setItem('current_dashboard', JSON.stringify({ name: companies[0].company.name, id: companies[0].company._id, theme: companies[0].company?.theme || false }));
+        localStorage.setItem('current_dashboard', JSON.stringify({ name: companies[0].company.name, id: companies[0].company._id, theme: companies[0].company?.theme || false, subscription: companies[0].company.subscription || false }));
         axios.defaults.headers.common.companyId =  companies[0].company._id || ''
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
         saveTheme(companies[0].company?.theme || defaultTheme );
         axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
-      }else{
-        localStorage.setItem('current_dashboard', JSON.stringify({ name: companyExists.company.name, id: companyExists.company._id, theme: companyExists.company?.theme || false  }));
+      }else{ 
+        localStorage.setItem('current_dashboard', JSON.stringify({ name: companyExists.company.name, id: companyExists.company._id, theme: companyExists.company?.theme || false, subscription: companyExists.company.subscription || false  }));
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companyExists?.memberData || null))
+        axios.defaults.headers.common.companyId =  companyExists.company._id || ''
         saveTheme(companyExists.company?.theme || defaultTheme );
         axios.defaults.headers.common.memberkey =  companyExists?.memberData?._id || ''
       }
-    }else{
-      localStorage.setItem('current_dashboard', JSON.stringify({name: companies[0].company.name, id: companies[0].company._id, theme: companies[0].company?.theme || false}));
+      setAuthorization()
+    }else{ 
+      localStorage.setItem('current_dashboard', JSON.stringify({name: companies[0].company.name, id: companies[0].company._id, theme: companies[0].company?.theme || false, subscription: companies[0].company.subscription || false }));
       axios.defaults.headers.common.companyId =  companies[0].company._id || ''
       localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
       axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
@@ -218,6 +221,10 @@ export function logout() {
   }, 500);
   return true;
 }
+
+export const MarkProject = (projectId, isMarked, member) => {
+  socket.emit('mark_project', { projectId, isMarked, member});
+};
 
 export const SendComment = (type = 'task', text, postId, userId,parentCommentId) => {
   socket.emit('comment', { text, postId, userId,parentCommentId, type });

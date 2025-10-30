@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Modal, Button, Form, Row, Col, Card, Badge } from "react-bootstrap";
 import { FiEdit3, FiTrash2, FiPlus } from "react-icons/fi";
-import { GoDotFill } from "react-icons/go";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
-import { ListAttendanceStatuses,saveAttendanceStatuses } from "../../redux/actions/attendance.action";
+import { GoDotFill } from "react-icons/go";
+import {ListAttendanceStatuses,saveAttendanceStatuses} from "../../redux/actions/attendance.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 
 const AttendanceStatusManager = ({ toggle, show }) => {
@@ -180,7 +180,7 @@ const getTotalMinutes = (hour, minute) => {
     setForm({ ...form, color });
   };
 
-  const showError = (field) => errors[field] ? <span className="form-error"><GoDotFill /> {errors[field]}</span> : null;
+  const showError = (field) => errors[field] ? <span className="form-error"><GoDotFill />{errors[field]}</span> : null;
 
   const handleSubmit = (e) => {
   e.preventDefault();
@@ -399,7 +399,7 @@ if (endMinutes - startMinutes < 1) {
           <Form onSubmit={handleSubmit}>
             {
               Object.keys(errors).length > 0 ?
-              <div className="error--box">
+              <div className="error--stack">
                 <p className="form-errors"><AiOutlineExclamationCircle /> Please fix the following errors:</p> 
                 {showError("ruleName")}
                 {showError("startHour")}

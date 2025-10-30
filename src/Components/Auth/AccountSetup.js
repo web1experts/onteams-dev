@@ -115,7 +115,7 @@ function AccountSetup() {
 
         if( workspace.success ){ 
             setTimeout(function(){
-                navigate('/dashboard')
+                navigate('/plans')
             },1000)
         }
     },[apiResult, workspace])

@@ -51,9 +51,14 @@
 .modal-header {
     border-bottom: 0;
     border-top-left-radius: 0;
+    padding-right: 2rem;
 }
 
-.theme--modal .modal-body .field__tabs {
+.modal-header .modal-title {
+    line-height: 1;
+}
+
+.modal-body .field__tabs {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
     background: rgb(255, 255, 255);
     border-radius: 0.5rem;
@@ -66,7 +71,7 @@
     margin-bottom: 1rem;
 }
 
-.theme--modal .modal-body .field__tabs .btn--view {
+.modal-body .field__tabs .btn--view {
     width: auto;
     height: auto;
     display: flex;
@@ -80,22 +85,32 @@
     --bs-btn-color: transparent;
     font-size: 1rem;
     border-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    border-top-left-radius: .5rem;
+    border-bottom-left-radius: .5rem;
+    border-bottom-right-radius: .5rem;
     padding: 0.35rem 0.65rem;
     background: transparent;
     border: 0px;
 }
 
-.theme--modal .modal-body .field__tabs .btn--view.active,
-.theme--modal .modal-body .field__tabs .btn--view:focus-visible,
-.theme--modal .modal-body .field__tabs .btn--view:hover,
-.theme--modal .modal-body .field__tabs .btn-primary:not(:disabled):not(.disabled).active {
+.modal-body .field__tabs .btn--view:first-child:not(:last-child),
+.modal-body .field__tabs .btn--view:last-child:not(:first-child) {
+    border-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    border-top-left-radius: .5rem;
+    border-bottom-left-radius: .5rem;
+    border-bottom-right-radius: .5rem;
+}
+
+.modal-body .field__tabs .btn--view.active,
+.modal-body .field__tabs .btn--view:focus-visible,
+.modal-body .field__tabs .btn--view:hover,
+.modal-body .field__tabs .btn-primary:not(:disabled):not(.disabled).active {
     color: rgb(255, 255, 255);
     box-shadow: none !important;
     background: linear-gradient(90deg, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-    border-width: 0px;
-    border-style: initial;
-    border-color: initial;
-    border-image: initial;
+    border: 0px;
 }
 
 .rules--modal .modal-header .btn-primary {
@@ -124,6 +139,8 @@
   position: relative;
   padding-right: 3rem;
 }
+
+
 
 .rules--modal .modal-header .btn-close {
     position: absolute;
@@ -389,7 +406,7 @@
 }
 
 .modal.show {
-    z-index: 77777;
+    z-index: 888888;
 }
 
 .error--box {
@@ -461,7 +478,7 @@ span.form-error {
 }
 
 .setting__modal .setting--page {
-    height: auto;
+    height: 100%;
 }
 
 .setting__modal .setting--page .form-floating>label {
@@ -814,7 +831,7 @@ ul#subtasks-ul li textarea.form-control+button {
     width: 100%;
 }
 
-.task--message .msg-member-info .team--initial {
+.task--message .msg-member-info .team--initial, .task--message .msg-member-info img {
     width: 28px;
     min-width: 28px;
     height: 28px;
@@ -822,19 +839,16 @@ ul#subtasks-ul li textarea.form-control+button {
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
 }
 
 .task--message .msg-member-info img {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     object-fit: cover;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
+}
+
+.task--message .msg-member-info .team--initial {
+    background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
 .task--message .msg-member-info p {
@@ -965,6 +979,36 @@ input.form-error,
 select.form-error {
     color: red;
     border: 1px solid red;
+}
+
+.error--stack {
+    margin-bottom: 1.5rem;
+    padding: .75rem;
+    background-color: rgb(254 242 242);
+    border: 1px solid rgb(254 202 202);
+   border-radius: .5rem;
+   -webkit-border-radius: .5rem;
+}
+
+.error--stack .form-errors {
+    color: rgb(153 27 27);
+    font-weight: 500;
+   font-size: .875rem;
+    line-height: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    margin-bottom: .25rem;
+}
+
+.error--stack .form-error {
+    color: rgb(185 28 28);
+    font-size: .875rem;
+    line-height: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    margin-bottom: .15rem;
 }
 
 .rmdp-header {
@@ -1221,6 +1265,10 @@ select.form-error {
     line-height: 1.2;
 }
 
+.reports-section .single--project--stack p strong svg {
+    min-width: 18px;
+}
+
 .reports-section .single--project--stack p small {
     font-size: .85rem;
     font-weight: normal;
@@ -1247,7 +1295,7 @@ select.form-error {
     gap: 1rem;
 }
 
-.color--selection input.form-control {
+.color--selection input.form-control, .color--selection .form--input {
     flex: 1 1;
 }
 
@@ -1259,11 +1307,11 @@ select.form-error {
     background: #ffffff;
     border: 1px solid rgb(0 0 0 / .1);
     border-radius: .5rem;
-    padding: 4px 8px 4px 4px;
+    padding: 6px 10px 6px 6px;
     margin: 0;
 }
 
-.theme--modal .color--selection .form-control-color {
+.color--selection .selected-badge-color .form-control-color {
     flex: none;
     border-radius: .25rem;
     width: 30px;
@@ -1339,12 +1387,9 @@ select.form-error {
         margin-bottom: .5rem;
     }
 
-    .added--fields .card .card-body .col-auto {
-        flex: 1 1;
-    }
-
     .added--fields .card .card-body .col-auto:last-child {
         text-align: right;
+        margin-left: auto;
     }
 
     .rules--modal .modal-title strong {
@@ -1356,7 +1401,7 @@ select.form-error {
         justify-content: space-between;
     }
 
-    .color--selection input.form-control {
+    .color--selection input.form-control, .color--selection .form--input {
         flex: 1 1 100%;
     }
 }
@@ -1383,8 +1428,23 @@ select.form-error {
     .reports-section .btns--set .btn {
         flex: 1 1;
     }
+}
 
+@media screen and (max-width:320px) {
     .theme--modal .modal-title strong {
         font-size: 18px;
+    }
+
+    .reports-section .single--project--stack p strong {
+        font-size: .875rem;
+    }
+
+    .reports-section .single--project--stack p small {
+        font-size: .8rem;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-top: .5rem;
     }
 }

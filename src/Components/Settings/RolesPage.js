@@ -433,7 +433,7 @@ function RolesPage() {
   }, [activeRole]);
 
   const handleDeleteRole = async (e) => {
-    setLoader(true); console.log(activeRole._id)
+    setLoader(true); 
     dispatch(deleteRole(activeRole._id))
   }
 
@@ -509,6 +509,7 @@ function RolesPage() {
       }
       if( apiPermission.deletedRole){
         setRoles((prev) => prev.filter((role) => role._id !== apiPermission.deletedRole?._id));
+        setFields({name: ""})
       }
       if (apiPermission.updatedMeta) {
         const meta = apiPermission.updatedMeta?.meta_value;
@@ -564,6 +565,8 @@ function RolesPage() {
     }
   }, [workspace]);
 
+  
+
   return (
     <>
         <div className="page--wrapper setting--page">
@@ -578,7 +581,7 @@ function RolesPage() {
                   <Col lg={6}>
                     <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
                     <FloatingLabel label="Select Role">
-                        <Form.Select className="custom-selectbox"  onChange={(e) => {
+                        <Form.Select className="custom-selectbox" key={`rolelist`}  onChange={(e) => {
                           const selectedRole = roles.find((role) => role._id === e.target.value);
                           setActiveRole(selectedRole);
                         }}>
@@ -716,8 +719,8 @@ function RolesPage() {
                     })}
 
                   <div className="mt-4 text-end fixed--bottom">
-                    <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete Role</Button>
-                    <Button variant="primary" className="ms-3" onClick={handleSave}>Save Permissions</Button>
+                    <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete</Button>
+                    <Button variant="primary" className="ms-3" onClick={handleSave}>Save</Button>
                   </div>
                 </div>
             </>
@@ -728,7 +731,11 @@ function RolesPage() {
         )}
       </div>
       {show && (
-        <Modal show={show} onHide={() => setShow(false)} size="lg">
+        <Modal show={show} onHide={() => {setShow(false);
+          setTimeout(() => {
+            selectboxObserver()
+          },650)
+        }} size="lg">
             <Modal.Header closeButton>
                 <Modal.Title>Add New Role</Modal.Title>
             </Modal.Header>

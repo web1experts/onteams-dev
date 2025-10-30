@@ -6,9 +6,9 @@ import {
     SUBSCRIPTION_ERROR,
     SUBSCRIPTION_SUCCESS,
     AUTHORIZE_PAYMENT_SUCCESS,
-    AUTHORIZE_PAYMENT_FAIL
+    SUBSCRIPTION_UPDATE_SUCCESS,
+    ACTIVE_PLAN
 } from "./types";
-// console.log('Environment : ', process.env.NODE_ENV)
 const config = {
   headers: {
     'Content-Type': "application/json; charset=utf-8"
@@ -32,12 +32,11 @@ function errorRequest(err, dispatch) {
     });
   }
 }
-
-export const handleAuthorizePayment = (payload) => {
+export const createSubscription = (payload) => {
 
   return async (dispatch) => {
     try {
-      const response = await API.apiPostUrl('payment', '/authorize' , payload)
+      const response = await API.apiPostUrl('subscription', '/create' , payload)
       if (response.data && response.data.success) {
         await dispatch({ type: AUTHORIZE_PAYMENT_SUCCESS, payload: response.data });
       } else {
@@ -49,14 +48,13 @@ export const handleAuthorizePayment = (payload) => {
   };
 }
 
-
-export const handleStripeAuthorizePayment = (payload) => {
+export const saveAuthorization = (payload) => {
 
   return async (dispatch) => {
     try {
-      const response = await API.apiPostUrl('payment', '/authorize-stripe' , payload)
+      const response = await API.apiPostUrl('subscription', '/save' , payload)
       if (response.data && response.data.success) {
-        await dispatch({ type: AUTHORIZE_PAYMENT_SUCCESS, payload: response.data });
+        await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }
@@ -66,11 +64,46 @@ export const handleStripeAuthorizePayment = (payload) => {
   };
 }
 
-export const startRazorPayMandate = (payload) => {
+export const subscribeFreePlan = () => {
 
   return async (dispatch) => {
     try {
-      const response = await API.apiPostUrl('payment', '/emandate' , payload)
+      const response = await API.apiPostUrl('subscription', '/free', {})
+      if (response.data && response.data.success) {
+        await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+}
+ 
+}
+
+
+export const subscribeTrialPlan = () => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('subscription', '/trial', {})
+      if (response.data && response.data.success) {
+        await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+}
+ 
+}
+
+export const updateSubscription = (payload) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPutUrl('subscription', '/update', payload)
       if (response.data && response.data.success) {
         await dispatch({ type: AUTHORIZE_PAYMENT_SUCCESS, payload: response.data });
       } else {
@@ -79,16 +112,17 @@ export const startRazorPayMandate = (payload) => {
     } catch (err) {
       errorRequest(err, dispatch);
     }
-  };
+}
+ 
 }
 
-export const saveMandateDetails = (payload) => {
+export const getActiveSubscription = () => {
 
   return async (dispatch) => {
     try {
-      const response = await API.apiPostUrl('payment', '/save-mandate' , payload)
+      const response = await API.apiGetByKey('subscription', '/active-subscription')
       if (response.data && response.data.success) {
-        await dispatch({ type: AUTHORIZE_PAYMENT_SUCCESS, payload: response.data });
+        await dispatch({ type: ACTIVE_PLAN, payload: response.data });
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }

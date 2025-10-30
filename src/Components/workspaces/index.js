@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getloggedInUser } from "../../helpers/auth";
 import { AlertDialog, TransferOnwerShip } from "../modals";
 import { getMemberdata } from "../../helpers/commonfunctions";
-import { deleteWorkspace } from "../../redux/actions/workspace.action";
+import { deleteWorkspace, leaveCompany } from "../../redux/actions/workspace.action";
 import Spinner from 'react-bootstrap/Spinner';
 import { BsTrash2, BsEye } from "react-icons/bs";
 function Workspace(props) {
@@ -21,10 +21,18 @@ function Workspace(props) {
   const commonState = useSelector(state => state.common)
   const dispatch = useDispatch();
   const currentMember = getMemberdata();
+  const currentUser = getloggedInUser();
+  
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
+  const [showLeaveWarning, setShowLeaveWarning] = useState(false);
+  const handleCloseWarning = () => {
+     setShowLeaveWarning(false);
+     setSpinner(false)
+  }
   const handleShow = () => setShow(true);
   const [ editworkspace, setEditWorkspace] = useState('')
+  const [selectedWorkspace, setSelectedWorkspace] = useState(false)
   const workspacefeed = useSelector(state => state.auth.userCompanies);
   const [workspaces, setWorkspaces] = useState([])
   const apiResult = useSelector((state) => state.member);
@@ -61,17 +69,25 @@ function Workspace(props) {
     setEditWorkspace( company )
     setShowDialog(true)
   }
+  const leaveWorkspace = (workspace) => {
+    setSelectedWorkspace( workspace )
+    setShowLeaveWarning(true)
+  }
   const handledeleteWorkspace = async (id) => {
-    
     await dispatch(
       deleteWorkspace(id)
     );
   };
 
-
-  const handleownership = async () => {
-    console.log("transfer ownership");
-  };
+  const handleLeave = async () => {
+    setSpinner(true)
+    await dispatch(
+      leaveCompany({
+        companyId: selectedWorkspace?.company._id,
+        memberId: selectedWorkspace.memberData._id,
+      })
+    );
+  }
 
   const handleEdit = (workspace) => {
     setEditWorkspace( workspace )
@@ -102,59 +118,67 @@ function Workspace(props) {
         <div className='page--wrapper px-md-2 pb-4 pt-4'>
         {
           spinner ?
-          <div class="loading-bar">
-              <img src="images/OnTeam-icon.png" className="flipchar" />
+          <div className="loading-bar">
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
           </div>
           :
           <Container fluid>
             <div className="attendance--table members--view">
               <div className="attendance--table--list">
-                <Table responsive="lg">
-                  <thead className="onHide">
-                    <tr key="project-table-header">
-                      <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
-                        <FiUsers className="me-1" /> Name
-                      </th>
-                      <th scope="col" key="client-action-header" className="onHide">
-                        <FiTarget className="me-1" /> Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      !spinner && workspaces && workspaces.length > 0 ?
-                      workspaces.map((workspace, index) => (
-                        <tr key={`row-${index}`}>
-                          {/* <td width={30}>{index + 1 }</td> */}
-                          <td className="cursor--pointer project--title--td">
-                            <div className="d-flex justify-content-between">
-                              <div className="project--name d-flex gap-3 align-items-center">
-                                  <div className="drag--indicator"><abbr>{index + 1 }</abbr><MdDragIndicator /></div>
-                                  <div className="title--initial">{workspace.company?.name?.substring(0,1)}</div>
-                                  <div className="title--span flex-column d-flex align-items-start gap-0">
-                                    <span>{workspace.company?.name}</span>
-                                  </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="d-flex gap-3 align-items-center justify-content-md-end">
-                              <Button variant="dark" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
-                              <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    :
-                    !spinner && workspaces && workspaces.length === 0 &&
-                    <tr>
-                        <td colSpan={3}>
-                          <h2 className="mt-2 text-center">No workspace found.</h2>
-                        </td>
+                {
+                  !spinner && workspaces && workspaces.length > 0 ?
+                  <Table responsive="lg">
+                    <thead className="onHide">
+                      <tr key="project-table-header">
+                        <th scope="col" className="sticky pe-0 py-0" key="project-name-header">
+                          <FiUsers className="me-1" /> Name
+                        </th>
+                        <th scope="col" key="client-action-header" className="onHide">
+                          <FiTarget className="me-1" /> Actions
+                        </th>
                       </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        workspaces.map((workspace, index) => (
+                          <tr key={`row-${index}`}>
+                            {/* <td width={30}>{index + 1 }</td> */}
+                            <td className="cursor--pointer project--title--td">
+                              <div className="d-flex justify-content-between">
+                                <div className="project--name d-flex gap-3 align-items-center">
+                                    <div className="drag--indicator"><abbr>{index + 1 }</abbr></div>
+                                    <div className="title--initial">{workspace.company?.name?.substring(0,1)}</div>
+                                    <div className="title--span flex-column d-flex align-items-start gap-0">
+                                      <span>{workspace.company?.name}</span>
+                                    </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="d-flex gap-3 align-items-center justify-content-md-end">
+                                {(currentUser &&
+                                    currentUser._id === workspace?.company?.owner) ?
+                                    <>
+                                    <Button variant="dark" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
+                                    <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
+                                    </>
+                                    :
+                                    <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => leaveWorkspace( workspace)}><FaTrashAlt /> Leave</Button>
+                                }
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      }
+                      
+                    </tbody>
+                  </Table>
+                  :
+                  !spinner && workspaces && workspaces.length === 0 &&
+                    <div className="text-center">
+                          <h2 className="mt-2 text-center">No workspace found.</h2>
+                    </div>
                     }
-                  </tbody>
-                </Table>
               </div>
             </div>
           </Container>
@@ -169,8 +193,8 @@ function Workspace(props) {
         </Modal.Body>
       </Modal>
 
-      {(currentMember &&
-        currentMember.role?.slug === "owner" &&
+      {(currentUser &&
+          currentUser._id === editworkspace?.owner &&
         
         <>
           <AlertDialog
@@ -180,11 +204,32 @@ function Workspace(props) {
             callback={() => handledeleteWorkspace( editworkspace._id)}
           />
         </>
-      
       )}
-      </div>
-      
 
+      {
+        showLeaveWarning && 
+        <Modal
+          show={showLeaveWarning}
+          onHide={handleCloseWarning}
+          centered
+          size="md"
+          className="add--member--modal"
+      >
+          <Modal.Header closeButton>
+            <Modal.Title>Are you sure you want to leave?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>This action cannot be undone.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-primary" onClick={handleCloseWarning}>Disagree</Button>
+            <Button variant="primary" disabled={spinner} onClick={() => handleLeave()}>
+              { spinner ? 'Please wait...' : 'Agree' }
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      }
+      </div>
   );
 }
 

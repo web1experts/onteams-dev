@@ -183,7 +183,7 @@ export const permissionsLabel = {
     "update_manual_time": {
       "icon": <FiEdit />,
       heading: "Time Management",
-      sub_heading: "Manual time update"
+      sub_heading: "Manual time approve/disapprove"
     }
   },
   holidays: {

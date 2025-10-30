@@ -112,7 +112,7 @@ Sidebar CSS-=-=
   -webkit-border-radius: .75rem;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
-  padding: 20px;
+  padding: .85rem;
 }
 
 .panel--sidebar .user--dropdown .dropdown-item {
@@ -302,7 +302,7 @@ Sidebar CSS-=-=
 .panel--sidebar .navbar {
   display: block !important;
   background: transparent;
-  height: calc(100dvh - 112px);
+  height: calc(100dvh - 98px);
 }
 
 .panel--sidebar .navbar-expand-lg .navbar-collapse {
@@ -539,9 +539,11 @@ Sidebar CSS-=-=
 
 .current--workspace .dropdown-toggle {
   padding: .85rem;
+  padding-right: 2rem;
   width: 100%;
   display: flex;
   align-items: center;
+  flex-flow: row wrap;
   gap: .5rem;
   border: 1px solid rgb(203 213 225 / 10%);
   height: auto;
@@ -584,7 +586,7 @@ Sidebar CSS-=-=
   width: 35px;
   min-width: 35px;
   justify-content: center;
-  margin-right: .5rem;
+  margin-right: 0;
   padding: .25rem 0;
   text-align: center;
   text-transform: uppercase;
@@ -631,6 +633,17 @@ Sidebar CSS-=-=
   display: flex;
   flex-flow: column wrap;
   text-align: left;
+  flex: 1 1;
+  max-width: calc(100% - 43px);
+}
+
+.current--workspace .dropdown-toggle strong span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+  width:  100%;
+  display: block;
 }
 
 .current--workspace .dropdown-toggle strong small {
@@ -727,6 +740,10 @@ Sidebar CSS-=-=
 
 .theme--modal .modal-header .btn-close:hover {
   background: #ffffff4d;
+}
+
+.btn-close:focus {
+	box-shadow: none;
 }
 
 .theme--modal .modal-title strong {
@@ -877,6 +894,7 @@ Sidebar CSS-=-=
 .theme--modal .form-label {
   font-weight: 500;
   margin: 0 0 0.15rem;
+  width: 100%;
 }
 
 .theme--modal .btn--group .btn {
@@ -931,7 +949,7 @@ Sidebar CSS-=-=
     border-radius: 100px;
     width: 60px;
     height: 60px;
-    z-index: 999999;
+    z-index: 888888;
     transform: translate(0px, -70px);
     -webkit-transform: translate(0px, -70px);
   }
@@ -944,9 +962,9 @@ Sidebar CSS-=-=
     min-width: 100%;
     border: 0;
     bottom: 0;
-    transition: all .5s ease-in-out;
-    -webkit-transition: all .5s ease-in-out;
-    z-index: 999999;
+    transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-in-out;
+    z-index: 888888;
   }
 
   .team--page {
@@ -959,7 +977,7 @@ Sidebar CSS-=-=
     max-width: 100%;
     width: 100%;
     min-width: auto;
-    z-index: 999999;
+    z-index: 888888;
     transform: translateX(0) translateY(0%);
     -webkit-transform: translateX(0) translateY(0%);
     height: 100%;

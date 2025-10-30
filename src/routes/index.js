@@ -23,6 +23,9 @@ import DashboardPage from "../Components/Dashboard/DashboardPage";
 import DesktopPage from "../Components/Desktop/DesktopPage";
 import ManualTime from "../Components/TimeTracking/ManualTime";
 import PlansPage from "../Components/subscriptions/Plans";
+import ManagePlan from "../Components/subscriptions/ManagePlan";
+import PlanOverview from "../Components/subscriptions/PlanOverview";
+import SubscriptionPlans from "../Components/subscriptions/subscriptionPlans";
 const commonRouter = [
     {
         type: 'page',
@@ -92,10 +95,10 @@ const publicRoutes = [
     },
     {
         type: 'page',
-        name: 'Onteams',
-        key: 'ONTEAMS',
+        name: 'Primeteams',
+        key: 'PRIMETEAMS',
         component: <DesktopPage/>,
-        route: '/onteamsio',
+        route: '/primeteamsio',
     },
 ];
 
@@ -110,6 +113,7 @@ const privateRoutes = [
         route: "*"
 
     },
+    
     {
         type: 'page',
         name: 'Manual Time Approve',
@@ -224,10 +228,10 @@ const privateRoutes = [
     },
     {
         type: 'page',
-        name: 'Onteams',
-        key: 'ONTEAMS',
+        name: 'Primeteams',
+        key: 'PRIMETEAMS',
         component: <DesktopPage/>,
-        route: '/onteamsio',
+        route: '/primeteamsio',
     },
     {
         type: 'page',
@@ -235,6 +239,20 @@ const privateRoutes = [
         key: 'PLANS',
         component: <PlansPage />,
         route: '/plans'
+    },
+    {
+        type: 'page',
+        name: 'SubscriptionPlans',
+        key: 'SUBSCRIPTION_PLANS',
+        component: <SubscriptionPlans />,
+        route: '/subscription-plans'
+    },
+    {
+        type: 'page',
+        name: 'PlanOverview',
+        key: 'PLANS_OVERVIEW',
+        component: <PlanOverview />,
+        route: '/plan-details'
     }
 ];
 const hideSidebarRoutes = [
@@ -246,7 +264,8 @@ const hideSidebarRoutes = [
     '/reset-password/:token',
     '/account-setup/:token',
     '/accept-invite/:token',
-    '/member-signup/:token'
+    '/member-signup/:token',
+    
 ]
 
 export { publicRoutes, privateRoutes, hideSidebarRoutes };

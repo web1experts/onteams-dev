@@ -6,6 +6,15 @@
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
+svg {
+  vertical-align: inherit;
+}
+
+b, strong {
+	font-weight: 700;
+}
+
+/* For WebKit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -19,6 +28,12 @@
 ::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin; /* "auto" or "thin" */
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent; /* thumb color and track color */
 }
 
 img {
@@ -43,8 +58,8 @@ h6 {
 a {
   text-decoration: none;
   outline: none;
-  transition: all 0.5s cubic-bezier(.4, 0, .2, 1);
-  -webkit-transition: all 0.5s cubic-bezier(.4, 0, .2, 1);
+  transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+  -webkit-transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
 }
 
 a:hover,
@@ -132,7 +147,7 @@ fieldset:disabled .btn {
 .btn-primary {
   color: #ffffff;
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-  border: 1px solid transparent;
+  border: 0;
   background-origin: border-box;
   background-clip: padding-box, border-box;
   background-image: 
@@ -172,7 +187,7 @@ fieldset:disabled .btn {
 .show>.btn-primary.dropdown-toggle {
   color: #ffffff;
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
-  border-color: rgba(var(--theme-primary), 1);
+  border: 0;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1) !important;
   outline: none;
@@ -191,9 +206,11 @@ fieldset:disabled .btn {
 .btn.active:focus-visible,
 .btn.show:focus-visible,
 .btn:first-child:active:focus-visible,
+.btn:focus-visible,
 :not(.btn-check)+.btn:active:focus-visible {
   box-shadow: none !important;
   outline: none;
+  background-color: transparent !important;
 }
 
 .btn-warning {
@@ -277,7 +294,7 @@ strong.activity-type-text {
 
 .btn-secondary {
   --bs-btn-color: rgba(51, 65, 85, 1);
-  --bs-btn-bg: rgba(241, 245, 249, 1);
+  --bs-btn-bg: rgba(51, 65, 85, .08);
   --bs-btn-border-color: rgba(51, 65, 85, 0);
 }
 
@@ -313,14 +330,6 @@ Login Forms CSS-=-=
   object-position: center;
 }
 
-.btn-check:checked+.btn:focus-visible,
-.btn.active:focus-visible,
-.btn.show:focus-visible,
-.btn:first-child:active:focus-visible,
-:not(.btn-check)+.btn:active:focus-visible {
-  box-shadow: none;
-}
-
 .form-control,
 .form-select {
   border-radius: .5rem;
@@ -328,6 +337,23 @@ Login Forms CSS-=-=
   min-height: 40px;
   padding: .5rem 1.2rem;
   font-size: 15px;
+}
+
+media-control-bar * {
+    background: none;
+}
+
+media-control-bar {
+  display: flex;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0 .5rem;
+}
+
+media-control-bar slot, media-control-bar img {
+  width: 30px;
+  height: auto;
+  font-size: 28px;
 }
 
 .wrapper--title .form-select,
@@ -637,7 +663,10 @@ Add Project Modal CSS-=-=-
 
 .modalbox .project--form--inputs {
   max-height: calc(100dvh - 200px);
-  padding-top: 0;
+}
+
+.modalbox .project--form--inputs, .modalbox .project--form--actions {
+  padding-top: .5rem;
 }
 
 .project--form--inputs form .form-group {
@@ -652,7 +681,8 @@ Add Project Modal CSS-=-=-
   padding-top: 15px;
 }
 
-.add--member--modal form .form-control, .add--member--modal form .form-select {
+.add--member--modal form .form-control, .add--member--modal form .form-select,
+.modal form .form-control, .modal form .form-select {
   min-height: 43px;
 }
 
@@ -977,6 +1007,43 @@ Add Project Modal CSS-=-=-
   border: 0;
 }
 
+.status--modal .status--list .list-group-item span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.contact--card .list-group-item .status--modal, .theme--modal .status--modal {
+    text-transform: capitalize;
+    padding: .3rem .75rem;
+    width: 100%;
+    margin: 0;
+    font-weight: normal;
+    font-size: 15px;
+    min-height: max-content;
+    color: rgba(148, 163, 184, 1);
+    min-height: 33px;
+    margin-top: .25rem;
+    border-radius: .25rem;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    /* justify-content: space-between; */
+    cursor: pointer;
+}
+
+.theme--modal .status--modal {
+    padding: .55rem .55rem .55rem 1.2rem;
+    color: #454545;
+}
+
+.contact--card .list-group-item .status--modal svg, .theme--modal .status--modal svg {
+  width: 12px;
+  height: auto;
+}
+
 .status--modal .status--list .status--active {
   background: rgb(233 241 249);
   color: rgb(15 23 42);
@@ -1001,8 +1068,9 @@ Add Project Modal CSS-=-=-
 }
 
 .status--modal .status--list .list-group-item p svg {
-  color: var(--as-teal);
+  color: rgba(var(--theme-primary), 1);
   margin-left: auto;
+  font-size: .875rem;
   opacity: 0;
 }
 
@@ -1096,14 +1164,17 @@ Add Project Modal CSS-=-=-
 
 .add--workflow--modal .workflow--list .drag--icon {
   margin-right: .5rem;
-  font-size: 18px;
+  font-size: 15px;
   cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.add--workflow--modal .workflow--list .list-group-item:first-child .drag--icon,
+/* .add--workflow--modal .workflow--list .list-group-item:first-child .drag--icon,
 .add--workflow--modal .workflow--list .list-group-item:last-child .drag--icon {
   display: none;
-}
+} */
 
 .add--workflow--modal .workflow--list .list-group-item:first-child,
 .add--workflow--modal .workflow--list .list-group-item:last-child {
@@ -1117,8 +1188,8 @@ Add Project Modal CSS-=-=-
   justify-content: center;
   color: #777777;
   font-size: 1.4rem;
-  transition: all 0.4s cubic-bezier(.4, 0, .2, 1);
-  -webkit-transition: all 0.4s cubic-bezier(.4, 0, .2, 1);
+  transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+  -webkit-transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
 }
 
 .add--workflow--modal .workflow--list .list-group-item .delete--workstep {
@@ -1183,6 +1254,10 @@ Add Project Modal CSS-=-=-
   padding: 0;
 }
 
+.added--fields .card .card-body h5 {
+  font-size: 1rem;
+}
+
 .col-auto {
   position: relative;
 }
@@ -1201,6 +1276,21 @@ Add Project Modal CSS-=-=-
 
 .added--fields .card:hover .abbr--n {
   opacity: 0;
+}
+
+.added--fields .card .card-body .btn:focus,
+.added--fields .card .card-body .btn:hover, .added--fields .card .card-body .btn:focus-visible,
+.added--fields .card .card-body .btn:focus-within, .added--fields .card .card-body .btn:active {
+  background: none;
+}
+
+.added--fields .card .card-body .btn-outline-danger {
+    --bs-btn-color: #dc3545;
+    --bs-btn-hover-color: #dc3545;
+    --bs-btn-hover-bg: transparent;
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-color: #dc3545;
+    --bs-btn-active-bg: transparent;
 }
 
 .add--workflow--modal .nav-tabs .nav-link {
@@ -1306,8 +1396,8 @@ Add Project Modal CSS-=-=-
   height: 70px;
   justify-content: center;
   margin-bottom: 1rem;
-  transition: all .5s cubic-bezier(.4, 0, .2, 1);
-  -webkit-transition: all .5s cubic-bezier(.4, 0, .2, 1);
+  transition: all .3s cubic-bezier(.4, 0, .2, 1);
+  -webkit-transition: all .3s cubic-bezier(.4, 0, .2, 1);
   width: 70px;
 }
 

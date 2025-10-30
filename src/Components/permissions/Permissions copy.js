@@ -197,8 +197,8 @@ function PermissionsPage() {
           <div className='page--wrapper setting--page'>
           {
               spinner &&
-              <div class="loading-bar">
-                  <img src="images/OnTeam-icon.png" className="flipchar" />
+              <div className="loading-bar">
+                  <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
           }
             <div className="setting--tabs">
@@ -235,9 +235,9 @@ function PermissionsPage() {
                             </Accordion.Header>
                           </div>
                           <Accordion.Body>
-                            <h6 class="mb-1">Default Permissions</h6>
+                            <h6 className="mb-1">Default Permissions</h6>
                             <p>Default permissions will be applied for the newly added members.</p>
-                            <div class="switch-wrapper">
+                            <div className="switch-wrapper">
                               <input id={`view-default-${roleData._id}`} key={`view-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('projects','default', roleData._id, 'view')} checked={roleData?.permissions?.projects === 'view'} />
                               <label htmlFor={`view-default`}>View</label>
                               <input id={`add-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} key={`add-default--${roleData._id}`} onChange={() => handlePermissionChange('projects','default', roleData._id, 'view_and_edit')}  checked={roleData?.permissions?.projects === 'view_and_edit'} />
@@ -255,7 +255,7 @@ function PermissionsPage() {
                                   <tr>
                                     <td>{member?.name}</td>
                                     <td>
-                                      <div class="switch-wrapper">
+                                      <div className="switch-wrapper">
                                         <input id={`project-view-${member._id}`} key={`project-view-${member._id}`} type="radio" name={`member-${member._id}`}onChange={() => handlePermissionChange('projects','member', member._id, 'view')} checked={member?.permissions?.projects === 'view'} />
                                         <label htmlFor={`project-view-${member._id}`}>View</label>
                                         <input id={`project-add-${member._id}`} type="radio" name={`member-${member._id}`} key={`project-view-${member._id}`} onChange={() => handlePermissionChange('projects','member', member._id, 'view_and_edit')} checked={member?.permissions?.projects === 'view_and_edit'} />
@@ -296,9 +296,9 @@ function PermissionsPage() {
                             </Accordion.Header>
                           </div>
                           <Accordion.Body>
-                            <h6 class="mb-1">Default Permissions</h6>
+                            <h6 className="mb-1">Default Permissions</h6>
                             <p>Default permissions will be applied for the newly added members.</p>
-                            <div class="switch-wrapper">
+                            <div className="switch-wrapper">
                               <input id={`view-default-${roleData._id}`} key={`view-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('tasks','default', roleData._id, 'view')} checked={roleData?.permissions?.tasks === 'view'} />
                               <label htmlFor={`view-default-${roleData._id}`}>View</label>
                               <input id={`add-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} key={`add-default--${roleData._id}`} onChange={() => handlePermissionChange('tasks','default', roleData._id, 'view_and_edit')} checked={roleData?.permissions?.tasks === 'view_and_edit'} />
@@ -316,7 +316,7 @@ function PermissionsPage() {
                                   <tr>
                                     <td>{member?.name}</td>
                                     <td>
-                                      <div class="switch-wrapper">
+                                      <div className="switch-wrapper">
                                         <input id={`task-view-${member._id}`} key={`task-view-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('tasks','member', member._id, 'view')} checked={member?.permissions?.tasks === 'view'} />
                                         <label htmlFor={`task-view-${member._id}`}>View</label>
                                         <input id={`task-add-${member._id}`} type="radio" name={`member-${member._id}`} key={`task-add-${member._id}`} onChange={() => handlePermissionChange('tasks','member', member._id, 'view_and_edit')} checked={member?.permissions?.tasks === 'view_and_edit'} />
@@ -357,9 +357,9 @@ function PermissionsPage() {
                             </Accordion.Header>
                           </div>
                           <Accordion.Body>
-                            <h6 class="mb-1">Default Permissions</h6>
+                            <h6 className="mb-1">Default Permissions</h6>
                             <p>Default permissions will be applied for the newly added members.</p>
-                            <div class="switch-wrapper">
+                            <div className="switch-wrapper">
                               <input id={`view-default-${roleData._id}`} key={`view-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('clients','default', roleData._id, 'view')} checked={roleData?.permissions?.clients === 'view'} />
                               <label htmlFor={`view-default-${roleData._id}`}>View</label>
                               <input id={`add-default-${roleData._id}`} key={`add-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('clients','default', roleData._id, 'view_and_edit')} checked={roleData?.permissions?.clients === 'view_and_edit'} />
@@ -377,7 +377,7 @@ function PermissionsPage() {
                                   <tr>
                                     <td>{member?.name}</td>
                                     <td>
-                                      <div class="switch-wrapper">
+                                      <div className="switch-wrapper">
                                         <input id={`client-view-${member._id}`} key={`client-view-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('clients','member', member._id, 'view')} checked={member?.permissions?.clients === 'view'} />
                                         <label htmlFor={`client-view-${member._id}`}>View</label>
                                         <input id={`client-add-${member._id}`} type="radio"  key={`client-add-${member._id}`} name={`member-${member._id}`} onChange={() => handlePermissionChange('clients','member', member._id, 'view_and_edit')} checked={member?.permissions?.clients === 'view_and_edit'} />
@@ -418,9 +418,9 @@ function PermissionsPage() {
                             </Accordion.Header>
                           </div>
                           <Accordion.Body>
-                            <h6 class="mb-1">Default Permissions</h6>
+                            <h6 className="mb-1">Default Permissions</h6>
                             <p>Default permissions will be applied for the newly added members.</p>
-                            <div class="switch-wrapper">
+                            <div className="switch-wrapper">
                               <input id={`view-default-${roleData._id}`} key={`view-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('tracking','default', roleData._id, 'view')} checked={roleData?.permissions?.tracking === 'view'} />
                               <label htmlFor={`view-default-${roleData._id}`}>View</label>
                               <input id={`add-default-${roleData._id}`} type="radio" key={`add-default--${roleData._id}`} name={`default-${roleSlug}`} onChange={() => handlePermissionChange('tracking','default', roleData._id, 'view_and_edit')} checked={roleData?.permissions?.tracking === 'view_and_edit'}/>
@@ -438,7 +438,7 @@ function PermissionsPage() {
                                   <tr>
                                     <td>{member?.name}</td>
                                     <td>
-                                      <div class="switch-wrapper">
+                                      <div className="switch-wrapper">
                                         <input id={`tracking-view-${member._id}`} key={`tracking-view-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('tracking','member', member._id, 'view')} checked={member?.permissions?.tracking === 'view'} />
                                         <label htmlFor={`tracking-view-${member._id}`}>View</label>
                                         <input id={`tracking-add-${member._id}`} key={`tracking-add-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('tracking','member', member._id, 'view_and_edit')} checked={member?.permissions?.tracking === 'view_and_edit'} />
@@ -479,9 +479,9 @@ function PermissionsPage() {
                             </Accordion.Header>
                           </div>
                           <Accordion.Body>
-                            <h6 class="mb-1">Default Permissions</h6>
+                            <h6 className="mb-1">Default Permissions</h6>
                             <p>Default permissions will be applied for the newly added members.</p>
-                            <div class="switch-wrapper">
+                            <div className="switch-wrapper">
                               <input id={`view-default-${roleData._id}`} key={`view-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('members','default', roleData._id, 'view')} checked={roleData?.permissions?.members === 'view'} />
                               <label htmlFor={`view-default-${roleData._id}`}>View</label>
                               <input id={`add-default-${roleData._id}`} type="radio" key={`add-default--${roleData._id}`} name={`default-${roleSlug}`} onChange={() => handlePermissionChange('members','default', roleData._id, 'view_and_edit')}  checked={roleData?.permissions?.members === 'view_and_edit'}/>
@@ -499,7 +499,7 @@ function PermissionsPage() {
                                   <tr>
                                     <td>{member?.name}</td>
                                     <td>
-                                      <div class="switch-wrapper">
+                                      <div className="switch-wrapper">
                                         <input id={`member-view-${member._id}`} key={`member-view-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('members','member', member._id, 'view')} checked={member?.permissions?.members === 'view'} />
                                         <label htmlFor={`member-view-${member._id}`}>View</label>
                                         <input id={`member-add-${member._id}`} type="radio" key={`member-add-${member._id}`} name={`member-${member._id}`} onChange={() => handlePermissionChange('members','member', member._id, 'view_and_edit')} checked={member?.permissions?.members === 'view_and_edit'} />
@@ -540,9 +540,9 @@ function PermissionsPage() {
                             </Accordion.Header>
                           </div>
                           <Accordion.Body>
-                            <h6 class="mb-1">Default Permissions</h6>
+                            <h6 className="mb-1">Default Permissions</h6>
                             <p>Default permissions will be applied for the newly added members.</p>
-                            <div class="switch-wrapper">
+                            <div className="switch-wrapper">
                               <input id={`view-default-${roleData._id}`} key={`view-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('reports','default', roleData._id, 'view')} checked={roleData?.permissions?.reports === 'view'} />
                               <label htmlFor={`view-default-${roleData._id}`}>View</label>
                               <input id={`add-default-${roleData._id}`} type="radio" key={`add-default-${roleData._id}`} name={`default-${roleSlug}`} onChange={() => handlePermissionChange('reports','default', roleData._id, 'view_and_edit')}  checked={roleData?.permissions?.reports === 'view_and_edit'} />
@@ -560,7 +560,7 @@ function PermissionsPage() {
                                   <tr>
                                     <td>{member?.name}</td>
                                     <td>
-                                      <div class="switch-wrapper">
+                                      <div className="switch-wrapper">
                                         <input id={`report-view-${member._id}`} key={`report-view-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('reports','member', member._id, 'view')} checked={member?.permissions?.reports === 'view'} />
                                         <label htmlFor={`report-view-${member._id}`}>View</label>
                                         <input id={`report-add-${member._id}`} type="radio" key={`report-add-${member._id}`} name={`member-${member._id}`} onChange={() => handlePermissionChange('reports','member', member._id, 'view_and_edit')} checked={member?.permissions?.reports === 'view_and_edit'} />
@@ -601,9 +601,9 @@ function PermissionsPage() {
                             </Accordion.Header>
                           </div>
                           <Accordion.Body>
-                            <h6 class="mb-1">Default Permissions</h6>
+                            <h6 className="mb-1">Default Permissions</h6>
                             <p>Default permissions will be applied for the newly added members.</p>
-                            <div class="switch-wrapper">
+                            <div className="switch-wrapper">
                               <input id={`view-default-${roleData._id}`} key={`view-default-${roleData._id}`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('holidays','default', roleData._id, 'view')} checked={roleData?.permissions?.holidays === 'view'} />
                               <label htmlFor={`view-default-${roleData._id}`}>View</label>
                               <input id={`add-default-${roleData._id}`} type="radio" key={`add-default-${roleData._id}`} name={`default-${roleSlug}`} onChange={() => handlePermissionChange('holidays','default', roleData._id, 'view_and_edit')} checked={roleData?.permissions?.holidays === 'view_and_edit'} />
@@ -621,7 +621,7 @@ function PermissionsPage() {
                                   <tr>
                                     <td>{member?.name}</td>
                                     <td>
-                                      <div class="switch-wrapper">
+                                      <div className="switch-wrapper">
                                         <input id={`holiday-view-${member._id}`} key={`holiday-view-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('holidays','member', member._id, 'view')} checked={member?.permissions?.holidays === 'view'} />
                                         <label htmlFor={`holiday-view-${member._id}`}>View</label>
                                         <input id={`holiday-add-${member._id}`} type="radio" key={`holiday-add-${member._id}`} name={`member-${member._id}`} onChange={() => handlePermissionChange('holidays','member', member._id, 'view_and_edit')} checked={member?.permissions?.holidays === 'view_and_edit'} />
@@ -662,9 +662,9 @@ function PermissionsPage() {
                             </Accordion.Header>
                           </div>
                           <Accordion.Body>
-                            <h6 class="mb-1">Default Permissions</h6>
+                            <h6 className="mb-1">Default Permissions</h6>
                             <p>Default permissions will be applied for the newly added members.</p>
-                            <div class="switch-wrapper">
+                            <div className="switch-wrapper">
                               <input id={`view-default`} key={`view-default`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('attendance','default', roleData._id, 'view')} checked={roleData?.permissions?.attendance === 'view'} />
                               <label htmlFor={`view-default`}>View</label>
                               <input id={`add-default`} type="radio" name={`default-${roleSlug}`} onChange={() => handlePermissionChange('attendance','default', roleData._id, 'view_and_edit')} checked={roleData?.permissions?.attendance === 'view_and_edit'} />
@@ -682,7 +682,7 @@ function PermissionsPage() {
                                   <tr>
                                     <td>{member?.name}</td>
                                     <td>
-                                      <div class="switch-wrapper">
+                                      <div className="switch-wrapper">
                                         <input id={`view-${member._id}`} key={`view-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('attendance','member', member._id, 'view')} checked={member?.permissions?.attendance === 'view'} />
                                         <label htmlFor={`view-${member._id}`}>View</label>
                                         <input id={`add-${member._id}`} type="radio" name={`member-${member._id}`} onChange={() => handlePermissionChange('attendance','member', member._id, 'view_and_edit')} checked={member?.permissions?.attendance === 'view_and_edit'} />

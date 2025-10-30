@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import debounce from "lodash.debounce";
 import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
 import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
@@ -30,8 +31,10 @@ import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
 import RolesPage from "../Settings/RolesPage";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { logout } from "../../redux/actions/auth.actions";
 
 function TeamMembersPage() {
+  const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
   const currentMember = getMemberdata();
   //const addToast = useToast();
@@ -143,9 +146,7 @@ function TeamMembersPage() {
     );
   };
 
-  const handleownership = async () => {
-    console.log("transfer ownership");
-  };
+  
 
   const toggleCustomFields = () => {
     setShowCustomFields((prev) => !prev);
@@ -181,7 +182,7 @@ function TeamMembersPage() {
       handleListMember();
     }
     dispatch(fetchCustomFields({ module: "members" }));
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, activeTab]);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -190,6 +191,19 @@ function TeamMembersPage() {
       selectboxObserver();
     }
   }, [isEditing]);
+  
+  useEffect(() => {
+  if (!fields?.role && roles?.length > 0) {
+    const defaultRoleId = roles[0]._id;
+
+    // Simulate handleChange for default role
+    handleChange({ target: { name: "role", value: defaultRoleId } });
+
+    // Set permissions for default role
+    setPermissions(roles[0].permissions || []);
+  }
+}, [fields?.role, roles]);
+
 
   useEffect(() => {
     if (apiResult.success) {
@@ -225,6 +239,13 @@ function TeamMembersPage() {
       setIsActive(false);
       setShowDialog(false);
     }
+
+    if( workspaceState.ownershipUpdate === true){
+      setShowDialog(false)
+      setTimeout(function(){
+        dispatch(logout())
+      },1000)
+    }
   }, [apiResult, workspaceState]);
 
   useEffect(() => {
@@ -256,12 +277,24 @@ function TeamMembersPage() {
       setCustomFields(apiCustomfields.customFields);
     }
 
-    if (apiCustomfields.newField) {
-      setCustomFields((prevCustomFields) => [
-        apiCustomfields.newField,
-        ...prevCustomFields,
-      ]);
-    }
+    // if (apiCustomfields.newField) {
+    //   setCustomFields((prevCustomFields) => [
+    //     apiCustomfields.newField,
+    //     ...prevCustomFields,
+    //   ]);
+    // }
+
+    if (
+      apiCustomfields.newField &&
+        apiCustomfields.newField?.module === "members"
+      ) {
+        setCustomFields((prevCustomFields) => [
+          ...prevCustomFields.filter(
+            (field) => field._id !== apiCustomfields.newField._id
+          ),
+          apiCustomfields.newField
+        ]);
+      }
 
     if (apiCustomfields.updatedField) {
       setCustomFields((prevCustomFields) =>
@@ -375,6 +408,15 @@ function TeamMembersPage() {
   const handleEditClick = (fieldName) => {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
+
+  // Debounced search handler
+      const debouncedUpdateSearch = useMemo(
+      () =>
+        debounce((value) => {
+          setsearchTerm(value)
+        }, 1000), // 1 sec debounce
+      []
+    );
 
   const toggleVisibility = (key) => {
         setVisiblePasswords((prev) => ({
@@ -830,18 +872,18 @@ function TeamMembersPage() {
                 {activeTab}
                 <ListGroup horizontal className={isActive ? "d-none" : "me-2 ms-auto d-none d-xl-flex" }>
                   <ListGroup horizontal>
-                    <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
+                    <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item className="d-none d-md-block" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
+                      <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
                     )}
                   </ListGroup>
-                  <ListGroup.Item className="d-none d-xl-block ms-3">
+                  <ListGroup.Item className="d-none d-xl-flex ms-3">
                     <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                       <Form.Group className="mb-0 form-group">
                         <MdOutlineSearch />
-                        <Form.Control type="text" placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)}/>
+                        <Form.Control type="text" readOnly={showloader} ref={inputRef} placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => debouncedUpdateSearch(e.target.value)}/>
                       </Form.Group>
                     </Form>
                   </ListGroup.Item>
@@ -851,21 +893,8 @@ function TeamMembersPage() {
                     <ListGroup.Item action className="view--icon" active={isActiveView === 1} onClick={() => setIsActiveView(1)}><BsGrid /></ListGroup.Item>
                     <ListGroup.Item action className="view--icon" active={isActiveView === 2} onClick={() => setIsActiveView(2)}><FaList /></ListGroup.Item>
                   </ListGroup>
-                  <ListGroup horizontal className="d-flex d-xl-none bg-white shadow-none p-0 border-0">
-                    <Dropdown className="select--dropdown manual--dropdown">
-                      <Dropdown.Toggle variant="success" id="dropdown-basic" className="border-0"><MdFilterList /></Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
-                        {(memberProfile?.permissions?.members
-                          ?.create_edit_delete === true ||
-                          memberProfile?.role?.slug === "owner") && (
-                          <Dropdown.Item action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</Dropdown.Item>
-                        )}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </ListGroup>
                   <ListGroup horizontal className={isActive ? "d-none" : "d-flex bg-white expand--icon"}>
-                    <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdSearch /></ListGroup.Item>
+                    <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdFilterList /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
                     <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
@@ -891,13 +920,14 @@ function TeamMembersPage() {
           {pagetopbar()}
           <div className="page--wrapper px-md-2 pb-4 pt-4">
             {showloader ?
-              <div className="loading-bar"><img src="images/OnTeam-icon.png" className="flipchar" /></div>
+              <div className="loading-bar"><img src="images/OnTeam-icon-gray.png" className="flipchar" /></div>
             :
             <Container fluid>
               <>
                 <DragDropContext onDragEnd={handleDragEnd}>
                   <div className={ isActiveView === 1 ? "project--grid--table project--grid--new--table table-responsive-xl" : isActiveView === 2 ? "project--table draggable--table new--project--rows table-responsive-xl" : "project--table new--project--rows table-responsive-xl"}>
-                    
+                    {!showloader && memberFeeds && memberFeeds.length > 0
+                      ?
                       <Table>
                         <thead className="onHide">
                           <tr key="project-table-header">
@@ -915,144 +945,137 @@ function TeamMembersPage() {
                         </thead>
                         <Droppable droppableId={`droppable-members-table`} type="MEMBERS" >
                           {(provided) => (
-                          <tbody ref={provided.innerRef} {...provided.droppableProps}>
-                            {!showloader && memberFeeds && memberFeeds.length > 0
-                              ? memberFeeds.map((member, idx) => (
-                                <>
-                                <Draggable
-                                  key={member?._id}
-                                  draggableId={`member-${member?._id}`}
-                                  index={idx}
-                                >
-                                  {(provided) => (
-                                    <tr
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      key={`member-table-row-${member._id}`}
-                                      className={
-                                        member._id === selectedMember?._id
-                                          ? "project--active"
-                                          : ""
-                                      }
-                                      onClick={
-                                          () => handleTableToggle(member)
-                                          
-                                      }
-                                    >
-                                      <td className="project--title--td sticky border-bottom" data-label="Member Name">
-                                        <div className="d-flex justify-content-between border-end flex-wrap">
-                                          <div className="project--name">
-                                            <div className="drag--indicator"><abbr>{idx + 1}</abbr><MdDragIndicator /></div>
-                                            <div className="title--initial">{
-                                              (member?.avatar && member?.avatar !== null ) ? 
-                                                <span><img src={member?.avatar} alt={'member-avatar'} /></span>
-                                                :
-                                                member.name.charAt(0)
-                                            }</div>
-                                            <div className="title--span flex-column align-items-start gap-0">
-                                              <span>{member.name}</span>
-                                              <strong>{member.role?.name}</strong>
+                            <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                              {memberFeeds.map((member, idx) => (
+                                  <>
+                                  <Draggable
+                                    key={member?._id}
+                                    draggableId={`member-${member?._id}`}
+                                    index={idx}
+                                  >
+                                    {(provided) => (
+                                      <tr
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        key={`member-table-row-${member._id}`}
+                                        className={
+                                          member._id === selectedMember?._id
+                                            ? "project--active"
+                                            : ""
+                                        }
+                                        onClick={
+                                            () => handleTableToggle(member)
+                                            
+                                        }
+                                      >
+                                        <td className="project--title--td sticky border-bottom" data-label="Member Name">
+                                          <div className="d-flex justify-content-between border-end flex-wrap">
+                                            <div className="project--name">
+                                              <div className="drag--indicator"><abbr>{idx + 1}</abbr><MdDragIndicator /></div>
+                                              <div className="title--initial">{
+                                                (member?.avatar && member?.avatar !== null ) ? 
+                                                  <span><img src={member?.avatar} alt={'member-avatar'} /></span>
+                                                  :
+                                                  member.name.charAt(0)
+                                              }</div>
+                                              <div className="title--span flex-column align-items-start gap-0">
+                                                <span>{member.name}</span>
+                                                <strong>{member.role?.name}</strong>
+                                              </div>
+                                            </div>
+                                            <div className="onHide task--buttons">
+                                              <Button variant="primary" className="px-3 py-2" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /></Button>
                                             </div>
                                           </div>
-                                          <div className="onHide task--buttons">
-                                            <Button variant="primary" className="px-3 py-2" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /></Button>
-                                          </div>
-                                        </div>
-                                      </td>
-                                      <td className="onHide new--td">
-                                        <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-flex d-lg-none text-uppercase fs-small mb-1' : 'd-flex d-lg-none text-uppercase fs-small mb-1'}>Email</strong>
-                                        {member.email}
-                                      </td>
-                                      {Array.isArray(customFields) &&
-                                        customFields
-                                          .filter(
-                                            (field) => field?.showInTable !== false
-                                          )
-                                          .map((field, idx) => {
-                                            const fieldname = field.name;
-                                            let mvalue =
-                                              member?.memberMeta?.[fieldname]
-                                                ?.meta_value;
-                                            const fieldType = field.type;
-                                            const uniqueKey = `${fieldname || idx}-${mvalue}`;
-                                            if (
-                                              field.type === "badge" &&
-                                              Array.isArray(field.options)
-                                            ) {
-                                              const matchedOption = field.options.find(
-                                                (opt) => opt.value === mvalue
-                                              );
-                                              if (matchedOption) {
-                                                mvalue = (
-                                                  <span
-                                                    className="priority--badge"
-                                                    style={{
-                                                      backgroundColor: matchedOption.color,
-                                                      color: "#fff",
-                                                      display: "inline-block",
-                                                      borderColor: matchedOption.color,
-                                                      borderWidth: '1px',
-                                                      borderStyle: 'solid'
-                                                    }}
-                                                    onClick={() => toggleBadges(field)}
-                                                  >
-                                                    {
-                                                      member?.memberMeta?.[fieldname]
-                                                        ?.meta_value
-                                                    }
-                                                  </span>
+                                        </td>
+                                        <td className="onHide new--td">
+                                          <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-flex d-lg-none text-uppercase fs-small mb-1' : 'd-flex d-lg-none text-uppercase fs-small mb-1'}>Email</strong>
+                                          {member.email}
+                                        </td>
+                                        {Array.isArray(customFields) &&
+                                          customFields
+                                            .filter(
+                                              (field) => field?.showInTable !== false
+                                            )
+                                            .map((field, idx) => {
+                                              const fieldname = field.name;
+                                              let mvalue =
+                                                member?.memberMeta?.[fieldname]
+                                                  ?.meta_value;
+                                              const fieldType = field.type;
+                                              const uniqueKey = `${fieldname || idx}-${mvalue}`;
+                                              if (
+                                                field.type === "badge" &&
+                                                Array.isArray(field.options)
+                                              ) {
+                                                const matchedOption = field.options.find(
+                                                  (opt) => opt.value === mvalue
                                                 );
-                                              }
-                                            }
-                                            else if(fieldType === 'password'){
-                                                return (
-                                                    <span className="d-flex align-items-center gap-2">
-                                                        {visiblePasswords[uniqueKey] ? mvalue : '*****'}
-                                                        <span
-                                                            style={{ cursor: 'pointer' }}
-                                                            onClick={() => toggleVisibility(uniqueKey)}
-                                                        >
-                                                            {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
-                                                        </span>
+                                                if (matchedOption) {
+                                                  mvalue = (
+                                                    <span
+                                                      className="priority--badge"
+                                                      style={{
+                                                        backgroundColor: matchedOption.color,
+                                                        color: "#fff",
+                                                        display: "inline-block",
+                                                        borderColor: matchedOption.color,
+                                                        borderWidth: '1px',
+                                                        borderStyle: 'solid'
+                                                      }}
+                                                      onClick={() => toggleBadges(field)}
+                                                    >
+                                                      {
+                                                        member?.memberMeta?.[fieldname]
+                                                          ?.meta_value
+                                                      }
                                                     </span>
-                                                )
-                                            }
-                                            return (
-                                              <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
-                                                <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-flex d-lg-none text-uppercase fs-small mb-1' : 'd-flex d-lg-none text-uppercase fs-small mb-1'}>{field.label}</strong>
-                                                {mvalue}
-                                              </td>
-                                            );
-                                          })}
-                                      <td className="task--last--buttons mt-auto">
-                                        <div className="d-flex justify-content-between flex-wrap">
-                                          <div className="onHide">
-                                            <Button variant="dark" className="px-3 py-1" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /> View</Button>
+                                                  );
+                                                }
+                                              }
+                                              else if(fieldType === 'password'){
+                                                  return (
+                                                      <span className="d-flex align-items-center gap-2">
+                                                          {visiblePasswords[uniqueKey] ? mvalue : '*****'}
+                                                          <span
+                                                              style={{ cursor: 'pointer' }}
+                                                              onClick={() => toggleVisibility(uniqueKey)}
+                                                          >
+                                                              {visiblePasswords[uniqueKey] ? <BsEyeSlash /> : <BsEye />}
+                                                          </span>
+                                                      </span>
+                                                  )
+                                              }
+                                              return (
+                                                <td key={`client-${ fieldname || idx }-${mvalue}`} className="onHide new--td">
+                                                  <strong className={isActiveView === 1 ? 'd-flex text-uppercase fs-small' : isActiveView === 2 ? 'd-flex d-lg-none text-uppercase fs-small mb-1' : 'd-flex d-lg-none text-uppercase fs-small mb-1'}>{field.label}</strong>
+                                                  {mvalue}
+                                                </td>
+                                              );
+                                            })}
+                                        <td className="task--last--buttons mt-auto">
+                                          <div className="d-flex justify-content-between flex-wrap">
+                                            <div className="onHide">
+                                              <Button variant="dark" className="px-3 py-1" onClick={() => {handleTableToggle(member);setIsActive(true);}}><BsEye /> View</Button>
+                                            </div>
                                           </div>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  )}
-                                  </Draggable>
-                                  </>
-                                ))
-                              : !showloader &&
-                                memberFeeds &&
-                                memberFeeds.length === 0 && (
-                                  <tr className="no--invite">
-                                    <td colSpan={5}>
-                                      <h2 className="mt-2 text-center">
-                                        Members Not Found
-                                      </h2>
-                                    </td>
-                                  </tr>
-                                )}
-                          </tbody>
+                                        </td>
+                                      </tr>
+                                    )}
+                                    </Draggable>
+                                    </>
+                                  ))
+                                }   
+                            </tbody>
                           )}
                           </Droppable>
                       </Table>
-                    
+                    : !showloader && memberFeeds && memberFeeds.length === 0 && (
+                    <div className="text-center">
+                      <h2>No Members Found</h2>
+                    </div>
+                  )}
                   </div>
                 </DragDropContext>
               </>
@@ -1122,7 +1145,15 @@ function TeamMembersPage() {
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
-                          <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> Delete</Dropdown.Item>
+                          <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> 
+                          {
+                            memberProfile?._id === selectedMember?._id ? 
+                            'Leave'
+                            :
+                            'Delete'
+                          }
+                          
+                          </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown>
                     )}
@@ -1345,8 +1376,14 @@ function TeamMembersPage() {
                 <Card.Body>
                   <Card.Title>
                     <FiShield /> Permissions & Access{" "}
-                    <Button variant="primary" className="ms-auto d-flex align-items-center gap-1" onClick={() => {setAdjustPermissions(true);}}><FaCog /> Manage Permissions</Button>
-                  </Card.Title>
+                    {
+                      (memberProfile &&
+                      Object.keys(memberProfile).length > 0 &&
+                      memberProfile?.permissions?.members?.create_edit_delete === true ||
+                      memberProfile?.role?.slug !== "owner") ? (
+                        <Button variant="primary" className="ms-auto d-flex align-items-center gap-1" onClick={() => {setAdjustPermissions(true);}}><FaCog /> Manage Permissions</Button>) : <></>                    
+                      }
+                    </Card.Title>
                   <Card.Text>
                    
                     {/* /*New Accordion Design*/}
@@ -1358,7 +1395,9 @@ function TeamMembersPage() {
                         const truePermissionCount = Object.values(
                           modPerms
                         ).filter((val) => val === true).length;
-
+                        if(truePermissionCount === 0){
+                          return;
+                        }
                         return (
                           <Accordion.Item eventKey={ind} className="bg--blue--accordion">
                             <Accordion.Header>
@@ -1456,7 +1495,7 @@ function TeamMembersPage() {
           <Form onSubmit={handleSubmit}>
             {/* {rows.map((row, index) => ( */}
             <div className="form-row pb-3" key={`row-0`}>
-              <Form.Group className="mb-0 pb-0 form-group d-flex gap-3 align-items-center">
+              <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
                 <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
                   <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
                     placeholder="Email address"
@@ -1466,7 +1505,7 @@ function TeamMembersPage() {
                   />
                 </FloatingLabel>
                 {showError("email")}
-                <span className="badge bg-success">{fields?.rolename || ''}</span>
+                <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
               </Form.Group>
 
               <Button
@@ -1537,7 +1576,7 @@ function TeamMembersPage() {
                   name="role"
                   controlId="floatingSelect"
                   className={"form-control custom-selectbox"}
-                  defaultValue={fields?.role}
+                  value={fields?.role || roles?.[0]?._id || ""}
                   onChange={(e) => {
                     handleChange(e);
                     const matchedRole = roles.find(
@@ -1550,7 +1589,7 @@ function TeamMembersPage() {
                     setPermissions(matchedPermissions);
                   }}
                 >
-                  <option value="role">Select role</option>
+                  {/* <option value="role">Select role</option> */}
                   {roles.map((role, roleIndex) => (
                     <option key={`role-${roleIndex}`} value={role._id}>
                       {role.name}
@@ -1802,7 +1841,7 @@ function TeamMembersPage() {
           </Modal.Body>
           <Modal.Footer>
             <div className="m-0 text-end">
-              <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save Permissions"}</Button>
+              <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save"}</Button>
             </div>
           </Modal.Footer>
         </Modal>)
@@ -1814,7 +1853,7 @@ function TeamMembersPage() {
       (selectedMember?._id !== memberProfile?._id &&
         memberProfile &&
         Object.keys(memberProfile).length > 0 &&
-        memberProfile?.permissions?.members?.create_edit_delete === true &&
+        memberProfile?.permissions?.members?.create_edit_delete === true ||
         memberProfile?.role?.slug !== "owner") ? (
         <>
           <AlertDialog
@@ -1824,7 +1863,8 @@ function TeamMembersPage() {
             callback={handledeleteMember}
           />
         </>
-      ) : memberProfile &&
+      ) 
+      : memberProfile &&
         Object.keys(memberProfile).length > 0 &&
         memberProfile.role?.slug !== "owner" &&
         selectedMember?._id === memberProfile._id ? (
@@ -1836,7 +1876,8 @@ function TeamMembersPage() {
             callback={handleleavecompany}
           />
         </>
-      ) : (memberProfile &&
+      ) 
+      : (memberProfile &&
           Object.keys(memberProfile).length > 0 &&
           memberProfile?.role?.permissions?.members?.create_edit_delete ===
             true) ||
@@ -1855,22 +1896,32 @@ function TeamMembersPage() {
       {/*--=-=Search Modal**/}
       <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
         <Modal.Header closeButton>
-          <Modal.Title>Search</Modal.Title>
+          <Modal.Title>Filters</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ListGroup>
-            <ListGroup.Item className="border-0 p-0">
-              <Form>
+            <ListGroup.Item className="p-0 border-0">
+              <Dropdown className="select--dropdown manual--dropdown">
+                <Dropdown.Toggle variant="success">
+                  {activeTab}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <div className="drop--scroll">
+                    <Dropdown.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
+                    {(memberProfile?.permissions?.members
+                      ?.create_edit_delete === true ||
+                      memberProfile?.role?.slug === "owner") && (
+                      <Dropdown.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</Dropdown.Item>
+                    )}
+                  </div>
+                </Dropdown.Menu>
+              </Dropdown>
+            </ListGroup.Item>
+            <ListGroup.Item className="border-0 p-0 mt-3">
+              <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                 <Form.Group className="mb-0 form-group">
-                  <Form.Control
-                    type="text"
-                    placeholder={
-                      activeTab === "Members"
-                        ? "Search Member.."
-                        : "Search Invitations.."
-                    }
-                    onChange={(e) => setsearchTerm(e.target.value)}
-                  />
+                  <MdOutlineSearch />
+                  <Form.Control type="text" readOnly={showloader} ref={inputRef} placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => debouncedUpdateSearch(e.target.value)}/>
                 </Form.Group>
               </Form>
             </ListGroup.Item>

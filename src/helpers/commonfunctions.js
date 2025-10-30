@@ -173,15 +173,15 @@ export function parseDateWithoutTimezone(dateString) {
 
     // Pattern for URLs starting with http://, https://, or ftp://
     const replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
-    replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+    replacedText = inputText?.replace(replacePattern1, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 
     // Pattern for URLs starting with "www." (without // before it)
     const replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gi;
-    replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank" rel="noopener noreferrer">$2</a>');
+    replacedText = replacedText?.replace(replacePattern2, '$1<a href="http://$2" target="_blank" rel="noopener noreferrer">$2</a>');
 
     // Pattern for email addresses
     const replacePattern3 = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-    replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+    replacedText = replacedText?.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
 
     return replacedText;
 };
@@ -248,42 +248,42 @@ const getDayWithSuffix = (day) => {
   // Helper function to format the time ago
   export const timeAgo = (dateString) => {
     const date = new Date(dateString);
-  const now = new Date();
+    const now = new Date();
   
-  // Calculate the difference in milliseconds
-  const diff = now - date;
+    // Calculate the difference in milliseconds
+    const diff = now - date;
   
-  // Calculate time differences
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+    // Calculate time differences
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
   
-  if (seconds < 60) {
-    return `${seconds} seconds ago`;
-  } else if (minutes < 60) {
-    return `${minutes} minutes ago`;
-  } else if (hours < 24) {
-    return `${hours} hours ago`;
-  } else {
-    // If it's more than 24 hours, return the date in 'ddth Month YYYY' format
-    const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'long' });
-    const year = date.getFullYear();
+    if (seconds < 60) {
+      return `${seconds} seconds ago`;
+    } else if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    } else if (hours < 24) {
+      return `${hours} hours ago`;
+    } else {
+      // If it's more than 24 hours, return the date in 'ddth Month YYYY' format
+      const day = date.getDate();
+      const month = date.toLocaleString('default', { month: 'long' });
+      const year = date.getFullYear();
+      
+      // Format the day with a suffix like 1st, 2nd, 3rd, etc.
+      const suffix = (day) => {
+        if (day > 3 && day < 21) return 'th'; // Suffix for 4-20
+        switch (day % 10) {
+          case 1: return 'st';
+          case 2: return 'nd';
+          case 3: return 'rd';
+          default: return 'th';
+        }
+      };
     
-    // Format the day with a suffix like 1st, 2nd, 3rd, etc.
-    const suffix = (day) => {
-      if (day > 3 && day < 21) return 'th'; // Suffix for 4-20
-      switch (day % 10) {
-        case 1: return 'st';
-        case 2: return 'nd';
-        case 3: return 'rd';
-        default: return 'th';
-      }
-    };
-    
-    return `${day}${suffix(day)} ${month} ${year}`;
-  }
+      return `${day}${suffix(day)} ${month} ${year}`;
+    }
   };
 
   export const showAmPmtime = (timestamp) => {
@@ -327,27 +327,57 @@ const getDayWithSuffix = (day) => {
     );
   }
 
-  export function generateTimeRange(createdAt, duration) {
-    // Create a Date object from createdAt
-    const startTime = new Date(createdAt);
-    const options = { 
-      timeZone: 'Asia/Kolkata', 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: true 
+//   export function generateTimeRange(createdAt, duration) {
+//     // Create a Date object from createdAt
+//     const startTime = new Date(createdAt);
+//     const options = { 
+//       timeZone: 'Asia/Kolkata', 
+//       hour: '2-digit', 
+//       minute: '2-digit',
+//       hour12: true 
+//     };
+
+//     // Calculate the endTime by adding duration (in seconds) to the startTime
+//     const endTime = new Date(startTime.getTime() + duration * 1000); // Convert seconds to milliseconds
+
+//     // Format the start and end times using local time zone
+//     const startTimeFormatted = startTime.toLocaleTimeString('en-IN', options);
+
+//     const endTimeFormatted = endTime.toLocaleTimeString('en-IN', options);
+//     const totaltime = convertSecondstoTime(duration)
+//     // Return the formatted time range in the desired format
+//     return `${startTimeFormatted} - ${endTimeFormatted} (${totaltime})`;
+// }
+
+export function generateTimeRange(createdAt, duration = 0) {
+  if(typeof duration === 'undefined'){
+    duration = 0;
+  }
+  const startTime = new Date(createdAt);
+  const options = { 
+    timeZone: 'Asia/Kolkata', 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: true 
   };
 
-    // Calculate the endTime by adding duration (in seconds) to the startTime
-    const endTime = new Date(startTime.getTime() + duration * 1000); // Convert seconds to milliseconds
+  const endTime = new Date(startTime.getTime() + duration * 1000);
 
-    // Format the start and end times using local time zone
-    const startTimeFormatted = startTime.toLocaleTimeString('en-IN', options);
+  const startTimeFormatted = startTime.toLocaleTimeString('en-IN', options);
+  const endTimeFormatted = endTime.toLocaleTimeString('en-IN', options);
 
-    const endTimeFormatted = endTime.toLocaleTimeString('en-IN', options);
-    const totaltime = convertSecondstoTime(duration)
-    // Return the formatted time range in the desired format
-    return `${startTimeFormatted} - ${endTimeFormatted} (${totaltime})`;
+  // format duration into hh:mm:ss
+  const hours = Math.floor(duration / 3600);
+  const minutes = Math.floor((duration % 3600) / 60);
+  const seconds = duration % 60;
+  const totalTimeFormatted =
+    `${hours.toString().padStart(2, '0')}:` +
+    `${minutes.toString().padStart(2, '0')}:` +
+    `${seconds.toString().padStart(2, '0')}`;
+
+  return `${startTimeFormatted} - ${endTimeFormatted} (${totalTimeFormatted})`;
 }
+
 
 
 export function secondstoMinutes(seconds) {
@@ -367,7 +397,25 @@ export function secondstoMinutes(seconds) {
     }
   }
   
-  export function convertSecondstoTime(totalSeconds) { 
+//   export function convertSecondstoTime(totalSeconds) { 
+//     if (totalSeconds === 0 || totalSeconds == null) {
+//         return `00:00`;
+//     } else if (totalSeconds < 60) {
+//         return `${totalSeconds} seconds`;
+//     }
+
+//     const hours = Math.floor(totalSeconds / 3600);
+//     const remainingSecondsAfterHours = totalSeconds % 3600;
+//     const minutes = Math.floor(remainingSecondsAfterHours / 60);
+//     const seconds = remainingSecondsAfterHours % 60;
+//     // Pad hours and minutes to ensure two-digit format
+//     const paddedHours = hours.toString().padStart(2, '0');
+//     const paddedMinutes = minutes.toString().padStart(2, '0');
+
+//     return `${paddedHours}:${paddedMinutes}`;
+// }
+
+export function convertSecondstoTime(totalSeconds) { 
     if (totalSeconds === 0 || totalSeconds == null) {
         return `00:00`;
     } else if (totalSeconds < 60) {
@@ -376,14 +424,23 @@ export function secondstoMinutes(seconds) {
 
     const hours = Math.floor(totalSeconds / 3600);
     const remainingSecondsAfterHours = totalSeconds % 3600;
-    const minutes = Math.floor(remainingSecondsAfterHours / 60);
-    const seconds = remainingSecondsAfterHours % 60;
-    // Pad hours and minutes to ensure two-digit format
-    const paddedHours = hours.toString().padStart(2, '0');
+    
+    // ✅ Round minutes instead of flooring
+    let minutes = Math.round(remainingSecondsAfterHours / 60);
+
+    // If rounding minutes makes it 60, roll over to next hour
+    let finalHours = hours;
+    if (minutes === 60) {
+        finalHours += 1;
+        minutes = 0;
+    }
+
+    const paddedHours = finalHours.toString().padStart(2, '0');
     const paddedMinutes = minutes.toString().padStart(2, '0');
 
     return `${paddedHours}:${paddedMinutes}`;
 }
+
 
 export const timeStringToDate = (time, baseDate = new Date()) => {
     const [hours, minutes] = time.split(':').map(Number);
@@ -492,3 +549,16 @@ export function formatDateToDDMMYYYY(dateValue) {
 
   return `${day}/${month}/${year}`;
 }
+
+export function  hexToRgba (hex, opacity) {
+  let c;
+  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+    c = hex.substring(1).split('');
+    if (c.length === 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+    c = '0x' + c.join('');
+    return `rgba(${(c >> 16) & 255}, ${(c >> 8) & 255}, ${c & 255}, ${opacity})`;
+  }
+  return hex;
+};

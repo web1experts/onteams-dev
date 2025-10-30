@@ -538,7 +538,7 @@ function DesktopPage() {
                       </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="3">
-                      <Accordion.Header>OnTeams</Accordion.Header>
+                      <Accordion.Header>PrimeTeams</Accordion.Header>
                       <Accordion.Body>
                         <Accordion defaultActiveKey="03" className="p-3">
                           <Accordion.Item eventKey="0001">
@@ -1283,7 +1283,7 @@ function DesktopPage() {
                       </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="3">
-                      <Accordion.Header>OnTeams</Accordion.Header>
+                      <Accordion.Header>PrimeTeams</Accordion.Header>
                       <Accordion.Body>
                         <Accordion defaultActiveKey="03" className="p-3">
                           <Accordion.Item eventKey="0001">
@@ -2028,7 +2028,7 @@ function DesktopPage() {
                       </Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="3">
-                      <Accordion.Header>OnTeams</Accordion.Header>
+                      <Accordion.Header>PrimeTeams</Accordion.Header>
                       <Accordion.Body>
                         <Accordion defaultActiveKey="03" className="p-3">
                           <Accordion.Item eventKey="0001">
@@ -2279,12 +2279,12 @@ function DesktopPage() {
               </Tabs>
             </Col>
             <Col sm={12} lg={6}>
-              <div class="timer--task">
+              <div className="timer--task">
                 <h5>Web Design <small>Design project page</small></h5>
-                <p class="task--timer"><span>Current Session <strong>2:03:34</strong></span></p>
+                <p className="task--timer"><span>Current Session <strong>2:03:34</strong></span></p>
                 <Button active={showButton === 'start--btn'} onClick={() => setshowButton('stop--btn')} variant="primary"><FaPlay /> Start Tracking</Button>
                 <Button active={showButton === 'stop--btn'} onClick={() => setshowButton('start--btn')} variant="danger"><FaPause /> Stop Tracking</Button>
-                <div class="total--timer"><p>Todays Total <strong>2h 40m</strong></p></div>
+                <div className="total--timer"><p>Todays Total <strong>2h 40m</strong></p></div>
               </div>
             </Col>
           </Row>

@@ -11,7 +11,7 @@ export function BadgesModal({badgesData: {name, options, label}, toggleBadges,sh
   };
 
 
-  const filteredStatuses = options.filter(status => 
+  const filteredStatuses = options?.filter(status => 
     status.label.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -29,7 +29,7 @@ export function BadgesModal({badgesData: {name, options, label}, toggleBadges,sh
                   </Form>
                   <ListGroup className="status--list">
                   {
-                    filteredStatuses.map(status => (
+                    filteredStatuses?.map(status => (
                       <ListGroup.Item key={`status-${status.value}`} className={value == status.value ? "status--active": ""} onClick={() => {
                         handleSelect({ target: { name: `custom_field[${name}]`, value: status.value } });
                         toggleBadges(null)

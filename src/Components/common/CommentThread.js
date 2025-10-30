@@ -5,10 +5,8 @@ import { BsTrash } from "react-icons/bs";
 import { FaEllipsisV } from 'react-icons/fa';
 import { getMemberdata } from "../../helpers/commonfunctions";
 import {
-  socket,
   SendComment,
-  DeleteComment,
-  UpdateComment,
+  DeleteComment
 } from "../../helpers/auth";
 const Comment = ({ comment, memberdata, parentId, allowReply }) => {
   const [selectedComment, setSelectedComment] = useState({});
