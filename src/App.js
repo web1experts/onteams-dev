@@ -184,9 +184,9 @@ function App(props) {
   
   if( !themecolor){
     themecolor = JSON.stringify({
-      color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))',
-      primaryColor: '59, 130, 246', 
-      secondaryColor: '6, 182, 212'
+      color: 'linear-gradient(135deg, rgb(223 169 61), rgb(175 113 50))',
+      primaryColor: '223, 169, 61', 
+      secondaryColor: '175, 113, 50'
     })
     localStorage.setItem('theme', themecolor)
     dispatch(toggleTheme(JSON.parse(themecolor)));

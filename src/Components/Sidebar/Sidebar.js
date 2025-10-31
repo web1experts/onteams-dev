@@ -153,9 +153,9 @@ function SidebarPanel() {
         return `${r}, ${g}, ${b}`;
     }
 
-   const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' }
+   const defaultTheme = { name: 'Golden Brown', color: 'linear-gradient(135deg, rgb(223 169 61), rgb(175 113 50))', primaryColor: '223, 169, 61', secondaryColor: '175, 113, 50' }
     const themes = [
-        { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' },
+        { name: 'Golden Brown', color: 'linear-gradient(135deg, rgb(223 169 61), rgb(175 113 50))', primaryColor: '223, 169, 61', secondaryColor: '175, 113, 50' },
         { name: 'Purple Dream', color: 'linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))', primaryColor: '168, 85, 247', secondaryColor: '236, 72, 153' },
         { name: 'Forest Green', color: 'linear-gradient(135deg, rgb(16 185 129), rgb(20 184 166))', primaryColor: '16, 185, 129', secondaryColor: '20, 184, 166' },
         { name: 'Sunset Orange', color: 'linear-gradient(135deg, rgb(249 115 22), rgb(239 68 68))', primaryColor: '249, 115, 22', secondaryColor: '239, 68, 68' },
@@ -172,9 +172,9 @@ function SidebarPanel() {
         { name: 'Copper Bronze', color: 'linear-gradient(135deg, rgb(234 88 12), rgb(202 138 4))', primaryColor: '234, 88, 12', secondaryColor: '202, 138, 4' },
     ];
 
-    const [selectedTheme, setSelectedTheme] = useState('Ocean Blue');
-    const [primaryColor, setPrimaryColor] = useState('#3b82f6');
-    const [secondaryColor, setSecondaryColor] = useState('#06b6d4');
+    const [selectedTheme, setSelectedTheme] = useState('Golden Brown');
+    const [primaryColor, setPrimaryColor] = useState('#dfa93d');
+    const [secondaryColor, setSecondaryColor] = useState('#af7132');
     const [themeName, setThemeName] = useState('Custom Theme');
 
     const onApply = ({ primaryColor, secondaryColor, themeName }) => {
@@ -205,7 +205,7 @@ function SidebarPanel() {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" className="d-flex d-lg-none" onClick={() => {handleSidebarSmall(true);}} />
                 <Navbar expand="lg">
                     <Navbar.Brand>
-                        <span><img src="images/OnTeam-white-icon.png" alt="" /></span>
+                        <span><img src="images/logo-prime-team-icon.png" alt="" /></span>
                         <img src="images/primeTeam-Logo.png" alt="" />
                     </Navbar.Brand>
                     <div className="current--workspace">
