@@ -28,8 +28,8 @@ const SubscriptionGuard = ({ children }) => {
     activeSubscription?.planId ||
     localSub?.planId;
 
-  const isOnPlansPage = location.pathname.startsWith("/plans");
-
+  const isOnPlansPage =  location.pathname.startsWith("/account-setup");
+console.log(isOnPlansPage)
   // If not subscribed and not on /plans → redirect to /plans
   if (!hasActiveSubscription && !isOnPlansPage) {
     return <Navigate to="/plans" replace />;

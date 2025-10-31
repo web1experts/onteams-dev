@@ -260,7 +260,7 @@ function App(props) {
       if (route.route) {
         // Wrap private routes (except /plans) in SubscriptionGuard
         const element =
-          _privateRoute && route.route !== "/plans"
+          _privateRoute && route.route !== "/plans" && !route.route.startsWith("/account-setup")
             ? <SubscriptionGuard>{route.component}</SubscriptionGuard>
             : route.component;
 
