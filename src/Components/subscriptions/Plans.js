@@ -311,7 +311,7 @@ const [priceDetails, setPriceDetails] = useState(null);
                     </div>
                   </div>
 
-                  <ul className="list-unstyled text-start flex-grow-1 mt-3">
+                  <ul className="list-unstyled text-start flex-grow-1 mt-3 mb-4">
                     {plan.features.map((feature, idx) => (
                       <li key={idx}>• {feature}</li>
                     ))}

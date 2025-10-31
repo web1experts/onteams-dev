@@ -128,7 +128,7 @@ function MemberSignUp() {
                     </Col>
                     <Col sm={12} lg={6} className="px-0">
                         <div className="common--form">
-                            <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
+                            <span className='new--logo'><img className="logo--sm" src="../images/logo-prime-team-icon.png" alt="MyTeams" /></span>
                             <Form onSubmit={handleSubmit}> 
                                 <h2>Don't have an account? Sign Up</h2>
                                 <Form.Group className={`mb-3 form-group ${errors['email'] ? 'has-error' : ''}`}>

@@ -396,10 +396,11 @@ textarea.form-control {
   max-width: 120px;
   width: 120px;
   height: 120px;
+  background: #151d2d;
   padding: .75rem;
   border-radius: 1rem;
   -webkit-border-radius: 1rem;
-  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
+  /* background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1)); */
 }
 
 .main--login .login--image img {
