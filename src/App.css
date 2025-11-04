@@ -8169,11 +8169,79 @@ ul#icon-tabs .nav-link span svg {
   width: 1rem;
 }
 
-.setting__modal .billing--title--icon {
+.setting__modal .billing--title--icon, .plan--overview--page .billing--title--icon {
   width: 3rem;
   height: 3rem;
   color: #ffffff;
   font-size: 1.5rem;
+}
+
+.plan--overview--page .bg-gradient-to-br {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
+  background-image: linear-gradient(to bottom right, #10b981, #0d9488);
+  border: 2px solid rgb(52 211 153);
+}
+
+.plan--overview--page .upgrade--icon {
+  background-color: rgba(255, 255, 255, .2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plan--overview--page .upgrade--icon svg {
+  height: auto;
+  width: 2rem;
+}
+
+.plan--overview--page .bg-gradient-blue {
+  background-image: linear-gradient(to right, #3b82f6, #06b6d4);
+}
+
+.plan--overview--page .plan--status .status--icon {
+  padding: .5rem;
+  border-radius: .5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.plan--overview--page .plan--status .status--icon--blue {
+  background-color: rgb(219 234 254);
+  color: rgb(37 99 235);
+}
+
+.plan--overview--page .plan--status .status--icon--green {
+  background-color: rgb(209 250 229);
+  color: rgb(5 150 105);
+}
+
+.plan--overview--page .plan--status .status--icon--grey {
+  background-color: rgb(241 245 249);
+  color: rgb(71 85 105);
+}
+
+.plan--overview--page .bg-amber {
+  background-color: rgb(255 251 235);
+  border: 1px solid rgb(252 211 77);
+}
+
+.plan--overview--page .bg-amber-icon {
+  background: rgb(253 230 138);
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(180 83 9);
+  font-size: 1.25rem;
+}
+
+.fs-7 {
+    font-size: .75rem !important;
 }
 
 /*-=-=-=-==-=-
