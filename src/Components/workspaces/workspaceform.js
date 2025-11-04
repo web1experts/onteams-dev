@@ -126,7 +126,12 @@ function WorkspaceForm(props) {
           className={errors['industry'] && errors['industry'] !== "" ? "form-control input-error filled custom-selectbox" : 'form-control filled custom-selectbox'} 
           onChange={handleChange} value={fields['industry'] || ""} name="industry">
           <option value="">None</option>
-          <option value="it">IT</option>
+          <option value="software-development-and-it-services">Software Development & IT Services</option>
+          <option value="digital-marketing-agencies">Digital Marketing Agencies</option>
+          <option value="creative-and-design-studios">Creative & Design Studios</option>
+          <option value="consulting-and-professional-services">Consulting & Professional Services</option>
+          <option value="remote-and-hybrid-teams">Remote & Hybrid Teams</option>
+          <option value="other">Other</option>
         </Form.Select>
         {showError('industry')}
       </Form.Group>

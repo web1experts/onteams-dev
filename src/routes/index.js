@@ -233,27 +233,27 @@ const privateRoutes = [
         component: <DesktopPage/>,
         route: '/primeteamsio',
     },
-    {
-        type: 'page',
-        name: 'Plans',
-        key: 'PLANS',
-        component: <PlansPage />,
-        route: '/plans'
-    },
-    {
-        type: 'page',
-        name: 'SubscriptionPlans',
-        key: 'SUBSCRIPTION_PLANS',
-        component: <SubscriptionPlans />,
-        route: '/subscription-plans'
-    },
-    {
-        type: 'page',
-        name: 'PlanOverview',
-        key: 'PLANS_OVERVIEW',
-        component: <PlanOverview />,
-        route: '/plan-details'
-    }
+    // {
+    //     type: 'page',
+    //     name: 'Plans',
+    //     key: 'PLANS',
+    //     component: <PlansPage />,
+    //     route: '/plans'
+    // },
+    // {
+    //     type: 'page',
+    //     name: 'SubscriptionPlans',
+    //     key: 'SUBSCRIPTION_PLANS',
+    //     component: <SubscriptionPlans />,
+    //     route: '/subscription-plans'
+    // },
+    // {
+    //     type: 'page',
+    //     name: 'PlanOverview',
+    //     key: 'PLANS_OVERVIEW',
+    //     component: <PlanOverview />,
+    //     route: '/plan-details'
+    // }
 ];
 const hideSidebarRoutes = [
     '/login',

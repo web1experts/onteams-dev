@@ -247,34 +247,34 @@ function App(props) {
   
         if (!hasPermission) return null;
       }
-      // if (route.route) {
-      //   return (
-      //     <Route
-      //       exact
-      //       path={route.route}
-      //       element={route.component}
-      //       key={route.key}
-      //     />
-      //   );
-      // }
       if (route.route) {
-        // Wrap private routes (except /plans) in SubscriptionGuard
-        const element =
-          _privateRoute && route.route !== "/plans" && !route.route.startsWith("/account-setup")
-            ? <SubscriptionGuard>{route.component}</SubscriptionGuard>
-            : route.component;
-
-            
-
         return (
           <Route
             exact
             path={route.route}
-            element={element}
+            element={route.component}
             key={route.key}
           />
         );
       }
+      // if (route.route) {
+      //   // Wrap private routes (except /plans) in SubscriptionGuard
+      //   const element =
+      //     _privateRoute && route.route !== "/plans" && !route.route.startsWith("/account-setup")
+      //       ? <SubscriptionGuard>{route.component}</SubscriptionGuard>
+      //       : route.component;
+
+            
+
+      //   return (
+      //     <Route
+      //       exact
+      //       path={route.route}
+      //       element={element}
+      //       key={route.key}
+      //     />
+      //   );
+      // }
       return null;
     });
   };

@@ -517,7 +517,7 @@ export const SystemFieldModal = (props) => {
 
           
             <div className="added--fields">
-              <h5>Systen Fields</h5>
+              <h5>System Fields</h5>
                   <div>
                     {systemFields?.length === 0 ? (
                       <p className="text-muted">No system fields.</p>

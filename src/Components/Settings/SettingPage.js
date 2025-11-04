@@ -352,7 +352,7 @@ function SettingPage(props) {
             >
               <MdLockOutline /> Security
             </ListGroup.Item>
-            {
+            {/* {
               currentSubscription === false || currentSubscription?.status === 'active' && currentSubscription?.planId == 'trial' ? 
                 <ListGroup.Item
                  
@@ -375,7 +375,7 @@ function SettingPage(props) {
               >
                 <MdLockOutline /> Billing
               </ListGroup.Item>
-            }
+            } */}
             
              <ListGroup.Item onClick={() => setShowAlert(true)}>
               <FaRegBell /> Close Account

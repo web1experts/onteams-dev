@@ -35,17 +35,20 @@ function AccountSetup() {
     const [companyerrors, setcompanyerrors] = useState('')
     const workspace = useSelector(state => state.workspace)
 
-    const handleChange = ({ target: { name, value } }) => {
+    const handleChange = ({ target: { name, value, type, checked } }) => {
+        
         if (name === "email") {
             setOwneremail(value);
         }
         let newFields = { ...fields };
         let newErrors = { ...errors };
-
+        
         if (name === "companyname" && value === "") {
             delete newFields.companyname;
             delete newErrors.companyname;
-        } else {
+        } else if(name === 'agree'){
+            newFields[name] = checked
+        }else {
             newFields[name] = value;
             newErrors[name] = '';
 
@@ -66,7 +69,7 @@ function AccountSetup() {
     const handleSubmit = async (event) => {
         
         event.preventDefault();
-        setLoader(true)
+        
         const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
             // Get rules for the current field
             const rules = getFieldRules('signup', fieldName);
@@ -91,7 +94,11 @@ function AccountSetup() {
             setLoader(false)
             setErrors(fieldErrors);
         } else {
-            
+            if (!fields.agree) {
+                alert("Please agree to the Terms & Conditions");
+                return;
+            }
+            setLoader(true)
             const jsonPayload = {};
             for (const [key, value] of Object.entries(fields)) {
                 jsonPayload[key] = value;
@@ -148,6 +155,18 @@ function AccountSetup() {
                                             </FloatingLabel>
                                             {showError('password')}
                                         </Form.Group>
+                                        <div className="form-check mb-3" style={{ display: 'flex', alignItems: 'center' }}>
+                                            <Form.Check
+                                                type="checkbox"
+                                                name="agree"
+                                                checked={fields?.agree}
+                                                onChange={handleChange}
+                                                
+                                            />
+                                             <label className="form-check-label">
+                                                I agree to the <a href="#" target="_blank" rel="noreferrer">Terms & Conditions</a>
+                                            </label>
+                                        </div>
                                         <Button variant="primary" type="submit" disabled={loader}>{loader ? 'Please wait...' : 'Setup Account' }</Button>
                                     </Form>
                                 :
