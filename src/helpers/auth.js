@@ -120,7 +120,7 @@ export async function login(token,  current_loggedin_user = false, companies = [
 }
 
 export function setupDashboards( companies ){
-  const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))', primaryColor: '59, 130, 246', secondaryColor: '6, 182, 212' }
+  const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(223, 169, 61), rgb(175, 113, 50))', primaryColor: '223, 169, 61', secondaryColor: '175, 113, 50' }
   if( companies.length > 0){ 
     localStorage.setItem('mt_dashboards', JSON.stringify(companies));
     const current_dashboard = localStorage.getItem('current_dashboard');
