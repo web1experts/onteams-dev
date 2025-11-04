@@ -7,6 +7,7 @@ import {
     SUBSCRIPTION_SUCCESS,
     AUTHORIZE_PAYMENT_SUCCESS,
     SUBSCRIPTION_UPDATE_SUCCESS,
+    BILLING_SUCCESS,
     ACTIVE_PLAN
 } from "./types";
 const config = {
@@ -95,9 +96,25 @@ export const subscribeTrialPlan = () => {
     } catch (err) {
       errorRequest(err, dispatch);
     }
+  }
 }
- 
+
+export const getBillingdetails = () => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGetByKey('subscription', '/billing-details', {})
+      if (response.data && response.data.success) {
+        await dispatch({ type: BILLING_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  }
 }
+
 
 export const updateSubscription = (payload) => {
 
