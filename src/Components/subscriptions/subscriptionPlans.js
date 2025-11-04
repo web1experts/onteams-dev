@@ -5,46 +5,55 @@ import { FiGlobe, FiUsers, FiCheck } from "react-icons/fi";
 import { BsTags } from "react-icons/bs";
 import { MdOutlineClose } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan } from "../../redux/actions/subscription.action";
+import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
 
 function SubscriptionPlans() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const [plans] = useState([
-    {
-      id: "free",
-      name: "Free",
-      pricePerUser: 0,
-      features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-    {
-      id: "plan_RYrMylosZ72fKs",
-      name: "Basic",
-      pricePerUser: 1,
-      features: [
-        "Up to 5 members",
-        "Basic support",
-        "Access to core features",
-      ],
-    },
-    {
-      id: "plan_RYrNV77OrcUeIm",
-      name: "Pro",
-      pricePerUser: 2,
-      features: [
-        "Up to 50 members",
-        "Priority support",
-        "Advanced analytics",
-        "Custom integrations",
-      ],
-    },
-  ]);
+      {
+        id: "free",
+        name: "Free",
+        pricePerUser: 0,
+        disount: 0,
+        billing_cycle: false,
+        members_text: 'Free for up to 3 members',
+        features: [
+          "3 members",
+          "Dedicated support",
+          "Custom features & integrations",
+          "Advanced security",
+        ],
+      },
+      {
+        id: "plan_RbIMGsESONzXnh",
+        name: "Basic",
+        pricePerUser: 100,
+        disount: 20,
+        billing_cycle: 'monthly',
+        members_text: 'Unlimited Team Members',
+        features: [
+          "Up to 5 members",
+          "Basic support",
+          "Access to core features",
+        ],
+      },
+      {
+        id: "plan_RYrNV77OrcUeIm",
+        name: "Pro",
+        disount: 40,
+        pricePerUser: 2000,
+        billing_cycle: 'monthly',
+        members_text: 'Unlimited Team Members',
+        features: [
+          "Up to 50 members",
+          "Priority support",
+          "Advanced analytics",
+          "Custom integrations",
+        ],
+      },
+    ]);
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -56,6 +65,7 @@ function SubscriptionPlans() {
     country: "India",
     agree: false,
   });
+  
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
   const [authorizationData, setAuthorizationData] = useState(false)
@@ -82,6 +92,7 @@ function SubscriptionPlans() {
   useEffect(() => {
     setTimeout(() => {
       dispatch(getActiveSubscription())
+      dispatch(getBillingdetails())
     }, 1000)
   }, [])
 
@@ -93,13 +104,38 @@ function SubscriptionPlans() {
     }
   }, [subscriptionState])
 
-  //   useEffect(() => {
-  //     if(subscriptionState.activeSubscription){
-  //       setActiveSubscription(subscriptionState.activeSubscription)
-  //       navigate('/dashboard', { replace: true })
+  useEffect(() => {
+    if(subscriptionState.activeSubscription){
 
-  //     }
-  //   }, [subscriptionState.activeSubscription])
+      setActiveSubscription(subscriptionState.activeSubscription)
+        const current_dashboard = localStorage.getItem('current_dashboard');
+      
+      if (current_dashboard) {
+        const parsedata = JSON.parse(current_dashboard)
+        const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
+        localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
+      }
+
+    }
+  }, [subscriptionState.activeSubscription])
+
+    useEffect(() => {
+      if(subscriptionState.billing_info){
+        const billingInfo = {
+          fullName: subscriptionState.billing_info?.meta_value?.fullName || "",
+          phone: subscriptionState.billing_info?.meta_value?.phone || "",
+          address1: subscriptionState.billing_info?.meta_value?.address1 || "",
+          address2:subscriptionState.billing_info?.meta_value?.address2 || "",
+          city: subscriptionState.billing_info?.meta_value?.city || "",
+          state: subscriptionState.billing_info?.meta_value?.state || "",
+          postal: subscriptionState.billing_info?.meta_value?.postal || "",
+          country: subscriptionState.billing_info?.meta_value?.country || "India"
+        };
+
+        setFormData(billingInfo)
+
+      }
+    }, [subscriptionState.billing_info])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -110,11 +146,18 @@ function SubscriptionPlans() {
   };
 
   const handlePayment = async () => {
+    const { fullName, phone, address1, city, state, postal, country, agree } = formData;
 
+    // Validate required fields
+    if (!fullName || !phone || !address1 || !city || !state || !postal || !country) {
+      alert("Please fill in all required fields.");
+      return;
+    }
     if (!formData.agree) {
       alert("Please agree to the Terms & Conditions");
       return;
     }
+    setLoading(true)
     dispatch(
       createSubscription({
         plan_id: priceDetails.plan.id,
@@ -134,6 +177,7 @@ function SubscriptionPlans() {
     const cycleMultiplier =
       billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1;
     const totalPerCycle = discountedPricePerUser * members * cycleMultiplier;
+    const totalWithoutDiscount = plan.pricePerUser * members * cycleMultiplier;
     const totalSavings =
       (plan.pricePerUser - discountedPricePerUser) * members * cycleMultiplier;
     const discountPercent =
@@ -141,11 +185,13 @@ function SubscriptionPlans() {
 
     setPriceDetails({
       plan,
+      pricePerUser: plan.pricePerUser,
       discountedPricePerUser,
       cycleMultiplier,
       totalPerCycle,
       totalSavings,
       discountPercent,
+      totalWithoutDiscount
     });
 
     setSelectedPlan(plan);
@@ -219,9 +265,9 @@ function SubscriptionPlans() {
               <Form.Group className="select--size">
                 <Form.Label><FiUsers /> Select Your Team Size</Form.Label>
                 <div class="d-flex align-items-center gap-2 bg--teal p-2">
-                  <Button variant="secondary" onChange={(e) => setMembers(Number(e.target.value))}>-</Button>
-                  <Form.Control type="number" min="1" value={members} onChange={(e) => setMembers(Number(e.target.value))}/>
-                  <Button variant="primary" onChange={(e) => setMembers(Number(e.target.value))}>+</Button>
+                  <Button variant="secondary" onChange={() => setMembers(prev => Math.max(1, prev - 1))}>-</Button>
+                  <Form.Control type="number" min="1" value={members}  onChange={(e) => setMembers(Number(e.target.value))}/>
+                  <Button variant="primary" onClick={() => setMembers(prev => prev + 1)}>+</Button>
                 </div>
               </Form.Group>
             </Form>
@@ -275,8 +321,9 @@ function SubscriptionPlans() {
             <Row className="g-4">
               {plans.map((plan) => {
                 const finalPricePerUser = getDiscountedPrice(plan);
+                const baseAmount = plan.pricePerUser * members
                 const total = finalPricePerUser * members;
-
+                const savedAmount = baseAmount - total
                 return (
                   <Col key={plan.id} md={4}>
                     <Card
@@ -289,56 +336,74 @@ function SubscriptionPlans() {
                       <Card.Title>{plan.name}</Card.Title>
                       <Card.Body className="d-flex flex-column p-4">
                         
-                        <p>Free for up to 3 members</p>
-                        <div class="bg-gradient-primary p-3 mb-3 rounded-3">
-                            <div class="text--small mb-1 text-uppercase">Free Forever</div>
-                            <div class="text--large mb-2">FREE</div>
-                            <div class="text-slate-600 mt-1">Up to 3 Team Members</div>
-                        </div>
-                        <div class="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
-                            <div class="text--small mb-1 text-uppercase">Discounted Price</div>
-                            <div class="text--large mb-2">₹400<small>/user/month</small></div>
-                            <div class="text-slate-600 mt-1">when billed yearly</div>
-                        </div>
+                        <p>{plan.members_text}</p>
+                        {plan.id === 'free' ? 
+                          <div class="bg-gradient-primary p-3 mb-3 rounded-3">
+                              <div class="text--small mb-1 text-uppercase">Free Forever</div>
+                              <div class="text--large mb-2">FREE</div>
+                              <div class="text-slate-600 mt-1">Up to 3 Team Members</div>
+                          </div> 
+                          :
+                          <>
+                            <p>Regular Price</p>
+                            
+                          </>
+                        }
+                        
                         <div class="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                             <div class="text--small mb-1 text-uppercase">Your Total Cost</div>
                             <ListGroup>
-                              <ListGroup.Item>Base Amount: <span>₹400</span></ListGroup.Item>
-                              <ListGroup.Item className="font-weight-bold">50% Limited Offer: <span>-₹200</span></ListGroup.Item>
-                              <ListGroup.Item className="font-weight-bold border-top pt-2">Final Price: <strong className="display-6">₹200</strong></ListGroup.Item>
+                              <ListGroup.Item>Base Amount: <span>₹{baseAmount.toFixed(0)}</span></ListGroup.Item>
+                              {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
+                              <ListGroup.Item className="font-weight-bold">{plan.disount}% Limited Offer: <span>-₹{total.toFixed(0)}</span></ListGroup.Item>
+                              )}
+                              {plan.id !== 'free' && 
+                              <ListGroup.Item className="font-weight-bold border-top pt-2">Final Price: <strong className="display-6">₹{total.toFixed(0)}</strong></ListGroup.Item>
+                              }
                             </ListGroup>
-                            <div class="text-slate-600 mt-1 mb-3 text-end">per month for 1 user</div>
-                            <div class="bg-gradient-primary p-3 mb-3 rounded-3">
-                              <div class="text--small mb-1 text-uppercase">You Save in 1 Year</div>
-                              <div class="text--large display-5 mb-0">₹5,592</div>
+                            {plan.id !== 'free' &&  
+                              <>
+                              <div class="text-slate-600 mt-1 mb-3 text-end">per month for {members} user</div>
+                                {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
+                                  <div class="bg-gradient-primary p-3 mb-3 rounded-3">
+                                    <div class="text--small mb-1 text-uppercase">You Save in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
+                                    <div class="text--large display-5 mb-0">₹{savedAmount.toFixed(0)}</div>
+                                  </div>
+                                )}
+                              </>
+                            }
+                        </div>
+                       {plan.id !== 'free' &&
+                          <>
+                            <div className="in--free--plan">
+                              <p className="mb-0"><strong>No Credit Card Required</strong></p>
+                              <p><small>Get started immediately</small></p>
                             </div>
-                        </div>
-                        <div className="in--free--plan">
-                          <p className="mb-0"><strong>No Credit Card Required</strong></p>
-                          <p><small>Get started immediately</small></p>
-                        </div>
-                        <div className="in--basic--plan">
-                          <p className="mb-0"><strong>14 Days Free Trial</strong></p>
-                          <p><small>Charges will apply after trial period</small></p>
-                        </div>
-                        <div className="in--pro--plan">
-                          <p className="mb-0"><strong>14 Days Free Trial</strong></p>
-                          <p><small>Charges will apply after trial period</small></p>
-                        </div>
+                            
+                            <div className="in--pro--plan">
+                              <p className="mb-0"><strong>14 Days Free Trial</strong></p>
+                              <p><small>Charges will apply after trial period</small></p>
+                            </div>
+                          </>
+                        }
                         <Button
+                          
                           variant={
                             activeSubscription?.planId === plan.id
                               ? "outline-primary"
                               : "primary"
                           }
                           onClick={() => {
+                            if(activeSubscription?.planId === plan.id){
+                              return;
+                            }
                             if (plan.id === 'free') {
                               activateFreePlan()
                             } else {
                               handleSubmit(plan)
                             }
                           }}
-                          disabled={loading}
+                          disabled={activeSubscription?.planId === plan.id || loading}
                         >
                           {activeSubscription?.planId === plan.id
                             ? "Selected"
@@ -382,18 +447,7 @@ function SubscriptionPlans() {
                 );
               })}
             </Row>
-            <Row className="mt-5">
-              <Col md="12">
-                <div className="flex justify-center">
-                  <Button disabled={loading} onClick={activateTrialPlan} className="d-flex align-items-center gap-2 px-6 py-3 shadow-3 mx-auto">
-                    <span>{
-                      loading ? 'Please wait...' : 'Skip for now and activate the 14 days free trial'
-                    }</span>
-                    <MdOutlineClose />
-                  </Button>
-                </div>
-              </Col>
-            </Row>
+            
 
           </Container>
         </div>
@@ -457,10 +511,7 @@ function SubscriptionPlans() {
               <div className="rounded bg-gradient-light p-3 mb-4">
                 <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
                 <ListGroup>
-                  <ListGroup.Item>
-                    <small>Discounted price per user</small>
-                    <p className="mb-0 display-8">₹{priceDetails.discountedPricePerUser.toFixed(0)}<span>/user/month</span></p>
-                  </ListGroup.Item>
+                  
                   <ListGroup.Item>
                     <small>Base calculation</small>
                     <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
@@ -473,32 +524,41 @@ function SubscriptionPlans() {
                     <small>{priceDetails.discountPercent}% Limited Offer Discount</small>
                   </div>
                 )}
-                <div className="annual--cost rounded p-3 bg-warning mt-3 mb-3">
-                  <h6 className="fw-bold mb-2 text-uppercase">Annual COST BREAKDOWN</h6>
-                  <div className="d-flex align-items-center justify-content-between gap-3 bg-white p-3 rounded fw-normal border border-warning">
-                    <p className="mb-0">
-                      {billingCycle === "yearly"
-                      ? `₹${(priceDetails.discountedPricePerUser * members).toFixed(0)}/month × 12 months`
-                      : billingCycle === "quarterly"
-                      ? `₹${(
-                          priceDetails.discountedPricePerUser * members
-                        ).toFixed(0)}/month × 3 months`
-                      : `₹${(
-                        priceDetails.discountedPricePerUser * members
-                      ).toFixed(0)}/month × 1 month`}
-                    </p>
-                    <p className="fw-bold display-8 mb-0">
-                      = ₹{priceDetails.totalPerCycle.toLocaleString()}
-                    </p>
+                {billingCycle === "yearly" || billingCycle === "quarterly" ?
+                <>
+                  <div className="annual--cost rounded p-3 bg-warning mt-3 mb-3">
+                    <h6 className="fw-bold mb-2 text-uppercase">{billingCycle} COST BREAKDOWN</h6>
+                    <div className="d-flex align-items-center justify-content-between gap-3 bg-white p-3 rounded fw-normal border border-warning">
+                      <p className="mb-0">
+                        {billingCycle === "yearly"
+                        ? `₹${(priceDetails.pricePerUser * members).toFixed(0)}/month × 12 months`
+                        : billingCycle === "quarterly"
+                        ? `₹${(
+                            priceDetails.pricePerUser * members
+                          ).toFixed(0)}/month × 3 months`
+                        : `₹${(
+                          priceDetails.pricePerUser * members
+                        ).toFixed(0)}/month × 1 month`}
+                      </p>
+                      <p className="fw-bold display-8 mb-0">
+                        = ₹{priceDetails.totalWithoutDiscount.toLocaleString()}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                  <div class="text--small mb-1 text-uppercase">Total Savings in 1 Year</div>
-                  <div class="text-slate-600 mt-1">₹466/month × 12 months = ₹5,592</div>
-                  <div class="text--large mb-0">₹5,592</div>
-                </div>
                   
-                
+                  <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                    <div class="text--small mb-1 text-uppercase">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
+                    <div className="text-slate-600 mt-1">
+                    ₹{(priceDetails.discountedPricePerUser * members).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
+                    {(priceDetails.discountedPricePerUser * members * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
+                  </div>
+                    <div class="text--large mb-0">₹{priceDetails.totalSavings}</div>
+                  </div>
+                  </>
+                  :
+                  
+                  <></>
+                  }
                 {/* <p className="mb-1 text-muted">
                   Regular price per user:{" "}
                   <span className="text-decoration-line-through">
