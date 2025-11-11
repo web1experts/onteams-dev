@@ -205,7 +205,7 @@ function PlansPage() {
           localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
         }
         
-        navigate('/dashboard', { replace: true })
+        navigate(0);
 
       }
       
