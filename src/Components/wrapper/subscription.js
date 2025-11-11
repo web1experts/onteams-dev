@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { parseIfValidJSON } from "../../helpers/commonfunctions";
-import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { parseIfValidJSON } from "../../helpers/commonfunctions";
+import { Navigate, useLocation, matchPath } from "react-router-dom";
+
 import PlansPage from "../subscriptions/Plans";
 import SubscriptionPlans from "../subscriptions/subscriptionPlans";
 
@@ -12,12 +13,35 @@ const SubscriptionGuard = ({ children }) => {
   const activeSubscription = useSelector(
     (state) => state.subscription?.activeSubscription
   );
+const hideSidebarRoutes = [
+    '/login',
+    '/signup',
+    '/',
+    '/forgot-password',
+    '/404',
+    '/reset-password/:token',
+    '/account-setup/:token',
+    '/accept-invite/:token',
+    '/member-signup/:token',
+    
+]
 
+// ✅ Check if the current route matches any of the patterns
+  const shouldHideSidebar = hideSidebarRoutes.some((route) =>
+    matchPath({ path: route, end: true }, location.pathname)
+  );
+
+  // ✅ Return children directly if path matches one of the routes
+  if (shouldHideSidebar) {
+    return children;
+  }
   const encryptedCompany = localStorage.getItem('current_dashboard');
     let companyData;
     if (encryptedCompany && encryptedCompany !== "") {
         const decryptedCompany = parseIfValidJSON(encryptedCompany);
         companyData = (decryptedCompany) ? decryptedCompany : null
+    }else{
+      return children;
     }
     
 

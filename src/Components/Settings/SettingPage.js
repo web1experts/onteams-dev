@@ -377,9 +377,9 @@ function SettingPage(props) {
               </ListGroup.Item>
             } 
             
-             <ListGroup.Item onClick={() => setShowAlert(true)}>
+             {/* <ListGroup.Item onClick={() => setShowAlert(true)}>
               <FaRegBell /> Close Account
-            </ListGroup.Item>
+            </ListGroup.Item> */}
             {/*<ListGroup.Item
               action
               active={activeTab === "Preferences"}

@@ -7,13 +7,14 @@ import { MdOutlineClose } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { currentMemberProfile } from "../../helpers/auth";
 import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan } from "../../redux/actions/subscription.action";
-
+import { selectboxObserver } from "../../helpers/commonfunctions";
 function PlansPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [loader, setLoader] = useState(true)
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const memberProfile = currentMemberProfile();
+  const [errors, setErrors] = useState({});
   const [plans] = useState(
     {
       'monthly':[
@@ -213,20 +214,55 @@ function PlansPage() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    let newErrors = { ...errors };
+    newErrors[name] = ""; 
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+    setErrors(newErrors);
   };
 
-  const handlePayment = async () => {
-    const { fullName, phone, address1, city, state, postal, country, agree } = formData;
+  const validateForm = () => {
+  const requiredFields = [
+    "fullName",
+    "phone",
+    "address1",
+    "city",
+    "state",
+    "postal",
+    "country",
+  ];
 
-    // Validate required fields
-    if (!fullName || !phone || !address1 || !city || !state || !postal || !country) {
-      alert("Please fill in all required fields.");
-      return;
+  let newErrors = {};
+
+  requiredFields.forEach((field) => {
+    if (!formData[field]) {
+      newErrors[field] = "This field is required";
     }
+  });
+
+  if (!formData.agree) {
+    newErrors.agree = "You must agree to the Terms & Conditions";
+  }
+
+  setErrors(newErrors);
+
+  // If no errors, return true
+  return Object.keys(newErrors).length === 0;
+};
+
+const showError = (name) => {
+  if (errors[name]) {
+    return <span className="error">{errors[name]}</span>;
+  }
+  return null;
+};
+
+
+
+  const handlePayment = async () => {
+    if (!validateForm()) return;
     if (!formData.agree) {
       alert("Please agree to the Terms & Conditions");
       return;
@@ -270,6 +306,9 @@ function PlansPage() {
 
     setSelectedPlan(plan);
     setShowConfirm(true);
+    setTimeout(() => {
+      selectboxObserver()
+    },1000)
   };
 
 
@@ -736,15 +775,16 @@ function PlansPage() {
 
               <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
                 <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
-                <Row className="mb-3">
-                  <Form.Group as={Col} md="12">
+                <Row>
+                  <Form.Group as={Col} md="12" className="mb-3 form-group">
                     <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Control type="text" name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
+                    <Form.Control type="text" className={errors?.fullName ? 'br-red' : ''} name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
+                    {showError("fullName")}
                   </Form.Group>
                 </Row>
 
-                <Row className="mb-3">
-                  <Form.Group>
+                <Row>
+                  <Form.Group className="mb-3 form-group">
                     <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
                     <Row>
                       <Col className="d-flex align-items-center gap-3">
@@ -752,25 +792,28 @@ function PlansPage() {
                           <option>+91</option>
                         </Form.Select>
                       
-                        <Form.Control type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                        <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                        {showError("phone")}
                       </Col>
                     </Row>
                   </Form.Group>
                 </Row>
 
-                <Form.Group className="mb-3">
+                <Form.Group  className="mb-3 form-group">
                   <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
                   <Form.Control
                     type="text"
                     name="address1"
+                    className={errors?.address1 ? 'br-red' : ''} 
                     placeholder="Street address, building, apartment"
                     value={formData.address1}
                     onChange={handleChange}
                     required
                   />
+                  {showError("address1")}
                 </Form.Group>
 
-                <Form.Group className="mb-3">
+                <Form.Group className="mb-3 form-group">
                   <Form.Label>Address Line 2</Form.Label>
                   <Form.Control
                     type="text"
@@ -781,21 +824,24 @@ function PlansPage() {
                   />
                 </Form.Group>
 
-                <Row className="mb-3">
-                  <Form.Group as={Col} md="4">
+                <Row className="">
+                  <Form.Group as={Col} md="4" className="mb-3 form-group">
                     <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
                     <Form.Control
                       type="text"
                       name="city"
+                      className={errors?.city ? 'br-red' : ''} 
                       placeholder="City"
                       value={formData.city}
                       onChange={handleChange}
                       required
                     />
+                    {showError("city")}
                   </Form.Group>
-                  <Form.Group as={Col} md="4">
+                  <Form.Group as={Col} md="4" className="mb-3 form-group">
                     <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
                     <Form.Control
+                      className={errors?.state ? 'br-red' : ''} 
                       type="text"
                       name="state"
                       placeholder="State or Province"
@@ -803,23 +849,27 @@ function PlansPage() {
                       onChange={handleChange}
                       required
                     />
+                    {showError("state")}
                   </Form.Group>
-                  <Form.Group as={Col} md="4">
+                  <Form.Group as={Col} md="4" className="mb-3 form-group">
                     <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
                     <Form.Control
                       type="text"
                       name="postal"
+                      className={errors?.postal ? 'br-red' : ''} 
                       placeholder="Postal code"
                       value={formData.postal}
                       onChange={handleChange}
                       required
                     />
+                    {showError("postal")}
                   </Form.Group>
                 </Row>
 
-                <Form.Group className="mb-3">
+                <Form.Group  className="mb-3 form-group">
                   <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
                   <Form.Select
+                    className="custom-selectbox"
                     name="country"
                     value={formData.country}
                     onChange={handleChange}
@@ -830,12 +880,14 @@ function PlansPage() {
                     <option>United Kingdom</option>
                     <option>Canada</option>
                   </Form.Select>
+                  {showError("country")}
                 </Form.Group>
 
-                <div className="p-3 border rounded bg-white mb-3" style={{ fontSize: "0.9rem" }}>
+                <div className="p-3 border rounded bg-white" style={{ fontSize: "0.9rem" }}>
                   <Form.Check
                     type="checkbox"
                     name="agree"
+                    className=""
                     checked={formData.agree}
                     onChange={handleChange}
                     label={
@@ -852,6 +904,7 @@ function PlansPage() {
                     }
                     required
                   />
+                  {showError("agree")}
                 </div>
 
               </Form>

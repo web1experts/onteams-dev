@@ -129,6 +129,9 @@ body {
 .text-muted {
   color: rgb(150 150 150 / 75%) !important;
 }
+input.form-control.br-red {
+    border: 1px solid red;
+}
 
 .holidays--list tr {
   position: relative;

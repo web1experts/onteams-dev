@@ -7,11 +7,12 @@ import { MdOutlineClose } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { currentMemberProfile } from "../../helpers/auth";
 import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
-
+import { selectboxObserver } from "../../helpers/commonfunctions";
 function SubscriptionPlans() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const memberProfile = currentMemberProfile();
+  const [errors, setErrors] = useState({});
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const [plans] = useState(
       {
@@ -228,20 +229,62 @@ function SubscriptionPlans() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    let newErrors = { ...errors };
+    newErrors[name] = ""; 
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+    setErrors(newErrors);
   };
 
-  const handlePayment = async () => {
-    const { fullName, phone, address1, city, state, postal, country, agree } = formData;
 
-    // Validate required fields
-    if (!fullName || !phone || !address1 || !city || !state || !postal || !country) {
-      alert("Please fill in all required fields.");
-      return;
+  const validateForm = () => {
+  const requiredFields = [
+    "fullName",
+    "phone",
+    "address1",
+    "city",
+    "state",
+    "postal",
+    "country",
+  ];
+
+  let newErrors = {};
+
+  requiredFields.forEach((field) => {
+    if (!formData[field]) {
+      newErrors[field] = "This field is required";
     }
+  });
+
+  if (!formData.agree) {
+    newErrors.agree = "You must agree to the Terms & Conditions";
+  }
+
+  setErrors(newErrors);
+
+  // If no errors, return true
+  return Object.keys(newErrors).length === 0;
+};
+
+const showError = (name) => {
+  if (errors[name]) {
+    return <span className="error">{errors[name]}</span>;
+  }
+  return null;
+};
+
+
+  const handlePayment = async () => {
+    // const { fullName, phone, address1, city, state, postal, country, agree } = formData;
+
+    // // Validate required fields
+    // if (!fullName || !phone || !address1 || !city || !state || !postal || !country) {
+    //   alert("Please fill in all required fields.");
+    //   return;
+    // }
+    if (!validateForm()) return;
     if (!formData.agree) {
       alert("Please agree to the Terms & Conditions");
       return;
@@ -285,6 +328,9 @@ function SubscriptionPlans() {
 
     setSelectedPlan(plan);
     setShowConfirm(true);
+    setTimeout(() => {
+      selectboxObserver()
+    },1000)
   };
 
 
@@ -707,126 +753,140 @@ function SubscriptionPlans() {
               </p>
 
               <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
-                <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
-                <Row className="mb-3">
-                  <Form.Group as={Col} md="12">
-                    <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Control type="text" name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
-                  </Form.Group>
-                </Row>
-
-                <Row className="mb-3">
-                  <Form.Group>
-                    <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                    <Row>
-                      <Col className="d-flex align-items-center gap-3">
-                        <Form.Select disabled className="w-auto pe-5">
-                          <option>+91</option>
-                        </Form.Select>
-                      
-                        <Form.Control type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
-                      </Col>
-                    </Row>
-                  </Form.Group>
-                </Row>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="address1"
-                    placeholder="Street address, building, apartment"
-                    value={formData.address1}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Address Line 2</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="address2"
-                    placeholder="Additional address details (optional)"
-                    value={formData.address2}
-                    onChange={handleChange}
-                  />
-                </Form.Group>
-
-                <Row className="mb-3">
-                  <Form.Group as={Col} md="4">
-                    <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="city"
-                      placeholder="City"
-                      value={formData.city}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col} md="4">
-                    <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="state"
-                      placeholder="State or Province"
-                      value={formData.state}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col} md="4">
-                    <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="postal"
-                      placeholder="Postal code"
-                      value={formData.postal}
-                      onChange={handleChange}
-                      required
-                    />
-                  </Form.Group>
-                </Row>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
-                  <Form.Select
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option>India</option>
-                    <option>United States</option>
-                    <option>United Kingdom</option>
-                    <option>Canada</option>
-                  </Form.Select>
-                </Form.Group>
-
-                <div className="p-3 border rounded bg-white mb-3" style={{ fontSize: "0.9rem" }}>
-                  <Form.Check
-                    type="checkbox"
-                    name="agree"
-                    checked={formData.agree}
-                    onChange={handleChange}
-                    label={
-                      <>
-                        I agree to the{" "}
-                        <a href="#" target="_blank" rel="noreferrer">
-                          Terms & Conditions
-                        </a>{" "}
-                        and{" "}
-                        <a href="#" target="_blank" rel="noreferrer">
-                          Refund Policy
-                        </a>
-                      </>
-                    }
-                    required
-                  />
-                </div>
-
-              </Form>
+                              <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
+                              <Row>
+                                <Form.Group as={Col} md="12" className="mb-3 form-group">
+                                  <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
+                                  <Form.Control type="text" className={errors?.fullName ? 'br-red' : ''} name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
+                                  {showError("fullName")}
+                                </Form.Group>
+                              </Row>
+              
+                              <Row>
+                                <Form.Group className="mb-3 form-group">
+                                  <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
+                                  <Row>
+                                    <Col className="d-flex align-items-center gap-3">
+                                      <Form.Select disabled className="w-auto pe-5">
+                                        <option>+91</option>
+                                      </Form.Select>
+                                    
+                                      <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                                      {showError("phone")}
+                                    </Col>
+                                  </Row>
+                                </Form.Group>
+                              </Row>
+              
+                              <Form.Group  className="mb-3 form-group">
+                                <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  name="address1"
+                                  className={errors?.address1 ? 'br-red' : ''} 
+                                  placeholder="Street address, building, apartment"
+                                  value={formData.address1}
+                                  onChange={handleChange}
+                                  required
+                                />
+                                {showError("address1")}
+                              </Form.Group>
+              
+                              <Form.Group className="mb-3 form-group">
+                                <Form.Label>Address Line 2</Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  name="address2"
+                                  placeholder="Additional address details (optional)"
+                                  value={formData.address2}
+                                  onChange={handleChange}
+                                />
+                              </Form.Group>
+              
+                              <Row className="">
+                                <Form.Group as={Col} md="4" className="mb-3 form-group">
+                                  <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="city"
+                                    className={errors?.city ? 'br-red' : ''} 
+                                    placeholder="City"
+                                    value={formData.city}
+                                    onChange={handleChange}
+                                    required
+                                  />
+                                  {showError("city")}
+                                </Form.Group>
+                                <Form.Group as={Col} md="4" className="mb-3 form-group">
+                                  <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
+                                  <Form.Control
+                                    className={errors?.state ? 'br-red' : ''} 
+                                    type="text"
+                                    name="state"
+                                    placeholder="State or Province"
+                                    value={formData.state}
+                                    onChange={handleChange}
+                                    required
+                                  />
+                                  {showError("state")}
+                                </Form.Group>
+                                <Form.Group as={Col} md="4" className="mb-3 form-group">
+                                  <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    name="postal"
+                                    className={errors?.postal ? 'br-red' : ''} 
+                                    placeholder="Postal code"
+                                    value={formData.postal}
+                                    onChange={handleChange}
+                                    required
+                                  />
+                                  {showError("postal")}
+                                </Form.Group>
+                              </Row>
+              
+                              <Form.Group  className="mb-3 form-group">
+                                <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
+                                <Form.Select
+                                  className="custom-selectbox"
+                                  name="country"
+                                  value={formData.country}
+                                  onChange={handleChange}
+                                  required
+                                >
+                                  <option>India</option>
+                                  <option>United States</option>
+                                  <option>United Kingdom</option>
+                                  <option>Canada</option>
+                                </Form.Select>
+                                {showError("country")}
+                              </Form.Group>
+              
+                              <div className="p-3 border rounded bg-white" style={{ fontSize: "0.9rem" }}>
+                                <Form.Check
+                                  type="checkbox"
+                                  name="agree"
+                                  className=""
+                                  checked={formData.agree}
+                                  onChange={handleChange}
+                                  label={
+                                    <>
+                                      I agree to the{" "}
+                                      <a href="#" target="_blank" rel="noreferrer">
+                                        Terms & Conditions
+                                      </a>{" "}
+                                      and{" "}
+                                      <a href="#" target="_blank" rel="noreferrer">
+                                        Refund Policy
+                                      </a>
+                                    </>
+                                  }
+                                  required
+                                />
+                                {showError("agree")}
+                              </div>
+              
+                            </Form>
             </>
           )}
         </Modal.Body>
