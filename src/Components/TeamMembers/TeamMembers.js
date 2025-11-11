@@ -13,7 +13,7 @@ import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { MdOutlineSearch, MdOutlineClose, MdDragIndicator, MdSearch, MdFilterList } from "react-icons/md";
 import { getMemberdata } from "../../helpers/commonfunctions";
-import { Listmembers, deleteMember, updateMember} from "../../redux/actions/members.action";
+import { Listmembers, deleteMember, updateMember, listCompanyinvite} from "../../redux/actions/members.action";
 import { toggleSidebar, toggleSidebarSmall} from "../../redux/actions/common.action";
 import { leaveCompany } from "../../redux/actions/workspace.action";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +32,7 @@ import { renderDynamicField } from "../common/dynamicFields";
 import RolesPage from "../Settings/RolesPage";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { logout } from "../../redux/actions/auth.actions";
+import { getActiveSubscription } from "../../redux/actions/subscription.action";
 
 function TeamMembersPage() {
   const inputRef = useRef(null);
@@ -42,7 +43,9 @@ function TeamMembersPage() {
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
-
+  const subscriptionState = useSelector((state) => state.subscription);
+  const [invitationsTotal, setInvitationsTotal] = useState(0)
+  const [activeSubscription, setActiveSubscription] = useState(null)
   const [showdelete, setShowDelete] = useState(false);
   const [activeKey, setActiveKey] = useState(null);
   const [activeRole, setActiveRole] = useState({});
@@ -111,6 +114,7 @@ function TeamMembersPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedMember, setSelectedMember] = useState(null);
   const [memberFeeds, setMemberFeed] = useState([]);
+  const invitationsFeed = useSelector((state) => state.member.invitations);
   const [showloader, setShowloader] = useState(false);
    const [showPasswordFields, setShowPasswordFields] = useState({});
   const apiResult = useSelector((state) => state.member);
@@ -125,6 +129,9 @@ function TeamMembersPage() {
       setMemberFeed([]);
 
       await dispatch(Listmembers(currentPage, searchTerm));
+      await dispatch(
+        listCompanyinvite()
+      );
       setShowloader(false);
     }
   };
@@ -174,8 +181,15 @@ function TeamMembersPage() {
     });
 
     setPermissions(prm);
+
+    setTimeout(() => {
+        dispatch(getActiveSubscription())
+      }, 1000)
+      
   }, []);
 
+
+   
   useEffect(() => {
     if (currentPage !== "" && activeTab === "Members") {
       setShowloader(true);
@@ -183,6 +197,12 @@ function TeamMembersPage() {
     }
     dispatch(fetchCustomFields({ module: "members" }));
   }, [currentPage, searchTerm, activeTab]);
+
+  useEffect(() => {
+    if (invitationsFeed && invitationsFeed.inviteData) {
+      setInvitationsTotal(invitationsFeed.total);
+    }
+  }, [invitationsFeed]);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -203,6 +223,17 @@ function TeamMembersPage() {
     setPermissions(roles[0].permissions || []);
   }
 }, [fields?.role, roles]);
+
+useEffect(() => {
+  
+  if(subscriptionState.activeSubscription){
+    setActiveSubscription(subscriptionState.activeSubscription) 
+  }
+}, [subscriptionState.activeSubscription])
+
+useEffect(() => {
+  console.log('activeSubscription:: ', activeSubscription);
+}, [activeSubscription])
 
 
   useEffect(() => {
@@ -901,7 +932,15 @@ function TeamMembersPage() {
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                      <ListGroup.Item className="btn btn-primary" onClick={() => {
+                        if(activeSubscription?.planId === 'free' && (invitationsTotal + memberFeeds?.length) > 3){
+                          navigate('/subscription-plans', { replace: true })
+                        }else{
+                          handleShow()
+                        }
+                        
+                      }
+                      }><FaPlus /></ListGroup.Item>
                     )}
                   </ListGroup>
                 </ListGroup>

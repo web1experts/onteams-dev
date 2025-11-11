@@ -8004,6 +8004,10 @@ ul#icon-tabs .nav-link span svg {
     line-height: 1;
 }
 
+.bg-gradient-primary .text--large > span.text-slate-600 {
+    text-transform: lowercase !important;
+}
+
 .bg-gradient-primary .text-slate-600 {
     color: #454545;
     font-weight: 500;

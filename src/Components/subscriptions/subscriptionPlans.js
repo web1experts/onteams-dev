@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { currentMemberProfile } from "../../helpers/auth";
 import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
+import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
 function SubscriptionPlans() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -15,135 +16,192 @@ function SubscriptionPlans() {
   const [errors, setErrors] = useState({});
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const [plans] = useState(
-      {
-        'monthly':[
-        {
-          id: "free",
-          name: "Free",
-          pricePerUser: 0,
-          disount: 0,
-          billing_cycle: false,
-          members_text: 'Free for up to 3 members',
-          features: [
-            "3 members",
-            "Dedicated support",
-            "Custom features & integrations",
-            "Advanced security",
-          ],
-        },
-        {
-          id: "plan_ReKaLINYJwq8FZ",
-          name: "Pro",
-          pricePerUser: 666,
-          disount: 0,
-          billing_cycle: 'monthly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 5 members",
-            "Basic support",
-            "Access to core features",
-          ],
-        },
-        {
-          id: "plan_ReKagUnhkdX86V",
-          name: "Elite",
-          disount: 0,
-          pricePerUser: 916,
-          billing_cycle: 'monthly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 50 members",
-            "Priority support",
-            "Advanced analytics",
-            "Custom integrations",
-          ],
-        }],
-        'quarterly':[
           {
-          id: "free",
-          name: "Free",
-          pricePerUser: 0,
-          disount: 0,
-          billing_cycle: false,
-          members_text: 'Free for up to 3 members',
-          features: [
-            "3 members",
-            "Dedicated support",
-            "Custom features & integrations",
-            "Advanced security",
-          ],
-        },
-        {
-          id: "plan_ReKb2o8oIyYuSN",
-          name: "Pro",
-          disount: 20,
-          pricePerUser: 533,
-          billing_cycle: 'quarterly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 50 members",
-            "Priority support",
-            "Advanced analytics",
-            "Custom integrations",
-          ],
-        },{
-        id: "plan_ReKbqwqKZJ4aDz",
-        name: "Elite",
-        disount: 20,
-        pricePerUser: 733,
-        billing_cycle: 'quarterly',
-        members_text: 'Unlimited Team Members',
-        features: [
-          "Up to 50 members",
-          "Priority support",
-          "Advanced analytics",
-          "Custom integrations",
-        ],
-        }],
-        'yearly': [
-          {
-          id: "free",
-          name: "Free",
-          pricePerUser: 0,
-          disount: 0,
-          billing_cycle: false,
-          members_text: 'Free for up to 3 members',
-          features: [
-            "3 members",
-            "Dedicated support",
-            "Custom features & integrations",
-            "Advanced security",
-          ],
-        },{
-          
-          id: "plan_ReKc4NmD60B7rW",
-          name: "Pro",
-          disount: 40,
-          pricePerUser: 400,
-          billing_cycle: 'yearly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 50 members",
-            "Priority support",
-            "Advanced analytics",
-            "Custom integrations",
-          ],
-        },{
-          id: "plan_ReKcjcfoNCmtNY",
-          name: "Elite",
-          disount: 40,
-          pricePerUser: 550,
-          billing_cycle: 'yearly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 50 members",
-            "Priority support",
-            "Advanced analytics",
-            "Custom integrations",
-          ],
-        }]
-      }
-    );
+            'monthly':[
+            {
+              id: "free",
+              name: "Free",
+              originalPrice: 0,
+              pricePerUser: 0,
+              disount: 0,
+              billing_cycle: false,
+              members_text: 'Free for up to 3 members',
+              features: [
+                "Single Workspace",
+                "Unlimited Projects",
+                "Unlimited Tasks",
+                "Unlimited Workflows",
+                "Time Tracking",
+                "Live Screen View",
+                "Screenshots",
+                "Reports",
+                "Attendance Tracking"
+              ],
+            },
+            {
+              id: "plan_ReKaLINYJwq8FZ",
+              name: "Pro",
+              originalPrice: 666,
+              pricePerUser: 666,
+              disount: 0,
+              billing_cycle: 'monthly',
+              members_text: 'Unlimited Team Members',
+              features: [
+                "Unlimited Workspace",
+                "Unlimited Projects",
+                "Unlimited Tasks",
+                "Unlimited Workflows",
+                "Time Tracking",
+                "Live Screen View",
+                "Screenshots",
+                "Reports",
+                "Attendance Tracking"
+              ],
+            },
+            {
+              id: "plan_ReKagUnhkdX86V",
+              name: "Elite",
+              disount: 0,
+              originalPrice: 916,
+              pricePerUser: 916,
+              billing_cycle: 'monthly',
+              members_text: 'Unlimited Team Members',
+              features: [
+                "Unlimited Workspace",
+                "Unlimited Projects",
+                "Unlimited Tasks",
+                "Unlimited Workflows",
+                "Time Tracking",
+                "Live Screen View",
+                "Screenshots",
+                "Recorded Screen Videos",
+                "Reports",
+                "Attendance Tracking"
+              ],
+            }],
+            'quarterly':[
+              {
+              id: "free",
+              name: "Free",
+              originalPrice: 0,
+              pricePerUser: 0,
+              disount: 0,
+              billing_cycle: false,
+              members_text: 'Free for up to 3 members',
+              features: [
+                "Single Workspace",
+                "Unlimited Projects",
+                "Unlimited Tasks",
+                "Unlimited Workflows",
+                "Time Tracking",
+                "Live Screen View",
+                "Screenshots",
+                "Reports",
+                "Attendance Tracking"
+              ],
+            },
+            {
+              id: "plan_ReKb2o8oIyYuSN",
+              name: "Pro",
+              disount: 20,
+              originalPrice: 666.25,
+              pricePerUser: 533,
+              billing_cycle: 'quarterly',
+              members_text: 'Unlimited Team Members',
+              features: [
+                "Unlimited Workspace",
+                "Unlimited Projects",
+                "Unlimited Tasks",
+                "Unlimited Workflows",
+                "Time Tracking",
+                "Live Screen View",
+                "Screenshots",
+                "Reports",
+                "Attendance Tracking"
+              ],
+            },{
+            id: "plan_ReKbqwqKZJ4aDz",
+            name: "Elite",
+            disount: 20,
+            originalPrice: 916.25,
+            pricePerUser: 733,
+            billing_cycle: 'quarterly',
+            members_text: 'Unlimited Team Members',
+            features: [
+              "Unlimited Workspace",
+              "Unlimited Projects",
+              "Unlimited Tasks",
+              "Unlimited Workflows",
+              "Time Tracking",
+              "Live Screen View",
+              "Screenshots",
+              "Recorded Screen Videos",
+              "Reports",
+              "Attendance Tracking"
+            ],
+            }],
+            'yearly': [
+              {
+              id: "free",
+              name: "Free",
+              pricePerUser: 0,
+              disount: 0,
+              billing_cycle: false,
+              members_text: 'Free for up to 3 members',
+              features: [
+                "Single Workspace",
+                "Unlimited Projects",
+                "Unlimited Tasks",
+                "Unlimited Workflows",
+                "Time Tracking",
+                "Live Screen View",
+                "Screenshots",
+                "Reports",
+                "Attendance Tracking"
+              ],
+            },{
+              
+              id: "plan_ReKc4NmD60B7rW",
+              name: "Pro",
+              disount: 40,
+              originalPrice: 666.67,
+              pricePerUser: 400,
+              billing_cycle: 'yearly',
+              members_text: 'Unlimited Team Members',
+              features: [
+                "Unlimited Workspace",
+                "Unlimited Projects",
+                "Unlimited Tasks",
+                "Unlimited Workflows",
+                "Time Tracking",
+                "Live Screen View",
+                "Screenshots",
+                "Reports",
+                "Attendance Tracking"
+              ],
+            },{
+              id: "plan_ReKcjcfoNCmtNY",
+              name: "Elite",
+              disount: 40,
+              originalPrice: 916.67,
+              pricePerUser: 550,
+              billing_cycle: 'yearly',
+              members_text: 'Unlimited Team Members',
+              features: [
+                "Unlimited Workspace",
+                "Unlimited Projects",
+                "Unlimited Tasks",
+                "Unlimited Workflows",
+                "Time Tracking",
+                "Live Screen View",
+                "Screenshots",
+                "Recorded Screen Videos",
+                "Reports",
+                "Attendance Tracking"
+              ],
+            }]
+          }
+        );
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -155,7 +213,18 @@ function SubscriptionPlans() {
     country: "India",
     agree: false,
   });
-  
+
+  const handleListMember = async () => {
+   
+      await dispatch(Listmembers(1,''));
+      await dispatch(
+        listCompanyinvite()
+      );
+  };
+  const [memberFeeds, setMemberFeed] = useState([]);
+    const invitationsFeed = useSelector((state) => state.member.invitations);
+    const [invitationsTotal, setInvitationsTotal] = useState(0)
+    const memberFeed = useSelector((state) => state.member.members);
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
   const [authorizationData, setAuthorizationData] = useState(false)
@@ -169,9 +238,9 @@ function SubscriptionPlans() {
   const getDiscountedPrice = (plan) => {
     switch (billingCycle) {
       case "yearly":
-        return plan.pricePerUser * 0.6; // 40% OFF
+        return plan.originalPrice * 0.6; // 40% OFF
       case "quarterly":
-        return plan.pricePerUser * 0.8; // 20% OFF
+        return plan.originalPrice * 0.8; // 20% OFF
       default:
         return plan.pricePerUser;
     }
@@ -184,6 +253,7 @@ function SubscriptionPlans() {
       dispatch(getActiveSubscription())
       dispatch(getBillingdetails())
     }, 1000)
+    handleListMember();
   }, [])
 
   useEffect(() => {
@@ -208,6 +278,21 @@ function SubscriptionPlans() {
      
     }
   }, [subscriptionState.activeSubscription])
+
+  useEffect(() => {
+      if (memberFeed && memberFeed.memberData) {
+        setMemberFeed(memberFeed.memberData);
+        setMembers((members || 0) + (memberFeed.memberData?.length || 0));
+
+      }
+    }, [memberFeed]);
+
+     useEffect(() => {
+        if (invitationsFeed && invitationsFeed.inviteData) {
+          setInvitationsTotal(invitationsFeed.total);
+          setMembers((members || 0) + invitationsFeed.total || 0);
+        }
+      }, [invitationsFeed]);
 
     useEffect(() => {
       if(subscriptionState.billing_info){
@@ -310,15 +395,22 @@ const showError = (name) => {
       billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1;
     const totalPerCycle = discountedPricePerUser * members * cycleMultiplier;
     const totalWithoutDiscount = plan.pricePerUser * members * cycleMultiplier;
-    const totalSavings =
-      (plan.pricePerUser - discountedPricePerUser) * members * cycleMultiplier;
+    // const totalSavings =
+    //   (plan.pricePerUser - discountedPricePerUser) * members * cycleMultiplier;
     const discountPercent =
       billingCycle === "yearly" ? 40 : billingCycle === "quarterly" ? 20 : 0;
+
+      const baseAmount = plan.originalPrice * members
+      const total = discountedPricePerUser * members;
+      
+      const totalSavings = (baseAmount - total) * cycleMultiplier;
+
 
     setPriceDetails({
       plan,
       pricePerUser: plan.pricePerUser,
       discountedPricePerUser,
+      originalPrice: plan.originalPrice,
       cycleMultiplier,
       totalPerCycle,
       totalSavings,
@@ -406,16 +498,16 @@ const showError = (name) => {
                 <Form.Label><FiGlobe /> Select Currency</Form.Label>
                 <Form.Select>
                   <option value="INR">₹ INR - Indian Rupee</option>
-                  <option value="USD">$ USD - US Dollar</option>
+                  {/* <option value="USD">$ USD - US Dollar</option>
                   <option value="EUR">€ EUR - Euro</option>
-                  <option value="GBP">£ GBP - British Pound</option>
+                  <option value="GBP">£ GBP - British Pound</option> */}
                 </Form.Select>
               </Form.Group>
               <Form.Group className="select--size">
                 <Form.Label><FiUsers /> Select Your Team Size</Form.Label>
                 <div class="d-flex align-items-center gap-2 bg--teal p-2">
                   <Button variant="secondary" onChange={() => setMembers(prev => Math.max(1, prev - 1))}>-</Button>
-                  <Form.Control type="number" min="1" value={members}  onChange={(e) => setMembers(Number(e.target.value))}/>
+                  <Form.Control type="number" min={(memberFeeds?.length + invitationsTotal) || 1} value={members}  onChange={(e) => setMembers(Number(e.target.value))}/>
                   <Button variant="primary" onClick={() => setMembers(prev => prev + 1)}>+</Button>
                 </div>
               </Form.Group>
@@ -470,9 +562,13 @@ const showError = (name) => {
             <Row className="g-4">
               {plans[billingCycle].map((plan) => {
                 const finalPricePerUser = getDiscountedPrice(plan);
-                const baseAmount = plan.pricePerUser * members
+                const baseAmount = plan.originalPrice * members
                 const total = finalPricePerUser * members;
-                const savedAmount = baseAmount - total
+                let months = 1;
+                if (billingCycle === "quarterly") months = 3;
+                if (billingCycle === "yearly") months = 12;
+                const savedAmount = (baseAmount - total) * months;
+                const totalCostForPeriod = total * months;
                 return (
                   <Col key={plan.id} md={4}>
                     <Card
@@ -493,24 +589,31 @@ const showError = (name) => {
                               <div class="text-slate-600 mt-1">Up to 3 Team Members</div>
                           </div> 
                           :
-                          <>
-                            <p>Regular Price</p>
-                            
-                          </>
+                          billingCycle !== 'monthly' ? 
+                            <>
+                              <p>Regular Price</p>
+                              <div class="bg-gradient-primary p-3 mb-3 rounded-3">
+                                <div class="text--small mb-1 text-uppercase">Discounted Price</div>
+                                <div class="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span class="text-slate-600 mt-1">/user/month</span></div>
+                                <div class="text-slate-600 mt-1">Up to 3 Team Members</div>
+                              </div> 
+                            </>
+                            :
+                            <></>
                         }
                         
                         <div class="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                             <div class="text--small mb-1 text-uppercase">Your Total Cost</div>
                             <ListGroup>
-                              <ListGroup.Item>Base Amount: <span>₹{baseAmount.toFixed(0)}</span></ListGroup.Item>
-                              {/*(plan.disount !== 0 && billingCycle !== 'monthly') &&(
-                              <ListGroup.Item className="font-weight-bold">{plan.disount}% Limited Offer: <span>-₹{total.toFixed(0)}</span></ListGroup.Item>
+                              <ListGroup.Item>Base Amount: <span>₹{(plan.originalPrice.toFixed(0) * members).toFixed(0)}</span></ListGroup.Item>
+                              {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
+                              <ListGroup.Item className="font-weight-bold">{plan.disount}% Limited Offer: <span>-₹{(plan.pricePerUser.toFixed(0) * members).toFixed(0)}</span></ListGroup.Item>
                               )}
                               {plan.id !== 'free' && 
                               <ListGroup.Item className="font-weight-bold border-top pt-2">Final Price: <strong className="display-6">₹{total.toFixed(0)}</strong></ListGroup.Item>
-                              */}
+                              }
                             </ListGroup>
-                            {/*plan.id !== 'free' &&  
+                            {plan.id !== 'free' &&  
                               <>
                               <div class="text-slate-600 mt-1 mb-3 text-end">per month for {members} user</div>
                                 {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
@@ -520,18 +623,22 @@ const showError = (name) => {
                                   </div>
                                 )}
                               </>
-                           */ }
+                            }
                         </div>
-                       {plan.id !== 'free' &&
+                       {plan.id !== 'free' ?
                           <>
-                            <div className="in--free--plan">
-                              <p className="mb-0"><strong>No Credit Card Required</strong></p>
-                              <p><small>Get started immediately</small></p>
-                            </div>
+                            
                             
                             <div className="in--pro--plan">
                               <p className="mb-0"><strong>14 Days Free Trial</strong></p>
                               <p><small>Charges will apply after trial period</small></p>
+                            </div>
+                          </>
+                          :
+                          <>
+                            <div className="in--free--plan">
+                              <p className="mb-0"><strong>No Credit Card Required</strong></p>
+                              <p><small>Get started immediately</small></p>
                             </div>
                           </>
                         }
@@ -662,19 +769,27 @@ const showError = (name) => {
               <div className="rounded bg-gradient-light p-3 mb-4">
                 <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
                 <ListGroup>
-                  
+                  <ListGroup.Item>
+                    <small>Discounted price per user</small>
+                    <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
+                      <span>₹{priceDetails.pricePerUser.toFixed(0)}/user/month</span>
+                    </p>
+                  </ListGroup.Item>
                   <ListGroup.Item>
                     <small>Base calculation</small>
                     <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
-                      <span>₹{priceDetails.discountedPricePerUser.toFixed(0)} ×{" "}{members} user(s)</span> <strong className="display-8">= ₹{(priceDetails.discountedPricePerUser * members).toFixed(0)}</strong>
+                      <span>₹{priceDetails.pricePerUser.toFixed(0)} ×{" "}{members} user(s)</span> <strong className="display-8">= ₹{(priceDetails.pricePerUser * members).toFixed(0)}</strong>
                     </p>
                   </ListGroup.Item>
                 </ListGroup>
-                {/*priceDetails.discountPercent > 0 && (
+                {priceDetails.discountPercent > 0 && (
                   <div className="discount--offer rounded p-2 bg-warning-subtle my-3">
                     <small>{priceDetails.discountPercent}% Limited Offer Discount</small>
+                    <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
+                      <span>₹{priceDetails.originalPrice.toFixed(0)} ×{" "}{priceDetails.discountPercent} </span> <strong className="display-8">= ₹{(priceDetails.pricePerUser).toFixed(0)}</strong>
+                    </p>
                   </div>
-                )*/}
+                )}
                 {billingCycle === "yearly" || billingCycle === "quarterly" ?
                 <>
                   <div className="annual--cost rounded p-3 bg-warning mt-3 mb-3">
@@ -682,29 +797,30 @@ const showError = (name) => {
                     <div className="d-flex align-items-center justify-content-between gap-3 bg-white p-3 rounded fw-normal border border-warning">
                       <p className="mb-0">
                         {billingCycle === "yearly"
-                        ? `₹${(priceDetails.pricePerUser * members).toFixed(0)}/month × 12 months`
+                        ? `₹${(priceDetails.pricePerUser).toFixed(0)}/month × 12 months`
                         : billingCycle === "quarterly"
                         ? `₹${(
-                            priceDetails.pricePerUser * members
+                            priceDetails.pricePerUser
                           ).toFixed(0)}/month × 3 months`
                         : `₹${(
-                          priceDetails.pricePerUser * members
+                          priceDetails.pricePerUser
                         ).toFixed(0)}/month × 1 month`}
                       </p>
                       <p className="fw-bold display-8 mb-0">
-                        = ₹{priceDetails.totalWithoutDiscount.toLocaleString()}
+                        = ₹{priceDetails.pricePerUser.toFixed(0) * (billingCycle === 'quarterly' ? 3 : 12)}
                       </p>
                     </div>
                   </div>
                   
-                 {/* <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                 { <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
                     <div class="text--small mb-1 text-uppercase">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
                     <div className="text-slate-600 mt-1">
-                    ₹{(priceDetails.discountedPricePerUser * members).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
-                    {(priceDetails.discountedPricePerUser * members * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
+                     
+                    ₹{(priceDetails.pricePerUser).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
+                    {(priceDetails.pricePerUser * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
                   </div>
-                    <div class="text--large mb-0">₹{priceDetails.totalSavings}</div>
-                  </div>*/}
+                    <div class="text--large mb-0">₹{priceDetails.totalSavings.toFixed(0)}</div>
+                  </div>}
                   </>
                   :
                   
