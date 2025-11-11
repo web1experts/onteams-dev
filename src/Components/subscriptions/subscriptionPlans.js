@@ -204,7 +204,7 @@ function SubscriptionPlans() {
         const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
         localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
       }
-      navigate(0);
+     
     }
   }, [subscriptionState.activeSubscription])
 
