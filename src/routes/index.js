@@ -233,20 +233,20 @@ const privateRoutes = [
         component: <DesktopPage/>,
         route: '/primeteamsio',
     },
-    // {
-    //     type: 'page',
-    //     name: 'Plans',
-    //     key: 'PLANS',
-    //     component: <PlansPage />,
-    //     route: '/plans'
-    // },
-    // {
-    //     type: 'page',
-    //     name: 'SubscriptionPlans',
-    //     key: 'SUBSCRIPTION_PLANS',
-    //     component: <SubscriptionPlans />,
-    //     route: '/subscription-plans'
-    // },
+    {
+        type: 'page',
+        name: 'Plans',
+        key: 'PLANS',
+        component: <PlansPage />,
+        route: '/plans'
+    },
+    {
+        type: 'page',
+        name: 'SubscriptionPlans',
+        key: 'SUBSCRIPTION_PLANS',
+        component: <SubscriptionPlans />,
+        route: '/subscription-plans'
+    },
     // {
     //     type: 'page',
     //     name: 'PlanOverview',

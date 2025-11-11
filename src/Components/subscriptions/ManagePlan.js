@@ -5,89 +5,140 @@ import { FiUsers, FiCalendar, FiCheck, FiSave, FiCreditCard } from "react-icons/
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { updateSubscription, saveAuthorization, getActiveSubscription } from "../../redux/actions/subscription.action";
 
-const plans = {
-  monthly: [
-    {
-      id: "free", name: "Free", price: 0, limit: 3, discount: 0, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-    {
-      id: "plan_RTjP0lgv1nmVhC", name: "Basic", price: 500, discount: 0, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-    {
-      id: "plan_RWvXN91H1qGktu", name: "Pro", price: 10000, discount: 0, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-  ],
-  quarterly: [
-    {
-      id: "free", name: "Free", price: 0, limit: 3, discount: 0, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-    {
-      id: "plan_RTjP0lgv1nmVhC", name: "Basic", price: 500, discount: 20, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-    {
-      id: "plan_RWvXN91H1qGktu", name: "Pro", price: 10000, discount: 20, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-  ],
-  yearly: [
-    {
-      id: "free", name: "Free", price: 0, limit: 3, discount: 40, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-    {
-      id: "plan_RTjP0lgv1nmVhC", name: "Basic", price: 500, discount: 40, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-    {
-      id: "plan_RWvXN91H1qGktu", name: "Pro", price: 10000, discount: 40, features: [
-        "3 members",
-        "Dedicated support",
-        "Custom features & integrations",
-        "Advanced security",
-      ],
-    },
-  ],
-};
+
 
 export default function ManagePlan() {
   const dispatch = useDispatch()
+  const [plans] = useState(
+      {
+        'monthly':[
+        {
+          id: "free",
+          name: "Free",
+          pricePerUser: 0,
+          disount: 0,
+          billing_cycle: false,
+          members_text: 'Free for up to 3 members',
+          features: [
+            "3 members",
+            "Dedicated support",
+            "Custom features & integrations",
+            "Advanced security",
+          ],
+        },
+        {
+          id: "plan_ReKaLINYJwq8FZ",
+          name: "Pro",
+          pricePerUser: 666,
+          disount: 0,
+          billing_cycle: 'monthly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 5 members",
+            "Basic support",
+            "Access to core features",
+          ],
+        },
+        {
+          id: "plan_ReKagUnhkdX86V",
+          name: "Elite",
+          disount: 0,
+          pricePerUser: 916,
+          billing_cycle: 'monthly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 50 members",
+            "Priority support",
+            "Advanced analytics",
+            "Custom integrations",
+          ],
+        }],
+        'quarterly':[
+          {
+          id: "free",
+          name: "Free",
+          pricePerUser: 0,
+          disount: 0,
+          billing_cycle: false,
+          members_text: 'Free for up to 3 members',
+          features: [
+            "3 members",
+            "Dedicated support",
+            "Custom features & integrations",
+            "Advanced security",
+          ],
+        },
+        {
+          id: "plan_ReKb2o8oIyYuSN",
+          name: "Pro",
+          disount: 20,
+          pricePerUser: 533,
+          billing_cycle: 'quarterly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 50 members",
+            "Priority support",
+            "Advanced analytics",
+            "Custom integrations",
+          ],
+        },{
+        id: "plan_ReKbqwqKZJ4aDz",
+        name: "Elite",
+        disount: 20,
+        pricePerUser: 733,
+        billing_cycle: 'quarterly',
+        members_text: 'Unlimited Team Members',
+        features: [
+          "Up to 50 members",
+          "Priority support",
+          "Advanced analytics",
+          "Custom integrations",
+        ],
+        }],
+        'yearly': [
+          {
+          id: "free",
+          name: "Free",
+          pricePerUser: 0,
+          disount: 0,
+          billing_cycle: false,
+          members_text: 'Free for up to 3 members',
+          features: [
+            "3 members",
+            "Dedicated support",
+            "Custom features & integrations",
+            "Advanced security",
+          ],
+        },{
+          
+          id: "plan_ReKc4NmD60B7rW",
+          name: "Pro",
+          disount: 40,
+          pricePerUser: 400,
+          billing_cycle: 'yearly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 50 members",
+            "Priority support",
+            "Advanced analytics",
+            "Custom integrations",
+          ],
+        },{
+          id: "plan_ReKcjcfoNCmtNY",
+          name: "Elite",
+          disount: 40,
+          pricePerUser: 550,
+          billing_cycle: 'yearly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 50 members",
+            "Priority support",
+            "Advanced analytics",
+            "Custom integrations",
+          ],
+        }]
+      }
+    );
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
@@ -305,13 +356,13 @@ export default function ManagePlan() {
                   </p>
                 </div>
                 <p className="mb-2 d-flex align-items-center justify-content-between gap-3">Number of users: <strong className="text-end">{teamMembers}</strong></p>
-                <div className="bg-gradient-primary p-3 mb-3 rounded-3">
+                {/* <div className="bg-gradient-primary p-3 mb-3 rounded-3">
                     <div className="text--small mb-1 text-uppercase">You Save in 1 Year</div>
                     <div className="text--large display-8">₹{totalSavings.toLocaleString()}</div>
-                </div>
-                <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fw-bold border-bottom pb-3">
+                </div> */}
+                {/* <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fw-bold border-bottom pb-3">
                   Total per {billingCycle}: <strong className="display-6 fw-bold text-end">₹{totalPerCycle.toLocaleString()}</strong>
-                </p>
+                </p> */}
                 <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
                   Total for 1{" "}
                   {billingCycle === "yearly"

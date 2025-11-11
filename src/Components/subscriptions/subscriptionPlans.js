@@ -5,46 +5,92 @@ import { FiGlobe, FiUsers, FiCheck } from "react-icons/fi";
 import { BsTags } from "react-icons/bs";
 import { MdOutlineClose } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
+import { currentMemberProfile } from "../../helpers/auth";
 import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
 
 function SubscriptionPlans() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const memberProfile = currentMemberProfile();
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
-  const [plans] = useState([
+  const [plans] = useState(
       {
-        id: "free",
-        name: "Free",
-        pricePerUser: 0,
-        disount: 0,
-        billing_cycle: false,
-        members_text: 'Free for up to 3 members',
-        features: [
-          "3 members",
-          "Dedicated support",
-          "Custom features & integrations",
-          "Advanced security",
-        ],
-      },
-      {
-        id: "plan_RbIMGsESONzXnh",
-        name: "Basic",
-        pricePerUser: 100,
+        'monthly':[
+        {
+          id: "free",
+          name: "Free",
+          pricePerUser: 0,
+          disount: 0,
+          billing_cycle: false,
+          members_text: 'Free for up to 3 members',
+          features: [
+            "3 members",
+            "Dedicated support",
+            "Custom features & integrations",
+            "Advanced security",
+          ],
+        },
+        {
+          id: "plan_ReKaLINYJwq8FZ",
+          name: "Pro",
+          pricePerUser: 666,
+          disount: 0,
+          billing_cycle: 'monthly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 5 members",
+            "Basic support",
+            "Access to core features",
+          ],
+        },
+        {
+          id: "plan_ReKagUnhkdX86V",
+          name: "Elite",
+          disount: 0,
+          pricePerUser: 916,
+          billing_cycle: 'monthly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 50 members",
+            "Priority support",
+            "Advanced analytics",
+            "Custom integrations",
+          ],
+        }],
+        'quarterly':[
+          {
+          id: "free",
+          name: "Free",
+          pricePerUser: 0,
+          disount: 0,
+          billing_cycle: false,
+          members_text: 'Free for up to 3 members',
+          features: [
+            "3 members",
+            "Dedicated support",
+            "Custom features & integrations",
+            "Advanced security",
+          ],
+        },
+        {
+          id: "plan_ReKb2o8oIyYuSN",
+          name: "Pro",
+          disount: 20,
+          pricePerUser: 533,
+          billing_cycle: 'quarterly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 50 members",
+            "Priority support",
+            "Advanced analytics",
+            "Custom integrations",
+          ],
+        },{
+        id: "plan_ReKbqwqKZJ4aDz",
+        name: "Elite",
         disount: 20,
-        billing_cycle: 'monthly',
-        members_text: 'Unlimited Team Members',
-        features: [
-          "Up to 5 members",
-          "Basic support",
-          "Access to core features",
-        ],
-      },
-      {
-        id: "plan_RYrNV77OrcUeIm",
-        name: "Pro",
-        disount: 40,
-        pricePerUser: 2000,
-        billing_cycle: 'monthly',
+        pricePerUser: 733,
+        billing_cycle: 'quarterly',
         members_text: 'Unlimited Team Members',
         features: [
           "Up to 50 members",
@@ -52,8 +98,51 @@ function SubscriptionPlans() {
           "Advanced analytics",
           "Custom integrations",
         ],
-      },
-    ]);
+        }],
+        'yearly': [
+          {
+          id: "free",
+          name: "Free",
+          pricePerUser: 0,
+          disount: 0,
+          billing_cycle: false,
+          members_text: 'Free for up to 3 members',
+          features: [
+            "3 members",
+            "Dedicated support",
+            "Custom features & integrations",
+            "Advanced security",
+          ],
+        },{
+          
+          id: "plan_ReKc4NmD60B7rW",
+          name: "Pro",
+          disount: 40,
+          pricePerUser: 400,
+          billing_cycle: 'yearly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 50 members",
+            "Priority support",
+            "Advanced analytics",
+            "Custom integrations",
+          ],
+        },{
+          id: "plan_ReKcjcfoNCmtNY",
+          name: "Elite",
+          disount: 40,
+          pricePerUser: 550,
+          billing_cycle: 'yearly',
+          members_text: 'Unlimited Team Members',
+          features: [
+            "Up to 50 members",
+            "Priority support",
+            "Advanced analytics",
+            "Custom integrations",
+          ],
+        }]
+      }
+    );
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -219,12 +308,26 @@ function SubscriptionPlans() {
           setLoading(false)
           selectedPlan(null)
         },
+        modal: {
+          ondismiss: function () {
+            console.warn("⚠️ Payment popup closed by user (cancelled).");
+            setLoading(false);
+            // Optional: show a message or alert
+            alert("Payment was cancelled. You can try again anytime.");
+          },
+        },
         theme: {
           color: "#F37254",
         },
       };
 
       const rzp = new window.Razorpay(options);
+      // 🔴 Handle payment failure
+      rzp.on("payment.failed", function (response) {
+        console.error("❌ Payment Failed:", response.error);
+        alert(`Payment failed: ${response.error.description || "Unknown error"}`);
+        setLoading(false);
+      });
       rzp.open();
     } catch (err) {
       console.error(err);
@@ -319,7 +422,7 @@ function SubscriptionPlans() {
 
             {/* Plan Cards */}
             <Row className="g-4">
-              {plans.map((plan) => {
+              {plans[billingCycle].map((plan) => {
                 const finalPricePerUser = getDiscountedPrice(plan);
                 const baseAmount = plan.pricePerUser * members
                 const total = finalPricePerUser * members;
@@ -354,14 +457,14 @@ function SubscriptionPlans() {
                             <div class="text--small mb-1 text-uppercase">Your Total Cost</div>
                             <ListGroup>
                               <ListGroup.Item>Base Amount: <span>₹{baseAmount.toFixed(0)}</span></ListGroup.Item>
-                              {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
+                              {/*(plan.disount !== 0 && billingCycle !== 'monthly') &&(
                               <ListGroup.Item className="font-weight-bold">{plan.disount}% Limited Offer: <span>-₹{total.toFixed(0)}</span></ListGroup.Item>
                               )}
                               {plan.id !== 'free' && 
                               <ListGroup.Item className="font-weight-bold border-top pt-2">Final Price: <strong className="display-6">₹{total.toFixed(0)}</strong></ListGroup.Item>
-                              }
+                              */}
                             </ListGroup>
-                            {plan.id !== 'free' &&  
+                            {/*plan.id !== 'free' &&  
                               <>
                               <div class="text-slate-600 mt-1 mb-3 text-end">per month for {members} user</div>
                                 {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
@@ -371,7 +474,7 @@ function SubscriptionPlans() {
                                   </div>
                                 )}
                               </>
-                            }
+                           */ }
                         </div>
                        {plan.id !== 'free' &&
                           <>
@@ -386,6 +489,7 @@ function SubscriptionPlans() {
                             </div>
                           </>
                         }
+                        {(memberProfile?.role?.slug === "owner") && (
                         <Button
                           
                           variant={
@@ -410,7 +514,8 @@ function SubscriptionPlans() {
                             : loading
                               ? "Please wait..."
                               : "Select Plan"}
-                        </Button>
+                        </Button>)
+                      }
                         {/* <h5 className="text-muted text-decoration-line-through">
                           ₹{plan.pricePerUser}/user/month
                         </h5>
@@ -519,11 +624,11 @@ function SubscriptionPlans() {
                     </p>
                   </ListGroup.Item>
                 </ListGroup>
-                {priceDetails.discountPercent > 0 && (
+                {/*priceDetails.discountPercent > 0 && (
                   <div className="discount--offer rounded p-2 bg-warning-subtle my-3">
                     <small>{priceDetails.discountPercent}% Limited Offer Discount</small>
                   </div>
-                )}
+                )*/}
                 {billingCycle === "yearly" || billingCycle === "quarterly" ?
                 <>
                   <div className="annual--cost rounded p-3 bg-warning mt-3 mb-3">
@@ -546,14 +651,14 @@ function SubscriptionPlans() {
                     </div>
                   </div>
                   
-                  <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                 {/* <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
                     <div class="text--small mb-1 text-uppercase">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
                     <div className="text-slate-600 mt-1">
                     ₹{(priceDetails.discountedPricePerUser * members).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
                     {(priceDetails.discountedPricePerUser * members * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
                   </div>
                     <div class="text--large mb-0">₹{priceDetails.totalSavings}</div>
-                  </div>
+                  </div>*/}
                   </>
                   :
                   

@@ -110,7 +110,7 @@ function SettingPage(props) {
   const activeSubscription = useSelector(
       (state) => state.subscription?.activeSubscription
   );
-  const [currentSubscription, setCurrentSubscription] = useState(false)
+  const [currentSubscription, setCurrentSubscription] = useState(null)
   const [userProfile, setUserProfile] = useState({});
   const [loader, setLoader] = useState(false);
   const [spinner, setSpinner] = useState(false);
@@ -352,8 +352,8 @@ function SettingPage(props) {
             >
               <MdLockOutline /> Security
             </ListGroup.Item>
-            {/* {
-              currentSubscription === false || currentSubscription?.status === 'active' && currentSubscription?.planId == 'trial' ? 
+             {
+              currentSubscription === null || currentSubscription?.status === 'active' && currentSubscription?.planId == 'trial' ? 
                 <ListGroup.Item
                  
                   onClick={() => {
@@ -375,7 +375,7 @@ function SettingPage(props) {
               >
                 <MdLockOutline /> Billing
               </ListGroup.Item>
-            } */}
+            } 
             
              <ListGroup.Item onClick={() => setShowAlert(true)}>
               <FaRegBell /> Close Account
