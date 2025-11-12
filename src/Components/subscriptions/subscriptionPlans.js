@@ -634,7 +634,7 @@ const showError = (name) => {
                             :
                             <></>
                         }
-                        {plan.id !== 'free' && (
+                        {/*plan.id !== 'free' && (
                         <div class="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                             <div class="text--small mb-1 text-uppercase">Your Total Cost</div>
                             <ListGroup>
@@ -658,7 +658,7 @@ const showError = (name) => {
                               </>
                             
                         </div>)
-                        }
+                        */}
                        {plan.id !== 'free' ?
                           <>
                             
