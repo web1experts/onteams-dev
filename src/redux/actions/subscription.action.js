@@ -8,7 +8,8 @@ import {
     AUTHORIZE_PAYMENT_SUCCESS,
     SUBSCRIPTION_UPDATE_SUCCESS,
     BILLING_SUCCESS,
-    ACTIVE_PLAN
+    ACTIVE_PLAN,
+    SUBSCRIPTION_DATA
 } from "./types";
 const config = {
   headers: {
@@ -140,6 +141,22 @@ export const getActiveSubscription = () => {
       const response = await API.apiGetByKey('subscription', '/active-subscription')
       if (response.data && response.data.success) {
         await dispatch({ type: ACTIVE_PLAN, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
+export const getActiveSubscriptionDetails = () => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGetByKey('subscription', '/susbscription-details')
+      if (response.data && response.data.success) {
+        await dispatch({ type: SUBSCRIPTION_DATA, payload: response.data });
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }

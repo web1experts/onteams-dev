@@ -247,13 +247,13 @@ const privateRoutes = [
         component: <SubscriptionPlans />,
         route: '/subscription-plans'
     },
-    // {
-    //     type: 'page',
-    //     name: 'PlanOverview',
-    //     key: 'PLANS_OVERVIEW',
-    //     component: <PlanOverview />,
-    //     route: '/plan-details'
-    // }
+    {
+        type: 'page',
+        name: 'PlanOverview',
+        key: 'PLANS_OVERVIEW',
+        component: <PlanOverview />,
+        route: '/plan-details'
+    }
 ];
 const hideSidebarRoutes = [
     '/login',

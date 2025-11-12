@@ -267,7 +267,9 @@ function PlansPage() {
           localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
         }
         
-        navigate(0);
+        if(subscriptionState.activeSubscription.status === 'active'){
+          navigate('/dashboard', { replace: true })
+        }
 
       }
       

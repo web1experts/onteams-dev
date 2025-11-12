@@ -4,7 +4,8 @@ import {
     CLEAR_MESSAGES,
     AUTHORIZE_PAYMENT_SUCCESS,
     ACTIVE_PLAN,
-    BILLING_SUCCESS
+    BILLING_SUCCESS,
+    SUBSCRIPTION_DATA
 } from "../actions/types";
 
 const initialState = {
@@ -51,6 +52,11 @@ export default (state = initialState, action) => {
             message: null,
             message_variant: null,
         };
+    case SUBSCRIPTION_DATA: 
+        return {
+            ...state,
+            subscriptionData: action.payload.subscription
+        }
     default: return state;
   }
 };
