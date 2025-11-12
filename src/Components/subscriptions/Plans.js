@@ -584,6 +584,7 @@ const showError = (name) => {
                                 :
                                 <></>
                             }
+                            {plan.id !== 'free' && ( 
                             <div class="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                                 <div class="text--small mb-1 text-uppercase">Your Total Cost</div>
                                 <ListGroup>
@@ -595,7 +596,7 @@ const showError = (name) => {
                                   <ListGroup.Item className="font-weight-bold border-top pt-2">Final Price: <strong className="display-6">₹{total.toFixed(0)}</strong></ListGroup.Item>
                                   }
                                 </ListGroup>
-                                {plan.id !== 'free' &&  
+                                
                                   <>
                                   <div class="text-slate-600 mt-1 mb-3 text-end">per month for {members} user</div>
                                     {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
@@ -605,8 +606,9 @@ const showError = (name) => {
                                       </div>
                                     )}
                                   </>
-                                }
-                            </div>
+                                
+                            </div>)
+                            }
                             {plan.id !== 'free' ?
                               <>
                                 
