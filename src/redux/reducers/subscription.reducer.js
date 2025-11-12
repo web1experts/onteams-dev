@@ -5,7 +5,8 @@ import {
     AUTHORIZE_PAYMENT_SUCCESS,
     ACTIVE_PLAN,
     BILLING_SUCCESS,
-    SUBSCRIPTION_DATA
+    SUBSCRIPTION_DATA,
+    SUBSCRIPTION_CANCEL
 } from "../actions/types";
 
 const initialState = {
@@ -56,6 +57,14 @@ export default (state = initialState, action) => {
         return {
             ...state,
             subscriptionData: action.payload.subscription
+        }
+    case SUBSCRIPTION_CANCEL: 
+        return {
+            ...state,
+            message: action.payload.message,
+            message_variant: 'success',
+            subscriptionCancel: true,
+            activeSubscription: action.payload.updatedSubscription
         }
     default: return state;
   }

@@ -261,7 +261,7 @@ export default function ManagePlan() {
   return (
     <>
       <div className="rounded--box p-4">
-        <h2 className="fw-bold mb-1">Manage Your Plan</h2>
+        <h2 className="fw-bold mb-1">Manage Your Plan <a className="fs-6" href="/plan-details">View Active Subscription</a></h2>
         <p>Upgrade, downgrade, or adjust your team size</p>
         <div className="bg-white rounded-4 shadow border p-4 mb-4">
           <h4 className="text-xl fw-bold mb-4">Number of Team Members</h4>

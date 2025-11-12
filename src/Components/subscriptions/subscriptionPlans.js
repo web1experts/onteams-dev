@@ -494,7 +494,9 @@ const showError = (name) => {
 
   const activateTrialPlan = () => {
     setLoading(true)
-    dispatch(subscribeTrialPlan())
+    dispatch(subscribeTrialPlan({
+        initial_quantity: members
+      }))
   }
 
   return (

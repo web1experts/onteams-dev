@@ -30,6 +30,7 @@ import {
 import { getFieldRules, validateField } from "../../helpers/rules";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import ManagePlan from "../subscriptions/ManagePlan";
+import { currentMemberProfile } from "../../helpers/auth";
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function EditableField({
   field,
@@ -99,6 +100,7 @@ function EditableField({
 function SettingPage(props) {
   const dispatch = useDispatch();
   const navigate = useNavigate()
+  const memberProfile = currentMemberProfile();
   const fileInputRef = useRef();
   const [activeTab, setActiveTab] = useState("Profile");
   const [isActive, setIsActive] = useState(false);
@@ -353,28 +355,30 @@ function SettingPage(props) {
               <MdLockOutline /> Security
             </ListGroup.Item>
              {
-              currentSubscription === null || currentSubscription?.status === 'active' && currentSubscription?.planId == 'trial' ? 
+              memberProfile?.role?.slug === "owner" ?
+                currentSubscription === null || currentSubscription?.status === 'active' && currentSubscription?.planId == 'trial' ? 
+                  <ListGroup.Item
+                  
+                    onClick={() => {
+                      if(props.close){
+                        props.close()
+                      }
+                      navigate('/subscription-plans', { replace: true })
+                    }}
+                  >
+                    <MdLockOutline /> Billing
+                    </ListGroup.Item>
+                :
                 <ListGroup.Item
-                 
+                  action
+                  active={activeTab === "billing"}
                   onClick={() => {
-                    if(props.close){
-                      props.close()
-                    }
-                    navigate('/subscription-plans', { replace: true })
+                    setActiveTab("billing");
                   }}
                 >
                   <MdLockOutline /> Billing
-                  </ListGroup.Item>
-              :
-              <ListGroup.Item
-                action
-                active={activeTab === "billing"}
-                onClick={() => {
-                  setActiveTab("billing");
-                }}
-              >
-                <MdLockOutline /> Billing
-              </ListGroup.Item>
+                </ListGroup.Item>
+                :<></>
             } 
             
              {/* <ListGroup.Item onClick={() => setShowAlert(true)}>

@@ -1,15 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button, Badge, ListGroup, Alert } from "react-bootstrap";
 import { FiArrowUpRight, FiCalendar, FiCheckCircle, FiClock, FiUsers, FiSettings, FiDownload } from "react-icons/fi";
 import { BsExclamationTriangle } from "react-icons/bs";
 import { BiFile } from "react-icons/bi";
-import { getActiveSubscriptionDetails } from "../../redux/actions/subscription.action";
+import { getActiveSubscriptionDetails, cancelSubscription } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
-
-
+import { AlertDialog } from "../modals";
+import { currentMemberProfile } from "../../helpers/auth";
 const PlanOverview = () => {
   const dispatch = useDispatch()
+   const navigate = useNavigate()
+  const memberProfile = currentMemberProfile();
+   const [showdialog, setShowDialog] = useState(false);
   const [spinner, setSpinner] = useState(true);
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
@@ -61,6 +65,25 @@ const PlanOverview = () => {
       },700)
   }, [subscriptionState.subscriptionData]);
 
+  useEffect(()=> {
+    console.log(activeSubscription)
+  }, [activeSubscription])
+
+  useEffect(() => {
+    if(subscriptionState.subscriptionCancel === 0){
+      navigate(0)
+    }
+    
+  }, [subscriptionState.subscriptionCancel])
+
+  const doCancel = () => {
+    setShowDialog(true)
+  }
+
+  const handleCancelSubscription = () => {
+    dispatch(cancelSubscription(activeSubscription?.subscriptionId))
+    setShowDialog(false)
+  }
 
   
   return (
@@ -91,58 +114,88 @@ const PlanOverview = () => {
             <div className="bg-white rounded-4 shadow border p-4 mb-4">
               {/* Plan Card */}
               <Card className="border-0 mb-4">
-                <Card.Header className="bg-gradient-blue text-white d-flex justify-content-between align-items-center rounded-4 p-4 mb-4 shadow">
-                  <div className="d-flex gap-2 align-items-center">
-                    <h3 className="mb-0 fw-bold">{activeSubscription?.subscriptionDetails?.plan_info?.name} Plan</h3>
-                    <h4 className="m-0 d-flex gap-2 align-items-center text-capitalize"><FiCheckCircle /> {activeSubscription?.subscriptionDetails?.status}</h4>
-                  </div>
-                  <div className="d-flex gap-2 align-items-end flex-column">
-                    <h6 className="mb-0 fw-bold text-uppercase">Price per Member</h6>
-                    <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
-                      <span>₹{activeSubscription?.subscriptionDetails?.plan_info?.pricePerUser} <small className="fs-5 fw-normal">/month</small></span><span className="fs-6 fw-normal">billed {activeSubscription?.subscriptionDetails?.plan_info?.billing_cycle || 'monthly'}</span>
-                    </h3>
-                  </div>
-                </Card.Header>
+                {activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial' ?
+                  <Card.Header className="bg-gradient-blue text-white d-flex justify-content-between align-items-center rounded-4 p-4 mb-4 shadow">
+                    <div className="d-flex gap-2 align-items-center">
+                      <h3 className="mb-0 fw-bold">{activeSubscription?.planId === 'free' ? 'Free': 'Trial'} Plan</h3>
+                      <h4 className="m-0 d-flex gap-2 align-items-center text-capitalize"><FiCheckCircle />Active</h4>
+                    </div>
+                    <div className="d-flex gap-2 align-items-end flex-column">
+                      <h6 className="mb-0 fw-bold text-uppercase">Price per Member</h6>
+                      <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
+                        <span>free </span>
+                      </h3>
+                    </div>
+                  </Card.Header>
+                  :
+                  <Card.Header className="bg-gradient-blue text-white d-flex justify-content-between align-items-center rounded-4 p-4 mb-4 shadow">
+                    <div className="d-flex gap-2 align-items-center">
+                      <h3 className="mb-0 fw-bold">{activeSubscription?.subscriptionDetails?.plan_info?.name} Plan</h3>
+                      <h4 className="m-0 d-flex gap-2 align-items-center text-capitalize"><FiCheckCircle /> {activeSubscription?.subscriptionDetails?.status}</h4>
+                    </div>
+                    <div className="d-flex gap-2 align-items-end flex-column">
+                      <h6 className="mb-0 fw-bold text-uppercase">Price per Member</h6>
+                      <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
+                        <span>₹{activeSubscription?.subscriptionDetails?.plan_info?.pricePerUser} <small className="fs-5 fw-normal">/month</small></span><span className="fs-6 fw-normal">billed {activeSubscription?.subscriptionDetails?.plan_info?.billing_cycle || 'monthly'}</span>
+                      </h3>
+                    </div>
+                  </Card.Header>
+                }
 
                 <Card.Body className="p-0">
-                  <Row className="mb-3">
-                    <Col>
-                      <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
-                        <div className="status--title d-flex align-items-center gap-2 mb-3">
-                          <span className="status--icon status--icon--blue"><FiUsers /></span>
-                          <p className="mb-0 fw-semibold">Team Size</p>
+                  {activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial' ?
+                    <Row className="mb-3">
+                      <Col>
+                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
+                          <div className="status--title d-flex align-items-center gap-2 mb-3">
+                            <span className="status--icon status--icon--blue"><FiUsers /></span>
+                            <p className="mb-0 fw-semibold">Team Size</p>
+                          </div>
+                          <h4 className="mb-0 fw-bold fs-3">{activeSubscription?.quantity || 0}</h4>
                         </div>
-                        <h4 className="mb-0 fw-bold fs-3">{activeSubscription?.subscriptionDetails?.quantity || 0}</h4>
-                      </div>
-                    </Col>
-                    <Col>
-                      <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
-                        <div className="status--title d-flex align-items-center gap-2 mb-3">
-                          <span className="status--icon status--icon--green"><FiCalendar /></span>
-                          <p className="mb-0 fw-semibold">Billing Cycle</p>
+                      </Col>
+                      
+                    </Row>
+                    :
+                        <Row className="mb-3">
+                      <Col>
+                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
+                          <div className="status--title d-flex align-items-center gap-2 mb-3">
+                            <span className="status--icon status--icon--blue"><FiUsers /></span>
+                            <p className="mb-0 fw-semibold">Team Size</p>
+                          </div>
+                          <h4 className="mb-0 fw-bold fs-3">{activeSubscription?.subscriptionDetails?.quantity || 0}</h4>
                         </div>
-                        <h4 className="mb-0 fw-bold fs-3 text-capitalize">{activeSubscription?.subscriptionDetails?.plan_info?.billing_cycle}</h4>
-                      </div>
-                    </Col>
-                    <Col>
-                      <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
-                        <div className="status--title d-flex align-items-center gap-2 mb-3">
-                          <span className="status--icon status--icon--grey"><FiClock /></span>
-                          <p className="mb-0 fw-semibold">Next Billing</p>
+                      </Col>
+                      <Col>
+                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
+                          <div className="status--title d-flex align-items-center gap-2 mb-3">
+                            <span className="status--icon status--icon--green"><FiCalendar /></span>
+                            <p className="mb-0 fw-semibold">Billing Cycle</p>
+                          </div>
+                          <h4 className="mb-0 fw-bold fs-3 text-capitalize">{activeSubscription?.subscriptionDetails?.plan_info?.billing_cycle}</h4>
                         </div>
-                        <h4 className="mb-0 fw-bold fs-3">{new Date(activeSubscription?.subscriptionDetails?.charge_at * 1000)?.toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}</h4>
-                      </div>
-                    </Col>
-                  </Row>
+                      </Col>
+                      <Col>
+                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
+                          <div className="status--title d-flex align-items-center gap-2 mb-3">
+                            <span className="status--icon status--icon--grey"><FiClock /></span>
+                            <p className="mb-0 fw-semibold">Next Billing</p>
+                          </div>
+                          <h4 className="mb-0 fw-bold fs-3">{new Date(activeSubscription?.subscriptionDetails?.charge_at * 1000)?.toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}</h4>
+                        </div>
+                      </Col>
+                    </Row>
+                  }
 
                   <div className="text-center">
                     <Button variant="primary" className="px-4 w-100 fw-bold py-3"><FiSettings /> Manage Plan</Button>
                   </div>
-                  <div class="mt-4 bg-amber rounded-4 p-4">
+                  {/* <div class="mt-4 bg-amber rounded-4 p-4">
                     <div class="d-flex align-items-start gap-3">
                         <div class="p-2 bg-amber-icon rounded-3"><FiClock /></div>
                         <div class="flex-1">
@@ -150,19 +203,24 @@ const PlanOverview = () => {
                             <p class="text-sm mb-0">Submit your billing information — you won’t be billed until your trial period ends on <span class="fw-bold text-secondary">8 November 2025</span>.</p>
                         </div>
                     </div>
-                  </div>
-
-                  <div class="mt-4 bg-amber rounded-4 p-4">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="p-2 bg-amber-icon rounded-3"><BsExclamationTriangle /> </div>
-                        <div class="flex-1">
-                            <h5 class="fw-bold text-secondary mb-2">Scheduled Plan Change</h5>
-                            <p class="text-sm mb-1">Your plan will downgrade to <strong class="fw-bold text-secondary">Free Plan</strong> on your next billing cycle.</p>
-                            <p class="text-sm mb-0"><small className="text-secondary">Effective Date: 15 Nov 2025</small></p>
-                        </div>
-                        <Button variant="warning" className="ms-auto">Cancel</Button>
-                    </div>
-                  </div>
+                  </div> */}
+                   {(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial' && memberProfile?.role?.slug === "owner" ) && (
+                    <div class="mt-4 bg-amber rounded-4 p-4">
+                      <div class="d-flex align-items-start gap-3">
+                          <div class="p-2 bg-amber-icon rounded-3"><BsExclamationTriangle /> </div>
+                          <div class="flex-1">
+                              <h5 class="fw-bold text-secondary mb-2">Scheduled Plan Change</h5>
+                              <p class="text-sm mb-1">Your plan will downgrade to <strong class="fw-bold text-secondary">Free Plan</strong> on your next billing cycle.</p>
+                              <p class="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date(activeSubscription?.subscriptionDetails?.charge_at * 1000)?.toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}</small></p>
+                          </div>
+                          <Button variant="warning" onClick={doCancel} className="ms-auto">Cancel</Button>
+                      </div>
+                    </div>)
+                  }
                 </Card.Body>
               </Card>
             </div>
@@ -235,6 +293,12 @@ const PlanOverview = () => {
                 </ListGroup>
               </Card>
             </div>*/}
+            <AlertDialog
+              showdialog={showdialog}
+              toggledialog={setShowDialog}
+              msg="Are you sure you want to cancel your subscription?"
+              callback={handleCancelSubscription}
+            />
           </Container>)
         }
       </div>

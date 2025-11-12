@@ -9,6 +9,7 @@ import {
     SUBSCRIPTION_UPDATE_SUCCESS,
     BILLING_SUCCESS,
     ACTIVE_PLAN,
+    SUBSCRIPTION_CANCEL,
     SUBSCRIPTION_DATA
 } from "./types";
 const config = {
@@ -83,12 +84,27 @@ export const subscribeFreePlan = () => {
  
 }
 
-
-export const subscribeTrialPlan = () => {
+export const cancelSubscription = (subscriptionId) => {
 
   return async (dispatch) => {
     try {
-      const response = await API.apiPostUrl('subscription', '/trial', {})
+      const response = await API.apiDeleteUrl('subscription', `/${subscriptionId}`)
+      if (response.data && response.data.success) {
+        await dispatch({ type: SUBSCRIPTION_CANCEL, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  }
+}
+
+export const subscribeTrialPlan = (payload) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('subscription', '/trial', payload)
       if (response.data && response.data.success) {
         await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
       } else {
