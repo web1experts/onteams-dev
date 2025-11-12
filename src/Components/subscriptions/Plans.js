@@ -574,7 +574,7 @@ const showError = (name) => {
                               :
                               billingCycle !== 'monthly' ? 
                                 <>
-                                  <p>Regular Price</p>
+                                  {/* <p>Regular Price</p> */}
                                   <div class="bg-gradient-primary p-3 mb-3 rounded-3">
                                     <div class="text--small mb-1 text-uppercase">Discounted Price</div>
                                     <div class="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span class="text-slate-600 mt-1">/user/month</span></div>
