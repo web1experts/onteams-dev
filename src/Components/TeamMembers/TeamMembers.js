@@ -153,8 +153,13 @@ function TeamMembersPage() {
     );
   };
 
+  useEffect(() => {
+    console.log('invitationsTotal:: ', invitationsTotal)
+  }, [invitationsTotal])
   
-
+  useEffect(() => {
+    console.log('memberfeed length:: ', memberFeeds.length)
+  }, [memberFeeds])
   const toggleCustomFields = () => {
     setShowCustomFields((prev) => !prev);
   };
@@ -932,15 +937,16 @@ useEffect(() => {
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item className="btn btn-primary" onClick={() => {
-                        if(activeSubscription?.planId === 'free' && (invitationsTotal + memberFeeds?.length) > 3){
-                          navigate('/subscription-plans', { replace: true })
-                        }else{
-                          handleShow()
-                        }
-                        
-                      }
-                      }><FaPlus /></ListGroup.Item>
+                      <ListGroup.Item className="btn btn-primary"  onClick={() => {
+                          if (
+                            activeSubscription?.planId === 'free' &&
+                            (invitationsTotal + memberFeeds?.length) === 3
+                          ) {
+                            navigate('/subscription-plans', { replace: true });
+                          } else {
+                            handleShow();
+                          }
+                        }}><FaPlus /></ListGroup.Item>
                     )}
                   </ListGroup>
                 </ListGroup>
