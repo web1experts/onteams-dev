@@ -9,199 +9,203 @@ import { currentMemberProfile } from "../../helpers/auth";
 import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
+import { countries } from "../../helpers/countries";
+import { plans } from "../../helpers/plans";
+import { useToast } from "../../context/ToastContext";
 function SubscriptionPlans() {
+  const addToast = useToast();
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
-  const [plans] = useState(
-          {
-            'monthly':[
-            {
-              id: "free",
-              name: "Free",
-              originalPrice: 0,
-              pricePerUser: 0,
-              disount: 0,
-              billing_cycle: false,
-              members_text: 'Free for up to 3 members',
-              features: [
-                "Single Workspace",
-                "Unlimited Projects",
-                "Unlimited Tasks",
-                "Unlimited Workflows",
-                "Time Tracking",
-                "Live Screen View",
-                "Screenshots",
-                "Reports",
-                "Attendance Tracking"
-              ],
-            },
-            {
-              id: "plan_ReKaLINYJwq8FZ",
-              name: "Pro",
-              originalPrice: 666,
-              pricePerUser: 666,
-              disount: 0,
-              billing_cycle: 'monthly',
-              members_text: 'Unlimited Team Members',
-              features: [
-                "Unlimited Workspace",
-                "Unlimited Projects",
-                "Unlimited Tasks",
-                "Unlimited Workflows",
-                "Time Tracking",
-                "Live Screen View",
-                "Screenshots",
-                "Reports",
-                "Attendance Tracking"
-              ],
-            },
-            {
-              id: "plan_ReKagUnhkdX86V",
-              name: "Elite",
-              disount: 0,
-              originalPrice: 916,
-              pricePerUser: 916,
-              billing_cycle: 'monthly',
-              members_text: 'Unlimited Team Members',
-              features: [
-                "Unlimited Workspace",
-                "Unlimited Projects",
-                "Unlimited Tasks",
-                "Unlimited Workflows",
-                "Time Tracking",
-                "Live Screen View",
-                "Screenshots",
-                "Recorded Screen Videos",
-                "Reports",
-                "Attendance Tracking"
-              ],
-            }],
-            'quarterly':[
-              {
-              id: "free",
-              name: "Free",
-              originalPrice: 0,
-              pricePerUser: 0,
-              disount: 0,
-              billing_cycle: false,
-              members_text: 'Free for up to 3 members',
-              features: [
-                "Single Workspace",
-                "Unlimited Projects",
-                "Unlimited Tasks",
-                "Unlimited Workflows",
-                "Time Tracking",
-                "Live Screen View",
-                "Screenshots",
-                "Reports",
-                "Attendance Tracking"
-              ],
-            },
-            {
-              id: "plan_ReKb2o8oIyYuSN",
-              name: "Pro",
-              disount: 20,
-              originalPrice: 666.25,
-              pricePerUser: 533,
-              billing_cycle: 'quarterly',
-              members_text: 'Unlimited Team Members',
-              features: [
-                "Unlimited Workspace",
-                "Unlimited Projects",
-                "Unlimited Tasks",
-                "Unlimited Workflows",
-                "Time Tracking",
-                "Live Screen View",
-                "Screenshots",
-                "Reports",
-                "Attendance Tracking"
-              ],
-            },{
-            id: "plan_ReKbqwqKZJ4aDz",
-            name: "Elite",
-            disount: 20,
-            originalPrice: 916.25,
-            pricePerUser: 733,
-            billing_cycle: 'quarterly',
-            members_text: 'Unlimited Team Members',
-            features: [
-              "Unlimited Workspace",
-              "Unlimited Projects",
-              "Unlimited Tasks",
-              "Unlimited Workflows",
-              "Time Tracking",
-              "Live Screen View",
-              "Screenshots",
-              "Recorded Screen Videos",
-              "Reports",
-              "Attendance Tracking"
-            ],
-            }],
-            'yearly': [
-              {
-              id: "free",
-              name: "Free",
-              pricePerUser: 0,
-              disount: 0,
-              billing_cycle: false,
-              members_text: 'Free for up to 3 members',
-              features: [
-                "Single Workspace",
-                "Unlimited Projects",
-                "Unlimited Tasks",
-                "Unlimited Workflows",
-                "Time Tracking",
-                "Live Screen View",
-                "Screenshots",
-                "Reports",
-                "Attendance Tracking"
-              ],
-            },{
+  // const [plans] = useState(
+  //         {
+  //           'monthly':[
+  //           {
+  //             id: "free",
+  //             name: "Free",
+  //             originalPrice: 0,
+  //             pricePerUser: 0,
+  //             disount: 0,
+  //             billing_cycle: false,
+  //             members_text: 'Free for up to 3 members',
+  //             features: [
+  //               "Single Workspace",
+  //               "Unlimited Projects",
+  //               "Unlimited Tasks",
+  //               "Unlimited Workflows",
+  //               "Time Tracking",
+  //               "Live Screen View",
+  //               "Screenshots",
+  //               "Reports",
+  //               "Attendance Tracking"
+  //             ],
+  //           },
+  //           {
+  //             id: "plan_ReKaLINYJwq8FZ",
+  //             name: "Pro",
+  //             originalPrice: 666,
+  //             pricePerUser: 666,
+  //             disount: 0,
+  //             billing_cycle: 'monthly',
+  //             members_text: 'Unlimited Team Members',
+  //             features: [
+  //               "Unlimited Workspace",
+  //               "Unlimited Projects",
+  //               "Unlimited Tasks",
+  //               "Unlimited Workflows",
+  //               "Time Tracking",
+  //               "Live Screen View",
+  //               "Screenshots",
+  //               "Reports",
+  //               "Attendance Tracking"
+  //             ],
+  //           },
+  //           {
+  //             id: "plan_ReKagUnhkdX86V",
+  //             name: "Elite",
+  //             disount: 0,
+  //             originalPrice: 916,
+  //             pricePerUser: 916,
+  //             billing_cycle: 'monthly',
+  //             members_text: 'Unlimited Team Members',
+  //             features: [
+  //               "Unlimited Workspace",
+  //               "Unlimited Projects",
+  //               "Unlimited Tasks",
+  //               "Unlimited Workflows",
+  //               "Time Tracking",
+  //               "Live Screen View",
+  //               "Screenshots",
+  //               "Recorded Screen Videos",
+  //               "Reports",
+  //               "Attendance Tracking"
+  //             ],
+  //           }],
+  //           'quarterly':[
+  //             {
+  //             id: "free",
+  //             name: "Free",
+  //             originalPrice: 0,
+  //             pricePerUser: 0,
+  //             disount: 0,
+  //             billing_cycle: false,
+  //             members_text: 'Free for up to 3 members',
+  //             features: [
+  //               "Single Workspace",
+  //               "Unlimited Projects",
+  //               "Unlimited Tasks",
+  //               "Unlimited Workflows",
+  //               "Time Tracking",
+  //               "Live Screen View",
+  //               "Screenshots",
+  //               "Reports",
+  //               "Attendance Tracking"
+  //             ],
+  //           },
+  //           {
+  //             id: "plan_ReKb2o8oIyYuSN",
+  //             name: "Pro",
+  //             disount: 20,
+  //             originalPrice: 1066,
+  //             pricePerUser: 533,
+  //             billing_cycle: 'quarterly',
+  //             members_text: 'Unlimited Team Members',
+  //             features: [
+  //               "Unlimited Workspace",
+  //               "Unlimited Projects",
+  //               "Unlimited Tasks",
+  //               "Unlimited Workflows",
+  //               "Time Tracking",
+  //               "Live Screen View",
+  //               "Screenshots",
+  //               "Reports",
+  //               "Attendance Tracking"
+  //             ],
+  //           },{
+  //           id: "plan_ReKbqwqKZJ4aDz",
+  //           name: "Elite",
+  //           disount: 20,
+  //           originalPrice: 916.25,
+  //           pricePerUser: 733,
+  //           billing_cycle: 'quarterly',
+  //           members_text: 'Unlimited Team Members',
+  //           features: [
+  //             "Unlimited Workspace",
+  //             "Unlimited Projects",
+  //             "Unlimited Tasks",
+  //             "Unlimited Workflows",
+  //             "Time Tracking",
+  //             "Live Screen View",
+  //             "Screenshots",
+  //             "Recorded Screen Videos",
+  //             "Reports",
+  //             "Attendance Tracking"
+  //           ],
+  //           }],
+  //           'yearly': [
+  //             {
+  //             id: "free",
+  //             name: "Free",
+  //             pricePerUser: 0,
+  //             disount: 0,
+  //             billing_cycle: false,
+  //             members_text: 'Free for up to 3 members',
+  //             features: [
+  //               "Single Workspace",
+  //               "Unlimited Projects",
+  //               "Unlimited Tasks",
+  //               "Unlimited Workflows",
+  //               "Time Tracking",
+  //               "Live Screen View",
+  //               "Screenshots",
+  //               "Reports",
+  //               "Attendance Tracking"
+  //             ],
+  //           },{
               
-              id: "plan_ReKc4NmD60B7rW",
-              name: "Pro",
-              disount: 40,
-              originalPrice: 666.67,
-              pricePerUser: 400,
-              billing_cycle: 'yearly',
-              members_text: 'Unlimited Team Members',
-              features: [
-                "Unlimited Workspace",
-                "Unlimited Projects",
-                "Unlimited Tasks",
-                "Unlimited Workflows",
-                "Time Tracking",
-                "Live Screen View",
-                "Screenshots",
-                "Reports",
-                "Attendance Tracking"
-              ],
-            },{
-              id: "plan_ReKcjcfoNCmtNY",
-              name: "Elite",
-              disount: 40,
-              originalPrice: 916.67,
-              pricePerUser: 550,
-              billing_cycle: 'yearly',
-              members_text: 'Unlimited Team Members',
-              features: [
-                "Unlimited Workspace",
-                "Unlimited Projects",
-                "Unlimited Tasks",
-                "Unlimited Workflows",
-                "Time Tracking",
-                "Live Screen View",
-                "Screenshots",
-                "Recorded Screen Videos",
-                "Reports",
-                "Attendance Tracking"
-              ],
-            }]
-          }
-        );
+  //             id: "plan_ReKc4NmD60B7rW",
+  //             name: "Pro",
+  //             disount: 40,
+  //             originalPrice: 666.67,
+  //             pricePerUser: 400,
+  //             billing_cycle: 'yearly',
+  //             members_text: 'Unlimited Team Members',
+  //             features: [
+  //               "Unlimited Workspace",
+  //               "Unlimited Projects",
+  //               "Unlimited Tasks",
+  //               "Unlimited Workflows",
+  //               "Time Tracking",
+  //               "Live Screen View",
+  //               "Screenshots",
+  //               "Reports",
+  //               "Attendance Tracking"
+  //             ],
+  //           },{
+  //             id: "plan_ReKcjcfoNCmtNY",
+  //             name: "Elite",
+  //             disount: 40,
+  //             originalPrice: 916.67,
+  //             pricePerUser: 550,
+  //             billing_cycle: 'yearly',
+  //             members_text: 'Unlimited Team Members',
+  //             features: [
+  //               "Unlimited Workspace",
+  //               "Unlimited Projects",
+  //               "Unlimited Tasks",
+  //               "Unlimited Workflows",
+  //               "Time Tracking",
+  //               "Live Screen View",
+  //               "Screenshots",
+  //               "Recorded Screen Videos",
+  //               "Reports",
+  //               "Attendance Tracking"
+  //             ],
+  //           }]
+  //         }
+  //       );
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -274,6 +278,10 @@ function SubscriptionPlans() {
         const parsedata = JSON.parse(current_dashboard)
         const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
         localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
+      }
+
+      if(subscriptionState?.message && subscriptionState.message_variant === 'success'){
+        navigate('/dashboard', { replace: true })
       }
      
     }
@@ -360,7 +368,6 @@ const showError = (name) => {
   return null;
 };
 
-
   const handlePayment = async () => {
     // const { fullName, phone, address1, city, state, postal, country, agree } = formData;
 
@@ -390,11 +397,11 @@ const showError = (name) => {
     if (!plan) return;
 
 
-    const discountedPricePerUser = getDiscountedPrice(plan);
+    const discountedPricePerUser = plan.pricePerUser;
     const cycleMultiplier =
       billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1;
     const totalPerCycle = discountedPricePerUser * members * cycleMultiplier;
-    const totalWithoutDiscount = plan.pricePerUser * members * cycleMultiplier;
+    const totalWithoutDiscount = plan.originalPrice * members * cycleMultiplier;
     // const totalSavings =
     //   (plan.pricePerUser - discountedPricePerUser) * members * cycleMultiplier;
     const discountPercent =
@@ -476,6 +483,11 @@ const showError = (name) => {
   }
 
   const activateFreePlan = () => {
+    
+    if(members > 3){
+      addToast('You cannot activate free plan for more than 3 members.', 'danger');
+      return;
+    }
     setLoading(true)
     dispatch(subscribeFreePlan())
   }
@@ -561,14 +573,16 @@ const showError = (name) => {
             {/* Plan Cards */}
             <Row className="g-4">
               {plans[billingCycle].map((plan) => {
-                const finalPricePerUser = getDiscountedPrice(plan);
+                const finalPricePerUser = plan.pricePerUser;//getDiscountedPrice(plan);
                 const baseAmount = plan.originalPrice * members
                 const total = finalPricePerUser * members;
                 let months = 1;
                 if (billingCycle === "quarterly") months = 3;
                 if (billingCycle === "yearly") months = 12;
                 const savedAmount = (baseAmount - total) * months;
-                const totalCostForPeriod = total * months;
+
+
+                
                 return (
                   <Col key={plan.id} md={4}>
                     <Card
@@ -970,10 +984,11 @@ const showError = (name) => {
                                   onChange={handleChange}
                                   required
                                 >
-                                  <option>India</option>
-                                  <option>United States</option>
-                                  <option>United Kingdom</option>
-                                  <option>Canada</option>
+                                  {countries.map((country) => (
+                                    <option key={country.isoCode} value={country.value}>
+                                      {country.name}
+                                    </option>
+                                  ))}
                                 </Form.Select>
                                 {showError("country")}
                               </Form.Group>

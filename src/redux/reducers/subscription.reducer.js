@@ -22,7 +22,7 @@ export default (state = initialState, action) => {
             message: action.payload.message,
             message_variant: 'success',
             success: true,
-            activeSubscription: action.payload.updatedSubsciption
+            activeSubscription: action.payload.updatedSubscription
         };
     case BILLING_SUCCESS: 
         return {
