@@ -130,7 +130,7 @@ function TeamMembersPage() {
 
       await dispatch(Listmembers(currentPage, searchTerm));
       await dispatch(
-        listCompanyinvite()
+        listCompanyinvite(0, 'company')
       );
       setShowloader(false);
     }

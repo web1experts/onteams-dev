@@ -16,6 +16,7 @@ function SubscriptionPlans() {
   const addToast = useToast();
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [spinner, setSpinner] = useState(true);
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
@@ -222,7 +223,7 @@ function SubscriptionPlans() {
    
       await dispatch(Listmembers(1,''));
       await dispatch(
-        listCompanyinvite()
+        listCompanyinvite(0, 'company')
       );
   };
   const [memberFeeds, setMemberFeed] = useState([]);
@@ -234,6 +235,7 @@ function SubscriptionPlans() {
   const [authorizationData, setAuthorizationData] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [members, setMembers] = useState(1);
+  const [ totalmembers, setTotalMembers] = useState(0);
   const [loading, setLoading] = useState(false);
   const [billingCycle, setBillingCycle] = useState("monthly"); // monthly | quarterly | yearly
   const [showConfirm, setShowConfirm] = useState(false);
@@ -253,11 +255,13 @@ function SubscriptionPlans() {
   const handlePlanSelect = (plan) => setSelectedPlan(plan);
 
   useEffect(() => {
+    setSpinner(true)
     setTimeout(() => {
       dispatch(getActiveSubscription())
       dispatch(getBillingdetails())
     }, 1000)
     handleListMember();
+    
   }, [])
 
   useEffect(() => {
@@ -290,17 +294,25 @@ function SubscriptionPlans() {
   useEffect(() => {
       if (memberFeed && memberFeed.memberData) {
         setMemberFeed(memberFeed.memberData);
-        setMembers((members || 0) + (memberFeed.memberData?.length || 0));
+        setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
 
       }
+      setTimeout(() => {
+        setSpinner(false)
+      },800)
     }, [memberFeed]);
 
      useEffect(() => {
         if (invitationsFeed && invitationsFeed.inviteData) {
           setInvitationsTotal(invitationsFeed.total);
-          setMembers((members || 0) + invitationsFeed.total || 0);
+          setTotalMembers((totalmembers) + invitationsFeed.total || 0);
         }
+        setTimeout(() => {
+        setSpinner(false)
+      },800)
       }, [invitationsFeed]);
+
+   
 
     useEffect(() => {
       if(subscriptionState.billing_info){
@@ -503,6 +515,11 @@ const showError = (name) => {
     <>
       <div className="team--page subscription--page">
         <div className="page--wrapper py-5 pt-5 text-center">
+          {spinner ? (
+            <div className="loading-bar">
+              <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+            </div>
+          ) : (
           <Container>
             <h2 className="text-center mb-1">Choose Your Plan</h2>
             <p className="text-center mb-4">Start with a 14-day free trial. Charges apply only after the trial period.</p>
@@ -521,7 +538,7 @@ const showError = (name) => {
                 <Form.Label><FiUsers /> Select Your Team Size</Form.Label>
                 <div class="d-flex align-items-center gap-2 bg--teal p-2">
                   <Button variant="secondary" onChange={() => setMembers(prev => Math.max(1, prev - 1))}>-</Button>
-                  <Form.Control type="number" min={(memberFeeds?.length + invitationsTotal) || 1} value={members}  onChange={(e) => setMembers(Number(e.target.value))}/>
+                  <Form.Control type="number" min={totalmembers || 1} value={members + totalmembers}  onChange={(e) => setMembers(Number(e.target.value))}/>
                   <Button variant="primary" onClick={() => setMembers(prev => prev + 1)}>+</Button>
                 </div>
               </Form.Group>
@@ -723,7 +740,8 @@ const showError = (name) => {
             </Row>
             
 
-          </Container>
+          </Container>)
+        }
         </div>
       </div>
       <Modal show={showConfirm} onHide={() => setShowConfirm(false)} centered size="lg" className="subscription--modal theme--modal">
