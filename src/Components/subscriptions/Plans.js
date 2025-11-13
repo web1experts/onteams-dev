@@ -465,9 +465,9 @@ const showError = (name) => {
                   <Form.Label><FiGlobe /> Select Currency</Form.Label>
                   <Form.Select>
                     <option value="INR">₹ INR - Indian Rupee</option>
-                    <option value="USD">$ USD - US Dollar</option>
+                    {/* <option value="USD">$ USD - US Dollar</option>
                     <option value="EUR">€ EUR - Euro</option>
-                    <option value="GBP">£ GBP - British Pound</option>
+                    <option value="GBP">£ GBP - British Pound</option> */}
                   </Form.Select>
                 </Form.Group>
                 <Form.Group className="select--size">
