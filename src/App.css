@@ -7836,7 +7836,7 @@ ul#icon-tabs .nav-link span svg {
 
 .subscription--page .plan-card {
   border: 2px solid rgb(226 232 240);
-  border-radius: .75rem;
+  border-radius: .85rem;
   transition: all 0.3s ease;
   position: relative;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
@@ -7862,8 +7862,9 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .subscription--page .active-plan {
-  border: 2px solid #007bff;
+  border: 2px solid rgb(4 120 87);
   background-color: #f0f8ff;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / .2), 0 8px 10px -6px rgb(0 0 0 / .2);
 }
 
 .subscription--page form {
@@ -7978,8 +7979,22 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .subscription--page .bg-gradient-primary, .subscription--modal .bg-gradient-primary {
-  border: 2px solid rgba(var(--theme-primary), .5);
-  background: linear-gradient(145deg, rgba(var(--theme-primary), .2), rgba(var(--theme-secondary), .05));
+    border: 2px solid #14B8A330;
+    background: linear-gradient(145deg, #14B8A315, #14B8A315);
+    min-height: 130px;
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.subscription--modal .bg-gradient-primary {
+  margin-top: 1rem;
+  margin-bottom: 0 !important;
+}
+
+.in--free--plan strong, .in--pro--plan strong {
+  color: rgb(4 120 87);
 }
 
 .subscription--page .bg-gradient-light, .subscription--modal .bg-gradient-light {
@@ -7997,7 +8012,7 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .bg-gradient-primary .text--large {
-    color: #1e293b;
+    color: rgb(4 120 87);
     text-transform: uppercase;
     font-weight: 700;
     font-size: 3rem;
@@ -8251,6 +8266,34 @@ ul#icon-tabs .nav-link span svg {
     font-size: .75rem !important;
 }
 
+.subscription--modal .bg--highlight {
+    color: #1e3a8a;
+    border: 2px solid rgb(147 197 253);
+    background: rgb(239 246 255);
+    font-weight: 600;
+    text-align: center;
+}
+
+.subscription--modal .form-group {
+    padding-bottom: 0;
+}
+
+.subscription--modal .form-group .error {
+  position: relative;
+  bottom: 0;
+}
+
+.subscription--modal .annual--cost {
+  border: 2px solid rgb(251 191 36);
+  background-image: linear-gradient(to right, #fffbeb, #fff7ed);
+}
+
+.subscription--modal .text-amber {
+  color: rgb(120 53 15);
+}
+.subscription--modal .text-emerald {
+  color: rgb(4 120 87);
+}
 /*-=-=-=-==-=-
 Media CSS-=-==
 ==-=-=-=-=-*/

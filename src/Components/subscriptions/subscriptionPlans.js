@@ -616,7 +616,7 @@ const showError = (name) => {
                         }`}
                     >
                       {activeSubscription?.planId === plan.id && (
-                        <Badge bg="success" style={{ position: "absolute", top: "10px", right: "10px" }}>Currently Active</Badge>
+                        <Badge bg="success" style={{ position: "absolute", top: "10px", right: "10px" }}>Active</Badge>
                       )}
                       <Card.Title>{plan.name}</Card.Title>
                       <Card.Body className="d-flex flex-column p-4">
@@ -632,7 +632,7 @@ const showError = (name) => {
                           billingCycle !== 'monthly' ? 
                             <>
                               {/* <p>Regular Price</p> */}
-                              <div className="bg-gradient-primary p-3 mb-3 rounded-3">
+                              <div className="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                                 <div className="text--small mb-1 text-uppercase">Discounted Price</div>
                                 <div className="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span className="text-slate-600 mt-1">/user/month</span></div>
                                 <div className="text-slate-600 mt-1">when billed {billingCycle}</div>
@@ -640,7 +640,7 @@ const showError = (name) => {
                             </>
                             :
                             <>
-                              <div className="bg-gradient-primary p-3 mb-3 rounded-3">
+                              <div className="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                                 <div className="text--small mb-1 text-uppercase">Regular Price</div>
                                 <div className="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span className="text-slate-600 mt-1">/user/month</span></div>
                                 <div className="text-slate-600 mt-1">when billed {billingCycle}</div>
@@ -840,38 +840,40 @@ const showError = (name) => {
                 )*/}
                 {billingCycle === "yearly" || billingCycle === "quarterly" ?
                 <>
-                  <div className="annual--cost rounded p-3 bg-warning mt-3 mb-3">
-                    <h6 className="fw-bold mb-2 text-uppercase">{billingCycle} COST BREAKDOWN</h6>
-                    <div className="d-flex align-items-center justify-content-between gap-3 bg-white p-3 rounded fw-normal border border-warning">
+                  <div className="annual--cost rounded p-3 mt-3 mb-3 border-warning border-2">
+                    <h6 className="fw-bold mb-2 text-uppercase text-amber">{billingCycle} COST BREAKDOWN</h6>
+                    <div className="bg-white p-3 rounded fw-normal border-1 border-warning text-dark">
                       <span className="text--small">{billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} calculation</span>
-                      <p className="mb-0">
-                        {billingCycle === "yearly"
-                        ? `₹${(priceDetails.pricePerUser * members).toFixed(0)}/month × 12 months`
-                        : billingCycle === "quarterly"
-                        ? `₹${(
+                      <div className="d-flex align-items-center justify-content-between gap-3">
+                        <p className="mb-0">
+                          {billingCycle === "yearly"
+                          ? `₹${(priceDetails.pricePerUser * members).toFixed(0)}/month × 12 months`
+                          : billingCycle === "quarterly"
+                          ? `₹${(
+                              priceDetails.pricePerUser * members
+                            ).toFixed(0)}/month × 3 months`
+                          : `₹${(
                             priceDetails.pricePerUser * members
-                          ).toFixed(0)}/month × 3 months`
-                        : `₹${(
-                          priceDetails.pricePerUser * members
-                        ).toFixed(0)}/month × 1 month`}
-                      </p>
-                      <p className="fw-bold display-8 mb-0">
-                        = ₹{priceDetails.pricePerUser.toFixed(0) *  members * (billingCycle === 'quarterly' ? 3 : 12)}
-                      </p>
-                      <p className="text--small">Total {billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} Payment</p>
-                      <div className="text--large mb-0">₹{priceDetails.pricePerUser.toFixed(0) * members * (billingCycle === 'quarterly' ? 3 : 12)}</div>
-                    
+                          ).toFixed(0)}/month × 1 month`}
+                        </p>
+                        <p className="fw-bold display-8 mb-0 text-amber">
+                          = ₹{priceDetails.pricePerUser.toFixed(0) *  members * (billingCycle === 'quarterly' ? 3 : 12)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-center mt-3">
+                      <p className="text--small mb-1 fw-normal text-amber">Total {billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} Payment</p>
+                      <div className="text--large mb-0 text-amber">₹{priceDetails.pricePerUser.toFixed(0) * members * (billingCycle === 'quarterly' ? 3 : 12)}</div>
                     </div>
                   </div>
                   
                  { <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                    <div className="text--small mb-1 text-uppercase">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
+                    <div className="text--small mb-1 text-uppercase text-emerald">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
                     <div className="text-slate-600 mt-1">
-                     
-                   ₹{((priceDetails.originalPrice - priceDetails.pricePerUser) *  members).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
-                    {(((priceDetails.originalPrice - priceDetails.pricePerUser)) *  members * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
-                  </div>
-                    <div className="text--large mb-0">₹{priceDetails.totalSavings.toFixed(0)}</div>
+                      ₹{((priceDetails.originalPrice - priceDetails.pricePerUser) *  members).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
+                      {(((priceDetails.originalPrice - priceDetails.pricePerUser)) *  members * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
+                    </div>
+                    <div className="text--large mb-0 text-emerald mt-2">₹{priceDetails.totalSavings.toFixed(0)}</div>
                   </div>}
                   </>
                   :
@@ -922,7 +924,7 @@ const showError = (name) => {
                 </p>
               </div> */}
 
-              <p className="bg-gradient-light mb-3 p-2 rounded-3">
+              <p className="bg-gradient-light bg--highlight mb-3 p-2 rounded-3">
                 ✨ 14 Days Free Trial – Charges apply after trial period
               </p>
 
@@ -949,8 +951,10 @@ const showError = (name) => {
                                         ))}
                                       </Form.Select>
                                     
-                                      <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
-                                      {showError("phone")}
+                                      <div className="flex-fill">
+                                        <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                                        {showError("phone")}
+                                      </div>
                                     </Col>
                                   </Row>
                                 </Form.Group>
@@ -1042,27 +1046,29 @@ const showError = (name) => {
                               </Form.Group>
               
                               <div className="p-3 border rounded bg-white" style={{ fontSize: "0.9rem" }}>
-                                <Form.Check
-                                  type="checkbox"
-                                  name="agree"
-                                  className=""
-                                  checked={formData.agree}
-                                  onChange={handleChange}
-                                  label={
-                                    <>
-                                      I agree to the{" "}
-                                      <a href="https://primeteams.ai/terms-and-conditions/" target="_blank" rel="noreferrer">
-                                        Terms & Conditions
-                                      </a>{" "}
-                                      and{" "}
-                                      <a href="https://primeteams.ai/cancellation-refunds/" target="_blank" rel="noreferrer">
-                                        Refund Policy
-                                      </a>
-                                    </>
-                                  }
-                                  required
-                                />
-                                {showError("agree")}
+                                <Form.Group className="form-group">
+                                  <Form.Check
+                                    type="checkbox"
+                                    name="agree"
+                                    className=""
+                                    checked={formData.agree}
+                                    onChange={handleChange}
+                                    label={
+                                      <>
+                                        I agree to the{" "}
+                                        <a href="https://primeteams.ai/terms-and-conditions/" target="_blank" rel="noreferrer">
+                                          Terms & Conditions
+                                        </a>{" "}
+                                        and{" "}
+                                        <a href="https://primeteams.ai/cancellation-refunds/" target="_blank" rel="noreferrer">
+                                          Refund Policy
+                                        </a>
+                                      </>
+                                    }
+                                    required
+                                  />
+                                  {showError("agree")}
+                                </Form.Group>
                               </div>
               
                             </Form>
