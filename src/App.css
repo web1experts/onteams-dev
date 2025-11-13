@@ -8274,13 +8274,8 @@ ul#icon-tabs .nav-link span svg {
     text-align: center;
 }
 
-.subscription--modal .form-group {
-    padding-bottom: 0;
-}
-
 .subscription--modal .form-group .error {
   position: relative;
-  bottom: 0;
 }
 
 .subscription--modal .annual--cost {

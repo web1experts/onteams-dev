@@ -842,7 +842,7 @@ const showError = (name) => {
                 <>
                   <div className="annual--cost rounded p-3 mt-3 mb-3 border-warning border-2">
                     <h6 className="fw-bold mb-2 text-uppercase text-amber">{billingCycle} COST BREAKDOWN</h6>
-                    <div className="bg-white p-3 rounded fw-normal border-1 border-warning text-dark">
+                    <div className="bg-white p-3 rounded fw-normal border-1 border-warning text-dark border">
                       <span className="text--small">{billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} calculation</span>
                       <div className="d-flex align-items-center justify-content-between gap-3">
                         <p className="mb-0">
@@ -881,7 +881,7 @@ const showError = (name) => {
                   <>
                     <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
                       <div className="text--small mb-1 text-uppercase">Your monthly payment</div>
-                      <div className="text--large mb-0">₹{(priceDetails.pricePerUser * members).toFixed(0)}</div>
+                      <div className="text--large mb-0 text-emerald">₹{(priceDetails.pricePerUser * members).toFixed(0)}</div>
                       <div className="text--small mb-1 text-lowercase">for {members} users</div>
                     </div>
                   </>
@@ -931,7 +931,7 @@ const showError = (name) => {
               <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
                               <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
                               <Row>
-                                <Form.Group as={Col} md="12" className="mb-3 form-group">
+                                <Form.Group as={Col} md="12" className="position-relative mb-0 form-group">
                                   <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
                                   <Form.Control type="text" className={errors?.fullName ? 'br-red' : ''} name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
                                   {showError("fullName")}
@@ -939,10 +939,10 @@ const showError = (name) => {
                               </Row>
               
                               <Row>
-                                <Form.Group className="mb-3 form-group">
+                                <Form.Group className="position-relative mb-0 form-group">
                                   <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
                                   <Row>
-                                    <Col className="d-flex align-items-center gap-3">
+                                    <Col className="d-flex align-items-start gap-3">
                                       <Form.Select className="w-auto pe-5">
                                         {countries.map((country) => (
                                           <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
@@ -951,7 +951,7 @@ const showError = (name) => {
                                         ))}
                                       </Form.Select>
                                     
-                                      <div className="flex-fill">
+                                      <div className="flex-fill position-relative">
                                         <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
                                         {showError("phone")}
                                       </div>
@@ -960,7 +960,7 @@ const showError = (name) => {
                                 </Form.Group>
                               </Row>
               
-                              <Form.Group  className="mb-3 form-group">
+                              <Form.Group  className="position-relative mb-0 form-group">
                                 <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
                                 <Form.Control
                                   type="text"
@@ -974,7 +974,7 @@ const showError = (name) => {
                                 {showError("address1")}
                               </Form.Group>
               
-                              <Form.Group className="mb-3 form-group">
+                              <Form.Group className="position-relative mb-0 form-group">
                                 <Form.Label>Address Line 2</Form.Label>
                                 <Form.Control
                                   type="text"
@@ -986,7 +986,7 @@ const showError = (name) => {
                               </Form.Group>
               
                               <Row className="">
-                                <Form.Group as={Col} md="4" className="mb-3 form-group">
+                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
                                   <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
                                   <Form.Control
                                     type="text"
@@ -999,7 +999,7 @@ const showError = (name) => {
                                   />
                                   {showError("city")}
                                 </Form.Group>
-                                <Form.Group as={Col} md="4" className="mb-3 form-group">
+                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
                                   <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
                                   <Form.Control
                                     className={errors?.state ? 'br-red' : ''} 
@@ -1012,7 +1012,7 @@ const showError = (name) => {
                                   />
                                   {showError("state")}
                                 </Form.Group>
-                                <Form.Group as={Col} md="4" className="mb-3 form-group">
+                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
                                   <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
                                   <Form.Control
                                     type="text"
@@ -1027,7 +1027,7 @@ const showError = (name) => {
                                 </Form.Group>
                               </Row>
               
-                              <Form.Group  className="mb-3 form-group">
+                              <Form.Group  className="position-relative mb-0 form-group">
                                 <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
                                 <Form.Select
                                   className="custom-selectbox"
