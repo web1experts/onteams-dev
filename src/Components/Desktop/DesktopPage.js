@@ -57,7 +57,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -77,7 +77,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -87,7 +87,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -102,7 +102,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -122,7 +122,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -132,7 +132,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -142,7 +142,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -152,7 +152,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -167,7 +167,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -187,7 +187,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -197,7 +197,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -207,7 +207,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -217,7 +217,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -232,7 +232,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -252,7 +252,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -262,7 +262,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -272,7 +272,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -282,7 +282,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -304,7 +304,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -324,7 +324,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -334,7 +334,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -349,7 +349,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -369,7 +369,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -379,7 +379,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -389,7 +389,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -399,7 +399,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -414,7 +414,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -434,7 +434,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -444,7 +444,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -454,7 +454,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -464,7 +464,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -479,7 +479,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -499,7 +499,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -509,7 +509,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -519,7 +519,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -529,7 +529,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -551,7 +551,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -571,7 +571,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -581,7 +581,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -596,7 +596,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -616,7 +616,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -626,7 +626,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -636,7 +636,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -646,7 +646,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -661,7 +661,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -681,7 +681,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -691,7 +691,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -701,7 +701,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -711,7 +711,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -726,7 +726,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -746,7 +746,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -756,7 +756,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -766,7 +766,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -776,7 +776,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -802,7 +802,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -822,7 +822,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -832,7 +832,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -847,7 +847,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -867,7 +867,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -877,7 +877,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -887,7 +887,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -897,7 +897,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -912,7 +912,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -932,7 +932,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -942,7 +942,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -952,7 +952,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -962,7 +962,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -977,7 +977,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -997,7 +997,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1007,7 +1007,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1017,7 +1017,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1027,7 +1027,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1049,7 +1049,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1069,7 +1069,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1079,7 +1079,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1094,7 +1094,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1114,7 +1114,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1124,7 +1124,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1134,7 +1134,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1144,7 +1144,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1159,7 +1159,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1179,7 +1179,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1189,7 +1189,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1199,7 +1199,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1209,7 +1209,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1224,7 +1224,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1244,7 +1244,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1254,7 +1254,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1264,7 +1264,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1274,7 +1274,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1296,7 +1296,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1316,7 +1316,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1326,7 +1326,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1341,7 +1341,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1361,7 +1361,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1371,7 +1371,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1381,7 +1381,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1391,7 +1391,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1406,7 +1406,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1426,7 +1426,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1436,7 +1436,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1446,7 +1446,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1456,7 +1456,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1471,7 +1471,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1491,7 +1491,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1501,7 +1501,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1511,7 +1511,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1521,7 +1521,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1547,7 +1547,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1567,7 +1567,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1577,7 +1577,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1592,7 +1592,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1612,7 +1612,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1622,7 +1622,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1632,7 +1632,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1642,7 +1642,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1657,7 +1657,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1677,7 +1677,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1687,7 +1687,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1697,7 +1697,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1707,7 +1707,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1722,7 +1722,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1742,7 +1742,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1752,7 +1752,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1762,7 +1762,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1772,7 +1772,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1794,7 +1794,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1814,7 +1814,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1824,7 +1824,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1839,7 +1839,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1859,7 +1859,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1869,7 +1869,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1879,7 +1879,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1889,7 +1889,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1904,7 +1904,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1924,7 +1924,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1934,7 +1934,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1944,7 +1944,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1954,7 +1954,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -1969,7 +1969,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1989,7 +1989,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -1999,7 +1999,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2009,7 +2009,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2019,7 +2019,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -2041,7 +2041,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2061,7 +2061,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2071,7 +2071,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -2086,7 +2086,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2106,7 +2106,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2116,7 +2116,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2126,7 +2126,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2136,7 +2136,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -2151,7 +2151,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2171,7 +2171,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2181,7 +2181,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2191,7 +2191,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2201,7 +2201,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>
@@ -2216,7 +2216,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2236,7 +2236,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2246,7 +2246,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2256,7 +2256,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                               <ListGroup>
@@ -2266,7 +2266,7 @@ function DesktopPage() {
                                     <FaPause className="d-none" />
                                   </span>
                                   Design Landing Page
-                                  {/* <span class="time--span">01:22:32</span> */}
+                                  {/* <span className="time--span">01:22:32</span> */}
                                 </ListGroup.Item>
                               </ListGroup>
                             </Accordion.Body>

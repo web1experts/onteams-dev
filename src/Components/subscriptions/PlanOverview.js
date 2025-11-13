@@ -103,7 +103,7 @@ const PlanOverview = () => {
               <div className="d-flex align-items-center justify-content-between">
                 <div className="d-flex align-items-center gap-4">
                   <div className="p-3 upgrade--icon rounded-4">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-8 h-8"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-sparkles w-8 h-8"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>
                   </div>
                   <h4 className="fw-bold mb-0">Upgrade to yearly billing and save ₹6,000 in a year</h4>
                 </div>
@@ -195,23 +195,23 @@ const PlanOverview = () => {
                   <div className="text-center">
                     <Button variant="primary" className="px-4 w-100 fw-bold py-3"><FiSettings /> Manage Plan</Button>
                   </div>
-                  {/* <div class="mt-4 bg-amber rounded-4 p-4">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="p-2 bg-amber-icon rounded-3"><FiClock /></div>
-                        <div class="flex-1">
-                            <h5 class="fw-bold text-secondary mb-2">14 Days Remaining in Trial</h5>
-                            <p class="text-sm mb-0">Submit your billing information — you won’t be billed until your trial period ends on <span class="fw-bold text-secondary">8 November 2025</span>.</p>
+                  {/* <div className="mt-4 bg-amber rounded-4 p-4">
+                    <div className="d-flex align-items-start gap-3">
+                        <div className="p-2 bg-amber-icon rounded-3"><FiClock /></div>
+                        <div className="flex-1">
+                            <h5 className="fw-bold text-secondary mb-2">14 Days Remaining in Trial</h5>
+                            <p className="text-sm mb-0">Submit your billing information — you won’t be billed until your trial period ends on <span className="fw-bold text-secondary">8 November 2025</span>.</p>
                         </div>
                     </div>
                   </div> */}
                    {(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial' && memberProfile?.role?.slug === "owner" ) && (
-                    <div class="mt-4 bg-amber rounded-4 p-4">
-                      <div class="d-flex align-items-start gap-3">
-                          <div class="p-2 bg-amber-icon rounded-3"><BsExclamationTriangle /> </div>
-                          <div class="flex-1">
-                              <h5 class="fw-bold text-secondary mb-2">Scheduled Plan Change</h5>
-                              <p class="text-sm mb-1">Your plan will downgrade to <strong class="fw-bold text-secondary">Free Plan</strong> on your next billing cycle.</p>
-                              <p class="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date(activeSubscription?.subscriptionDetails?.charge_at * 1000)?.toLocaleDateString("en-GB", {
+                    <div className="mt-4 bg-amber rounded-4 p-4">
+                      <div className="d-flex align-items-start gap-3">
+                          <div className="p-2 bg-amber-icon rounded-3"><BsExclamationTriangle /> </div>
+                          <div className="flex-1">
+                              <h5 className="fw-bold text-secondary mb-2">Scheduled Plan Change</h5>
+                              <p className="text-sm mb-1">Your plan will downgrade to <strong className="fw-bold text-secondary">Free Plan</strong> on your next billing cycle.</p>
+                              <p className="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date(activeSubscription?.subscriptionDetails?.charge_at * 1000)?.toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "long",
                             year: "numeric",
@@ -237,16 +237,16 @@ const PlanOverview = () => {
                   </div>
                   <Badge bg="secondary" className="ms-auto bg-light text-dark px-3 py-2 fw-bold fs-6 rounded-2">3 Invoices</Badge>
                 </div>
-                <div class="mb-4 bg-amber rounded-4 p-4">
-                  <div class="d-flex align-items-start gap-3">
-                      <div class="p-2 bg-amber-icon rounded-3"><BiFile /></div>
-                      <div class="flex-1">
-                          <h5 class="fw-bold text-secondary mb-2">Pending Invoice</h5>
-                          <p class="text-sm mb-1">Invoice #INV-2025-001</p>
-                          <p class="text-sm mb-0"><small className="text-muted">Due Date: 11 Nov 2025</small></p>
+                <div className="mb-4 bg-amber rounded-4 p-4">
+                  <div className="d-flex align-items-start gap-3">
+                      <div className="p-2 bg-amber-icon rounded-3"><BiFile /></div>
+                      <div className="flex-1">
+                          <h5 className="fw-bold text-secondary mb-2">Pending Invoice</h5>
+                          <p className="text-sm mb-1">Invoice #INV-2025-001</p>
+                          <p className="text-sm mb-0"><small className="text-muted">Due Date: 11 Nov 2025</small></p>
                       </div>
-                      <div class="d-flex text-end flex-column gap-0 ms-auto">
-                        <p class="text-sm mb-0"><small>Amount Due</small></p>
+                      <div className="d-flex text-end flex-column gap-0 ms-auto">
+                        <p className="text-sm mb-0"><small>Amount Due</small></p>
                         <h5 className="fw-bold fs-3 mb-1">₹1,000</h5>
                         <Button variant="primary">Make Payment</Button>
                       </div>

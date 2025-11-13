@@ -470,7 +470,7 @@ const showError = (name) => {
                 </Form.Group>
                 <Form.Group className="select--size">
                   <Form.Label><FiUsers /> Select Your Team Size</Form.Label>
-                  <div class="d-flex align-items-center gap-2 bg--teal p-2">
+                  <div className="d-flex align-items-center gap-2 bg--teal p-2">
                     <Button
                       variant="secondary"
                       onClick={() => setMembers(prev => Math.max(0, prev - 1))} // Decrease but not below 1
@@ -569,33 +569,33 @@ const showError = (name) => {
                             
                             <p>{plan.members_text}</p>
                             {plan.id === 'free' ? 
-                              <div class="bg-gradient-primary p-3 mb-3 rounded-3">
-                                  <div class="text--small mb-1 text-uppercase">Free Forever</div>
-                                  <div class="text--large mb-2">FREE</div>
-                                  <div class="text-slate-600 mt-1">Up to 3 Team Members</div>
+                              <div className="bg-gradient-primary p-3 mb-3 rounded-3">
+                                  <div className="text--small mb-1 text-uppercase">Free Forever</div>
+                                  <div className="text--large mb-2">FREE</div>
+                                  <div className="text-slate-600 mt-1">Up to 3 Team Members</div>
                               </div> 
                               :
                               billingCycle !== 'monthly' ? 
                                 <>
                                   {/* <p>Regular Price</p> */}
-                                  <div class="bg-gradient-primary p-3 mb-3 rounded-3">
-                                    <div class="text--small mb-1 text-uppercase">Discounted Price</div>
-                                    <div class="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span class="text-slate-600 mt-1">/user/month</span></div>
-                                    <div class="text-slate-600 mt-1">when billed {billingCycle}</div>
+                                  <div className="bg-gradient-primary p-3 mb-3 rounded-3">
+                                    <div className="text--small mb-1 text-uppercase">Discounted Price</div>
+                                    <div className="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span className="text-slate-600 mt-1">/user/month</span></div>
+                                    <div className="text-slate-600 mt-1">when billed {billingCycle}</div>
                                   </div> 
                                 </>
                                 :
                                 <>
-                                  <div class="bg-gradient-primary p-3 mb-3 rounded-3">
-                                    <div class="text--small mb-1 text-uppercase">Regular Price</div>
-                                    <div class="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span class="text-slate-600 mt-1">/user/month</span></div>
-                                    <div class="text-slate-600 mt-1">when billed {billingCycle}</div>
+                                  <div className="bg-gradient-primary p-3 mb-3 rounded-3">
+                                    <div className="text--small mb-1 text-uppercase">Regular Price</div>
+                                    <div className="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span className="text-slate-600 mt-1">/user/month</span></div>
+                                    <div className="text-slate-600 mt-1">when billed {billingCycle}</div>
                                   </div> 
                                 </>
                             }
-                            {/*plan.id !== 'free' && ( 
-                            <div class="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
-                                <div class="text--small mb-1 text-uppercase">Your Total Cost</div>
+                            {(plan.id !== 'free' && billingCycle !== 'monthly') && (
+                            <div className="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
+                                <div className="text--small mb-1 text-uppercase">Your Total Cost</div>
                                 <ListGroup>
                                   <ListGroup.Item>Base Amount: <span>₹{(plan.originalPrice.toFixed(0) * members).toFixed(0)}</span></ListGroup.Item>
                                   {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
@@ -607,17 +607,17 @@ const showError = (name) => {
                                 </ListGroup>
                                 
                                   <>
-                                  <div class="text-slate-600 mt-1 mb-3 text-end">per month for {members} user</div>
+                                  <div className="text-slate-600 mt-1 mb-3 text-end">per month for {members} user</div>
                                     {(plan.disount !== 0 && billingCycle !== 'monthly') &&(
-                                      <div class="bg-gradient-primary p-3 mb-3 rounded-3">
-                                        <div class="text--small mb-1 text-uppercase">You Save in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
-                                        <div class="text--large display-5 mb-0">₹{savedAmount.toFixed(0)}</div>
+                                      <div className="bg-gradient-primary p-3 mb-3 rounded-3">
+                                        <div className="text--small mb-1 text-uppercase">You Save in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
+                                        <div className="text--large display-5 mb-0">₹{savedAmount.toFixed(0)}</div>
                                       </div>
                                     )}
                                   </>
                                 
                             </div>)
-                           */ }
+                            }
                             {plan.id !== 'free' ?
                               <>
                                 
@@ -821,22 +821,22 @@ const showError = (name) => {
                   </div>
                   
                   { <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                    <div class="text--small mb-1 text-uppercase">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
+                    <div className="text--small mb-1 text-uppercase">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
                     <div className="text-slate-600 mt-1">
                      
                     ₹{(priceDetails.pricePerUser).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
                     {(priceDetails.pricePerUser * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
                   </div>
-                    <div class="text--large mb-0">₹{priceDetails.totalSavings.toFixed(0)}</div>
+                    <div className="text--large mb-0">₹{priceDetails.totalSavings.toFixed(0)}</div>
                   </div>}
                   </>
                   :
                   
                   <>
                     <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                      <div class="text--small mb-1 text-uppercase">Your monthly payment</div>
-                      <div class="text--large mb-0">₹{(priceDetails.pricePerUser * members).toFixed(0)}</div>
-                      <div class="text--small mb-1 text-lowercase">for {members} users</div>
+                      <div className="text--small mb-1 text-uppercase">Your monthly payment</div>
+                      <div className="text--large mb-0">₹{(priceDetails.pricePerUser * members).toFixed(0)}</div>
+                      <div className="text--small mb-1 text-lowercase">for {members} users</div>
                     </div>
                   </>
                   }
@@ -900,7 +900,7 @@ const showError = (name) => {
                       <Col className="d-flex align-items-center gap-3">
                         <Form.Select className="w-auto pe-5">
                          {countries.map((country) => (
-                            <option key={country.phoneCode} value={country.phoneCode}>
+                            <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
                               {country.phoneCode}
                             </option>
                           ))}
@@ -990,7 +990,7 @@ const showError = (name) => {
                     required
                   >
                     {countries.map((country) => (
-                      <option key={country.isoCode} value={country.value}>
+                      <option key={`country-${country.isoCode}--${country.phoneCode}`} value={country.value}>
                         {country.name}
                       </option>
                     ))}
