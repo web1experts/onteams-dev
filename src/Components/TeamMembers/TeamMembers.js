@@ -940,7 +940,8 @@ useEffect(() => {
                       <ListGroup.Item className="btn btn-primary"  onClick={() => {
                           if (
                             activeSubscription?.planId === 'free' &&
-                            (invitationsTotal + memberFeeds?.length) === 3
+                            (invitationsTotal + memberFeeds?.length === 3) || activeSubscription?.quantity ===
+                            invitationsTotal + memberFeeds?.length
                           ) {
                             navigate('/subscription-plans', { replace: true });
                           } else {
