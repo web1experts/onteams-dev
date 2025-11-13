@@ -221,7 +221,7 @@ function PlansPage() {
   const [activeSubscription, setActiveSubscription] = useState(null)
   const [authorizationData, setAuthorizationData] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [members, setMembers] = useState(1);
+  const [members, setMembers] = useState(0);
   const [loading, setLoading] = useState(false);
   const [billingCycle, setBillingCycle] = useState("monthly"); // monthly | quarterly | yearly
   const [showConfirm, setShowConfirm] = useState(false);
@@ -344,7 +344,10 @@ const showError = (name) => {
 
   const handleSubmit = async (plan) => {
     if (!plan) return;
-
+    if(members <= 0){
+      addToast('Please add number of team members first.', 'danger');
+      return;
+    }
 
     const discountedPricePerUser = plan.pricePerUser;
     const cycleMultiplier =
@@ -470,7 +473,7 @@ const showError = (name) => {
                   <div class="d-flex align-items-center gap-2 bg--teal p-2">
                     <Button
                       variant="secondary"
-                      onClick={() => setMembers(prev => Math.max(1, prev - 1))} // Decrease but not below 1
+                      onClick={() => setMembers(prev => Math.max(0, prev - 1))} // Decrease but not below 1
                     >
                       -
                     </Button>
@@ -578,11 +581,17 @@ const showError = (name) => {
                                   <div class="bg-gradient-primary p-3 mb-3 rounded-3">
                                     <div class="text--small mb-1 text-uppercase">Discounted Price</div>
                                     <div class="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span class="text-slate-600 mt-1">/user/month</span></div>
-                                    <div class="text-slate-600 mt-1">Up to 3 Team Members</div>
+                                    <div class="text-slate-600 mt-1">when billed {billingCycle}</div>
                                   </div> 
                                 </>
                                 :
-                                <></>
+                                <>
+                                  <div class="bg-gradient-primary p-3 mb-3 rounded-3">
+                                    <div class="text--small mb-1 text-uppercase">Regular Price</div>
+                                    <div class="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span class="text-slate-600 mt-1">/user/month</span></div>
+                                    <div class="text-slate-600 mt-1">when billed {billingCycle}</div>
+                                  </div> 
+                                </>
                             }
                             {/*plan.id !== 'free' && ( 
                             <div class="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
@@ -823,7 +832,13 @@ const showError = (name) => {
                   </>
                   :
                   
-                  <></>
+                  <>
+                    <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                      <div class="text--small mb-1 text-uppercase">Your monthly payment</div>
+                      <div class="text--large mb-0">₹{(priceDetails.pricePerUser * members).toFixed(0)}</div>
+                      <div class="text--small mb-1 text-lowercase">for {members} users</div>
+                    </div>
+                  </>
                   }
                 
                 {/* <p className="mb-1 text-muted">
@@ -883,8 +898,12 @@ const showError = (name) => {
                     <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
                     <Row>
                       <Col className="d-flex align-items-center gap-3">
-                        <Form.Select disabled className="w-auto pe-5">
-                          <option>+91</option>
+                        <Form.Select className="w-auto pe-5">
+                         {countries.map((country) => (
+                            <option key={country.phoneCode} value={country.phoneCode}>
+                              {country.phoneCode}
+                            </option>
+                          ))}
                         </Form.Select>
                       
                         <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
@@ -989,11 +1008,11 @@ const showError = (name) => {
                     label={
                       <>
                         I agree to the{" "}
-                        <a href="#" target="_blank" rel="noreferrer">
+                        <a href="https://primeteams.ai/terms-and-conditions/" target="_blank" rel="noreferrer">
                           Terms & Conditions
                         </a>{" "}
                         and{" "}
-                        <a href="#" target="_blank" rel="noreferrer">
+                        <a href="https://primeteams.ai/cancellation-refunds/" target="_blank" rel="noreferrer">
                           Refund Policy
                         </a>
                       </>
