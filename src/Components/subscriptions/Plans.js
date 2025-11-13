@@ -327,7 +327,7 @@ const showError = (name) => {
   const handlePayment = async () => {
     if (!validateForm()) return;
     if (!formData.agree) {
-      alert("Please agree to the Terms & Conditions");
+      addToast("Please agree to the Terms & Conditions", 'danger');
       return;
     }
     setLoading(true)
@@ -362,19 +362,21 @@ const showError = (name) => {
       const baseAmount = plan.originalPrice * members
       const total = discountedPricePerUser * members;
       
-      const totalSavings = (baseAmount - total) * cycleMultiplier;
+      const totalSavings = (baseAmount - total) * cycleMultiplier ;
       
 
     setPriceDetails({
       plan,
       pricePerUser: plan.pricePerUser,
       discountedPricePerUser,
+      originalPrice: plan.originalPrice,
       cycleMultiplier,
       totalPerCycle,
       totalSavings,
       discountPercent,
       totalWithoutDiscount
     });
+
 
     setSelectedPlan(plan);
     setShowConfirm(true);
@@ -546,14 +548,14 @@ const showError = (name) => {
                 {plans[billingCycle].map((plan) => {
                   if(plan.billing_cycle === false || plan.billing_cycle === billingCycle){
                     
-                    const finalPricePerUser = getDiscountedPrice(plan);
-                    const baseAmount = plan.pricePerUser * members
-                    const total = finalPricePerUser * members;
-                     let months = 1;
-                    if (billingCycle === "quarterly") months = 3;
-                    if (billingCycle === "yearly") months = 12;
-                    const savedAmount = (baseAmount - total) * months;
-                    const totalCostForPeriod = total * months;
+                    const finalPricePerUser = plan.pricePerUser;//getDiscountedPrice(plan);
+                const baseAmount = plan.originalPrice * members
+                const total = finalPricePerUser * members;
+                let months = 1;
+                if (billingCycle === "quarterly") months = 3;
+                if (billingCycle === "yearly") months = 12;
+                const savedAmount = (baseAmount - total) * months;
+
 
                     return (
                       <Col key={plan.id} md={4}>
@@ -593,7 +595,7 @@ const showError = (name) => {
                                   </div> 
                                 </>
                             }
-                            {(plan.id !== 'free' && billingCycle !== 'monthly') && (
+                            {/*(plan.id !== 'free' && billingCycle !== 'monthly') && (
                             <div className="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                                 <div className="text--small mb-1 text-uppercase">Your Total Cost</div>
                                 <ListGroup>
@@ -617,7 +619,7 @@ const showError = (name) => {
                                   </>
                                 
                             </div>)
-                            }
+                           */ }
                             {plan.id !== 'free' ?
                               <>
                                 
@@ -747,7 +749,7 @@ const showError = (name) => {
                         ? "Annual Payment (Billed Once a Year)"
                         : billingCycle === "quarterly"
                         ? "Quarterly Payment (Billed Every 3 Months)"
-                        : "Monthly Payment"
+                        : "Monthly Payment (Billed Every Month)"
                       }
                     </p>
                   </ListGroup.Item>
@@ -778,7 +780,7 @@ const showError = (name) => {
                 <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
                 <ListGroup>
                  <ListGroup.Item>
-                    <small>Discounted price per user</small>
+                    <small>{billingCycle === 'monthly' ? 'Regular': 'Discounted'} price per user</small>
                     <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
                       <span>₹{priceDetails.pricePerUser.toFixed(0)}/user/month</span>
                     </p>
@@ -790,33 +792,36 @@ const showError = (name) => {
                     </p>
                   </ListGroup.Item>
                 </ListGroup>
-                {priceDetails.discountPercent > 0 && (
+                {/*priceDetails.discountPercent > 0 && (
                   <div className="discount--offer rounded p-2 bg-warning-subtle my-3">
                     <small>{priceDetails.discountPercent}% Limited Offer Discount</small>
                     <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
                       <span>₹{priceDetails.originalPrice.toFixed(0)} ×{" "}{priceDetails.discountPercent} </span> <strong className="display-8">= ₹{(priceDetails.pricePerUser).toFixed(0)}</strong>
                     </p>
                   </div>
-                )}
+                )*/}
                 {billingCycle === "yearly" || billingCycle === "quarterly" ?
                 <>
                   <div className="annual--cost rounded p-3 bg-warning mt-3 mb-3">
                     <h6 className="fw-bold mb-2 text-uppercase">{billingCycle} COST BREAKDOWN</h6>
                     <div className="d-flex align-items-center justify-content-between gap-3 bg-white p-3 rounded fw-normal border border-warning">
+                      <span className="text--small">{billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} calculation</span>
                       <p className="mb-0">
                         {billingCycle === "yearly"
-                        ? `₹${(priceDetails.pricePerUser).toFixed(0)}/month × 12 months`
+                        ? `₹${(priceDetails.pricePerUser * members).toFixed(0)}/month × 12 months`
                         : billingCycle === "quarterly"
                         ? `₹${(
-                            priceDetails.pricePerUser
+                            priceDetails.pricePerUser * members
                           ).toFixed(0)}/month × 3 months`
                         : `₹${(
-                          priceDetails.pricePerUser
+                          priceDetails.pricePerUser * members
                         ).toFixed(0)}/month × 1 month`}
                       </p>
                       <p className="fw-bold display-8 mb-0">
-                        = ₹{priceDetails.pricePerUser.toFixed(0) * (billingCycle === 'quarterly' ? 3 : 12)}
+                        = ₹{priceDetails.pricePerUser.toFixed(0) * members * (billingCycle === 'quarterly' ? 3 : 12)}
                       </p>
+                      <p className="text--small">Total {billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} Payment</p>
+                      <div className="text--large mb-0">₹{priceDetails.pricePerUser.toFixed(0) * members * (billingCycle === 'quarterly' ? 3 : 12)}</div>
                     </div>
                   </div>
                   
@@ -824,8 +829,8 @@ const showError = (name) => {
                     <div className="text--small mb-1 text-uppercase">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
                     <div className="text-slate-600 mt-1">
                      
-                    ₹{(priceDetails.pricePerUser).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
-                    {(priceDetails.pricePerUser * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
+                    ₹{((priceDetails.originalPrice - priceDetails.pricePerUser) *  members).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
+                    {(((priceDetails.originalPrice - priceDetails.pricePerUser) ) *  members * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
                   </div>
                     <div className="text--large mb-0">₹{priceDetails.totalSavings.toFixed(0)}</div>
                   </div>}

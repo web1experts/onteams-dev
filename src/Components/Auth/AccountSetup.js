@@ -95,7 +95,8 @@ function AccountSetup() {
             setErrors(fieldErrors);
         } else {
             if (!fields.agree) {
-                alert("Please agree to the Terms & Conditions");
+                addToast("Please agree to the Terms & Conditions", 'danger');
+                
                 return;
             }
             setLoader(true)
@@ -164,7 +165,7 @@ function AccountSetup() {
                                                 
                                             />
                                              <label className="form-check-label">
-                                                I agree to the <a href="#" target="_blank" rel="noreferrer">Terms & Conditions</a>
+                                                I agree to the <a href="https://primeteams.ai/terms-and-conditions/" target="_blank" rel="noreferrer">Terms & Conditions</a>
                                             </label>
                                         </div>
                                         <Button variant="primary" type="submit" disabled={loader}>{loader ? 'Please wait...' : 'Setup Account' }</Button>
