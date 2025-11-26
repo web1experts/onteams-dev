@@ -1718,16 +1718,17 @@ const formattedDate = (date) => {
                           </Col>
                         </Row>
                         
-                          { memberProfile?.role?.slug === 'owner' || memberProfile?.permissions?.reports?.view_others && memberProfile?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.permissions?.reports?.selected_members.includes(singleMemberReport?.member?._id) || memberdata?._id === singleMemberReport?.member?._id ?
-              
+                        { memberProfile?.role?.slug === 'owner' || memberProfile?.permissions?.reports?.view_others && memberProfile?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.permissions?.reports?.selected_members.includes(singleMemberReport?.member?._id) || memberdata?._id === singleMemberReport?.member?._id ?
                           <Row>
-                              <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
+                            <Col sm={12}>
+                              <div className="border-top pt-3 mt-3">
                                 <Button variant="primary" onClick={() => {setProjectRemarks([]);setremarksActive(true); setSelectedReport(report)}}>View Remarks</Button>
-                                </Col>
-                              </Row>
-                              :
-                              <></>
-                            }
+                              </div>
+                            </Col>
+                          </Row>
+                          :
+                          <></>
+                        }
                         
                       </div>
                     </div>
@@ -1845,12 +1846,14 @@ const formattedDate = (date) => {
                               || memberdata?._id === member?._id ?
 
                               <Row>
-                                <Col sm={12} className="mb-4 border-top border-bottom pt-3 pb-3 bg-light">
-                                  <Button variant="primary" onClick={() => {setProjectRemarks([]);setremarksActive(true); setSelectedReport(member)}}>View Remarks</Button>
-                                  </Col>
-                                </Row>
-                                :
-                                <></>
+                                <Col sm={12}>
+                                  <div className="border-top pt-3 mt-3">
+                                    <Button variant="primary" onClick={() => {setProjectRemarks([]);setremarksActive(true); setSelectedReport(member)}}>View Remarks</Button>
+                                  </div>
+                                </Col>
+                              </Row>
+                              :
+                              <></>
                             }
                           
                         </div>

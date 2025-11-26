@@ -379,8 +379,6 @@ useEffect(() => {
                                   attendanceStatus?.map((status, idx) => {
                                     const rgbaBorder = hexToRgba(status?.color, 0.4);
                                     const rgbaBg = hexToRgba(status?.color, 0.1);
-                                    
-
                                     return (
                                       <th key={idx} className="text-center p-0" style={{color: status.color,backgroundColor: rgbaBg}}>
                                         <div className="padd--x" style={{ borderRight: `1px solid ${rgbaBorder}`, borderBottom: `1px solid ${rgbaBorder}`}}>
@@ -461,7 +459,7 @@ useEffect(() => {
 
                                                 {
                                                   (atten?.total_time !== '--') &&
-                                                  <strong>{ atten?.total_time }</strong>
+                                                  <small className="d-block mt-1 fw-semibold">{ atten?.total_time }</small>
                                                 }
                                                 
                                                 {/* <strong><BsDash /></strong> Replace '--' with this icon */}

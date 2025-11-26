@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Card, Button, Row, Col, Form, Badge, Collapse, Modal } from "react-bootstrap";
+import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from "react-bootstrap";
 import { FiUsers, FiCalendar, FiCheck, FiSave, FiCreditCard } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { updateSubscription, saveAuthorization, getActiveSubscription } from "../../redux/actions/subscription.action";
@@ -260,220 +260,228 @@ export default function ManagePlan() {
 
   return (
     <>
-      <div className="rounded--box p-4">
-        <h2 className="fw-bold mb-1">Manage Your Plan <a className="fs-6" href="/plan-details">View Active Subscription</a></h2>
-        <p>Upgrade, downgrade, or adjust your team size</p>
-        <div className="bg-white rounded-4 shadow border p-4 mb-4">
-          <h4 className="text-xl fw-bold mb-4">Number of Team Members</h4>
-          <Form>
-            <Form.Group className="d-flex align-items-center gap-3">
-              <Form.Label className="d-inline-flex align-items-center gap-2 form-label w-auto mb-0"><FiUsers /> Team Members</Form.Label>
-              <Form.Control type="number" className="w-50 flex-grow-1" min='1' value={teamMembers} onChange={(e) => setTeamMembers(Number(e.target.value))}/>
-              <Button type="submit" variant="primary">Update Members</Button>
-            </Form.Group>
-          </Form>
-        </div>
-        {/* Plan Selection */}
-        <div className="bg-white rounded-4 shadow border p-4 mb-4">
-          <h4 className="text-xl fw-bold mb-4">Choose Your Plan & Price Summary</h4>
-          <h6 className="fw-bold mb-2">Choose Your Plan</h6>
-          <Row className="mb-4">
-            {plans[billingCycle].map((plan) => (
-              <Col key={plan.name} md={4} className="mb-3">
-                <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card" : "modal--plan--card"}`}
-                  onClick={() => setSelectedPlan(plan)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <Card.Body className="p-0">
-                    {plan.discount > 0 && (
-                      <Badge bg="success" pill className="mb-2">
-                        {plan.discount}% OFF
-                      </Badge>
-                    )}
-                    <Card.Title>{plan.name}</Card.Title>
-                    <Card.Text className="small">
-                      {plan.limit
-                        ? `Free for up to ${plan.limit} members`
-                        : "Unlimited Team Members"}
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-          {/* Billing Cycle */}
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold mb-2 d-inline-flex align-items-center gap-2"><FiCalendar /> Billing Cycle</Form.Label>
-            <Form.Select value={billingCycle} onChange={(e) => setBillingCycle(e.target.value)}>
-              <option value="monthly">Monthly</option>
-              <option value="quarterly">Quarterly (Save 20%)</option>
-              <option value="yearly">Yearly (Save 40%)</option>
-            </Form.Select>
-          </Form.Group>
-          {/* Price Summary */}
-          <Card className="p-0 border-0 mb-4 summary--card flex-column">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <Card.Title className="fw-bold mb-0">Price Summary</Card.Title>
-              <Button variant="link" size="sm" className="text-decoration-none px-3 py-1 border-0" onClick={() => setShowFeatures((prev) => !prev)}>
-                {showFeatures ? (
-                  <>
-                    <span>Hide Features</span>
-                    <FaChevronUp />
-                  </>
-                ) : (
-                  <>
-                    <span>View Features</span>
-                    <FaChevronDown />
-                  </>
-                )}
-              </Button>
-            </div>
-            <Card.Body className="p-0">
-              {/* Collapsible Feature List */}
-              <Collapse in={showFeatures}>
-                <div className="mb-3 border-bottom pb-3">
-                  <h5 className="text-slate-700 text-uppercase fw-bold">Plan Features</h5>
-                  <ul>
-                    {selectedPlanData?.features.map((feature, idx) => (
-                      <li className="d-flex align-items-center gap-2" key={idx}><FiCheck /> {feature}</li>
+      <div className="team--page manage--page">
+        <div className="page--wrapper py-5 pt-5 text-start h-100">
+          <Container>
+            <Row className="justify-content-center">
+              <Col md={10} lg={8}>
+                <h2 className="fw-bold mb-1 d-flex align-items-center">Manage Your Plan <a className="fs-6 ms-auto" href="/plan-details">View Active Subscription</a></h2>
+                <p>Upgrade, downgrade, or adjust your team size</p>
+                <div className="bg-white rounded-4 shadow border p-4 mb-4">
+                  <h4 className="text-xl fw-bold mb-4">Number of Team Members</h4>
+                  <Form>
+                    <Form.Group className="d-flex align-items-center gap-3">
+                      <Form.Label className="d-inline-flex align-items-center gap-2 form-label w-auto mb-0"><FiUsers /> Team Members</Form.Label>
+                      <Form.Control type="number" className="w-50 flex-grow-1" min='1' value={teamMembers} onChange={(e) => setTeamMembers(Number(e.target.value))}/>
+                      <Button type="submit" variant="primary">Update Members</Button>
+                    </Form.Group>
+                  </Form>
+                </div>
+                {/* Plan Selection */}
+                <div className="bg-white rounded-4 shadow border p-4 mb-4">
+                  <h4 className="text-xl fw-bold mb-4">Choose Your Plan & Price Summary</h4>
+                  <h6 className="fw-bold mb-2">Choose Your Plan</h6>
+                  <Row className="mb-4">
+                    {plans[billingCycle].map((plan) => (
+                      <Col key={plan.name} md={4} className="mb-3">
+                        <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
+                          onClick={() => setSelectedPlan(plan)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <Card.Body className="p-0">
+                            {plan.discount > 0 && (
+                              <Badge bg="success" pill className="mb-2">
+                                {plan.discount}% OFF
+                              </Badge>
+                            )}
+                            <Card.Title>{plan.name}</Card.Title>
+                            <Card.Text className="small">
+                              {plan.limit
+                                ? `Free for up to ${plan.limit} members`
+                                : "Unlimited Team Members"}
+                            </Card.Text>
+                          </Card.Body>
+                        </Card>
+                      </Col>
                     ))}
-                  </ul>
+                  </Row>
+                  {/* Billing Cycle */}
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-bold mb-2 d-inline-flex align-items-center gap-2"><FiCalendar /> Billing Cycle</Form.Label>
+                    <Form.Select value={billingCycle} onChange={(e) => setBillingCycle(e.target.value)}>
+                      <option value="monthly">Monthly</option>
+                      <option value="quarterly">Quarterly (Save 20%)</option>
+                      <option value="yearly">Yearly (Save 40%)</option>
+                    </Form.Select>
+                  </Form.Group>
+                  {/* Price Summary */}
+                  <Card className="p-0 border-0 mb-4 summary--card flex-column">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <Card.Title className="fw-bold mb-0">Price Summary</Card.Title>
+                      <Button variant="link" size="sm" className="text-decoration-none px-3 py-1 border-0" onClick={() => setShowFeatures((prev) => !prev)}>
+                        {showFeatures ? (
+                          <>
+                            <span>Hide Features</span>
+                            <FaChevronUp />
+                          </>
+                        ) : (
+                          <>
+                            <span>View Features</span>
+                            <FaChevronDown />
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <Card.Body className="p-0">
+                      {/* Collapsible Feature List */}
+                      <Collapse in={showFeatures}>
+                        <div className="mb-3 border-bottom pb-3">
+                          <h5 className="text-slate-700 text-uppercase fw-bold">Plan Features</h5>
+                          <ul>
+                            {selectedPlanData?.features.map((feature, idx) => (
+                              <li className="d-flex align-items-center gap-2" key={idx}><FiCheck /> {feature}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </Collapse>
+
+                      <div>
+                        <div className="mb-2 d-flex align-items-center justify-content-between gap-3">
+                          <p className="mb-0">Price per user:</p>
+                          <p className="mb-0 text-end">
+                            {selectedPlanData?.price > 0 && (
+                              <small className="text-decoration-line-through d-block">
+                                ₹{selectedPlanData?.price}/month
+                              </small>
+                            )}
+                            <span className="fw-bold d-block">
+                              ₹{discountPrice}/month
+                            </span>
+                          </p>
+                        </div>
+                        <p className="mb-2 d-flex align-items-center justify-content-between gap-3">Number of users: <strong className="text-end">{teamMembers}</strong></p>
+                        {/* <div className="bg-gradient-primary p-3 mb-3 rounded-3">
+                            <div className="text--small mb-1 text-uppercase">You Save in 1 Year</div>
+                            <div className="text--large display-8">₹{totalSavings.toLocaleString()}</div>
+                        </div> */}
+                        {/* <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fw-bold border-bottom pb-3">
+                          Total per {billingCycle}: <strong className="display-6 fw-bold text-end">₹{totalPerCycle.toLocaleString()}</strong>
+                        </p> */}
+                        <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
+                          Total for 1{" "}
+                          {billingCycle === "yearly"
+                            ? "year"
+                            : billingCycle === "quarterly"
+                              ? "quarter"
+                              : "month"}
+                          : <strong className="text-end">₹{totalPerCycle.toLocaleString()}</strong>
+                        </p>
+                      </div>
+                    </Card.Body>
+                  </Card>
                 </div>
-              </Collapse>
-
-              <div>
-                <div className="mb-2 d-flex align-items-center justify-content-between gap-3">
-                  <p className="mb-0">Price per user:</p>
-                  <p className="mb-0 text-end">
-                    {selectedPlanData?.price > 0 && (
-                      <small className="text-decoration-line-through d-block">
-                        ₹{selectedPlanData?.price}/month
-                      </small>
-                    )}
-                    <span className="fw-bold d-block">
-                      ₹{discountPrice}/month
-                    </span>
-                  </p>
+                <Button variant="primary" disabled={loading} size="lg" className="w-100 fw-semibold" onClick={() => handleConfirm()}>
+                  {loading ? 'Please wait...' : 'Update Plan'}
+                </Button>
+                <div className="bg-white rounded-4 shadow border p-4 mb-4 border-danger mt-4">
+                  <h5 className="fw-bold text-danger mb-3">Danger Zone</h5>
+                  <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
+                  <Button variant="danger" className="w-100 fw-bold">Cancel Subscription</Button>
                 </div>
-                <p className="mb-2 d-flex align-items-center justify-content-between gap-3">Number of users: <strong className="text-end">{teamMembers}</strong></p>
-                {/* <div className="bg-gradient-primary p-3 mb-3 rounded-3">
-                    <div className="text--small mb-1 text-uppercase">You Save in 1 Year</div>
-                    <div className="text--large display-8">₹{totalSavings.toLocaleString()}</div>
-                </div> */}
-                {/* <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fw-bold border-bottom pb-3">
-                  Total per {billingCycle}: <strong className="display-6 fw-bold text-end">₹{totalPerCycle.toLocaleString()}</strong>
-                </p> */}
-                <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
-                  Total for 1{" "}
-                  {billingCycle === "yearly"
-                    ? "year"
-                    : billingCycle === "quarterly"
-                      ? "quarter"
-                      : "month"}
-                  : <strong className="text-end">₹{totalPerCycle.toLocaleString()}</strong>
-                </p>
-              </div>
-            </Card.Body>
-          </Card>
+                <Form className="bg-white rounded-4 shadow border p-4">
+                  <div className="d-flex align-items-center gap-3 mb-4">
+                    <div className="bg-primary rounded-4 d-flex align-items-center justify-content-center billing--title--icon"><FiCreditCard /></div>
+                    <div className="billing--title">
+                      <h4 className="fw-bold mb-1">Billing Information</h4>
+                      <p className="mb-0">Manage your billing and payment details</p>
+                    </div>
+                  </div>
+                  <Row className="mb-3">
+                    <Form.Group as={Col} md="12">
+                      <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control type="text" name="fullName" value='Rakesh Kumar' required/>
+                    </Form.Group>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Form.Group>
+                      <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
+                      <Row>
+                        <Col className="d-flex align-items-center gap-3">
+                          <Form.Select disabled className="w-auto pe-5">
+                            <option>+91</option>
+                          </Form.Select>
+                          <Form.Control type="tel" name="phone" value='9876543210' required/>
+                        </Col>
+                      </Row>
+                    </Form.Group>
+                  </Row>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="address1"
+                      value='123 MG Road, Koramangala'
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Address Line 2</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="address2"
+                      value='Near Metro Station'
+                    />
+                  </Form.Group>
+
+                  <Row className="mb-3">
+                    <Form.Group as={Col} md="4">
+                      <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="city"
+                        value='Bangalore'
+                        required
+                      />
+                    </Form.Group>
+                    <Form.Group as={Col} md="4">
+                      <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="state"
+                        value='Karnataka'
+                        required
+                      />
+                    </Form.Group>
+                    <Form.Group as={Col} md="4">
+                      <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="postal"
+                        value='560034'
+                        required
+                      />
+                    </Form.Group>
+                  </Row>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
+                    <Form.Select name="country" required>
+                      <option selected>India</option>
+                      <option>United States</option>
+                      <option>United Kingdom</option>
+                      <option>Canada</option>
+                    </Form.Select>
+                  </Form.Group>
+
+                  <Button variant="primary" className="w-100 mt-4 d-flex align-items-center justify-content-center gap-2 fw-bold"><FiSave /> Save Billing Information</Button>
+                </Form>
+              </Col>
+            </Row>
+          </Container>
         </div>
-        <Button variant="primary" disabled={loading} size="lg" className="w-100 fw-semibold" onClick={() => handleConfirm()}>
-          {loading ? 'Please wait...' : 'Update Plan'}
-        </Button>
-        <div className="bg-white rounded-4 shadow border p-4 mb-4 border-danger mt-4">
-          <h5 className="fw-bold text-danger mb-3">Danger Zone</h5>
-          <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
-          <Button variant="danger" className="w-100 fw-bold">Cancel Subscription</Button>
-        </div>
-        <Form className="bg-white rounded-4 shadow border p-4">
-          <div className="d-flex align-items-center gap-3 mb-4">
-            <div className="bg-primary rounded-4 d-flex align-items-center justify-content-center billing--title--icon"><FiCreditCard /></div>
-            <div className="billing--title">
-              <h4 className="fw-bold mb-1">Billing Information</h4>
-              <p className="mb-0">Manage your billing and payment details</p>
-            </div>
-          </div>
-          <Row className="mb-3">
-            <Form.Group as={Col} md="12">
-              <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
-              <Form.Control type="text" name="fullName" value='Rakesh Kumar' required/>
-            </Form.Group>
-          </Row>
-
-          <Row className="mb-3">
-            <Form.Group>
-              <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-              <Row>
-                <Col className="d-flex align-items-center gap-3">
-                  <Form.Select disabled className="w-auto pe-5">
-                    <option>+91</option>
-                  </Form.Select>
-                  <Form.Control type="tel" name="phone" value='9876543210' required/>
-                </Col>
-              </Row>
-            </Form.Group>
-          </Row>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
-            <Form.Control
-              type="text"
-              name="address1"
-              value='123 MG Road, Koramangala'
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Address Line 2</Form.Label>
-            <Form.Control
-              type="text"
-              name="address2"
-              value='Near Metro Station'
-            />
-          </Form.Group>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} md="4">
-              <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
-              <Form.Control
-                type="text"
-                name="city"
-                value='Bangalore'
-                required
-              />
-            </Form.Group>
-            <Form.Group as={Col} md="4">
-              <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
-              <Form.Control
-                type="text"
-                name="state"
-                value='Karnataka'
-                required
-              />
-            </Form.Group>
-            <Form.Group as={Col} md="4">
-              <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
-              <Form.Control
-                type="text"
-                name="postal"
-                value='560034'
-                required
-              />
-            </Form.Group>
-          </Row>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
-            <Form.Select name="country" required>
-              <option selected>India</option>
-              <option>United States</option>
-              <option>United Kingdom</option>
-              <option>Canada</option>
-            </Form.Select>
-          </Form.Group>
-
-          <Button variant="primary" className="w-100 mt-4 d-flex align-items-center justify-content-center gap-2 fw-bold"><FiSave /> Save Billing Information</Button>
-        </Form>
       </div>
       <Modal show={showConfirm} onHide={handleCloseConfirm} centered size="lg">
         <Modal.Header closeButton>

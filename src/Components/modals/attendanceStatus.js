@@ -395,7 +395,7 @@ if (endMinutes - startMinutes < 1) {
         <Modal.Header className="pb-0">
           <Modal.Title>{EditIndex !== false ? "Edit Rule" : "Add New Rule"}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="overflow-visible">
           <Form onSubmit={handleSubmit}>
             {
               Object.keys(errors).length > 0 ?

@@ -3288,7 +3288,7 @@ const ymd = (dateLike) => {
             </strong>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="overflow-visible">
           <div className="new--entry">
             <div className="d-flex align-items-center justify-content-between mb-3">
               <h4>Added Entries ({entries?.length || 0})</h4>

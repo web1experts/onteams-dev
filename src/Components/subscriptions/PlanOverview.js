@@ -123,7 +123,7 @@ const PlanOverview = () => {
                     <div className="d-flex gap-2 align-items-end flex-column">
                       <h6 className="mb-0 fw-bold text-uppercase">Price per Member</h6>
                       <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
-                        <span>free </span>
+                        <span>FREE </span>
                       </h3>
                     </div>
                   </Card.Header>
@@ -193,7 +193,7 @@ const PlanOverview = () => {
                   }
 
                   <div className="text-center">
-                    <Button variant="primary" className="px-4 w-100 fw-bold py-3"><FiSettings /> Manage Plan</Button>
+                    <Button variant="primary" href="/manage-plan" className="px-4 w-100 fw-bold py-3"><FiSettings /> Manage Plan</Button>
                   </div>
                   {/* <div className="mt-4 bg-amber rounded-4 p-4">
                     <div className="d-flex align-items-start gap-3">
