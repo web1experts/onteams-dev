@@ -521,7 +521,7 @@ const showError = (name) => {
   return (
     <>
       <div className="team--page subscription--page">
-        <div className="page--wrapper py-5 pt-5 text-center">
+        <div className="page--wrapper py-5 pt-5 text-center h-100">
           {spinner ? (
             <div className="loading-bar">
               <img src="images/OnTeam-icon-gray.png" className="flipchar" />
@@ -1046,7 +1046,7 @@ const showError = (name) => {
                               </Form.Group>
               
                               <div className="p-3 border rounded bg-white" style={{ fontSize: "0.9rem" }}>
-                                <Form.Group className="form-group">
+                                <Form.Group className="form-group pb-0">
                                   <Form.Check
                                     type="checkbox"
                                     name="agree"

@@ -188,7 +188,7 @@ function Workspace(props) {
         <Modal.Header closeButton>
           <Modal.Title>Create a Workspace</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="overflow-visible">
           <WorkspaceForm editworkspace={editworkspace} />
         </Modal.Body>
       </Modal>

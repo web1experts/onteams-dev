@@ -515,7 +515,7 @@ function HolidaysPage() {
             </strong>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="overflow-visible">
           <Form onSubmit={handleSubmit}>
             <Form.Group className="form-group">
               <DatePicker

@@ -731,7 +731,7 @@ function DashboardPage() {
                                     className="text-muted d-block"
                                     style={{ fontSize: "0.875rem" }}
                                   >
-                                    • {dayjs(post.createdAt).fromNow()}
+                                    {dayjs(post.createdAt).fromNow()}
                                   </span>
                                 </strong>{" "}
                                 {memberdata?._id === post.author?._id && (
@@ -760,7 +760,7 @@ function DashboardPage() {
                                   {post.post_type === "text" && (
                                     <>
                                       {post.title && <h5>{post.title}</h5>}
-                                      <p>{post.content}</p>
+                                      <pre>{post.content}</pre>
                                     </>
                                   )}
 
@@ -785,12 +785,9 @@ function DashboardPage() {
                                   {post.post_type === "quote" && (
                                     <blockquote className="blockquote p-3 rounded mt-3">
                                       <LuQuote className="me-2" />
-                                      <p
-                                        className="mb-0"
-                                        style={{ fontStyle: "italic" }}
-                                      >
+                                      <pre className="mb-0" style={{ fontStyle: "italic" }}>
                                         {post.content}
-                                      </p>
+                                      </pre>
                                       {post?.quoteAuthor && (
                                         <p>
                                           <strong>- {post.quoteAuthor}</strong>
