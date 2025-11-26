@@ -64,6 +64,7 @@ import {
 } from "../../helpers/commonfunctions";
 import CommentThread from "../common/CommentThread";
 import API from "../../helpers/api";
+import { useDropzone } from 'react-dropzone'
 
 dayjs.extend(relativeTime);
 function DashboardPage() {
@@ -90,6 +91,7 @@ function DashboardPage() {
     content: "",
     files: [],
   });
+  // const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
   const handleClose = () => {
     setFields({
       type: "text",

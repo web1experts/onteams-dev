@@ -216,15 +216,17 @@ function HolidaysPage() {
   };
 
   const getDaysLeft = (date) => {
-    const today = dayjs();
-    const target = dayjs(date);
+    const today = dayjs().startOf("day");
+    const target = dayjs(date).startOf("day");
     const diff = target.diff(today, "day");
-    return diff >= 0 ? (
-      `${diff} days left`
-    ) : (
-      <span className="text-muted">Past Holiday</span>
-    );
+
+    if (diff < 0) {
+      return <span className="text-muted">Past Holiday</span>;
+    }
+
+    return diff === 1 ? `1 day left` : `${diff} days left`;
   };
+
 
   return (
     <>

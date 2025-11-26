@@ -794,7 +794,9 @@ const ymd = (dateLike) => {
    
   };
 
-  
+  useEffect(() =>{
+      console.log('current Activity:: ', currentActivity)
+    },[currentActivity])
 
   useEffect(() => {
     refreshSocket();
@@ -884,6 +886,8 @@ const ymd = (dateLike) => {
 
       // handleLiveActivityList() if required
     });
+
+    
 
     socket.on("offer", function (id, description, roomId) { 
       if (peerConnections[id]) {

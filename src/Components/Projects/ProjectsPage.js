@@ -2287,7 +2287,7 @@ function ProjectsPage() {
                                 colSpan={9}
                                 className="text-center"
                               >
-                                <h2 className="mt-2 text-center">
+                                <h2 className="mt-2 text-center py-3">
                                   No Projects Found
                                 </h2>
                               </td>
@@ -2301,7 +2301,7 @@ function ProjectsPage() {
                 !spinner &&
                 projects &&
                 projects.length === 0) && (
-                  <div className="text-center">
+                  <div className="mt-2 text-center py-3">
                     <h2>No Projects Found</h2>
                   </div>
                 )}
