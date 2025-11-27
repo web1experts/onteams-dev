@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, act } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import {Tabs, Tab} from 'react-bootstrap';
 import {useNavigate} from "react-router-dom";
 import {
   Button,
@@ -31,6 +32,7 @@ import { getFieldRules, validateField } from "../../helpers/rules";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import ManagePlan from "../subscriptions/ManagePlan";
 import { currentMemberProfile } from "../../helpers/auth";
+import PlanOverview from "../subscriptions/PlanOverview";
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function EditableField({
   field,
@@ -358,7 +360,6 @@ function SettingPage(props) {
               memberProfile?.role?.slug === "owner" ?
                 currentSubscription === null || currentSubscription?.status === 'active' && currentSubscription?.planId === 'trial' || currentSubscription?.status === 'active' && currentSubscription?.planId === 'free' ? 
                   <ListGroup.Item
-                  
                     onClick={() => {
                       if(props.close){
                         props.close()
@@ -528,7 +529,16 @@ function SettingPage(props) {
         )}
         {
           activeTab === "billing" && (
-            <ManagePlan />
+            <div className="manage__plan__tabs rounded--box p-4">
+              <Tabs defaultActiveKey="manage" id="manage-plans-tab">
+                <Tab eventKey="manage" title="Manage Plan">
+                  <ManagePlan />
+                </Tab>
+                <Tab eventKey="planDetails" title="Plan Details">
+                  <PlanOverview />
+                </Tab>
+              </Tabs>
+            </div>
           )
         }
         {

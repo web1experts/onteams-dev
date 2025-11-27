@@ -146,7 +146,7 @@ const PlanOverview = () => {
                   {activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial' ?
                     <Row className="mb-3">
                       <Col>
-                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
+                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm h-100">
                           <div className="status--title d-flex align-items-center gap-2 mb-3">
                             <span className="status--icon status--icon--blue"><FiUsers /></span>
                             <p className="mb-0 fw-semibold">Team Size</p>
@@ -157,9 +157,9 @@ const PlanOverview = () => {
                       
                     </Row>
                     :
-                        <Row className="mb-3">
+                    <Row className="mb-3">
                       <Col>
-                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
+                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm h-100">
                           <div className="status--title d-flex align-items-center gap-2 mb-3">
                             <span className="status--icon status--icon--blue"><FiUsers /></span>
                             <p className="mb-0 fw-semibold">Team Size</p>
@@ -168,7 +168,7 @@ const PlanOverview = () => {
                         </div>
                       </Col>
                       <Col>
-                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
+                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm h-100">
                           <div className="status--title d-flex align-items-center gap-2 mb-3">
                             <span className="status--icon status--icon--green"><FiCalendar /></span>
                             <p className="mb-0 fw-semibold">Billing Cycle</p>
@@ -177,7 +177,7 @@ const PlanOverview = () => {
                         </div>
                       </Col>
                       <Col>
-                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm">
+                        <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm h-100">
                           <div className="status--title d-flex align-items-center gap-2 mb-3">
                             <span className="status--icon status--icon--grey"><FiClock /></span>
                             <p className="mb-0 fw-semibold">Next Billing</p>

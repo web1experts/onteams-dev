@@ -2162,7 +2162,7 @@ span.open--sidebar {
   margin-top: -150px;
 }
 
-.rounded--box .card .card--img label,
+.rounded--box .card .card--img label .card-img-top,
 .team-members--page .rounded--box .card img.card-img-top {
   max-width: 220px;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
@@ -9865,7 +9865,7 @@ Media CSS-=-==
     margin-bottom: 0;
   }
 
-  .rounded--box .card .card--img label,
+  .rounded--box .card .card--img label .card-img-top,
   .team-members--page .rounded--box .card img.card-img-top {
     max-width: 100%;
     min-width: 100%;

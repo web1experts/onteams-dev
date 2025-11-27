@@ -481,8 +481,60 @@ span.form-error {
     height: 100%;
 }
 
+.setting__modal .team--page {
+    max-width: 100%;
+    margin-left: 0;
+}
+
+.setting__modal .page--wrapper .nav-tabs {
+    border: 0;
+    margin-bottom: 0;
+    justify-content: center;
+}
+
 .setting__modal .setting--page .form-floating>label {
     display: none;
+}
+
+.setting__modal .page--wrapper .col-lg-8, .setting__modal .page--wrapper .col-md-10 {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.setting__modal .page--wrapper .nav-tabs button {
+    border: 1px solid rgba(var(--theme-secondary), 1);
+    color: rgb(17 24 39);
+    height: auto;
+    padding: 10px 20px;
+    width: auto;
+}
+
+.setting__modal .setting--page .manage__plan__tabs .card {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    flex-flow: column wrap;
+}
+
+.setting__modal .setting--page .manage__plan__tabs .modal--plan--card {
+    background: none;
+    border-radius: .75rem;
+    border: 2px solid rgba(0, 0, 0, .14);
+}
+
+.setting__modal .setting--page .manage__plan__tabs .modal--plan--card--active {
+    border: 2px solid rgba(var(--theme-primary), .5);
+    text-align: center;
+    background: linear-gradient(145deg, rgba(var(--theme-primary), .2), rgba(var(--theme-secondary), .05));
+}
+
+.setting__modal .setting--page .rounded--box .modal--plan--card .card-title {
+    font-size: 1.25rem;
+    margin-bottom: .25rem;
+}
+
+.setting__modal .page--wrapper .nav-tabs button.active, .setting__modal .page--wrapper .nav-tabs button:hover {
+    border: 1px solid rgba(var(--theme-secondary), 1);
 }
 
 .file--preview--modal .modal-dialog {
