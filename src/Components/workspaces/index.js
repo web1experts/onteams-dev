@@ -14,12 +14,17 @@ import { getMemberdata } from "../../helpers/commonfunctions";
 import { deleteWorkspace, leaveCompany } from "../../redux/actions/workspace.action";
 import Spinner from 'react-bootstrap/Spinner';
 import { BsTrash2, BsEye } from "react-icons/bs";
+import { getActiveSubscription } from "../../redux/actions/subscription.action";
+import { useNavigate } from "react-router-dom";
 function Workspace(props) {
   const [spinner, setSpinner] = useState( true)
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
   const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true));
   const commonState = useSelector(state => state.common)
+  const subscriptionState = useSelector((state) => state.subscription);
+  const [activeSubscription, setActiveSubscription] = useState(null)
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const currentMember = getMemberdata();
   const currentUser = getloggedInUser();
   
@@ -49,6 +54,9 @@ function Workspace(props) {
   useEffect(() => {
     setSpinner( true )
     handleworkspacelist()
+    
+    dispatch(getActiveSubscription())
+    
   },[])
 
   useEffect(() => {
@@ -56,6 +64,13 @@ function Workspace(props) {
       setWorkspaces( workspacefeed )
     }
   },[workspacefeed])
+
+  useEffect(() => {
+    
+    if(subscriptionState.activeSubscription){
+      setActiveSubscription(subscriptionState.activeSubscription) 
+    }
+  }, [subscriptionState.activeSubscription])
 
   useEffect(() => {
     if( workspace.message && workspace.message_variant && workspace.message_variant === "success"){
@@ -107,7 +122,17 @@ function Workspace(props) {
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
                         <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
-                        <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                        <ListGroup.Item className="btn btn-primary" onClick={() => {
+                          if (
+                            activeSubscription?.planId === 'free' &&
+                            (workspaces?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+                            workspaces?.length
+                          ) {
+                            navigate('/subscription-plans', { replace: true });
+                          } else {
+                            handleShow();
+                          }
+                          }}><FaPlus /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>

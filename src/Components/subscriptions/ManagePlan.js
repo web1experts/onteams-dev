@@ -101,7 +101,7 @@ export default function ManagePlan() {
   };
 
   const handleProceedToPayment = () => {
-
+    setLoading(true)
     updatePlan(); // your existing function
   };
 

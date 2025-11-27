@@ -236,10 +236,6 @@ useEffect(() => {
   }
 }, [subscriptionState.activeSubscription])
 
-useEffect(() => {
-  console.log('activeSubscription:: ', activeSubscription);
-}, [activeSubscription])
-
 
   useEffect(() => {
     if (apiResult.success) {
@@ -940,7 +936,7 @@ useEffect(() => {
                       <ListGroup.Item className="btn btn-primary"  onClick={() => {
                           if (
                             activeSubscription?.planId === 'free' &&
-                            (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity ===
+                            (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
                             invitationsTotal + memberFeeds?.length
                           ) {
                             navigate('/subscription-plans', { replace: true });
