@@ -193,7 +193,7 @@ const PlanOverview = () => {
                   }
 
                   <div className="text-center">
-                    <Button variant="primary" href="/manage-plan" className="px-4 w-100 fw-bold py-3"><FiSettings /> Manage Plan</Button>
+                    <Button variant="primary" href="/manage-plans" className="px-4 w-100 fw-bold py-3"><FiSettings /> Manage Plan</Button>
                   </div>
                   {/* <div className="mt-4 bg-amber rounded-4 p-4">
                     <div className="d-flex align-items-start gap-3">

@@ -35,17 +35,17 @@ const hideSidebarRoutes = [
   if (shouldHideSidebar) {
     return children;
   }
-  const encryptedCompany = localStorage.getItem('current_dashboard');
-    let companyData;
-    if (encryptedCompany && encryptedCompany !== "") {
-        const decryptedCompany = parseIfValidJSON(encryptedCompany);
-        companyData = (decryptedCompany) ? decryptedCompany : null
+  const activesubscription = localStorage.getItem('active_subscription');
+    let active_subscription;
+    if (activesubscription && activesubscription !== "") {
+        const decryptedSubscription = parseIfValidJSON(activesubscription);
+        active_subscription = (decryptedSubscription) ? decryptedSubscription : null
     }else{
       return children;
     }
     
 
-  const localSub = companyData?.subscription;
+  const localSub = active_subscription;
 
   // Helper function: determine if user has active subscription
   const hasActiveSubscription =

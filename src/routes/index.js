@@ -240,13 +240,13 @@ const privateRoutes = [
         component: <PlansPage />,
         route: '/plans'
     },
-    // {
-    //     type: 'page',
-    //     name: 'Manage',
-    //     key: 'MANAGE',
-    //     component: <ManagePlan />,
-    //     route: '/manage-plans'
-    // },
+    {
+        type: 'page',
+        name: 'Manage',
+        key: 'MANAGE',
+        component: <ManagePlan />,
+        route: '/manage-plans'
+    },
     {
         type: 'page',
         name: 'SubscriptionPlans',

@@ -146,8 +146,23 @@ export const updateSubscription = (payload) => {
     } catch (err) {
       errorRequest(err, dispatch);
     }
+  }
 }
- 
+
+export const updateQuantity = (payload) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPutUrl('subscription', '/update-qty', payload)
+      if (response.data && response.data.success) {
+        await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  }
 }
 
 export const getActiveSubscription = () => {

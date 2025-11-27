@@ -3,167 +3,75 @@ import { useDispatch, useSelector } from "react-redux";
 import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from "react-bootstrap";
 import { FiUsers, FiCalendar, FiCheck, FiSave, FiCreditCard } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { updateSubscription, saveAuthorization, getActiveSubscription } from "../../redux/actions/subscription.action";
-
-
+import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails, updateSubscription, updateQuantity } from "../../redux/actions/subscription.action";
+import { plans } from "../../helpers/plans";
+import { useToast } from "../../context/ToastContext";
+import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
 
 export default function ManagePlan() {
   const dispatch = useDispatch()
-  const [plans] = useState(
-      {
-        'monthly':[
-        {
-          id: "free",
-          name: "Free",
-          pricePerUser: 0,
-          disount: 0,
-          billing_cycle: false,
-          members_text: 'Free for up to 3 members',
-          features: [
-            "3 members",
-            "Dedicated support",
-            "Custom features & integrations",
-            "Advanced security",
-          ],
-        },
-        {
-          id: "plan_ReKaLINYJwq8FZ",
-          name: "Pro",
-          pricePerUser: 666,
-          disount: 0,
-          billing_cycle: 'monthly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 5 members",
-            "Basic support",
-            "Access to core features",
-          ],
-        },
-        {
-          id: "plan_ReKagUnhkdX86V",
-          name: "Elite",
-          disount: 0,
-          pricePerUser: 916,
-          billing_cycle: 'monthly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 50 members",
-            "Priority support",
-            "Advanced analytics",
-            "Custom integrations",
-          ],
-        }],
-        'quarterly':[
-          {
-          id: "free",
-          name: "Free",
-          pricePerUser: 0,
-          disount: 0,
-          billing_cycle: false,
-          members_text: 'Free for up to 3 members',
-          features: [
-            "3 members",
-            "Dedicated support",
-            "Custom features & integrations",
-            "Advanced security",
-          ],
-        },
-        {
-          id: "plan_ReKb2o8oIyYuSN",
-          name: "Pro",
-          disount: 20,
-          pricePerUser: 533,
-          billing_cycle: 'quarterly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 50 members",
-            "Priority support",
-            "Advanced analytics",
-            "Custom integrations",
-          ],
-        },{
-        id: "plan_ReKbqwqKZJ4aDz",
-        name: "Elite",
-        disount: 20,
-        pricePerUser: 733,
-        billing_cycle: 'quarterly',
-        members_text: 'Unlimited Team Members',
-        features: [
-          "Up to 50 members",
-          "Priority support",
-          "Advanced analytics",
-          "Custom integrations",
-        ],
-        }],
-        'yearly': [
-          {
-          id: "free",
-          name: "Free",
-          pricePerUser: 0,
-          disount: 0,
-          billing_cycle: false,
-          members_text: 'Free for up to 3 members',
-          features: [
-            "3 members",
-            "Dedicated support",
-            "Custom features & integrations",
-            "Advanced security",
-          ],
-        },{
-          
-          id: "plan_ReKc4NmD60B7rW",
-          name: "Pro",
-          disount: 40,
-          pricePerUser: 400,
-          billing_cycle: 'yearly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 50 members",
-            "Priority support",
-            "Advanced analytics",
-            "Custom integrations",
-          ],
-        },{
-          id: "plan_ReKcjcfoNCmtNY",
-          name: "Elite",
-          disount: 40,
-          pricePerUser: 550,
-          billing_cycle: 'yearly',
-          members_text: 'Unlimited Team Members',
-          features: [
-            "Up to 50 members",
-            "Priority support",
-            "Advanced analytics",
-            "Custom integrations",
-          ],
-        }]
-      }
-    );
+  const addToast = useToast();
+  const [spinner, setSpinner] = useState(true);
+  
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
   const [billingCycle, setBillingCycle] = useState('monthly');
-  const [selectedPlan, setSelectedPlan] = useState({
-    id: "free", name: "Free", price: 0, limit: 3, discount: 0, features: [
-      "3 members",
-      "Dedicated support",
-      "Custom features & integrations",
-      "Advanced security",
-    ],
-  });
-
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [memberFeeds, setMemberFeed] = useState([]);
+  const invitationsFeed = useSelector((state) => state.member.invitations);
+  const [invitationsTotal, setInvitationsTotal] = useState(0)
+  const memberFeed = useSelector((state) => state.member.members);
   const [teamMembers, setTeamMembers] = useState(1);
+  const [ totalmembers, setTotalMembers] = useState(0);
   const [showFeatures, setShowFeatures] = useState(false);
   const [loading, setLoading] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const handleListMember = async () => {
+     
+        await dispatch(Listmembers(1,''));
+        await dispatch(
+          listCompanyinvite(0, 'company')
+        );
+    };
+
   useEffect(() => {
+    setSpinner(true)
     dispatch(getActiveSubscription())
+    handleListMember();
   }, [])
+
+  useEffect(() => {
+    setTeamMembers(totalmembers)
+  },[totalmembers])
+
+  useEffect(() => {
+    if (memberFeed && memberFeed.memberData) {
+      setMemberFeed(memberFeed.memberData);
+      setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
+
+    }
+    setTimeout(() => {
+      setSpinner(false)
+    },800)
+  }, [memberFeed]);
+
+    useEffect(() => {
+      if (invitationsFeed && invitationsFeed.inviteData) {
+        setInvitationsTotal(invitationsFeed.total);
+        setTotalMembers((totalmembers) + invitationsFeed.total || 0);
+      }
+      setTimeout(() => {
+        setSpinner(false)
+      },800)
+    }, [invitationsFeed]);
+  
 
   useEffect(() => {
     if (subscriptionState.activeSubscription) {
       setActiveSubscription(subscriptionState.activeSubscription)
+      setBillingCycle(subscriptionState.activeSubscription?.interval || 'monthly')
       const allPlans = [...plans.monthly, ...plans.quarterly, ...plans.yearly];
 
       const matchedPlan = allPlans.find(plan => plan.id === subscriptionState.activeSubscription.planId);
@@ -174,6 +82,13 @@ export default function ManagePlan() {
       } else {
         console.warn("No matching plan found for plan_id:", subscriptionState.activeSubscription.planId);
       }
+      // const current_dashboard = localStorage.getItem('current_dashboard');
+      
+      // if (current_dashboard) {
+      //   const parsedata = JSON.parse(current_dashboard)
+      //   const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
+        localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
+      // }
     }
   }, [subscriptionState.activeSubscription])
 
@@ -189,6 +104,15 @@ export default function ManagePlan() {
 
     updatePlan(); // your existing function
   };
+
+  const handleQuantitySubmit = (e) => {
+    e.preventDefault()
+    const payload = {
+      quantity: teamMembers,
+      selectedPlan: selectedPlan?.id
+    }
+    dispatch(updateQuantity(payload))
+  }
   const selectedPlanData = useMemo(() => {
     return plans[billingCycle]?.find((p) => p.name === selectedPlan?.name);
   }, [billingCycle, selectedPlan]);
@@ -209,7 +133,9 @@ export default function ManagePlan() {
     dispatch(updateSubscription({
       ...selectedPlan,
       total_count: 12,
-      initial_quantity: teamMembers
+      initial_quantity: teamMembers,
+      billingCycle: billingCycle,
+      name: selectedPlan.plan.name,
     }))
     setLoading(false)
     setShowConfirm(false);
@@ -269,11 +195,24 @@ export default function ManagePlan() {
                 <p>Upgrade, downgrade, or adjust your team size</p>
                 <div className="bg-white rounded-4 shadow border p-4 mb-4">
                   <h4 className="text-xl fw-bold mb-4">Number of Team Members</h4>
-                  <Form>
+                  <Form onSubmit={handleQuantitySubmit}>
                     <Form.Group className="d-flex align-items-center gap-3">
                       <Form.Label className="d-inline-flex align-items-center gap-2 form-label w-auto mb-0"><FiUsers /> Team Members</Form.Label>
-                      <Form.Control type="number" className="w-50 flex-grow-1" min='1' value={teamMembers} onChange={(e) => setTeamMembers(Number(e.target.value))}/>
-                      <Button type="submit" variant="primary">Update Members</Button>
+                      <Form.Control type="number" className="w-50 flex-grow-1" min={totalmembers || 1} disabled={activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial'} value={teamMembers} onChange={(e) => {
+                        if(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial'){
+                          setTeamMembers(Number(e.target.value)) 
+                        }else{
+                          return false;
+                        }
+                      }}/>
+                      
+                        {
+                          
+                          (selectedPlanData?.planId?.toLowerCase() !== 'free' && selectedPlanData?.planId?.toLowerCase() !== 'trial') && (
+                            <Button type="submit" variant="primary">Update Members</Button>
+                          )
+                        }
+                      
                     </Form.Group>
                   </Form>
                 </div>
@@ -296,8 +235,8 @@ export default function ManagePlan() {
                             )}
                             <Card.Title>{plan.name}</Card.Title>
                             <Card.Text className="small">
-                              {plan.limit
-                                ? `Free for up to ${plan.limit} members`
+                              {plan.id === 'free'
+                                ? `Free for up to 3 members`
                                 : "Unlimited Team Members"}
                             </Card.Text>
                           </Card.Body>
@@ -349,14 +288,14 @@ export default function ManagePlan() {
                         <div className="mb-2 d-flex align-items-center justify-content-between gap-3">
                           <p className="mb-0">Price per user:</p>
                           <p className="mb-0 text-end">
-                            {selectedPlanData?.price > 0 && (
-                              <small className="text-decoration-line-through d-block">
-                                ₹{selectedPlanData?.price}/month
+                            {selectedPlanData?.pricePerUser > 0 && (
+                              <small className=" d-block">
+                                ₹{selectedPlanData?.pricePerUser}/month
                               </small>
                             )}
-                            <span className="fw-bold d-block">
+                            {/* <span className="fw-bold d-block">
                               ₹{discountPrice}/month
-                            </span>
+                            </span> */}
                           </p>
                         </div>
                         <p className="mb-2 d-flex align-items-center justify-content-between gap-3">Number of users: <strong className="text-end">{teamMembers}</strong></p>
@@ -368,21 +307,26 @@ export default function ManagePlan() {
                           Total per {billingCycle}: <strong className="display-6 fw-bold text-end">₹{totalPerCycle.toLocaleString()}</strong>
                         </p> */}
                         <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
-                          Total for 1{" "}
+                          Total for{" "}
                           {billingCycle === "yearly"
-                            ? "year"
+                            ? "1 year"
                             : billingCycle === "quarterly"
-                              ? "quarter"
-                              : "month"}
-                          : <strong className="text-end">₹{totalPerCycle.toLocaleString()}</strong>
+                              ? "3 months"
+                              : "1 month"}
+                          : <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
                         </p>
+
                       </div>
                     </Card.Body>
                   </Card>
                 </div>
-                <Button variant="primary" disabled={loading} size="lg" className="w-100 fw-semibold" onClick={() => handleConfirm()}>
-                  {loading ? 'Please wait...' : 'Update Plan'}
-                </Button>
+                {
+                  (activeSubscription?.planId !== selectedPlanData?.id) && (
+                  <Button variant="primary" disabled={loading} size="lg" className="w-100 fw-semibold" onClick={() => handleConfirm()}>
+                    {loading ? 'Please wait...' : 'Update Plan'}
+                  </Button>)
+                }
+                
                 <div className="bg-white rounded-4 shadow border p-4 mb-4 border-danger mt-4">
                   <h5 className="fw-bold text-danger mb-3">Danger Zone</h5>
                   <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
@@ -498,8 +442,9 @@ export default function ManagePlan() {
                 {billingCycle === "yearly"
                   ? "Annual Payment (Billed Once a Year)"
                   : billingCycle === "quarterly"
-                    ? "Quarterly Payment (Billed Every 3 Months)"
-                    : "Monthly Payment"}
+                  ? "Quarterly Payment (Billed Every 3 Months)"
+                  : "Monthly Payment (Billed Every Month)"
+                }
               </p>
               <p className="mb-0">
                 <strong>Next Payment Date:</strong>{" "}
@@ -519,57 +464,104 @@ export default function ManagePlan() {
           <div className="border rounded p-3 mb-4">
             <h6 className="fw-semibold mb-3">PRICE CALCULATION</h6>
             <div className="mb-2">
-              <p className="mb-1 text-muted">
+              {/* <p className="mb-1 text-muted">
                 Regular price per user:{" "}
                 <span className="text-decoration-line-through">
-                  ₹{selectedPlanData?.price}/user/month
+                  ₹{selectedPlanData?.pricePerUser}/user/month
                 </span>
-              </p>
+              </p> */}
               <p className="mb-1">
                 Discounted price per user:{" "}
                 <span className="fw-semibold text-primary">
-                  ₹{discountPrice}/user/month
+                  ₹{selectedPlanData?.pricePerUser}/user/month
                 </span>
               </p>
-              <p className="mb-1">Base calculation: ₹{discountPrice} × {teamMembers} user(s) = ₹{discountPrice * teamMembers}</p>
+              <p className="mb-1">Base calculation: ₹{selectedPlanData?.pricePerUser} × {teamMembers} user(s) = ₹{(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}</p>
             </div>
 
-            {selectedPlanData?.discount > 0 && (
-              <div className="border rounded p-2 bg-warning-subtle mb-3">
-                <p className="mb-0 text-danger fw-semibold">
-                  {selectedPlanData.discount}% Limited Offer Discount: -₹
-                  {((selectedPlanData.price * selectedPlanData.discount) / 100) * teamMembers}
-                </p>
-              </div>
-            )}
-
             {/* Cost Breakdown */}
-            <div className="border rounded p-3 bg-light">
+            {billingCycle === "yearly" || billingCycle === "quarterly" ?
+              <>
+                <div className="annual--cost rounded p-3 mt-3 mb-3 border-warning border-2">
+                  <h6 className="fw-bold mb-2 text-uppercase text-amber">{billingCycle} COST BREAKDOWN</h6>
+                  <div className="bg-white p-3 rounded fw-normal border-1 border-warning text-dark border">
+                    <span className="text--small">{billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} calculation</span>
+                    <div className="d-flex align-items-center justify-content-between gap-3">
+                      <p className="mb-0">
+                        {billingCycle === "yearly"
+                        ? `₹${(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}/month × 12 months`
+                        : billingCycle === "quarterly"
+                        ? `₹${(
+                            selectedPlanData?.pricePerUser * teamMembers
+                          ).toFixed(0)}/month × 3 months`
+                        : `₹${(
+                          selectedPlanData?.pricePerUser * teamMembers
+                        ).toFixed(0)}/month × 1 month`}
+                      </p>
+                      <p className="fw-bold display-8 mb-0 text-amber">
+                        = ₹{selectedPlanData?.pricePerUser.toFixed(0) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-center mt-3">
+                    <p className="text--small mb-1 fw-normal text-amber">Total {billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} Payment</p>
+                    <div className="text--large mb-0 text-amber">₹{selectedPlanData?.pricePerUser.toFixed(0) * teamMembers * (billingCycle === 'quarterly' ? 3 : 12)}</div>
+                  </div>
+                </div>
+                
+                { <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                  <div className="text--small mb-1 text-uppercase text-emerald">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
+                  <div className="text-slate-600 mt-1">
+                    ₹{((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) *  teamMembers).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
+                    {(((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser)) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
+                  </div>
+                  <div className="text--large mb-0 text-emerald mt-2">₹{
+                    (( selectedPlanData?.originalPrice * teamMembers ) - (selectedPlanData?.pricePerUser * teamMembers)) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
+                    
+                  }</div>
+                </div>}
+                </>
+                :
+                
+                <>
+                  <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                    <div className="text--small mb-1 text-uppercase">Your monthly payment</div>
+                    <div className="text--large mb-0 text-emerald">₹{(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}</div>
+                    <div className="text--small mb-1 text-lowercase">for {teamMembers} users</div>
+                  </div>
+                </>
+                }
+            {/* <div className="border rounded p-3 bg-light">
               <h6 className="fw-semibold mb-2">COST BREAKDOWN</h6>
               <p className="mb-1">
                 {billingCycle === "yearly"
-                  ? `Annual calculation: ₹${discountPrice * teamMembers}/month × 12 months`
+                  ? `₹${(selectedPlanData.pricePerUser * teamMembers).toFixed(0)}/month × 12 months`
                   : billingCycle === "quarterly"
-                    ? `Quarterly calculation: ₹${discountPrice * teamMembers}/month × 3 months`
-                    : `Monthly calculation: ₹${discountPrice * teamMembers}/month × 1 month`}
+                  ? `₹${(
+                      selectedPlanData.pricePerUser * teamMembers
+                    ).toFixed(0)}/month × 3 months`
+                  : `₹${(
+                    selectedPlanData.pricePerUser * teamMembers
+                  ).toFixed(0)}/month × 1 month`}
+                
               </p>
               <p className="fw-semibold text-dark mb-0">
-                = ₹{totalPerCycle.toLocaleString()}
+                 = ₹{selectedPlanData.pricePerUser.toFixed(0) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)}
               </p>
-            </div>
+            </div> */}
 
             {/* Total Savings */}
-            {totalSavings > 0 && (
+            {/* {totalSavings > 0 && (
               <div className="border rounded p-2 bg-success-subtle mt-3">
                 <p className="mb-0 text-success fw-semibold">
                   You save ₹{totalSavings.toLocaleString()}!
                 </p>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Final Total */}
-          <div className="border rounded p-3 bg-light">
+          {/* <div className="border rounded p-3 bg-light">
             <h6 className="fw-semibold mb-2">FINAL TOTAL</h6>
             <p className="fw-semibold fs-5 mb-0 text-primary">
               ₹{totalPerCycle.toLocaleString()}{" "}
@@ -581,7 +573,7 @@ export default function ManagePlan() {
                     : "1 Month"}
               </small>
             </p>
-          </div>
+          </div> */}
         </Modal.Body>
 
         <Modal.Footer>

@@ -65,7 +65,7 @@ export const login = (payload) => {
       const response = await API.apiPost('login', payload, config)
     
       if (response.data && response.data.accessToken) {
-        await auth.login(response.data.accessToken, response.data.userDetails, response.data.companies);
+        await auth.login(response.data.accessToken, response.data.userDetails, response.data.companies, response.data?.activeSubscription);
 
         await dispatch({ type: LOGIN_SUCCESS, payload: response.data });
 

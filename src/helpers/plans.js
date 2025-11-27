@@ -1,4 +1,4 @@
-/*export const plans = {
+export const plans = {
     'monthly':[
     {
     id: "free",
@@ -182,192 +182,192 @@
         "Attendance Tracking"
     ],
     }]
-};*/
-
-
-export const plans = {
-    'monthly':[
-    {
-    id: "free",
-    name: "Free",
-    originalPrice: 0,
-    pricePerUser: 0,
-    disount: 0,
-    billing_cycle: false,
-    members_text: 'Free for up to 3 members',
-    features: [
-        "Single Workspace",
-        "Unlimited Projects",
-        "Unlimited Tasks",
-        "Unlimited Workflows",
-        "Time Tracking",
-        "Live Screen View",
-        "Screenshots",
-        "Reports",
-        "Attendance Tracking"
-    ],
-    },
-    {
-    id: "plan_ReJTkc9BZpqjVt",
-    name: "Pro",
-    originalPrice: 666,
-    pricePerUser: 666,
-    disount: 0,
-    billing_cycle: 'monthly',
-    members_text: 'Unlimited Team Members',
-    features: [
-        "Unlimited Workspace",
-        "Unlimited Projects",
-        "Unlimited Tasks",
-        "Unlimited Workflows",
-        "Time Tracking",
-        "Live Screen View",
-        "Screenshots",
-        "Reports",
-        "Attendance Tracking"
-    ],
-    },
-    {
-    id: "plan_ReJU8Qn1ekZM4s",
-    name: "Elite",
-    disount: 0,
-    originalPrice: 916,
-    pricePerUser: 916,
-    billing_cycle: 'monthly',
-    members_text: 'Unlimited Team Members',
-    features: [
-        "Unlimited Workspace",
-        "Unlimited Projects",
-        "Unlimited Tasks",
-        "Unlimited Workflows",
-        "Time Tracking",
-        "Live Screen View",
-        "Screenshots",
-        "Recorded Screen Videos",
-        "Reports",
-        "Attendance Tracking"
-    ],
-    }],
-    'quarterly':[
-    {
-    id: "free",
-    name: "Free",
-    originalPrice: 0,
-    pricePerUser: 0,
-    disount: 0,
-    billing_cycle: false,
-    members_text: 'Free for up to 3 members',
-    features: [
-        "Single Workspace",
-        "Unlimited Projects",
-        "Unlimited Tasks",
-        "Unlimited Workflows",
-        "Time Tracking",
-        "Live Screen View",
-        "Screenshots",
-        "Reports",
-        "Attendance Tracking"
-    ],
-    },
-    {
-    id: "plan_RfBpT4zO4A1jBF",
-    name: "Pro",
-    disount: 20,
-    originalPrice: 666,
-    pricePerUser: 533,
-    billing_cycle: 'quarterly',
-    members_text: 'Unlimited Team Members',
-    features: [
-        "Unlimited Workspace",
-        "Unlimited Projects",
-        "Unlimited Tasks",
-        "Unlimited Workflows",
-        "Time Tracking",
-        "Live Screen View",
-        "Screenshots",
-        "Reports",
-        "Attendance Tracking"
-    ],
-    },{
-    id: "plan_RfBqGfoXXQnRKJ",
-    name: "Elite",
-    disount: 20,
-    originalPrice: 916,
-    pricePerUser: 733,
-    billing_cycle: 'quarterly',
-    members_text: 'Unlimited Team Members',
-    features: [
-    "Unlimited Workspace",
-    "Unlimited Projects",
-    "Unlimited Tasks",
-    "Unlimited Workflows",
-    "Time Tracking",
-    "Live Screen View",
-    "Screenshots",
-    "Recorded Screen Videos",
-    "Reports",
-    "Attendance Tracking"
-    ],
-    }],
-    'yearly': [
-    {
-    id: "free",
-    name: "Free",
-    pricePerUser: 0,
-    disount: 0,
-    billing_cycle: false,
-    members_text: 'Free for up to 3 members',
-    features: [
-        "Single Workspace",
-        "Unlimited Projects",
-        "Unlimited Tasks",
-        "Unlimited Workflows",
-        "Time Tracking",
-        "Live Screen View",
-        "Screenshots",
-        "Reports",
-        "Attendance Tracking"
-    ],
-    },{
-    
-    id: "plan_RfBqffQvGgLK1w",
-    name: "Pro",
-    disount: 40,
-    originalPrice: 666,
-    pricePerUser: 400,
-    billing_cycle: 'yearly',
-    members_text: 'Unlimited Team Members',
-    features: [
-        "Unlimited Workspace",
-        "Unlimited Projects",
-        "Unlimited Tasks",
-        "Unlimited Workflows",
-        "Time Tracking",
-        "Live Screen View",
-        "Screenshots",
-        "Reports",
-        "Attendance Tracking"
-    ],
-    },{
-    id: "plan_RfBr3vHscWqtas",
-    name: "Elite",
-    disount: 40,
-    originalPrice: 916,
-    pricePerUser: 550,
-    billing_cycle: 'yearly',
-    members_text: 'Unlimited Team Members',
-    features: [
-        "Unlimited Workspace",
-        "Unlimited Projects",
-        "Unlimited Tasks",
-        "Unlimited Workflows",
-        "Time Tracking",
-        "Live Screen View",
-        "Screenshots",
-        "Recorded Screen Videos",
-        "Reports",
-        "Attendance Tracking"
-    ],
-    }]
 };
+
+
+// export const plans = {
+//     'monthly':[
+//     {
+//     id: "free",
+//     name: "Free",
+//     originalPrice: 0,
+//     pricePerUser: 0,
+//     disount: 0,
+//     billing_cycle: false,
+//     members_text: 'Free for up to 3 members',
+//     features: [
+//         "Single Workspace",
+//         "Unlimited Projects",
+//         "Unlimited Tasks",
+//         "Unlimited Workflows",
+//         "Time Tracking",
+//         "Live Screen View",
+//         "Screenshots",
+//         "Reports",
+//         "Attendance Tracking"
+//     ],
+//     },
+//     {
+//     id: "plan_ReJTkc9BZpqjVt",
+//     name: "Pro",
+//     originalPrice: 666,
+//     pricePerUser: 666,
+//     disount: 0,
+//     billing_cycle: 'monthly',
+//     members_text: 'Unlimited Team Members',
+//     features: [
+//         "Unlimited Workspace",
+//         "Unlimited Projects",
+//         "Unlimited Tasks",
+//         "Unlimited Workflows",
+//         "Time Tracking",
+//         "Live Screen View",
+//         "Screenshots",
+//         "Reports",
+//         "Attendance Tracking"
+//     ],
+//     },
+//     {
+//     id: "plan_ReJU8Qn1ekZM4s",
+//     name: "Elite",
+//     disount: 0,
+//     originalPrice: 916,
+//     pricePerUser: 916,
+//     billing_cycle: 'monthly',
+//     members_text: 'Unlimited Team Members',
+//     features: [
+//         "Unlimited Workspace",
+//         "Unlimited Projects",
+//         "Unlimited Tasks",
+//         "Unlimited Workflows",
+//         "Time Tracking",
+//         "Live Screen View",
+//         "Screenshots",
+//         "Recorded Screen Videos",
+//         "Reports",
+//         "Attendance Tracking"
+//     ],
+//     }],
+//     'quarterly':[
+//     {
+//     id: "free",
+//     name: "Free",
+//     originalPrice: 0,
+//     pricePerUser: 0,
+//     disount: 0,
+//     billing_cycle: false,
+//     members_text: 'Free for up to 3 members',
+//     features: [
+//         "Single Workspace",
+//         "Unlimited Projects",
+//         "Unlimited Tasks",
+//         "Unlimited Workflows",
+//         "Time Tracking",
+//         "Live Screen View",
+//         "Screenshots",
+//         "Reports",
+//         "Attendance Tracking"
+//     ],
+//     },
+//     {
+//     id: "plan_RfBpT4zO4A1jBF",
+//     name: "Pro",
+//     disount: 20,
+//     originalPrice: 666,
+//     pricePerUser: 533,
+//     billing_cycle: 'quarterly',
+//     members_text: 'Unlimited Team Members',
+//     features: [
+//         "Unlimited Workspace",
+//         "Unlimited Projects",
+//         "Unlimited Tasks",
+//         "Unlimited Workflows",
+//         "Time Tracking",
+//         "Live Screen View",
+//         "Screenshots",
+//         "Reports",
+//         "Attendance Tracking"
+//     ],
+//     },{
+//     id: "plan_RfBqGfoXXQnRKJ",
+//     name: "Elite",
+//     disount: 20,
+//     originalPrice: 916,
+//     pricePerUser: 733,
+//     billing_cycle: 'quarterly',
+//     members_text: 'Unlimited Team Members',
+//     features: [
+//     "Unlimited Workspace",
+//     "Unlimited Projects",
+//     "Unlimited Tasks",
+//     "Unlimited Workflows",
+//     "Time Tracking",
+//     "Live Screen View",
+//     "Screenshots",
+//     "Recorded Screen Videos",
+//     "Reports",
+//     "Attendance Tracking"
+//     ],
+//     }],
+//     'yearly': [
+//     {
+//     id: "free",
+//     name: "Free",
+//     pricePerUser: 0,
+//     disount: 0,
+//     billing_cycle: false,
+//     members_text: 'Free for up to 3 members',
+//     features: [
+//         "Single Workspace",
+//         "Unlimited Projects",
+//         "Unlimited Tasks",
+//         "Unlimited Workflows",
+//         "Time Tracking",
+//         "Live Screen View",
+//         "Screenshots",
+//         "Reports",
+//         "Attendance Tracking"
+//     ],
+//     },{
+    
+//     id: "plan_RfBqffQvGgLK1w",
+//     name: "Pro",
+//     disount: 40,
+//     originalPrice: 666,
+//     pricePerUser: 400,
+//     billing_cycle: 'yearly',
+//     members_text: 'Unlimited Team Members',
+//     features: [
+//         "Unlimited Workspace",
+//         "Unlimited Projects",
+//         "Unlimited Tasks",
+//         "Unlimited Workflows",
+//         "Time Tracking",
+//         "Live Screen View",
+//         "Screenshots",
+//         "Reports",
+//         "Attendance Tracking"
+//     ],
+//     },{
+//     id: "plan_RfBr3vHscWqtas",
+//     name: "Elite",
+//     disount: 40,
+//     originalPrice: 916,
+//     pricePerUser: 550,
+//     billing_cycle: 'yearly',
+//     members_text: 'Unlimited Team Members',
+//     features: [
+//         "Unlimited Workspace",
+//         "Unlimited Projects",
+//         "Unlimited Tasks",
+//         "Unlimited Workflows",
+//         "Time Tracking",
+//         "Live Screen View",
+//         "Screenshots",
+//         "Recorded Screen Videos",
+//         "Reports",
+//         "Attendance Tracking"
+//     ],
+//     }]
+// };
       

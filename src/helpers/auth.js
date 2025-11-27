@@ -111,9 +111,10 @@ export function isAuth() {
   }
 }
 
-export async function login(token,  current_loggedin_user = false, companies = []) {
+export async function login(token,  current_loggedin_user = false, companies = [], activeSubscription = null) {
   localStorage.setItem('accessToken', token);
   localStorage.setItem('current_loggedin_user', JSON.stringify(current_loggedin_user, secretKey));
+  localStorage.setItem('active_subscription', JSON.stringify(activeSubscription))
   setupDashboards( companies)
   setAuthorization();
   return true;

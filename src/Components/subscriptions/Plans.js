@@ -259,13 +259,13 @@ function PlansPage() {
       if(subscriptionState.activeSubscription){
         
         setActiveSubscription(subscriptionState.activeSubscription)
-         const current_dashboard = localStorage.getItem('current_dashboard');
+        //  const current_dashboard = localStorage.getItem('current_dashboard');
         
-        if (current_dashboard) {
-          const parsedata = JSON.parse(current_dashboard)
-          const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
-          localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
-        }
+        // if (current_dashboard) {
+        //   const parsedata = JSON.parse(current_dashboard)
+        //   const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
+          localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
+        // }
         
         if(subscriptionState.activeSubscription.status === 'active'){
           navigate('/dashboard', { replace: true })
@@ -335,6 +335,8 @@ const showError = (name) => {
       createSubscription({
         plan_id: priceDetails.plan.id,
         initial_quantity: members,
+        billingCycle: billingCycle,
+        name: priceDetails.plan.name,
         total_count: 12,
         ...formData
       })
@@ -374,7 +376,8 @@ const showError = (name) => {
       totalPerCycle,
       totalSavings,
       discountPercent,
-      totalWithoutDiscount
+      totalWithoutDiscount,
+      billingCycle
     });
 
 
