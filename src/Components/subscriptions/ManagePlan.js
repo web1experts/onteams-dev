@@ -367,7 +367,7 @@ const handleSubmit = (e) => {
                               activeSubscription?.planId === "free" ||
                               activeSubscription?.planId === "trial"
                             }
-                            value={teamMembers === 0 ? minValue : teamMembers}
+                            value={qty}
                             onChange={(e) => {
                               if (
                                 activeSubscription?.planId !== "free" &&
