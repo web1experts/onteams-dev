@@ -47,9 +47,7 @@ export default function ToastAlerts() {
 
       if(subscription.message ){ 
           addToast(subscription.message, subscription.message_variant);
-          setTimeout(() => {
-            handleClearMessages()
-          },1000)
+          handleClearMessages()
       }
 
       if( apiResultAuth.message ){ 
