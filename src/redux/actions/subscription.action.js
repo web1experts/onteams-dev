@@ -116,6 +116,22 @@ export const subscribeTrialPlan = (payload) => {
   }
 }
 
+export const saveBillingDetails = (payload) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('subscription', '/save-billing-details', payload)
+      if (response.data && response.data.success) {
+        await dispatch({ type: BILLING_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  }
+}
+
 export const getBillingdetails = () => {
 
   return async (dispatch) => {

@@ -3,8 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from "react-bootstrap";
 import { FiUsers, FiCalendar, FiCheck, FiSave, FiCreditCard } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity } from "../../redux/actions/subscription.action";
+import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
+import { countries } from "../../helpers/countries";
 import { useToast } from "../../context/ToastContext";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
 import { AlertDialog } from "../modals";
@@ -28,6 +29,18 @@ export default function ManagePlan() {
   const [showFeatures, setShowFeatures] = useState(false);
   const [loading, setLoading] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false);
+  const [errors, setErrors] = useState({});
+    const [formData, setFormData] = useState({
+      fullName: "",
+      phone: "",
+      address1: "",
+      address2: "",
+      city: "",
+      state: "",
+      postal: "",
+      country: "India",
+      agree: false,
+    });
 
     const doCancel = () => {
       setShowDialog(true)
@@ -50,6 +63,7 @@ export default function ManagePlan() {
     setSpinner(true)
     dispatch(getActiveSubscription())
     handleListMember();
+    dispatch(getBillingdetails())
   }, [])
 
   useEffect(() => {
@@ -115,6 +129,80 @@ export default function ManagePlan() {
     updatePlan(); // your existing function
   };
 
+  const validateForm = () => {
+    const requiredFields = [
+      "fullName",
+      "phone",
+      "address1",
+      "city",
+      "state",
+      "postal",
+      "country",
+    ];
+
+    let newErrors = {};
+
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = "This field is required";
+      }
+    });
+
+  setErrors(newErrors);
+
+  // If no errors, return true
+  return Object.keys(newErrors).length === 0;
+};
+
+  const showError = (name) => {
+  if (errors[name]) {
+    return <span className="error">{errors[name]}</span>;
+  }
+  return null;
+};
+
+useEffect(() => {
+      if(subscriptionState.billing_info){
+        const billingInfo = {
+          fullName: subscriptionState.billing_info?.meta_value?.fullName || "",
+          phone: subscriptionState.billing_info?.meta_value?.phone || "",
+          address1: subscriptionState.billing_info?.meta_value?.address1 || "",
+          address2:subscriptionState.billing_info?.meta_value?.address2 || "",
+          city: subscriptionState.billing_info?.meta_value?.city || "",
+          state: subscriptionState.billing_info?.meta_value?.state || "",
+          postal: subscriptionState.billing_info?.meta_value?.postal || "",
+          country: subscriptionState.billing_info?.meta_value?.country || "India"
+        };
+
+        setFormData(billingInfo)
+
+      }
+    }, [subscriptionState.billing_info])
+
+      const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    let newErrors = { ...errors };
+    newErrors[name] = ""; 
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+    setErrors(newErrors);
+  };
+
+
+const handleSubmit = (e) => {
+  e.preventDefault()
+  
+  if (!validateForm()) return;
+  
+  setLoading(true)
+  dispatch(
+    saveBillingDetails({
+      ...formData
+    })
+  );
+}
   const handleQuantitySubmit = (e) => {
     e.preventDefault()
     const payload = {
@@ -357,96 +445,127 @@ export default function ManagePlan() {
                   <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
                   <Button variant="danger"  onClick={doCancel} className="w-100 fw-bold">Cancel Subscription</Button>
                 </div>
-                <Form className="bg-white rounded-4 shadow border p-4">
-                  <div className="d-flex align-items-center gap-3 mb-4">
-                    <div className="bg-primary rounded-4 d-flex align-items-center justify-content-center billing--title--icon"><FiCreditCard /></div>
-                    <div className="billing--title">
-                      <h4 className="fw-bold mb-1">Billing Information</h4>
-                      <p className="mb-0">Manage your billing and payment details</p>
-                    </div>
-                  </div>
-                  <Row className="mb-3">
-                    <Form.Group as={Col} md="12">
-                      <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
-                      <Form.Control type="text" name="fullName" value='Rakesh Kumar' required/>
-                    </Form.Group>
-                  </Row>
-
-                  <Row className="mb-3">
-                    <Form.Group>
-                      <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                      <Row>
-                        <Col className="d-flex align-items-center gap-3">
-                          <Form.Select disabled className="w-auto pe-5">
-                            <option>+91</option>
-                          </Form.Select>
-                          <Form.Control type="tel" name="phone" value='9876543210' required/>
-                        </Col>
-                      </Row>
-                    </Form.Group>
-                  </Row>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="address1"
-                      value='123 MG Road, Koramangala'
-                      required
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label>Address Line 2</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="address2"
-                      value='Near Metro Station'
-                    />
-                  </Form.Group>
-
-                  <Row className="mb-3">
-                    <Form.Group as={Col} md="4">
-                      <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="city"
-                        value='Bangalore'
-                        required
-                      />
-                    </Form.Group>
-                    <Form.Group as={Col} md="4">
-                      <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="state"
-                        value='Karnataka'
-                        required
-                      />
-                    </Form.Group>
-                    <Form.Group as={Col} md="4">
-                      <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="postal"
-                        value='560034'
-                        required
-                      />
-                    </Form.Group>
-                  </Row>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Select name="country" required>
-                      <option selected>India</option>
-                      <option>United States</option>
-                      <option>United Kingdom</option>
-                      <option>Canada</option>
-                    </Form.Select>
-                  </Form.Group>
-
-                  <Button variant="primary" className="w-100 mt-4 d-flex align-items-center justify-content-center gap-2 fw-bold"><FiSave /> Save Billing Information</Button>
-                </Form>
+                <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
+                                              <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
+                                              <Row>
+                                                <Form.Group as={Col} md="12" className="position-relative mb-0 form-group">
+                                                  <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
+                                                  <Form.Control type="text" className={errors?.fullName ? 'br-red' : ''} name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
+                                                  {showError("fullName")}
+                                                </Form.Group>
+                                              </Row>
+                              
+                                              <Row>
+                                                <Form.Group className="position-relative mb-0 form-group">
+                                                  <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
+                                                  <Row>
+                                                    <Col className="d-flex align-items-start gap-3">
+                                                      <Form.Select className="w-auto pe-5">
+                                                        {countries.map((country) => (
+                                                          <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
+                                                            {country.phoneCode}
+                                                          </option>
+                                                        ))}
+                                                      </Form.Select>
+                                                    
+                                                      <div className="flex-fill position-relative">
+                                                        <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                                                        {showError("phone")}
+                                                      </div>
+                                                    </Col>
+                                                  </Row>
+                                                </Form.Group>
+                                              </Row>
+                              
+                                              <Form.Group  className="position-relative mb-0 form-group">
+                                                <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
+                                                <Form.Control
+                                                  type="text"
+                                                  name="address1"
+                                                  className={errors?.address1 ? 'br-red' : ''} 
+                                                  placeholder="Street address, building, apartment"
+                                                  value={formData.address1}
+                                                  onChange={handleChange}
+                                                  required
+                                                />
+                                                {showError("address1")}
+                                              </Form.Group>
+                              
+                                              <Form.Group className="position-relative mb-0 form-group">
+                                                <Form.Label>Address Line 2</Form.Label>
+                                                <Form.Control
+                                                  type="text"
+                                                  name="address2"
+                                                  placeholder="Additional address details (optional)"
+                                                  value={formData.address2}
+                                                  onChange={handleChange}
+                                                />
+                                              </Form.Group>
+                              
+                                              <Row className="">
+                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                                                  <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
+                                                  <Form.Control
+                                                    type="text"
+                                                    name="city"
+                                                    className={errors?.city ? 'br-red' : ''} 
+                                                    placeholder="City"
+                                                    value={formData.city}
+                                                    onChange={handleChange}
+                                                    required
+                                                  />
+                                                  {showError("city")}
+                                                </Form.Group>
+                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                                                  <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
+                                                  <Form.Control
+                                                    className={errors?.state ? 'br-red' : ''} 
+                                                    type="text"
+                                                    name="state"
+                                                    placeholder="State or Province"
+                                                    value={formData.state}
+                                                    onChange={handleChange}
+                                                    required
+                                                  />
+                                                  {showError("state")}
+                                                </Form.Group>
+                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                                                  <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
+                                                  <Form.Control
+                                                    type="text"
+                                                    name="postal"
+                                                    className={errors?.postal ? 'br-red' : ''} 
+                                                    placeholder="Postal code"
+                                                    value={formData.postal}
+                                                    onChange={handleChange}
+                                                    required
+                                                  />
+                                                  {showError("postal")}
+                                                </Form.Group>
+                                              </Row>
+                              
+                                              <Form.Group  className="position-relative mb-0 form-group">
+                                                <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
+                                                <Form.Select
+                                                  className="custom-selectbox"
+                                                  name="country"
+                                                  value={formData.country}
+                                                  onChange={handleChange}
+                                                  required
+                                                >
+                                                  {countries.map((country) => (
+                                                    <option key={`country-${country.isoCode}--${country.phoneCode}`} value={country.value}>
+                                                      {country.name}
+                                                    </option>
+                                                  ))}
+                                                </Form.Select>
+                                                {showError("country")}
+                                              </Form.Group>
+                              
+                                                <Button variant="primary" type="submit" onClick={handleSubmit} className="w-100 mt-4 d-flex align-items-center justify-content-center gap-2 fw-bold" disabled={loading}><FiSave /> { loading ? 'Please wait...': 'Save Billing Information'}</Button>
+                                            
+                              
+                                            </Form>
               </Col>
             </Row>
           </Container>

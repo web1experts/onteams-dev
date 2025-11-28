@@ -125,8 +125,7 @@ function Workspace(props) {
                         <ListGroup.Item className="btn btn-primary" onClick={() => {
                           if (
                             activeSubscription?.planId === 'free' &&
-                            (workspaces?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
-                            workspaces?.length
+                            (workspaces?.length === 1)
                           ) {
                             navigate('/subscription-plans', { replace: true });
                           } else {
