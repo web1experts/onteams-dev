@@ -219,6 +219,19 @@ const handleSubmit = (e) => {
     dispatch(updateQuantity(payload))
     setLoading(true)
   }
+
+ useEffect(() => {
+  if (!plans[billingCycle] || !selectedPlan?.name) return;
+
+  const updatedPlan = plans[billingCycle].find(
+    (p) => p.name === selectedPlan.name
+  );
+
+  if (updatedPlan) {
+    setSelectedPlan(updatedPlan);
+  }
+}, [billingCycle]);
+
   const selectedPlanData = useMemo(() => {
     return plans[billingCycle]?.find((p) => p.name === selectedPlan?.name);
   }, [billingCycle, selectedPlan]);
@@ -363,20 +376,20 @@ const handleSubmit = (e) => {
                             min={minValue}
                             id="qty-field"
                             ref={qtyRef}
-                            disabled={
-                              activeSubscription?.planId === "free" ||
-                              activeSubscription?.planId === "trial"
-                            }
-                            value={qty}
+                            // disabled={
+                            //   activeSubscription?.planId === "free" ||
+                            //   activeSubscription?.planId === "trial"
+                            // }
+                            value={teamMembers}
                             onChange={(e) => {
-                              if (
-                                activeSubscription?.planId !== "free" &&
-                                activeSubscription?.planId !== "trial"
-                              ) {
+                              // if (
+                              //   activeSubscription?.planId !== "free" &&
+                              //   activeSubscription?.planId !== "trial"
+                              // ) {
                                 setTeamMembers(Number(e.target.value));
-                              } else {
-                                return false;
-                              }
+                              // } else {
+                              //   return false;
+                              // }
                             }}
                           />
                         );
