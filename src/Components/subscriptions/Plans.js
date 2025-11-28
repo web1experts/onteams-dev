@@ -767,22 +767,23 @@ const showError = (name) => {
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <small>Next Payment Date</small>
-                    {new Date(
-                      Date.now() +
-                      (billingCycle === "yearly"
-                        ? 365
-                        : billingCycle === "quarterly"
-                          ? 90
-                          : 30) *
-                      24 *
-                      60 *
-                      60 *
-                      1000
-                    ).toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {(() => {
+                      const nextDate = new Date();
+                      
+                      if (billingCycle === "yearly") {
+                        nextDate.setFullYear(nextDate.getFullYear() + 1);
+                      } else if (billingCycle === "quarterly") {
+                        nextDate.setMonth(nextDate.getMonth() + 3);
+                      } else {
+                        nextDate.setMonth(nextDate.getMonth() + 1);
+                      }
+
+                      return nextDate.toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      });
+                    })()}
                   </ListGroup.Item>
                 </ListGroup>
               </div>
