@@ -358,7 +358,7 @@ function SettingPage(props) {
             </ListGroup.Item>
              {
               memberProfile?.role?.slug === "owner" ?
-                currentSubscription === null || currentSubscription?.status === 'active' && currentSubscription?.planId === 'trial' || currentSubscription?.status === 'active' && currentSubscription?.planId === 'free' ? 
+                currentSubscription === null ? 
                   <ListGroup.Item
                     onClick={() => {
                       if(props.close){

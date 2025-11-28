@@ -90,13 +90,14 @@ function SubscriptionPlans() {
     if(subscriptionState.activeSubscription){
 
       setActiveSubscription(subscriptionState.activeSubscription)
-      //   const current_dashboard = localStorage.getItem('current_dashboard');
+        const current_dashboard = localStorage.getItem('current_dashboard');
       
-      // if (current_dashboard) {
-      //   const parsedata = JSON.parse(current_dashboard)
-      //   const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
-        localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
-      // }
+      if (current_dashboard) {
+        const parsedata = JSON.parse(current_dashboard)
+        const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
+        // localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
+        localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
+      }
 
       if(subscriptionState?.message && subscriptionState.message_variant === 'success'){
         navigate('/dashboard', { replace: true })

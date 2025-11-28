@@ -3,16 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from "react-bootstrap";
 import { FiUsers, FiCalendar, FiCheck, FiSave, FiCreditCard } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails, updateSubscription, updateQuantity } from "../../redux/actions/subscription.action";
+import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
 import { useToast } from "../../context/ToastContext";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
+import { AlertDialog } from "../modals";
 
 export default function ManagePlan() {
   const dispatch = useDispatch()
   const addToast = useToast();
   const [spinner, setSpinner] = useState(true);
-  
+  const [showdialog, setShowDialog] = useState(false);
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
@@ -22,11 +23,20 @@ export default function ManagePlan() {
   const invitationsFeed = useSelector((state) => state.member.invitations);
   const [invitationsTotal, setInvitationsTotal] = useState(0)
   const memberFeed = useSelector((state) => state.member.members);
-  const [teamMembers, setTeamMembers] = useState(1);
+  const [teamMembers, setTeamMembers] = useState(0);
   const [ totalmembers, setTotalMembers] = useState(0);
   const [showFeatures, setShowFeatures] = useState(false);
   const [loading, setLoading] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false);
+
+    const doCancel = () => {
+      setShowDialog(true)
+    }
+
+    const handleCancelSubscription = () => {
+        dispatch(cancelSubscription(activeSubscription?.subscriptionId))
+        setShowDialog(false)
+      }
 
   const handleListMember = async () => {
      
@@ -75,20 +85,20 @@ export default function ManagePlan() {
       const allPlans = [...plans.monthly, ...plans.quarterly, ...plans.yearly];
 
       const matchedPlan = allPlans.find(plan => plan.id === subscriptionState.activeSubscription.planId);
-
       // If found, set it in state
       if (matchedPlan) {
         setSelectedPlan(matchedPlan);
       } else {
         console.warn("No matching plan found for plan_id:", subscriptionState.activeSubscription.planId);
       }
-      // const current_dashboard = localStorage.getItem('current_dashboard');
+       const current_dashboard = localStorage.getItem('current_dashboard');
       
-      // if (current_dashboard) {
-      //   const parsedata = JSON.parse(current_dashboard)
-      //   const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
-        localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
-      // }
+      if (current_dashboard) {
+        const parsedata = JSON.parse(current_dashboard)
+        const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
+        // localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
+        localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
+      }
     }
   }, [subscriptionState.activeSubscription])
 
@@ -135,7 +145,7 @@ export default function ManagePlan() {
       total_count: 12,
       initial_quantity: teamMembers,
       billingCycle: billingCycle,
-      name: selectedPlan.plan.name,
+      name: selectedPlan?.name,
     }))
     setLoading(false)
     setShowConfirm(false);
@@ -169,14 +179,29 @@ export default function ManagePlan() {
           setLoading(false)
           setSelectedPlan(null)
         },
+        modal: {
+          ondismiss: function () {
+            console.warn("⚠️ Payment popup closed by user (cancelled).");
+            setLoading(false);
+            // Optional: show a message or alert
+            alert("Payment was cancelled. You can try again anytime.");
+          },
+        },
         theme: {
           color: "#F37254",
         },
       };
 
       const rzp = new window.Razorpay(options);
+      // 🔴 Handle payment failure
+      rzp.on("payment.failed", function (response) {
+        console.error("❌ Payment Failed:", response.error);
+        alert(`Payment failed: ${response.error.description || "Unknown error"}`);
+        setLoading(false);
+      });
       rzp.open();
     } catch (err) {
+      alert("Error creating subscription: " + err.message);
       console.error(err);
       //alert("Error creating subscription: " + err.message);
     } finally {
@@ -223,7 +248,7 @@ export default function ManagePlan() {
                   <Row className="mb-4">
                     {plans[billingCycle].map((plan) => (
                       <Col key={plan.name} md={4} className="mb-3">
-                        <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
+                        <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name}  ${plan.name} ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
                           onClick={() => setSelectedPlan(plan)}
                           style={{ cursor: "pointer" }}
                         >
@@ -330,7 +355,7 @@ export default function ManagePlan() {
                 <div className="bg-white rounded-4 shadow border p-4 mb-4 border-danger mt-4">
                   <h5 className="fw-bold text-danger mb-3">Danger Zone</h5>
                   <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
-                  <Button variant="danger" className="w-100 fw-bold">Cancel Subscription</Button>
+                  <Button variant="danger"  onClick={doCancel} className="w-100 fw-bold">Cancel Subscription</Button>
                 </div>
                 <Form className="bg-white rounded-4 shadow border p-4">
                   <div className="d-flex align-items-center gap-3 mb-4">
@@ -427,6 +452,12 @@ export default function ManagePlan() {
           </Container>
         </div>
       </div>
+      <AlertDialog
+        showdialog={showdialog}
+        toggledialog={setShowDialog}
+        msg="Are you sure you want to cancel your subscription?"
+        callback={handleCancelSubscription}
+      />
       <Modal show={showConfirm} onHide={handleCloseConfirm} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title className="fw-semibold">Subscription Confirmation</Modal.Title>
