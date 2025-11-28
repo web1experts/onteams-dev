@@ -240,13 +240,13 @@ const privateRoutes = [
         component: <PlansPage />,
         route: '/plans'
     },
-    {
-        type: 'page',
-        name: 'Manage',
-        key: 'MANAGE',
-        component: <ManagePlan />,
-        route: '/manage-plans'
-    },
+    // {
+    //     type: 'page',
+    //     name: 'Manage',
+    //     key: 'MANAGE',
+    //     component: <ManagePlan />,
+    //     route: '/manage-plans'
+    // },
     {
         type: 'page',
         name: 'SubscriptionPlans',
@@ -254,13 +254,13 @@ const privateRoutes = [
         component: <SubscriptionPlans />,
         route: '/subscription-plans'
     },
-    {
-        type: 'page',
-        name: 'PlanOverview',
-        key: 'PLANS_OVERVIEW',
-        component: <PlanOverview />,
-        route: '/plan-details'
-    }
+    // {
+    //     type: 'page',
+    //     name: 'PlanOverview',
+    //     key: 'PLANS_OVERVIEW',
+    //     component: <PlanOverview />,
+    //     route: '/plan-details'
+    // }
 ];
 const hideSidebarRoutes = [
     '/login',

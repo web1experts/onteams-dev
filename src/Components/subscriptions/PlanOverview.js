@@ -192,9 +192,9 @@ const PlanOverview = () => {
                     </Row>
                   }
 
-                  <div className="text-center">
+                  {/* <div className="text-center">
                     <Button variant="primary" href="/manage-plans" className="px-4 w-100 fw-bold py-3"><FiSettings /> Manage Plan</Button>
-                  </div>
+                  </div> */}
                   {/* <div className="mt-4 bg-amber rounded-4 p-4">
                     <div className="d-flex align-items-start gap-3">
                         <div className="p-2 bg-amber-icon rounded-3"><FiClock /></div>

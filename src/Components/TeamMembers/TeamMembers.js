@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Alert, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
 import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
 import { FiEdit, FiMail, FiSidebar, FiTrash2, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
@@ -934,15 +934,15 @@ useEffect(() => {
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <ListGroup.Item className="btn btn-primary"  onClick={() => {
-                          if (
-                            activeSubscription?.planId === 'free' &&
-                            (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
-                            invitationsTotal + memberFeeds?.length
-                          ) {
-                            navigate('/subscription-plans', { replace: true });
-                          } else {
+                          // if (
+                          //   activeSubscription?.planId === 'free' &&
+                          //   (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+                          //   invitationsTotal + memberFeeds?.length
+                          // ) {
+                          //   navigate('/subscription-plans', { replace: true });
+                          // } else {
                             handleShow();
-                          }
+                          // }
                         }}><FaPlus /></ListGroup.Item>
                     )}
                   </ListGroup>
@@ -1534,6 +1534,17 @@ useEffect(() => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {
+            (
+              activeSubscription?.planId === 'free' &&
+              (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+              invitationsTotal + memberFeeds?.length
+            ) ?
+            <Alert key={'danger'} variant={'danger'}>
+                Your current Free plan allows only 3 members. To add additional members, please upgrade to a paid plan.
+              </Alert>
+
+            :
           <Form onSubmit={handleSubmit}>
             {/* {rows.map((row, index) => ( */}
             <div className="form-row pb-3" key={`row-0`}>
@@ -1594,6 +1605,7 @@ useEffect(() => {
             </div>
             {/* ))} */}
           </Form>
+          }
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleSubmit} disabled={loader}>

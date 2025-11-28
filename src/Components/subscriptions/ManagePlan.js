@@ -304,7 +304,9 @@ const handleSubmit = (e) => {
           <Container>
             <Row className="justify-content-center">
               <Col md={10} lg={8}>
-                <h2 className="fw-bold mb-1 d-flex align-items-center">Manage Your Plan <a className="fs-6 ms-auto" href="/plan-details">View Active Subscription</a></h2>
+                <h2 className="fw-bold mb-1 d-flex align-items-center">Manage Your Plan 
+                  {/* <a className="fs-6 ms-auto" href="/plan-details">View Active Subscription</a> */}
+                </h2>
                 <p>Upgrade, downgrade, or adjust your team size</p>
                 <div className="bg-white rounded-4 shadow border p-4 mb-4">
                   <h4 className="text-xl fw-bold mb-4">Number of Team Members</h4>

@@ -530,13 +530,14 @@ function SettingPage(props) {
         {
           activeTab === "billing" && (
             <div className="manage__plan__tabs rounded--box p-4">
-              <Tabs defaultActiveKey="manage" id="manage-plans-tab">
-                <Tab eventKey="manage" title="Manage Plan">
-                  <ManagePlan />
-                </Tab>
+              <Tabs defaultActiveKey="planDetails" id="manage-plans-tab">
                 <Tab eventKey="planDetails" title="Plan Details">
                   <PlanOverview />
                 </Tab>
+                <Tab eventKey="manage" title="Manage Plan">
+                  <ManagePlan />
+                </Tab>
+                
               </Tabs>
             </div>
           )

@@ -408,7 +408,7 @@ const showError = (name) => {
             dispatch(saveAuthorization({ ...response, subscription_id }))
           }
           setLoading(false)
-          selectedPlan(null)
+          setSelectedPlan(null)
         },
         modal: {
           ondismiss: function () {
@@ -440,6 +440,10 @@ const showError = (name) => {
   }
 
   const activateFreePlan = () => {
+    if(members < 1){
+      addToast('Please add number of members first.', 'danger');
+      return;
+    }
     if(members > 3){
       addToast('You cannot activate free plan for more than 3 members.', 'danger');
       return;
@@ -449,6 +453,10 @@ const showError = (name) => {
   }
 
   const activateTrialPlan = () => {
+    if(members < 1){
+      addToast('Please add number of members first.', 'danger');
+      return;
+    }
     setLoading(true)
     dispatch(subscribeTrialPlan())
   }
