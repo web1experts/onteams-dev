@@ -13,6 +13,7 @@ import { AlertDialog } from "../modals";
 export default function ManagePlan() {
   const dispatch = useDispatch()
   const addToast = useToast();
+  const qtyRef = useRef(null);
   const [spinner, setSpinner] = useState(true);
   const [showdialog, setShowDialog] = useState(false);
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
@@ -73,7 +74,7 @@ export default function ManagePlan() {
   useEffect(() => {
     if (memberFeed && memberFeed.memberData) {
       setMemberFeed(memberFeed.memberData);
-      setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
+      // setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
 
     }
     setTimeout(() => {
@@ -84,7 +85,7 @@ export default function ManagePlan() {
     useEffect(() => {
       if (invitationsFeed && invitationsFeed.inviteData) {
         setInvitationsTotal(invitationsFeed.total);
-        setTotalMembers((totalmembers) + invitationsFeed.total || 0);
+        // setTotalMembers((totalmembers) + invitationsFeed.total || 0);
       }
       setTimeout(() => {
         setSpinner(false)
@@ -205,11 +206,18 @@ const handleSubmit = (e) => {
 }
   const handleQuantitySubmit = (e) => {
     e.preventDefault()
+
+    if(qtyRef.current.value === activeSubscription?.quantity){
+      addToast('You have not changed the quantity.', 'danger');
+      return false;
+    }
+    setLoading(true)
     const payload = {
-      quantity: teamMembers,
-      selectedPlan: selectedPlan?.id
+      quantity: qtyRef.current.value,
+      subscriptionId: activeSubscription?._id
     }
     dispatch(updateQuantity(payload))
+    setLoading(true)
   }
   const selectedPlanData = useMemo(() => {
     return plans[billingCycle]?.find((p) => p.name === selectedPlan?.name);
@@ -226,15 +234,34 @@ const handleSubmit = (e) => {
   const totalSavings =
     (selectedPlanData?.price - discountPrice) * teamMembers * cycleMultiplier;
 
+    const activateFreePlan = () => {
+      if(teamMembers < 1){
+        addToast('Please add number of members first.', 'danger');
+        return;
+      }
+      if(teamMembers > 3){
+        addToast('You cannot activate free plan for more than 3 members.', 'danger');
+        return;
+      }
+      setLoading(true)
+      dispatch(subscribeFreePlan())
+    }
+
   const updatePlan = () => {
     setLoading(true)
-    dispatch(updateSubscription({
-      ...selectedPlan,
-      total_count: 12,
-      initial_quantity: teamMembers,
-      billingCycle: billingCycle,
-      name: selectedPlan?.name,
-    }))
+
+    if( selectedPlan.id === 'free'){
+      activateFreePlan()
+    }else{
+      dispatch(updateSubscription({
+        ...selectedPlan,
+        total_count: 12,
+        initial_quantity: qtyRef.current.value,
+        billingCycle: billingCycle,
+        name: selectedPlan?.name,
+      }))
+    }
+    
     setLoading(false)
     setShowConfirm(false);
   }
@@ -313,18 +340,52 @@ const handleSubmit = (e) => {
                   <Form onSubmit={handleQuantitySubmit}>
                     <Form.Group className="d-flex align-items-center gap-3">
                       <Form.Label className="d-inline-flex align-items-center gap-2 form-label w-auto mb-0"><FiUsers /> Team Members</Form.Label>
-                      <Form.Control type="number" className="w-50 flex-grow-1" min={totalmembers || 1} disabled={activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial'} value={teamMembers} onChange={(e) => {
+                      {/* <Form.Control type="number" className="w-50 flex-grow-1" min={totalmembers || 1} disabled={activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial'} value={teamMembers} onChange={(e) => {
                         if(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial'){
                           setTeamMembers(Number(e.target.value)) 
                         }else{
                           return false;
                         }
-                      }}/>
+                      }}/> */}
+                      {(() => {
+                        const qty = activeSubscription?.quantity || 1;
+                        const tmembers = memberFeeds?.length || 0;
+                        const invites = invitationsTotal || 0;
+
+                        // Calculate min value
+                        const currentTotal = tmembers + invites;
+                        const minValue = currentTotal < qty ? currentTotal : qty;
+
+                        return (
+                          <Form.Control
+                            type="number"
+                            className="w-50 flex-grow-1"
+                            min={minValue}
+                            id="qty-field"
+                            ref={qtyRef}
+                            disabled={
+                              activeSubscription?.planId === "free" ||
+                              activeSubscription?.planId === "trial"
+                            }
+                            value={teamMembers === 0 ? minValue : teamMembers}
+                            onChange={(e) => {
+                              if (
+                                activeSubscription?.planId !== "free" &&
+                                activeSubscription?.planId !== "trial"
+                              ) {
+                                setTeamMembers(Number(e.target.value));
+                              } else {
+                                return false;
+                              }
+                            }}
+                          />
+                        );
+                      })()}
                       
                         {
                           
                           (selectedPlanData?.planId?.toLowerCase() !== 'free' && selectedPlanData?.planId?.toLowerCase() !== 'trial') && (
-                            <Button type="submit" variant="primary">Update Members</Button>
+                            <Button type="submit" variant="primary" disabled={loading}>{ loading ? 'Please wait...': 'Update Members'}</Button>
                           )
                         }
                       

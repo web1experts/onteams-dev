@@ -204,7 +204,7 @@ const PlanOverview = () => {
                         </div>
                     </div>
                   </div> */}
-                   {(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial' && memberProfile?.role?.slug === "owner" ) && (
+                   {(activeSubscription && activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial' && memberProfile?.role?.slug === "owner" ) && (
                     <div className="mt-4 bg-amber rounded-4 p-4">
                       <div className="d-flex align-items-start gap-3">
                           <div className="p-2 bg-amber-icon rounded-3"><BsExclamationTriangle /> </div>
