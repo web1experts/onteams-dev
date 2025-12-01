@@ -93,6 +93,8 @@ import {
   ListMemberProjects,
 } from "../../redux/actions/project.action";
 import debounce from "lodash.debounce";
+import { getActiveSubscription } from "../../redux/actions/subscription.action";
+
 
 function TimeTrackingPage() {
   const inputRef = useRef(null);
@@ -107,6 +109,7 @@ function TimeTrackingPage() {
     custom: "Custom",
   };
   const [selected, setSelected] = useState(null);
+  const subscriptionState = useSelector((state) => state.subscription);
   const [projectFilter, setProjectFilter] = useState({ status: "in-progress" });
   const memberProfile = currentMemberProfile();
   let totalhours = 0;
@@ -165,7 +168,7 @@ function TimeTrackingPage() {
   const taskFeed = useSelector((state) => state.task.tasks);
   const [taskslists, setTasksLists] = useState([]);
   const reportState = useSelector((state) => state.reports);
-
+  const [activeSubscription, setActiveSubscription] = useState(null)
   const manuldatePickerRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
@@ -212,6 +215,13 @@ useEffect(() => {
 useEffect(() => {
   currentActivityTabRef.current = currentActivity;
 },[currentActivity])
+
+useEffect(() => {
+  
+  if(subscriptionState.activeSubscription){
+    setActiveSubscription(subscriptionState.activeSubscription) 
+  }
+}, [subscriptionState.activeSubscription])
 
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
@@ -459,6 +469,7 @@ useEffect(() => {
 
   useEffect(() => {
     handleListProjects();
+    dispatch(getActiveSubscription())
   }, [dispatch]);
 
   useEffect(() => {
@@ -1601,15 +1612,28 @@ const ymd = (dateLike) => {
               >
                 <TbScreenshot className="me-1" /> Screenshots
               </Button>
-              <Button
-                variant="primary"
-                className="btn--view"
-                key={"videos1-tab-key"}
-                active={screenshotTab === "Videos"}
-                onClick={() => setScreenshotTab("Videos")}
-              >
-                <MdOutlineVideoLibrary className="me-1" /> Videos
-              </Button>
+              {
+                (activeSubscription && activeSubscription?.planId === 'elite' ) ? (
+                  <Button
+                    variant="primary"
+                    className="btn--view"
+                    key={"videos1-tab-key"}
+                    active={screenshotTab === "Videos"}
+                    onClick={() => setScreenshotTab("Videos")}
+                  >
+                    <MdOutlineVideoLibrary className="me-1" /> Videos
+                  </Button>)
+                :
+                <Button
+                    variant="primary"
+                    className="btn--view"
+                    key={"videos1-tab-key"}
+                    disabled
+                    onClick={() => {return false;}}
+                  >
+                    <MdOutlineVideoLibrary className="me-1" /> Videos
+                  </Button>
+              }
             </ListGroup>
           </ListGroup>
         </>

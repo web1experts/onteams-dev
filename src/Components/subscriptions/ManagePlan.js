@@ -96,6 +96,7 @@ export default function ManagePlan() {
   useEffect(() => {
     if (subscriptionState.activeSubscription) {
       setActiveSubscription(subscriptionState.activeSubscription)
+      setTotalMembers(subscriptionState.activeSubscription?.quantity)
       setBillingCycle(subscriptionState.activeSubscription?.interval || 'monthly')
       const allPlans = [...plans.monthly, ...plans.quarterly, ...plans.yearly];
 

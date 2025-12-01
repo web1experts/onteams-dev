@@ -1379,13 +1379,20 @@ useEffect(() => {
                         <FiVideo />
                         <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording during work hours</small></h6>
                       </div>
-                      <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
-                        updateRecodingType({
-                            custom_field: {
-                                video_recording: event.target.checked ? "enable" : "disabled"
-                            }
-                        });
-                      }} name={`custom_field[video_recording]`} />
+                      {
+                        (activeSubscription && activeSubscription?.planId === 'elite' ) ? (
+                          <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
+                            updateRecodingType({
+                                custom_field: {
+                                    video_recording: event.target.checked ? "enable" : "disabled"
+                                }
+                            });
+                          }} name={`custom_field[video_recording]`} />
+                        ):
+
+                        <Form.Check type="switch" key={`video-only`} disabled checked={false} value={"disabled"} onChange={(event) => {return false;}} name={`custom_field[video_recording]`} />
+                      }
+                      
                     </Card.Body>
                   </Card>
 
