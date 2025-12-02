@@ -415,30 +415,35 @@ useEffect(() => {
                                     {
                                         data.attendanceData && data.attendanceData.length > 0 && 
                                         data.attendanceData.map((atten, ind) => {
+                                          const key = atten?.status?.toLowerCase()?.replace(/\s+/g, '_');
+                                          const rgbaBorder = hexToRgba(statusObject?.[key]?.color, 0.3);
+                                          const rgbaBg = hexToRgba(statusObject?.[key]?.color, 0.1);
+                                          function hexToRgba(hex, alpha) {
+                                            hex = (typeof hex !== 'undefined') ? hex.replace('#', ''): '';
+
+                                            if (hex.length === 3) {
+                                              hex = hex.split('').map(c => c + c).join('');
+                                            }
+
+                                            const bigint = parseInt(hex, 16);
+                                            const r = (bigint >> 16) & 255;
+                                            const g = (bigint >> 8) & 255;
+                                            const b = bigint & 255;
+
+                                            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                                          }
                                           if (atten.count !== undefined) {
                                             return (
-                                              <td className={`${atten?.bg} text-center border-bottom border-end`} key={ind}>
+                                              <td className={`${atten?.bg} text-center border-bottom border-end`} key={ind} style={{
+                                                    color: statusObject?.[key]?.color,
+                                                    backgroundColor: rgbaBg,
+                                                    borderColor: `1px solid ${rgbaBorder}`,
+                                                  }}>
                                                 <strong>{atten?.count}</strong>
                                               </td>
                                             );
                                           } else {
-                                              const key = atten?.status?.toLowerCase()?.replace(/\s+/g, '_');
-                                              const rgbaBorder = hexToRgba(statusObject?.[key]?.color, 0.3);
-                                              const rgbaBg = hexToRgba(statusObject?.[key]?.color, 0.1);
-                                              function hexToRgba(hex, alpha) {
-                                                hex = (typeof hex !== 'undefined') ? hex.replace('#', ''): '';
-
-                                                if (hex.length === 3) {
-                                                  hex = hex.split('').map(c => c + c).join('');
-                                                }
-
-                                                const bigint = parseInt(hex, 16);
-                                                const r = (bigint >> 16) & 255;
-                                                const g = (bigint >> 8) & 255;
-                                                const b = bigint & 255;
-
-                                                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                                              }
+                                              
 
                                             return (
                                               <td className="text-center border-bottom border-end" key={ind}>
