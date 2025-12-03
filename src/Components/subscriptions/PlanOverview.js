@@ -217,7 +217,7 @@ const PlanOverview = () => {
                             year: "numeric",
                           })}</small></p>
                           </div>
-                          <Button variant="warning" onClick={doCancel} className="ms-auto">Cancel</Button>
+                          {/* <Button variant="warning" onClick={doCancel} className="ms-auto">Cancel</Button> */}
                       </div>
                     </div>)
                   }
