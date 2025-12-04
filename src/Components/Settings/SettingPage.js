@@ -361,15 +361,6 @@ function SettingPage(props) {
             >
               <MdLockOutline /> Security
             </ListGroup.Item>
-            <ListGroup.Item
-                  action
-                  active={activeTab === "billing"}
-                  onClick={() => {
-                    setActiveTab("billing");
-                  }}
-                >
-                  <MdLockOutline /> Billing
-                </ListGroup.Item>
              {
               memberProfile?.role?.slug === "owner" ?
                 currentSubscription === null ? 
@@ -503,55 +494,56 @@ function SettingPage(props) {
                 <Form onSubmit={handleSecurityUpdate}>
                   <Form.Group className="mb-3">
                     <Form.Label>Current Password</Form.Label>
-                    <Form.Control
+                    <span className="position-relative">
+                      <Form.Control
                       type={showCurrentPassword ? "text" : "password"}
                       name="current_password"
                       value={securityFields?.current_password || ""}
                       onChange={handleSecurityFields}
                     />
                     {/* Show/Hide Password Toggle */}
-                      <span
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                          style={{
+                    <span
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        style={{
                           position: "absolute",
                           right: "12px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
                           cursor: "pointer",
-                          fontSize: "18px",
                           color: "#6c757d",
-                          }}
-                      >
-                          {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
-                      </span>
+                          bottom: "14px"
+                        }}
+                    >
+                        {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                    </span>
+                    </span>
                     {showError("current_password", "security")}
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label>New Password</Form.Label>
-                    <Form.Control
-                      type={showPassword ? "text" : "password"}
-                      name="new_password"
-                      value={securityFields?.new_password || ""}
-                      onChange={handleSecurityFields}
-                    />
-                    <span
+                    <span className="position-relative">
+                      <Form.Control
+                        type={showPassword ? "text" : "password"}
+                        name="new_password"
+                        value={securityFields?.new_password || ""}
+                        onChange={handleSecurityFields}
+                      />
+                      <span
                           onClick={() => setShowPassword(!showPassword)}
                           style={{
-                          position: "absolute",
-                          right: "12px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          cursor: "pointer",
-                          fontSize: "18px",
-                          color: "#6c757d",
+                            position: "absolute",
+                            right: "12px",
+                            cursor: "pointer",
+                            color: "#6c757d",
+                            bottom: "14px"
                           }}
                       >
                           {showPassword ? <FaEyeSlash /> : <FaEye />}
                       </span>
+                    </span>
                     {showError("confirm_password", "security")}
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label>Confirm Password</Form.Label>
+                    <span className="position-relative">
                     <Form.Control
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirm_password"
@@ -563,14 +555,13 @@ function SettingPage(props) {
                       style={{
                       position: "absolute",
                       right: "12px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
                       cursor: "pointer",
-                      fontSize: "18px",
                       color: "#6c757d",
+                      bottom: "14px"
                       }}
                   >
                       {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
                   </span>
                     {showError("confirm_password", "security")}
                   </Form.Group>

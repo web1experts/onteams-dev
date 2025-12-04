@@ -4130,6 +4130,18 @@ Project Task View CSS=-=-=
   margin-top: 1rem;
 }
 
+.modal .new--accordion--block .bg--blue--accordion form svg {
+  background: none;
+  box-shadow: none;
+    border-radius: 0;
+    width: 1rem;
+    min-width: 1rem;
+    height: auto;
+    color: inherit;
+    opacity: .7;
+    padding: 0;
+}
+
 .new--accordion--block .accordion-button h6,
 .modal .new--accordion--block .bg--blue--accordion h6 {
   font-size: 1.25rem;
