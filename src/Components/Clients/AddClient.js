@@ -137,6 +137,7 @@ function AddClient(props) {
       setErrors(updatedErrors);
     } else {
       const formData = new FormData();
+   
       Object.entries(rows).forEach(([fieldName, value]) => {
         if (Array.isArray(value)) {
           // Check if the value is an array

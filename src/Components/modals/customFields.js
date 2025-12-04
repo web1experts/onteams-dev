@@ -216,10 +216,11 @@ export const CustomFieldModal = (props) => {
     return fieldName
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
-      .replace(/\s+/g, "-") // Replace spaces with dashes
-      .replace(/-+/g, "-"); // Replace multiple dashes with one
+      .replace(/[^a-z0-9\s_]/g, "") // Remove special characters except underscore
+      .replace(/\s+/g, "_") // Replace spaces with underscore
+      .replace(/_+/g, "_"); // Replace multiple underscores with one
   }
+
 
   const handleUpdateField = async () => {
     const newErrors = {};
