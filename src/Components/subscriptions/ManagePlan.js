@@ -482,11 +482,11 @@ const handleSubmit = (e) => {
                         <div className="mb-2 d-flex align-items-center justify-content-between gap-3">
                           <p className="mb-0">Price per user:</p>
                           <p className="mb-0 text-end">
-                            {selectedPlanData?.pricePerUser > 0 && (
+                            {selectedPlanData?.pricePerUser > 0 ?
                               <small className=" d-block">
                                 ₹{selectedPlanData?.pricePerUser}/month
                               </small>
-                            )}
+                            : <small className=" d-block">0</small>}
                             {/* <span className="fw-bold d-block">
                               ₹{discountPrice}/month
                             </span> */}
@@ -500,6 +500,24 @@ const handleSubmit = (e) => {
                         {/* <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fw-bold border-bottom pb-3">
                           Total per {billingCycle}: <strong className="display-6 fw-bold text-end">₹{totalPerCycle.toLocaleString()}</strong>
                         </p> */}
+                        
+                         { billingCycle === "yearly" && selectedPlanData?.id !== 'free' || billingCycle === "quarterly" && selectedPlanData?.id !== 'free' && (
+                          <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                          <div className="text--small mb-1 text-uppercase text-emerald">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
+                          <div className="text-slate-600 mt-1">
+                            ₹{((selectedPlanData.originalPrice - selectedPlanData.pricePerUser) *  teamMembers).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
+                            {(((selectedPlanData.originalPrice - selectedPlanData.pricePerUser) ) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
+                          </div>
+                          <div className="text--large mb-0 text-emerald mt-2">₹{
+                            (( selectedPlanData?.originalPrice * teamMembers ) - (selectedPlanData?.pricePerUser * teamMembers)) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
+                            
+                          }</div>
+                        </div>)
+                        }  
+                        <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
+                          Total per month
+                           <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
+                        </p> 
                         <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
                           Total for{" "}
                           {billingCycle === "yearly"
@@ -507,9 +525,8 @@ const handleSubmit = (e) => {
                             : billingCycle === "quarterly"
                               ? "3 months"
                               : "1 month"}
-                          : <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
+                          : <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1).toFixed(0)}</strong>
                         </p>
-
                       </div>
                     </Card.Body>
                   </Card>
@@ -711,7 +728,7 @@ const handleSubmit = (e) => {
                 </span>
               </p> */}
               <p className="mb-1">
-                Discounted price per user:{" "}
+                {billingCycle === 'monthly' ? 'Regular': 'Discounted'} price per user:{" "}
                 <span className="fw-semibold text-primary">
                   ₹{selectedPlanData?.pricePerUser}/user/month
                 </span>
