@@ -361,6 +361,15 @@ function SettingPage(props) {
             >
               <MdLockOutline /> Security
             </ListGroup.Item>
+            <ListGroup.Item
+                  action
+                  active={activeTab === "billing"}
+                  onClick={() => {
+                    setActiveTab("billing");
+                  }}
+                >
+                  <MdLockOutline /> Billing
+                </ListGroup.Item>
              {
               memberProfile?.role?.slug === "owner" ?
                 currentSubscription === null ? 

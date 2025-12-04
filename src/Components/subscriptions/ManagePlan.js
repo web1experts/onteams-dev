@@ -469,8 +469,8 @@ const handleSubmit = (e) => {
                       {/* Collapsible Feature List */}
                       <Collapse in={showFeatures}>
                         <div className="mb-3 border-bottom pb-3">
-                          <h5 className="text-slate-700 text-uppercase fw-bold">Plan Features</h5>
-                          <ul>
+                          <h5 className="text-slate-700 text-uppercase fw-bold fs-6">Plan Features</h5>
+                          <ul className="d-flex flex-column gap-2">
                             {selectedPlanData?.features.map((feature, idx) => (
                               <li className="d-flex align-items-center gap-2" key={idx}><FiCheck /> {feature}</li>
                             ))}
@@ -484,14 +484,14 @@ const handleSubmit = (e) => {
                           <p className="mb-0 text-end">
                             {
                               (selectedPlanData?.discount > 0) && (
-                                <span className="text-decoration-line-through">₹{selectedPlanData.originalPrice.toFixed(0)}</span>
+                                <span className="text-decoration-line-through text-muted">₹{selectedPlanData.originalPrice.toFixed(0)}</span>
                               )
                             }
                             {selectedPlanData?.pricePerUser > 0 ?
-                              <small className=" d-block">
+                              <small className="fs-6 fw-bold d-block">
                                 ₹{selectedPlanData?.pricePerUser}/month
                               </small>
-                            : <small className=" d-block">0</small>}
+                            : <small className="fs-6 fw-bold d-block">0</small>}
                             {/* <span className="fw-bold d-block">
                               ₹{discountPrice}/month
                             </span> */}
@@ -508,17 +508,17 @@ const handleSubmit = (e) => {
                         
                          {(selectedPlanData?.id !== "free" && 
                             (billingCycle === "yearly" || billingCycle === "quarterly")) && (
-                            <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                            <div className="bg-gradient-green p-3 text-center mb-3 rounded-3">
                               <div className="text--small mb-1 text-uppercase text-emerald">
                                 Total Savings in {billingCycle === "quarterly" ? "3 Months" : "1 Year"}
                               </div>
 
-                              <div className="text-slate-600 mt-1">
+                              {/* <div className="text-slate-600 mt-1">
                                 ₹{((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) * teamMembers).toFixed(0)}
                                 /month × {billingCycle === "quarterly" ? 3 : 12} months = ₹
                                 {(((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) * teamMembers) *
                                   (billingCycle === "quarterly" ? 3 : 12)).toFixed(0)}
-                              </div>
+                              </div> */}
 
                               <div className="text--large mb-0 text-emerald mt-2">
                                 ₹{
@@ -530,9 +530,9 @@ const handleSubmit = (e) => {
                             </div>
                           )}
 
-                        <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
+                        <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fs-5 fw-bold border-top border-bottom py-2">
                           Total per month
-                           <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
+                           <strong className="text-end fs-3">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
                         </p> 
                         <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
                           Total for{" "}
@@ -541,7 +541,7 @@ const handleSubmit = (e) => {
                             : billingCycle === "quarterly"
                               ? "3 months"
                               : "1 month"}
-                          : <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1).toFixed(0)}</strong>
+                          : <strong className="text-end fs-5">₹{(teamMembers * selectedPlanData?.pricePerUser) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1).toFixed(0)}</strong>
                         </p>
                       </div>
                     </Card.Body>

@@ -434,12 +434,13 @@ useEffect(() => {
                                           }
                                           if (atten.count !== undefined) {
                                             return (
-                                              <td className={`${atten?.bg} text-center border-bottom border-end`} key={ind} style={{
+                                              <td className={`${atten?.bg} text-center border-bottom`} key={ind} style={{
                                                     color: statusObject?.[key]?.color,
                                                     backgroundColor: rgbaBg,
-                                                    borderColor: `1px solid ${rgbaBorder}`,
+                                                    borderRight: `1px solid ${rgbaBorder}`
                                                   }}>
-                                                <strong>{atten?.count}</strong>
+                                                      <strong>{atten?.count}</strong>
+                                                    
                                               </td>
                                             );
                                           } else {

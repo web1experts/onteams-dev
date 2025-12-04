@@ -8172,6 +8172,50 @@ ul#icon-tabs .nav-link span svg {
   background: linear-gradient(145deg, rgba(var(--theme-primary), .2), rgba(var(--theme-secondary), .05));
 }
 
+.setting__modal .bg-gradient-green {
+  border: 2px solid rgb(52 211 153);
+  text-align: center;
+  background: linear-gradient(145deg, #ecfdf5, #f0fdf4);
+}
+
+.bg-gradient-green .text--small {
+    color: #454545;
+    letter-spacing: .025em;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: .75rem;
+    line-height: 1rem;
+}
+
+.bg-gradient-green .text--large {
+    color: rgb(4 120 87);
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.setting__modal .setting--page .manage__plan__tabs .modal--plan--card .badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: max-content;
+    margin: auto;
+    transform: translateY(-10px);
+}
+
+.bg-gradient-green .text--large > span.text-slate-600 {
+    text-transform: lowercase !important;
+}
+
+.bg-gradient-green .text-slate-600 {
+    color: #454545;
+    font-weight: 500;
+    font-size: .75rem;
+    line-height: 1rem;
+}
+
 .summary--card {
   background: none;
 }
