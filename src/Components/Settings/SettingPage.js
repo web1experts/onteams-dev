@@ -105,6 +105,7 @@ function SettingPage(props) {
   const memberProfile = currentMemberProfile();
   const fileInputRef = useRef();
   const [activeTab, setActiveTab] = useState("Profile");
+  const [activePlanTab, setActivePlanTab] = useState("planDetails");
   const [isActive, setIsActive] = useState(false);
   const [fieldserrors, setFieldErrors] = useState({ name: "" });
   const [profile, setProfile] = useState({});
@@ -530,12 +531,12 @@ function SettingPage(props) {
         {
           activeTab === "billing" && (
             <div className="manage__plan__tabs rounded--box p-4">
-              <Tabs defaultActiveKey="planDetails" id="manage-plans-tab">
+              <Tabs defaultActiveKey="planDetails" id="manage-plans-tab" onSelect={(k) => setActivePlanTab(k)}>
                 <Tab eventKey="planDetails" title="Plan Details">
-                  <PlanOverview />
+                  {activePlanTab === "planDetails" && <PlanOverview />}
                 </Tab>
                 <Tab eventKey="manage" title="Manage Plan">
-                  <ManagePlan />
+                  {activePlanTab === "manage" && <ManagePlan />}
                 </Tab>
                 
               </Tabs>

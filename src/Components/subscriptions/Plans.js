@@ -223,7 +223,7 @@ function PlansPage() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [members, setMembers] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [billingCycle, setBillingCycle] = useState("monthly"); // monthly | quarterly | yearly
+  const [billingCycle, setBillingCycle] = useState("yearly"); // monthly | quarterly | yearly
   const [showConfirm, setShowConfirm] = useState(false);
   const [priceDetails, setPriceDetails] = useState(null);
   // Adjust price based on billing cycle

@@ -20,7 +20,7 @@ export default function ManagePlan() {
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [billingCycle, setBillingCycle] = useState('yearly');
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [memberFeeds, setMemberFeed] = useState([]);
   const invitationsFeed = useSelector((state) => state.member.invitations);
@@ -280,8 +280,6 @@ const handleSubmit = (e) => {
       }))
     }
     
-    setLoading(false)
-    setShowConfirm(false);
   }
 
   useEffect(() => {
@@ -290,6 +288,8 @@ const handleSubmit = (e) => {
       console.log('subscriptionState.authorizeData::: ', subscriptionState.authorizeData)
       authorizeSubscriptionPayment(subscriptionState.authorizeData)
     }
+    setLoading(false)
+    setShowConfirm(false);
   }, [subscriptionState])
 
   const authorizeSubscriptionPayment = async (payload) => {
