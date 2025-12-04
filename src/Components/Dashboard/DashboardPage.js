@@ -614,9 +614,9 @@ function DashboardPage() {
         <div className="page--wrapper px-md-2 pb-4 pt-4 text-center">
           <Container fluid>
             <Row className="justify-content-center">
-              <Col sm={12}>
+              <Col sm={12} className="mb-4">
                 <DateTimeCard />
-                <ListGroup className="invitation--list">
+                {/*<ListGroup className="invitation--list">
                   {invitationsFeeds &&
                     invitationsFeeds.length > 0 &&
                     invitationsFeeds.map((invitation, index) => {
@@ -664,7 +664,7 @@ function DashboardPage() {
                         </>
                       );
                     })}
-                </ListGroup>
+                </ListGroup>*/}
               </Col>
               <Col xl={8}>
                 <Card className="daily--star">

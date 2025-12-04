@@ -8008,7 +8008,7 @@ ul#icon-tabs .nav-link span svg {
   background: linear-gradient(145deg, #f8fafc, #f1f5f9);
 }
 
-.bg-gradient-primary .text--small {
+.text--small {
     color: #454545;
     letter-spacing: .025em;
     text-transform: uppercase;
@@ -8017,19 +8017,19 @@ ul#icon-tabs .nav-link span svg {
     line-height: 1rem;
 }
 
-.bg-gradient-primary .text--large {
+.text--large {
     color: rgb(4 120 87);
     text-transform: uppercase;
     font-weight: 700;
-    font-size: 3rem;
+    font-size: 1.8rem;
     line-height: 1;
 }
 
-.bg-gradient-primary .text--large > span.text-slate-600 {
+.text--large > span.text-slate-600 {
     text-transform: lowercase !important;
 }
 
-.bg-gradient-primary .text-slate-600 {
+.text-slate-600 {
     color: #454545;
     font-weight: 500;
     font-size: .75rem;
@@ -8236,7 +8236,7 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .summary--card ul li svg {
-  color: rgba(var(--theme-primary), 1);
+  color: rgb(5 150 105);
   height: auto;
   width: 1rem;
 }

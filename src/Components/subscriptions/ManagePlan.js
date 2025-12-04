@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from "react-bootstrap";
-import { FiUsers, FiCalendar, FiCheck, FiSave, FiCreditCard } from "react-icons/fi";
+import { FiUsers, FiCalendar, FiCheck, FiSave } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { BsTags } from "react-icons/bs";
 import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
 import { countries } from "../../helpers/countries";
@@ -442,14 +443,14 @@ const handleSubmit = (e) => {
                   {/* Billing Cycle */}
                   <Form.Group className="mb-3">
                     <Form.Label className="fw-bold mb-2 d-inline-flex align-items-center gap-2"><FiCalendar /> Billing Cycle</Form.Label>
-                    <Form.Select value={billingCycle} onChange={(e) => setBillingCycle(e.target.value)}>
+                    <Form.Select className="custom-selectbox" value={billingCycle} onChange={(e) => setBillingCycle(e.target.value)}>
                       <option value="monthly">Monthly</option>
                       <option value="quarterly">Quarterly (Save 20%)</option>
                       <option value="yearly">Yearly (Save 40%)</option>
                     </Form.Select>
                   </Form.Group>
                   {/* Price Summary */}
-                  <Card className="p-0 border-0 mb-4 summary--card flex-column">
+                  <Card className="p-0 border-0 mb-0 summary--card flex-column">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <Card.Title className="fw-bold mb-0">Price Summary</Card.Title>
                       <Button variant="link" size="sm" className="text-decoration-none px-3 py-1 border-0" onClick={() => setShowFeatures((prev) => !prev)}>
@@ -560,127 +561,125 @@ const handleSubmit = (e) => {
                   <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
                   <Button variant="danger"  onClick={doCancel} className="w-100 fw-bold">Cancel Subscription</Button>
                 </div>
-                <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
-                                              <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
-                                              <Row>
-                                                <Form.Group as={Col} md="12" className="position-relative mb-0 form-group">
-                                                  <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
-                                                  <Form.Control type="text" className={errors?.fullName ? 'br-red' : ''} name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
-                                                  {showError("fullName")}
-                                                </Form.Group>
-                                              </Row>
-                              
-                                              <Row>
-                                                <Form.Group className="position-relative mb-0 form-group">
-                                                  <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                                                  <Row>
-                                                    <Col className="d-flex align-items-start gap-3">
-                                                      <Form.Select className="w-auto pe-5 custom-selectbox">
-                                                        {countries.map((country) => (
-                                                          <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
-                                                            {country.phoneCode}
-                                                          </option>
-                                                        ))}
-                                                      </Form.Select>
-                                                    
-                                                      <div className="flex-fill position-relative">
-                                                        <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
-                                                        {showError("phone")}
-                                                      </div>
-                                                    </Col>
-                                                  </Row>
-                                                </Form.Group>
-                                              </Row>
-                              
-                                              <Form.Group  className="position-relative mb-0 form-group">
-                                                <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
-                                                <Form.Control
-                                                  type="text"
-                                                  name="address1"
-                                                  className={errors?.address1 ? 'br-red' : ''} 
-                                                  placeholder="Street address, building, apartment"
-                                                  value={formData.address1}
-                                                  onChange={handleChange}
-                                                  required
-                                                />
-                                                {showError("address1")}
-                                              </Form.Group>
-                              
-                                              <Form.Group className="position-relative mb-0 form-group">
-                                                <Form.Label>Address Line 2</Form.Label>
-                                                <Form.Control
-                                                  type="text"
-                                                  name="address2"
-                                                  placeholder="Additional address details (optional)"
-                                                  value={formData.address2}
-                                                  onChange={handleChange}
-                                                />
-                                              </Form.Group>
-                              
-                                              <Row className="">
-                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
-                                                  <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
-                                                  <Form.Control
-                                                    type="text"
-                                                    name="city"
-                                                    className={errors?.city ? 'br-red' : ''} 
-                                                    placeholder="City"
-                                                    value={formData.city}
-                                                    onChange={handleChange}
-                                                    required
-                                                  />
-                                                  {showError("city")}
-                                                </Form.Group>
-                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
-                                                  <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
-                                                  <Form.Control
-                                                    className={errors?.state ? 'br-red' : ''} 
-                                                    type="text"
-                                                    name="state"
-                                                    placeholder="State or Province"
-                                                    value={formData.state}
-                                                    onChange={handleChange}
-                                                    required
-                                                  />
-                                                  {showError("state")}
-                                                </Form.Group>
-                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
-                                                  <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
-                                                  <Form.Control
-                                                    type="text"
-                                                    name="postal"
-                                                    className={errors?.postal ? 'br-red' : ''} 
-                                                    placeholder="Postal code"
-                                                    value={formData.postal}
-                                                    onChange={handleChange}
-                                                    required
-                                                  />
-                                                  {showError("postal")}
-                                                </Form.Group>
-                                              </Row>
-                              
-                                              <Form.Group  className="position-relative mb-0 form-group">
-                                                <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
-                                                <Form.Select
-                                                  className="custom-selectbox"
-                                                  name="country"
-                                                  value={formData.country}
-                                                  onChange={handleChange}
-                                                  required
-                                                >
-                                                  {countries.map((country) => (
-                                                    <option key={`country-${country.isoCode}--${country.phoneCode}`} value={country.value}>
-                                                      {country.name}
-                                                    </option>
-                                                  ))}
-                                                </Form.Select>
-                                                {showError("country")}
-                                              </Form.Group>
-                              
-                                                <Button variant="primary" type="submit" onClick={handleSubmit} className="w-100 mt-4 d-flex align-items-center justify-content-center gap-2 fw-bold" disabled={loading}><FiSave /> { loading ? 'Please wait...': 'Save Billing Information'}</Button>
-                                            
-                              
-                                            </Form>
+                <Form className="bg-gradient-light bg-white rounded-4 shadow border p-4" onSubmit={handleSubmit}>
+                  <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
+                  <Row>
+                    <Form.Group as={Col} md="12" className="position-relative mb-0 form-group">
+                      <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control type="text" className={errors?.fullName ? 'br-red' : ''} name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
+                      {showError("fullName")}
+                    </Form.Group>
+                  </Row>
+  
+                  <Row>
+                    <Form.Group className="position-relative mb-0 form-group">
+                      <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
+                      <Row>
+                        <Col className="d-flex align-items-start gap-3">
+                          <Form.Select className="w-auto pe-5 custom-selectbox">
+                            {countries.map((country) => (
+                              <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
+                                {country.phoneCode}
+                              </option>
+                            ))}
+                          </Form.Select>
+                        
+                          <div className="flex-fill position-relative">
+                            <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                            {showError("phone")}
+                          </div>
+                        </Col>
+                      </Row>
+                    </Form.Group>
+                  </Row>
+  
+                  <Form.Group  className="position-relative mb-0 form-group">
+                    <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="address1"
+                      className={errors?.address1 ? 'br-red' : ''} 
+                      placeholder="Street address, building, apartment"
+                      value={formData.address1}
+                      onChange={handleChange}
+                      required
+                    />
+                    {showError("address1")}
+                  </Form.Group>
+  
+                  <Form.Group className="position-relative mb-0 form-group">
+                    <Form.Label>Address Line 2</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="address2"
+                      placeholder="Additional address details (optional)"
+                      value={formData.address2}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+  
+                  <Row className="">
+                    <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                      <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="city"
+                        className={errors?.city ? 'br-red' : ''} 
+                        placeholder="City"
+                        value={formData.city}
+                        onChange={handleChange}
+                        required
+                      />
+                      {showError("city")}
+                    </Form.Group>
+                    <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                      <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control
+                        className={errors?.state ? 'br-red' : ''} 
+                        type="text"
+                        name="state"
+                        placeholder="State or Province"
+                        value={formData.state}
+                        onChange={handleChange}
+                        required
+                      />
+                      {showError("state")}
+                    </Form.Group>
+                    <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                      <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="postal"
+                        className={errors?.postal ? 'br-red' : ''} 
+                        placeholder="Postal code"
+                        value={formData.postal}
+                        onChange={handleChange}
+                        required
+                      />
+                      {showError("postal")}
+                    </Form.Group>
+                  </Row>
+  
+                  <Form.Group  className="position-relative mb-0 form-group">
+                    <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
+                    <Form.Select
+                      className="custom-selectbox"
+                      name="country"
+                      value={formData.country}
+                      onChange={handleChange}
+                      required
+                    >
+                      {countries.map((country) => (
+                        <option key={`country-${country.isoCode}--${country.phoneCode}`} value={country.value}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    {showError("country")}
+                  </Form.Group>
+  
+                  <Button variant="primary" type="submit" onClick={handleSubmit} className="w-100 mt-4 d-flex align-items-center justify-content-center gap-2 fw-bold" disabled={loading}><FiSave /> { loading ? 'Please wait...': 'Save Billing Information'}</Button>
+                </Form>
               </Col>
             </Row>
           </Container>
@@ -692,28 +691,38 @@ const handleSubmit = (e) => {
         msg="Are you sure you want to cancel your subscription?"
         callback={handleCancelSubscription}
       />
-      <Modal show={showConfirm} onHide={handleCloseConfirm} centered size="lg">
+      <Modal show={showConfirm} onHide={handleCloseConfirm} centered size="lg" className="subscription--modal theme--modal">
         <Modal.Header closeButton>
-          <Modal.Title className="fw-semibold">Subscription Confirmation</Modal.Title>
+          <Modal.Title>
+              <span className="nav--item--icon"><BsTags /></span>
+              <strong>Subscription Confirmation <small>Let’s make something amazing together</small></strong>
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {/* Subscription Details */}
-          <div className="border rounded p-3 mb-4">
-            <h6 className="fw-semibold mb-3">SUBSCRIPTION DETAILS</h6>
-            <div className="border rounded p-3 bg-light mb-3">
-              <p className="mb-2"><strong>Team Members:</strong> {teamMembers} user{teamMembers > 1 ? "s" : ""}</p>
-              <p className="mb-2">
-                <strong>Payment Type:</strong>{" "}
-                {billingCycle === "yearly"
+          <div className="border rounded p-3 mb-4 bg-light">
+            <h6 className="fw-bold mb-3">SUBSCRIPTION DETAILS</h6>
+            <div className="bg-white rounded-3 p-3 border">
+              <p className="mb-0">Team Members <strong className="d-block fs-6 fw-bold">{teamMembers} user{teamMembers > 1 ? "s" : ""}</strong></p>
+            </div>
+            <div className="bg-white rounded-3 p-3 border my-3">
+              <p className="mb-0">
+                Payment Type{" "}
+                <strong className="d-block fs-6 fw-bold text-primary">
+                  {billingCycle === "yearly"
                   ? "Annual Payment (Billed Once a Year)"
                   : billingCycle === "quarterly"
                   ? "Quarterly Payment (Billed Every 3 Months)"
                   : "Monthly Payment (Billed Every Month)"
                 }
+                </strong>
               </p>
+            </div>
+            <div className="bg-white rounded-3 p-3 border">
               <p className="mb-0">
-                <strong>Next Payment Date:</strong>{" "}
-                {(() => {
+                Next Payment Date{" "}
+                <strong className="d-block fs-6 fw-bold">
+                  {(() => {
                   const nextDate = new Date();
                   
                   if (billingCycle === "yearly") {
@@ -730,13 +739,14 @@ const handleSubmit = (e) => {
                     year: "numeric",
                   });
                 })()}
+                </strong>
               </p>
             </div>
           </div>
 
           {/* Price Calculation */}
-          <div className="border rounded p-3 mb-4">
-            <h6 className="fw-semibold mb-3">PRICE CALCULATION</h6>
+          <div className="border rounded p-3 mb-4 bg-light">
+            <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
             <div className="mb-2">
               {/* <p className="mb-1 text-muted">
                 Regular price per user:{" "}
@@ -744,13 +754,19 @@ const handleSubmit = (e) => {
                   ₹{selectedPlanData?.pricePerUser}/user/month
                 </span>
               </p> */}
-              <p className="mb-1">
-                {billingCycle === 'monthly' ? 'Regular': 'Discounted'} price per user:{" "}
-                <span className="fw-semibold text-primary">
-                  ₹{selectedPlanData?.pricePerUser}/user/month
+              <div className="bg-white rounded-3 p-3 border mb-3">
+                <p className="mb-0">
+                {billingCycle === 'monthly' ? 'Regular': 'Discounted'} price per user{" "}
+                <span className="d-block">
+                  <strong className="text-primary fs-5">₹{selectedPlanData?.pricePerUser}</strong>/user/month
                 </span>
               </p>
-              <p className="mb-1">Base calculation: ₹{selectedPlanData?.pricePerUser} × {teamMembers} user(s) = ₹{(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}</p>
+              </div>
+              <div className="bg-white rounded-3 p-3 border">
+                <p className="mb-1">Base Calculation
+                  <span className="d-flex justify-content-between"> ₹{selectedPlanData?.pricePerUser} × {teamMembers} user(s) <strong className="fs-5">= ₹{(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}</strong></span>
+                </p>
+              </div>
             </div>
 
             {/* Cost Breakdown */}
@@ -785,10 +801,10 @@ const handleSubmit = (e) => {
                 
                 { <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
                   <div className="text--small mb-1 text-uppercase text-emerald">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
-                  <div className="text-slate-600 mt-1">
+                  {/* <div className="text-slate-600 mt-1">
                     ₹{((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) *  teamMembers).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
                     {(((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser)) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
-                  </div>
+                  </div> */}
                   <div className="text--large mb-0 text-emerald mt-2">₹{
                     (( selectedPlanData?.originalPrice * teamMembers ) - (selectedPlanData?.pricePerUser * teamMembers)) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
                     
