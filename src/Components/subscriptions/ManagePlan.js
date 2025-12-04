@@ -183,6 +183,7 @@ useEffect(() => {
         setFormData(billingInfo)
 
       }
+      selectboxObserver()
     }, [subscriptionState.billing_info])
 
       const handleChange = (e) => {
@@ -574,7 +575,7 @@ const handleSubmit = (e) => {
                                                   <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
                                                   <Row>
                                                     <Col className="d-flex align-items-start gap-3">
-                                                      <Form.Select className="w-auto pe-5">
+                                                      <Form.Select className="w-auto pe-5 custom-selectbox">
                                                         {countries.map((country) => (
                                                           <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
                                                             {country.phoneCode}
