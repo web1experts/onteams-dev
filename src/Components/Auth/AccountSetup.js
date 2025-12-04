@@ -8,6 +8,7 @@ import { getFieldRules, validateField } from '../../helpers/rules';
 import WorkspaceForm from "../workspaces/workspaceform";
 import { useToast } from "../../context/ToastContext";
 import useFilledClass from "../customHooks/useFilledclass";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 const timer = 60
 
 function AccountSetup() {
@@ -16,6 +17,7 @@ function AccountSetup() {
 
     const addToast = useToast();
     const { token } = useParams();
+    const [showPassword, setShowPassword] = useState(false);
     const [fields, setFields] = useState({ name: '', password: '', token: token });
     const navigate = useNavigate();
     /** -- Form Fields Errors -- */
@@ -152,8 +154,29 @@ function AccountSetup() {
                                         </Form.Group>
                                         <Form.Group className="mb-3 form-group">
                                             <FloatingLabel label="Password" controlId="floatingPassword">
-                                                <Form.Control type="password"  className={errors['password'] ? "input-error" : ''} placeholder="Password*" name="password" onChange={handleChange} />
+                                                <Form.Control 
+                                                    type={showPassword ? "text" : "password"} 
+                                                    className={errors['password'] ? "input-error" : ''} 
+                                                    placeholder="Password*" 
+                                                    name="password" 
+                                                    onChange={handleChange} 
+                                                />
                                             </FloatingLabel>
+                                            {/* Show/Hide Password Toggle */}
+                                            <span
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                style={{
+                                                position: "absolute",
+                                                right: "12px",
+                                                top: "50%",
+                                                transform: "translateY(-50%)",
+                                                cursor: "pointer",
+                                                fontSize: "18px",
+                                                color: "#6c757d",
+                                                }}
+                                            >
+                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </span>
                                             {showError('password')}
                                         </Form.Group>
                                         <div className="form-check mb-3" style={{ display: 'flex', alignItems: 'center' }}>

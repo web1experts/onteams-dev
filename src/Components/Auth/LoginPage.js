@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { login } from '../../redux/actions/auth.actions';
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { useToast } from "../../context/ToastContext";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 function LoginPage() {
     const inputs = document.querySelectorAll('.form-floating .form-control');
 
@@ -25,6 +26,7 @@ function LoginPage() {
     });
     const addToast = useToast();
     const location = useLocation();
+    const [showPassword, setShowPassword] = useState(false);
     const queryParams = new URLSearchParams(location.search);
     const paramsObject = {};
     queryParams.forEach((value, key) => {
@@ -122,9 +124,30 @@ function LoginPage() {
                                 </Form.Group>
                                 <Form.Group className="mb-3 form-group">
                                     <FloatingLabel label="Password">
-                                        <Form.Control type="password" placeholder='Password *' className={error['password'] ? "input-error" : ''} name="password" value={singinfields.password || ''}
-                                            onChange={handleChangeInput} />
+                                        <Form.Control 
+                                            type={showPassword ? "text" : "password"} 
+                                            placeholder='Password *' 
+                                            className={error['password'] ? "input-error" : ''} 
+                                            name="password" 
+                                            value={singinfields.password || ''}
+                                            onChange={handleChangeInput} 
+                                        />
                                     </FloatingLabel>
+                                    {/* Show/Hide Password Toggle */}
+                                    <span
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        cursor: "pointer",
+                                        fontSize: "18px",
+                                        color: "#6c757d",
+                                        }}
+                                    >
+                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </span>
                                     {showError('password')}
                                 </Form.Group>
                                 <Button variant="primary" disabled={loading} type="submit">{loading ? 'Please Wait...' : 'Sign In'}</Button>

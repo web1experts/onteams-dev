@@ -33,6 +33,7 @@ import { selectboxObserver } from "../../helpers/commonfunctions";
 import ManagePlan from "../subscriptions/ManagePlan";
 import { currentMemberProfile } from "../../helpers/auth";
 import PlanOverview from "../subscriptions/PlanOverview";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function EditableField({
   field,
@@ -115,6 +116,9 @@ function SettingPage(props) {
   const activeSubscription = useSelector(
       (state) => state.subscription?.activeSubscription
   );
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [currentSubscription, setCurrentSubscription] = useState(null)
   const [userProfile, setUserProfile] = useState({});
   const [loader, setLoader] = useState(false);
@@ -491,31 +495,74 @@ function SettingPage(props) {
                   <Form.Group className="mb-3">
                     <Form.Label>Current Password</Form.Label>
                     <Form.Control
-                      type="password"
+                      type={showCurrentPassword ? "text" : "password"}
                       name="current_password"
                       value={securityFields?.current_password || ""}
                       onChange={handleSecurityFields}
                     />
+                    {/* Show/Hide Password Toggle */}
+                      <span
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          style={{
+                          position: "absolute",
+                          right: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          cursor: "pointer",
+                          fontSize: "18px",
+                          color: "#6c757d",
+                          }}
+                      >
+                          {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
                     {showError("current_password", "security")}
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label>New Password</Form.Label>
                     <Form.Control
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       name="new_password"
                       value={securityFields?.new_password || ""}
                       onChange={handleSecurityFields}
                     />
+                    <span
+                          onClick={() => setShowPassword(!showPassword)}
+                          style={{
+                          position: "absolute",
+                          right: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          cursor: "pointer",
+                          fontSize: "18px",
+                          color: "#6c757d",
+                          }}
+                      >
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
                     {showError("confirm_password", "security")}
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label>Confirm Password</Form.Label>
                     <Form.Control
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       name="confirm_password"
                       value={securityFields?.confirm_password || ""}
                       onChange={handleSecurityFields}
                     />
+                    <span
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      style={{
+                      position: "absolute",
+                      right: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      fontSize: "18px",
+                      color: "#6c757d",
+                      }}
+                  >
+                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
                     {showError("confirm_password", "security")}
                   </Form.Group>
                   <div className="text-end">
