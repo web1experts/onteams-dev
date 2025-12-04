@@ -5,7 +5,7 @@ export const plans = {
     name: "Free",
     originalPrice: 0,
     pricePerUser: 0,
-    disount: 0,
+    discount: 0,
     billing_cycle: false,
     members_text: 'Free for up to 3 members',
     features: [
@@ -25,7 +25,7 @@ export const plans = {
     name: "Pro",
     originalPrice: 666,
     pricePerUser: 666,
-    disount: 0,
+    discount: 0,
     billing_cycle: 'monthly',
     members_text: 'Unlimited Team Members',
     features: [
@@ -43,7 +43,7 @@ export const plans = {
     {
     id: "plan_ReKagUnhkdX86V",
     name: "Elite",
-    disount: 0,
+    discount: 0,
     originalPrice: 916,
     pricePerUser: 916,
     billing_cycle: 'monthly',
@@ -67,7 +67,7 @@ export const plans = {
     name: "Free",
     originalPrice: 0,
     pricePerUser: 0,
-    disount: 0,
+    discount: 0,
     billing_cycle: false,
     members_text: 'Free for up to 3 members',
     features: [
@@ -85,7 +85,7 @@ export const plans = {
     {
     id: "plan_RfBkhuoO5A74Wk",
     name: "Pro",
-    disount: 20,
+    discount: 20,
     originalPrice: 666,
     pricePerUser: 533,
     billing_cycle: 'quarterly',
@@ -104,7 +104,7 @@ export const plans = {
     },{
     id: "plan_RfBm7DgKZvvN5Z",
     name: "Elite",
-    disount: 20,
+    discount: 20,
     originalPrice: 916,
     pricePerUser: 733,
     billing_cycle: 'quarterly',
@@ -127,7 +127,7 @@ export const plans = {
     id: "free",
     name: "Free",
     pricePerUser: 0,
-    disount: 0,
+    discount: 0,
     billing_cycle: false,
     members_text: 'Free for up to 3 members',
     features: [
@@ -145,7 +145,7 @@ export const plans = {
     
     id: "plan_RfBnTyGxNN8TJK",
     name: "Pro",
-    disount: 40,
+    discount: 40,
     originalPrice: 666,
     pricePerUser: 400,
     billing_cycle: 'yearly',
@@ -164,7 +164,7 @@ export const plans = {
     },{
     id: "plan_RfBoI6kHMxhvgS",
     name: "Elite",
-    disount: 40,
+    discount: 40,
     originalPrice: 916,
     pricePerUser: 550,
     billing_cycle: 'yearly',
@@ -192,7 +192,7 @@ export const plans = {
 //     name: "Free",
 //     originalPrice: 0,
 //     pricePerUser: 0,
-//     disount: 0,
+//     discount: 0,
 //     billing_cycle: false,
 //     members_text: 'Free for up to 3 members',
 //     features: [
@@ -212,7 +212,7 @@ export const plans = {
 //     name: "Pro",
 //     originalPrice: 666,
 //     pricePerUser: 666,
-//     disount: 0,
+//     discount: 0,
 //     billing_cycle: 'monthly',
 //     members_text: 'Unlimited Team Members',
 //     features: [
@@ -230,7 +230,7 @@ export const plans = {
 //     {
 //     id: "plan_ReJU8Qn1ekZM4s",
 //     name: "Elite",
-//     disount: 0,
+//     discount: 0,
 //     originalPrice: 916,
 //     pricePerUser: 916,
 //     billing_cycle: 'monthly',
@@ -254,7 +254,7 @@ export const plans = {
 //     name: "Free",
 //     originalPrice: 0,
 //     pricePerUser: 0,
-//     disount: 0,
+//     discount: 0,
 //     billing_cycle: false,
 //     members_text: 'Free for up to 3 members',
 //     features: [
@@ -272,7 +272,7 @@ export const plans = {
 //     {
 //     id: "plan_RfBpT4zO4A1jBF",
 //     name: "Pro",
-//     disount: 20,
+//     discount: 20,
 //     originalPrice: 666,
 //     pricePerUser: 533,
 //     billing_cycle: 'quarterly',
@@ -291,7 +291,7 @@ export const plans = {
 //     },{
 //     id: "plan_RfBqGfoXXQnRKJ",
 //     name: "Elite",
-//     disount: 20,
+//     discount: 20,
 //     originalPrice: 916,
 //     pricePerUser: 733,
 //     billing_cycle: 'quarterly',
@@ -314,7 +314,7 @@ export const plans = {
 //     id: "free",
 //     name: "Free",
 //     pricePerUser: 0,
-//     disount: 0,
+//     discount: 0,
 //     billing_cycle: false,
 //     members_text: 'Free for up to 3 members',
 //     features: [
@@ -332,7 +332,7 @@ export const plans = {
     
 //     id: "plan_RfBqffQvGgLK1w",
 //     name: "Pro",
-//     disount: 40,
+//     discount: 40,
 //     originalPrice: 666,
 //     pricePerUser: 400,
 //     billing_cycle: 'yearly',
@@ -351,7 +351,7 @@ export const plans = {
 //     },{
 //     id: "plan_RfBr3vHscWqtas",
 //     name: "Elite",
-//     disount: 40,
+//     discount: 40,
 //     originalPrice: 916,
 //     pricePerUser: 550,
 //     billing_cycle: 'yearly',

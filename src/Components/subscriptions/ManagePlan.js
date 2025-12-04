@@ -416,12 +416,12 @@ const handleSubmit = (e) => {
                   <h6 className="fw-bold mb-2">Choose Your Plan</h6>
                   <Row className="mb-4">
                     {plans[billingCycle].map((plan) => (
-                      <Col key={plan.name} md={4} className="mb-3">
+                      <Col key={plan.id} data-plan={plan.id} md={4} className="mb-3">
                         <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name}  ${plan.name} ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
                           onClick={() => setSelectedPlan(plan)}
                           style={{ cursor: "pointer" }}
                         >
-                          <Card.Body className="p-0">
+                          <Card.Body className="p-0" key={`body-${plan.id}`}>
                             {plan.discount > 0 && (
                               <Badge bg="success" pill className="mb-2">
                                 {plan.discount}% OFF
@@ -482,6 +482,11 @@ const handleSubmit = (e) => {
                         <div className="mb-2 d-flex align-items-center justify-content-between gap-3">
                           <p className="mb-0">Price per user:</p>
                           <p className="mb-0 text-end">
+                            {
+                              (selectedPlanData?.discount > 0) && (
+                                <span className="text-decoration-line-through">₹{selectedPlanData.originalPrice.toFixed(0)}</span>
+                              )
+                            }
                             {selectedPlanData?.pricePerUser > 0 ?
                               <small className=" d-block">
                                 ₹{selectedPlanData?.pricePerUser}/month
@@ -501,19 +506,30 @@ const handleSubmit = (e) => {
                           Total per {billingCycle}: <strong className="display-6 fw-bold text-end">₹{totalPerCycle.toLocaleString()}</strong>
                         </p> */}
                         
-                         { billingCycle === "yearly" && selectedPlanData?.id !== 'free' || billingCycle === "quarterly" && selectedPlanData?.id !== 'free' && (
-                          <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                          <div className="text--small mb-1 text-uppercase text-emerald">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
-                          <div className="text-slate-600 mt-1">
-                            ₹{((selectedPlanData.originalPrice - selectedPlanData.pricePerUser) *  teamMembers).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
-                            {(((selectedPlanData.originalPrice - selectedPlanData.pricePerUser) ) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
-                          </div>
-                          <div className="text--large mb-0 text-emerald mt-2">₹{
-                            (( selectedPlanData?.originalPrice * teamMembers ) - (selectedPlanData?.pricePerUser * teamMembers)) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
-                            
-                          }</div>
-                        </div>)
-                        }  
+                         {(selectedPlanData?.id !== "free" && 
+                            (billingCycle === "yearly" || billingCycle === "quarterly")) && (
+                            <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                              <div className="text--small mb-1 text-uppercase text-emerald">
+                                Total Savings in {billingCycle === "quarterly" ? "3 Months" : "1 Year"}
+                              </div>
+
+                              <div className="text-slate-600 mt-1">
+                                ₹{((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) * teamMembers).toFixed(0)}
+                                /month × {billingCycle === "quarterly" ? 3 : 12} months = ₹
+                                {(((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) * teamMembers) *
+                                  (billingCycle === "quarterly" ? 3 : 12)).toFixed(0)}
+                              </div>
+
+                              <div className="text--large mb-0 text-emerald mt-2">
+                                ₹{
+                                  ((selectedPlanData?.originalPrice * teamMembers) -
+                                    (selectedPlanData?.pricePerUser * teamMembers)) *
+                                  (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
+                                }
+                              </div>
+                            </div>
+                          )}
+
                         <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
                           Total per month
                            <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
