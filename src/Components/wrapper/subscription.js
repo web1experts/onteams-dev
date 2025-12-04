@@ -35,17 +35,26 @@ const hideSidebarRoutes = [
   if (shouldHideSidebar) {
     return children;
   }
-  const activesubscription = localStorage.getItem('active_subscription');
-    let active_subscription;
-    if (activesubscription && activesubscription !== "") {
-        const decryptedSubscription = parseIfValidJSON(activesubscription);
-        active_subscription = (decryptedSubscription) ? decryptedSubscription : null
+  // const activesubscription = localStorage.getItem('active_subscription');
+  //   let active_subscription;
+  //   if (activesubscription && activesubscription !== "") {
+  //       const decryptedSubscription = parseIfValidJSON(activesubscription);
+  //       active_subscription = (decryptedSubscription) ? decryptedSubscription : null
+  //   }else{
+  //     return children;
+  //   }
+
+  const company_dashboard = localStorage.getItem('current_dashboard');
+    let companyData;
+    if (company_dashboard && company_dashboard !== "") {
+        const decryptedCompany = parseIfValidJSON(company_dashboard);
+        companyData = (decryptedCompany) ? decryptedCompany : null
     }else{
       return children;
     }
     
 
-  const localSub = active_subscription;
+  const localSub = companyData?.subscription;
 
   // Helper function: determine if user has active subscription
   const hasActiveSubscription =
@@ -75,7 +84,7 @@ const hideSidebarRoutes = [
   if (trialExpired) {
     return <SubscriptionPlans />;
   }
-
+console.log('hasActiveSubscription::: ', hasActiveSubscription)
   // If not subscribed and not on /plans → redirect to /plans
   if (!hasActiveSubscription && !isOnPlansPage) {
     return <PlansPage />

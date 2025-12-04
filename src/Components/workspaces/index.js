@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup,Alert} from "react-bootstrap";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
 import { FiSidebar, FiUsers, FiTarget } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
@@ -123,15 +123,14 @@ function Workspace(props) {
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
                         <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
                         <ListGroup.Item className="btn btn-primary" onClick={() => {
-                          if (
-                            activeSubscription?.planId === 'free' &&
-                            (workspaces?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
-                            workspaces?.length
-                          ) {
-                            navigate('/subscription-plans', { replace: true });
-                          } else {
+                          // if (
+                          //   activeSubscription?.planId === 'free' &&
+                          //   (workspaces?.length === 1)
+                          // ) {
+                          //   navigate('/subscription-plans', { replace: true });
+                          // } else {
                             handleShow();
-                          }
+                          // }
                           }}><FaPlus /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
@@ -214,7 +213,18 @@ function Workspace(props) {
           <Modal.Title>Create a Workspace</Modal.Title>
         </Modal.Header>
         <Modal.Body className="overflow-visible">
-          <WorkspaceForm editworkspace={editworkspace} />
+          {
+            (
+              activeSubscription?.planId === 'free' &&
+              (workspaces?.length >= 1 ) 
+            ) ?
+              <Alert key={'danger'} variant={'danger'}>
+                Your current Free plan allows only 1 workspace. To add additional workspaces, please upgrade to a paid plan.
+              </Alert>
+            :
+            <WorkspaceForm editworkspace={editworkspace} />
+          }
+          
         </Modal.Body>
       </Modal>
 

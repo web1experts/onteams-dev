@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Alert, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
 import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
 import { FiEdit, FiMail, FiSidebar, FiTrash2, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
@@ -934,15 +934,15 @@ useEffect(() => {
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <ListGroup.Item className="btn btn-primary"  onClick={() => {
-                          if (
-                            activeSubscription?.planId === 'free' &&
-                            (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
-                            invitationsTotal + memberFeeds?.length
-                          ) {
-                            navigate('/subscription-plans', { replace: true });
-                          } else {
+                          // if (
+                          //   activeSubscription?.planId === 'free' &&
+                          //   (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+                          //   invitationsTotal + memberFeeds?.length
+                          // ) {
+                          //   navigate('/subscription-plans', { replace: true });
+                          // } else {
                             handleShow();
-                          }
+                          // }
                         }}><FaPlus /></ListGroup.Item>
                     )}
                   </ListGroup>
@@ -1379,13 +1379,20 @@ useEffect(() => {
                         <FiVideo />
                         <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording during work hours</small></h6>
                       </div>
-                      <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
-                        updateRecodingType({
-                            custom_field: {
-                                video_recording: event.target.checked ? "enable" : "disabled"
-                            }
-                        });
-                      }} name={`custom_field[video_recording]`} />
+                      {
+                        (activeSubscription && activeSubscription?.planId === 'elite' ) ? (
+                          <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
+                            updateRecodingType({
+                                custom_field: {
+                                    video_recording: event.target.checked ? "enable" : "disabled"
+                                }
+                            });
+                          }} name={`custom_field[video_recording]`} />
+                        ):
+
+                        <Form.Check type="switch" key={`video-only`} disabled checked={false} value={"disabled"} onChange={(event) => {return false;}} name={`custom_field[video_recording]`} />
+                      }
+                      
                     </Card.Body>
                   </Card>
 
@@ -1534,71 +1541,92 @@ useEffect(() => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            {/* {rows.map((row, index) => ( */}
-            <div className="form-row pb-3" key={`row-0`}>
-              <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
-                <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
-                  <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
-                    placeholder="Email address"
-                    name="email"
-                    value={fields?.email}
-                    onChange={handleChange}
-                  />
-                </FloatingLabel>
-                {showError("email")}
-                <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
-              </Form.Group>
+          {
+            (
+              activeSubscription?.planId === 'free' &&
+              (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+              invitationsTotal + memberFeeds?.length
+            ) ?
+            <Alert key={'danger'} variant={'danger'}>
+                Your current Free plan allows only 3 members. To add additional members, please upgrade to a paid plan.
+              </Alert>
 
-              <Button
-                variant="primary"
-                onClick={() => {
-                  showPermissionsModal();
-                }}
-              >
-                Select Role
-              </Button>
-              {showError("role")}
-            </div>
-            <div className="form-row" key={`row-1`}>
-              <Form.Group className="mb-0 form-group other__fields">
-                {customFields.length > 0 && (
-                  <>
-                    {customFields.map((field, index) =>
-                      renderDynamicField({
-                        name: `custom_field[${field.name}]`,
-                        type: field.type,
-                        label: field.label,
-                        value: field.type === 'date' && fields[`custom_field[${field.name}]`]
-                                ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
-                                : fields[`custom_field[${field.name}]`] || '',
-                        options: field?.options || [],
-                        onChange: (e) => {
-                                            if(field.type === "date"){
-                                                
-                                                handleDateChange(e, `custom_field[${field.name}]`)
-                                            }else{
-                                                handleChange(e)
-                                            }
-                                        },
-                        fieldId: `new-${field.name}-${index}`,
-                        range_options: field?.range_options || {},
-                        showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
-                        toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
-                        toggleBadges: () => toggleBadges(field),
-                      })
-                    )}
-                  </>
-                )}
-              </Form.Group>
-            </div>
-            {/* ))} */}
-          </Form>
+            :
+            <Form onSubmit={handleSubmit}>
+              {/* {rows.map((row, index) => ( */}
+              <div className="form-row pb-3" key={`row-0`}>
+                <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
+                  <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
+                    <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
+                      placeholder="Email address"
+                      name="email"
+                      value={fields?.email}
+                      onChange={handleChange}
+                    />
+                  </FloatingLabel>
+                  {showError("email")}
+                  <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
+                </Form.Group>
+
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    showPermissionsModal();
+                  }}
+                >
+                  Select Role
+                </Button>
+                {showError("role")}
+              </div>
+              <div className="form-row" key={`row-1`}>
+                <Form.Group className="mb-0 form-group other__fields">
+                  {customFields.length > 0 && (
+                    <>
+                      {customFields.map((field, index) =>
+                        renderDynamicField({
+                          name: `custom_field[${field.name}]`,
+                          type: field.type,
+                          label: field.label,
+                          value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                  ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                  : fields[`custom_field[${field.name}]`] || '',
+                          options: field?.options || [],
+                          onChange: (e) => {
+                                              if(field.type === "date"){
+                                                  
+                                                  handleDateChange(e, `custom_field[${field.name}]`)
+                                              }else{
+                                                  handleChange(e)
+                                              }
+                                          },
+                          fieldId: `new-${field.name}-${index}`,
+                          range_options: field?.range_options || {},
+                          showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                          toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                          toggleBadges: () => toggleBadges(field),
+                        })
+                      )}
+                    </>
+                  )}
+                </Form.Group>
+              </div>
+              {/* ))} */}
+            </Form>
+          }
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleSubmit} disabled={loader}>
-            {loader ? "Please Wait..." : "Save"}
-          </Button>
+          {
+            (
+              activeSubscription?.planId === 'free' &&
+              (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+              invitationsTotal + memberFeeds?.length
+            ) ?
+            <></>
+            :
+              <Button variant="primary" onClick={handleSubmit} disabled={loader}>
+                {loader ? "Please Wait..." : "Save"}
+              </Button>
+          }
         </Modal.Footer>
       </Modal>
       {showPermissions && (

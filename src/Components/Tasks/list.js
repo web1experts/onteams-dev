@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Form, FloatingLabel } from "react-bootstrap";
-import { FaPlus, FaRegTimesCircle } from "react-icons/fa";
+import { FaPlus, FaRegTimesCircle, FaRegComments } from "react-icons/fa";
 import { ACTIVE_FORM_TYPE, CURRENT_TASK } from "../../redux/actions/types";
 import {
   togglePopups,
@@ -529,6 +529,18 @@ const TasksList = React.memo((props) => {
                                               </span>
                                             </>
                                           )}
+                                        {task.comments &&
+                                          task.comments.length > 0 && (
+                                            <>
+                                              <span
+                                                className="files-count"
+                                                key={`comments-count-${task._id}`}
+                                              >
+                                                <FaRegComments />
+                                                {task.comments.length}
+                                              </span>
+                                            </>
+                                          )}
                                         <p className="m-0 ms-auto">
                                           {task?.members &&
                                             task?.members.length > 0 && (
@@ -640,6 +652,17 @@ const TasksList = React.memo((props) => {
                                     </span>
                                   </>
                                 )}
+                                {task?.comments && task.comments?.length > 0 && (
+                                  <>
+                                    <span
+                                      className="files-count"
+                                      key={`comments-count-${task._id}`}
+                                    >
+                                      <FaRegComments />
+                                      {task.comments.length}
+                                    </span>
+                                  </>
+                                )}
                                 <p className="m-0 ms-auto">
                                   {task?.members &&
                                     task?.members.length > 0 && (
@@ -739,6 +762,17 @@ const TasksList = React.memo((props) => {
                                               </span>
                                             </>
                                           )}
+                                          {task?.comments && task.comments?.length > 0 && (
+                                            <>
+                                              <span
+                                                className="files-count"
+                                                key={`comments-count-${task._id}`}
+                                              >
+                                                <FaRegComments />
+                                                {task.comments.length}
+                                              </span>
+                                            </>
+                                          )}
                                         <p className="m-0 ms-auto">
                                           {task?.members &&
                                             task?.members.length > 0 && (
@@ -812,6 +846,17 @@ const TasksList = React.memo((props) => {
                                     >
                                       <GrAttachment />
                                       {task.files.length}
+                                    </span>
+                                  </>
+                                )}
+                                {task?.comments && task.comments?.length > 0 && (
+                                  <>
+                                    <span
+                                      className="files-count"
+                                      key={`comments-count-${task._id}`}
+                                    >
+                                      <FaRegComments />
+                                      {task.comments.length}
                                     </span>
                                   </>
                                 )}

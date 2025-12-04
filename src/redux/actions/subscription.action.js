@@ -10,7 +10,8 @@ import {
     BILLING_SUCCESS,
     ACTIVE_PLAN,
     SUBSCRIPTION_CANCEL,
-    SUBSCRIPTION_DATA
+    SUBSCRIPTION_DATA,
+    SUBSCRIPTION_SCHEDULED
 } from "./types";
 const config = {
   headers: {
@@ -100,6 +101,23 @@ export const cancelSubscription = (subscriptionId) => {
   }
 }
 
+export const getScheduledPlan = (subscriptionId) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGetByKey('subscription', '/scheduled-plan')
+      if (response.data && response.data.success) {
+        await dispatch({ type: SUBSCRIPTION_SCHEDULED, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  }
+}
+
+
 export const subscribeTrialPlan = (payload) => {
 
   return async (dispatch) => {
@@ -107,6 +125,22 @@ export const subscribeTrialPlan = (payload) => {
       const response = await API.apiPostUrl('subscription', '/trial', payload)
       if (response.data && response.data.success) {
         await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  }
+}
+
+export const saveBillingDetails = (payload) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('subscription', '/save-billing-details', payload)
+      if (response.data && response.data.success) {
+        await dispatch({ type: BILLING_SUCCESS, payload: response.data });
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }

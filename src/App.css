@@ -7307,6 +7307,8 @@ ul#icon-tabs .nav-link span svg {
 .daily--attendance--table th,
 .daily--attendance--table td {
   vertical-align: middle;
+  border-left-width: var(--bs-border-width);
+  border-right-width: var(--bs-border-width);
 }
 
 .daily--attendance--table th {

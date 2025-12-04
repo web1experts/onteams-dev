@@ -51,7 +51,7 @@ function SubscriptionPlans() {
   const [members, setMembers] = useState(0);
   const [ totalmembers, setTotalMembers] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [billingCycle, setBillingCycle] = useState("monthly"); // monthly | quarterly | yearly
+  const [billingCycle, setBillingCycle] = useState("yearly"); // monthly | quarterly | yearly
   const [showConfirm, setShowConfirm] = useState(false);
   const [priceDetails, setPriceDetails] = useState(null);
   // Adjust price based on billing cycle
@@ -90,13 +90,14 @@ function SubscriptionPlans() {
     if(subscriptionState.activeSubscription){
 
       setActiveSubscription(subscriptionState.activeSubscription)
-      //   const current_dashboard = localStorage.getItem('current_dashboard');
+        const current_dashboard = localStorage.getItem('current_dashboard');
       
-      // if (current_dashboard) {
-      //   const parsedata = JSON.parse(current_dashboard)
-      //   const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
-        localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
-      // }
+      if (current_dashboard) {
+        const parsedata = JSON.parse(current_dashboard)
+        const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
+        // localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
+        localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
+      }
 
       if(subscriptionState?.message && subscriptionState.message_variant === 'success'){
         navigate('/dashboard', { replace: true })
@@ -287,7 +288,7 @@ const showError = (name) => {
             dispatch(saveAuthorization({ ...response, subscription_id }))
           }
           setLoading(false)
-          selectedPlan(null)
+          setSelectedPlan(null)
         },
         modal: {
           ondismiss: function () {
@@ -319,7 +320,10 @@ const showError = (name) => {
   }
 
   const activateFreePlan = () => {
-    
+    if(members < 1){
+      addToast('Please add number of members first.', 'danger');
+      return;
+    }
     if(members > 3){
       addToast('You cannot activate free plan for more than 3 members.', 'danger');
       return;
@@ -329,6 +333,10 @@ const showError = (name) => {
   }
 
   const activateTrialPlan = () => {
+    if(members < 1){
+      addToast('Please add number of members first.', 'danger');
+      return;
+    }
     setLoading(true)
     dispatch(subscribeTrialPlan({
         initial_quantity: members
@@ -610,22 +618,23 @@ const showError = (name) => {
                   </ListGroup.Item>
                   <ListGroup.Item>
                     <small>Next Payment Date</small>
-                    {new Date(
-                      Date.now() +
-                      (billingCycle === "yearly"
-                        ? 365
-                        : billingCycle === "quarterly"
-                          ? 90
-                          : 30) *
-                      24 *
-                      60 *
-                      60 *
-                      1000
-                    ).toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {(() => {
+                      const nextDate = new Date();
+                      
+                      if (billingCycle === "yearly") {
+                        nextDate.setFullYear(nextDate.getFullYear() + 1);
+                      } else if (billingCycle === "quarterly") {
+                        nextDate.setMonth(nextDate.getMonth() + 3);
+                      } else {
+                        nextDate.setMonth(nextDate.getMonth() + 1);
+                      }
+
+                      return nextDate.toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      });
+                    })()}
                   </ListGroup.Item>
                 </ListGroup>
               </div>

@@ -3,30 +3,55 @@ import { useDispatch, useSelector } from "react-redux";
 import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from "react-bootstrap";
 import { FiUsers, FiCalendar, FiCheck, FiSave, FiCreditCard } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails, updateSubscription, updateQuantity } from "../../redux/actions/subscription.action";
+import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
+import { countries } from "../../helpers/countries";
 import { useToast } from "../../context/ToastContext";
+import { selectboxObserver } from "../../helpers/commonfunctions";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
+import { AlertDialog } from "../modals";
 
 export default function ManagePlan() {
   const dispatch = useDispatch()
   const addToast = useToast();
+  const qtyRef = useRef(null);
   const [spinner, setSpinner] = useState(true);
-  
+  const [showdialog, setShowDialog] = useState(false);
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [billingCycle, setBillingCycle] = useState('yearly');
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [memberFeeds, setMemberFeed] = useState([]);
   const invitationsFeed = useSelector((state) => state.member.invitations);
   const [invitationsTotal, setInvitationsTotal] = useState(0)
   const memberFeed = useSelector((state) => state.member.members);
-  const [teamMembers, setTeamMembers] = useState(1);
+  const [teamMembers, setTeamMembers] = useState(0);
   const [ totalmembers, setTotalMembers] = useState(0);
   const [showFeatures, setShowFeatures] = useState(false);
   const [loading, setLoading] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false);
+  const [errors, setErrors] = useState({});
+    const [formData, setFormData] = useState({
+      fullName: "",
+      phone: "",
+      address1: "",
+      address2: "",
+      city: "",
+      state: "",
+      postal: "",
+      country: "India",
+      agree: false,
+    });
+
+    const doCancel = () => {
+      setShowDialog(true)
+    }
+
+    const handleCancelSubscription = () => {
+        dispatch(cancelSubscription(activeSubscription?.subscriptionId))
+        setShowDialog(false)
+      }
 
   const handleListMember = async () => {
      
@@ -40,6 +65,7 @@ export default function ManagePlan() {
     setSpinner(true)
     dispatch(getActiveSubscription())
     handleListMember();
+    dispatch(getBillingdetails())
   }, [])
 
   useEffect(() => {
@@ -49,7 +75,7 @@ export default function ManagePlan() {
   useEffect(() => {
     if (memberFeed && memberFeed.memberData) {
       setMemberFeed(memberFeed.memberData);
-      setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
+      // setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
 
     }
     setTimeout(() => {
@@ -60,7 +86,7 @@ export default function ManagePlan() {
     useEffect(() => {
       if (invitationsFeed && invitationsFeed.inviteData) {
         setInvitationsTotal(invitationsFeed.total);
-        setTotalMembers((totalmembers) + invitationsFeed.total || 0);
+        // setTotalMembers((totalmembers) + invitationsFeed.total || 0);
       }
       setTimeout(() => {
         setSpinner(false)
@@ -71,29 +97,33 @@ export default function ManagePlan() {
   useEffect(() => {
     if (subscriptionState.activeSubscription) {
       setActiveSubscription(subscriptionState.activeSubscription)
+      setTotalMembers(subscriptionState.activeSubscription?.quantity)
       setBillingCycle(subscriptionState.activeSubscription?.interval || 'monthly')
       const allPlans = [...plans.monthly, ...plans.quarterly, ...plans.yearly];
 
       const matchedPlan = allPlans.find(plan => plan.id === subscriptionState.activeSubscription.planId);
-
       // If found, set it in state
       if (matchedPlan) {
         setSelectedPlan(matchedPlan);
       } else {
         console.warn("No matching plan found for plan_id:", subscriptionState.activeSubscription.planId);
       }
-      // const current_dashboard = localStorage.getItem('current_dashboard');
+       const current_dashboard = localStorage.getItem('current_dashboard');
       
-      // if (current_dashboard) {
-      //   const parsedata = JSON.parse(current_dashboard)
-      //   const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
-        localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
-      // }
+      if (current_dashboard) {
+        const parsedata = JSON.parse(current_dashboard)
+        const updatedData = {...parsedata, ['subscription']: subscriptionState.activeSubscription}
+        // localStorage.setItem('active_subscription', JSON.stringify(subscriptionState.activeSubscription))
+        localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
+      }
     }
   }, [subscriptionState.activeSubscription])
 
   const handleConfirm = () => {
     setShowConfirm(true);
+    setTimeout(() => {
+      selectboxObserver()
+    },1000)
   };
 
   const handleCloseConfirm = () => {
@@ -105,14 +135,108 @@ export default function ManagePlan() {
     updatePlan(); // your existing function
   };
 
+  const validateForm = () => {
+    const requiredFields = [
+      "fullName",
+      "phone",
+      "address1",
+      "city",
+      "state",
+      "postal",
+      "country",
+    ];
+
+    let newErrors = {};
+
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = "This field is required";
+      }
+    });
+
+  setErrors(newErrors);
+
+  // If no errors, return true
+  return Object.keys(newErrors).length === 0;
+};
+
+  const showError = (name) => {
+  if (errors[name]) {
+    return <span className="error">{errors[name]}</span>;
+  }
+  return null;
+};
+
+useEffect(() => {
+      if(subscriptionState.billing_info){
+        const billingInfo = {
+          fullName: subscriptionState.billing_info?.meta_value?.fullName || "",
+          phone: subscriptionState.billing_info?.meta_value?.phone || "",
+          address1: subscriptionState.billing_info?.meta_value?.address1 || "",
+          address2:subscriptionState.billing_info?.meta_value?.address2 || "",
+          city: subscriptionState.billing_info?.meta_value?.city || "",
+          state: subscriptionState.billing_info?.meta_value?.state || "",
+          postal: subscriptionState.billing_info?.meta_value?.postal || "",
+          country: subscriptionState.billing_info?.meta_value?.country || "India"
+        };
+
+        setFormData(billingInfo)
+
+      }
+    }, [subscriptionState.billing_info])
+
+      const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    let newErrors = { ...errors };
+    newErrors[name] = ""; 
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+    setErrors(newErrors);
+  };
+
+
+const handleSubmit = (e) => {
+  e.preventDefault()
+  
+  if (!validateForm()) return;
+  
+  setLoading(true)
+  dispatch(
+    saveBillingDetails({
+      ...formData
+    })
+  );
+}
   const handleQuantitySubmit = (e) => {
     e.preventDefault()
+
+    if(qtyRef.current.value === activeSubscription?.quantity){
+      addToast('You have not changed the quantity.', 'danger');
+      return false;
+    }
+    setLoading(true)
     const payload = {
-      quantity: teamMembers,
-      selectedPlan: selectedPlan?.id
+      quantity: qtyRef.current.value,
+      subscriptionId: activeSubscription?._id
     }
     dispatch(updateQuantity(payload))
+    setLoading(true)
   }
+
+ useEffect(() => {
+  if (!plans[billingCycle] || !selectedPlan?.name) return;
+
+  const updatedPlan = plans[billingCycle].find(
+    (p) => p.name === selectedPlan.name
+  );
+
+  if (updatedPlan) {
+    setSelectedPlan(updatedPlan);
+  }
+}, [billingCycle]);
+
   const selectedPlanData = useMemo(() => {
     return plans[billingCycle]?.find((p) => p.name === selectedPlan?.name);
   }, [billingCycle, selectedPlan]);
@@ -128,17 +252,34 @@ export default function ManagePlan() {
   const totalSavings =
     (selectedPlanData?.price - discountPrice) * teamMembers * cycleMultiplier;
 
+    const activateFreePlan = () => {
+      if(teamMembers < 1){
+        addToast('Please add number of members first.', 'danger');
+        return;
+      }
+      if(teamMembers > 3){
+        addToast('You cannot activate free plan for more than 3 members.', 'danger');
+        return;
+      }
+      setLoading(true)
+      dispatch(subscribeFreePlan())
+    }
+
   const updatePlan = () => {
     setLoading(true)
-    dispatch(updateSubscription({
-      ...selectedPlan,
-      total_count: 12,
-      initial_quantity: teamMembers,
-      billingCycle: billingCycle,
-      name: selectedPlan.plan.name,
-    }))
-    setLoading(false)
-    setShowConfirm(false);
+
+    if( selectedPlan.id === 'free'){
+      activateFreePlan()
+    }else{
+      dispatch(updateSubscription({
+        ...selectedPlan,
+        total_count: 12,
+        initial_quantity: qtyRef.current.value,
+        billingCycle: billingCycle,
+        name: selectedPlan?.name,
+      }))
+    }
+    
   }
 
   useEffect(() => {
@@ -147,6 +288,8 @@ export default function ManagePlan() {
       console.log('subscriptionState.authorizeData::: ', subscriptionState.authorizeData)
       authorizeSubscriptionPayment(subscriptionState.authorizeData)
     }
+    setLoading(false)
+    setShowConfirm(false);
   }, [subscriptionState])
 
   const authorizeSubscriptionPayment = async (payload) => {
@@ -169,14 +312,29 @@ export default function ManagePlan() {
           setLoading(false)
           setSelectedPlan(null)
         },
+        modal: {
+          ondismiss: function () {
+            console.warn("⚠️ Payment popup closed by user (cancelled).");
+            setLoading(false);
+            // Optional: show a message or alert
+            alert("Payment was cancelled. You can try again anytime.");
+          },
+        },
         theme: {
           color: "#F37254",
         },
       };
 
       const rzp = new window.Razorpay(options);
+      // 🔴 Handle payment failure
+      rzp.on("payment.failed", function (response) {
+        console.error("❌ Payment Failed:", response.error);
+        alert(`Payment failed: ${response.error.description || "Unknown error"}`);
+        setLoading(false);
+      });
       rzp.open();
     } catch (err) {
+      alert("Error creating subscription: " + err.message);
       console.error(err);
       //alert("Error creating subscription: " + err.message);
     } finally {
@@ -191,25 +349,61 @@ export default function ManagePlan() {
           <Container>
             <Row className="justify-content-center">
               <Col md={10} lg={8}>
-                <h2 className="fw-bold mb-1 d-flex align-items-center">Manage Your Plan <a className="fs-6 ms-auto" href="/plan-details">View Active Subscription</a></h2>
+                <h2 className="fw-bold mb-1 d-flex align-items-center">Manage Your Plan 
+                  {/* <a className="fs-6 ms-auto" href="/plan-details">View Active Subscription</a> */}
+                </h2>
                 <p>Upgrade, downgrade, or adjust your team size</p>
                 <div className="bg-white rounded-4 shadow border p-4 mb-4">
                   <h4 className="text-xl fw-bold mb-4">Number of Team Members</h4>
                   <Form onSubmit={handleQuantitySubmit}>
                     <Form.Group className="d-flex align-items-center gap-3">
                       <Form.Label className="d-inline-flex align-items-center gap-2 form-label w-auto mb-0"><FiUsers /> Team Members</Form.Label>
-                      <Form.Control type="number" className="w-50 flex-grow-1" min={totalmembers || 1} disabled={activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial'} value={teamMembers} onChange={(e) => {
+                      {/* <Form.Control type="number" className="w-50 flex-grow-1" min={totalmembers || 1} disabled={activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial'} value={teamMembers} onChange={(e) => {
                         if(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial'){
                           setTeamMembers(Number(e.target.value)) 
                         }else{
                           return false;
                         }
-                      }}/>
+                      }}/> */}
+                      {(() => {
+                        const qty = activeSubscription?.quantity || 1;
+                        const tmembers = memberFeeds?.length || 0;
+                        const invites = invitationsTotal || 0;
+
+                        // Calculate min value
+                        const currentTotal = tmembers + invites;
+                        const minValue = currentTotal < qty ? currentTotal : qty;
+
+                        return (
+                          <Form.Control
+                            type="number"
+                            className="w-50 flex-grow-1"
+                            min={minValue}
+                            id="qty-field"
+                            ref={qtyRef}
+                            // disabled={
+                            //   activeSubscription?.planId === "free" ||
+                            //   activeSubscription?.planId === "trial"
+                            // }
+                            value={teamMembers}
+                            onChange={(e) => {
+                              // if (
+                              //   activeSubscription?.planId !== "free" &&
+                              //   activeSubscription?.planId !== "trial"
+                              // ) {
+                                setTeamMembers(Number(e.target.value));
+                              // } else {
+                              //   return false;
+                              // }
+                            }}
+                          />
+                        );
+                      })()}
                       
                         {
                           
                           (selectedPlanData?.planId?.toLowerCase() !== 'free' && selectedPlanData?.planId?.toLowerCase() !== 'trial') && (
-                            <Button type="submit" variant="primary">Update Members</Button>
+                            <Button type="submit" variant="primary" disabled={loading}>{ loading ? 'Please wait...': 'Update Members'}</Button>
                           )
                         }
                       
@@ -222,12 +416,12 @@ export default function ManagePlan() {
                   <h6 className="fw-bold mb-2">Choose Your Plan</h6>
                   <Row className="mb-4">
                     {plans[billingCycle].map((plan) => (
-                      <Col key={plan.name} md={4} className="mb-3">
-                        <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
+                      <Col key={plan.id} data-plan={plan.id} md={4} className="mb-3">
+                        <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name}  ${plan.name} ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
                           onClick={() => setSelectedPlan(plan)}
                           style={{ cursor: "pointer" }}
                         >
-                          <Card.Body className="p-0">
+                          <Card.Body className="p-0" key={`body-${plan.id}`}>
                             {plan.discount > 0 && (
                               <Badge bg="success" pill className="mb-2">
                                 {plan.discount}% OFF
@@ -288,11 +482,16 @@ export default function ManagePlan() {
                         <div className="mb-2 d-flex align-items-center justify-content-between gap-3">
                           <p className="mb-0">Price per user:</p>
                           <p className="mb-0 text-end">
-                            {selectedPlanData?.pricePerUser > 0 && (
+                            {
+                              (selectedPlanData?.discount > 0) && (
+                                <span className="text-decoration-line-through">₹{selectedPlanData.originalPrice.toFixed(0)}</span>
+                              )
+                            }
+                            {selectedPlanData?.pricePerUser > 0 ?
                               <small className=" d-block">
                                 ₹{selectedPlanData?.pricePerUser}/month
                               </small>
-                            )}
+                            : <small className=" d-block">0</small>}
                             {/* <span className="fw-bold d-block">
                               ₹{discountPrice}/month
                             </span> */}
@@ -306,6 +505,35 @@ export default function ManagePlan() {
                         {/* <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fw-bold border-bottom pb-3">
                           Total per {billingCycle}: <strong className="display-6 fw-bold text-end">₹{totalPerCycle.toLocaleString()}</strong>
                         </p> */}
+                        
+                         {(selectedPlanData?.id !== "free" && 
+                            (billingCycle === "yearly" || billingCycle === "quarterly")) && (
+                            <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
+                              <div className="text--small mb-1 text-uppercase text-emerald">
+                                Total Savings in {billingCycle === "quarterly" ? "3 Months" : "1 Year"}
+                              </div>
+
+                              <div className="text-slate-600 mt-1">
+                                ₹{((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) * teamMembers).toFixed(0)}
+                                /month × {billingCycle === "quarterly" ? 3 : 12} months = ₹
+                                {(((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) * teamMembers) *
+                                  (billingCycle === "quarterly" ? 3 : 12)).toFixed(0)}
+                              </div>
+
+                              <div className="text--large mb-0 text-emerald mt-2">
+                                ₹{
+                                  ((selectedPlanData?.originalPrice * teamMembers) -
+                                    (selectedPlanData?.pricePerUser * teamMembers)) *
+                                  (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
+                                }
+                              </div>
+                            </div>
+                          )}
+
+                        <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
+                          Total per month
+                           <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
+                        </p> 
                         <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
                           Total for{" "}
                           {billingCycle === "yearly"
@@ -313,9 +541,8 @@ export default function ManagePlan() {
                             : billingCycle === "quarterly"
                               ? "3 months"
                               : "1 month"}
-                          : <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
+                          : <strong className="text-end">₹{(teamMembers * selectedPlanData?.pricePerUser) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1).toFixed(0)}</strong>
                         </p>
-
                       </div>
                     </Card.Body>
                   </Card>
@@ -330,103 +557,140 @@ export default function ManagePlan() {
                 <div className="bg-white rounded-4 shadow border p-4 mb-4 border-danger mt-4">
                   <h5 className="fw-bold text-danger mb-3">Danger Zone</h5>
                   <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
-                  <Button variant="danger" className="w-100 fw-bold">Cancel Subscription</Button>
+                  <Button variant="danger"  onClick={doCancel} className="w-100 fw-bold">Cancel Subscription</Button>
                 </div>
-                <Form className="bg-white rounded-4 shadow border p-4">
-                  <div className="d-flex align-items-center gap-3 mb-4">
-                    <div className="bg-primary rounded-4 d-flex align-items-center justify-content-center billing--title--icon"><FiCreditCard /></div>
-                    <div className="billing--title">
-                      <h4 className="fw-bold mb-1">Billing Information</h4>
-                      <p className="mb-0">Manage your billing and payment details</p>
-                    </div>
-                  </div>
-                  <Row className="mb-3">
-                    <Form.Group as={Col} md="12">
-                      <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
-                      <Form.Control type="text" name="fullName" value='Rakesh Kumar' required/>
-                    </Form.Group>
-                  </Row>
-
-                  <Row className="mb-3">
-                    <Form.Group>
-                      <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                      <Row>
-                        <Col className="d-flex align-items-center gap-3">
-                          <Form.Select disabled className="w-auto pe-5">
-                            <option>+91</option>
-                          </Form.Select>
-                          <Form.Control type="tel" name="phone" value='9876543210' required/>
-                        </Col>
-                      </Row>
-                    </Form.Group>
-                  </Row>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="address1"
-                      value='123 MG Road, Koramangala'
-                      required
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label>Address Line 2</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="address2"
-                      value='Near Metro Station'
-                    />
-                  </Form.Group>
-
-                  <Row className="mb-3">
-                    <Form.Group as={Col} md="4">
-                      <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="city"
-                        value='Bangalore'
-                        required
-                      />
-                    </Form.Group>
-                    <Form.Group as={Col} md="4">
-                      <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="state"
-                        value='Karnataka'
-                        required
-                      />
-                    </Form.Group>
-                    <Form.Group as={Col} md="4">
-                      <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="postal"
-                        value='560034'
-                        required
-                      />
-                    </Form.Group>
-                  </Row>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
-                    <Form.Select name="country" required>
-                      <option selected>India</option>
-                      <option>United States</option>
-                      <option>United Kingdom</option>
-                      <option>Canada</option>
-                    </Form.Select>
-                  </Form.Group>
-
-                  <Button variant="primary" className="w-100 mt-4 d-flex align-items-center justify-content-center gap-2 fw-bold"><FiSave /> Save Billing Information</Button>
-                </Form>
+                <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
+                                              <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
+                                              <Row>
+                                                <Form.Group as={Col} md="12" className="position-relative mb-0 form-group">
+                                                  <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
+                                                  <Form.Control type="text" className={errors?.fullName ? 'br-red' : ''} name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
+                                                  {showError("fullName")}
+                                                </Form.Group>
+                                              </Row>
+                              
+                                              <Row>
+                                                <Form.Group className="position-relative mb-0 form-group">
+                                                  <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
+                                                  <Row>
+                                                    <Col className="d-flex align-items-start gap-3">
+                                                      <Form.Select className="w-auto pe-5">
+                                                        {countries.map((country) => (
+                                                          <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
+                                                            {country.phoneCode}
+                                                          </option>
+                                                        ))}
+                                                      </Form.Select>
+                                                    
+                                                      <div className="flex-fill position-relative">
+                                                        <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                                                        {showError("phone")}
+                                                      </div>
+                                                    </Col>
+                                                  </Row>
+                                                </Form.Group>
+                                              </Row>
+                              
+                                              <Form.Group  className="position-relative mb-0 form-group">
+                                                <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
+                                                <Form.Control
+                                                  type="text"
+                                                  name="address1"
+                                                  className={errors?.address1 ? 'br-red' : ''} 
+                                                  placeholder="Street address, building, apartment"
+                                                  value={formData.address1}
+                                                  onChange={handleChange}
+                                                  required
+                                                />
+                                                {showError("address1")}
+                                              </Form.Group>
+                              
+                                              <Form.Group className="position-relative mb-0 form-group">
+                                                <Form.Label>Address Line 2</Form.Label>
+                                                <Form.Control
+                                                  type="text"
+                                                  name="address2"
+                                                  placeholder="Additional address details (optional)"
+                                                  value={formData.address2}
+                                                  onChange={handleChange}
+                                                />
+                                              </Form.Group>
+                              
+                                              <Row className="">
+                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                                                  <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
+                                                  <Form.Control
+                                                    type="text"
+                                                    name="city"
+                                                    className={errors?.city ? 'br-red' : ''} 
+                                                    placeholder="City"
+                                                    value={formData.city}
+                                                    onChange={handleChange}
+                                                    required
+                                                  />
+                                                  {showError("city")}
+                                                </Form.Group>
+                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                                                  <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
+                                                  <Form.Control
+                                                    className={errors?.state ? 'br-red' : ''} 
+                                                    type="text"
+                                                    name="state"
+                                                    placeholder="State or Province"
+                                                    value={formData.state}
+                                                    onChange={handleChange}
+                                                    required
+                                                  />
+                                                  {showError("state")}
+                                                </Form.Group>
+                                                <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                                                  <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
+                                                  <Form.Control
+                                                    type="text"
+                                                    name="postal"
+                                                    className={errors?.postal ? 'br-red' : ''} 
+                                                    placeholder="Postal code"
+                                                    value={formData.postal}
+                                                    onChange={handleChange}
+                                                    required
+                                                  />
+                                                  {showError("postal")}
+                                                </Form.Group>
+                                              </Row>
+                              
+                                              <Form.Group  className="position-relative mb-0 form-group">
+                                                <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
+                                                <Form.Select
+                                                  className="custom-selectbox"
+                                                  name="country"
+                                                  value={formData.country}
+                                                  onChange={handleChange}
+                                                  required
+                                                >
+                                                  {countries.map((country) => (
+                                                    <option key={`country-${country.isoCode}--${country.phoneCode}`} value={country.value}>
+                                                      {country.name}
+                                                    </option>
+                                                  ))}
+                                                </Form.Select>
+                                                {showError("country")}
+                                              </Form.Group>
+                              
+                                                <Button variant="primary" type="submit" onClick={handleSubmit} className="w-100 mt-4 d-flex align-items-center justify-content-center gap-2 fw-bold" disabled={loading}><FiSave /> { loading ? 'Please wait...': 'Save Billing Information'}</Button>
+                                            
+                              
+                                            </Form>
               </Col>
             </Row>
           </Container>
         </div>
       </div>
+      <AlertDialog
+        showdialog={showdialog}
+        toggledialog={setShowDialog}
+        msg="Are you sure you want to cancel your subscription?"
+        callback={handleCancelSubscription}
+      />
       <Modal show={showConfirm} onHide={handleCloseConfirm} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title className="fw-semibold">Subscription Confirmation</Modal.Title>
@@ -448,14 +712,23 @@ export default function ManagePlan() {
               </p>
               <p className="mb-0">
                 <strong>Next Payment Date:</strong>{" "}
-                {new Date(Date.now() +
-                  (billingCycle === "yearly"
-                    ? 365
-                    : billingCycle === "quarterly"
-                      ? 90
-                      : 30
-                  ) * 24 * 60 * 60 * 1000
-                ).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+                {(() => {
+                  const nextDate = new Date();
+                  
+                  if (billingCycle === "yearly") {
+                    nextDate.setFullYear(nextDate.getFullYear() + 1);
+                  } else if (billingCycle === "quarterly") {
+                    nextDate.setMonth(nextDate.getMonth() + 3);
+                  } else {
+                    nextDate.setMonth(nextDate.getMonth() + 1);
+                  }
+
+                  return nextDate.toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  });
+                })()}
               </p>
             </div>
           </div>
@@ -471,7 +744,7 @@ export default function ManagePlan() {
                 </span>
               </p> */}
               <p className="mb-1">
-                Discounted price per user:{" "}
+                {billingCycle === 'monthly' ? 'Regular': 'Discounted'} price per user:{" "}
                 <span className="fw-semibold text-primary">
                   ₹{selectedPlanData?.pricePerUser}/user/month
                 </span>

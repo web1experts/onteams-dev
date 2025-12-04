@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Button, Badge, ListGroup, Alert } from "reac
 import { FiArrowUpRight, FiCalendar, FiCheckCircle, FiClock, FiUsers, FiSettings, FiDownload } from "react-icons/fi";
 import { BsExclamationTriangle } from "react-icons/bs";
 import { BiFile } from "react-icons/bi";
-import { getActiveSubscriptionDetails, cancelSubscription } from "../../redux/actions/subscription.action";
+import { getActiveSubscriptionDetails, cancelSubscription, getScheduledPlan } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
 import { AlertDialog } from "../modals";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -17,10 +17,11 @@ const PlanOverview = () => {
   const [spinner, setSpinner] = useState(true);
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
-
+  const [scheduledSub, setScheduledSub] = useState(null)
   useEffect(() => {
     setSpinner(true)
     dispatch(getActiveSubscriptionDetails())
+    dispatch(getScheduledPlan())
   }, [])
 
   useEffect(() => {
@@ -33,6 +34,10 @@ const PlanOverview = () => {
       getActiveSubscriptionDetails(subscriptionState.activeSubscription?.subscriptionId)
     }
   }, [subscriptionState.activeSubscription])
+
+  useEffect(() => {
+    setScheduledSub(subscriptionState.scheduledSubscription)
+  }, [subscriptionState.scheduledSubscription])
 
    useEffect(() => {
     const subscriptionData = subscriptionState?.subscriptionData;
@@ -192,9 +197,9 @@ const PlanOverview = () => {
                     </Row>
                   }
 
-                  <div className="text-center">
+                  {/* <div className="text-center">
                     <Button variant="primary" href="/manage-plans" className="px-4 w-100 fw-bold py-3"><FiSettings /> Manage Plan</Button>
-                  </div>
+                  </div> */}
                   {/* <div className="mt-4 bg-amber rounded-4 p-4">
                     <div className="d-flex align-items-start gap-3">
                         <div className="p-2 bg-amber-icon rounded-3"><FiClock /></div>
@@ -204,20 +209,20 @@ const PlanOverview = () => {
                         </div>
                     </div>
                   </div> */}
-                   {(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial' && memberProfile?.role?.slug === "owner" ) && (
+                   {(scheduledSub && memberProfile?.role?.slug === "owner" ) && (
                     <div className="mt-4 bg-amber rounded-4 p-4">
                       <div className="d-flex align-items-start gap-3">
                           <div className="p-2 bg-amber-icon rounded-3"><BsExclamationTriangle /> </div>
                           <div className="flex-1">
                               <h5 className="fw-bold text-secondary mb-2">Scheduled Plan Change</h5>
-                              <p className="text-sm mb-1">Your plan will downgrade to <strong className="fw-bold text-secondary">Free Plan</strong> on your next billing cycle.</p>
-                              <p className="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date(activeSubscription?.subscriptionDetails?.charge_at * 1000)?.toLocaleDateString("en-GB", {
+                              <p className="text-sm mb-1">Your plan will downgrade to <strong className="fw-bold text-secondary">{scheduledSub?.name?.toUpperCase()} Plan</strong> on your next billing cycle.</p>
+                              <p className="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date(scheduledSub?.start_at * 1000)?.toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "long",
                             year: "numeric",
                           })}</small></p>
                           </div>
-                          <Button variant="warning" onClick={doCancel} className="ms-auto">Cancel</Button>
+                          {/* <Button variant="warning" onClick={doCancel} className="ms-auto">Cancel</Button> */}
                       </div>
                     </div>)
                   }
