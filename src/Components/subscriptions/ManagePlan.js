@@ -7,6 +7,7 @@ import { createSubscription, saveAuthorization, getActiveSubscription, subscribe
 import { plans } from "../../helpers/plans";
 import { countries } from "../../helpers/countries";
 import { useToast } from "../../context/ToastContext";
+import { selectboxObserver } from "../../helpers/commonfunctions";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
 import { AlertDialog } from "../modals";
 
@@ -120,6 +121,9 @@ export default function ManagePlan() {
 
   const handleConfirm = () => {
     setShowConfirm(true);
+    setTimeout(() => {
+      selectboxObserver()
+    },1000)
   };
 
   const handleCloseConfirm = () => {

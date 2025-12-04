@@ -1552,72 +1552,81 @@ useEffect(() => {
               </Alert>
 
             :
-          <Form onSubmit={handleSubmit}>
-            {/* {rows.map((row, index) => ( */}
-            <div className="form-row pb-3" key={`row-0`}>
-              <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
-                <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
-                  <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
-                    placeholder="Email address"
-                    name="email"
-                    value={fields?.email}
-                    onChange={handleChange}
-                  />
-                </FloatingLabel>
-                {showError("email")}
-                <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
-              </Form.Group>
+            <Form onSubmit={handleSubmit}>
+              {/* {rows.map((row, index) => ( */}
+              <div className="form-row pb-3" key={`row-0`}>
+                <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
+                  <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
+                    <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
+                      placeholder="Email address"
+                      name="email"
+                      value={fields?.email}
+                      onChange={handleChange}
+                    />
+                  </FloatingLabel>
+                  {showError("email")}
+                  <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
+                </Form.Group>
 
-              <Button
-                variant="primary"
-                onClick={() => {
-                  showPermissionsModal();
-                }}
-              >
-                Select Role
-              </Button>
-              {showError("role")}
-            </div>
-            <div className="form-row" key={`row-1`}>
-              <Form.Group className="mb-0 form-group other__fields">
-                {customFields.length > 0 && (
-                  <>
-                    {customFields.map((field, index) =>
-                      renderDynamicField({
-                        name: `custom_field[${field.name}]`,
-                        type: field.type,
-                        label: field.label,
-                        value: field.type === 'date' && fields[`custom_field[${field.name}]`]
-                                ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
-                                : fields[`custom_field[${field.name}]`] || '',
-                        options: field?.options || [],
-                        onChange: (e) => {
-                                            if(field.type === "date"){
-                                                
-                                                handleDateChange(e, `custom_field[${field.name}]`)
-                                            }else{
-                                                handleChange(e)
-                                            }
-                                        },
-                        fieldId: `new-${field.name}-${index}`,
-                        range_options: field?.range_options || {},
-                        showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
-                        toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
-                        toggleBadges: () => toggleBadges(field),
-                      })
-                    )}
-                  </>
-                )}
-              </Form.Group>
-            </div>
-            {/* ))} */}
-          </Form>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    showPermissionsModal();
+                  }}
+                >
+                  Select Role
+                </Button>
+                {showError("role")}
+              </div>
+              <div className="form-row" key={`row-1`}>
+                <Form.Group className="mb-0 form-group other__fields">
+                  {customFields.length > 0 && (
+                    <>
+                      {customFields.map((field, index) =>
+                        renderDynamicField({
+                          name: `custom_field[${field.name}]`,
+                          type: field.type,
+                          label: field.label,
+                          value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                  ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                  : fields[`custom_field[${field.name}]`] || '',
+                          options: field?.options || [],
+                          onChange: (e) => {
+                                              if(field.type === "date"){
+                                                  
+                                                  handleDateChange(e, `custom_field[${field.name}]`)
+                                              }else{
+                                                  handleChange(e)
+                                              }
+                                          },
+                          fieldId: `new-${field.name}-${index}`,
+                          range_options: field?.range_options || {},
+                          showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                          toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                          toggleBadges: () => toggleBadges(field),
+                        })
+                      )}
+                    </>
+                  )}
+                </Form.Group>
+              </div>
+              {/* ))} */}
+            </Form>
           }
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleSubmit} disabled={loader}>
-            {loader ? "Please Wait..." : "Save"}
-          </Button>
+          {
+            (
+              activeSubscription?.planId === 'free' &&
+              (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+              invitationsTotal + memberFeeds?.length
+            ) ?
+            <></>
+            :
+              <Button variant="primary" onClick={handleSubmit} disabled={loader}>
+                {loader ? "Please Wait..." : "Save"}
+              </Button>
+          }
         </Modal.Footer>
       </Modal>
       {showPermissions && (
