@@ -358,7 +358,7 @@ const handleSubmit = (e) => {
                 <div className="bg-white rounded-4 shadow border p-4 mb-4">
                   <h4 className="text-xl fw-bold mb-4">Number of Team Members</h4>
                   <Form onSubmit={handleQuantitySubmit}>
-                    <Form.Group className="d-flex align-items-center gap-3">
+                    <Form.Group className="d-flex align-items-center gap-2 gap-xl-3 flex-wrap">
                       <Form.Label className="d-inline-flex align-items-center gap-2 form-label w-auto mb-0"><FiUsers /> Team Members</Form.Label>
                       {/* <Form.Control type="number" className="w-50 flex-grow-1" min={totalmembers || 1} disabled={activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial'} value={teamMembers} onChange={(e) => {
                         if(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial'){
@@ -367,47 +367,47 @@ const handleSubmit = (e) => {
                           return false;
                         }
                       }}/> */}
-                      {(() => {
-                        const qty = activeSubscription?.quantity || 1;
-                        const tmembers = memberFeeds?.length || 0;
-                        const invites = invitationsTotal || 0;
+                      <div className="d-flex align-items-center gap-2 gap-xl-3 flex-grow-1">
+                        {(() => {
+                          const qty = activeSubscription?.quantity || 1;
+                          const tmembers = memberFeeds?.length || 0;
+                          const invites = invitationsTotal || 0;
 
-                        // Calculate min value
-                        const currentTotal = tmembers + invites;
-                        const minValue = currentTotal < qty ? currentTotal : qty;
+                          // Calculate min value
+                          const currentTotal = tmembers + invites;
+                          const minValue = currentTotal < qty ? currentTotal : qty;
 
-                        return (
-                          <Form.Control
-                            type="number"
-                            className="w-50 flex-grow-1"
-                            min={minValue}
-                            id="qty-field"
-                            ref={qtyRef}
-                            // disabled={
-                            //   activeSubscription?.planId === "free" ||
-                            //   activeSubscription?.planId === "trial"
-                            // }
-                            value={teamMembers}
-                            onChange={(e) => {
-                              // if (
-                              //   activeSubscription?.planId !== "free" &&
-                              //   activeSubscription?.planId !== "trial"
-                              // ) {
-                                setTeamMembers(Number(e.target.value));
-                              // } else {
-                              //   return false;
+                          return (
+                            <Form.Control
+                              type="number"
+                              className="w-50 flex-grow-1"
+                              min={minValue}
+                              id="qty-field"
+                              ref={qtyRef}
+                              // disabled={
+                              //   activeSubscription?.planId === "free" ||
+                              //   activeSubscription?.planId === "trial"
                               // }
-                            }}
-                          />
-                        );
-                      })()}
-                      
+                              value={teamMembers}
+                              onChange={(e) => {
+                                // if (
+                                //   activeSubscription?.planId !== "free" &&
+                                //   activeSubscription?.planId !== "trial"
+                                // ) {
+                                  setTeamMembers(Number(e.target.value));
+                                // } else {
+                                //   return false;
+                                // }
+                              }}
+                            />
+                          );
+                        })()}
                         {
-                          
                           (selectedPlanData?.planId?.toLowerCase() !== 'free' && selectedPlanData?.planId?.toLowerCase() !== 'trial') && (
                             <Button type="submit" variant="primary" disabled={loading}>{ loading ? 'Please wait...': 'Update Members'}</Button>
                           )
                         }
+                      </div>
                       
                     </Form.Group>
                   </Form>
@@ -418,12 +418,12 @@ const handleSubmit = (e) => {
                   <h6 className="fw-bold mb-2">Choose Your Plan</h6>
                   <Row className="mb-4">
                     {plans[billingCycle].map((plan) => (
-                      <Col key={plan.id} data-plan={plan.id} md={4} className="mb-3">
+                      <Col key={plan.id} data-plan={plan.id} xl={4} className="mb-3">
                         <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name}  ${plan.name} ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
                           onClick={() => setSelectedPlan(plan)}
                           style={{ cursor: "pointer" }}
                         >
-                          <Card.Body className="p-0" key={`body-${plan.id}`}>
+                          <Card.Body className="p-0 m-0" key={`body-${plan.id}`}>
                             {plan.discount > 0 && (
                               <Badge bg="success" pill className="mb-2">
                                 {plan.discount}% OFF
@@ -619,7 +619,7 @@ const handleSubmit = (e) => {
                   </Form.Group>
   
                   <Row className="">
-                    <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                    <Form.Group as={Col} xl="4" className="position-relative mb-0 form-group">
                       <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
                       <Form.Control
                         type="text"
@@ -632,7 +632,7 @@ const handleSubmit = (e) => {
                       />
                       {showError("city")}
                     </Form.Group>
-                    <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                    <Form.Group as={Col} xl="4" className="position-relative mb-0 form-group">
                       <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
                       <Form.Control
                         className={errors?.state ? 'br-red' : ''} 
@@ -645,7 +645,7 @@ const handleSubmit = (e) => {
                       />
                       {showError("state")}
                     </Form.Group>
-                    <Form.Group as={Col} md="4" className="position-relative mb-0 form-group">
+                    <Form.Group as={Col} xl="4" className="position-relative mb-0 form-group">
                       <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
                       <Form.Control
                         type="text"
@@ -660,7 +660,7 @@ const handleSubmit = (e) => {
                     </Form.Group>
                   </Row>
   
-                  <Form.Group  className="position-relative mb-0 form-group">
+                  <Form.Group className="position-relative mb-0 form-group">
                     <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
                     <Form.Select
                       className="custom-selectbox"
@@ -794,7 +794,7 @@ const handleSubmit = (e) => {
                     </div>
                   </div>
                   <div className="text-center mt-3">
-                    <p className="text--small mb-1 fw-normal text-amber">Total {billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} Payment</p>
+                    <p className="text--small mb-1 fw-semibold text-amber">Total {billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} Payment</p>
                     <div className="text--large mb-0 text-amber">₹{selectedPlanData?.pricePerUser.toFixed(0) * teamMembers * (billingCycle === 'quarterly' ? 3 : 12)}</div>
                   </div>
                 </div>

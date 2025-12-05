@@ -128,12 +128,12 @@ const PlanOverview = () => {
                     </div>
                   </Card.Header>
                   :
-                  <Card.Header className="bg-gradient-blue text-white d-flex justify-content-between align-items-center rounded-4 p-4 mb-4 shadow">
-                    <div className="d-flex gap-2 align-items-center">
+                  <Card.Header className="bg-gradient-blue text-white d-xl-flex justify-content-between align-items-center rounded-4 p-4 mb-4 shadow">
+                    <div className="d-flex gap-2 align-items-center justify-content-center justify-content-xl-start mb-2 mb-xl-0">
                       <h3 className="mb-0 fw-bold">{activeSubscription?.subscriptionDetails?.plan_info?.name} Plan</h3>
                       <h4 className="m-0 d-flex gap-2 align-items-center text-capitalize"><FiCheckCircle /> {activeSubscription?.subscriptionDetails?.status}</h4>
                     </div>
-                    <div className="d-flex gap-2 align-items-end flex-column">
+                    <div className="d-flex gap-2 align-items-center align-items-xl-end flex-column">
                       <h6 className="mb-0 fw-bold text-uppercase">Price per Member</h6>
                       <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
                         <span>₹{activeSubscription?.subscriptionDetails?.plan_info?.pricePerUser} <small className="fs-5 fw-normal">/month</small></span><span className="fs-6 fw-normal">billed {activeSubscription?.subscriptionDetails?.plan_info?.billing_cycle || 'monthly'}</span>
@@ -145,7 +145,7 @@ const PlanOverview = () => {
                 <Card.Body className="p-0">
                   {activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial' ?
                     <Row className="mb-0">
-                      <Col>
+                      <Col md={4} className="mb-md-3 mb-0">
                         <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm h-100">
                           <div className="status--title d-flex align-items-center gap-2 mb-3">
                             <span className="status--icon status--icon--blue"><FiUsers /></span>
@@ -158,7 +158,7 @@ const PlanOverview = () => {
                     </Row>
                     :
                     <Row className="mb-0">
-                      <Col>
+                      <Col xl={4} className="mb-md-3 mb-0">
                         <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm h-100">
                           <div className="status--title d-flex align-items-center gap-2 mb-3">
                             <span className="status--icon status--icon--blue"><FiUsers /></span>
@@ -167,7 +167,7 @@ const PlanOverview = () => {
                           <h4 className="mb-0 fw-bold fs-5">{activeSubscription?.subscriptionDetails?.quantity || 0}</h4>
                         </div>
                       </Col>
-                      <Col>
+                      <Col xl={4} className="mb-md-3 mb-0">
                         <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm h-100">
                           <div className="status--title d-flex align-items-center gap-2 mb-3">
                             <span className="status--icon status--icon--green"><FiCalendar /></span>
@@ -176,7 +176,7 @@ const PlanOverview = () => {
                           <h4 className="mb-0 fw-bold fs-5 text-capitalize">{activeSubscription?.subscriptionDetails?.plan_info?.billing_cycle}</h4>
                         </div>
                       </Col>
-                      <Col>
+                      <Col xl={4} className="mb-md-3 mb-0">
                         <div className="plan--status bg-white rounded-4 p-4 border border-1 shadow-sm h-100">
                           <div className="status--title d-flex align-items-center gap-2 mb-3">
                             <span className="status--icon status--icon--grey"><FiClock /></span>
