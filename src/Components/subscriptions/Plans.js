@@ -458,7 +458,7 @@ const showError = (name) => {
       return;
     }
     setLoading(true)
-    dispatch(subscribeTrialPlan())
+    dispatch(subscribeTrialPlan({initial_quantity: members}))
   }
 
   return (
