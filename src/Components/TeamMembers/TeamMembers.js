@@ -1548,7 +1548,7 @@ useEffect(() => {
               invitationsTotal + memberFeeds?.length
             ) ?
             <Alert key={'danger'} variant={'danger'}>
-                Your current Free plan allows only 3 members. To add additional members, please upgrade to a paid plan.
+                Your current {activeSubscription?.name} plan allows to only {activeSubscription?.quantity} members. To add additional members, please upgrade the count of team members.
               </Alert>
 
             :

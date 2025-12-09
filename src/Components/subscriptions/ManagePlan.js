@@ -868,7 +868,7 @@ const handleSubmit = (e) => {
 
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseConfirm}>Cancel</Button>
-          <Button variant="success" disabled={loading} onClick={handleProceedToPayment}>Proceed to Payment</Button>
+          <Button variant="success" disabled={loading} onClick={handleProceedToPayment}>{loading ? 'Please wait...': 'Proceed to Payment'}</Button>
         </Modal.Footer>
       </Modal>
     </>
