@@ -87,7 +87,7 @@ const hideSidebarRoutes = [
 console.log('hasActiveSubscription::: ', hasActiveSubscription)
   // If not subscribed and not on /plans → redirect to /plans
   if (!hasActiveSubscription && !isOnPlansPage) {
-    return <PlansPage />
+    return <SubscriptionPlans />
     // return <Navigate to="/plans" replace />;
   }
 

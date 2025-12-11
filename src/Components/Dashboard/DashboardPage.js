@@ -525,7 +525,7 @@ function DashboardPage() {
   };
 
   const handleInvitationList = async () => {
-    await dispatch(listCompanyinvite());
+    await dispatch(listCompanyinvite(0, 'member'));
   };
 
   const getQuote = async () => {
@@ -616,13 +616,13 @@ function DashboardPage() {
             <Row className="justify-content-center">
               <Col sm={12} className="mb-4">
                 <DateTimeCard />
-                {/*<ListGroup className="invitation--list">
+                <ListGroup className="invitation--list">
                   {invitationsFeeds &&
                     invitationsFeeds.length > 0 &&
                     invitationsFeeds.map((invitation, index) => {
                       return (
-                        <>
-                          <ListGroup.Item>
+                        
+                          <ListGroup.Item key={`invite-item-${invitation._id}`}>
                             <p className="mb-0">
                               You got an invitation from{" "}
                               <strong>{invitation.company?.name}</strong> to
@@ -661,10 +661,9 @@ function DashboardPage() {
                               </Button>
                             </div>
                           </ListGroup.Item>
-                        </>
                       );
                     })}
-                </ListGroup>*/}
+                </ListGroup>
               </Col>
               <Col xl={8}>
                 <Card className="daily--star">

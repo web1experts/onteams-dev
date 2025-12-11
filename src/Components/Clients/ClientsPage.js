@@ -705,7 +705,10 @@ function ClientsPage() {
                                                 <MdDragIndicator />
                                               </div>
                                               <div className="title--initial">
-                                                {client.name.charAt(0)}
+                                               { (client?.avatar && client?.avatar !== null ) ? 
+                                                  <span><img src={client?.avatar} alt={'client-avatar'} /></span>
+                                                  :
+                                                client.name.charAt(0)}
                                               </div>
                                               <div className="title--span flex-column align-items-start gap-0">
                                                 <span>{client.name}</span>
@@ -894,7 +897,10 @@ function ClientsPage() {
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <div className="title--initial">
-                    {selectedClient?.name?.charAt(0)}
+                     {(selectedClient?.avatar && selectedClient?.avatar !== null ) ? 
+                      <span><img src={selectedClient?.avatar} alt={'client-avatar'} /></span>
+                      :
+                    selectedClient?.name?.charAt(0)}
                   </div>
                   <div className="title--span flex-column align-items-start gap-0">
                     <h3>
@@ -918,7 +924,11 @@ function ClientsPage() {
                           }
                         >
                           <div className="title--initial">
-                            {client?.name.charAt(0)}
+                            {(client?.avatar && client?.avatar !== null ) ? 
+                              <span><img src={client?.avatar} alt={'client-avatar'} /></span>
+                              :
+                            client?.name.charAt(0)
+                            }
                           </div>
                           <div className="title--span flex-column align-items-start gap-0">
                             <strong>{client?.name}</strong>
@@ -951,18 +961,20 @@ function ClientsPage() {
           <div className="rounded--box client--box">
             <Card className="contact--card">
               <div className="card--img">
-                {/* <Form.Control
-                  type="file"
-                  id="upload--img"
-                  hidden
-                  onChange={(e) => handleFieldChange("avatar", e)}
-                  accept=".jpg, .jpeg, .png, .gif"
-                /> */}
+                {isEditing === true && (
+                  <Form.Control
+                    type="file"
+                    id="upload--img"
+                    hidden
+                    onChange={(e) => handleFieldChange("avatar", e)}
+                    accept=".jpg, .jpeg, .png, .gif"
+                  />
+                )}
                 {memberProfile?.permissions?.clients?.create_edit_delete ===
                   true || memberProfile?.role?.slug === "owner" ? (
                   <>
                     <Form.Label 
-                    // htmlFor="upload--img"
+                    htmlFor="upload--img"
                     >
                       {avatarPreview ? (
                         <Card.Img variant="top" src={avatarPreview} />

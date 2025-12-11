@@ -190,6 +190,10 @@ function TeamMembersPage() {
     setTimeout(() => {
         dispatch(getActiveSubscription())
       }, 1000)
+
+       socket.on('receive_record_types', async (record_types = {}) => { 
+        console.log('record_types:: ', record_types)
+       })
       
   }, []);
 
@@ -238,9 +242,9 @@ useEffect(() => {
 
 
   useEffect(() => {
-    if (apiResult.success) {
+    if (apiResult.success) { console.log('on success', activeTab)
       if (activeTab === "Members") {
-        if (apiResult.updatedMember) {
+        if (apiResult.updatedMember) { console.log('I am here')
           socket.emit("refresh_record_type", selectedMember?._id);
           socket.emit("refresh_record_types", selectedMember?._id);
           const updatedMemberFeeds = memberFeeds.map((m) =>
@@ -1136,7 +1140,12 @@ useEffect(() => {
             <div className="projecttitle">
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
-                    <div className="title--initial">{selectedMember?.name?.charAt(0)}</div>
+                    <div className="title--initial">
+                      {(selectedMember?.avatar && selectedMember?.avatar !== null ) ? 
+                        <span><img src={selectedMember?.avatar} alt={'member-avatar'} /></span>
+                        :
+                      selectedMember?.name?.charAt(0)}
+                      </div>
                     <div className="title--span flex-column align-items-start gap-0">
                         <h3>
                           <strong>{selectedMember?.name}</strong>
@@ -1150,7 +1159,12 @@ useEffect(() => {
                         memberFeeds.length > 0 &&
                         memberFeeds.map((member, idx) => (
                           <Dropdown.Item onClick={() => {handleTableToggle(member);setIsActive(true); }} key={`item-${idx}`} className={(selectedMember?._id === member?._id) ? 'active-project': ''}>
-                            <div className="title--initial">{member?.name.charAt(0)}</div>
+                            <div className="title--initial">
+                              {(member?.avatar && member?.avatar !== null ) ? 
+                                <span><img src={member?.avatar} alt={'member-avatar'} /></span>
+                                :
+                              member?.name.charAt(0)}
+                              </div>
                             <div className="title--span flex-column align-items-start gap-0">
                               <strong>{member?.name}</strong>
                               <span>{member.role?.name}</span>

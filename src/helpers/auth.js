@@ -120,6 +120,24 @@ export async function login(token,  current_loggedin_user = false, companies = [
   return true;
 }
 
+export function removeSubscription() {
+  const currentDashboard = localStorage.getItem('current_dashboard');
+
+  if (!currentDashboard) return; // nothing to remove
+
+  try {
+    const parsedData = JSON.parse(currentDashboard);
+
+    if (parsedData && typeof parsedData === 'object') {
+      parsedData.subscription = null;
+      localStorage.setItem('current_dashboard', JSON.stringify(parsedData));
+    }
+  } catch (error) {
+    console.error('Failed to parse current_dashboard:', error);
+  }
+}
+
+
 export function setupDashboards( companies ){
   const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(223, 169, 61), rgb(175, 113, 50))', primaryColor: '223, 169, 61', secondaryColor: '175, 113, 50' }
   if( companies.length > 0){ 

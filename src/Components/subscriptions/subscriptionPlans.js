@@ -74,7 +74,7 @@ function SubscriptionPlans() {
       dispatch(getActiveSubscription())
       dispatch(getBillingdetails())
     }, 1000)
-    handleListMember();
+    // handleListMember();
     
   }, [])
 
@@ -87,6 +87,9 @@ function SubscriptionPlans() {
   }, [subscriptionState])
 
   useEffect(() => {
+    setTimeout(() => {
+      setSpinner(false)
+    },2000)
     if(subscriptionState.activeSubscription){
 
       setActiveSubscription(subscriptionState.activeSubscription)
@@ -110,26 +113,24 @@ function SubscriptionPlans() {
     setMembers(totalmembers)
   },[totalmembers])
 
-  useEffect(() => {
-      if (memberFeed && memberFeed.memberData) {
-        setMemberFeed(memberFeed.memberData);
-        setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
+  // useEffect(() => {
+  //     if (memberFeed && memberFeed.memberData) {
+  //       setMemberFeed(memberFeed.memberData);
+  //       setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
 
-      }
-      setTimeout(() => {
-        setSpinner(false)
-      },800)
-    }, [memberFeed]);
+  //     }
+      
+  //   }, [memberFeed]);
 
-     useEffect(() => {
-        if (invitationsFeed && invitationsFeed.inviteData) {
-          setInvitationsTotal(invitationsFeed.total);
-          setTotalMembers((totalmembers) + invitationsFeed.total || 0);
-        }
-        setTimeout(() => {
-        setSpinner(false)
-      },800)
-      }, [invitationsFeed]);
+  //    useEffect(() => {
+  //       if (invitationsFeed && invitationsFeed.inviteData) {
+  //         setInvitationsTotal(invitationsFeed.total);
+  //         setTotalMembers((totalmembers) + invitationsFeed.total || 0);
+  //       }
+  //     //   setTimeout(() => {
+  //     //   setSpinner(false)
+  //     // },800)
+  //     }, [invitationsFeed]);
 
    
 
@@ -346,7 +347,7 @@ const showError = (name) => {
   return (
     <>
       <div className="team--page subscription--page">
-        <div className="page--wrapper py-5 pt-5 text-center h-100">
+        <div className="page--wrapper px-md-2 pb-4 pt-4 py-5 pt-5 text-center h-100">
           {spinner ? (
             <div className="loading-bar">
               <img src="images/OnTeam-icon-gray.png" className="flipchar" />

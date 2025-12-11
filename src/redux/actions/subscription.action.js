@@ -91,6 +91,7 @@ export const cancelSubscription = (subscriptionId) => {
     try {
       const response = await API.apiDeleteUrl('subscription', `/${subscriptionId}`)
       if (response.data && response.data.success) {
+        await auth.removeSubscription()
         await dispatch({ type: SUBSCRIPTION_CANCEL, payload: response.data });
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
