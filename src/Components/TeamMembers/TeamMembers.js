@@ -1394,7 +1394,7 @@ useEffect(() => {
                         <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording during work hours</small></h6>
                       </div>
                       {
-                        (activeSubscription && activeSubscription?.planId === 'elite' ) ? (
+                        (activeSubscription && activeSubscription?.name === 'Elite' ) ? (
                           <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
                             updateRecodingType({
                                 custom_field: {

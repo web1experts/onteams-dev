@@ -18,6 +18,7 @@ function ManualTime() {
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
   const [spinner, setSpinner] = useState(false);
+  const [processing, setProcessing] = useState(false)
   const handleClose = () => {
     setShow(false);
   };
@@ -37,6 +38,7 @@ function ManualTime() {
   }, [dispatch]);
 
   const handleReportSubmit = async (status, date, memberId, data) => {
+    setProcessing(true)
     let activityStatus = {};
     for (const activity of data) {
       activityStatus[activity?._id] = {};
@@ -53,6 +55,9 @@ function ManualTime() {
         activityStatus: activityStatus,
       })
     );
+    setTimeout(()=>{
+      setProcessing(false)
+    },1500)
   };
 
   useEffect(() => {
@@ -189,6 +194,7 @@ function ManualTime() {
                               project.activities
                             );
                           }}
+                          disabled={processing}
                         >
                           <FiCheckCircle className="me-1" /> Approve
                         </Button>
@@ -202,6 +208,7 @@ function ManualTime() {
                               project.activities
                             );
                           }}
+                          disabled={processing}
                         >
                           <AiOutlineCloseCircle className="me-1" /> Reject
                         </Button>
