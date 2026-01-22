@@ -7,7 +7,10 @@ import {
     BILLING_SUCCESS,
     SUBSCRIPTION_DATA,
     SUBSCRIPTION_CANCEL,
-    SUBSCRIPTION_SCHEDULED
+    SUBSCRIPTION_SCHEDULED,
+    SUBSCRIPTION_UPDATE_SUCCESS,
+    SUBSCRIPTION_INVOICE_SUCCESS,
+    UPCOMING_INVOICE
 } from "../actions/types";
 
 const initialState = {
@@ -15,6 +18,7 @@ const initialState = {
     success: false,
     message: null,
     message_variant: null,
+    invoice: null,
 };
 
 export default (state = initialState, action) => {
@@ -27,6 +31,26 @@ export default (state = initialState, action) => {
             success: true,
             activeSubscription: action.payload.updatedSubscription
         };
+    case UPCOMING_INVOICE: {
+        return {
+            ...state,
+            invoicePreview: action.payload.invoiceData
+        }
+    }
+    case SUBSCRIPTION_INVOICE_SUCCESS: {
+        return {
+            ...state,
+            success: true,
+            invoice: null,
+            InvoiceData: action.payload.InvoiceData
+        }
+    }
+    case SUBSCRIPTION_UPDATE_SUCCESS:
+        return {
+            ...state,
+            success: true,
+            invoice: action.payload.invoice
+        }
     case SUBSCRIPTION_SCHEDULED :
         return {
             ...state,

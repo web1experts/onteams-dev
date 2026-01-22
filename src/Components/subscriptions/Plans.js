@@ -11,12 +11,19 @@ import { selectboxObserver } from "../../helpers/commonfunctions";
 import { countries } from "../../helpers/countries";
 import { plans } from "../../helpers/plans";
 import { useToast } from "../../context/ToastContext";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import CheckoutForm from "./CheckoutForm";
+const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
+  
 function PlansPage() {
   const addToast = useToast();
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [loader, setLoader] = useState(true)
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
+  const [clientSecret, setClientSecret] = useState(null);
+  const [showCheckout, setShowCheckout] = useState( false)
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
   // const [plans] = useState(
@@ -250,7 +257,9 @@ function PlansPage() {
     setLoading(false)
     setShowConfirm(false);
     if (subscriptionState.success === 'success' && subscriptionState.authorizeData) {
-      authorizeSubscriptionPayment(subscriptionState.authorizeData)
+      setClientSecret(subscriptionState.authorizeData.clientSecret)
+      setShowCheckout(true)
+      // authorizeSubscriptionPayment(subscriptionState.authorizeData)
     }
   }, [subscriptionState])
 
@@ -393,44 +402,45 @@ const showError = (name) => {
   const authorizeSubscriptionPayment = async (payload) => {
     try {
       setLoading(true)
-      const { customer_id, subscription_id, plan_id } = payload;
+      const { url,  subscription_id, plan_id } = payload;
 
       // Load Razorpay
-      const options = {
-        key: razorPayKey,
-        subscription_id: subscription_id,
-        recurring: 1,
-        name: "Prime Teams",
-        description: `${selectedPlan.name} Plan Subscription`,
-        handler: function (response) {
-          console.log("Subscription Authorized:", response);
-          if (response?.razorpay_payment_id) {
-            dispatch(saveAuthorization({ ...response, subscription_id }))
-          }
-          setLoading(false)
-          setSelectedPlan(null)
-        },
-        modal: {
-          ondismiss: function () {
-            console.warn("⚠️ Payment popup closed by user (cancelled).");
-            setLoading(false);
-            // Optional: show a message or alert
-            alert("Payment was cancelled. You can try again anytime.");
-          },
-        },
-        theme: {
-          color: "#F37254",
-        },
-      };
+      // const options = {
+      //   key: razorPayKey,
+      //   subscription_id: subscription_id,
+      //   recurring: 1,
+      //   name: "Prime Teams",
+      //   description: `${selectedPlan.name} Plan Subscription`,
+      //   handler: function (response) {
+      //     console.log("Subscription Authorized:", response);
+      //     if (response?.razorpay_payment_id) {
+      //       dispatch(saveAuthorization({ ...response, subscription_id }))
+      //     }
+      //     setLoading(false)
+      //     setSelectedPlan(null)
+      //   },
+      //   modal: {
+      //     ondismiss: function () {
+      //       console.warn("⚠️ Payment popup closed by user (cancelled).");
+      //       setLoading(false);
+      //       // Optional: show a message or alert
+      //       alert("Payment was cancelled. You can try again anytime.");
+      //     },
+      //   },
+      //   theme: {
+      //     color: "#F37254",
+      //   },
+      // };
 
-      const rzp = new window.Razorpay(options);
-      // 🔴 Handle payment failure
-      rzp.on("payment.failed", function (response) {
-        console.error("❌ Payment Failed:", response.error);
-        alert(`Payment failed: ${response.error.description || "Unknown error"}`);
-        setLoading(false);
-      });
-      rzp.open();
+      // const rzp = new window.Razorpay(options);
+      // // 🔴 Handle payment failure
+      // rzp.on("payment.failed", function (response) {
+      //   console.error("❌ Payment Failed:", response.error);
+      //   alert(`Payment failed: ${response.error.description || "Unknown error"}`);
+      //   setLoading(false);
+      // });
+      // rzp.open();
+      window.location.href = url
     } catch (err) {
       console.error(err);
       alert("Error creating subscription: " + err.message);
@@ -1063,6 +1073,26 @@ const showError = (name) => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {
+        clientSecret !== null && (
+          <Modal show={showCheckout} onHide={() => setShowCheckout(false)} centered size="lg" className="subscription--modal theme--modal">
+            <Modal.Header closeButton>
+                <Modal.Title>
+                    <span className="nav--item--icon"><BsTags /></span>
+                    <strong>Checkout</strong>
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutForm />
+              </Elements>
+            </Modal.Body>
+         </Modal>
+          
+        )
+      }
     </>
   );
 }

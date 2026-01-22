@@ -23,9 +23,9 @@ import DashboardPage from "../Components/Dashboard/DashboardPage";
 import DesktopPage from "../Components/Desktop/DesktopPage";
 import ManualTime from "../Components/TimeTracking/ManualTime";
 import PlansPage from "../Components/subscriptions/Plans";
-import ManagePlan from "../Components/subscriptions/ManagePlan";
-import PlanOverview from "../Components/subscriptions/PlanOverview";
 import SubscriptionPlans from "../Components/subscriptions/subscriptionPlans";
+import SuccessPage from "../Components/subscriptions/success";
+import CancelPage from "../Components/subscriptions/cancel";
 const commonRouter = [
     {
         type: 'page',
@@ -113,7 +113,20 @@ const privateRoutes = [
         route: "*"
 
     },
-    
+    {
+        type: 'page',
+        name: 'Success page',
+        key: 'SUCCESS_PAGE',
+        component: <SuccessPage />,
+        route: '/success'
+    },
+    {
+        type: 'page',
+        name: 'Cancel page',
+        key: 'CANCEL_PAGE',
+        component: <CancelPage />,
+        route: '/cancel'
+    },
     {
         type: 'page',
         name: 'Manual Time Approve',

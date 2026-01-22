@@ -1,17 +1,23 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button, Form, Badge, ButtonGroup, ToggleButton, Modal, ListGroup } from "react-bootstrap";
 import { FiGlobe, FiUsers, FiCheck } from "react-icons/fi";
 import { BsTags } from "react-icons/bs";
-import { MdOutlineClose } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { currentMemberProfile } from "../../helpers/auth";
-import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
+import { createSubscription, saveAuthorization, getActiveSubscription,getUpcomingInvoice, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
 import { countries } from "../../helpers/countries";
 import { plans } from "../../helpers/plans";
 import { useToast } from "../../context/ToastContext";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import CheckoutForm from "./CheckoutForm";
+import InvoicePreview from "./InvoicePreview";
+const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
+  
+
 function SubscriptionPlans() {
   const addToast = useToast();
   const dispatch = useDispatch()
@@ -20,7 +26,8 @@ function SubscriptionPlans() {
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
-  
+  const [clientSecret, setClientSecret] = useState(null);
+  const [showCheckout, setShowCheckout] = useState( false)
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -33,17 +40,11 @@ function SubscriptionPlans() {
     agree: false,
   });
 
-  const handleListMember = async () => {
-   
-      await dispatch(Listmembers(1,''));
-      await dispatch(
-        listCompanyinvite(0, 'company')
-      );
-  };
   const [memberFeeds, setMemberFeed] = useState([]);
     const invitationsFeed = useSelector((state) => state.member.invitations);
     const [invitationsTotal, setInvitationsTotal] = useState(0)
     const memberFeed = useSelector((state) => state.member.members);
+    const [invoicePreview, setInvoicePreview] = useState(false)
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
   const [authorizationData, setAuthorizationData] = useState(false)
@@ -74,15 +75,17 @@ function SubscriptionPlans() {
       dispatch(getActiveSubscription())
       dispatch(getBillingdetails())
     }, 1000)
-    // handleListMember();
     
   }, [])
 
   useEffect(() => {
-    setLoading(false)
-    setShowConfirm(false);
+    
     if (subscriptionState.success === 'success' && subscriptionState.authorizeData) {
-      authorizeSubscriptionPayment(subscriptionState.authorizeData)
+      setLoading(false)
+      setShowConfirm(false);
+      setClientSecret(subscriptionState.authorizeData.clientSecret)
+      setShowCheckout(true)
+      // authorizeSubscriptionPayment(subscriptionState.authorizeData)
     }
   }, [subscriptionState])
 
@@ -113,26 +116,6 @@ function SubscriptionPlans() {
     setMembers(totalmembers)
   },[totalmembers])
 
-  // useEffect(() => {
-  //     if (memberFeed && memberFeed.memberData) {
-  //       setMemberFeed(memberFeed.memberData);
-  //       setTotalMembers((totalmembers) + (memberFeed.memberData?.length || 0));
-
-  //     }
-      
-  //   }, [memberFeed]);
-
-  //    useEffect(() => {
-  //       if (invitationsFeed && invitationsFeed.inviteData) {
-  //         setInvitationsTotal(invitationsFeed.total);
-  //         setTotalMembers((totalmembers) + invitationsFeed.total || 0);
-  //       }
-  //     //   setTimeout(() => {
-  //     //   setSpinner(false)
-  //     // },800)
-  //     }, [invitationsFeed]);
-
-   
 
     useEffect(() => {
       if(subscriptionState.billing_info){
@@ -201,13 +184,7 @@ const showError = (name) => {
 };
 
   const handlePayment = async () => {
-    // const { fullName, phone, address1, city, state, postal, country, agree } = formData;
-
-    // // Validate required fields
-    // if (!fullName || !phone || !address1 || !city || !state || !postal || !country) {
-    //   alert("Please fill in all required fields.");
-    //   return;
-    // }
+   
     if (!validateForm()) return;
     if (!formData.agree) {
       addToast("Please agree to the Terms & Conditions", 'danger');
@@ -233,6 +210,12 @@ const showError = (name) => {
       addToast('Please add number of team members first.', 'danger');
       return;
     }
+    dispatch(getUpcomingInvoice({
+        ...plan,
+        initial_quantity: members,
+        billingCycle: billingCycle,
+        name: plan?.name,
+    }))
 
     const discountedPricePerUser = plan.pricePerUser;
     const cycleMultiplier =
@@ -270,48 +253,55 @@ const showError = (name) => {
     },1000)
   };
 
+    useEffect(() => {
+      if( subscriptionState.invoicePreview !== false && subscriptionState.invoicePreview !== null){
+        setInvoicePreview(subscriptionState.invoicePreview)
+      }
+    }, [subscriptionState.invoicePreview])
+
 
   const authorizeSubscriptionPayment = async (payload) => {
     try {
       setLoading(true)
-      const { customer_id, subscription_id, plan_id } = payload;
+      const { url, subscription_id, plan_id } = payload;
 
-      // Load Razorpay
-      const options = {
-        key: razorPayKey,
-        subscription_id: subscription_id,
-        recurring: 1,
-        name: "Prime Teams",
-        description: `${selectedPlan.name} Plan Subscription`,
-        handler: function (response) {
-          console.log("Subscription Authorized:", response);
-          if (response?.razorpay_payment_id) {
-            dispatch(saveAuthorization({ ...response, subscription_id }))
-          }
-          setLoading(false)
-          setSelectedPlan(null)
-        },
-        modal: {
-          ondismiss: function () {
-            console.warn("⚠️ Payment popup closed by user (cancelled).");
-            setLoading(false);
-            // Optional: show a message or alert
-            alert("Payment was cancelled. You can try again anytime.");
-          },
-        },
-        theme: {
-          color: "#F37254",
-        },
-      };
+      // // Load Razorpay
+      // const options = {
+      //   key: razorPayKey,
+      //   subscription_id: subscription_id,
+      //   recurring: 1,
+      //   name: "Prime Teams",
+      //   description: `${selectedPlan.name} Plan Subscription`,
+      //   handler: function (response) {
+      //     console.log("Subscription Authorized:", response);
+      //     if (response?.razorpay_payment_id) {
+      //       dispatch(saveAuthorization({ ...response, subscription_id }))
+      //     }
+      //     setLoading(false)
+      //     setSelectedPlan(null)
+      //   },
+      //   modal: {
+      //     ondismiss: function () {
+      //       console.warn("⚠️ Payment popup closed by user (cancelled).");
+      //       setLoading(false);
+      //       // Optional: show a message or alert
+      //       alert("Payment was cancelled. You can try again anytime.");
+      //     },
+      //   },
+      //   theme: {
+      //     color: "#F37254",
+      //   },
+      // };
 
-      const rzp = new window.Razorpay(options);
-      // 🔴 Handle payment failure
-      rzp.on("payment.failed", function (response) {
-        console.error("❌ Payment Failed:", response.error);
-        alert(`Payment failed: ${response.error.description || "Unknown error"}`);
-        setLoading(false);
-      });
-      rzp.open();
+      // const rzp = new window.Razorpay(options);
+      // // 🔴 Handle payment failure
+      // rzp.on("payment.failed", function (response) {
+      //   console.error("❌ Payment Failed:", response.error);
+      //   alert(`Payment failed: ${response.error.description || "Unknown error"}`);
+      //   setLoading(false);
+      // });
+      // rzp.open();
+      window.location.href = url
     } catch (err) {
       console.error(err);
       alert("Error creating subscription: " + err.message);
@@ -901,6 +891,11 @@ const showError = (name) => {
                             </Form>
             </>
           )}
+           {
+                (invoicePreview !== false && invoicePreview !== null) && (
+                  <InvoicePreview invoice={invoicePreview} />
+                )
+              }
         </Modal.Body>
 
         <Modal.Footer>
@@ -916,6 +911,26 @@ const showError = (name) => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {
+        clientSecret !== null && (
+          <Modal show={showCheckout} onHide={() => setShowCheckout(false)} centered size="lg" className="subscription--modal theme--modal">
+            <Modal.Header closeButton>
+                <Modal.Title>
+                    <span className="nav--item--icon"><BsTags /></span>
+                    <strong>Checkout</strong>
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutForm />
+              </Elements>
+        </Modal.Body>
+      </Modal>
+          
+        )
+      }
     </>
   );
 }

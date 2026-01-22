@@ -4,20 +4,33 @@ import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from 
 import { FiUsers, FiCalendar, FiCheck, FiSave } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { BsTags } from "react-icons/bs";
-import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
+import { checkInvoiceStatus, saveAuthorization,getUpcomingInvoice, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
 import { countries } from "../../helpers/countries";
 import { useToast } from "../../context/ToastContext";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
 import { AlertDialog } from "../modals";
-
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import ConfirmPayment from "./ConfirmPayment";
+import InvoicePreview from "./InvoicePreview";
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
+  
 export default function ManagePlan() {
   const dispatch = useDispatch()
   const addToast = useToast();
   const qtyRef = useRef(null);
   const [spinner, setSpinner] = useState(true);
   const [showdialog, setShowDialog] = useState(false);
+  const [clientSecret, setClientSecret] = useState(null);
+    const [showCheckout, setShowCheckout] = useState( false)
+  const [invoiceData, setInvoiceData] = useState(null)
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
@@ -28,6 +41,7 @@ export default function ManagePlan() {
   const [invitationsTotal, setInvitationsTotal] = useState(0)
   const memberFeed = useSelector((state) => state.member.members);
   const [teamMembers, setTeamMembers] = useState(0);
+  const [invoicePreview, setInvoicePreview] = useState(false)
   const [ totalmembers, setTotalMembers] = useState(0);
   const [showFeatures, setShowFeatures] = useState(false);
   const [loading, setLoading] = useState(false)
@@ -47,6 +61,11 @@ export default function ManagePlan() {
 
     const doCancel = () => {
       setShowDialog(true)
+    }
+
+    const closeCallback = () => {
+      setShowConfirm( false);
+      setLoading(false)
     }
 
     const handleCancelSubscription = () => {
@@ -120,7 +139,17 @@ export default function ManagePlan() {
     }
   }, [subscriptionState.activeSubscription])
 
+  useEffect(() => {
+
+  })
+
   const handleConfirm = () => {
+    dispatch(getUpcomingInvoice({
+       ...selectedPlan,
+        initial_quantity: qtyRef.current.value,
+        billingCycle: billingCycle,
+        name: selectedPlan?.name,
+    }))
     setShowConfirm(true);
     setTimeout(() => {
       selectboxObserver()
@@ -285,14 +314,34 @@ const handleSubmit = (e) => {
   }
 
   useEffect(() => {
-    setLoading(false)
-    if (subscriptionState.success === 'success' && subscriptionState.authorizeData) {
-      console.log('subscriptionState.authorizeData::: ', subscriptionState.authorizeData)
-      authorizeSubscriptionPayment(subscriptionState.authorizeData)
+    if (subscriptionState.success === true && subscriptionState?.invoice &&  subscriptionState?.invoice?.id) {
+      setTimeout(() => {
+        dispatch(checkInvoiceStatus(subscriptionState.invoice?.id))
+      },1000)
     }
-    setLoading(false)
-    setShowConfirm(false);
-  }, [subscriptionState])
+    // setLoading(false)
+    // setShowConfirm(false);
+  }, [subscriptionState.invoice])
+
+    useEffect(() => {
+      if( subscriptionState.invoicePreview !== false && subscriptionState.invoicePreview !== null){
+        setInvoicePreview(subscriptionState.invoicePreview)
+      }
+    }, [subscriptionState.invoicePreview])
+
+  useEffect(() => {
+    
+    if(subscriptionState.InvoiceData && subscriptionState.InvoiceData !== null && subscriptionState.InvoiceData?.status === 'action_required'){
+      setInvoiceData(subscriptionState.InvoiceData)
+      setClientSecret(subscriptionState.InvoiceData.client_secret)
+      setShowCheckout(true)
+    }else if(subscriptionState.InvoiceData && subscriptionState.InvoiceData !== null && subscriptionState.InvoiceData?.status === 'paid'){
+      setLoading(false)
+      setShowConfirm(false)
+      addToast('Your subscription has been updated.', 'success');
+      
+    }
+  }, [subscriptionState.InvoiceData])
 
   const authorizeSubscriptionPayment = async (payload) => {
     try {
@@ -443,7 +492,7 @@ const handleSubmit = (e) => {
                   {/* Billing Cycle */}
                   <Form.Group className="mb-3">
                     <Form.Label className="fw-bold mb-2 d-inline-flex align-items-center gap-2"><FiCalendar /> Billing Cycle</Form.Label>
-                    <Form.Select className="custom-selectbox" value={billingCycle} onChange={(e) => setBillingCycle(e.target.value)}>
+                    <Form.Select className="custom-selectbox" key={`interval-key`} value={billingCycle} data-interval={billingCycle} onChange={(e) => setBillingCycle(e.target.value)}>
                       <option value="monthly">Monthly</option>
                       <option value="quarterly">Quarterly (Save 20%)</option>
                       <option value="yearly">Yearly (Save 40%)</option>
@@ -821,49 +870,15 @@ const handleSubmit = (e) => {
                   </div>
                 </>
                 }
-            {/* <div className="border rounded p-3 bg-light">
-              <h6 className="fw-semibold mb-2">COST BREAKDOWN</h6>
-              <p className="mb-1">
-                {billingCycle === "yearly"
-                  ? `₹${(selectedPlanData.pricePerUser * teamMembers).toFixed(0)}/month × 12 months`
-                  : billingCycle === "quarterly"
-                  ? `₹${(
-                      selectedPlanData.pricePerUser * teamMembers
-                    ).toFixed(0)}/month × 3 months`
-                  : `₹${(
-                    selectedPlanData.pricePerUser * teamMembers
-                  ).toFixed(0)}/month × 1 month`}
-                
-              </p>
-              <p className="fw-semibold text-dark mb-0">
-                 = ₹{selectedPlanData.pricePerUser.toFixed(0) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)}
-              </p>
-            </div> */}
-
-            {/* Total Savings */}
-            {/* {totalSavings > 0 && (
-              <div className="border rounded p-2 bg-success-subtle mt-3">
-                <p className="mb-0 text-success fw-semibold">
-                  You save ₹{totalSavings.toLocaleString()}!
-                </p>
-              </div>
-            )} */}
+           {
+              (invoicePreview !== false && invoicePreview !== null) && (
+                <InvoicePreview invoice={invoicePreview} />
+              )
+            }
+            
           </div>
 
-          {/* Final Total */}
-          {/* <div className="border rounded p-3 bg-light">
-            <h6 className="fw-semibold mb-2">FINAL TOTAL</h6>
-            <p className="fw-semibold fs-5 mb-0 text-primary">
-              ₹{totalPerCycle.toLocaleString()}{" "}
-              <small className="text-muted">
-                for {billingCycle === "yearly"
-                  ? "1 Year"
-                  : billingCycle === "quarterly"
-                    ? "1 Quarter"
-                    : "1 Month"}
-              </small>
-            </p>
-          </div> */}
+          
         </Modal.Body>
 
         <Modal.Footer>
@@ -871,6 +886,23 @@ const handleSubmit = (e) => {
           <Button variant="success" disabled={loading} onClick={handleProceedToPayment}>{loading ? 'Please wait...': 'Proceed to Payment'}</Button>
         </Modal.Footer>
       </Modal>
-    </>
+      {
+        clientSecret !== null && (
+          <Modal show={showCheckout} onHide={() => setShowCheckout(false)} centered size="lg" className="subscription--modal theme--modal">
+          <Modal.Header closeButton>
+              <Modal.Title>
+                  <span className="nav--item--icon"><BsTags /></span>
+                  <strong>Almost Done! Please Confirm Your Action</strong>
+              </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <ConfirmPayment invoiceData={invoiceData} closeConfirmation={closeCallback} />
+          </Elements>
+          </Modal.Body>
+          </Modal>
+          )
+      }
+      </>
   );
 }

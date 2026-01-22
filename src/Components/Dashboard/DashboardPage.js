@@ -81,7 +81,6 @@ function DashboardPage() {
   const [isEdit, setIseEdit] = useState(false);
   const [quote, setQuote] = useState("");
   const [isActive, setIsActive] = useState(0);
-  const commonState = useSelector((state) => state.common);
   const [show, setShow] = useState(false);
   const [posts, setPosts] = useState([]);
   const [loader, setLoader] = useState(false)

@@ -11,7 +11,9 @@ import {
     ACTIVE_PLAN,
     SUBSCRIPTION_CANCEL,
     SUBSCRIPTION_DATA,
-    SUBSCRIPTION_SCHEDULED
+    SUBSCRIPTION_SCHEDULED,
+    SUBSCRIPTION_INVOICE_SUCCESS,
+    UPCOMING_INVOICE
 } from "./types";
 const config = {
   headers: {
@@ -43,6 +45,21 @@ export const createSubscription = (payload) => {
       const response = await API.apiPostUrl('subscription', '/create' , payload)
       if (response.data && response.data.success) {
         await dispatch({ type: AUTHORIZE_PAYMENT_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
+export const checkInvoiceStatus = (invoiceId) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGetByKey('subscription', `/invoice/${invoiceId}`)
+      if (response.data && response.data.success) {
+        await dispatch({ type: SUBSCRIPTION_INVOICE_SUCCESS, payload: response.data });
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }
@@ -173,9 +190,14 @@ export const updateSubscription = (payload) => {
   return async (dispatch) => {
     try {
       const response = await API.apiPutUrl('subscription', '/update', payload)
-      if (response.data && response.data.success) {
+      if (response.data && response.data.success && response.data.authorizeData) {
         await dispatch({ type: AUTHORIZE_PAYMENT_SUCCESS, payload: response.data });
-      } else {
+      }
+      else if (response.data && response.data.success && response.data.invoice) {
+        // await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
+        await dispatch({ type: SUBSCRIPTION_UPDATE_SUCCESS, payload: response.data });
+      } 
+      else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }
     } catch (err) {
@@ -190,7 +212,7 @@ export const updateQuantity = (payload) => {
     try {
       const response = await API.apiPutUrl('subscription', '/update-qty', payload)
       if (response.data && response.data.success) {
-        await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
+        await dispatch({ type: SUBSCRIPTION_UPDATE_SUCCESS, payload: response.data });
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }
@@ -198,6 +220,21 @@ export const updateQuantity = (payload) => {
       errorRequest(err, dispatch);
     }
   }
+}
+
+export const getUpcomingInvoice = (payload) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('subscription', '/upcoming-invoice', payload)
+      if (response.data && response.data.success) {
+        await dispatch({ type: UPCOMING_INVOICE, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
 }
 
 export const getActiveSubscription = () => {

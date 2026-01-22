@@ -12,6 +12,16 @@ import { currentMemberProfile } from "../../helpers/auth";
 const PlanOverview = () => {
   const dispatch = useDispatch()
    const navigate = useNavigate()
+
+   const planNames =  {
+      'price_1Sd5xOSZtJkrH95e6De3lu49': 'Pro',
+      'price_1Sd61mSZtJkrH95eF1JYfDT8': 'Pro',
+      'price_1Sm7xbSZtJkrH95e4Vo7M7xx': 'Pro',
+      'price_1Sd5xcSZtJkrH95eunkuqn5L': 'Elite',
+      'price_1Sm7ybSZtJkrH95ejSuFgBwz': 'Elite',
+      'price_1Sm7ymSZtJkrH95eeInuKZel': 'Elite'
+   }
+
   const memberProfile = currentMemberProfile();
    const [showdialog, setShowDialog] = useState(false);
   const [spinner, setSpinner] = useState(true);
@@ -70,10 +80,6 @@ const PlanOverview = () => {
       },700)
   }, [subscriptionState.subscriptionData]);
 
-  useEffect(()=> {
-    console.log(activeSubscription)
-  }, [activeSubscription])
-
   useEffect(() => {
     if(subscriptionState.subscriptionCancel === 0){
       navigate(0)
@@ -130,13 +136,15 @@ const PlanOverview = () => {
                   :
                   <Card.Header className="bg-gradient-blue text-white d-xl-flex justify-content-between align-items-center rounded-4 p-4 mb-4 shadow">
                     <div className="d-flex gap-2 align-items-center justify-content-center justify-content-xl-start mb-2 mb-xl-0">
-                      <h3 className="mb-0 fw-bold">{activeSubscription?.subscriptionDetails?.plan_info?.name} Plan</h3>
+                      <h3 className="mb-0 fw-bold">{planNames[activeSubscription?.planId]} Plan</h3>
                       <h4 className="m-0 d-flex gap-2 align-items-center text-capitalize"><FiCheckCircle /> {activeSubscription?.subscriptionDetails?.status}</h4>
                     </div>
                     <div className="d-flex gap-2 align-items-center align-items-xl-end flex-column">
                       <h6 className="mb-0 fw-bold text-uppercase">Price per Member</h6>
                       <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
-                        <span>₹{activeSubscription?.subscriptionDetails?.plan_info?.pricePerUser} <small className="fs-5 fw-normal">/month</small></span><span className="fs-6 fw-normal">billed {activeSubscription?.subscriptionDetails?.plan_info?.billing_cycle || 'monthly'}</span>
+                        <span>₹{(activeSubscription?.subscriptionDetails?.items?.data[0]?.plan?.amount / 100)} <small className="fs-5 fw-normal">/month</small></span><span className="fs-6 fw-normal">billed {`${activeSubscription?.subscriptionDetails?.items?.data?.[0]?.plan?.interval_count ?? 1} 
+                              ${activeSubscription?.subscriptionDetails?.items?.data?.[0]?.plan?.interval ?? 'month'}`}
+</span>
                       </h3>
                     </div>
                   </Card.Header>
@@ -164,7 +172,7 @@ const PlanOverview = () => {
                             <span className="status--icon status--icon--blue"><FiUsers /></span>
                             <p className="mb-0 fw-semibold">Team Size</p>
                           </div>
-                          <h4 className="mb-0 fw-bold fs-5">{activeSubscription?.subscriptionDetails?.quantity || 0}</h4>
+                          <h4 className="mb-0 fw-bold fs-5">{activeSubscription?.subscriptionDetails?.items?.data[0]?.quantity || activeSubscription?.quantity || 0}</h4>
                         </div>
                       </Col>
                       <Col xl={4} className="mb-md-3 mb-0">
@@ -173,7 +181,7 @@ const PlanOverview = () => {
                             <span className="status--icon status--icon--green"><FiCalendar /></span>
                             <p className="mb-0 fw-semibold">Billing Cycle</p>
                           </div>
-                          <h4 className="mb-0 fw-bold fs-5 text-capitalize">{activeSubscription?.subscriptionDetails?.plan_info?.billing_cycle}</h4>
+                          <h4 className="mb-0 fw-bold fs-5 text-capitalize">{activeSubscription?.subscriptionDetails?.items?.data[0]?.plan?.interval_count} {activeSubscription?.subscriptionDetails?.items?.data[0]?.plan?.interval}</h4>
                         </div>
                       </Col>
                       <Col xl={4} className="mb-md-3 mb-0">
@@ -182,7 +190,7 @@ const PlanOverview = () => {
                             <span className="status--icon status--icon--grey"><FiClock /></span>
                             <p className="mb-0 fw-semibold">Next Billing</p>
                           </div>
-                          <h4 className="mb-0 fw-bold fs-5">{new Date(activeSubscription?.subscriptionDetails?.charge_at * 1000)?.toLocaleDateString("en-GB", {
+                          <h4 className="mb-0 fw-bold fs-5">{new Date(activeSubscription?.subscriptionDetails?.items?.data[0]?.current_period_end * 1000)?.toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "long",
                             year: "numeric",
@@ -211,7 +219,8 @@ const PlanOverview = () => {
                           <div className="flex-1">
                               <h5 className="fw-bold text-secondary mb-2">Scheduled Plan Change</h5>
                               <p className="text-sm mb-1">Your plan will downgrade to <strong className="fw-bold text-secondary">{scheduledSub?.name?.toUpperCase()} Plan</strong> on your next billing cycle.</p>
-                              <p className="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date(scheduledSub?.start_at * 1000)?.toLocaleDateString("en-GB", {
+                              <p className="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date((scheduledSub.current_phase?.end_date ||
+  scheduledSub.phases?.[0]?.end_date) * 1000)?.toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "long",
                             year: "numeric",

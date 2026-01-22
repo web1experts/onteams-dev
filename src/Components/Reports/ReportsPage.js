@@ -153,7 +153,7 @@ function ReportsPage() {
   const [view, setView] = useState("group");
 
   const [filtereddate, setFilteredDate] = useState([
-    new Date().toISOString().split("T")[0],
+    new Date().toLocaleDateString("en-CA"),
   ]);
   const [selectedFilter, setSelectedFilter] = useState("today");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
