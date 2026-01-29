@@ -65,7 +65,8 @@ export default function ManagePlan() {
 
     const closeCallback = () => {
       setShowConfirm( false);
-      setLoading(false)
+      setLoading(false);
+      setShowCheckout(false)
     }
 
     const handleCancelSubscription = () => {
@@ -308,6 +309,7 @@ const handleSubmit = (e) => {
         initial_quantity: qtyRef.current.value,
         billingCycle: billingCycle,
         name: selectedPlan?.name,
+        subId: activeSubscription?.subscriptionId
       }))
     }
     
@@ -499,7 +501,7 @@ const handleSubmit = (e) => {
                     </Form.Select>
                   </Form.Group>
                   {/* Price Summary */}
-                  <Card className="p-0 border-0 mb-0 summary--card flex-column">
+                  {/* <Card className="p-0 border-0 mb-0 summary--card flex-column">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <Card.Title className="fw-bold mb-0">Price Summary</Card.Title>
                       <Button variant="link" size="sm" className="text-decoration-none px-3 py-1 border-0" onClick={() => setShowFeatures((prev) => !prev)}>
@@ -517,7 +519,6 @@ const handleSubmit = (e) => {
                       </Button>
                     </div>
                     <Card.Body className="p-0">
-                      {/* Collapsible Feature List */}
                       <Collapse in={showFeatures}>
                         <div className="mb-3 border-bottom pb-3">
                           <h5 className="text-slate-700 text-uppercase fw-bold fs-6">Plan Features</h5>
@@ -543,19 +544,11 @@ const handleSubmit = (e) => {
                                 ₹{selectedPlanData?.pricePerUser}/month
                               </small>
                             : <small className="fs-6 fw-bold d-block">0</small>}
-                            {/* <span className="fw-bold d-block">
-                              ₹{discountPrice}/month
-                            </span> */}
+                           
                           </p>
                         </div>
                         <p className="mb-2 d-flex align-items-center justify-content-between gap-3">Number of users: <strong className="text-end">{teamMembers}</strong></p>
-                        {/* <div className="bg-gradient-primary p-3 mb-3 rounded-3">
-                            <div className="text--small mb-1 text-uppercase">You Save in 1 Year</div>
-                            <div className="text--large display-8">₹{totalSavings.toLocaleString()}</div>
-                        </div> */}
-                        {/* <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fw-bold border-bottom pb-3">
-                          Total per {billingCycle}: <strong className="display-6 fw-bold text-end">₹{totalPerCycle.toLocaleString()}</strong>
-                        </p> */}
+                        
                         
                          {(selectedPlanData?.id !== "free" && 
                             (billingCycle === "yearly" || billingCycle === "quarterly")) && (
@@ -563,13 +556,6 @@ const handleSubmit = (e) => {
                               <div className="text--small mb-1 text-uppercase text-emerald">
                                 Total Savings in {billingCycle === "quarterly" ? "3 Months" : "1 Year"}
                               </div>
-
-                              {/* <div className="text-slate-600 mt-1">
-                                ₹{((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) * teamMembers).toFixed(0)}
-                                /month × {billingCycle === "quarterly" ? 3 : 12} months = ₹
-                                {(((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) * teamMembers) *
-                                  (billingCycle === "quarterly" ? 3 : 12)).toFixed(0)}
-                              </div> */}
 
                               <div className="text--large mb-0 text-emerald mt-2">
                                 ₹{
@@ -596,7 +582,7 @@ const handleSubmit = (e) => {
                         </p>
                       </div>
                     </Card.Body>
-                  </Card>
+                  </Card> */}
                 </div>
                 {
                   (activeSubscription?.planId !== selectedPlanData?.id) && (
@@ -748,8 +734,13 @@ const handleSubmit = (e) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {
+              (invoicePreview !== false && invoicePreview !== null) && (
+                <InvoicePreview invoice={invoicePreview} />
+              )
+            }
           {/* Subscription Details */}
-          <div className="border rounded p-3 mb-4 bg-light">
+          {/* <div className="border rounded p-3 mb-4 bg-light">
             <h6 className="fw-bold mb-3">SUBSCRIPTION DETAILS</h6>
             <div className="bg-white rounded-3 p-3 border">
               <p className="mb-0">Team Members <strong className="d-block fs-6 fw-bold">{teamMembers} user{teamMembers > 1 ? "s" : ""}</strong></p>
@@ -791,18 +782,13 @@ const handleSubmit = (e) => {
                 </strong>
               </p>
             </div>
-          </div>
+          </div> */}
 
           {/* Price Calculation */}
-          <div className="border rounded p-3 mb-4 bg-light">
+          {/* <div className="border rounded p-3 mb-4 bg-light">
             <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
             <div className="mb-2">
-              {/* <p className="mb-1 text-muted">
-                Regular price per user:{" "}
-                <span className="text-decoration-line-through">
-                  ₹{selectedPlanData?.pricePerUser}/user/month
-                </span>
-              </p> */}
+            
               <div className="bg-white rounded-3 p-3 border mb-3">
                 <p className="mb-0">
                 {billingCycle === 'monthly' ? 'Regular': 'Discounted'} price per user{" "}
@@ -816,10 +802,10 @@ const handleSubmit = (e) => {
                   <span className="d-flex justify-content-between"> ₹{selectedPlanData?.pricePerUser} × {teamMembers} user(s) <strong className="fs-5">= ₹{(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}</strong></span>
                 </p>
               </div>
-            </div>
+            </div> */}
 
             {/* Cost Breakdown */}
-            {billingCycle === "yearly" || billingCycle === "quarterly" ?
+            {/* {billingCycle === "yearly" || billingCycle === "quarterly" ?
               <>
                 <div className="annual--cost rounded p-3 mt-3 mb-3 border-warning border-2">
                   <h6 className="fw-bold mb-2 text-uppercase text-amber">{billingCycle} COST BREAKDOWN</h6>
@@ -850,10 +836,7 @@ const handleSubmit = (e) => {
                 
                 { <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
                   <div className="text--small mb-1 text-uppercase text-emerald">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
-                  {/* <div className="text-slate-600 mt-1">
-                    ₹{((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser) *  teamMembers).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
-                    {(((selectedPlanData?.originalPrice - selectedPlanData?.pricePerUser)) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
-                  </div> */}
+                 
                   <div className="text--large mb-0 text-emerald mt-2">₹{
                     (( selectedPlanData?.originalPrice * teamMembers ) - (selectedPlanData?.pricePerUser * teamMembers)) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
                     
@@ -869,14 +852,10 @@ const handleSubmit = (e) => {
                     <div className="text--small mb-1 text-lowercase">for {teamMembers} users</div>
                   </div>
                 </>
-                }
-           {
-              (invoicePreview !== false && invoicePreview !== null) && (
-                <InvoicePreview invoice={invoicePreview} />
-              )
-            }
+                } */}
+           
             
-          </div>
+          {/* </div> */}
 
           
         </Modal.Body>
@@ -888,7 +867,7 @@ const handleSubmit = (e) => {
       </Modal>
       {
         clientSecret !== null && (
-          <Modal show={showCheckout} onHide={() => setShowCheckout(false)} centered size="lg" className="subscription--modal theme--modal">
+          <Modal show={showConfirm} onHide={() => {setShowConfirm(false); setShowCheckout(false)}} centered size="lg" className="subscription--modal theme--modal">
           <Modal.Header closeButton>
               <Modal.Title>
                   <span className="nav--item--icon"><BsTags /></span>

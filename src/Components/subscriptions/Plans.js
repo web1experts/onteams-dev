@@ -6,7 +6,7 @@ import { BsTags } from "react-icons/bs";
 import { MdOutlineClose } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { currentMemberProfile } from "../../helpers/auth";
-import { createSubscription, saveAuthorization, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan } from "../../redux/actions/subscription.action";
+import { createSubscription, saveAuthorization, getUpcomingInvoice, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan } from "../../redux/actions/subscription.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { countries } from "../../helpers/countries";
 import { plans } from "../../helpers/plans";
@@ -14,6 +14,7 @@ import { useToast } from "../../context/ToastContext";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "./CheckoutForm";
+import InvoicePreview from "./InvoicePreview";
 const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
   
 function PlansPage() {
@@ -23,196 +24,11 @@ function PlansPage() {
   const [loader, setLoader] = useState(true)
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const [clientSecret, setClientSecret] = useState(null);
+  const [mode, setMode] = useState('payment')
   const [showCheckout, setShowCheckout] = useState( false)
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
-  // const [plans] = useState(
-  //       {
-  //         'monthly':[
-  //         {
-  //           id: "free",
-  //           name: "Free",
-  //           originalPrice: 0,
-  //           pricePerUser: 0,
-  //           disount: 0,
-  //           billing_cycle: false,
-  //           members_text: 'Free for up to 3 members',
-  //           features: [
-  //             "Single Workspace",
-  //             "Unlimited Projects",
-  //             "Unlimited Tasks",
-  //             "Unlimited Workflows",
-  //             "Time Tracking",
-  //             "Live Screen View",
-  //             "Screenshots",
-  //             "Reports",
-  //             "Attendance Tracking"
-  //           ],
-  //         },
-  //         {
-  //           id: "plan_ReKaLINYJwq8FZ",
-  //           name: "Pro",
-  //           originalPrice: 666,
-  //           pricePerUser: 666,
-  //           disount: 0,
-  //           billing_cycle: 'monthly',
-  //           members_text: 'Unlimited Team Members',
-  //           features: [
-  //             "Unlimited Workspace",
-  //             "Unlimited Projects",
-  //             "Unlimited Tasks",
-  //             "Unlimited Workflows",
-  //             "Time Tracking",
-  //             "Live Screen View",
-  //             "Screenshots",
-  //             "Reports",
-  //             "Attendance Tracking"
-  //           ],
-  //         },
-  //         {
-  //           id: "plan_ReKagUnhkdX86V",
-  //           name: "Elite",
-  //           disount: 0,
-  //           originalPrice: 916,
-  //           pricePerUser: 916,
-  //           billing_cycle: 'monthly',
-  //           members_text: 'Unlimited Team Members',
-  //           features: [
-  //             "Unlimited Workspace",
-  //             "Unlimited Projects",
-  //             "Unlimited Tasks",
-  //             "Unlimited Workflows",
-  //             "Time Tracking",
-  //             "Live Screen View",
-  //             "Screenshots",
-  //             "Recorded Screen Videos",
-  //             "Reports",
-  //             "Attendance Tracking"
-  //           ],
-  //         }],
-  //         'quarterly':[
-  //           {
-  //           id: "free",
-  //           name: "Free",
-  //           originalPrice: 0,
-  //           pricePerUser: 0,
-  //           disount: 0,
-  //           billing_cycle: false,
-  //           members_text: 'Free for up to 3 members',
-  //           features: [
-  //             "Single Workspace",
-  //             "Unlimited Projects",
-  //             "Unlimited Tasks",
-  //             "Unlimited Workflows",
-  //             "Time Tracking",
-  //             "Live Screen View",
-  //             "Screenshots",
-  //             "Reports",
-  //             "Attendance Tracking"
-  //           ],
-  //         },
-  //         {
-  //           id: "plan_ReKb2o8oIyYuSN",
-  //           name: "Pro",
-  //           disount: 20,
-  //           originalPrice: 666.25,
-  //           pricePerUser: 533,
-  //           billing_cycle: 'quarterly',
-  //           members_text: 'Unlimited Team Members',
-  //           features: [
-  //             "Unlimited Workspace",
-  //             "Unlimited Projects",
-  //             "Unlimited Tasks",
-  //             "Unlimited Workflows",
-  //             "Time Tracking",
-  //             "Live Screen View",
-  //             "Screenshots",
-  //             "Reports",
-  //             "Attendance Tracking"
-  //           ],
-  //         },{
-  //         id: "plan_ReKbqwqKZJ4aDz",
-  //         name: "Elite",
-  //         disount: 20,
-  //         originalPrice: 916.25,
-  //         pricePerUser: 733,
-  //         billing_cycle: 'quarterly',
-  //         members_text: 'Unlimited Team Members',
-  //         features: [
-  //           "Unlimited Workspace",
-  //           "Unlimited Projects",
-  //           "Unlimited Tasks",
-  //           "Unlimited Workflows",
-  //           "Time Tracking",
-  //           "Live Screen View",
-  //           "Screenshots",
-  //           "Recorded Screen Videos",
-  //           "Reports",
-  //           "Attendance Tracking"
-  //         ],
-  //         }],
-  //         'yearly': [
-  //           {
-  //           id: "free",
-  //           name: "Free",
-  //           pricePerUser: 0,
-  //           disount: 0,
-  //           billing_cycle: false,
-  //           members_text: 'Free for up to 3 members',
-  //           features: [
-  //             "Single Workspace",
-  //             "Unlimited Projects",
-  //             "Unlimited Tasks",
-  //             "Unlimited Workflows",
-  //             "Time Tracking",
-  //             "Live Screen View",
-  //             "Screenshots",
-  //             "Reports",
-  //             "Attendance Tracking"
-  //           ],
-  //         },{
-            
-  //           id: "plan_ReKc4NmD60B7rW",
-  //           name: "Pro",
-  //           disount: 40,
-  //           originalPrice: 666.67,
-  //           pricePerUser: 400,
-  //           billing_cycle: 'yearly',
-  //           members_text: 'Unlimited Team Members',
-  //           features: [
-  //             "Unlimited Workspace",
-  //             "Unlimited Projects",
-  //             "Unlimited Tasks",
-  //             "Unlimited Workflows",
-  //             "Time Tracking",
-  //             "Live Screen View",
-  //             "Screenshots",
-  //             "Reports",
-  //             "Attendance Tracking"
-  //           ],
-  //         },{
-  //           id: "plan_ReKcjcfoNCmtNY",
-  //           name: "Elite",
-  //           disount: 40,
-  //           originalPrice: 916.67,
-  //           pricePerUser: 550,
-  //           billing_cycle: 'yearly',
-  //           members_text: 'Unlimited Team Members',
-  //           features: [
-  //             "Unlimited Workspace",
-  //             "Unlimited Projects",
-  //             "Unlimited Tasks",
-  //             "Unlimited Workflows",
-  //             "Time Tracking",
-  //             "Live Screen View",
-  //             "Screenshots",
-  //             "Recorded Screen Videos",
-  //             "Reports",
-  //             "Attendance Tracking"
-  //           ],
-  //         }]
-  //       }
-  //     );
+  
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -224,6 +40,7 @@ function PlansPage() {
     country: "India",
     agree: false,
   });
+  const [invoicePreview, setInvoicePreview] = useState(false)
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
   const [authorizationData, setAuthorizationData] = useState(false)
@@ -254,10 +71,12 @@ function PlansPage() {
   }, [])
 
   useEffect(() => {
-    setLoading(false)
-    setShowConfirm(false);
+    
     if (subscriptionState.success === 'success' && subscriptionState.authorizeData) {
+      setLoading(false)
+    setShowConfirm(false);
       setClientSecret(subscriptionState.authorizeData.clientSecret)
+      setMode(subscriptionState.authorizeData.mode || 'payment')
       setShowCheckout(true)
       // authorizeSubscriptionPayment(subscriptionState.authorizeData)
     }
@@ -284,6 +103,12 @@ function PlansPage() {
       }
       
     }, [subscriptionState.activeSubscription])
+
+    useEffect(() => {
+      if( subscriptionState.invoicePreview !== false && subscriptionState.invoicePreview !== null){
+        setInvoicePreview(subscriptionState.invoicePreview)
+      }
+    }, [subscriptionState.invoicePreview])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -360,6 +185,13 @@ const showError = (name) => {
       addToast('Please add number of team members first.', 'danger');
       return;
     }
+
+    dispatch(getUpcomingInvoice({
+            ...plan,
+            initial_quantity: members,
+            billingCycle: billingCycle,
+            name: plan?.name,
+        }))
 
     const discountedPricePerUser = plan.pricePerUser;
     const cycleMultiplier =
@@ -752,8 +584,13 @@ const showError = (name) => {
         <Modal.Body>
           {priceDetails && (
             <>
-              {/* Subscription Details */}
-              <div className="bg-gradient-light rounded p-3 mb-4">
+            {
+              (invoicePreview !== false && invoicePreview !== null) && (
+                <InvoicePreview invoice={invoicePreview} />
+              )
+            }
+              
+              {/* <div className="bg-gradient-light rounded p-3 mb-4">
                 <h6 className="fw-bold mb-3">SUBSCRIPTION DETAILS</h6>
                 <ListGroup>
                   <ListGroup.Item>
@@ -798,7 +635,7 @@ const showError = (name) => {
                 </ListGroup>
               </div>
 
-              {/* Price Calculation */}
+              
               <div className="rounded bg-gradient-light p-3 mb-4">
                 <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
                 <ListGroup>
@@ -815,14 +652,7 @@ const showError = (name) => {
                     </p>
                   </ListGroup.Item>
                 </ListGroup>
-                {/*priceDetails.discountPercent > 0 && (
-                  <div className="discount--offer rounded p-2 bg-warning-subtle my-3">
-                    <small>{priceDetails.discountPercent}% Limited Offer Discount</small>
-                    <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
-                      <span>₹{priceDetails.originalPrice.toFixed(0)} ×{" "}{priceDetails.discountPercent} </span> <strong className="display-8">= ₹{(priceDetails.pricePerUser).toFixed(0)}</strong>
-                    </p>
-                  </div>
-                )*/}
+                
                 {billingCycle === "yearly" || billingCycle === "quarterly" ?
                 <>
                   <div className="annual--cost rounded p-3 mt-3 mb-3 border-warning border-2">
@@ -871,48 +701,11 @@ const showError = (name) => {
                     </div>
                   </>
                   }
-                
-                {/* <p className="mb-1 text-muted">
-                  Regular price per user:{" "}
-                  <span className="text-decoration-line-through">
-                    ₹{priceDetails.plan.pricePerUser}/user/month
-                  </span>
-                </p> */}
-
-                
-
-                {/* Cost Breakdown */}
-                
-
-                {/* Total Savings */}
-                {/* {priceDetails.totalSavings > 0 && (
-                  <div className="border rounded p-2 bg-success-subtle mt-3">
-                    <p className="mb-0 text-success fw-bold">
-                      You save ₹{priceDetails.totalSavings.toLocaleString()}!
-                    </p>
-                  </div>
-                )} */}
               </div>
-
-              {/* Final Total */}
-              {/* <div className="border rounded p-3 bg-gradient-primary">
-                <h6 className="fw-bold mb-2">FINAL TOTAL</h6>
-                <p className="fw-bold fs-5 mb-0 text-primary">
-                  ₹{priceDetails.totalPerCycle.toLocaleString()}{" "}
-                  <small className="text-muted">
-                    for{" "}
-                    {billingCycle === "yearly"
-                      ? "1 Year"
-                      : billingCycle === "quarterly"
-                        ? "1 Quarter"
-                        : "1 Month"}
-                  </small>
-                </p>
-              </div> */}
 
               <p className="bg-gradient-light bg--highlight mb-3 p-2 rounded-3">
                 ✨ 14 Days Free Trial – Charges apply after trial period
-              </p>
+              </p> */}
 
               <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
                 <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
@@ -929,7 +722,7 @@ const showError = (name) => {
                     <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
                     <Row>
                       <Col className="d-flex align-items-start gap-3">
-                        <Form.Select className="w-auto pe-5">
+                        <Form.Select className="w-auto pe-5 custom-selectbox">
                          {countries.map((country) => (
                             <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
                               {country.phoneCode}
@@ -1057,7 +850,9 @@ const showError = (name) => {
                 </div>
               </Form>
             </>
+            
           )}
+          
         </Modal.Body>
 
         <Modal.Footer>
@@ -1086,7 +881,7 @@ const showError = (name) => {
             <Modal.Body>
               
               <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <CheckoutForm />
+                <CheckoutForm mode={mode}/>
               </Elements>
             </Modal.Body>
          </Modal>

@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Button, Badge, ListGroup, Alert } from "reac
 import { FiArrowUpRight, FiCalendar, FiCheckCircle, FiClock, FiUsers, FiSettings, FiDownload } from "react-icons/fi";
 import { BsExclamationTriangle } from "react-icons/bs";
 import { BiFile } from "react-icons/bi";
-import { getActiveSubscriptionDetails, cancelSubscription, getScheduledPlan } from "../../redux/actions/subscription.action";
+import { getActiveSubscriptionDetails, cancelSchedule, getScheduledPlan } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
 import { AlertDialog } from "../modals";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -15,11 +15,11 @@ const PlanOverview = () => {
 
    const planNames =  {
       'price_1Sd5xOSZtJkrH95e6De3lu49': 'Pro',
-      'price_1Sd61mSZtJkrH95eF1JYfDT8': 'Pro',
-      'price_1Sm7xbSZtJkrH95e4Vo7M7xx': 'Pro',
+      'price_1SseHESZtJkrH95eo0T8FSjF': 'Pro',
+      'price_1SseGYSZtJkrH95encqmjvOc': 'Pro',
       'price_1Sd5xcSZtJkrH95eunkuqn5L': 'Elite',
-      'price_1Sm7ybSZtJkrH95ejSuFgBwz': 'Elite',
-      'price_1Sm7ymSZtJkrH95eeInuKZel': 'Elite'
+      'price_1SseEhSZtJkrH95einCYWefE': 'Elite',
+      'price_1SseEMSZtJkrH95eK49kldme': 'Elite'
    }
 
   const memberProfile = currentMemberProfile();
@@ -87,12 +87,12 @@ const PlanOverview = () => {
     
   }, [subscriptionState.subscriptionCancel])
 
-  const doCancel = () => {
+  const doCancelSchedule = () => {
     setShowDialog(true)
   }
 
-  const handleCancelSubscription = () => {
-    dispatch(cancelSubscription(activeSubscription?.subscriptionId))
+  const handleCancelSchedule = () => {
+    dispatch(cancelSchedule(activeSubscription?.subscriptionId))
     setShowDialog(false)
   }
 
@@ -142,7 +142,12 @@ const PlanOverview = () => {
                     <div className="d-flex gap-2 align-items-center align-items-xl-end flex-column">
                       <h6 className="mb-0 fw-bold text-uppercase">Price per Member</h6>
                       <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
-                        <span>₹{(activeSubscription?.subscriptionDetails?.items?.data[0]?.plan?.amount / 100)} <small className="fs-5 fw-normal">/month</small></span><span className="fs-6 fw-normal">billed {`${activeSubscription?.subscriptionDetails?.items?.data?.[0]?.plan?.interval_count ?? 1} 
+                        <span>₹{(activeSubscription?.subscriptionDetails?.items?.data[0]?.plan?.amount / 100)} 
+                          <small className="fs-5 fw-normal">
+                            /{`${activeSubscription?.subscriptionDetails?.items?.data?.[0]?.plan?.interval ?? 'month'}`}
+                          </small>
+                          </span>
+                          <span className="fs-6 fw-normal">billed {`${activeSubscription?.subscriptionDetails?.items?.data?.[0]?.plan?.interval_count ?? 1} 
                               ${activeSubscription?.subscriptionDetails?.items?.data?.[0]?.plan?.interval ?? 'month'}`}
 </span>
                       </h3>
@@ -217,16 +222,15 @@ const PlanOverview = () => {
                       <div className="d-flex align-items-start gap-3">
                           <div className="p-2 bg-amber-icon rounded-3"><BsExclamationTriangle /> </div>
                           <div className="flex-1">
-                              <h5 className="fw-bold text-secondary mb-2">Scheduled Plan Change</h5>
-                              <p className="text-sm mb-1">Your plan will downgrade to <strong className="fw-bold text-secondary">{scheduledSub?.name?.toUpperCase()} Plan</strong> on your next billing cycle.</p>
-                              <p className="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date((scheduledSub.current_phase?.end_date ||
-  scheduledSub.phases?.[0]?.end_date) * 1000)?.toLocaleDateString("en-GB", {
+                              <h5 className="fw-bold text-secondary mb-2">Scheduled Plan Cancel</h5>
+                              <p className="text-sm mb-1">Your plan will be canceled at the end of your current billing cycle.</p>
+                              <p className="text-sm mb-0"><small className="text-secondary">Effective Date: {new Date(scheduledSub?.cancel_at * 1000)?.toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "long",
                             year: "numeric",
                           })}</small></p>
                           </div>
-                          {/* <Button variant="warning" onClick={doCancel} className="ms-auto">Cancel</Button> */}
+                          <Button variant="warning" onClick={doCancelSchedule} className="ms-auto">Cancel</Button>
                       </div>
                     </div>)
                   }
@@ -305,8 +309,8 @@ const PlanOverview = () => {
             <AlertDialog
               showdialog={showdialog}
               toggledialog={setShowDialog}
-              msg="Are you sure you want to cancel your subscription?"
-              callback={handleCancelSubscription}
+              msg="Are you sure you want to cancel your subscription cancellation schedule?"
+              callback={handleCancelSchedule}
             />
           </Container>
       </div>

@@ -537,7 +537,7 @@ function DashboardPage() {
   useEffect(() => {
     const check = ["undefined", undefined, "null", null, ""];
 
-    if (invitationsFeed && invitationsFeed.inviteData) {
+    if (invitationsFeed && invitationsFeed.inviteData && invitationsFeed?.Invitelistfor === 'member') {
       setInvitationsFeed(invitationsFeed.inviteData);
     }
   }, [invitationsFeed]);

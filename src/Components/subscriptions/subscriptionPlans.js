@@ -27,6 +27,7 @@ function SubscriptionPlans() {
   const [errors, setErrors] = useState({});
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const [clientSecret, setClientSecret] = useState(null);
+    const [mode, setMode] = useState('payment')
   const [showCheckout, setShowCheckout] = useState( false)
   const [formData, setFormData] = useState({
     fullName: "",
@@ -84,6 +85,7 @@ function SubscriptionPlans() {
       setLoading(false)
       setShowConfirm(false);
       setClientSecret(subscriptionState.authorizeData.clientSecret)
+      setMode(subscriptionState.authorizeData.mode || 'payment')
       setShowCheckout(true)
       // authorizeSubscriptionPayment(subscriptionState.authorizeData)
     }
@@ -582,10 +584,15 @@ const showError = (name) => {
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {priceDetails && (
+          
+           {priceDetails && (
             <>
-              {/* Subscription Details */}
-              <div className="bg-gradient-light rounded p-3 mb-4">
+              {
+              (invoicePreview !== false && invoicePreview !== null) && (
+                <InvoicePreview invoice={invoicePreview} />
+              )
+            }
+            {/*  <div className="bg-gradient-light rounded p-3 mb-4">
                 <h6 className="fw-bold mb-3">SUBSCRIPTION DETAILS</h6>
                 <ListGroup>
                   <ListGroup.Item>
@@ -630,7 +637,6 @@ const showError = (name) => {
                 </ListGroup>
               </div>
 
-              {/* Price Calculation */}
               <div className="rounded bg-gradient-light p-3 mb-4">
                 <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
                 <ListGroup>
@@ -647,14 +653,6 @@ const showError = (name) => {
                     </p>
                   </ListGroup.Item>
                 </ListGroup>
-                {/*priceDetails.discountPercent > 0 && (
-                  <div className="discount--offer rounded p-2 bg-warning-subtle my-3">
-                    <small>{priceDetails.discountPercent}% Limited Offer Discount</small>
-                    <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
-                      <span>₹{priceDetails.originalPrice.toFixed(0)} ×{" "}{priceDetails.discountPercent} </span> <strong className="display-8">= ₹{(priceDetails.pricePerUser).toFixed(0)}</strong>
-                    </p>
-                  </div>
-                )*/}
                 {billingCycle === "yearly" || billingCycle === "quarterly" ?
                 <>
                   <div className="annual--cost rounded p-3 mt-3 mb-3 border-warning border-2">
@@ -703,27 +701,8 @@ const showError = (name) => {
                     </div>
                   </>
                   }
-                {/* <p className="mb-1 text-muted">
-                  Regular price per user:{" "}
-                  <span className="text-decoration-line-through">
-                    ₹{priceDetails.plan.pricePerUser}/user/month
-                  </span>
-                </p> */}
-
                 
-
-                {/* Cost Breakdown */}
-                
-
-                {/* Total Savings */}
-                {/* {priceDetails.totalSavings > 0 && (
-                  <div className="border rounded p-2 bg-success-subtle mt-3">
-                    <p className="mb-0 text-success fw-bold">
-                      You save ₹{priceDetails.totalSavings.toLocaleString()}!
-                    </p>
-                  </div>
-                )} */}
-              </div>
+              </div> */}
 
               {/* Final Total */}
               {/* <div className="border rounded p-3 bg-gradient-primary">
@@ -741,9 +720,9 @@ const showError = (name) => {
                 </p>
               </div> */}
 
-              <p className="bg-gradient-light bg--highlight mb-3 p-2 rounded-3">
+              {/* <p className="bg-gradient-light bg--highlight mb-3 p-2 rounded-3">
                 ✨ 14 Days Free Trial – Charges apply after trial period
-              </p>
+              </p> */}
 
               <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
                               <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
@@ -760,7 +739,7 @@ const showError = (name) => {
                                   <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
                                   <Row>
                                     <Col className="d-flex align-items-start gap-3">
-                                      <Form.Select className="w-auto pe-5">
+                                      <Form.Select className="w-auto pe-5 custom-selectbox">
                                         {countries.map((country) => (
                                           <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
                                             {country.phoneCode}
@@ -891,11 +870,7 @@ const showError = (name) => {
                             </Form>
             </>
           )}
-           {
-                (invoicePreview !== false && invoicePreview !== null) && (
-                  <InvoicePreview invoice={invoicePreview} />
-                )
-              }
+           
         </Modal.Body>
 
         <Modal.Footer>
@@ -924,7 +899,7 @@ const showError = (name) => {
             <Modal.Body>
               
               <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <CheckoutForm />
+                <CheckoutForm mode={mode} />
               </Elements>
         </Modal.Body>
       </Modal>

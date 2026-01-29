@@ -270,7 +270,7 @@ export const plans = {
     ],
     },
     {
-    id: "price_1Sd61mSZtJkrH95eF1JYfDT8",
+    id: "price_1SseHESZtJkrH95eo0T8FSjF",
     name: "Pro",
     discount: 20,
     originalPrice: 666,
@@ -289,7 +289,7 @@ export const plans = {
         "Attendance Tracking"
     ],
     },{
-    id: "price_1Sm7ybSZtJkrH95ejSuFgBwz",
+    id: "price_1SseEMSZtJkrH95eK49kldme",
     name: "Elite",
     discount: 20,
     originalPrice: 916,
@@ -330,7 +330,7 @@ export const plans = {
     ],
     },{
     
-    id: "price_1Sm7xbSZtJkrH95e4Vo7M7xx",
+    id: "price_1SseGYSZtJkrH95encqmjvOc",
     name: "Pro",
     discount: 40,
     originalPrice: 666,
@@ -349,7 +349,7 @@ export const plans = {
         "Attendance Tracking"
     ],
     },{
-    id: "price_1Sm7ymSZtJkrH95eeInuKZel",
+    id: "price_1SseEhSZtJkrH95einCYWefE",
     name: "Elite",
     discount: 40,
     originalPrice: 916,

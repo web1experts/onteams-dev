@@ -10,7 +10,8 @@ import {
     SUBSCRIPTION_SCHEDULED,
     SUBSCRIPTION_UPDATE_SUCCESS,
     SUBSCRIPTION_INVOICE_SUCCESS,
-    UPCOMING_INVOICE
+    UPCOMING_INVOICE,
+    CLEAR_CLIENT_SECRET
 } from "../actions/types";
 
 const initialState = {
@@ -80,6 +81,10 @@ export default (state = initialState, action) => {
         return {
             ...state,
             activeSubscription: action.payload.subscription
+        }
+    case CLEAR_CLIENT_SECRET: 
+        return {
+            InvoiceData: null
         }
     case CLEAR_MESSAGES:
         return {

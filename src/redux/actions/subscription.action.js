@@ -102,6 +102,23 @@ export const subscribeFreePlan = () => {
  
 }
 
+export const cancelSchedule = (subscriptionId) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiDeleteUrl('subscription', `/cancel-schedule/${subscriptionId}`)
+      if (response.data && response.data.success) {
+        await auth.removeSubscription()
+        await dispatch({ type: SUBSCRIPTION_CANCEL, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  }
+}
+
 export const cancelSubscription = (subscriptionId) => {
 
   return async (dispatch) => {

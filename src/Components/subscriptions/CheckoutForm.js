@@ -6,22 +6,32 @@ import {
 } from "@stripe/react-stripe-js";
 import { Button } from "react-bootstrap";
 
-export default function CheckoutForm() {
+export default function CheckoutForm({mode}) {
   const stripe = useStripe();
   const elements = useElements();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let result;
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: "https://app.primeteams.ai/success",
-      },
-    });
+    if (mode === "setup") {
+      result = await stripe.confirmSetup({
+        elements,
+        confirmParams: {
+          return_url: "https://app.primeteams.ai/success",
+        },
+      });
+    } else {
+      result = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: "https://app.primeteams.ai/success",
+        },
+      });
+    }
 
-    if (error) {
-      alert(error.message);
+    if (result?.error) {
+      alert(result.error.message);
     }
   };
 
