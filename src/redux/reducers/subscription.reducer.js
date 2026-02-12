@@ -84,7 +84,10 @@ export default (state = initialState, action) => {
         }
     case CLEAR_CLIENT_SECRET: 
         return {
-            InvoiceData: null
+            ...state,
+            InvoiceData: null,
+            message: null,
+            message_variant: null,
         }
     case CLEAR_MESSAGES:
         return {

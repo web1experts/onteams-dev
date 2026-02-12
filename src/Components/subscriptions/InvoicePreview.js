@@ -3,15 +3,27 @@ import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
-
+import { planPrices } from "../../helpers/plans";
 export default function InvoicePreview({ invoice }) {
   // ✅ Hooks must be called always (even if invoice is null)
 
-  const formatAmount = (amount) =>
-    `₹${((amount || 0) / 100).toLocaleString("en-IN", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
+  // const formatAmount = (amount) =>
+  //   `₹${((amount || 0) / 100).toLocaleString("en-IN", {
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   })}`;
+
+  const formatAmount = (amount) => {
+  const value = Number(amount) || 0;
+  const isNegative = value < 0;
+
+  const formatted = (Math.abs(value) / 100).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  return `${isNegative ? "-" : ""}₹${formatted}`;
+};
 
   const formatDate = (ts) =>
     new Date(ts * 1000).toLocaleDateString("en-IN", {
@@ -47,7 +59,7 @@ export default function InvoicePreview({ invoice }) {
 
   const totalDueNow = invoice?.total || 0;
   const hasAmountDueNow = totalDueNow > 0;
-  const hasCredit = totalDueNow < 0;
+  const hasCredit = invoice?.customerDetails?.balance //totalDueNow < 0;
 
   const taxAmount =
     typeof invoice?.tax === "number"
@@ -119,45 +131,62 @@ const newPlanText = newPlanLine
           <Row key={line.id} className="py-2 border-top">
             <Col className="text-muted">{line.description}</Col>
             <Col className="text-end fw-semibold">
-              {line.amount < 0 ? "-" : ""}
+              {(line.amount < 0) ? "-" : ""}
               {formatAmount(Math.abs(line.amount))}
             </Col>
           </Row>
         ))}
+        {
+          (prorationLines?.length === 1) && (
+            <Row key={'new-line-item'} className="py-2 border-top">
+              <Col className="text-muted">{newPlanLine?.description}</Col>
+              <Col className="text-end fw-semibold">
+               {formatAmount(Math.abs(newPlanLine?.amount))}
+              </Col>
+            </Row>
+          )
+        }
+        
+        
+        {hasCredit !== 0 && hasCredit != null && (
+          <Row key={'new-line-item'} className="py-2 border-top">
+            <Col className="text-muted">Credit Balance:</Col>
+            <Col className="text-end fw-semibold">
+              {formatAmount(Math.abs(hasCredit))}
+            </Col>
+          </Row>
+        )}
 
         <Row className="py-2 border-top">
           <Col className="fw-semibold">Net Amount</Col>
           <Col className="text-end fw-semibold">
             {totalDueNow < 0 ? "-" : ""}
-            {formatAmount(Math.abs(totalDueNow))}
+            {/* {formatAmount(Math.abs(totalDueNow))} */}
+            {
+                (hasCredit !== 0 && hasCredit != null) ?
+                  formatAmount((Number(totalDueNow) || 0) + (Number(hasCredit) || 0))
+                :
+                  formatAmount(totalDueNow)
+              }
           </Col>
         </Row>
-
-        {taxAmount > 0 && (
-          <SummaryRow label="Tax (18% GST)" value={formatAmount(taxAmount)} />
-        )}
 
         {/* Total Due Now */}
         {hasAmountDueNow && (
           <div className="mt-3 p-3 rounded bg-success bg-opacity-10 d-flex justify-content-between align-items-center">
             <div className="fw-semibold">Total Due Now</div>
             <div className="fw-bold fs-4 text-success">
-              {formatAmount(totalDueNow)}
+              {
+                (hasCredit !== 0 && hasCredit != null) ?
+                  formatAmount((Number(totalDueNow) || 0) + (Number(hasCredit) || 0))
+                :
+                  formatAmount(totalDueNow)
+              }
             </div>
           </div>
         )}
 
-        {/* Credit Balance */}
-        {hasCredit && (
-          <Alert variant="warning" className="mt-3 mb-0">
-            <div className="fw-semibold">
-              Credit Balance: {formatAmount(Math.abs(totalDueNow))}
-            </div>
-            <div className="small">
-              This amount will be adjusted as credit in your next invoice.
-            </div>
-          </Alert>
-        )}
+       
 
         <div className="mt-3 p-3 rounded bg-primary bg-opacity-10 d-flex justify-content-between align-items-center">
           <div className="fw-semibold">Effective Immediately</div>
@@ -174,19 +203,35 @@ const newPlanText = newPlanLine
       <Card.Body>
         {recurringLines?.[0] && (
           <div className="d-flex justify-content-between align-items-start mb-3">
-            <div>
-              <div className="fw-semibold">{recurringLines[0].description}</div>
-              <div className="text-muted">
-                at {formatAmount(recurringLines[0].unit_amount || 0)} / month
+            
+            {
+              (invoice.trialEnd !== null && Number(recurringLines?.[0]?.pricing?.unit_amount_decimal) === 0) ?
+              
+              <><div>
+                <div className="fw-semibold">{recurringLines?.[0]?.quantity} x {recurringLines[0].description}</div>
               </div>
-            </div>
-            <div className="fw-bold fs-4">{formatAmount(recurringTotal)}</div>
+              <div className="fw-bold fs-4">{formatAmount(planPrices[recurringLines?.[0]?.pricing?.price_details?.price] * recurringLines?.[0]?.quantity)}</div>
+              </>
+              :
+              <><div>
+                <div className="fw-semibold">{recurringLines[0].description}</div>
+              </div>
+              <div className="fw-bold fs-4">{formatAmount(recurringTotal)}</div>
+              </>
+            }
+            
           </div>
         )}
 
         <SummaryRow
           label="Subtotal"
-          value={formatAmount(invoice?.subtotal || recurringTotal)}
+          value={
+            
+              (invoice.trialEnd !== null && Number(recurringLines?.[0]?.pricing?.unit_amount_decimal) === 0) ?
+              <div className="fw-bold fs-4">{formatAmount(planPrices[recurringLines?.[0]?.pricing?.price_details?.price] * recurringLines?.[0]?.quantity)}</div>
+              :
+            formatAmount(invoice?.subtotal || recurringTotal)
+          }
         />
 
         {taxAmount > 0 && (
@@ -196,7 +241,13 @@ const newPlanText = newPlanLine
         <div className="mt-3 p-3 rounded bg-success bg-opacity-10 d-flex justify-content-between align-items-center">
           <div className="fw-semibold">Total</div>
           <div className="fw-bold fs-4 text-success">
-            {formatAmount(invoice?.total || 0)}
+             {
+              (invoice.trialEnd !== null && Number(recurringLines?.[0]?.pricing?.unit_amount_decimal) === 0) ?
+              <div className="fw-bold fs-4">{formatAmount(planPrices[recurringLines?.[0]?.pricing?.price_details?.price] * recurringLines?.[0]?.quantity)}</div>
+              :
+                formatAmount(invoice?.total || 0)
+
+            }
           </div>
         </div>
 

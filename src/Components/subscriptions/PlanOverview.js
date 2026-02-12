@@ -142,7 +142,7 @@ const PlanOverview = () => {
                     <div className="d-flex gap-2 align-items-center align-items-xl-end flex-column">
                       <h6 className="mb-0 fw-bold text-uppercase">Price per Member</h6>
                       <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
-                        <span>₹{(activeSubscription?.subscriptionDetails?.items?.data[0]?.plan?.amount / 100)} 
+                        <span>₹{(activeSubscription?.subscriptionDetails?.items?.data[0]?.plan?.amount) ? (activeSubscription?.subscriptionDetails?.items?.data[0]?.plan?.amount / 100): ''} 
                           <small className="fs-5 fw-normal">
                             /{`${activeSubscription?.subscriptionDetails?.items?.data?.[0]?.plan?.interval ?? 'month'}`}
                           </small>
@@ -195,11 +195,15 @@ const PlanOverview = () => {
                             <span className="status--icon status--icon--grey"><FiClock /></span>
                             <p className="mb-0 fw-semibold">Next Billing</p>
                           </div>
-                          <h4 className="mb-0 fw-bold fs-5">{new Date(activeSubscription?.subscriptionDetails?.items?.data[0]?.current_period_end * 1000)?.toLocaleDateString("en-GB", {
+                          <h4 className="mb-0 fw-bold fs-5">{
+                            (activeSubscription?.subscriptionDetails?.items?.data[0]?.current_period_end) ?
+                          new Date(activeSubscription?.subscriptionDetails?.items?.data[0]?.current_period_end * 1000)?.toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "long",
                             year: "numeric",
-                          })}</h4>
+                          })
+                          : ''
+                        }</h4>
                         </div>
                       </Col>
                     </Row>

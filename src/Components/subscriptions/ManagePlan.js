@@ -15,6 +15,8 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import ConfirmPayment from "./ConfirmPayment";
 import InvoicePreview from "./InvoicePreview";
+import { CLEAR_CLIENT_SECRET } from "../../redux/actions/types";
+import Spinner from 'react-bootstrap/Spinner';
 import {
   PaymentElement,
   useStripe,
@@ -30,6 +32,7 @@ export default function ManagePlan() {
   const [showdialog, setShowDialog] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
     const [showCheckout, setShowCheckout] = useState( false)
+    const [ isloading, setIsLoading] = useState( false)
   const [invoiceData, setInvoiceData] = useState(null)
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
@@ -67,6 +70,10 @@ export default function ManagePlan() {
       setShowConfirm( false);
       setLoading(false);
       setShowCheckout(false)
+      setClientSecret(null)
+      dispatch({
+        type: CLEAR_CLIENT_SECRET
+      })
     }
 
     const handleCancelSubscription = () => {
@@ -145,6 +152,9 @@ export default function ManagePlan() {
   })
 
   const handleConfirm = () => {
+    setIsLoading(true)
+    setInvoiceData(null)
+    setInvoicePreview(null)
     dispatch(getUpcomingInvoice({
        ...selectedPlan,
         initial_quantity: qtyRef.current.value,
@@ -152,6 +162,7 @@ export default function ManagePlan() {
         name: selectedPlan?.name,
     }))
     setShowConfirm(true);
+    
     setTimeout(() => {
       selectboxObserver()
     },1000)
@@ -159,6 +170,7 @@ export default function ManagePlan() {
 
   const handleCloseConfirm = () => {
     setShowConfirm(false);
+    setInvoicePreview(null)
   };
 
   const handleProceedToPayment = () => {
@@ -326,6 +338,7 @@ const handleSubmit = (e) => {
   }, [subscriptionState.invoice])
 
     useEffect(() => {
+      setIsLoading(false)
       if( subscriptionState.invoicePreview !== false && subscriptionState.invoicePreview !== null){
         setInvoicePreview(subscriptionState.invoicePreview)
       }
@@ -735,6 +748,10 @@ const handleSubmit = (e) => {
         </Modal.Header>
         <Modal.Body>
           {
+            (isloading === true) && (
+            <Spinner animation="border" />)
+          }
+          {
               (invoicePreview !== false && invoicePreview !== null) && (
                 <InvoicePreview invoice={invoicePreview} />
               )
@@ -862,7 +879,12 @@ const handleSubmit = (e) => {
 
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseConfirm}>Cancel</Button>
-          <Button variant="success" disabled={loading} onClick={handleProceedToPayment}>{loading ? 'Please wait...': 'Proceed to Payment'}</Button>
+          {
+            (invoicePreview) && (
+              <Button variant="success" disabled={loading} onClick={handleProceedToPayment}>{loading ? 'Please wait...': 'Proceed'}</Button>
+            )
+          }
+          
         </Modal.Footer>
       </Modal>
       {

@@ -370,3 +370,22 @@ export const plans = {
     ],
     }]
 };
+
+
+export const planNames =  {
+    'price_1Sd5xOSZtJkrH95e6De3lu49': 'Pro',
+    'price_1SseHESZtJkrH95eo0T8FSjF': 'Pro',
+    'price_1SseGYSZtJkrH95encqmjvOc': 'Pro',
+    'price_1Sd5xcSZtJkrH95eunkuqn5L': 'Elite',
+    'price_1SseEhSZtJkrH95einCYWefE': 'Elite',
+    'price_1SseEMSZtJkrH95eK49kldme': 'Elite'
+}
+
+export const planPrices =  {
+    'price_1Sd5xOSZtJkrH95e6De3lu49': 66600,
+    'price_1SseHESZtJkrH95eo0T8FSjF': 53300,
+    'price_1SseGYSZtJkrH95encqmjvOc': 40000,
+    'price_1Sd5xcSZtJkrH95eunkuqn5L': 91600,
+    'price_1SseEhSZtJkrH95einCYWefE': 55000,
+    'price_1SseEMSZtJkrH95eK49kldme': 73300
+}
