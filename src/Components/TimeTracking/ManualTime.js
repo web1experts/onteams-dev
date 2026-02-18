@@ -30,6 +30,7 @@ function ManualTime() {
 
   const handleManualTimeList = async () => {
     setSpinner(true);
+    setManualTimeList({})
     dispatch(getManualTimeList());
   };
 

@@ -85,11 +85,11 @@ export const saveAuthorization = (payload) => {
   };
 }
 
-export const subscribeFreePlan = () => {
+export const subscribeFreePlan = (payload = {}) => {
 
   return async (dispatch) => {
     try {
-      const response = await API.apiPostUrl('subscription', '/free', {})
+      const response = await API.apiPostUrl('subscription', '/free', payload)
       if (response.data && response.data.success) {
         await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
       } else {
@@ -229,7 +229,7 @@ export const updateQuantity = (payload) => {
     try {
       const response = await API.apiPutUrl('subscription', '/update-qty', payload)
       if (response.data && response.data.success) {
-        await dispatch({ type: SUBSCRIPTION_UPDATE_SUCCESS, payload: response.data });
+        await dispatch({ type: SUBSCRIPTION_SUCCESS, payload: response.data });
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }

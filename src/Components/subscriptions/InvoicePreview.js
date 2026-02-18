@@ -21,8 +21,12 @@ export default function InvoicePreview({ invoice }) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-
-  return `${isNegative ? "-" : ""}₹${formatted}`;
+  if(invoice?.currency === 'usd'){
+    return `${isNegative ? "-" : ""}$${formatted}`;
+  }else{
+    return `${isNegative ? "-" : ""}₹${formatted}`;
+  }
+  
 };
 
   const formatDate = (ts) =>
@@ -87,9 +91,12 @@ const currentPlanText = currentPlanLine
   : null;
 
 // Get new plan from first non-proration line
-const newPlanLine = invoice?.lines?.data.find(l => !l.parent?.subscription_item_details?.proration);
+let newPlanLine = invoice?.lines?.data.find(l => !l.parent?.subscription_item_details?.proration);
+if( !newPlanLine){
+  newPlanLine = invoice?.lines?.data[ invoice?.lines?.data?.length - 1];
+}
 const newPlanText = newPlanLine
-  ? newPlanLine?.description?.match(/(\d+\s*×.*)/)?.[1] // "Elite"
+  ? newPlanLine?.description?.split(" after ")[0]?.match(/(\d+\s*×.*)/)?.[1] // "Elite"
   : null;
 
   
@@ -131,8 +138,8 @@ const newPlanText = newPlanLine
           <Row key={line.id} className="py-2 border-top">
             <Col className="text-muted">{line.description}</Col>
             <Col className="text-end fw-semibold">
-              {(line.amount < 0) ? "-" : ""}
-              {formatAmount(Math.abs(line.amount))}
+              {/* {(line.amount < 0) ? "-" : ""} */}
+              {formatAmount(line.amount)}
             </Col>
           </Row>
         ))}
@@ -141,7 +148,7 @@ const newPlanText = newPlanLine
             <Row key={'new-line-item'} className="py-2 border-top">
               <Col className="text-muted">{newPlanLine?.description}</Col>
               <Col className="text-end fw-semibold">
-               {formatAmount(Math.abs(newPlanLine?.amount))}
+               {formatAmount(newPlanLine?.amount)}
               </Col>
             </Row>
           )
@@ -152,7 +159,7 @@ const newPlanText = newPlanLine
           <Row key={'new-line-item'} className="py-2 border-top">
             <Col className="text-muted">Credit Balance:</Col>
             <Col className="text-end fw-semibold">
-              {formatAmount(Math.abs(hasCredit))}
+              {formatAmount(hasCredit)}
             </Col>
           </Row>
         )}
@@ -160,7 +167,7 @@ const newPlanText = newPlanLine
         <Row className="py-2 border-top">
           <Col className="fw-semibold">Net Amount</Col>
           <Col className="text-end fw-semibold">
-            {totalDueNow < 0 ? "-" : ""}
+            {/* {totalDueNow < 0 ? "-" : ""} */}
             {/* {formatAmount(Math.abs(totalDueNow))} */}
             {
                 (hasCredit !== 0 && hasCredit != null) ?
@@ -172,7 +179,7 @@ const newPlanText = newPlanLine
         </Row>
 
         {/* Total Due Now */}
-        {hasAmountDueNow && (
+        {((Number(totalDueNow) || 0) + (Number(hasCredit) || 0) > 0) && (
           <div className="mt-3 p-3 rounded bg-success bg-opacity-10 d-flex justify-content-between align-items-center">
             <div className="fw-semibold">Total Due Now</div>
             <div className="fw-bold fs-4 text-success">
@@ -208,7 +215,28 @@ const newPlanText = newPlanLine
               (invoice.trialEnd !== null && Number(recurringLines?.[0]?.pricing?.unit_amount_decimal) === 0) ?
               
               <><div>
-                <div className="fw-semibold">{recurringLines?.[0]?.quantity} x {recurringLines[0].description}</div>
+                <div className="fw-semibold">
+                  {
+                    (() => {
+                      const line = recurringLines?.[0];
+                      if (!line) return null;
+
+                      const qty = line.quantity;
+                      const priceId = line?.pricing?.price_details?.price;
+
+                      switch (priceId) {
+                        case "free":
+                          return `${qty} × Free`;
+
+                        case "trial":
+                          return `${qty} × Trial`;
+
+                        default:
+                          return `${qty} × ${line.description}`;
+                      }
+                    })()
+                  }
+                </div>
               </div>
               <div className="fw-bold fs-4">{formatAmount(planPrices[recurringLines?.[0]?.pricing?.price_details?.price] * recurringLines?.[0]?.quantity)}</div>
               </>
