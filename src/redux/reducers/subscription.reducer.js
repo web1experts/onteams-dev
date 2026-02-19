@@ -50,7 +50,8 @@ export default (state = initialState, action) => {
         return {
             ...state,
             success: true,
-            invoice: action.payload.invoice
+            invoice: action.payload.invoice,
+            
         }
     case SUBSCRIPTION_SCHEDULED :
         return {
@@ -74,6 +75,7 @@ export default (state = initialState, action) => {
     case SUBSCRIPTION_ERROR :
         return {
             ...state,
+            success: 'error',
             message: action.payload?.message ? action.payload.message : action.payload,
             message_variant: 'danger',
         }
@@ -84,7 +86,10 @@ export default (state = initialState, action) => {
         }
     case CLEAR_CLIENT_SECRET: 
         return {
-            InvoiceData: null
+            ...state,
+            InvoiceData: null,
+            message: null,
+            message_variant: null,
         }
     case CLEAR_MESSAGES:
         return {

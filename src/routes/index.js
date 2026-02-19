@@ -7,6 +7,7 @@ import AccountSetup from "../Components/Auth/AccountSetup";
 import WorkspaceSetup from "../Components/Auth/WorkspaceSetup";
 import ResetPassword from "../Components/Auth/ResetPassword";
 import TeamMembersPage from "../Components/TeamMembers/TeamMembers";
+import MemberPermissionPage from "../Components/TeamMembers/MemberPermission";
 import Workspace from "../Components/workspaces";
 import ClientsPage from "../Components/Clients/ClientsPage";
 import ProjectsPage from "../Components/Projects/ProjectsPage"
@@ -162,6 +163,13 @@ const privateRoutes = [
         component: <TeamMembersPage/>,
         route: '/team-members',
         module: 'members'
+    },
+    {
+        type: 'page',
+        name: 'Member Permission',
+        key: 'MEMBER_PERMISSION',
+        component: <MemberPermissionPage/>,
+        route: '/member-permissions',
     },
     {
         type: 'page',

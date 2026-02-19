@@ -15,6 +15,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import InvoicePreview from "./InvoicePreview";
+import Spinner from 'react-bootstrap/Spinner';
 const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
   
 
@@ -25,10 +26,12 @@ function SubscriptionPlans() {
   const [spinner, setSpinner] = useState(true);
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
+  const [selectedCurrency, setSelectedCurrency] = useState('inr')
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const [clientSecret, setClientSecret] = useState(null);
     const [mode, setMode] = useState('payment')
   const [showCheckout, setShowCheckout] = useState( false)
+  const [ loader, setLoader] = useState(false)
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -72,6 +75,11 @@ function SubscriptionPlans() {
 
   useEffect(() => {
     setSpinner(true)
+    fetch("https://ipapi.co/json/")
+      .then(res => res.json())
+      .then(data => { console.log(data.country_code)
+        setSelectedCurrency(data?.country_code === "IN" ? "inr" : "usd");
+      });
     setTimeout(() => {
       dispatch(getActiveSubscription())
       dispatch(getBillingdetails())
@@ -87,7 +95,6 @@ function SubscriptionPlans() {
       setClientSecret(subscriptionState.authorizeData.clientSecret)
       setMode(subscriptionState.authorizeData.mode || 'payment')
       setShowCheckout(true)
-      // authorizeSubscriptionPayment(subscriptionState.authorizeData)
     }
   }, [subscriptionState])
 
@@ -198,6 +205,7 @@ const showError = (name) => {
         plan_id: priceDetails.plan.id,
         initial_quantity: members,
         total_count: 12,
+        selectedCurrency,
         billingCycle: billingCycle,
         name: priceDetails.plan.name,
         ...formData
@@ -206,17 +214,33 @@ const showError = (name) => {
 
   }
 
+  const activateFreePlan = () => {
+      if(members < 1){
+        addToast('Please add number of members first.', 'danger');
+        return;
+      }
+      if(members > 3){
+        addToast('You cannot activate free plan for more than 3 members.', 'danger');
+        return;
+      }
+      setLoading(true)
+      dispatch(subscribeFreePlan({selectedCurrency}))
+    }
+
   const handleSubmit = async (plan) => {
     if (!plan) return;
      if(members <= 0){
       addToast('Please add number of team members first.', 'danger');
       return;
     }
+    setLoader( true )
+     setInvoicePreview(null)
     dispatch(getUpcomingInvoice({
         ...plan,
         initial_quantity: members,
         billingCycle: billingCycle,
         name: plan?.name,
+        selectedCurrency
     }))
 
     const discountedPricePerUser = plan.pricePerUser;
@@ -256,85 +280,15 @@ const showError = (name) => {
   };
 
     useEffect(() => {
+      setLoader( false )
       if( subscriptionState.invoicePreview !== false && subscriptionState.invoicePreview !== null){
         setInvoicePreview(subscriptionState.invoicePreview)
+        setTimeout(() => {
+                selectboxObserver()
+              },1000)
       }
     }, [subscriptionState.invoicePreview])
 
-
-  const authorizeSubscriptionPayment = async (payload) => {
-    try {
-      setLoading(true)
-      const { url, subscription_id, plan_id } = payload;
-
-      // // Load Razorpay
-      // const options = {
-      //   key: razorPayKey,
-      //   subscription_id: subscription_id,
-      //   recurring: 1,
-      //   name: "Prime Teams",
-      //   description: `${selectedPlan.name} Plan Subscription`,
-      //   handler: function (response) {
-      //     console.log("Subscription Authorized:", response);
-      //     if (response?.razorpay_payment_id) {
-      //       dispatch(saveAuthorization({ ...response, subscription_id }))
-      //     }
-      //     setLoading(false)
-      //     setSelectedPlan(null)
-      //   },
-      //   modal: {
-      //     ondismiss: function () {
-      //       console.warn("⚠️ Payment popup closed by user (cancelled).");
-      //       setLoading(false);
-      //       // Optional: show a message or alert
-      //       alert("Payment was cancelled. You can try again anytime.");
-      //     },
-      //   },
-      //   theme: {
-      //     color: "#F37254",
-      //   },
-      // };
-
-      // const rzp = new window.Razorpay(options);
-      // // 🔴 Handle payment failure
-      // rzp.on("payment.failed", function (response) {
-      //   console.error("❌ Payment Failed:", response.error);
-      //   alert(`Payment failed: ${response.error.description || "Unknown error"}`);
-      //   setLoading(false);
-      // });
-      // rzp.open();
-      window.location.href = url
-    } catch (err) {
-      console.error(err);
-      alert("Error creating subscription: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const activateFreePlan = () => {
-    if(members < 1){
-      addToast('Please add number of members first.', 'danger');
-      return;
-    }
-    if(members > 3){
-      addToast('You cannot activate free plan for more than 3 members.', 'danger');
-      return;
-    }
-    setLoading(true)
-    dispatch(subscribeFreePlan())
-  }
-
-  const activateTrialPlan = () => {
-    if(members < 1){
-      addToast('Please add number of members first.', 'danger');
-      return;
-    }
-    setLoading(true)
-    dispatch(subscribeTrialPlan({
-        initial_quantity: members
-      }))
-  }
 
   return (
     <>
@@ -350,15 +304,17 @@ const showError = (name) => {
             <p className="text-center mb-4">Start with a 14-day free trial. Charges apply only after the trial period.</p>
             {/* Number of Members Input */}
             <Form className="text-center">
-              <Form.Group className="select--currency">
+             {/* <Form.Group className="select--currency">
                 <Form.Label><FiGlobe /> Select Currency</Form.Label>
-                <Form.Select>
-                  <option value="INR">₹ INR - Indian Rupee</option>
-                  {/* <option value="USD">$ USD - US Dollar</option>
-                  <option value="EUR">€ EUR - Euro</option>
-                  <option value="GBP">£ GBP - British Pound</option> */}
+                <Form.Select value={selectedCurrency} data-id={selectedCurrency}>
+                  {
+                    (selectedCurrency === 'inr' || !selectedCurrency) ? 
+                      <option value="inr">₹ INR - Indian Rupee</option>
+                    :
+                    <option value="usd">$ USD - US Dollar</option>
+                  }
                 </Form.Select>
-              </Form.Group>
+              </Form.Group>*/}
               <Form.Group className="select--size">
                 <Form.Label><FiUsers /> Select Your Team Size</Form.Label>
                 <div className="d-flex align-items-center gap-2 bg--teal p-2">
@@ -417,6 +373,7 @@ const showError = (name) => {
             {/* Plan Cards */}
             <Row className="g-4">
               {plans[billingCycle].map((plan) => {
+                if(plan.currency === selectedCurrency && plan.billing_cycle === false || plan.currency === selectedCurrency && plan.billing_cycle === billingCycle){
                 const finalPricePerUser = plan.pricePerUser;//getDiscountedPrice(plan);
                 const baseAmount = plan.originalPrice * members
                 const total = finalPricePerUser * members;
@@ -452,7 +409,14 @@ const showError = (name) => {
                               {/* <p>Regular Price</p> */}
                               <div className="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                                 <div className="text--small mb-1 text-uppercase">Discounted Price</div>
-                                <div className="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span className="text-slate-600 mt-1">/user/month</span></div>
+                                <div className="text--large display-5 mb-0">
+                                  {
+                                        (selectedCurrency === 'inr') ? 
+                                        <>₹{plan.pricePerUser.toFixed(0)}</>
+                                        :
+                                        <>${plan.pricePerUser.toFixed(2)}</>
+                                      }
+                                  <span className="text-slate-600 mt-1">/user/month</span></div>
                                 <div className="text-slate-600 mt-1">when billed {billingCycle}</div>
                               </div> 
                             </>
@@ -460,7 +424,13 @@ const showError = (name) => {
                             <>
                               <div className="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                                 <div className="text--small mb-1 text-uppercase">Regular Price</div>
-                                <div className="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span className="text-slate-600 mt-1">/user/month</span></div>
+                                <div className="text--large display-5 mb-0">
+                                  {
+                                        (selectedCurrency === 'inr') ? 
+                                        <>₹{plan.pricePerUser.toFixed(0)}</>
+                                        :
+                                        <>${plan.pricePerUser.toFixed(2)}</>
+                                      }<span className="text-slate-600 mt-1">/user/month</span></div>
                                 <div className="text-slate-600 mt-1">when billed {billingCycle}</div>
                               </div> 
                             </>
@@ -519,11 +489,14 @@ const showError = (name) => {
                             if(activeSubscription?.planId === plan.id){
                               return;
                             }
-                            if (plan.id === 'free') {
-                              activateFreePlan()
-                            } else {
-                              handleSubmit(plan)
-                            }
+                            
+                              if(plan.id === 'free'){
+                                  activateFreePlan()
+                              }else{
+                               
+                                handleSubmit(plan)
+                              }
+                            
                           }}
                           disabled={activeSubscription?.planId === plan.id || loading}
                         >
@@ -568,6 +541,7 @@ const showError = (name) => {
                     </Card>
                   </Col>
                 );
+              }
               })}
             </Row>
             
@@ -584,7 +558,10 @@ const showError = (name) => {
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          
+            {
+              (loader === true) && (
+              <Spinner animation="border" />)
+            }
            {priceDetails && (
             <>
               {
@@ -723,8 +700,9 @@ const showError = (name) => {
               {/* <p className="bg-gradient-light bg--highlight mb-3 p-2 rounded-3">
                 ✨ 14 Days Free Trial – Charges apply after trial period
               </p> */}
-
-              <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
+               {
+              (loader === false) && (
+              <Form className="bg-gradient-light p-3 rounded" onSubmit={() => {return false;}}>
                               <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
                               <Row>
                                 <Form.Group as={Col} md="12" className="position-relative mb-0 form-group">
@@ -867,7 +845,7 @@ const showError = (name) => {
                                 </Form.Group>
                               </div>
               
-                            </Form>
+                            </Form>)}
             </>
           )}
            
@@ -881,7 +859,7 @@ const showError = (name) => {
             }}
           >
             {
-              loading ? 'Please wait...' : 'Proceed to Payment'
+              loading ? 'Please wait...' : 'Proceed'
             }
           </Button>
         </Modal.Footer>

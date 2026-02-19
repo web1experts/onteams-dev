@@ -4,7 +4,7 @@ import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from 
 import { FiUsers, FiCalendar, FiCheck, FiSave } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { BsTags } from "react-icons/bs";
-import { checkInvoiceStatus, saveAuthorization,getUpcomingInvoice, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
+import { checkInvoiceStatus, saveAuthorization,getUpcomingInvoice, getScheduledPlan, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
 import { plans } from "../../helpers/plans";
 import { countries } from "../../helpers/countries";
 import { useToast } from "../../context/ToastContext";
@@ -15,6 +15,9 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import ConfirmPayment from "./ConfirmPayment";
 import InvoicePreview from "./InvoicePreview";
+import { CLEAR_CLIENT_SECRET } from "../../redux/actions/types";
+import Spinner from 'react-bootstrap/Spinner';
+import CheckoutForm from "./CheckoutForm";
 import {
   PaymentElement,
   useStripe,
@@ -30,7 +33,12 @@ export default function ManagePlan() {
   const [showdialog, setShowDialog] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
     const [showCheckout, setShowCheckout] = useState( false)
+    const [selectedCurrency, setSelectedCurrency] = useState('inr')
+    const [ isloading, setIsLoading] = useState( false)
+    const [showConfirmAlert, setShowConfirmAlert] = useState( false )
   const [invoiceData, setInvoiceData] = useState(null)
+  const [mode, setMode] = useState('payment')
+    const [scheduledSub, setScheduledSub] = useState(null)
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
@@ -46,6 +54,7 @@ export default function ManagePlan() {
   const [showFeatures, setShowFeatures] = useState(false);
   const [loading, setLoading] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
       fullName: "",
@@ -64,9 +73,18 @@ export default function ManagePlan() {
     }
 
     const closeCallback = () => {
+      setShowConfirmation( false);
       setShowConfirm( false);
       setLoading(false);
       setShowCheckout(false)
+      setClientSecret(null)
+      dispatch({
+        type: CLEAR_CLIENT_SECRET
+      })
+      handleCloseConfirm()
+      setTimeout(() => {
+        dispatch(getActiveSubscription())
+      },1500)
     }
 
     const handleCancelSubscription = () => {
@@ -84,14 +102,24 @@ export default function ManagePlan() {
 
   useEffect(() => {
     setSpinner(true)
+    fetch("https://ipapi.co/json/")
+      .then(res => res.json())
+      .then(data => { console.log(data.country_code)
+        setSelectedCurrency(data?.country_code === "IN" ? "inr" : "usd");
+      });
     dispatch(getActiveSubscription())
     handleListMember();
     dispatch(getBillingdetails())
+    dispatch(getScheduledPlan())
   }, [])
 
   useEffect(() => {
     setTeamMembers(totalmembers)
   },[totalmembers])
+
+    useEffect(() => {
+      setScheduledSub(subscriptionState.scheduledSubscription)
+    }, [subscriptionState.scheduledSubscription])
 
   useEffect(() => {
     if (memberFeed && memberFeed.memberData) {
@@ -117,7 +145,12 @@ export default function ManagePlan() {
 
   useEffect(() => {
     if (subscriptionState.activeSubscription) {
+      setLoading(false)
       setActiveSubscription(subscriptionState.activeSubscription)
+      if(subscriptionState.activeSubscription?.currency){
+        setSelectedCurrency(subscriptionState.activeSubscription?.currency);
+      }
+      
       setTotalMembers(subscriptionState.activeSubscription?.quantity)
       setBillingCycle(subscriptionState.activeSubscription?.interval || 'monthly')
       const allPlans = [...plans.monthly, ...plans.quarterly, ...plans.yearly];
@@ -141,24 +174,39 @@ export default function ManagePlan() {
   }, [subscriptionState.activeSubscription])
 
   useEffect(() => {
+    if(subscriptionState.success === 'error'){
+       setLoading(false)
+    }
+  }, [subscriptionState])
 
-  })
 
   const handleConfirm = () => {
-    dispatch(getUpcomingInvoice({
-       ...selectedPlan,
-        initial_quantity: qtyRef.current.value,
-        billingCycle: billingCycle,
-        name: selectedPlan?.name,
-    }))
-    setShowConfirm(true);
-    setTimeout(() => {
-      selectboxObserver()
-    },1000)
+
+    if( selectedPlan.id === 'free'){
+      setShowConfirmAlert(true)
+    }else{
+      setShowConfirm(true)
+      setIsLoading(true)
+      setInvoiceData(null)
+      setInvoicePreview(null)
+      dispatch(getUpcomingInvoice({
+        ...selectedPlan,
+          initial_quantity: qtyRef.current.value,
+          billingCycle: billingCycle,
+          name: selectedPlan?.name,
+      }))
+     
+      
+      setTimeout(() => {
+        selectboxObserver()
+      },1000)
+    }
+    
   };
 
   const handleCloseConfirm = () => {
     setShowConfirm(false);
+    setInvoicePreview(null)
   };
 
   const handleProceedToPayment = () => {
@@ -287,22 +335,29 @@ const handleSubmit = (e) => {
     const activateFreePlan = () => {
       if(teamMembers < 1){
         addToast('Please add number of members first.', 'danger');
+        setShowConfirmAlert(false);
+        setLoading( false )
         return;
       }
       if(teamMembers > 3){
         addToast('You cannot activate free plan for more than 3 members.', 'danger');
+        setShowConfirmAlert(false);
+        setLoading( false )
         return;
       }
       setLoading(true)
-      dispatch(subscribeFreePlan())
+      dispatch(subscribeFreePlan({selectedCurrency}))
+      setShowConfirmAlert(false)
     }
 
   const updatePlan = () => {
     setLoading(true)
 
-    if( selectedPlan.id === 'free'){
-      activateFreePlan()
-    }else{
+    
+      if(selectedPlan.id === 'free'){
+        activateFreePlan()
+      }else{
+   
       dispatch(updateSubscription({
         ...selectedPlan,
         total_count: 12,
@@ -311,23 +366,39 @@ const handleSubmit = (e) => {
         name: selectedPlan?.name,
         subId: activeSubscription?.subscriptionId
       }))
-    }
     
+      }
   }
+
+  useEffect(() => {
+      
+    if (subscriptionState.success === 'success' && subscriptionState.authorizeData) {
+      setLoading(false)
+      setShowConfirm(false);
+      setClientSecret(subscriptionState.authorizeData.clientSecret)
+      setMode(subscriptionState.authorizeData.mode || 'payment')
+      setShowCheckout(true)
+      // authorizeSubscriptionPayment(subscriptionState.authorizeData)
+    }
+  }, [subscriptionState?.authorizeData])
 
   useEffect(() => {
     if (subscriptionState.success === true && subscriptionState?.invoice &&  subscriptionState?.invoice?.id) {
       setTimeout(() => {
         dispatch(checkInvoiceStatus(subscriptionState.invoice?.id))
-      },1000)
+      },2000)
     }
     // setLoading(false)
     // setShowConfirm(false);
   }, [subscriptionState.invoice])
 
     useEffect(() => {
-      if( subscriptionState.invoicePreview !== false && subscriptionState.invoicePreview !== null){
+      setIsLoading(false)
+      if( subscriptionState.invoicePreview !== false && subscriptionState.invoicePreview !== null && subscriptionState.invoicePreview !== undefined){
         setInvoicePreview(subscriptionState.invoicePreview)
+        setTimeout(() => {
+          selectboxObserver()
+        },1000)
       }
     }, [subscriptionState.invoicePreview])
 
@@ -336,12 +407,17 @@ const handleSubmit = (e) => {
     if(subscriptionState.InvoiceData && subscriptionState.InvoiceData !== null && subscriptionState.InvoiceData?.status === 'action_required'){
       setInvoiceData(subscriptionState.InvoiceData)
       setClientSecret(subscriptionState.InvoiceData.client_secret)
-      setShowCheckout(true)
+      // setShowCheckout(true)
+      handleCloseConfirm()
+       setShowConfirmation(true);
     }else if(subscriptionState.InvoiceData && subscriptionState.InvoiceData !== null && subscriptionState.InvoiceData?.status === 'paid'){
       setLoading(false)
-      setShowConfirm(false)
+      setShowConfirmation(false)
+      handleCloseConfirm()
       addToast('Your subscription has been updated.', 'success');
-      
+      setTimeout(() => {
+        dispatch(getActiveSubscription())
+      },1500)
     }
   }, [subscriptionState.InvoiceData])
 
@@ -411,13 +487,7 @@ const handleSubmit = (e) => {
                   <Form onSubmit={handleQuantitySubmit}>
                     <Form.Group className="d-flex align-items-center gap-2 gap-xl-3 flex-wrap">
                       <Form.Label className="d-inline-flex align-items-center gap-2 form-label w-auto mb-0"><FiUsers /> Team Members</Form.Label>
-                      {/* <Form.Control type="number" className="w-50 flex-grow-1" min={totalmembers || 1} disabled={activeSubscription?.planId === 'free' || activeSubscription?.planId === 'trial'} value={teamMembers} onChange={(e) => {
-                        if(activeSubscription?.planId !== 'free' && activeSubscription?.planId !== 'trial'){
-                          setTeamMembers(Number(e.target.value)) 
-                        }else{
-                          return false;
-                        }
-                      }}/> */}
+                     
                       <div className="d-flex align-items-center gap-2 gap-xl-3 flex-grow-1">
                         {(() => {
                           const qty = activeSubscription?.quantity || 1;
@@ -454,7 +524,7 @@ const handleSubmit = (e) => {
                           );
                         })()}
                         {
-                          (selectedPlanData?.planId?.toLowerCase() !== 'free' && selectedPlanData?.planId?.toLowerCase() !== 'trial') && (
+                          (selectedPlanData?.planId !== 'free' && selectedPlanData?.planId !== 'trial') && (
                             <Button type="submit" variant="primary" disabled={loading}>{ loading ? 'Please wait...': 'Update Members'}</Button>
                           )
                         }
@@ -468,28 +538,32 @@ const handleSubmit = (e) => {
                   <h4 className="text-xl fw-bold mb-4">Choose Your Plan & Price Summary</h4>
                   <h6 className="fw-bold mb-2">Choose Your Plan</h6>
                   <Row className="mb-4">
-                    {plans[billingCycle].map((plan) => (
-                      <Col key={plan.id} data-plan={plan.id} xl={4} className="mb-3">
-                        <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name}  ${plan.name} ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
-                          onClick={() => setSelectedPlan(plan)}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <Card.Body className="p-0 m-0" key={`body-${plan.id}`}>
-                            {plan.discount > 0 && (
-                              <Badge bg="success" pill className="mb-2">
-                                {plan.discount}% OFF
-                              </Badge>
-                            )}
-                            <Card.Title>{plan.name}</Card.Title>
-                            <Card.Text className="small">
-                              {plan.id === 'free'
-                                ? `Free for up to 3 members`
-                                : "Unlimited Team Members"}
-                            </Card.Text>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    ))}
+                    {plans[billingCycle].map((plan) => {
+                      if(plan.currency === selectedCurrency){
+                        return (
+                        <Col key={plan.id} data-plan={plan.id} xl={4} className="mb-3">
+                          <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name}  ${plan.name} ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
+                            onClick={() => setSelectedPlan(plan)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <Card.Body className="p-0 m-0" key={`body-${plan.id}`}>
+                              {plan.discount > 0 && (
+                                <Badge bg="success" pill className="mb-2">
+                                  {plan.discount}% OFF
+                                </Badge>
+                              )}
+                              <Card.Title>{plan.name}</Card.Title>
+                              <Card.Text className="small">
+                                {plan.id === 'free'
+                                  ? `Free for up to 3 members`
+                                  : "Unlimited Team Members"}
+                              </Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        )
+                    }
+                    })}
                   </Row>
                   {/* Billing Cycle */}
                   <Form.Group className="mb-3">
@@ -500,89 +574,7 @@ const handleSubmit = (e) => {
                       <option value="yearly">Yearly (Save 40%)</option>
                     </Form.Select>
                   </Form.Group>
-                  {/* Price Summary */}
-                  {/* <Card className="p-0 border-0 mb-0 summary--card flex-column">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <Card.Title className="fw-bold mb-0">Price Summary</Card.Title>
-                      <Button variant="link" size="sm" className="text-decoration-none px-3 py-1 border-0" onClick={() => setShowFeatures((prev) => !prev)}>
-                        {showFeatures ? (
-                          <>
-                            <span>Hide Features</span>
-                            <FaChevronUp />
-                          </>
-                        ) : (
-                          <>
-                            <span>View Features</span>
-                            <FaChevronDown />
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    <Card.Body className="p-0">
-                      <Collapse in={showFeatures}>
-                        <div className="mb-3 border-bottom pb-3">
-                          <h5 className="text-slate-700 text-uppercase fw-bold fs-6">Plan Features</h5>
-                          <ul className="d-flex flex-column gap-2">
-                            {selectedPlanData?.features.map((feature, idx) => (
-                              <li className="d-flex align-items-center gap-2" key={idx}><FiCheck /> {feature}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </Collapse>
-
-                      <div>
-                        <div className="mb-2 d-flex align-items-center justify-content-between gap-3">
-                          <p className="mb-0">Price per user:</p>
-                          <p className="mb-0 text-end">
-                            {
-                              (selectedPlanData?.discount > 0) && (
-                                <span className="text-decoration-line-through text-muted">₹{selectedPlanData.originalPrice.toFixed(0)}</span>
-                              )
-                            }
-                            {selectedPlanData?.pricePerUser > 0 ?
-                              <small className="fs-6 fw-bold d-block">
-                                ₹{selectedPlanData?.pricePerUser}/month
-                              </small>
-                            : <small className="fs-6 fw-bold d-block">0</small>}
-                           
-                          </p>
-                        </div>
-                        <p className="mb-2 d-flex align-items-center justify-content-between gap-3">Number of users: <strong className="text-end">{teamMembers}</strong></p>
-                        
-                        
-                         {(selectedPlanData?.id !== "free" && 
-                            (billingCycle === "yearly" || billingCycle === "quarterly")) && (
-                            <div className="bg-gradient-green p-3 text-center mb-3 rounded-3">
-                              <div className="text--small mb-1 text-uppercase text-emerald">
-                                Total Savings in {billingCycle === "quarterly" ? "3 Months" : "1 Year"}
-                              </div>
-
-                              <div className="text--large mb-0 text-emerald mt-2">
-                                ₹{
-                                  ((selectedPlanData?.originalPrice * teamMembers) -
-                                    (selectedPlanData?.pricePerUser * teamMembers)) *
-                                  (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
-                                }
-                              </div>
-                            </div>
-                          )}
-
-                        <p className="mb-3 d-flex align-items-center justify-content-between gap-3 fs-5 fw-bold border-top border-bottom py-2">
-                          Total per month
-                           <strong className="text-end fs-3">₹{(teamMembers * selectedPlanData?.pricePerUser).toFixed(0)}</strong>
-                        </p> 
-                        <p className="mb-0 d-flex align-items-center justify-content-between gap-3">
-                          Total for{" "}
-                          {billingCycle === "yearly"
-                            ? "1 year"
-                            : billingCycle === "quarterly"
-                              ? "3 months"
-                              : "1 month"}
-                          : <strong className="text-end fs-5">₹{(teamMembers * selectedPlanData?.pricePerUser) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1).toFixed(0)}</strong>
-                        </p>
-                      </div>
-                    </Card.Body>
-                  </Card> */}
+                  
                 </div>
                 {
                   (activeSubscription?.planId !== selectedPlanData?.id) && (
@@ -590,12 +582,16 @@ const handleSubmit = (e) => {
                     {loading ? 'Please wait...' : 'Update Plan'}
                   </Button>)
                 }
+                {
+                  (!scheduledSub && activeSubscription) && (
+                    <div className="bg-white rounded-4 shadow border p-4 mb-4 border-danger mt-4">
+                      <h5 className="fw-bold text-danger mb-3">Danger Zone</h5>
+                      <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
+                      <Button variant="danger"  onClick={doCancel} className="w-100 fw-bold">Cancel Subscription</Button>
+                    </div>
+                  )
+                }
                 
-                <div className="bg-white rounded-4 shadow border p-4 mb-4 border-danger mt-4">
-                  <h5 className="fw-bold text-danger mb-3">Danger Zone</h5>
-                  <p className="mb-3">Cancel your subscription. Your access will continue until your next billing cycle.</p>
-                  <Button variant="danger"  onClick={doCancel} className="w-100 fw-bold">Cancel Subscription</Button>
-                </div>
                 <Form className="bg-gradient-light bg-white rounded-4 shadow border p-4" onSubmit={handleSubmit}>
                   <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
                   <Row>
@@ -726,6 +722,17 @@ const handleSubmit = (e) => {
         msg="Are you sure you want to cancel your subscription?"
         callback={handleCancelSubscription}
       />
+
+      {
+        (showConfirmAlert === true) && (
+          <AlertDialog
+            showdialog={showConfirmAlert}
+            toggledialog={setShowConfirmAlert}
+            msg="Are you sure you want to activate the free plan?"
+            callback={updatePlan}
+          />
+        )
+      }
       <Modal show={showConfirm} onHide={handleCloseConfirm} centered size="lg" className="subscription--modal theme--modal">
         <Modal.Header closeButton>
           <Modal.Title>
@@ -735,139 +742,29 @@ const handleSubmit = (e) => {
         </Modal.Header>
         <Modal.Body>
           {
+            (isloading === true) && (
+            <Spinner animation="border" />)
+          }
+          {
               (invoicePreview !== false && invoicePreview !== null) && (
                 <InvoicePreview invoice={invoicePreview} />
               )
             }
-          {/* Subscription Details */}
-          {/* <div className="border rounded p-3 mb-4 bg-light">
-            <h6 className="fw-bold mb-3">SUBSCRIPTION DETAILS</h6>
-            <div className="bg-white rounded-3 p-3 border">
-              <p className="mb-0">Team Members <strong className="d-block fs-6 fw-bold">{teamMembers} user{teamMembers > 1 ? "s" : ""}</strong></p>
-            </div>
-            <div className="bg-white rounded-3 p-3 border my-3">
-              <p className="mb-0">
-                Payment Type{" "}
-                <strong className="d-block fs-6 fw-bold text-primary">
-                  {billingCycle === "yearly"
-                  ? "Annual Payment (Billed Once a Year)"
-                  : billingCycle === "quarterly"
-                  ? "Quarterly Payment (Billed Every 3 Months)"
-                  : "Monthly Payment (Billed Every Month)"
-                }
-                </strong>
-              </p>
-            </div>
-            <div className="bg-white rounded-3 p-3 border">
-              <p className="mb-0">
-                Next Payment Date{" "}
-                <strong className="d-block fs-6 fw-bold">
-                  {(() => {
-                  const nextDate = new Date();
-                  
-                  if (billingCycle === "yearly") {
-                    nextDate.setFullYear(nextDate.getFullYear() + 1);
-                  } else if (billingCycle === "quarterly") {
-                    nextDate.setMonth(nextDate.getMonth() + 3);
-                  } else {
-                    nextDate.setMonth(nextDate.getMonth() + 1);
-                  }
-
-                  return nextDate.toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  });
-                })()}
-                </strong>
-              </p>
-            </div>
-          </div> */}
-
-          {/* Price Calculation */}
-          {/* <div className="border rounded p-3 mb-4 bg-light">
-            <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
-            <div className="mb-2">
-            
-              <div className="bg-white rounded-3 p-3 border mb-3">
-                <p className="mb-0">
-                {billingCycle === 'monthly' ? 'Regular': 'Discounted'} price per user{" "}
-                <span className="d-block">
-                  <strong className="text-primary fs-5">₹{selectedPlanData?.pricePerUser}</strong>/user/month
-                </span>
-              </p>
-              </div>
-              <div className="bg-white rounded-3 p-3 border">
-                <p className="mb-1">Base Calculation
-                  <span className="d-flex justify-content-between"> ₹{selectedPlanData?.pricePerUser} × {teamMembers} user(s) <strong className="fs-5">= ₹{(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}</strong></span>
-                </p>
-              </div>
-            </div> */}
-
-            {/* Cost Breakdown */}
-            {/* {billingCycle === "yearly" || billingCycle === "quarterly" ?
-              <>
-                <div className="annual--cost rounded p-3 mt-3 mb-3 border-warning border-2">
-                  <h6 className="fw-bold mb-2 text-uppercase text-amber">{billingCycle} COST BREAKDOWN</h6>
-                  <div className="bg-white p-3 rounded fw-normal border-1 border-warning text-dark border">
-                    <span className="text--small">{billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} calculation</span>
-                    <div className="d-flex align-items-center justify-content-between gap-3">
-                      <p className="mb-0">
-                        {billingCycle === "yearly"
-                        ? `₹${(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}/month × 12 months`
-                        : billingCycle === "quarterly"
-                        ? `₹${(
-                            selectedPlanData?.pricePerUser * teamMembers
-                          ).toFixed(0)}/month × 3 months`
-                        : `₹${(
-                          selectedPlanData?.pricePerUser * teamMembers
-                        ).toFixed(0)}/month × 1 month`}
-                      </p>
-                      <p className="fw-bold display-8 mb-0 text-amber">
-                        = ₹{selectedPlanData?.pricePerUser.toFixed(0) *  teamMembers * (billingCycle === 'quarterly' ? 3 : 12)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-center mt-3">
-                    <p className="text--small mb-1 fw-semibold text-amber">Total {billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} Payment</p>
-                    <div className="text--large mb-0 text-amber">₹{selectedPlanData?.pricePerUser.toFixed(0) * teamMembers * (billingCycle === 'quarterly' ? 3 : 12)}</div>
-                  </div>
-                </div>
-                
-                { <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                  <div className="text--small mb-1 text-uppercase text-emerald">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
-                 
-                  <div className="text--large mb-0 text-emerald mt-2">₹{
-                    (( selectedPlanData?.originalPrice * teamMembers ) - (selectedPlanData?.pricePerUser * teamMembers)) * (billingCycle === "yearly" ? 12 : billingCycle === "quarterly" ? 3 : 1)
-                    
-                  }</div>
-                </div>}
-                </>
-                :
-                
-                <>
-                  <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                    <div className="text--small mb-1 text-uppercase">Your monthly payment</div>
-                    <div className="text--large mb-0 text-emerald">₹{(selectedPlanData?.pricePerUser * teamMembers).toFixed(0)}</div>
-                    <div className="text--small mb-1 text-lowercase">for {teamMembers} users</div>
-                  </div>
-                </>
-                } */}
-           
-            
-          {/* </div> */}
-
-          
         </Modal.Body>
 
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseConfirm}>Cancel</Button>
-          <Button variant="success" disabled={loading} onClick={handleProceedToPayment}>{loading ? 'Please wait...': 'Proceed to Payment'}</Button>
+          {
+            (invoicePreview) && (
+              <Button variant="success" disabled={loading} onClick={handleProceedToPayment}>{loading ? 'Please wait...': 'Proceed'}</Button>
+            )
+          }
+          
         </Modal.Footer>
       </Modal>
       {
         clientSecret !== null && (
-          <Modal show={showConfirm} onHide={() => {setShowConfirm(false); setShowCheckout(false)}} centered size="lg" className="subscription--modal theme--modal">
+          <Modal show={showConfirmation} onHide={() => {setShowConfirmation(false);}} centered size="lg" className="subscription--modal theme--modal">
           <Modal.Header closeButton>
               <Modal.Title>
                   <span className="nav--item--icon"><BsTags /></span>
@@ -881,6 +778,26 @@ const handleSubmit = (e) => {
           </Modal.Body>
           </Modal>
           )
+      }
+
+      {
+        clientSecret !== null && (
+          <Modal show={showCheckout} onHide={() => setShowCheckout(false)} centered size="lg" className="subscription--modal theme--modal">
+            <Modal.Header closeButton>
+                <Modal.Title>
+                    <span className="nav--item--icon"><BsTags /></span>
+                    <strong>Checkout</strong>
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutForm mode={mode}/>
+              </Elements>
+            </Modal.Body>
+          </Modal>
+          
+        )
       }
       </>
   );

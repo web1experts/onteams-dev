@@ -15,6 +15,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import InvoicePreview from "./InvoicePreview";
+import Spinner from 'react-bootstrap/Spinner';
 const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
   
 function PlansPage() {
@@ -22,13 +23,14 @@ function PlansPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [loader, setLoader] = useState(true)
+  const [ spin, setSpin] = useState( false)
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const [clientSecret, setClientSecret] = useState(null);
   const [mode, setMode] = useState('payment')
   const [showCheckout, setShowCheckout] = useState( false)
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
-  
+  const [selectedCurrency, setSelectedCurrency] = useState('inr')
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -65,20 +67,27 @@ function PlansPage() {
   const handlePlanSelect = (plan) => setSelectedPlan(plan);
 
   useEffect(() => {
+
+    fetch("https://ipapi.co/json/")
+      .then(res => res.json())
+      .then(data => { console.log(data.country_code)
+        setSelectedCurrency(data?.country_code === "IN" ? "inr" : "usd");
+      });
     setTimeout(() => {
       dispatch(getActiveSubscription())
     }, 1000)
   }, [])
 
   useEffect(() => {
-    
+    if(subscriptionState.success === 'error'){
+       setLoading(false)
+    }
     if (subscriptionState.success === 'success' && subscriptionState.authorizeData) {
       setLoading(false)
     setShowConfirm(false);
       setClientSecret(subscriptionState.authorizeData.clientSecret)
       setMode(subscriptionState.authorizeData.mode || 'payment')
       setShowCheckout(true)
-      // authorizeSubscriptionPayment(subscriptionState.authorizeData)
     }
   }, [subscriptionState])
 
@@ -105,8 +114,12 @@ function PlansPage() {
     }, [subscriptionState.activeSubscription])
 
     useEffect(() => {
+      setSpin(false)
       if( subscriptionState.invoicePreview !== false && subscriptionState.invoicePreview !== null){
         setInvoicePreview(subscriptionState.invoicePreview)
+        setTimeout(() => {
+          selectboxObserver()
+        },1000)
       }
     }, [subscriptionState.invoicePreview])
 
@@ -172,6 +185,7 @@ const showError = (name) => {
         initial_quantity: members,
         billingCycle: billingCycle,
         name: priceDetails.plan.name,
+        selectedCurrency,
         total_count: 12,
         ...formData
       })
@@ -185,12 +199,14 @@ const showError = (name) => {
       addToast('Please add number of team members first.', 'danger');
       return;
     }
-
+    setSpin(true)
+     setInvoicePreview(null)
     dispatch(getUpcomingInvoice({
             ...plan,
             initial_quantity: members,
             billingCycle: billingCycle,
             name: plan?.name,
+            selectedCurrency
         }))
 
     const discountedPricePerUser = plan.pricePerUser;
@@ -230,57 +246,6 @@ const showError = (name) => {
     },1000)
   };
 
-
-  const authorizeSubscriptionPayment = async (payload) => {
-    try {
-      setLoading(true)
-      const { url,  subscription_id, plan_id } = payload;
-
-      // Load Razorpay
-      // const options = {
-      //   key: razorPayKey,
-      //   subscription_id: subscription_id,
-      //   recurring: 1,
-      //   name: "Prime Teams",
-      //   description: `${selectedPlan.name} Plan Subscription`,
-      //   handler: function (response) {
-      //     console.log("Subscription Authorized:", response);
-      //     if (response?.razorpay_payment_id) {
-      //       dispatch(saveAuthorization({ ...response, subscription_id }))
-      //     }
-      //     setLoading(false)
-      //     setSelectedPlan(null)
-      //   },
-      //   modal: {
-      //     ondismiss: function () {
-      //       console.warn("⚠️ Payment popup closed by user (cancelled).");
-      //       setLoading(false);
-      //       // Optional: show a message or alert
-      //       alert("Payment was cancelled. You can try again anytime.");
-      //     },
-      //   },
-      //   theme: {
-      //     color: "#F37254",
-      //   },
-      // };
-
-      // const rzp = new window.Razorpay(options);
-      // // 🔴 Handle payment failure
-      // rzp.on("payment.failed", function (response) {
-      //   console.error("❌ Payment Failed:", response.error);
-      //   alert(`Payment failed: ${response.error.description || "Unknown error"}`);
-      //   setLoading(false);
-      // });
-      // rzp.open();
-      window.location.href = url
-    } catch (err) {
-      console.error(err);
-      alert("Error creating subscription: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   const activateFreePlan = () => {
     if(members < 1){
       addToast('Please add number of members first.', 'danger');
@@ -291,7 +256,7 @@ const showError = (name) => {
       return;
     }
     setLoading(true)
-    dispatch(subscribeFreePlan())
+    dispatch(subscribeFreePlan({selectedCurrency}))
   }
 
   const activateTrialPlan = () => {
@@ -300,7 +265,7 @@ const showError = (name) => {
       return;
     }
     setLoading(true)
-    dispatch(subscribeTrialPlan({initial_quantity: members}))
+    dispatch(subscribeTrialPlan({initial_quantity: members, selectedCurrency}))
   }
 
   return (
@@ -315,15 +280,18 @@ const showError = (name) => {
               <p className="text-center mb-4">Start with a 14-day free trial. Charges apply only after the trial period.</p>
               {/* Number of Members Input */}
               <Form className="text-center">
-                <Form.Group className="select--currency">
+                {/*<Form.Group className="select--currency">
                   <Form.Label><FiGlobe /> Select Currency</Form.Label>
-                  <Form.Select>
-                    <option value="INR">₹ INR - Indian Rupee</option>
-                    {/* <option value="USD">$ USD - US Dollar</option>
-                    <option value="EUR">€ EUR - Euro</option>
-                    <option value="GBP">£ GBP - British Pound</option> */}
+                  <Form.Select value={selectedCurrency} data-id={selectedCurrency}>
+                    {
+                      (selectedCurrency === 'inr' || !selectedCurrency) ? 
+                        <option value="inr">₹ INR - Indian Rupee</option>
+                      :
+                      <option value="usd">$ USD - US Dollar</option>
+                    }
+                    
                   </Form.Select>
-                </Form.Group>
+                </Form.Group> */}
                 <Form.Group className="select--size">
                   <Form.Label><FiUsers /> Select Your Team Size</Form.Label>
                   <div className="d-flex align-items-center gap-2 bg--teal p-2">
@@ -400,15 +368,16 @@ const showError = (name) => {
               {/* Plan Cards */}
               <Row className="g-4">
                 {plans[billingCycle].map((plan) => {
-                  if(plan.billing_cycle === false || plan.billing_cycle === billingCycle){
+                  
+                  if(plan.currency === selectedCurrency && plan.billing_cycle === false || plan.currency === selectedCurrency && plan.billing_cycle === billingCycle){
                     
                     const finalPricePerUser = plan.pricePerUser;//getDiscountedPrice(plan);
-                const baseAmount = plan.originalPrice * members
-                const total = finalPricePerUser * members;
-                let months = 1;
-                if (billingCycle === "quarterly") months = 3;
-                if (billingCycle === "yearly") months = 12;
-                const savedAmount = (baseAmount - total) * months;
+                    const baseAmount = plan.originalPrice * members
+                    const total = finalPricePerUser * members;
+                    let months = 1;
+                    if (billingCycle === "quarterly") months = 3;
+                    if (billingCycle === "yearly") months = 12;
+                    const savedAmount = (baseAmount - total) * months;
 
 
                     return (
@@ -436,7 +405,15 @@ const showError = (name) => {
                                   {/* <p>Regular Price</p> */}
                                   <div className="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                                     <div className="text--small mb-1 text-uppercase">Discounted Price</div>
-                                    <div className="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span className="text-slate-600 mt-1">/user/month</span></div>
+                                    <div className="text--large display-5 mb-0">
+                                      {
+                                        (selectedCurrency === 'inr') ? 
+                                        <>₹{plan.pricePerUser.toFixed(0)}</>
+                                        :
+                                        <>${plan.pricePerUser.toFixed(2)}</>
+                                      }
+                                      
+                                      <span className="text-slate-600 mt-1">/user/month</span></div>
                                     <div className="text-slate-600 mt-1">when billed {billingCycle}</div>
                                   </div> 
                                 </>
@@ -444,7 +421,14 @@ const showError = (name) => {
                                 <>
                                   <div className="bg-gradient-primary bg-gradient-light p-3 mb-3 rounded-3">
                                     <div className="text--small mb-1 text-uppercase">Regular Price</div>
-                                    <div className="text--large display-5 mb-0">₹{plan.pricePerUser.toFixed(0)}<span className="text-slate-600 mt-1">/user/month</span></div>
+                                    <div className="text--large display-5 mb-0">
+                                      {
+                                        (selectedCurrency === 'inr') ? 
+                                        <>₹{plan.pricePerUser.toFixed(0)}</>
+                                        :
+                                        <>${plan.pricePerUser.toFixed(2)}</>
+                                      }
+                                      <span className="text-slate-600 mt-1">/user/month</span></div>
                                     <div className="text-slate-600 mt-1">when billed {billingCycle}</div>
                                   </div> 
                                 </>
@@ -499,9 +483,9 @@ const showError = (name) => {
                                     : "primary"
                                 }
                                 onClick={() => {
-                                  if (plan.id === 'free') {
+                                  if(plan.id === 'free'){
                                     activateFreePlan()
-                                  } else {
+                                  }else{
                                     handleSubmit(plan)
                                   }
                                 }}
@@ -582,6 +566,10 @@ const showError = (name) => {
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {
+            (spin === true) && (
+            <Spinner animation="border" />)
+          }
           {priceDetails && (
             <>
             {
@@ -589,124 +577,9 @@ const showError = (name) => {
                 <InvoicePreview invoice={invoicePreview} />
               )
             }
-              
-              {/* <div className="bg-gradient-light rounded p-3 mb-4">
-                <h6 className="fw-bold mb-3">SUBSCRIPTION DETAILS</h6>
-                <ListGroup>
-                  <ListGroup.Item>
-                    <small>Plan Name</small>
-                    <p className="text-uppercase mb-0">{priceDetails.plan.name}</p>
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <small>Team Members</small>
-                    {members} user{members > 1 ? "s" : ""}
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <small>Payment Type</small>
-                    <p className="text-primary mb-0">
-                      {billingCycle === "yearly"
-                        ? "Annual Payment (Billed Once a Year)"
-                        : billingCycle === "quarterly"
-                        ? "Quarterly Payment (Billed Every 3 Months)"
-                        : "Monthly Payment (Billed Every Month)"
-                      }
-                    </p>
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <small>Next Payment Date</small>
-                    {(() => {
-                      const nextDate = new Date();
-                      
-                      if (billingCycle === "yearly") {
-                        nextDate.setFullYear(nextDate.getFullYear() + 1);
-                      } else if (billingCycle === "quarterly") {
-                        nextDate.setMonth(nextDate.getMonth() + 3);
-                      } else {
-                        nextDate.setMonth(nextDate.getMonth() + 1);
-                      }
-
-                      return nextDate.toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      });
-                    })()}
-                  </ListGroup.Item>
-                </ListGroup>
-              </div>
-
-              
-              <div className="rounded bg-gradient-light p-3 mb-4">
-                <h6 className="fw-bold mb-3">PRICE CALCULATION</h6>
-                <ListGroup>
-                 <ListGroup.Item>
-                    <small>{billingCycle === 'monthly' ? 'Regular': 'Discounted'} price per user</small>
-                    <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
-                      <span>₹{priceDetails.pricePerUser.toFixed(0)}/user/month</span>
-                    </p>
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    <small>Base calculation</small>
-                    <p className="mb-0 d-flex align-items-center gap-3 justify-content-between w-100">
-                      <span>₹{priceDetails.pricePerUser.toFixed(0)} ×{" "}{members} user(s)</span> <strong className="display-8">= ₹{(priceDetails.pricePerUser * members).toFixed(0)}</strong>
-                    </p>
-                  </ListGroup.Item>
-                </ListGroup>
-                
-                {billingCycle === "yearly" || billingCycle === "quarterly" ?
-                <>
-                  <div className="annual--cost rounded p-3 mt-3 mb-3 border-warning border-2">
-                    <h6 className="fw-bold mb-2 text-uppercase text-amber">{billingCycle} COST BREAKDOWN</h6>
-                    <div className="bg-white p-3 rounded fw-normal border-1 border-warning text-dark border">
-                      <span className="text--small">{billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} calculation</span>
-                      <div className="d-flex align-items-center justify-content-between gap-3">
-                        <p className="mb-0">
-                          {billingCycle === "yearly"
-                          ? `₹${(priceDetails.pricePerUser * members).toFixed(0)}/month × 12 months`
-                          : billingCycle === "quarterly"
-                          ? `₹${(
-                              priceDetails.pricePerUser * members
-                            ).toFixed(0)}/month × 3 months`
-                          : `₹${(
-                            priceDetails.pricePerUser * members
-                          ).toFixed(0)}/month × 1 month`}
-                        </p>
-                        <p className="fw-bold display-8 mb-0 text-amber">
-                          = ₹{priceDetails.pricePerUser.toFixed(0) *  members * (billingCycle === 'quarterly' ? 3 : 12)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-center mt-3">
-                      <p className="text--small mb-1 fw-normal text-amber">Total {billingCycle === 'yearly' ? 'Annual' : 'Quarterly'} Payment</p>
-                      <div className="text--large mb-0 text-amber">₹{priceDetails.pricePerUser.toFixed(0) * members * (billingCycle === 'quarterly' ? 3 : 12)}</div>
-                    </div>
-                  </div>
-                  
-                  { <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                    <div className="text--small mb-1 text-uppercase text-emerald">Total Savings in {billingCycle === 'quarterly' ? '3 Months' : '1 Year' }</div>
-                    <div className="text-slate-600 mt-1">
-                      ₹{((priceDetails.originalPrice - priceDetails.pricePerUser) *  members).toFixed(0)}/month × {billingCycle === 'quarterly' ? 3 : 12} months = ₹
-                      {(((priceDetails.originalPrice - priceDetails.pricePerUser) ) *  members * (billingCycle === 'quarterly' ? 3 : 12)).toFixed(0)}
-                    </div>
-                    <div className="text--large mb-0 text-emerald mt-2">₹{priceDetails.totalSavings.toFixed(0)}</div>
-                  </div>}
-                  </>
-                  :
-                  
-                  <>
-                    <div className="bg-gradient-primary p-3 text-center mb-3 rounded-3">
-                      <div className="text--small mb-1 text-uppercase">Your monthly payment</div>
-                      <div className="text--large mb-0 text-emerald">₹{(priceDetails.pricePerUser * members).toFixed(0)}</div>
-                      <div className="text--small mb-1 text-lowercase">for {members} users</div>
-                    </div>
-                  </>
-                  }
-              </div>
-
-              <p className="bg-gradient-light bg--highlight mb-3 p-2 rounded-3">
-                ✨ 14 Days Free Trial – Charges apply after trial period
-              </p> */}
-
+            
+            {
+            (spin === false) && (
               <Form className="bg-gradient-light p-3 rounded" onSubmit={handleSubmit}>
                 <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
                 <Row>
@@ -849,6 +722,7 @@ const showError = (name) => {
                   </Form.Group>
                 </div>
               </Form>
+            )}
             </>
             
           )}
@@ -859,11 +733,15 @@ const showError = (name) => {
           <Button variant="secondary" onClick={() => setShowConfirm(false)}>Cancel</Button>
           <Button variant="primary" disabled={loading}
             onClick={() => {
-              handlePayment()
+              // if(priceDetails?.plan.id === 'free'){
+              //   activateFreePlan()
+              // }else{
+                handlePayment()
+              // }
             }}
           >
             {
-              loading ? 'Please wait...' : 'Proceed to Payment'
+              loading ? 'Please wait...' : 'Proceed'
             }
           </Button>
         </Modal.Footer>

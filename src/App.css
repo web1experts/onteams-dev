@@ -7921,13 +7921,13 @@ ul#icon-tabs .nav-link span svg {
   border-width: 2px;
   border-style: solid;
   border-radius: 1rem;
-  max-width: 48rem;
+  max-width: 20rem;
   width: 100%;
   margin: auto;
   margin-bottom: 50px;
   display: flex;
   gap: 2rem;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 .select--currency, .select--size {
