@@ -1367,6 +1367,11 @@ Add Project Modal CSS-=-=-
   object-fit: cover;
 }
 
+.assign--task--modal .status--list .list-group-item .team--color {
+  height: 30px;
+  width: 30px;
+}
+
 .upload--status .file--upload {
   align-items: center;
   background: #eee;

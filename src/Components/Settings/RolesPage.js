@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Form, ListGroup, Card, Modal, FloatingLabel, FormGroup, Row, Col} from "react-bootstrap";
-import { FaEdit, FaTrashAlt,FaRegBell, FaPlus, FaRegUser } from "react-icons/fa";
-import { FiCheck} from "react-icons/fi";
-import { LuFolderOpen } from "react-icons/lu";
-import { MdLockOutline } from "react-icons/md";
+import { Button, Form, Accordion, Tab, Badge, Card, Modal, FloatingLabel, Tabs, Row, Col} from "react-bootstrap";
+import { FaPlus } from "react-icons/fa";
+import { FiCheck, FiLock, FiUsers} from "react-icons/fi";
+import { LuFolderOpen, LuPencilLine } from "react-icons/lu";
 import Spinner from "react-bootstrap/Spinner";
 import { getUserProfile, updateProfile } from "../../redux/actions/auth.actions";
 import { getFieldRules, validateField } from "../../helpers/rules";
@@ -571,160 +570,310 @@ function RolesPage() {
     <>
         <div className="page--wrapper setting--page">
           <div className="rounded--box permission__page">
-            <h3 className="d-flex align-items-center justify-content-end">
-                <Button variant="primary" onClick={() => handleShow()}><FaPlus /> Add New</Button>
-            </h3>
-            
-            {activeRole && Object.keys(activeRole).length > 0 && (
-            <>
-                <Row className="mt-4">
-                  <Col lg={6}>
-                    <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
-                    <FloatingLabel label="Select Role">
-                        <Form.Select className="custom-selectbox" key={`rolelist`}  onChange={(e) => {
-                          const selectedRole = roles.find((role) => role._id === e.target.value);
-                          setActiveRole(selectedRole);
-                        }}>
-                        {roles.map((role, index) => {
-                            return (
-                            <option key={`role-${role._id}`} value={role?._id} action active={activeRole?._id === role._id}>{role.name}</option>
-                            );
-                        })}
-                        </Form.Select>
-                    </FloatingLabel>
-                    {/* <Form.Label>Select Role</Form.Label> */}
-                    
-                    </FormGroup>
-                </Col>
-                <Col lg={6}>
-                    <FormGroup className="form-group mb-0 pb-0">
-                      <FloatingLabel label="Role name">
-                        <Form.Control
-                        type="text"
-                        className={
-                        "form-control"
-                        }
-                        placeholder="Role name"
-                        name="name"
-                        value={fields['name']}
-                        onChange={(e) => {
-                            const { value} = e.target;
-                            setFields({...fields, ['name']: value})
-                        }}
-                        />
-                      </FloatingLabel>
-                    </FormGroup>
-                </Col>
-                
-                </Row>
-                
-                <div className="new--accordion--block w-100 mt-4">
-                {permissionModules.map((mod) => {
-                    const modSlug = mod.slug;
-                    const modPerms = permissions?.[modSlug] || {};
-                    const isExpanded = expanded?.[modSlug] || false;
-                    const isViewChecked = !!modPerms.view;
-                    const truePermissionCount = Object.values(
-                    modPerms
-                    ).filter((val) => val === true).length;
-                    return (
-                    <div className="bg--blue--accordion">
-                        <div className="d-flex gap-3 align-items-center">
-                            {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                            <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                        </div>
-                        {(mod.permissions || []).map((perm) => {
-                        if (perm === "view") {
-                            return (
-                            <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                <p className="mb-0">View</p>
-                                <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view}
-                                    onChange={() => toggleView(modSlug)}/>
+            <Tabs defaultActiveKey="roles">
+              <Tab eventKey="roles" title="Roles">
+                {activeRole && Object.keys(activeRole).length > 0 && (
+                  <>
+                  <Accordion >
+                   {roles.map((role, index) => {
+                      return (
+                        <Accordion.Item eventKey={role._id}>
+                          <Accordion.Header>
+                            <div className="d-flex gap-3 align-items-center">
+                              <span className="lock--icon d-flex align-items-center justify-content-center p-3 bg-light rounded-3"><FiLock /></span>
+                              <div className="role---name">
+                                <h4 className="d-flex align-items-center gap-2 mb-0">
+                                  <span>{role.name}</span>
+                                  <Badge bg="secondary" className="rounded-5 fw-medium">System</Badge>
+                                </h4>
+                                <p className="mb-0"><small>Full System Access</small></p>
+                              </div>
                             </div>
-                            )
-                        }
-                        return (
-                            <>
-                            <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                <p className="mb-0">{perm
-                                                    .replace(/[_-]/g, " ")
-                                                    .replace(/^\w/, (l) => l.toUpperCase())}</p>
-                                <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
-                                disabled={!isViewChecked}
-                                checked={!!modPerms[perm]}
-                                onChange={() =>
-                                    togglePermission(modSlug, perm)
-                                }
-                                />
-                            </div>
-                            {[
-                                "tracking",
-                                "projects",
-                                "reports",
-                                "attendance",
-                            ].includes(modSlug) &&
-                                perm === "view_others" &&
-                                modPerms[perm] === true && (
-                                <div className="team--card--grid">
-                                    {memberFeeds.map((member) => (
-                                    <Card className={`team--card ${modPerms[
-                                        "selected_members"
-                                        ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
-                                        //if (selectedMember?.role?.slug !== "owner") {
-                                        toggleMembers(
-                                            modSlug,
-                                            "selected_members",
-                                            member._id
-                                        )
-                                        // }
-                                        }}>
-                                        <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
-                                        <Card.Body>
-                                        <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
-                                        </Card.Body>
-                                        <FiCheck className="ms-auto" />
+                          </Accordion.Header>
+                          <Accordion.Body>
+                            <div className="new--accordion--block w-100">
+                              <Accordion className="mb-3">
+                                <Accordion.Item eventKey="0">
+                                  <Accordion.Header>
+                                    <div className="d-flex gap-3 align-items-center">
+                                      <FiUsers />
+                                      <h6 className="mb-0">Assigned Teams <small className="d-block">For team leads, managers, and HRs to view their team's data, projects, time tracking, reports, and attendance</small></h6>
+                                    </div>
+                                  </Accordion.Header>
+                                  <Accordion.Body>
+                                    <Card className="p-0 mb-0 border-0 rounded-0 bg-white radio--card">
+                                      <Form>
+                                        <div className="p-3 border border-gray rounded-3 mb-3">
+                                          <Form.Check
+                                            type="radio"
+                                            label="Can see specific teams only"
+                                            name="visibility"
+                                            id="specific-teams-only"
+                                          />
+                                          <Form.Text className="text-muted ms-4">
+                                            Ideal for team leads and managers.
+                                          </Form.Text>
+                                        </div>
+                                        <div className="p-3 border border-gray rounded-3 mb-3">
+                                          <Form.Check
+                                            type="radio"
+                                            label="Can see specific people only"
+                                            name="visibility"
+                                            id="specific-people-only"
+                                          />
+                                          <Form.Text className="text-muted ms-4">
+                                            Suitable for roles that need visibility to individuals.
+                                          </Form.Text>
+                                        </div>
+                                        <div className="p-3 border border-gray bg-light rounded-3 mb-3">
+                                          <p><strong>Select Teams - All members (current & future) from these teams will be visible:</strong></p>
+                                          <div className="p-3 border border-gray bg-white rounded-3 mb-3">
+                                            <Form.Check
+                                              type="checkbox"
+                                              label="Default Team"
+                                              name="visibility"
+                                              id="default-team"
+                                            />
+                                            <Form.Text className="text-muted ms-4">4 members</Form.Text>
+                                          </div>
+                                          <div className="p-3 border border-warning bg-warning rounded-3">
+                                            <Form.Check
+                                              type="switch"
+                                              label="Automatically include new teams"
+                                              name="visibility"
+                                              id="auto-include-new-teams"
+                                              className="text-dark"
+                                            />
+                                            <Form.Text className="text-muted ms-4 fw-normal ps-3">When new teams are created in the future, automatically grant visibility to their members</Form.Text>
+                                          </div>
+                                        </div>
+                                        
+                                      </Form>
                                     </Card>
-                                    ))}
-        
-                                    {modSlug === "projects" && (
-                                    <Card className={`team--card ${modPerms[
-                                        "selected_members"
-                                        ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                        //if (selectedMember?.role?.slug !== "owner") {
-                                        if(activeRole.slug !==
-                                                "owner"
-                                                ) {
-                                                toggleMembers(
-                                                    modSlug,
-                                                    "selected_members",
-                                                    "unassigned"
-                                                );
-                                                }
-                                        // }
-                                        }} key={`${modSlug}-${perm}-unassigned`}>
-                                        <span className="team--initial">U</span>
-                                        <Card.Body>
-                                        <h4>Unassigned</h4>
-                                        </Card.Body>
-                                        <FiCheck className="ms-auto" />
-                                    </Card>
-                                    )}
-                                </div>
-                                )}
-                            </>
-                        )
-                        })}
-                        </div>
-                        )
-                    })}
+                                  </Accordion.Body>
+                                </Accordion.Item>
+                              </Accordion>
+                              {permissionModules.map((mod) => {
+                                const modSlug = mod.slug;
+                                const modPerms = permissions?.[modSlug] || {};
+                                const isExpanded = expanded?.[modSlug] || false;
+                                const isViewChecked = !!modPerms.view;
+                                const truePermissionCount = Object.values(
+                                modPerms
+                                ).filter((val) => val === true).length;
+                                return (
+                                    <Accordion className="mb-3">
+                                      <Accordion.Item eventKey="1">
+                                        <Accordion.Header>
+                                          <div className="d-flex gap-3 align-items-center">
+                                            {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                                            <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                                          </div>
+                                        </Accordion.Header>
+                                        <Accordion.Body>
+                                          {(mod.permissions || []).map((perm) => {
+                                            if (perm === "view") {
+                                                return (
+                                                <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                                  <Form.Check key={`${modSlug}--view`} type="checkbox" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}
+                                                    id={`default-${modSlug}-view`}
+                                                    label='View'
+                                                  />
+                                                    {/* <Form.Check key={`${modSlug}--view`} type="switch" className="switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
+                                                    <p className="mb-0">View</p> */}
+                                                </div>
+                                                )
+                                            }
+                                            return (
+                                                <>
+                                                  <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                                      <Form.Check id={`${modSlug}-${perm}`} key={perm}
+                                                        disabled={!isViewChecked}
+                                                        checked={!!modPerms[perm]}
+                                                        onChange={() =>
+                                                            togglePermission(modSlug, perm)
+                                                        }
+                                                        label={perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}
+                                                      />
+                                                      {/* <Form.Check type="switch" className="switch--small" id={`${modSlug}-${perm}`} key={perm}
+                                                      disabled={!isViewChecked}
+                                                      checked={!!modPerms[perm]}
+                                                      onChange={() =>
+                                                          togglePermission(modSlug, perm)
+                                                      }
+                                                      />
+                                                      <p className="mb-0">{perm
+                                                                          .replace(/[_-]/g, " ")
+                                                                          .replace(/^\w/, (l) => l.toUpperCase())}</p> */}
+                                                  </div>
+                                                  {[
+                                                    "tracking",
+                                                    "projects",
+                                                    "reports",
+                                                    "attendance",
+                                                    ].includes(modSlug) &&
+                                                    perm === "view_others" &&
+                                                    modPerms[perm] === true && (
+                                                    <div className="team--card--grid">
+                                                        {memberFeeds.map((member) => (
+                                                        <Card className={`team--card ${modPerms[
+                                                            "selected_members"
+                                                            ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
+                                                            //if (selectedMember?.role?.slug !== "owner") {
+                                                            toggleMembers(
+                                                                modSlug,
+                                                                "selected_members",
+                                                                member._id
+                                                            )
+                                                            // }
+                                                            }}>
+                                                            <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
+                                                            <Card.Body>
+                                                            <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
+                                                            </Card.Body>
+                                                            <FiCheck className="ms-auto" />
+                                                        </Card>
+                                                        ))}
+                            
+                                                        {modSlug === "projects" && (
+                                                        <Card className={`team--card ${modPerms[
+                                                            "selected_members"
+                                                            ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
+                                                            //if (selectedMember?.role?.slug !== "owner") {
+                                                            if(activeRole.slug !==
+                                                                    "owner"
+                                                                    ) {
+                                                                    toggleMembers(
+                                                                        modSlug,
+                                                                        "selected_members",
+                                                                        "unassigned"
+                                                                    );
+                                                                    }
+                                                            // }
+                                                            }} key={`${modSlug}-${perm}-unassigned`}>
+                                                            <span className="team--initial">U</span>
+                                                            <Card.Body>
+                                                            <h4>Unassigned</h4>
+                                                            </Card.Body>
+                                                            <FiCheck className="ms-auto" />
+                                                        </Card>
+                                                        )}
+                                                    </div>
+                                                  )}
+                                                </>
+                                              )
+                                            })}
+                                        </Accordion.Body>
+                                      </Accordion.Item>
+                                    </Accordion>
+                                  )
+                                })}
 
-                  <div className="mt-4 text-end fixed--bottom">
-                    <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete</Button>
-                    <Button variant="primary" className="ms-3" onClick={handleSave}>Save</Button>
-                  </div>
-                </div>
-            </>
-            )}
+                              <div className="mt-4 text-end fixed--bottom">
+                                <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete</Button>
+                                <Button variant="primary" className="ms-3" onClick={handleSave}>Save</Button>
+                              </div>
+                            </div>
+                          </Accordion.Body>
+                        </Accordion.Item>
+                        );
+                      })}
+                  </Accordion>
+                      {/* <Row className="mt-4">
+                        <Col lg={6}>
+                          <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
+                          <FloatingLabel label="Select Role">
+                              <Form.Select className="custom-selectbox" key={`rolelist`}  onChange={(e) => {
+                                const selectedRole = roles.find((role) => role._id === e.target.value);
+                                setActiveRole(selectedRole);
+                              }}>
+                              {roles.map((role, index) => {
+                                  return (
+                                  <option key={`role-${role._id}`} value={role?._id} action active={activeRole?._id === role._id}>{role.name}</option>
+                                  );
+                              })}
+                              </Form.Select>
+                          </FloatingLabel>
+                          
+                          </FormGroup>
+                        </Col>
+                        <Col lg={6}>
+                          <FormGroup className="form-group mb-0 pb-0">
+                            <FloatingLabel label="Role name">
+                              <Form.Control
+                              type="text"
+                              className={
+                              "form-control"
+                              }
+                              placeholder="Role name"
+                              name="name"
+                              value={fields['name']}
+                              onChange={(e) => {
+                                  const { value} = e.target;
+                                  setFields({...fields, ['name']: value})
+                              }}
+                              />
+                            </FloatingLabel>
+                          </FormGroup>
+                        </Col>
+                      
+                      </Row> */}
+                      
+                  </>
+                )}
+              </Tab>
+              <Tab eventKey="teams" title="Teams">
+                <Card className="shadow-sm mb-5">
+                  <Card.Body className="p-0">
+                    <Row className="align-items-center mb-4">
+                      <Col>
+                        <h4 className="mb-1">Teams</h4>
+                        <div className="text-muted" style={{ fontSize: "14px" }}>
+                          1 team in your organization
+                        </div>
+                      </Col>
+                      <Col xs="auto">
+                        <Button variant="primary"><FaPlus className="me-2" />Create Team</Button>
+                      </Col>
+                    </Row>
+
+                    {/* Team Item */}
+                    <Card className="border rounded bg-white">
+                      <Card.Body>
+                        <Row className="align-items-center">
+                          <Col xs="auto">
+                            <div
+                              style={{
+                                width: "45px",
+                                height: "45px",
+                                backgroundColor: "#4e73df",
+                                borderRadius: "8px",
+                              }}
+                            />
+                          </Col>
+
+                          <Col>
+                            <div className="fw-semibold">Default Team</div>
+                            <div className="text-muted" style={{ fontSize: "14px" }}>
+                              Default team for all members · 4 members
+                            </div>
+                          </Col>
+
+                          <Col xs="auto">
+                            <LuPencilLine style={{ cursor: "pointer", color: "#6c757d" }}/>
+                          </Col>
+                        </Row>
+                      </Card.Body>
+                    </Card>
+                  </Card.Body>
+                </Card>
+              </Tab>
+            </Tabs>
+            {/* <h3 className="d-flex align-items-center justify-content-end">
+                <Button variant="primary" onClick={() => handleShow()}><FaPlus /> Add New</Button>
+            </h3> */}
+            
+            
         </div>
         {showdelete && (
           <AlertDialog showdialog={showdelete} toggledialog={setShowDelete} msg="Are you sure?" callback={handleDeleteRole}/>
@@ -780,23 +929,36 @@ function RolesPage() {
                                 {(mod.permissions || []).map((perm) => {
                                 if (perm === "view") {
                                     return (
-                                    <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                        <p className="mb-0">View</p>
-                                        <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
+                                    <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                      <Form.Check key={`${modSlug}--view`} type="checkbox" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}
+                                        id={`default-${modSlug}-view`}
+                                        label='View'
+                                      />
+                                        {/* <Form.Check key={`${modSlug}--view`} type="switch" className="switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
+                                        <p className="mb-0">View</p> */}
                                     </div>
                                     )
                                 }
                                 return (
                                     <>
-                                    <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                        <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
-                                        <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
+                                    <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                      <Form.Check id={`${modSlug}-${perm}`} key={perm}
+                                        disabled={!isViewChecked}
+                                        checked={!!modPerms[perm]}
+                                        onChange={() =>
+                                            togglePermission(modSlug, perm)
+                                        }
+                                        label={perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}
+                                      />
+                                        {/* <Form.Check type="switch" className="switch--small" id={`${modSlug}-${perm}`} key={perm}
                                         disabled={!isViewChecked}
                                         checked={!!modPerms[perm]}
                                         onChange={() =>
                                             togglePermission(modSlug, perm)
                                         }
                                         />
+
+                                        <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p> */}
                                     </div>
                                     {[
                                         "tracking",

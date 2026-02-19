@@ -2656,6 +2656,15 @@ table tr.marked-project td {
   border-color: #ececec transparent transparent transparent;
 }
 
+.page--wrapper table td.project--title--td .team-badge {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 3px;
+    line-height: 1.4;
+}
+
 .modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"]:before {
   border-color: #ffffff transparent transparent;
   top: auto;
@@ -3868,6 +3877,11 @@ Project Task View CSS=-=-=
   box-shadow: none;
 }
 
+.accordion .accordion-collapse.show {
+    border-top: 1px solid rgb(229 231 235);
+    padding-top: 20px;
+}
+
 .accordion-button::after {
   display: inline-block;
   position: absolute;
@@ -4028,6 +4042,32 @@ Project Task View CSS=-=-=
   margin-top: 1.25rem;
 }
 
+.permission__page .nav-tabs button {
+    align-items: center;
+    background: none;
+    border: 1px solid rgb(17 24 39);
+    color: rgb(17 24 39);
+    cursor: pointer;
+    display: flex;
+    font-size: 16px;
+    height: auto;
+    justify-content: center;
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    margin-right: 8px;
+    min-height: auto;
+    min-width: auto;
+    padding: 10px 20px;
+    width: auto;
+}
+
+.permission__page .nav-tabs button.active, .permission__page .nav-tabs button:hover {
+    background: linear-gradient(to right, rgba(var(--theme-secondary), 1), rgba(var(--theme-primary), 1));
+    color: #ffffff;
+    box-shadow: none;
+    border: 1px solid rgba(var(--theme-primary), 1);
+}
+
 .modal .new--accordion--block .team--card--grid {
   grid-template-columns: repeat(2, 1fr);
   margin-top: 1rem;
@@ -4133,7 +4173,8 @@ Project Task View CSS=-=-=
 }
 
 .new--accordion--block .bg--blue--accordion .accordion-button svg,
-.modal .new--accordion--block .bg--blue--accordion svg {
+.modal .new--accordion--block .bg--blue--accordion svg,
+.permission__page .new--accordion--block .accordion-button svg {
   background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
@@ -4194,6 +4235,27 @@ Project Task View CSS=-=-=
 .new--accordion--block .bg--blue--accordion {
   background-image: linear-gradient(to right, #ededed70, #ededed);
   border: 1px solid rgba(var(--theme-secondary), .05);
+}
+
+.permission__page .new--accordion--block .accordion-button h6 {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1rem;
+}
+
+.permission__page .new--accordion--block .accordion-button h6 small {
+    font-size: .75rem;
+    font-weight: normal;
+    line-height: 1rem;
+}
+
+.permission__page .new--accordion--block .switch--small {
+    padding-left: 0;
+}
+
+.permission__page .accordion-body .radio--card {
+    background: none;
+    display: block;
 }
 
 .form-check-input:checked {

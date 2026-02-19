@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { Container, Row, Col, Button, Modal, Alert, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
-import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
+import { FaList, FaPlus, FaCog, FaEllipsisV, FaCheck } from "react-icons/fa";
 import { FiEdit, FiMail, FiSidebar, FiTrash2, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { RiUserSettingsLine } from "react-icons/ri";
@@ -40,9 +40,17 @@ function TeamMembersPage() {
   const currentMember = getMemberdata();
   //const addToast = useToast();
   const [isActive, setIsActive] = useState(0);
+  const [activeItems, setActiveItems] = useState([]);
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
+  const handleClickTeams = (index) => {
+  setActiveItems(prev =>
+    prev.includes(index)
+      ? prev.filter(item => item !== index) // remove if already selected
+      : [...prev, index] // add if not selected
+  );
+};
   const subscriptionState = useSelector((state) => state.subscription);
   const [invitationsTotal, setInvitationsTotal] = useState(0)
   const [activeSubscription, setActiveSubscription] = useState(null)
@@ -89,6 +97,7 @@ function TeamMembersPage() {
   const [visiblePasswords, setVisiblePasswords] = useState({});
   const [showCustomFields, setShowCustomFields] = useState(false);
   const [customFields, setCustomFields] = useState([]);
+  const [search, setSearch] = useState('');
   const workspaceState = useSelector((state) => state.workspace);
   const [show, setShow] = useState(false);
   const handleClose = () => {
@@ -97,6 +106,9 @@ function TeamMembersPage() {
       setErrors([]);
       setShow(false);
     });
+  };
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
   };
   const [tab, setTab] = useState("details");
   const handleShow = () => setShow(true);
@@ -139,6 +151,10 @@ function TeamMembersPage() {
   const [showSearch, setSearchShow] = useState(false);
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
+
+  const [showTeams, setTeamsShow] = useState(false);
+  const handleTeamsClose = () => setTeamsShow(false);
+  const handleTeamsShow = () => setTeamsShow(true);
 
   const handledeleteMember = async () => {
     await dispatch(deleteMember(selectedMember._id));
@@ -1201,6 +1217,7 @@ useEffect(() => {
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
+                          <Dropdown.Item onClick={() => handleTeamsShow()} className="d-flex align-items-center gap-1"><AiOutlineTeam className="me-1" /> Change</Dropdown.Item>
                           <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> 
                           {
                             memberProfile?._id === selectedMember?._id ? 
@@ -1977,6 +1994,40 @@ useEffect(() => {
       ) : (
         <></>
       )}
+      {/*--=-=Teams Modal**/}
+      <Modal show={showTeams} onHide={handleTeamsClose} size="md" centered className="status--modal assign--task--modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Change Teams</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group>
+              <FloatingLabel label="Search here">
+                <Form.Control type="text" placeholder="Search here" value={search} onChange={handleSearchChange} />
+              </FloatingLabel>
+            </Form.Group>
+          </Form>
+          <ListGroup className="status--list">
+            {[
+              "#3b82f6",
+              "#8b5cf6",
+              "#ec4899",
+              "#f59e0b",
+              "#10b981",
+              "#6366f1",
+              "#14b8a6"
+            ].map((color, index) => (
+              <ListGroup.Item key={index} onClick={() => handleClickTeams(index)} className={activeItems.includes(index) ? "status--active" : ""}> 
+                <span className="team--color" style={{ background: color }}></span> 
+                <p>Default Team {activeItems.includes(index) && <FaCheck />} </p>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+
+
+
+        </Modal.Body>
+      </Modal>
       {/*--=-=Search Modal**/}
       <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
         <Modal.Header closeButton>
