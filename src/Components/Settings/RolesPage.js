@@ -838,8 +838,8 @@ function RolesPage() {
                     </Row>
 
                     {/* Team Item */}
-                    <Card className="border rounded bg-white">
-                      <Card.Body>
+                    <Card className="border rounded bg-light">
+                      <Card.Body className="p-0">
                         <Row className="align-items-center">
                           <Col xs="auto">
                             <div
