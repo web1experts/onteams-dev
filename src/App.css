@@ -1759,16 +1759,17 @@ span.open--sidebar {
 
 .preview--grid .preview--cell p {
   margin: 0;
-  display: block;
-  max-width: 150px;
-  text-overflow: ellipsis;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  white-space: nowrap;
+  max-width: 100%;
 }
 
-.upload--status .preview--grid .preview--cell p {
+/* .upload--status .preview--grid .preview--cell p {
   max-width: 400px;
-}
+} */
 
 .preview--cell embed,
 .preview--cell video {
@@ -2616,15 +2617,15 @@ table tr.marked-project td {
 .wrapper--title .dropdown-menu::before,
 .rounded--box .contact--card.card .card-title .dropdown-menu::before {
   border: 10px solid;
-  border-color: transparent transparent #ececec;
+  border-color: transparent transparent #ececec transparent;
   content: "";
   height: 0;
-  left: 15px;
   margin: auto;
   position: absolute;
+  width: 0;
   top: -20px;
   transform: translateX(-5px);
-  width: 0;
+  left: 15px;
 }
 
 .modal .select--dropdown .dropdown-menu[data-popper-placement="bottom-start"]:before,
@@ -2637,6 +2638,22 @@ table tr.marked-project td {
 
 .wrapper--title .dropdown-menu[data-popper-placement="bottom-start"]:before {
   right: 0;
+}
+
+.page--wrapper table td .select--dropdown .dropdown-menu[data-popper-placement="top-start"]::before,
+.team--page .page--title .select--dropdown .dropdown-menu[data-popper-placement="top-start"]::before,
+.wrapper--title .select--dropdown .dropdown-menu[data-popper-placement="top-start"]::before,
+.modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"]::before,
+.common--form .select--dropdown .dropdown-menu[data-popper-placement="top-start"]::before,
+.wrapper--title .dropdown-menu[data-popper-placement="top-start"]::before,
+.rounded--box .contact--card.card .card-title .dropdown-menu[data-popper-placement="top-start"]::before,
+.rounded--box .select--dropdown .dropdown-menu[data-popper-placement="top-start"]:before {
+  bottom: -20px;
+  top: auto;
+  transform: translateX(-5px);
+  left: auto;
+  right: 5px;
+  border-color: #ececec transparent transparent transparent;
 }
 
 .modal .select--dropdown .dropdown-menu[data-popper-placement="top-start"]:before {
@@ -7816,7 +7833,7 @@ ul#icon-tabs .nav-link span svg {
 
 .flipchar {
   display: inline-block;
-  max-width: 100px;
+  /* max-width: 100px; */
   animation: mirrorflip 5s 0s linear infinite;
   -webkit-animation: mirrorflip 5s 0s linear infinite;
 }
@@ -7853,12 +7870,24 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .subscription--page .plan-card {
-  border: 2px solid rgb(226 232 240);
-  border-radius: .85rem;
-  transition: all 0.3s ease;
-  position: relative;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
-  -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    border: 2px solid rgb(226 232 240);
+    border-radius: .85rem;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+    padding: 0;
+    color: initial;
+    overflow: visible;
+}
+
+.subscription--page .plan-card .card-body {
+    padding: 0;
+    display: flex;
+    align-items: normal;
+    justify-content: flex-start;
+    grid-gap: 1rem;
+    gap: 0rem;
 }
 
 .subscription--page .plan-card .card-title {
@@ -8375,9 +8404,9 @@ Media CSS-=-==
 }
 
 @media (max-width:1499px) {
-  .preview--grid .preview--cell p {
+  /* .preview--grid .preview--cell p {
     max-width: 110px;
-  }
+  } */
 
   .details--projects--view .project--form--actions {
     max-width: 25%;
@@ -9907,9 +9936,9 @@ Media CSS-=-==
     flex-shrink: 0;
   }
 
-  .upload--status .preview--grid .preview--cell p {
+  /* .upload--status .preview--grid .preview--cell p {
     max-width: 280px;
-  }
+  } */
 
   .current--player .timer--task {
     flex-flow: row wrap;

@@ -1524,6 +1524,14 @@ ul#subtasks-ul .form-group .quill--editor svg {
   opacity: 1 !important;
 }
 
+.mail--message {
+    margin: 0 auto;
+    flex: 1 1;
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+}
+
 @media (max-width:1199px) {
   .project--form {
     height: auto;

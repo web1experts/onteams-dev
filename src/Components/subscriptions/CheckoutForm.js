@@ -38,7 +38,7 @@ export default function CheckoutForm({mode}) {
   return (
     <form onSubmit={handleSubmit}>
       <PaymentElement />
-      <button class="btn btn-primary">Subscribe</button>
+      <button class="btn btn-primary mt-4">Continue</button>
     </form>
   );
 }

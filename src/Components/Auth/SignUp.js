@@ -151,17 +151,16 @@ function SignUpPage() {
                                 :
                                 
                                 <>
-                                { msgalert && msgalert !== "" &&
-                                    <h6>
-                                        { msgalert }
-                                    </h6>
-                                }
+                                
                                     <div className="mail--message">
+                                        { msgalert && msgalert !== "" &&
+                                            <h6>
+                                                { msgalert }
+                                            </h6>
+                                        }
                                         { !resendMail &&  <h6>We have sent an email to {fields['email']} to set up your account.</h6>}
                                         <p className='paragraph text-center '>Didn't see an email?</p>
-                                        <div className="">
-                                            <Button variant="primary" className="mb-3" onClick={() => resendLoader ? null : handleRequestAgain()}><span style={{ cursor: 'pointer' }}>{resendLoader ? 'Please wait...' : 'Resend'}</span></Button>
-                                        </div>
+                                        <Button variant="primary" className="mb-3" onClick={() => resendLoader ? null : handleRequestAgain()}><span style={{ cursor: 'pointer' }}>{resendLoader ? 'Please wait...' : 'Resend'}</span></Button>
                                         <p><span>OR</span></p>
                                         <p>Already have an account. <Link to="/login">Login Here</Link></p>
                                     </div>
