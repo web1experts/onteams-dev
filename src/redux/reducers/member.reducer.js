@@ -169,6 +169,7 @@ export default (state = initialState, action) => {
             invitations: action.payload.inviteData,
             createMember: initialState.createMember,
             invite: false,
+            Invitelistfor: action.payload?.listfor
         }
     case PUT_MEMBER_SUCCESS:
         return {

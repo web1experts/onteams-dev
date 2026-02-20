@@ -106,6 +106,11 @@ export const CustomFieldModal = (props) => {
                         className="text-xs bg-white text-secondary px-2 py-1 rounded border"
                         style={{ fontSize: "0.75rem" }} // Bootstrap doesn't have `text-xs` natively
                       >
+                       {
+                        (opt?.color && opt.color != null) && 
+                        <FaCircle className="me-2" style={{ color: opt.color }}></FaCircle>
+                       }
+                       
                         {opt.label}
                       </span>
                     ))}
@@ -211,10 +216,11 @@ export const CustomFieldModal = (props) => {
     return fieldName
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
-      .replace(/\s+/g, "-") // Replace spaces with dashes
-      .replace(/-+/g, "-"); // Replace multiple dashes with one
+      .replace(/[^a-z0-9\s_]/g, "") // Remove special characters except underscore
+      .replace(/\s+/g, "_") // Replace spaces with underscore
+      .replace(/_+/g, "_"); // Replace multiple underscores with one
   }
+
 
   const handleUpdateField = async () => {
     const newErrors = {};
@@ -431,7 +437,10 @@ export const CustomFieldModal = (props) => {
           {
               props.module === 'projects' && (
             <ListGroup horizontal className="field__tabs">
-              <ListGroup.Item className={`btn--view ${activeTab === 'custom' ? 'active' : ''}`} onClick={() => setActiveTab('custom')}>Custom Fields</ListGroup.Item>
+              <ListGroup.Item className={`btn--view ${activeTab === 'custom' ? 'active' : ''}`} onClick={() => {
+                setSelectedField({});
+                setIsEditing(false);
+                setActiveTab('custom')}}>Custom Fields</ListGroup.Item>
               
                   <ListGroup.Item className={`btn--view ${activeTab === 'system' ? 'active' : ''}`} onClick={() => setActiveTab('system')}>System Fields</ListGroup.Item>
               
@@ -439,11 +448,12 @@ export const CustomFieldModal = (props) => {
           </ListGroup>
           )
             }
-
+        { activeTab === 'custom' ? 
+        <>
           {(showOptions || isEditing) && (
             <div className="field--options">
               <div className="add--new--field">
-                <h5>Add New Custom Field</h5>
+                <h5>{isEditing? 'Edit' : 'Add New'} Custom Field</h5>
                 <Form ref={formRef}>
                   <Row>
                     <Col sm={12} md={6}>
@@ -632,8 +642,8 @@ export const CustomFieldModal = (props) => {
             </div>
           )}
           
-          {/* {showAddedFields && ( */}
-          { activeTab === 'custom' ? 
+          
+          
           <DragDropContext onDragEnd={handleDragEnd}>
             <div className="added--fields">
                 {!isEditing && (
@@ -681,6 +691,7 @@ export const CustomFieldModal = (props) => {
                 </Droppable>
               </div>
             </DragDropContext>
+            </>
             :
             <SystemFieldModal module={props.module}/>
             }

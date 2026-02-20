@@ -9,6 +9,7 @@ import {  emailValidation } from "../../utils/validations";
 import { useToast } from "../../context/ToastContext";
 import { getloggedInUser } from "../../helpers/auth";
 import Invite from "../invite";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 function MemberSignUp() {
     const inputs = document.querySelectorAll('.form-floating .form-control');
 
@@ -29,7 +30,7 @@ function MemberSignUp() {
   
     const addToast = useToast();
     
-    
+    const [showPassword, setShowPassword] = useState(false);
     const [loader, setLoader] = useState(false)
     const dispatch = useDispatch();
     let fieldErrors = {};
@@ -128,7 +129,7 @@ function MemberSignUp() {
                     </Col>
                     <Col sm={12} lg={6} className="px-0">
                         <div className="common--form">
-                            <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
+                            <span className='new--logo'><img className="logo--sm" src="../images/logo-prime-team-icon.png" alt="MyTeams" /></span>
                             <Form onSubmit={handleSubmit}> 
                                 <h2>Don't have an account? Sign Up</h2>
                                 <Form.Group className={`mb-3 form-group ${errors['email'] ? 'has-error' : ''}`}>
@@ -145,8 +146,25 @@ function MemberSignUp() {
                                 </Form.Group>
                                 <Form.Group className="mb-3 form-group">
                                     <FloatingLabel label="Password *">
-                                        <Form.Control type="password" placeholder="Password" value={fields.password}  className={errors['password'] ? "input-error" : ''} name="password" onChange={handleChange} />
+                                        <Form.Control 
+                                        type={showPassword ? "text" : "password"} 
+                                        placeholder="Password" value={fields.password}  className={errors['password'] ? "input-error" : ''} name="password" onChange={handleChange} />
                                     </FloatingLabel>
+                                    {/* Show/Hide Password Toggle */}
+                                    <span
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        cursor: "pointer",
+                                        fontSize: "18px",
+                                        color: "#6c757d",
+                                        }}
+                                    >
+                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </span>
                                     {showError('password')}
                                 </Form.Group>
                                 <Button variant="primary" type="submit" disabled={loader}>{loader ? 'Please Wait...' : 'Create Account'}</Button>

@@ -22,6 +22,7 @@ export default function ToastAlerts() {
     const reportState = useSelector((state) => state.reports)
     const activityState = useSelector((state) => state.activity)
     const attendance = useSelector((state) => state.attendance)
+    const subscription = useSelector((state) => state.subscription)
     const [loggedIn, setLoggedIn] = useState(false);
 
     const refreshDashboards = () => ({
@@ -41,6 +42,11 @@ export default function ToastAlerts() {
       }
       if(attendance.message ){ 
           addToast(attendance.message, attendance.message_variant);
+          handleClearMessages()
+      }
+
+      if(subscription.message ){ 
+          addToast(subscription.message, subscription.message_variant);
           handleClearMessages()
       }
 
@@ -105,6 +111,7 @@ export default function ToastAlerts() {
           addToast(apiResultTask.message, apiResultTask.message_variant);
           handleClearMessages()
         }
+        
         if(apiResultHoliday.message){
           addToast(apiResultHoliday.message, apiResultHoliday.message_variant);
           handleClearMessages()
@@ -114,7 +121,7 @@ export default function ToastAlerts() {
           handleClearMessages()
         }
     
-      },[apiResultMember,workflow, reportState,attendance, activityState, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask,apiResultHoliday,apiPermission,postResult, dispatch]);
+      },[apiResultMember,workflow, reportState,attendance,subscription, activityState, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask,apiResultHoliday,apiPermission,postResult, dispatch]);
 
       const clearMessages = () => ({
         type: CLEAR_MESSAGES,

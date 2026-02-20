@@ -4,10 +4,7 @@ import API from '../../helpers/api';
 import { 
    WORKFLOW_CREATE_SUCCESS,
    WORKFLOW_ERROR,
-   WORKFLOW_GET_SUCCESS,
-   WORKFLOW_SUCCESS,
-   WORKFLOW_UPDATE_SUCESS,
-   WORKFLOW_DELETE_SUCCESS
+   WORKFLOW_GET_SUCCESS
 } from "./types";
 
 const config = {

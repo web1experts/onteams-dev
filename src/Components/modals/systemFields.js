@@ -57,7 +57,8 @@ export const SystemFieldModal = (props) => {
               <div className="drag--indicator"><MdDragIndicator /></div>
             </Col>
             <Col>
-              <h5 className="mb-0 fw-bold">{label}</h5>
+              <h5 className="mb-0 fw-bold">
+                {label}</h5>
             </Col>
             
             <Col xs="auto" className="pe-0">
@@ -93,7 +94,8 @@ export const SystemFieldModal = (props) => {
                         className="text-xs bg-white text-secondary px-2 py-1 rounded border"
                         style={{ fontSize: "0.75rem" }} // Bootstrap doesn't have `text-xs` natively
                       >
-                        {opt.label}
+                        <FaCircle className="me-2" style={{ color: opt?.color }}>
+                </FaCircle> {opt.label}
                       </span>
                     ))}
                   </div>
@@ -274,6 +276,24 @@ export const SystemFieldModal = (props) => {
     });
   };
 
+  const handleOptionEdit = (index, fieldName, value) => {
+    setFields((prevFields) => {
+      const updatedOptions = [...(prevFields.options || [])];
+
+      if (updatedOptions[index]) {
+        updatedOptions[index] = {
+          ...updatedOptions[index],
+          [fieldName]: value, // update label or color
+        };
+      }
+
+      return {
+        ...prevFields,
+        options: updatedOptions,
+      };
+    });
+  };
+
 
   
 
@@ -417,9 +437,10 @@ export const SystemFieldModal = (props) => {
                         )}
                       </Form.Group>
 
-                      <div className="mb-3 d-flex flex-wrap gap-2">
+                      
                         {fields?.options.map((opt, idx) => (
-                          <div
+                          <div className="mb-3 d-flex flex-wrap gap-2">
+                            {/* <div
                             key={idx}
                             className="text-xs bg-white text-secondary px-2 py-1 rounded border d-flex align-items-center"
                             style={{
@@ -444,9 +465,27 @@ export const SystemFieldModal = (props) => {
                                 <span style={{ cursor: "pointer" }} onClick={() => removeOption(idx)}>×</span>
                             )}
 
+                          </div> */}
+                            <div className="d-flex color--selection">
+                              <Form.Control
+                                type="text"
+                                value={opt.label}
+                                onChange={(e) => handleOptionEdit(idx,'label', e.target.value)}
+                              />
+                              <p className="selected-badge-color">
+                                <Form.Control
+                                  type="color"
+                                  value={opt.color}
+                                  onChange={(e) => handleOptionEdit(idx,'color', e.target.value)}
+                                />
+                                <span>{opt.color}</span>
+                              </p>
+                              {( fields?.options?.length > 2) && (
+                                  <span style={{ cursor: "pointer" }} onClick={() => removeOption(idx)}>×</span>
+                              )}
+                            </div>
                           </div>
                         ))}
-                      </div>
                     </>
                   )}
 
@@ -478,7 +517,7 @@ export const SystemFieldModal = (props) => {
 
           
             <div className="added--fields">
-              <h5>Systen Fields</h5>
+              <h5>System Fields</h5>
                   <div>
                     {systemFields?.length === 0 ? (
                       <p className="text-muted">No system fields.</p>

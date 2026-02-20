@@ -59,35 +59,35 @@ function Invite() {
                 </div>
               </Col>
               <Col sm={12} lg={6} className="px-0">
-                <div className="common--form">
+                <div className="common--form flex-column">
                   <img
                     className="logo--sm"
-                    src="../images/primeTeam-Logo.png"
+                    src="../images/logo-prime-team-icon.png"
                     alt="MyTeams"
                   />
-                  <h6>
-                    {paramsObject["company_name"]} has invited you to join.{" "}
-                  </h6>
+                  
+                  <div className="mail--message">
+                    <h6>
+                      {paramsObject["company_name"]} has invited you to join.{" "}
+                    </h6>
 
-                  {loggedInUser && Object.keys(loggedInUser).length > 0 && (
-                    <p className="paragraph text-center ">
-                      Logged in as {loggedInUser?.name}
-                    </p>
-                  )}
-
-                  <div className="">
+                    {loggedInUser && Object.keys(loggedInUser).length > 0 && (
+                      <p className="paragraph text-center ">
+                        Logged in as {loggedInUser?.name}
+                      </p>
+                    )}
                     <Button variant="primary" onClick={handleclick}>
                       <span style={{ cursor: "pointer" }}>
                         {loading ? "Please Wait..." : "Accept Invite"}
                       </span>
                     </Button>
+                    <p>
+                      <span>OR</span>
+                    </p>
+                    <p>
+                      <Link to="/dashboard">Go to dashboard</Link>
+                    </p>
                   </div>
-                  <p>
-                    <span>OR</span>
-                  </p>
-                  <p>
-                    <Link to="/dashboard">Go to dashboard</Link>
-                  </p>
                 </div>
               </Col>
             </Row>

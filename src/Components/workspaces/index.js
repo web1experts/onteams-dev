@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup,Alert} from "react-bootstrap";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
 import { FiSidebar, FiUsers, FiTarget } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
@@ -11,20 +11,33 @@ import { useDispatch, useSelector } from "react-redux";
 import { getloggedInUser } from "../../helpers/auth";
 import { AlertDialog, TransferOnwerShip } from "../modals";
 import { getMemberdata } from "../../helpers/commonfunctions";
-import { deleteWorkspace } from "../../redux/actions/workspace.action";
+import { deleteWorkspace, leaveCompany } from "../../redux/actions/workspace.action";
 import Spinner from 'react-bootstrap/Spinner';
 import { BsTrash2, BsEye } from "react-icons/bs";
+import { getActiveSubscription } from "../../redux/actions/subscription.action";
+import { useNavigate } from "react-router-dom";
 function Workspace(props) {
   const [spinner, setSpinner] = useState( true)
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
   const handleSidebar = () => dispatch(toggleSidebar(commonState.sidebar_open ? false : true));
   const commonState = useSelector(state => state.common)
+  const subscriptionState = useSelector((state) => state.subscription);
+  const [activeSubscription, setActiveSubscription] = useState(null)
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const currentMember = getMemberdata();
+  const currentUser = getloggedInUser();
+  
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
+  const [showLeaveWarning, setShowLeaveWarning] = useState(false);
+  const handleCloseWarning = () => {
+     setShowLeaveWarning(false);
+     setSpinner(false)
+  }
   const handleShow = () => setShow(true);
   const [ editworkspace, setEditWorkspace] = useState('')
+  const [selectedWorkspace, setSelectedWorkspace] = useState(false)
   const workspacefeed = useSelector(state => state.auth.userCompanies);
   const [workspaces, setWorkspaces] = useState([])
   const apiResult = useSelector((state) => state.member);
@@ -41,6 +54,9 @@ function Workspace(props) {
   useEffect(() => {
     setSpinner( true )
     handleworkspacelist()
+    
+    dispatch(getActiveSubscription())
+    
   },[])
 
   useEffect(() => {
@@ -48,6 +64,13 @@ function Workspace(props) {
       setWorkspaces( workspacefeed )
     }
   },[workspacefeed])
+
+  useEffect(() => {
+    
+    if(subscriptionState.activeSubscription){
+      setActiveSubscription(subscriptionState.activeSubscription) 
+    }
+  }, [subscriptionState.activeSubscription])
 
   useEffect(() => {
     if( workspace.message && workspace.message_variant && workspace.message_variant === "success"){
@@ -61,17 +84,25 @@ function Workspace(props) {
     setEditWorkspace( company )
     setShowDialog(true)
   }
+  const leaveWorkspace = (workspace) => {
+    setSelectedWorkspace( workspace )
+    setShowLeaveWarning(true)
+  }
   const handledeleteWorkspace = async (id) => {
-    
     await dispatch(
       deleteWorkspace(id)
     );
   };
 
-
-  const handleownership = async () => {
-    console.log("transfer ownership");
-  };
+  const handleLeave = async () => {
+    setSpinner(true)
+    await dispatch(
+      leaveCompany({
+        companyId: selectedWorkspace?.company._id,
+        memberId: selectedWorkspace.memberData._id,
+      })
+    );
+  }
 
   const handleEdit = (workspace) => {
     setEditWorkspace( workspace )
@@ -91,7 +122,16 @@ function Workspace(props) {
                   <ListGroup horizontal className="ms-auto">
                     <ListGroup horizontal className="bg-white expand--icon ms-3">
                         <ListGroup.Item className="d-none d-lg-flex" onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
-                        <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                        <ListGroup.Item className="btn btn-primary" onClick={() => {
+                          // if (
+                          //   activeSubscription?.planId === 'free' &&
+                          //   (workspaces?.length === 1)
+                          // ) {
+                          //   navigate('/subscription-plans', { replace: true });
+                          // } else {
+                            handleShow();
+                          // }
+                          }}><FaPlus /></ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>
@@ -102,7 +142,7 @@ function Workspace(props) {
         <div className='page--wrapper px-md-2 pb-4 pt-4'>
         {
           spinner ?
-          <div class="loading-bar">
+          <div className="loading-bar">
               <img src="images/OnTeam-icon-gray.png" className="flipchar" />
           </div>
           :
@@ -140,8 +180,15 @@ function Workspace(props) {
                             </td>
                             <td>
                               <div className="d-flex gap-3 align-items-center justify-content-md-end">
-                                <Button variant="dark" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
-                                <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
+                                {(currentUser &&
+                                    currentUser._id === workspace?.company?.owner) ?
+                                    <>
+                                    <Button variant="dark" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handleEdit(workspace.company)}><BsEye /> Edit</Button>
+                                    <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => handledelete( workspace.company)}><FaTrashAlt /> Delete</Button>
+                                    </>
+                                    :
+                                    <Button variant="danger" className="px-2 py-1 d-flex gap-2 align-items-center"  onClick={() => leaveWorkspace( workspace)}><FaTrashAlt /> Leave</Button>
+                                }
                               </div>
                             </td>
                           </tr>
@@ -165,13 +212,24 @@ function Workspace(props) {
         <Modal.Header closeButton>
           <Modal.Title>Create a Workspace</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <WorkspaceForm editworkspace={editworkspace} />
+        <Modal.Body className="overflow-visible">
+          {
+            (
+              activeSubscription?.planId === 'free' &&
+              (workspaces?.length >= 1 ) 
+            ) ?
+              <Alert key={'danger'} variant={'danger'}>
+                Your current Free plan allows only 1 workspace. To add additional workspaces, please upgrade to a paid plan.
+              </Alert>
+            :
+            <WorkspaceForm editworkspace={editworkspace} />
+          }
+          
         </Modal.Body>
       </Modal>
 
-      {(currentMember &&
-        currentMember.role?.slug === "owner" &&
+      {(currentUser &&
+          currentUser._id === editworkspace?.owner &&
         
         <>
           <AlertDialog
@@ -181,11 +239,32 @@ function Workspace(props) {
             callback={() => handledeleteWorkspace( editworkspace._id)}
           />
         </>
-      
       )}
-      </div>
-      
 
+      {
+        showLeaveWarning && 
+        <Modal
+          show={showLeaveWarning}
+          onHide={handleCloseWarning}
+          centered
+          size="md"
+          className="add--member--modal"
+      >
+          <Modal.Header closeButton>
+            <Modal.Title>Are you sure you want to leave?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>This action cannot be undone.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-primary" onClick={handleCloseWarning}>Disagree</Button>
+            <Button variant="primary" disabled={spinner} onClick={() => handleLeave()}>
+              { spinner ? 'Please wait...' : 'Agree' }
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      }
+      </div>
   );
 }
 

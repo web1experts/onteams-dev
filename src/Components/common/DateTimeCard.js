@@ -54,7 +54,7 @@ const DateTimeCard = () => {
       </div>
       <div className="card--icon">
         <div className="star--icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-sunset w-6 h-6 text-white">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sunset w-6 h-6 text-white">
             <path d="M12 10V2"></path>
             <path d="m4.93 10.93 1.41 1.41"></path>
             <path d="M2 18h2"></path>
@@ -70,7 +70,7 @@ const DateTimeCard = () => {
             {getGreeting()}, <span>{memberData?.name}!</span>
           </strong>{" "}
           <small>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-sparkles w-4 h-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sparkles w-4 h-4">
               <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
               <path d="M5 3v4"></path>
               <path d="M19 17v4"></path>

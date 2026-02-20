@@ -18,6 +18,7 @@ import { MdArrowDownward } from "react-icons/md";
 import { GrDrag } from "react-icons/gr";
 import { dataObject } from '../../helpers/objectdata';
 import { useDropzone } from 'react-dropzone'
+import { useToast } from '../../context/ToastContext';
 export function AlertDialog(props) {
   const [open, setOpen] = useState(false);
   const [ loader, setLoader ] = useState(false);
@@ -63,6 +64,7 @@ export function AlertDialog(props) {
 }
 
 export function TransferOnwerShip(props) { 
+  // const addToast = useToast();
   useFilledClass('.form-floating .form-control');
   const [open, setOpen] = React.useState(false );
   const [selectedmember, setSelectedmember] = useState(false )
@@ -90,12 +92,15 @@ export function TransferOnwerShip(props) {
 
   useEffect(() => {
     if( workspace.success ){ 
+      setLoader(false)
       handleClose()
     }
   },[workspace])
 
   const saveOwnership = () => {
+    setLoader(true)
     dispatch( updateOwnership({ memberId: selectedmember, companyId: currentMember?.company?._id, removeMemberId: currentMember._id}))
+    setLoader(false)
   }
 
   return (
@@ -125,16 +130,24 @@ export function TransferOnwerShip(props) {
                         <label id="demo-simple-select-required-label">Select a member</label>
                         <Form.Select className="form-control custom-selectbox" id="members"
                           value={selectedmember} onChange={handleMemberChange} name="member">
-                        
-                          {
-                            props.members.map(member => (
-                              <option value={member._id}>{member.name}</option>
-                            ))
+                            <option key='defaultkey' value={false}>
+                                  Select a member
+                                </option>
+                         {
+                            props.members.map((member) =>
+                              member._id !==currentMember._id ? (   // 👈 your condition here
+                                <option key={member._id} value={member._id}>
+                                  {member.name}
+                                </option>
+                              ) : null
+                            )
                           }
+
+
                         </Form.Select>
                         </div>
                         <div>
-                        <Button className='primary btn' onClick={saveOwnership} disabled={loader} >{ loader ? 'Please wait..' : 'Transfer'}</Button>
+                        <Button className='primary btn' onClick={saveOwnership} disabled={loader || selectedmember === false} >{ loader ? 'Please wait..' : 'Transfer'}</Button>
                         </div>
                         </>
                         :
@@ -177,8 +190,6 @@ export function StatusModal(props){
        return stateObject
        
       case 'edit_project':
-        
-        
         const editstateObject = {}
         editstateObject['status'] = commonState.editProjectForm.status
         editstateObject['title'] = commonState.editProjectForm.title
@@ -189,8 +200,6 @@ export function StatusModal(props){
   }
 
   const [statusModalState, setStatusModalState] = useState({})
-
-
 
   const filteredStatuses = statuses.filter(status => 
     status.label.toLowerCase().includes(search.toLowerCase())
@@ -206,8 +215,6 @@ export function StatusModal(props){
       setStatusModalState(updatedState);
     }
   },[ commonState.projectForm, commonState.editProjectForm])
-
-  
 
   return (
     <>
@@ -280,7 +287,7 @@ export function MemberModal( props){
          
           if (curerntmembers.includes(member._id)) {
             // Add the member to the result object with `id` as key and `name` as value
-            acc[member._id] = member.name;
+            acc[member._id] = {name: member?.name, avatar: member?.avatar, id: member?._id};
           }
           return acc;
         }, {});
@@ -293,7 +300,7 @@ export function MemberModal( props){
           
             if (editcurerntmembers.includes(member._id)) {
               // Add the member to the result object with `id` as key and `name` as value
-              acc[member._id] = member.name;
+              acc[member._id] = {name: member?.name, avatar: member?.avatar, id: member?._id};
             }
             return acc;
           }, {});
@@ -306,7 +313,7 @@ export function MemberModal( props){
          
           if (curernttaskmembers.includes(member._id)) {
             // Add the member to the result object with `id` as key and `name` as value
-            acc[member._id] = member.name;
+            acc[member._id] = {name: member?.name, avatar: member?.avatar, id: member?._id};
           }
           return acc;
         }, {});
@@ -331,9 +338,9 @@ export function MemberModal( props){
 
   useEffect(() => {
     setMembersModalState(refreshstates(commonState.active_formtype))
+    
   },[ commonState?.projectForm?.members, commonState?.editProjectForm?.members])
 
-  
   let filteredMembers = commonState.allmembers
 
     if(commonState.allmembers && commonState.allmembers.length > 0){
@@ -346,11 +353,10 @@ export function MemberModal( props){
     setAssignShow(modalstate)
   }, [modalstate])
 
-
-
   useEffect(() => {
     setIsEdit(commonState.assign_members_direct)
 },[commonState.assign_members_direct])
+
 
   useFilledClass('.form-floating .form-control');
   const handleDone = () => {
@@ -389,7 +395,11 @@ export function MemberModal( props){
       ...prevMembersModalState,
       selectedMembers: {
         ...prevMembersModalState?.selectedMembers,
-        [member._id]: member.name
+        [member._id]: {
+          id: member._id,
+          name: member.name,
+          avatar: member?.avatar
+        }
       }
     }));
   };
@@ -422,11 +432,12 @@ export function MemberModal( props){
               </Form.Group>
           </Form>
           <ListGroup className="added--list">
-          {membersModalState?.selectedMembers && Object.keys(membersModalState?.selectedMembers).length > 0 &&
-            Object.entries(membersModalState.selectedMembers).map(([id, name], index) => (
-                <ListGroup.Item key={`listkey-${index}`} onClick={() => handleRemove(id)}>
-                    <span><img src="../images/default.jpg" alt="" /></span>
-                    <p>{name} <FaTimesCircle /></p>
+          {membersModalState?.selectedMembers &&
+            Object.keys(membersModalState.selectedMembers).length > 0 &&
+            Object.entries(membersModalState.selectedMembers).map(([id, memberInfo], index) => (
+                <ListGroup.Item key={`listkey-${index}`} onClick={() => handleRemove(memberInfo.id)}>
+                    <span><img src={memberInfo?.avatar || '../images/default.jpg'} alt="" /></span>
+                    <p>{memberInfo?.name} <FaTimesCircle /></p>
                 </ListGroup.Item>
             ))
           }
@@ -622,28 +633,12 @@ export const  WorkFlowModal =  (props) => {
       dispatch(saveNewWorkflow(fieldsData))
   };
 
-
-  const handleAddOption = () => {
-    if (newOption.trim()) {
-      const label = newOption.trim();
-      
-      setWorkflowFields({
-        ...workflow_fields,
-        tabs: [...(workflow_fields.tabs || []), label],
-      });
-
-      setNewOption("");
-    }
-  };
-
   const handleSelectworkflow = (workflow) => {
     setWorkflowModalState(prevWorkflowModalState => {
-     
         return {
           ...prevWorkflowModalState,
           workflow: workflow
         };
-      
     });
   }
 
@@ -695,48 +690,83 @@ export const  WorkFlowModal =  (props) => {
         
       }else{
     
-        // Get the last tab and its order based on the type (object or simple array)
-        const lastTab = workflowModalState?.workflow?.tabs.length 
-          ? workflowModalState?.workflow?.tabs[workflowModalState?.workflow?.tabs.length - 1] 
-          : null;
+        // // Get the last tab and its order based on the type (object or simple array)
+        // const lastTab = workflowModalState?.workflow?.tabs.length 
+        //   ? workflowModalState?.workflow?.tabs[workflowModalState?.workflow?.tabs.length - 1] 
+        //   : null;
       
-        const lastOrder = (typeof lastTab === 'object' && lastTab?.order !== undefined)
-          ? lastTab.order
-          : workflowModalState?.workflow?.tabs.length - 1; // Fallback to length-based index if tabs are a simple array
+        // const lastOrder = (typeof lastTab === 'object' && lastTab?.order !== undefined)
+        //   ? lastTab.order
+        //   : workflowModalState?.workflow?.tabs.length - 1; // Fallback to length-based index if tabs are a simple array
       
-        const newOrder = lastTab ? lastOrder + 1 : 0; // Set the order for the new tab
+        // const newOrder = lastTab ? lastOrder + 1 : 0; // Set the order for the new tab
       
-        // Create the new tab object
-        const newTab = (typeof lastTab === 'object' && lastTab !== null) ? {
-          title: fields['workspace_title'],
-          _id: false,
-          order: newOrder,
-        } : fields['workspace_title']; // Use simple title if tabs is a simple array
+        // // Create the new tab object
+        // const newTab = (typeof lastTab === 'object' && lastTab !== null) ? {
+        //   title: fields['workspace_title'],
+        //   _id: false,
+        //   order: newOrder,
+        // } : fields['workspace_title']; // Use simple title if tabs is a simple array
       
-        // Insert the new tab before the last tab
-        const updatedTabs = Array.isArray(workflowModalState?.workflow?.tabs)
-          ? [
-              ...workflowModalState?.workflow?.tabs.slice(0, -1), // All tabs except the last one
-              newTab, // Insert the new tab
-              lastTab // Add the last tab
-            ]
-          : [newTab]; // If tabs is empty, start with just the new tab
+        // // Insert the new tab before the last tab
+        // const updatedTabs = Array.isArray(workflowModalState?.workflow?.tabs)
+        //   ? [
+        //       ...workflowModalState?.workflow?.tabs.slice(0, -1), // All tabs except the last one
+        //       newTab, // Insert the new tab
+        //       lastTab // Add the last tab
+        //     ]
+        //   : [newTab]; // If tabs is empty, start with just the new tab
       
-        
-      
-        // Update the state with the new array
-        setWorkflowModalState(prevWorkflowModalState => ({
-          ...prevWorkflowModalState,
+        // // Update the state with the new array
+        // setWorkflowModalState(prevWorkflowModalState => ({
+        //   ...prevWorkflowModalState,
+        //   workflow: {
+        //     ...prevWorkflowModalState?.workflow,
+        //     tabs: updatedTabs.map((tab, index) => {
+        //       // If tab is an object, update its order; otherwise, return simple tab
+        //       return typeof tab === 'object'
+        //         ? { ...tab, order: index }
+        //         : tab;
+        //     }) // Ensure correct order sequence
+        //   }
+        // }));
+        // Get last tab (if any)
+        const tabs = workflowModalState?.workflow?.tabs || [];
+        const lastTab = tabs.length ? tabs[tabs.length - 1] : null;
+
+        // Figure out the next order
+        const lastOrder =
+          typeof lastTab === "object" && lastTab?.order !== undefined
+            ? lastTab.order
+            : tabs.length - 1;
+
+        const newOrder = tabs.length ? lastOrder + 1 : 0;
+
+        // Create the new tab
+        const newTab =
+          typeof lastTab === "object"
+            ? {
+                title: fields["workspace_title"],
+                _id: false,
+                order: newOrder,
+                color: fields['color']
+              }
+            : fields["workspace_title"];
+
+        // Append new tab at the end
+        const updatedTabs = [...tabs, newTab];
+
+        // Update state
+        setWorkflowModalState((prev) => ({
+          ...prev,
           workflow: {
-            ...prevWorkflowModalState?.workflow,
-            tabs: updatedTabs.map((tab, index) => {
-              // If tab is an object, update its order; otherwise, return simple tab
-              return typeof tab === 'object'
-                ? { ...tab, order: index }
-                : tab;
-            }) // Ensure correct order sequence
-          }
+            ...prev?.workflow,
+            tabs: updatedTabs.map((tab, index) =>
+              typeof tab === "object" ? { ...tab, order: index } : tab
+            ),
+          },
         }));
+
       }
     
       // Reset modal state
@@ -778,9 +808,6 @@ export const  WorkFlowModal =  (props) => {
           };
         });
 
-
-
-        
       }else{
         // Update workflow modal state
         setWorkflowModalState((prevWorkflowModalState) => {
@@ -830,7 +857,6 @@ export const  WorkFlowModal =  (props) => {
     return null
   }
 
-
   const handleDragEnd = (result) => {
     const { source, destination } = result;
   
@@ -839,7 +865,6 @@ export const  WorkFlowModal =  (props) => {
 
     if(Object.keys(selectedWorkflow).length > 0 || activeTab === 'new'){
       
-    
       // Rearrange the array based on drag result
       const reorderedTabs = Array.from(workflow_fields.tabs);
       const [removed] = reorderedTabs.splice(source.index, 1);
@@ -852,18 +877,12 @@ export const  WorkFlowModal =  (props) => {
           tab.order = index; // Update the order key based on position
         });
       }
-
       setWorkflowFields({
         ...workflow_fields,
         tabs: reorderedTabs,
       });
     }else{
 
-      // const isDropInvalid =
-      //   destination.index === 0 || destination.index === workflowModalState?.workflow.tabs.length - 1;
-
-      // if (isDropInvalid) return;
-    
       // Rearrange the array based on drag result
       const reorderedTabs = Array.from(workflowModalState?.workflow.tabs);
       const [removed] = reorderedTabs.splice(source.index, 1);
@@ -1367,6 +1386,7 @@ export const FilesModal = () => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [ showfileModal, setShowfilemodal] = useState( false )
   const [fields, setFields] = useState({ images: [] });
+  const [ errors, setErrors ] = useState({})
   const [filetoPreview, setFiletoPreview] = useState(null);
   const [showPreview, setPreviewShow] = useState(false);
 
@@ -1415,25 +1435,55 @@ export const FilesModal = () => {
     dispatch( togglePopups('files', false))
   }
 
-  const handleSelectedFiles = (acceptedFiles) => {
+  // const handleSelectedFiles = (acceptedFiles) => {
  
+  //   setFilesModalState((prevFilesModalState) => {
+  //     const allFiles = [...prevFilesModalState?.selectedFiles || [], ...acceptedFiles];
+    
+  //     // Filter out duplicate files based on a unique property (e.g., file.name)
+  //     const uniqueFiles = allFiles.filter(
+  //       (file, index, self) => 
+  //         index === self.findIndex(f => f.name === file.name) // Use `file.name` for uniqueness
+  //     );
+    
+  //     // Return the updated state, preserving the previous state structure
+  //     return {
+  //       ...prevFilesModalState,
+  //       selectedFiles: uniqueFiles
+  //     };
+  //   });
+    
+  // };
+
+  const handleSelectedFiles = (acceptedFiles) => {
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  const oversizedFiles = acceptedFiles.filter(file => file.size > maxSize);
+
+  if (oversizedFiles.length > 0) {
+    setErrors({'file_error':`Some files exceed 10MB and were not added: ${oversizedFiles.map(f => f.name).join(', ')}`})
+  }else{
+    setErrors({})
     setFilesModalState((prevFilesModalState) => {
-      const allFiles = [...prevFilesModalState?.selectedFiles || [], ...acceptedFiles];
-    
-      // Filter out duplicate files based on a unique property (e.g., file.name)
+      const validFiles = acceptedFiles.filter(file => file.size <= maxSize);
+
+      const allFiles = [
+        ...(prevFilesModalState?.selectedFiles || []),
+        ...validFiles
+      ];
+
       const uniqueFiles = allFiles.filter(
-        (file, index, self) => 
-          index === self.findIndex(f => f.name === file.name) // Use `file.name` for uniqueness
+        (file, index, self) =>
+          index === self.findIndex(f => f.name === file.name)
       );
-    
-      // Return the updated state, preserving the previous state structure
+
       return {
         ...prevFilesModalState,
         selectedFiles: uniqueFiles
       };
     });
-    
-  };
+  }
+};
+
 
   useEffect(() => {
     if (filesModalState?.selectedFiles && filesModalState.selectedFiles?.length > 0) {
@@ -1481,7 +1531,7 @@ export const FilesModal = () => {
 
   const handleattachfiles = () => {
     setImagePreviews([]); 
-    if( commonState.active_formtype === "task_edit" && filesModalState.selectedFiles.length > 0 && currentTask && Object.keys(currentTask).length > 0){
+    if( commonState.active_formtype === "task_edit" && filesModalState?.selectedFiles.length > 0 && currentTask && Object.keys(currentTask).length > 0){
       const formData = new FormData();
       for (const attach of filesModalState.selectedFiles){
         formData.append('images[]', attach);
@@ -1489,7 +1539,7 @@ export const FilesModal = () => {
       dispatch(updateTask(currentTask._id, formData))
     }else{
       if( dataObject[commonState.active_formtype]){
-        dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], { images: filesModalState.selectedFiles || []} ));
+        dispatch(updateStateData(dataObject[commonState.active_formtype]['state_key'], { images: filesModalState?.selectedFiles || []} ));
       }
     }
     
@@ -1567,13 +1617,23 @@ export const FilesModal = () => {
             <Modal.Title>Attach Files</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <Form {...getRootProps()}>
+            <Form {...getRootProps({ className: "dropzone" })}>
+              <input 
+                {...getInputProps({
+                  onChange: (e) => handleSelectedFiles(Array.from(e.target.files))
+                })} 
+              />
                 <Form.Group>
-                    <Form.Control type="file" multiple name="images[]" onChange={(e) => {handleSelectedFiles(Array.from(e.target.files))} } {...getInputProps()} id="attachments-new" />
+                    {/* <Form.Control type="file" multiple name="images[]" onChange={(e) => {handleSelectedFiles(Array.from(e.target.files))} } {...getInputProps()} id="attachments-new" /> */}
                     <Form.Label className="file--upload" htmlFor="attachments-new">
                         <span><FaUpload /></span>
                         <p>Drop your files here or <strong>browse</strong></p>
                     </Form.Label>
+                    {
+                      (Object.keys(errors).length > 0) && (
+                        <span className='error'>{ errors['file_error']}</span>
+                      )
+                    }
                 </Form.Group>
 
             </Form>

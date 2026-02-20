@@ -7,6 +7,7 @@ import AccountSetup from "../Components/Auth/AccountSetup";
 import WorkspaceSetup from "../Components/Auth/WorkspaceSetup";
 import ResetPassword from "../Components/Auth/ResetPassword";
 import TeamMembersPage from "../Components/TeamMembers/TeamMembers";
+import MemberPermissionPage from "../Components/TeamMembers/MemberPermission";
 import Workspace from "../Components/workspaces";
 import ClientsPage from "../Components/Clients/ClientsPage";
 import ProjectsPage from "../Components/Projects/ProjectsPage"
@@ -23,6 +24,9 @@ import DashboardPage from "../Components/Dashboard/DashboardPage";
 import DesktopPage from "../Components/Desktop/DesktopPage";
 import ManualTime from "../Components/TimeTracking/ManualTime";
 import PlansPage from "../Components/subscriptions/Plans";
+import SubscriptionPlans from "../Components/subscriptions/subscriptionPlans";
+import SuccessPage from "../Components/subscriptions/success";
+import CancelPage from "../Components/subscriptions/cancel";
 const commonRouter = [
     {
         type: 'page',
@@ -112,6 +116,20 @@ const privateRoutes = [
     },
     {
         type: 'page',
+        name: 'Success page',
+        key: 'SUCCESS_PAGE',
+        component: <SuccessPage />,
+        route: '/success'
+    },
+    {
+        type: 'page',
+        name: 'Cancel page',
+        key: 'CANCEL_PAGE',
+        component: <CancelPage />,
+        route: '/cancel'
+    },
+    {
+        type: 'page',
         name: 'Manual Time Approve',
         key: 'MANUAL_TIME_APPROVE',
         component: <ManualTime />,
@@ -145,6 +163,13 @@ const privateRoutes = [
         component: <TeamMembersPage/>,
         route: '/team-members',
         module: 'members'
+    },
+    {
+        type: 'page',
+        name: 'Member Permission',
+        key: 'MEMBER_PERMISSION',
+        component: <MemberPermissionPage/>,
+        route: '/member-permissions',
     },
     {
         type: 'page',
@@ -235,7 +260,28 @@ const privateRoutes = [
         key: 'PLANS',
         component: <PlansPage />,
         route: '/plans'
-    }
+    },
+    // {
+    //     type: 'page',
+    //     name: 'Manage',
+    //     key: 'MANAGE',
+    //     component: <ManagePlan />,
+    //     route: '/manage-plans'
+    // },
+    {
+        type: 'page',
+        name: 'SubscriptionPlans',
+        key: 'SUBSCRIPTION_PLANS',
+        component: <SubscriptionPlans />,
+        route: '/subscription-plans'
+    },
+    // {
+    //     type: 'page',
+    //     name: 'PlanOverview',
+    //     key: 'PLANS_OVERVIEW',
+    //     component: <PlanOverview />,
+    //     route: '/plan-details'
+    // }
 ];
 const hideSidebarRoutes = [
     '/login',
@@ -246,7 +292,8 @@ const hideSidebarRoutes = [
     '/reset-password/:token',
     '/account-setup/:token',
     '/accept-invite/:token',
-    '/member-signup/:token'
+    '/member-signup/:token',
+    
 ]
 
 export { publicRoutes, privateRoutes, hideSidebarRoutes };

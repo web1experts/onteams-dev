@@ -12,7 +12,8 @@ import {
     PROJECT_COMMON_ERROR,
     CLEAR_MESSAGES,
     PROJECT_REORDER,
-    MEMBER_PROJECTS
+    MEMBER_PROJECTS,
+    PROJECT_MARK
 
 } from "../actions/types";
     
@@ -89,6 +90,10 @@ import {
                 message: action.payload.message,
                 message_variant: 'success',
             }
+        case PROJECT_MARK: 
+            return {
+                marked_projectData: action.payload.marked_projectData
+            }
         case PUT_PROJECT_FAILED:
             return{
                 message: action.payload,
@@ -109,6 +114,7 @@ import {
                 singleProject: '',
                 message: null,
                 message_variant: null,
+                marked_projectData: null
             }
         case PROJECT_REORDER:
             return {

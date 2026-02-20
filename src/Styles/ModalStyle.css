@@ -409,6 +409,46 @@
     z-index: 888888;
 }
 
+.error--box {
+    padding: .75rem;
+    background-color: rgb(254 242 242);
+    border: 1px solid rgb(254 202 202);
+    border-radius: .5rem;
+    margin-bottom: 1rem;
+}
+
+p.form-errors {
+    align-items: center;
+    display: flex;   
+    margin-bottom: .5rem;
+    color: rgb(153 27 27);
+    font-weight: 500;
+    font-size: .875rem;
+    line-height: 1.25rem;
+}
+
+.form-errors svg {
+    color: rgb(220 38 38);
+    width: 1rem;
+    height: 1rem;
+    margin-right: .5rem;
+}
+
+span.form-error {
+    color: rgb(185 28 28);
+    font-size: .875rem;
+    line-height: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+}
+
+.form-error svg {
+    width: auto;
+    font-size: .7  5rem;
+    height: auto;
+}
+
 .reports__Data__modal .modal-content {
     height: calc(100% - 20px);
 }
@@ -441,8 +481,60 @@
     height: 100%;
 }
 
+.setting__modal .team--page {
+    max-width: 100%;
+    margin-left: 0;
+}
+
+.setting__modal .page--wrapper .nav-tabs {
+    border: 0;
+    margin-bottom: 0;
+    justify-content: center;
+}
+
 .setting__modal .setting--page .form-floating>label {
     display: none;
+}
+
+.setting__modal .page--wrapper .col-lg-8, .setting__modal .page--wrapper .col-md-10 {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+.setting__modal .page--wrapper .nav-tabs button {
+    border: 1px solid rgba(var(--theme-secondary), 1);
+    color: rgb(17 24 39);
+    height: auto;
+    padding: 10px 20px;
+    width: auto;
+}
+
+.setting__modal .setting--page .manage__plan__tabs .card {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    flex-flow: column wrap;
+}
+
+.setting__modal .setting--page .manage__plan__tabs .modal--plan--card {
+    background: none;
+    border-radius: .75rem;
+    border: 2px solid rgba(0, 0, 0, .14);
+}
+
+.setting__modal .setting--page .manage__plan__tabs .modal--plan--card--active {
+    border: 2px solid rgba(var(--theme-primary), .5);
+    text-align: center;
+    background: linear-gradient(145deg, rgba(var(--theme-primary), .2), rgba(var(--theme-secondary), .05));
+}
+
+.setting__modal .setting--page .rounded--box .modal--plan--card .card-title {
+    font-size: 1.25rem;
+    margin-bottom: .25rem;
+}
+
+.setting__modal .page--wrapper .nav-tabs button.active, .setting__modal .page--wrapper .nav-tabs button:hover {
+    border: 1px solid rgba(var(--theme-secondary), 1);
 }
 
 .file--preview--modal .modal-dialog {

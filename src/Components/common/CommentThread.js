@@ -5,10 +5,8 @@ import { BsTrash } from "react-icons/bs";
 import { FaEllipsisV } from 'react-icons/fa';
 import { getMemberdata } from "../../helpers/commonfunctions";
 import {
-  socket,
   SendComment,
-  DeleteComment,
-  UpdateComment,
+  DeleteComment
 } from "../../helpers/auth";
 const Comment = ({ comment, memberdata, parentId, allowReply }) => {
   const [selectedComment, setSelectedComment] = useState({});
@@ -51,7 +49,7 @@ const Comment = ({ comment, memberdata, parentId, allowReply }) => {
             // <Button variant="danger" size="sm" className="delete--button px-2 py-1" onClick={() => handleDelete(comment._id, comment?.post)}><BsTrash /></Button>
           )}
         </Card.Title>
-        <Card.Text>{comment.text}</Card.Text>
+        <Card.Text><pre>{comment.text}</pre></Card.Text>
         {comment.replies && comment.replies.length > 0 && (
           <div className="mt-3 ps-4 border-start border-2">
             {comment.replies.map((reply) => (

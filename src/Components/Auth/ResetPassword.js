@@ -6,11 +6,12 @@ import { useToast } from "../../context/ToastContext";
 import { useSelector, useDispatch } from "react-redux";
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { resetPassword } from '../../redux/actions/auth.actions';
-
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 function ResetPassword() {
 
     const inputs = document.querySelectorAll('.form-floating .form-control');
-
+const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   inputs.forEach(input => {
     input.addEventListener('input', function () {
       if (this.value) {
@@ -116,20 +117,50 @@ function ResetPassword() {
                     </Col>
                     <Col sm={12} lg={6} className="px-0">
                         <div className="common--form">
-                            <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
+                            <span className='new--logo'><img className="logo--sm" src="../images/logo-prime-team-icon.png" alt="MyTeams" /></span>
                             <Form onSubmit={handleSubmit}>
                                 <h2>Reset Password</h2>
                                 <Form.Group className="mb-2 form-group">
                                     <FloatingLabel label="New Password *">
-                                        <Form.Control type="password" placeholder='New Password' className={error['password'] ? "input-error" : ''} onChange={({ target }) => handleChangeInput(target)} value={fields.password || ''} name="password" />
+                                        <Form.Control type={showPassword ? "text" : "password"}  placeholder='New Password' className={error['password'] ? "input-error" : ''} onChange={({ target }) => handleChangeInput(target)} value={fields.password || ''} name="password" />
                                     </FloatingLabel>
+                                    {/* Show/Hide Password Toggle */}
+                                    <span
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        cursor: "pointer",
+                                        fontSize: "18px",
+                                        color: "#6c757d",
+                                        }}
+                                    >
+                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </span>
                                     {showError('password')}
                                 </Form.Group>
                                 <Form.Group className="mb-2 form-group">
                                     <FloatingLabel label="Confirm Password *">
-                                        <Form.Control type="password" placeholder='Confirm Password' value={fields.confirm_password || ''}  className={error['confirm_password'] ? "input-error" : ''}
+                                        <Form.Control type={showConfirmPassword ? "text" : "password"}  placeholder='Confirm Password' value={fields.confirm_password || ''}  className={error['confirm_password'] ? "input-error" : ''}
                                         onChange={({ target }) => handleChangeInput(target)} name="confirm_password" />
                                     </FloatingLabel>
+                                    {/* Show/Hide Password Toggle */}
+                                    <span
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        cursor: "pointer",
+                                        fontSize: "18px",
+                                        color: "#6c757d",
+                                        }}
+                                    >
+                                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </span>
                                     {showError('confirm_password')}
                                 </Form.Group>
                                 <Button variant="primary" type="submit" disabled={loading} >{loading ? 'Please Wait...' : 'Reset Password'}</Button>

@@ -65,3 +65,35 @@ export const handleStripeAuthorizePayment = (payload) => {
     }
   };
 }
+
+export const startRazorPayMandate = (payload) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('payment', '/emandate' , payload)
+      if (response.data && response.data.success) {
+        await dispatch({ type: AUTHORIZE_PAYMENT_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
+export const saveMandateDetails = (payload) => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiPostUrl('payment', '/save-mandate' , payload)
+      if (response.data && response.data.success) {
+        await dispatch({ type: AUTHORIZE_PAYMENT_SUCCESS, payload: response.data });
+      } else {
+        await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}

@@ -50,7 +50,9 @@ export function renderDynamicField(config) {
     readOnly,
     required,
   };
-console.log('Value:: ', value)
+
+  console.log(sharedProps)
+
   let filteredStatuses = options || []
 
   let percentage = 0;

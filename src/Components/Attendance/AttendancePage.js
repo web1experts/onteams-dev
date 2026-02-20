@@ -379,8 +379,6 @@ useEffect(() => {
                                   attendanceStatus?.map((status, idx) => {
                                     const rgbaBorder = hexToRgba(status?.color, 0.4);
                                     const rgbaBg = hexToRgba(status?.color, 0.1);
-                                    
-
                                     return (
                                       <th key={idx} className="text-center p-0" style={{color: status.color,backgroundColor: rgbaBg}}>
                                         <div className="padd--x" style={{ borderRight: `1px solid ${rgbaBorder}`, borderBottom: `1px solid ${rgbaBorder}`}}>
@@ -390,28 +388,6 @@ useEffect(() => {
                                     );
                                   })
                                 }
-
-                                
-                                {/* <th className="bg--red text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Absent</strong>
-                                  </div>
-                                </th>
-                                <th className="bg--purple text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Half Day</strong>
-                                  </div>
-                                </th>
-                                <th className="bg--blue text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Short Leave (6h)</strong>
-                                  </div>
-                                </th>
-                                <th className="bg--orange text-center p-0">
-                                  <div className="border-bottom padd--x border-top">
-                                    <strong>Short (2h)</strong>
-                                  </div>
-                                </th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -439,30 +415,36 @@ useEffect(() => {
                                     {
                                         data.attendanceData && data.attendanceData.length > 0 && 
                                         data.attendanceData.map((atten, ind) => {
+                                          const key = atten?.status?.toLowerCase()?.replace(/\s+/g, '_');
+                                          const rgbaBorder = hexToRgba(statusObject?.[key]?.color, 0.3);
+                                          const rgbaBg = hexToRgba(statusObject?.[key]?.color, 0.1);
+                                          function hexToRgba(hex, alpha) {
+                                            hex = (typeof hex !== 'undefined') ? hex.replace('#', ''): '';
+
+                                            if (hex.length === 3) {
+                                              hex = hex.split('').map(c => c + c).join('');
+                                            }
+
+                                            const bigint = parseInt(hex, 16);
+                                            const r = (bigint >> 16) & 255;
+                                            const g = (bigint >> 8) & 255;
+                                            const b = bigint & 255;
+
+                                            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                                          }
                                           if (atten.count !== undefined) {
                                             return (
-                                              <td className={`${atten?.bg} text-center border-bottom border-end`} key={ind}>
-                                                <strong>{atten?.count}</strong>
+                                              <td className={`${atten?.bg} text-center border-bottom`} key={ind} style={{
+                                                    color: statusObject?.[key]?.color,
+                                                    backgroundColor: rgbaBg,
+                                                    borderRight: `1px solid ${rgbaBorder}`
+                                                  }}>
+                                                      <strong>{atten?.count}</strong>
+                                                    
                                               </td>
                                             );
                                           } else {
-                                              const key = atten?.status?.toLowerCase()?.replace(/\s+/g, '_');
-                                              const rgbaBorder = hexToRgba(statusObject?.[key]?.color, 0.3);
-                                              const rgbaBg = hexToRgba(statusObject?.[key]?.color, 0.1);
-                                              function hexToRgba(hex, alpha) {
-                                                hex = (typeof hex !== 'undefined') ? hex.replace('#', ''): '';
-
-                                                if (hex.length === 3) {
-                                                  hex = hex.split('').map(c => c + c).join('');
-                                                }
-
-                                                const bigint = parseInt(hex, 16);
-                                                const r = (bigint >> 16) & 255;
-                                                const g = (bigint >> 8) & 255;
-                                                const b = bigint & 255;
-
-                                                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                                              }
+                                              
 
                                             return (
                                               <td className="text-center border-bottom border-end" key={ind}>
@@ -483,7 +465,7 @@ useEffect(() => {
 
                                                 {
                                                   (atten?.total_time !== '--') &&
-                                                  <strong>{ atten?.total_time }</strong>
+                                                  <small className="d-block mt-1 fw-semibold">{ atten?.total_time }</small>
                                                 }
                                                 
                                                 {/* <strong><BsDash /></strong> Replace '--' with this icon */}
@@ -499,35 +481,6 @@ useEffect(() => {
                         </tbody>
                     </Table>
                 </div>
-                {/* <div className="pt-4">
-                  <div className="d-flex align-items-center gap-3 gap-md-4 flex-wrap att--status--abbr">
-                    {
-                      attendanceStatus?.map((status, idx) => {
-                        const rgbaBg = hexToRgba(status?.color, 1);
-                        function hexToRgba(hex, alpha) {
-                          hex = hex.replace('#', '');
-
-                          if (hex.length === 3) {
-                            hex = hex.split('').map(c => c + c).join('');
-                          }
-
-                          const bigint = parseInt(hex, 16);
-                          const r = (bigint >> 16) & 255;
-                          const g = (bigint >> 8) & 255;
-                          const b = bigint & 255;
-
-                          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                        }
-                        return (
-                          <div key={idx} className="d-flex align-items-center gap-2">
-                            <span className="d-flex align-items-center justify-content-center att--status--span" style={{ backgroundColor: rgbaBg,}}></span>
-                            <span className="text-slate-600">{status.label}</span>
-                          </div>
-                        );
-                      })
-                    }
-                  </div>
-                </div> */}
               </div>
             )}
 
@@ -554,36 +507,7 @@ useEffect(() => {
                   </div>
                   <Row>
                     <Col className="card--stack">
-                      {/* <Card className="card--green">
-                        <Card.Body>
-                          <Card.Title><span>Present</span>{attendanceSummary?.present}</Card.Title>
-                          <Card.Text><FiCheckCircle /></Card.Text>
-                        </Card.Body>
-                      </Card>
-                      <Card className="card--red">
-                        <Card.Body>
-                          <Card.Title><span>Absent</span>{attendanceSummary?.absent}</Card.Title>
-                          <Card.Text><AiOutlineCloseCircle /></Card.Text>
-                        </Card.Body>
-                      </Card>
-                      <Card className="card--orange">
-                        <Card.Body>
-                          <Card.Title><span>Short (2h)</span>{attendanceSummary?.other}</Card.Title>
-                          <Card.Text><FiCoffee /></Card.Text>
-                        </Card.Body>
-                      </Card>
-                      <Card className="card--blue">
-                        <Card.Body>
-                          <Card.Title><span>Half Day</span>{attendanceSummary?.half_day}</Card.Title>
-                          <Card.Text><FiClock /></Card.Text>
-                        </Card.Body>
-                      </Card>
-                      <Card className="card--purple">
-                        <Card.Body>
-                          <Card.Title><span>Short Leave (6h)</span>{attendanceSummary?.short_leave}</Card.Title>
-                          <Card.Text><LuTimer /></Card.Text>
-                        </Card.Body>
-                      </Card> */}
+                      
                       {Object.entries(attendanceSummary).map(([key, count], index) => {
                         const config = { color: 'blue', icon: <FiCoffee /> };
                         const label = key?.replace(/_/g, ' ')  // e.g. short_leave => short leave
@@ -638,21 +562,7 @@ useEffect(() => {
                                         } <small>{status?.label}</small></h4>
                                     </div>
                                   ))}
-                                  {/* <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--green">{attendanceData?.attendance?.present || 0} <small>Present</small></h4>
-                                  </div>
-                                  <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--orange">{attendanceData?.attendance?.other || 0} <small>Short (2h)</small></h4>
-                                  </div>
-                                  <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--purple">{attendanceData?.attendance?.short_leave || 0} <small>Short Leave (6h)</small></h4>
-                                  </div>
-                                  <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--blue">{attendanceData?.attendance?.half_day || 0} <small>Half Day</small></h4>
-                                  </div>
-                                  <div className="text-center">
-                                    <h4 className="mb-0 d-flex flex-column align-items-center justify-content-center text--red">{attendanceData?.attendance?.absent || 0} <small>Absent</small></h4>
-                                  </div> */}
+                                  
                                   <Button variant="dark" className="px-3 py-2 d-flex align-items-center gap-2 justify-content-center" onClick={() => {handleMemberAttendance(attendanceData);setIsActive(1)}}><FaEye/> Details</Button>
                                 </div>
                               </td>

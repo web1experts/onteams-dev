@@ -60,7 +60,7 @@ export const ListClients = (currentPage = 0, searchterm = "") => {
 
 
 export const createClient = (payload) =>{
-    console.log('Payload: ', payload)
+    
     return async (dispatch)=>{
         try{
             const response = await API.apiPost('client', payload , config);

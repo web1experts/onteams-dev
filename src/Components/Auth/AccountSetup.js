@@ -8,6 +8,7 @@ import { getFieldRules, validateField } from '../../helpers/rules';
 import WorkspaceForm from "../workspaces/workspaceform";
 import { useToast } from "../../context/ToastContext";
 import useFilledClass from "../customHooks/useFilledclass";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 const timer = 60
 
 function AccountSetup() {
@@ -16,6 +17,7 @@ function AccountSetup() {
 
     const addToast = useToast();
     const { token } = useParams();
+    const [showPassword, setShowPassword] = useState(false);
     const [fields, setFields] = useState({ name: '', password: '', token: token });
     const navigate = useNavigate();
     /** -- Form Fields Errors -- */
@@ -35,17 +37,20 @@ function AccountSetup() {
     const [companyerrors, setcompanyerrors] = useState('')
     const workspace = useSelector(state => state.workspace)
 
-    const handleChange = ({ target: { name, value } }) => {
+    const handleChange = ({ target: { name, value, type, checked } }) => {
+        
         if (name === "email") {
             setOwneremail(value);
         }
         let newFields = { ...fields };
         let newErrors = { ...errors };
-
+        
         if (name === "companyname" && value === "") {
             delete newFields.companyname;
             delete newErrors.companyname;
-        } else {
+        } else if(name === 'agree'){
+            newFields[name] = checked
+        }else {
             newFields[name] = value;
             newErrors[name] = '';
 
@@ -66,7 +71,7 @@ function AccountSetup() {
     const handleSubmit = async (event) => {
         
         event.preventDefault();
-        setLoader(true)
+        
         const updatedErrorsPromises = Object.entries(fields).map(async ([fieldName, value]) => {
             // Get rules for the current field
             const rules = getFieldRules('signup', fieldName);
@@ -91,7 +96,12 @@ function AccountSetup() {
             setLoader(false)
             setErrors(fieldErrors);
         } else {
-            
+            if (!fields.agree) {
+                addToast("Please agree to the Terms & Conditions", 'danger');
+                
+                return;
+            }
+            setLoader(true)
             const jsonPayload = {};
             for (const [key, value] of Object.entries(fields)) {
                 jsonPayload[key] = value;
@@ -115,7 +125,7 @@ function AccountSetup() {
 
         if( workspace.success ){ 
             setTimeout(function(){
-                navigate('/dashboard')
+                navigate('/plans')
             },1000)
         }
     },[apiResult, workspace])
@@ -131,7 +141,7 @@ function AccountSetup() {
                     </Col>
                     <Col sm={12} lg={6} className="px-0">
                         <div className="common--form">
-                            <span className='new--logo'><img className="logo--sm" src="../images/OnTeam-white-icon.png" alt="MyTeams" /></span>
+                            <span className='new--logo'><img className="logo--sm" src="../images/logo-prime-team-icon.png" alt="MyTeams" /></span>
                             <div className="account--setup">
                                 {(companyform === false) ?
                                     <Form onSubmit={handleSubmit} >
@@ -144,10 +154,43 @@ function AccountSetup() {
                                         </Form.Group>
                                         <Form.Group className="mb-3 form-group">
                                             <FloatingLabel label="Password" controlId="floatingPassword">
-                                                <Form.Control type="password"  className={errors['password'] ? "input-error" : ''} placeholder="Password*" name="password" onChange={handleChange} />
+                                                <Form.Control 
+                                                    type={showPassword ? "text" : "password"} 
+                                                    className={errors['password'] ? "input-error" : ''} 
+                                                    placeholder="Password*" 
+                                                    name="password" 
+                                                    onChange={handleChange} 
+                                                />
                                             </FloatingLabel>
+                                            {/* Show/Hide Password Toggle */}
+                                            <span
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                style={{
+                                                position: "absolute",
+                                                right: "12px",
+                                                top: "50%",
+                                                transform: "translateY(-50%)",
+                                                cursor: "pointer",
+                                                fontSize: "18px",
+                                                color: "#6c757d",
+                                                }}
+                                            >
+                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </span>
                                             {showError('password')}
                                         </Form.Group>
+                                        <div className="form-check mb-3" style={{ display: 'flex', alignItems: 'center' }}>
+                                            <Form.Check
+                                                type="checkbox"
+                                                name="agree"
+                                                checked={fields?.agree}
+                                                onChange={handleChange}
+                                                
+                                            />
+                                             <label className="form-check-label">
+                                                I agree to the <a href="https://primeteams.ai/terms-and-conditions/" target="_blank" rel="noreferrer">Terms & Conditions</a>
+                                            </label>
+                                        </div>
                                         <Button variant="primary" type="submit" disabled={loader}>{loader ? 'Please wait...' : 'Setup Account' }</Button>
                                     </Form>
                                 :

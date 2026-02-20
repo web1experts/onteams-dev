@@ -5,7 +5,7 @@ import * as auth from '../../helpers/auth';
 import {
   LOGIN_FAILED,
   LOGIN_SUCCESS,
-  LOGOUT,
+  ACCOUNT_CLOSE_SUCCESS,
   UPDATE_PASSWORD_SUCCESS,
   LOGIN_COMMON_ERROR,
   RESET_PASSWORD_SUCCESS,
@@ -65,7 +65,7 @@ export const login = (payload) => {
       const response = await API.apiPost('login', payload, config)
     
       if (response.data && response.data.accessToken) {
-        await auth.login(response.data.accessToken, response.data.userDetails, response.data.companies);
+        await auth.login(response.data.accessToken, response.data.userDetails, response.data.companies, response.data?.activeSubscription);
 
         await dispatch({ type: LOGIN_SUCCESS, payload: response.data });
 
@@ -181,6 +181,23 @@ export const authregister = (payload) => {
       } else if (response.data.email_verification === false) {
         await dispatch({ type: VERIFY_EMAIL, payload: response.data });
       } else {
+        await dispatch({ type: REGISTER_FAILED, payload: response.data });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+}
+
+
+export const closeAccount = () => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiDeletePost('close_account')
+
+      if (response.data && response.data.success) {
+        await dispatch({ type: ACCOUNT_CLOSE_SUCCESS, payload: response.data });
+      }else {
         await dispatch({ type: REGISTER_FAILED, payload: response.data });
       }
     } catch (err) {

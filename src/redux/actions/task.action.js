@@ -92,7 +92,7 @@ export const reorderTasks  = (payload) => {
   }
 
 export const updateTask  = (task_id, payload) => {
-    
+   
     return async (dispatch) => {
       try {
         const response = await API.apiPutUrl('task', `/update/${task_id}`, payload);
@@ -100,6 +100,22 @@ export const updateTask  = (task_id, payload) => {
           await dispatch({ type: PUT_TASK_SUCCESS, payload: response.data});
         } else {
           await dispatch({ type: PUT_TASK_FAILED, payload: response.data.message });
+        }
+      } catch (error) {
+        errorRequest(error, dispatch);
+      }
+    }
+  }
+
+  export const getTaskById  = (task_id) => {
+    
+    return async (dispatch) => {
+      try {
+        const response = await API.apiGet('task', `/${task_id}`);
+        if(response.data && response.data.success){
+          await dispatch({ type: GET_SINGLE_TASK_SUCCESS, payload: response.data});
+        } else {
+          await dispatch({ type: TASK_COMMON_ERROR, payload: response.data.message });
         }
       } catch (error) {
         errorRequest(error, dispatch);

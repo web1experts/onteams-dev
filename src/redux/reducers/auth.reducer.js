@@ -16,7 +16,7 @@ import {
     FORGOT_PASSWORD_FAILED,
     VERIFICATION_REQUEST_FAILED,
     VERIFICATION_REQUEST_SUCCESS,
-    GET_PERMISSIONS_SUCCESS,
+    ACCOUNT_CLOSE_SUCCESS,
     GET_PERMISSIONS_FAILED,
     CLEAR_MESSAGES,
     USER_WORKSPACE_LIST_SUCCESS,
@@ -135,6 +135,13 @@ export default (state = initialState, action) => {
                 ...state,
                 message_variant: 'success',
                 message: action.payload,
+            }
+        case ACCOUNT_CLOSE_SUCCESS: 
+            return {
+                ...state,
+                message_variant: 'success',
+                message: action.payload.message,
+                accountDelete: true
             }
         case FORGOT_PASSWORD_FAILED:
             return {

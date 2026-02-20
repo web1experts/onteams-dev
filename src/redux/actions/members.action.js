@@ -158,7 +158,7 @@ export const acceptCompanyinvite = (payload) => {
     };
 }
 
-export const listCompanyinvite = (currentPage, listfor = 'member', search) => { 
+export const listCompanyinvite = (currentPage = 0, listfor = 'member', search = '') => { 
     return async (dispatch) => {
         try {
             const response = await API.apiGet('invites', {currentPage: currentPage, listfor: listfor, search: search}, config)

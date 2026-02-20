@@ -23,10 +23,12 @@ import {
   toggleSidebarSmall,
 } from "../../redux/actions/common.action";
 import { LuFolderOpen } from "react-icons/lu";
+import { FcInvite } from "react-icons/fc";
 import { GrExpand } from "react-icons/gr";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
+import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
-import { FiMail, FiBriefcase, FiShield, FiCheck } from "react-icons/fi";
+import { FiMail, FiBriefcase, FiShield, FiCheck, FiTrash2 } from "react-icons/fi";
 import {
   acceptCompanyinvite,
   listCompanyinvite,
@@ -763,19 +765,28 @@ function Invitation(props) {
             </div>
             <Card.Body className="p-0 ps-4">
               <Card.Title>
-                <FiMail /> Contact Information
+                <FiMail /> Member Information
                 {(memberProfile?.permissions?.members?.create_edit_delete ===
                   true ||
                   memberProfile?.role?.slug === "owner") && (
-                  <FiEdit
-                    className="fs-small"
-                    onClick={() => {
-                      setIsEditing(true);
-                      setTimeout(() => {
-                        selectboxObserver();
-                      }, 650);
-                    }}
-                  />
+                    <Dropdown>
+                      <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                        <FaEllipsisV />
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => sentInviteAgain(selectedInvitation?._id)} className="d-flex align-items-center gap-1">
+                          <FcInvite className="me-1" /> Resend
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => {setIsEditing(true);
+                          setTimeout(() => {
+                            selectboxObserver();
+                          }, 650);}} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
+                        <Dropdown.Item onClick={() => rejectInvite(selectedInvitation?._id)} className="d-flex align-items-center gap-1"><FiTrash2 />  {props.listfor && props.listfor === "company"
+                    ? "Delete"
+                    : "Decline"}</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  
                 )}
               </Card.Title>
               {isEditing === false ? (
@@ -910,45 +921,41 @@ function Invitation(props) {
                   </Card.Text>
                 </>
               )}
-              <div className="text-end mt-4">
-                <Button
-                  variant="secondary"
-                  onClick={() => rejectInvite(selectedInvitation?._id)}
-                >
-                  {props.listfor && props.listfor === "company"
-                    ? "Delete"
-                    : "Decline"}
-                </Button>
-                {props.listfor && props.listfor === "company" ? (
-                  <>
-                    <Button
-                      variant="primary"
-                      className="ms-3"
-                      onClick={() => sentInviteAgain(selectedInvitation?._id)}
-                    >
-                      Send Changes
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      variant="primary"
-                      className="ms-3"
-                      onClick={() =>
-                        acceptInvite(selectedInvitation?.inviteToken)
-                      }
-                    >
-                      Accept
-                    </Button>
-                  </>
-                )}
-              </div>
+              {isEditing === true && (
+                <div className="text-end mt-4">
+                  <Button variant="secondary" className="me-3" onClick={() => setIsEditing(false)}>Cancel</Button>
+                   
+                  {props.listfor && props.listfor === "company" ? (
+                    <>
+                      <Button
+                        variant="primary"
+                        className="ms-3"
+                        onClick={() => sentInviteAgain(selectedInvitation?._id)}
+                      >
+                        Send Changes
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="primary"
+                        className="ms-3"
+                        onClick={() =>
+                          acceptInvite(selectedInvitation?.inviteToken)
+                        }
+                      >
+                        Accept
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
             </Card.Body>
           </Card>
           <Card className="permission--card">
             <Card.Body>
               <Card.Title>
-                <FiShield /> Access Permissions{" "}
+                <FiShield /> Permissions & Access{" "}
                 <Button
                   variant="primary"
                   className="ms-auto"
@@ -956,17 +963,19 @@ function Invitation(props) {
                     showPermissionsModal();
                   }}
                 >
-                  <FiShield /> Manage Permissions
+                  <FaCog /> Manage Permissions
                 </Button>
               </Card.Title>
               <Card.Text>
+
                 <Accordion
-                  activeKey={Object.entries(expanded)
-                    .filter(([_, v]) => v)
-                    .map(([k]) => k)}
-                  alwaysOpen
+                  // activeKey={Object.entries(expanded)
+                  //   .filter(([_, v]) => v)
+                  //   .map(([k]) => k)}
+                  // alwaysOpen
+                  className="new--accordion--block"
                 >
-                  {permissionModules.map((mod) => {
+                  {permissionModules.map((mod, ind) => {
                     const modSlug = mod.slug;
                     const modPerms = permissions?.[modSlug] || {};
                     const isExpanded = expanded?.[modSlug] || false;
@@ -975,10 +984,10 @@ function Invitation(props) {
                     ).length;
 
                     // Show only modules with some true permissions
-                    if (truePermissionCount === 0) return null;
+                    if (truePermissionCount === 0) return;
 
                     return (
-                      <Accordion.Item eventKey={modSlug} key={modSlug}>
+                      <Accordion.Item eventKey={ind} className="bg--blue--accordion">
                         <Accordion.Header
                           onClick={() => {
                             setExpanded((prev) => ({
@@ -987,13 +996,13 @@ function Invitation(props) {
                             }));
                           }}
                         >
-                          {mod.name}{" "}
-                          <span className="per--count">
-                            {truePermissionCount}/{mod?.permissions?.length}
-                          </span>
+                          <div className="d-flex gap-3 align-items-center">
+                            {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                            <h6 className="mb-0">{permissionsLabel[modSlug]?.heading}<small className="d-block"> {permissionsLabel[modSlug]?.sub_heading}</small></h6>
+                           
+                          </div>
                         </Accordion.Header>
                         <Accordion.Body>
-                          <div className="transition-all">
                             {(mod.permissions || []).map((perm) => {
                               const isChecked = !!modPerms[perm];
                               if (!isChecked) return null;
@@ -1003,70 +1012,59 @@ function Invitation(props) {
                                 .replace(/^\w/, (l) => l.toUpperCase());
 
                               return (
-                                <React.Fragment key={`${modSlug}-${perm}`}>
-                                  <Form.Check
-                                    type="checkbox"
-                                    id={`${modSlug}-${perm}`}
-                                    label={label}
-                                    checked={true}
-                                    disabled={true}
-                                    className="parent-item"
-                                  />
+                                <Card className="mb-3" key={`${modSlug}-${perm}`}>
+                                  <span className="card--icon icon--green">
+                                    {permissionsLabel[modSlug][perm]?.icon || <BsEye />}
+                                  </span>
+                                  <Card.Body>
+                                    <Card.Title>{permissionsLabel[modSlug][perm]?.heading}</Card.Title>
+                                    <Card.Text>{permissionsLabel[modSlug][perm]?.sub_heading}</Card.Text>
 
-                                  {/* Show sub-members if view_others is true and selected_members exist */}
-                                  {[
-                                    "tracking",
-                                    "projects",
-                                    "reports",
-                                    "attendance",
-                                  ].includes(modSlug) &&
-                                    perm === "view_others" &&
-                                    Array.isArray(
-                                      modPerms["selected_members"]
-                                    ) &&
-                                    modPerms["selected_members"].length > 0 && (
-                                      <>
-                                        {memberFeeds.map((member) => {
-                                          if (
-                                            !modPerms[
-                                              "selected_members"
-                                            ].includes(String(member._id))
-                                          )
-                                            return null;
+                                    {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
+                                      perm === "view_others" &&
+                                      Array.isArray(modPerms["selected_members"]) &&
+                                      modPerms["selected_members"].length > 0 && (
+                                        <div className="team--card--grid" key={`members-grid-${modSlug}`}>
+                                          {memberFeeds.map((member) => {
+                                            if (!modPerms["selected_members"].includes(String(member._id))) {
+                                              return null;
+                                            }
+                                            return (
+                                              
+                                                <Card className="team--card">
+                                                  <span className="team--initial">
+                                                    {member.name?.charAt(0) || "U"}
+                                                  </span>
+                                                  <Card.Body>
+                                                    <h4>
+                                                      {member.name}{" "}
+                                                      <small className="d-block">{member.role?.name}</small>
+                                                    </h4>
+                                                  </Card.Body>
+                                                </Card>
+                                              
+                                            );
+                                          })}
 
-                                          return (
-                                            <Form.Check
-                                              key={`${modSlug}-${perm}-${member._id}`}
-                                              type="checkbox"
-                                              id={`${modSlug}-${perm}-${member._id}`}
-                                              label={member.name}
-                                              checked={true}
-                                              disabled
-                                              className="sub-items"
-                                            />
-                                          );
-                                        })}
-
-                                        {modSlug === "projects" &&
-                                          modPerms["selected_members"].includes(
-                                            "unassigned"
-                                          ) && (
-                                            <Form.Check
-                                              key={`${modSlug}-${perm}-unassigned`}
-                                              type="checkbox"
-                                              id={`${modSlug}-${perm}-unassigned`}
-                                              label="Unassigned"
-                                              checked={true}
-                                              disabled
-                                              className="sub-items"
-                                            />
-                                          )}
-                                      </>
-                                    )}
-                                </React.Fragment>
+                                          {modSlug === "projects" &&
+                                            modPerms["selected_members"].includes("unassigned") && (
+                                              <Card className="team--card">
+                                                <span className="team--initial">
+                                                  {"U"}
+                                                </span>
+                                                <Card.Body>
+                                                  <h4>
+                                                    Unassigned
+                                                  </h4>
+                                                </Card.Body>
+                                              </Card>
+                                            )}
+                                        </div>
+                                      )}
+                                  </Card.Body>
+                                </Card>
                               );
                             })}
-                          </div>
                         </Accordion.Body>
                       </Accordion.Item>
                     );
@@ -1119,7 +1117,7 @@ function Invitation(props) {
                     setPermissions(matchedPermissions);
                   }}
                 >
-                  <option value="role">Select role</option>
+                  {/* <option value="role">Select role</option> */}
                   {roles.map((role, roleIndex) => (
                     <option key={`role-${roleIndex}`} value={role._id}>
                       {role.name}

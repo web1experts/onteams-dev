@@ -396,10 +396,11 @@ textarea.form-control {
   max-width: 120px;
   width: 120px;
   height: 120px;
+  background: #151d2d;
   padding: .75rem;
   border-radius: 1rem;
   -webkit-border-radius: 1rem;
-  background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
+  /* background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1)); */
 }
 
 .main--login .login--image img {
@@ -1366,6 +1367,11 @@ Add Project Modal CSS-=-=-
   object-fit: cover;
 }
 
+.assign--task--modal .status--list .list-group-item .team--color {
+  height: 30px;
+  width: 30px;
+}
+
 .upload--status .file--upload {
   align-items: center;
   background: #eee;
@@ -1523,6 +1529,14 @@ ul#subtasks-ul .form-group .quill--editor svg {
   opacity: 1 !important;
 }
 
+.mail--message {
+    margin: 0 auto;
+    flex: 1 1;
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+}
+
 @media (max-width:1199px) {
   .project--form {
     height: auto;
@@ -1541,9 +1555,5 @@ ul#subtasks-ul .form-group .quill--editor svg {
 
   .modal-content {
     max-height: 100%;
-  }
-
-  .modal-lg, .modal-xl, .modal-sm, .modal-md {
-    max-width: 700px;
   }
 }

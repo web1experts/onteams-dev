@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Container, Row, Col, Button, Modal, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
+import debounce from "lodash.debounce";
+import { Container, Row, Col, Button, Modal, Alert, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
-import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
+import { FaList, FaPlus, FaCog, FaEllipsisV, FaCheck } from "react-icons/fa";
 import { FiEdit, FiMail, FiSidebar, FiTrash2, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { RiUserSettingsLine } from "react-icons/ri";
@@ -12,7 +13,7 @@ import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { MdOutlineSearch, MdOutlineClose, MdDragIndicator, MdSearch, MdFilterList } from "react-icons/md";
 import { getMemberdata } from "../../helpers/commonfunctions";
-import { Listmembers, deleteMember, updateMember} from "../../redux/actions/members.action";
+import { Listmembers, deleteMember, updateMember, listCompanyinvite} from "../../redux/actions/members.action";
 import { toggleSidebar, toggleSidebarSmall} from "../../redux/actions/common.action";
 import { leaveCompany } from "../../redux/actions/workspace.action";
 import { useNavigate } from "react-router-dom";
@@ -30,16 +31,29 @@ import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
 import RolesPage from "../Settings/RolesPage";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { logout } from "../../redux/actions/auth.actions";
+import { getActiveSubscription } from "../../redux/actions/subscription.action";
 
 function TeamMembersPage() {
+  const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
   const currentMember = getMemberdata();
   //const addToast = useToast();
   const [isActive, setIsActive] = useState(0);
+  const [activeItems, setActiveItems] = useState([]);
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
-
+  const handleClickTeams = (index) => {
+  setActiveItems(prev =>
+    prev.includes(index)
+      ? prev.filter(item => item !== index) // remove if already selected
+      : [...prev, index] // add if not selected
+  );
+};
+  const subscriptionState = useSelector((state) => state.subscription);
+  const [invitationsTotal, setInvitationsTotal] = useState(0)
+  const [activeSubscription, setActiveSubscription] = useState(null)
   const [showdelete, setShowDelete] = useState(false);
   const [activeKey, setActiveKey] = useState(null);
   const [activeRole, setActiveRole] = useState({});
@@ -83,6 +97,7 @@ function TeamMembersPage() {
   const [visiblePasswords, setVisiblePasswords] = useState({});
   const [showCustomFields, setShowCustomFields] = useState(false);
   const [customFields, setCustomFields] = useState([]);
+  const [search, setSearch] = useState('');
   const workspaceState = useSelector((state) => state.workspace);
   const [show, setShow] = useState(false);
   const handleClose = () => {
@@ -91,6 +106,9 @@ function TeamMembersPage() {
       setErrors([]);
       setShow(false);
     });
+  };
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
   };
   const [tab, setTab] = useState("details");
   const handleShow = () => setShow(true);
@@ -108,6 +126,7 @@ function TeamMembersPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedMember, setSelectedMember] = useState(null);
   const [memberFeeds, setMemberFeed] = useState([]);
+  const invitationsFeed = useSelector((state) => state.member.invitations);
   const [showloader, setShowloader] = useState(false);
    const [showPasswordFields, setShowPasswordFields] = useState({});
   const apiResult = useSelector((state) => state.member);
@@ -122,6 +141,9 @@ function TeamMembersPage() {
       setMemberFeed([]);
 
       await dispatch(Listmembers(currentPage, searchTerm));
+      await dispatch(
+        listCompanyinvite(0, 'company')
+      );
       setShowloader(false);
     }
   };
@@ -129,6 +151,10 @@ function TeamMembersPage() {
   const [showSearch, setSearchShow] = useState(false);
   const handleSearchClose = () => setSearchShow(false);
   const handleSearchShow = () => setSearchShow(true);
+
+  const [showTeams, setTeamsShow] = useState(false);
+  const handleTeamsClose = () => setTeamsShow(false);
+  const handleTeamsShow = () => setTeamsShow(true);
 
   const handledeleteMember = async () => {
     await dispatch(deleteMember(selectedMember._id));
@@ -143,10 +169,13 @@ function TeamMembersPage() {
     );
   };
 
-  const handleownership = async () => {
-    console.log("transfer ownership");
-  };
-
+  useEffect(() => {
+    console.log('invitationsTotal:: ', invitationsTotal)
+  }, [invitationsTotal])
+  
+  useEffect(() => {
+    console.log('memberfeed length:: ', memberFeeds.length)
+  }, [memberFeeds])
   const toggleCustomFields = () => {
     setShowCustomFields((prev) => !prev);
   };
@@ -173,15 +202,32 @@ function TeamMembersPage() {
     });
 
     setPermissions(prm);
+
+    setTimeout(() => {
+        dispatch(getActiveSubscription())
+      }, 1000)
+
+       socket.on('receive_record_types', async (record_types = {}) => { 
+        console.log('record_types:: ', record_types)
+       })
+      
   }, []);
 
+
+   
   useEffect(() => {
     if (currentPage !== "" && activeTab === "Members") {
       setShowloader(true);
       handleListMember();
     }
     dispatch(fetchCustomFields({ module: "members" }));
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, activeTab]);
+
+  useEffect(() => {
+    if (invitationsFeed && invitationsFeed.inviteData) {
+      setInvitationsTotal(invitationsFeed.total);
+    }
+  }, [invitationsFeed]);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -190,11 +236,31 @@ function TeamMembersPage() {
       selectboxObserver();
     }
   }, [isEditing]);
+  
+  useEffect(() => {
+  if (!fields?.role && roles?.length > 0) {
+    const defaultRoleId = roles[0]._id;
+
+    // Simulate handleChange for default role
+    handleChange({ target: { name: "role", value: defaultRoleId } });
+
+    // Set permissions for default role
+    setPermissions(roles[0].permissions || []);
+  }
+}, [fields?.role, roles]);
+
+useEffect(() => {
+  
+  if(subscriptionState.activeSubscription){
+    setActiveSubscription(subscriptionState.activeSubscription) 
+  }
+}, [subscriptionState.activeSubscription])
+
 
   useEffect(() => {
-    if (apiResult.success) {
+    if (apiResult.success) { console.log('on success', activeTab)
       if (activeTab === "Members") {
-        if (apiResult.updatedMember) {
+        if (apiResult.updatedMember) { console.log('I am here')
           socket.emit("refresh_record_type", selectedMember?._id);
           socket.emit("refresh_record_types", selectedMember?._id);
           const updatedMemberFeeds = memberFeeds.map((m) =>
@@ -224,6 +290,13 @@ function TeamMembersPage() {
     if (apiResult.deletedMember) {
       setIsActive(false);
       setShowDialog(false);
+    }
+
+    if( workspaceState.ownershipUpdate === true){
+      setShowDialog(false)
+      setTimeout(function(){
+        dispatch(logout())
+      },1000)
     }
   }, [apiResult, workspaceState]);
 
@@ -256,12 +329,24 @@ function TeamMembersPage() {
       setCustomFields(apiCustomfields.customFields);
     }
 
-    if (apiCustomfields.newField) {
-      setCustomFields((prevCustomFields) => [
-        apiCustomfields.newField,
-        ...prevCustomFields,
-      ]);
-    }
+    // if (apiCustomfields.newField) {
+    //   setCustomFields((prevCustomFields) => [
+    //     apiCustomfields.newField,
+    //     ...prevCustomFields,
+    //   ]);
+    // }
+
+    if (
+      apiCustomfields.newField &&
+        apiCustomfields.newField?.module === "members"
+      ) {
+        setCustomFields((prevCustomFields) => [
+          ...prevCustomFields.filter(
+            (field) => field._id !== apiCustomfields.newField._id
+          ),
+          apiCustomfields.newField
+        ]);
+      }
 
     if (apiCustomfields.updatedField) {
       setCustomFields((prevCustomFields) =>
@@ -375,6 +460,15 @@ function TeamMembersPage() {
   const handleEditClick = (fieldName) => {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
+
+  // Debounced search handler
+      const debouncedUpdateSearch = useMemo(
+      () =>
+        debounce((value) => {
+          setsearchTerm(value)
+        }, 1000), // 1 sec debounce
+      []
+    );
 
   const toggleVisibility = (key) => {
         setVisiblePasswords((prev) => ({
@@ -841,7 +935,7 @@ function TeamMembersPage() {
                     <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                       <Form.Group className="mb-0 form-group">
                         <MdOutlineSearch />
-                        <Form.Control type="text" placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)}/>
+                        <Form.Control type="text" readOnly={showloader} ref={inputRef} placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => debouncedUpdateSearch(e.target.value)}/>
                       </Form.Group>
                     </Form>
                   </ListGroup.Item>
@@ -859,7 +953,17 @@ function TeamMembersPage() {
                     {(memberProfile?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <ListGroup.Item className="btn btn-primary" onClick={handleShow}><FaPlus /></ListGroup.Item>
+                      <ListGroup.Item className="btn btn-primary"  onClick={() => {
+                          // if (
+                          //   activeSubscription?.planId === 'free' &&
+                          //   (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+                          //   invitationsTotal + memberFeeds?.length
+                          // ) {
+                          //   navigate('/subscription-plans', { replace: true });
+                          // } else {
+                            handleShow();
+                          // }
+                        }}><FaPlus /></ListGroup.Item>
                     )}
                   </ListGroup>
                 </ListGroup>
@@ -1052,7 +1156,12 @@ function TeamMembersPage() {
             <div className="projecttitle">
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
-                    <div className="title--initial">{selectedMember?.name?.charAt(0)}</div>
+                    <div className="title--initial">
+                      {(selectedMember?.avatar && selectedMember?.avatar !== null ) ? 
+                        <span><img src={selectedMember?.avatar} alt={'member-avatar'} /></span>
+                        :
+                      selectedMember?.name?.charAt(0)}
+                      </div>
                     <div className="title--span flex-column align-items-start gap-0">
                         <h3>
                           <strong>{selectedMember?.name}</strong>
@@ -1066,7 +1175,12 @@ function TeamMembersPage() {
                         memberFeeds.length > 0 &&
                         memberFeeds.map((member, idx) => (
                           <Dropdown.Item onClick={() => {handleTableToggle(member);setIsActive(true); }} key={`item-${idx}`} className={(selectedMember?._id === member?._id) ? 'active-project': ''}>
-                            <div className="title--initial">{member?.name.charAt(0)}</div>
+                            <div className="title--initial">
+                              {(member?.avatar && member?.avatar !== null ) ? 
+                                <span><img src={member?.avatar} alt={'member-avatar'} /></span>
+                                :
+                              member?.name.charAt(0)}
+                              </div>
                             <div className="title--span flex-column align-items-start gap-0">
                               <strong>{member?.name}</strong>
                               <span>{member.role?.name}</span>
@@ -1103,7 +1217,16 @@ function TeamMembersPage() {
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
-                          <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> Delete</Dropdown.Item>
+                          <Dropdown.Item onClick={() => handleTeamsShow()} className="d-flex align-items-center gap-1"><AiOutlineTeam className="me-1" /> Change</Dropdown.Item>
+                          <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> 
+                          {
+                            memberProfile?._id === selectedMember?._id ? 
+                            'Leave'
+                            :
+                            'Delete'
+                          }
+                          
+                          </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown>
                     )}
@@ -1287,13 +1410,20 @@ function TeamMembersPage() {
                         <FiVideo />
                         <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording during work hours</small></h6>
                       </div>
-                      <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
-                        updateRecodingType({
-                            custom_field: {
-                                video_recording: event.target.checked ? "enable" : "disabled"
-                            }
-                        });
-                      }} name={`custom_field[video_recording]`} />
+                      {
+                        (activeSubscription && activeSubscription?.name === 'Elite' ) ? (
+                          <Form.Check type="switch" key={`video-only`} checked={fields?.["custom_field[video_recording]"] === "enable"} value={"enable"} onChange={(event) => {handleChange(event);
+                            updateRecodingType({
+                                custom_field: {
+                                    video_recording: event.target.checked ? "enable" : "disabled"
+                                }
+                            });
+                          }} name={`custom_field[video_recording]`} />
+                        ):
+
+                        <Form.Check type="switch" key={`video-only`} disabled checked={false} value={"disabled"} onChange={(event) => {return false;}} name={`custom_field[video_recording]`} />
+                      }
+                      
                     </Card.Body>
                   </Card>
 
@@ -1326,8 +1456,14 @@ function TeamMembersPage() {
                 <Card.Body>
                   <Card.Title>
                     <FiShield /> Permissions & Access{" "}
-                    <Button variant="primary" className="ms-auto d-flex align-items-center gap-1" onClick={() => {setAdjustPermissions(true);}}><FaCog /> Manage Permissions</Button>
-                  </Card.Title>
+                    {
+                      (memberProfile &&
+                      Object.keys(memberProfile).length > 0 &&
+                      memberProfile?.permissions?.members?.create_edit_delete === true ||
+                      memberProfile?.role?.slug !== "owner") ? (
+                        <Button variant="primary" className="ms-auto d-flex align-items-center gap-1" onClick={() => {setAdjustPermissions(true);}}><FaCog /> Manage Permissions</Button>) : <></>                    
+                      }
+                    </Card.Title>
                   <Card.Text>
                    
                     {/* /*New Accordion Design*/}
@@ -1339,7 +1475,9 @@ function TeamMembersPage() {
                         const truePermissionCount = Object.values(
                           modPerms
                         ).filter((val) => val === true).length;
-
+                        if(truePermissionCount === 0){
+                          return;
+                        }
                         return (
                           <Accordion.Item eventKey={ind} className="bg--blue--accordion">
                             <Accordion.Header>
@@ -1434,71 +1572,92 @@ function TeamMembersPage() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            {/* {rows.map((row, index) => ( */}
-            <div className="form-row pb-3" key={`row-0`}>
-              <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
-                <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
-                  <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
-                    placeholder="Email address"
-                    name="email"
-                    value={fields?.email}
-                    onChange={handleChange}
-                  />
-                </FloatingLabel>
-                {showError("email")}
-                <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
-              </Form.Group>
+          {
+            (
+              activeSubscription?.planId === 'free' &&
+              (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+              invitationsTotal + memberFeeds?.length
+            ) ?
+            <Alert key={'danger'} variant={'danger'}>
+                Your current {activeSubscription?.name} plan allows to only {activeSubscription?.quantity} members. To add additional members, please upgrade the count of team members.
+              </Alert>
 
-              <Button
-                variant="primary"
-                onClick={() => {
-                  showPermissionsModal();
-                }}
-              >
-                Select Role
-              </Button>
-              {showError("role")}
-            </div>
-            <div className="form-row" key={`row-1`}>
-              <Form.Group className="mb-0 form-group other__fields">
-                {customFields.length > 0 && (
-                  <>
-                    {customFields.map((field, index) =>
-                      renderDynamicField({
-                        name: `custom_field[${field.name}]`,
-                        type: field.type,
-                        label: field.label,
-                        value: field.type === 'date' && fields[`custom_field[${field.name}]`]
-                                ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
-                                : fields[`custom_field[${field.name}]`] || '',
-                        options: field?.options || [],
-                        onChange: (e) => {
-                                            if(field.type === "date"){
-                                                
-                                                handleDateChange(e, `custom_field[${field.name}]`)
-                                            }else{
-                                                handleChange(e)
-                                            }
-                                        },
-                        fieldId: `new-${field.name}-${index}`,
-                        range_options: field?.range_options || {},
-                        showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
-                        toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
-                        toggleBadges: () => toggleBadges(field),
-                      })
-                    )}
-                  </>
-                )}
-              </Form.Group>
-            </div>
-            {/* ))} */}
-          </Form>
+            :
+            <Form onSubmit={handleSubmit}>
+              {/* {rows.map((row, index) => ( */}
+              <div className="form-row pb-3" key={`row-0`}>
+                <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
+                  <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
+                    <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
+                      placeholder="Email address"
+                      name="email"
+                      value={fields?.email}
+                      onChange={handleChange}
+                    />
+                  </FloatingLabel>
+                  {showError("email")}
+                  <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
+                </Form.Group>
+
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    showPermissionsModal();
+                  }}
+                >
+                  Select Role
+                </Button>
+                {showError("role")}
+              </div>
+              <div className="form-row" key={`row-1`}>
+                <Form.Group className="mb-0 form-group other__fields">
+                  {customFields.length > 0 && (
+                    <>
+                      {customFields.map((field, index) =>
+                        renderDynamicField({
+                          name: `custom_field[${field.name}]`,
+                          type: field.type,
+                          label: field.label,
+                          value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                  ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                  : fields[`custom_field[${field.name}]`] || '',
+                          options: field?.options || [],
+                          onChange: (e) => {
+                                              if(field.type === "date"){
+                                                  
+                                                  handleDateChange(e, `custom_field[${field.name}]`)
+                                              }else{
+                                                  handleChange(e)
+                                              }
+                                          },
+                          fieldId: `new-${field.name}-${index}`,
+                          range_options: field?.range_options || {},
+                          showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                          toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                          toggleBadges: () => toggleBadges(field),
+                        })
+                      )}
+                    </>
+                  )}
+                </Form.Group>
+              </div>
+              {/* ))} */}
+            </Form>
+          }
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleSubmit} disabled={loader}>
-            {loader ? "Please Wait..." : "Save"}
-          </Button>
+          {
+            (
+              activeSubscription?.planId === 'free' &&
+              (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
+              invitationsTotal + memberFeeds?.length
+            ) ?
+            <></>
+            :
+              <Button variant="primary" onClick={handleSubmit} disabled={loader}>
+                {loader ? "Please Wait..." : "Save"}
+              </Button>
+          }
         </Modal.Footer>
       </Modal>
       {showPermissions && (
@@ -1518,7 +1677,7 @@ function TeamMembersPage() {
                   name="role"
                   controlId="floatingSelect"
                   className={"form-control custom-selectbox"}
-                  defaultValue={fields?.role}
+                  value={fields?.role || roles?.[0]?._id || ""}
                   onChange={(e) => {
                     handleChange(e);
                     const matchedRole = roles.find(
@@ -1531,7 +1690,7 @@ function TeamMembersPage() {
                     setPermissions(matchedPermissions);
                   }}
                 >
-                  <option value="role">Select role</option>
+                  {/* <option value="role">Select role</option> */}
                   {roles.map((role, roleIndex) => (
                     <option key={`role-${roleIndex}`} value={role._id}>
                       {role.name}
@@ -1795,7 +1954,7 @@ function TeamMembersPage() {
       (selectedMember?._id !== memberProfile?._id &&
         memberProfile &&
         Object.keys(memberProfile).length > 0 &&
-        memberProfile?.permissions?.members?.create_edit_delete === true &&
+        memberProfile?.permissions?.members?.create_edit_delete === true ||
         memberProfile?.role?.slug !== "owner") ? (
         <>
           <AlertDialog
@@ -1805,7 +1964,8 @@ function TeamMembersPage() {
             callback={handledeleteMember}
           />
         </>
-      ) : memberProfile &&
+      ) 
+      : memberProfile &&
         Object.keys(memberProfile).length > 0 &&
         memberProfile.role?.slug !== "owner" &&
         selectedMember?._id === memberProfile._id ? (
@@ -1817,7 +1977,8 @@ function TeamMembersPage() {
             callback={handleleavecompany}
           />
         </>
-      ) : (memberProfile &&
+      ) 
+      : (memberProfile &&
           Object.keys(memberProfile).length > 0 &&
           memberProfile?.role?.permissions?.members?.create_edit_delete ===
             true) ||
@@ -1833,6 +1994,40 @@ function TeamMembersPage() {
       ) : (
         <></>
       )}
+      {/*--=-=Teams Modal**/}
+      <Modal show={showTeams} onHide={handleTeamsClose} size="md" centered className="status--modal assign--task--modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Change Teams</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group>
+              <FloatingLabel label="Search here">
+                <Form.Control type="text" placeholder="Search here" value={search} onChange={handleSearchChange} />
+              </FloatingLabel>
+            </Form.Group>
+          </Form>
+          <ListGroup className="status--list">
+            {[
+              "#3b82f6",
+              "#8b5cf6",
+              "#ec4899",
+              "#f59e0b",
+              "#10b981",
+              "#6366f1",
+              "#14b8a6"
+            ].map((color, index) => (
+              <ListGroup.Item key={index} onClick={() => handleClickTeams(index)} className={activeItems.includes(index) ? "status--active" : ""}> 
+                <span className="team--color" style={{ background: color }}></span> 
+                <p>Default Team {activeItems.includes(index) && <FaCheck />} </p>
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+
+
+
+        </Modal.Body>
+      </Modal>
       {/*--=-=Search Modal**/}
       <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
         <Modal.Header closeButton>
@@ -1861,7 +2056,7 @@ function TeamMembersPage() {
               <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                 <Form.Group className="mb-0 form-group">
                   <MdOutlineSearch />
-                  <Form.Control type="text" placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => setsearchTerm(e.target.value)}/>
+                  <Form.Control type="text" readOnly={showloader} ref={inputRef} placeholder={activeTab === "Members"? "Search Member..": "Search Invitations.."} onChange={(e) => debouncedUpdateSearch(e.target.value)}/>
                 </Form.Group>
               </Form>
             </ListGroup.Item>
