@@ -222,6 +222,7 @@ function ClientsPage() {
   useEffect(() => {
     if( deleteSuccess ){
       setIsActive( false )
+      setIsEditing(false);
       setSelectedClient({})
     }
   }, [deleteSuccess])
