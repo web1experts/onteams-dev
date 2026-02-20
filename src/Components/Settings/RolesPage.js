@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Form, Accordion, Tab, Badge, Card, Modal, FloatingLabel, Tabs, Row, Col} from "react-bootstrap";
+import { Button, Form, Accordion, Tab, Badge, Card, Modal, FloatingLabel, Tabs, Row, Col, ListGroup} from "react-bootstrap";
 import { FaPlus } from "react-icons/fa";
 import { FiCheck, FiLock, FiUsers} from "react-icons/fi";
 import { LuFolderOpen, LuPencilLine } from "react-icons/lu";
@@ -37,6 +37,9 @@ function RolesPage() {
   const [fields, setFields] = useState({ name: "" });
   const [errors, setErrors] = useState({});
   const [show, setShow] = useState(false);
+  const [showCreate, setCreateShow] = useState(false);
+  const handleCreateClose = () => setCreateShow(false);
+  const handleCreateShow = () => setCreateShow(true);
   const [showdelete, setShowDelete] = useState(false);
   const [activeKey, setActiveKey] = useState(null);
   const [activeRole, setActiveRole] = useState({});
@@ -563,8 +566,27 @@ function RolesPage() {
       setActiveRole(workspace.available_roles[0]);
     }
   }, [workspace]);
-
-  
+  const [activeItems, setActiveItems] = useState([]);
+  const handleSelectTeams = (index) => {
+  setActiveItems(prev =>
+    prev.includes(index)
+      ? prev.filter(item => item !== index) // remove if already selected
+      : [...prev, index] // add if not selected
+  );
+};
+  const [selected, setSelected] = useState(0);
+  const colors = [
+    "#4A80D8", // blue (selected)
+    "#7E5BEF", // purple
+    "#E0448F", // pink
+    "#F5A000", // orange
+    "#1FA97A", // green
+    "#5E60CE", // indigo
+    "#26A69A", // teal
+    "#FF7A18", // orange 2
+    "#1EA7B8", // cyan
+    "#7BC70E", // lime
+  ];
 
   return (
     <>
@@ -833,7 +855,7 @@ function RolesPage() {
                         </div>
                       </Col>
                       <Col xs="auto">
-                        <Button variant="primary"><FaPlus className="me-2" />Create Team</Button>
+                        <Button variant="primary" onClick={() => handleCreateShow()}><FaPlus className="me-2" />Create Team</Button>
                       </Col>
                     </Row>
 
@@ -860,7 +882,7 @@ function RolesPage() {
                           </Col>
 
                           <Col xs="auto">
-                            <LuPencilLine style={{ cursor: "pointer", color: "#6c757d" }}/>
+                            <LuPencilLine onClick={() => handleCreateShow()} style={{ cursor: "pointer", color: "#6c757d" }}/>
                           </Col>
                         </Row>
                       </Card.Body>
@@ -1025,6 +1047,79 @@ function RolesPage() {
             </Modal.Footer>
         </Modal>
       )}
+      
+      {/*--=-=Create Teams Modal**/}
+      <Modal show={showCreate} onHide={handleCreateClose} size="md" centered className="status--modal assign--task--modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Create Team</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group>
+              <FloatingLabel label="Team Name">
+                <Form.Control type="text" placeholder="Designing, Marketing, etc."/>
+              </FloatingLabel>
+            </Form.Group>
+          </Form>
+
+          <p className="mb-3 mt-4 fw-semibold">Color</p>
+          <div className="d-flex flex-wrap gap-3 mb-3">
+            {colors.map((color, index) => (
+              <div
+                key={index}
+                onClick={() => setSelected(index)}
+                className="rounded-2"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  backgroundColor: color,
+                  cursor: "pointer",
+                  border:
+                    selected === index
+                      ? "4px solid #212529"
+                      : "2px solid transparent",
+                  boxShadow:
+                    selected === index
+                      ? "0 0 0 4px #ffffff"
+                      : "none",
+                  transition: "all 0.2s ease-in-out",
+                }}
+              />
+            ))}
+          </div>
+
+          <Form className="mb-3">
+            <Form.Group>
+              <FloatingLabel label="Team Members">
+                <Form.Control type="text" placeholder="Search members..."/>
+              </FloatingLabel>
+            </Form.Group>
+          </Form>
+
+         {memberFeeds.map((member, index) => (
+          <ListGroup
+            key={index}
+            className="status--list mt-0"
+          >
+            <ListGroup.Item onClick={() => handleSelectTeams(index)}
+            className={activeItems.includes(index) ? "status--active" : ""}>
+              <span>
+                <img src="../images/default.jpg" alt="" />
+              </span>
+              <p>
+                {member.name}
+                {activeItems.includes(index) && <FiCheck />}
+              </p>
+            </ListGroup.Item>
+          </ListGroup>
+        ))}
+
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onHide={handleCreateClose}>Close</Button>
+          <Button variant="primary">Create Team</Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

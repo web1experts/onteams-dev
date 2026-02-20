@@ -432,15 +432,15 @@ export function MemberModal( props){
               </Form.Group>
           </Form>
           <ListGroup className="added--list">
-          {membersModalState?.selectedMembers &&
-            Object.keys(membersModalState.selectedMembers).length > 0 &&
-            Object.entries(membersModalState.selectedMembers).map(([id, memberInfo], index) => (
-                <ListGroup.Item key={`listkey-${index}`} onClick={() => handleRemove(memberInfo.id)}>
-                    <span><img src={memberInfo?.avatar || '../images/default.jpg'} alt="" /></span>
-                    <p>{memberInfo?.name} <FaTimesCircle /></p>
-                </ListGroup.Item>
-            ))
-          }
+            {membersModalState?.selectedMembers &&
+              Object.keys(membersModalState.selectedMembers).length > 0 &&
+              Object.entries(membersModalState.selectedMembers).map(([id, memberInfo], index) => (
+                  <ListGroup.Item key={`listkey-${index}`} onClick={() => handleRemove(memberInfo.id)}>
+                      <span><img src={memberInfo?.avatar || '../images/default.jpg'} alt="" /></span>
+                      <p>{memberInfo?.name} <FaTimesCircle /></p>
+                  </ListGroup.Item>
+              ))
+            }
 
           </ListGroup>
           <ListGroup className="status--list">
