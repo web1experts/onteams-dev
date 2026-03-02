@@ -383,7 +383,7 @@ const TasksList = React.memo((props) => {
                 >
                   <h5>
                     {tab.title}
-                    {(memberProfile?.permissions?.projects
+                    {(memberProfile?.role?.permissions?.projects
                       ?.create_edit_delete_task === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <Button
@@ -407,9 +407,9 @@ const TasksList = React.memo((props) => {
                       </Button>
                     )}
                   </h5>
-                  {(memberProfile?.permissions?.projects
+                  {(memberProfile?.role?.permissions?.projects
                     ?.create_edit_delete_task === true &&
-                    memberProfile?.permissions?.projects.update_tasks_order ===
+                    memberProfile?.role?.permissions?.projects.update_tasks_order ===
                       true) ||
                   memberProfile?.role?.slug === "owner" ? (
                     <Droppable
@@ -565,7 +565,7 @@ const TasksList = React.memo((props) => {
                         </ul>
                       )}
                     </Droppable>
-                  ) : memberProfile?.permissions?.projects
+                  ) : memberProfile?.role?.permissions?.projects
                       ?.create_edit_delete_task === true ||
                     memberProfile?.role?.slug === "owner" ? (
                     <ul
@@ -681,7 +681,7 @@ const TasksList = React.memo((props) => {
                           </li>
                         ))}
                     </ul>
-                  ) : memberProfile?.permissions?.projects
+                  ) : memberProfile?.role?.permissions?.projects
                       .update_tasks_order === true ||
                     memberProfile?.role?.slug === "owner" ? (
                     <Droppable

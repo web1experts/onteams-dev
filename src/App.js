@@ -242,7 +242,7 @@ function App(props) {
       // If the route has a 'module' key, check permissions
       if (route.module) {
         const hasPermission =
-          memberProfile?.permissions?.[route.module]?.view === true ||
+          memberProfile?.role?.permissions?.[route.module]?.view === true ||
           memberProfile?.role?.slug === 'owner';
   
         if (!hasPermission) return null;

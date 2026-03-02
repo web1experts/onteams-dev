@@ -693,7 +693,7 @@ useEffect(() => {
     const [taskModalState, setTaskModalState] = useState(refreshstates(commonState.active_formtype || false))
 
     const handlesubtaskChange = (index, oldval, newval, directupdate = false) => {
-        if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+        if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
             skipOutsideRef.current = true;
             const newSubtasks = [...subtasks];
             newSubtasks[index] = (typeof oldval === "object" && oldval._id) ? { ...oldval, ['title']: newval } : newval; // Update the specific subtask
@@ -751,7 +751,7 @@ useEffect(() => {
         // }
     };
     const addSubtask = () => {
-        if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+        if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
             setissubopen(true)
             setSubtasks([...subtasks, '']);
         }
@@ -783,7 +783,7 @@ useEffect(() => {
 
     // Function to handle blur event on subtask input
     const handleBlur = (index) => {
-        if((memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' )){
+        if((memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' )){
             const subtaskValue = subtasks[index];
             if (subtaskValue === '') {
                 removeSubtask(index);
@@ -1207,7 +1207,7 @@ const renderSubtasks = () => {
     return (
         <>
             <Modal show={modalstate} onHide={async () => {
-                if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
                     TaskUpdate()
                 }
                 
@@ -1227,7 +1227,7 @@ const renderSubtasks = () => {
                         </div>
                     )}
                     <div className="project--form">
-                        { (memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) ?
+                        { (memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) ?
                         <>
                         <div className="project--form--inputs" data-tabid={fields['tab']}>
                             <Form onSubmit={() => { return false }} key={`taskform-${currentTask?.tab}`}>
@@ -1235,7 +1235,7 @@ const renderSubtasks = () => {
                                     <Form.Label><small>Title</small></Form.Label>
                                     <Form.Control type="text" key={`task-title-${currentTask?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || currentTask?.title || ""} onChange={handleChange} onBlur={(e) => {
                                         if (currentTask.title !== fields['title']) {
-                                            if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                                            if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
                                                 dispatch(updateTask(currentTask._id, { title: fields['title'] }))
                                             }
                                             
@@ -1345,7 +1345,7 @@ const renderSubtasks = () => {
                                             },
                                             onBlur: (e) => {
                                                 if (currentTask.customFields?.[field.name]?.meta_value !== fields[`custom_field[${field.name}]`]) {
-                                                    if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                                                    if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
                                                         const formData = new FormData();
                                                         const dynamicKey = `custom_field[${field.name}]`;
                                                         formData.append(dynamicKey, fields[`custom_field[${field.name}]`]);
@@ -1557,7 +1557,7 @@ const renderSubtasks = () => {
                                 <ListGroup.Item onClick={() => { dispatch(togglePopups('members', true)) }}><FaPlus />Assign to</ListGroup.Item>
                                 <p className="m-0">
                                     {fields['members'] && Object.keys(fields['members']).length > 0 && (
-                                        <MemberInitials directUpdate={true} members={fields['members']} showRemove={(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner') ? true : false} showall={true} showAssign={false} postId={`${currentTask?._id}`} type="task" />
+                                        <MemberInitials directUpdate={true} members={fields['members']} showRemove={(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner') ? true : false} showall={true} showAssign={false} postId={`${currentTask?._id}`} type="task" />
                                     )}
                                 </p>
 
@@ -1580,7 +1580,7 @@ const renderSubtasks = () => {
                                     <label onClick={() => { setDatePickerModal(true) }} className='date--new w-100 mb-0'>{fields['due_date'] ? fields['due_date'] : ''}</label>
                                 </ListGroup.Item>
                                 <ListGroup.Item onClick={() => { 
-                                    if(memberProfile?.permissions?.projects?.update_tasks_order === true || memberProfile?.role?.slug === 'owner'){
+                                    if(memberProfile?.role?.permissions?.projects?.update_tasks_order === true || memberProfile?.role?.slug === 'owner'){
                                         setFlowstatus(commonState.currentProject.workflow.tabs); setWorkflowStatus(true) 
                                     }
                                     
@@ -1607,7 +1607,7 @@ const renderSubtasks = () => {
                                     </Form.Group>
                                 </ListGroup.Item>
                                 <ListGroup.Item className='text-danger' onClick={async () => {
-                                    if(memberProfile?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner'){
+                                    if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner'){
                                         setLoader(true)
                                         await dispatch(deleteTask(currentTask._id))
                                         setLoader(false)

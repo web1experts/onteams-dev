@@ -203,8 +203,6 @@ export function currentMemberProfile(){
     const current_memberProfile = parseIfValidJSON(localStorage.getItem('mt_featureSwitches'));
     
     if (current_memberProfile) {
-      // let permissions = mergePermissions(current_memberProfile?.role?.permissions, current_memberProfile?.permissions)
-      // current_memberProfile.permissions = permissions
       return current_memberProfile;
     }
     return false;

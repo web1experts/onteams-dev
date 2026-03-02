@@ -331,21 +331,21 @@ useEffect(() => {
         selectedfilters = { ...selectedfilters, ...currentFilters };
       }
 
-      if (
-        memberProfile?.permissions?.tracking?.view_others === true &&
-        memberProfile?.permissions?.tracking?.selected_members?.length > 0
-      ) {
-        selectedfilters = {
-          ...selectedfilters,
-          ["selected_members"]:
-            memberProfile?.permissions?.tracking?.selected_members,
-        };
-      } else {
-        selectedfilters = {
-          ...selectedfilters,
-          ["selected_members"]: [memberProfile?._id],
-        };
-      }
+      // if (
+      //   memberProfile?.permissions?.tracking?.view_others === true &&
+      //   memberProfile?.permissions?.tracking?.selected_members?.length > 0
+      // ) {
+      //   selectedfilters = {
+      //     ...selectedfilters,
+      //     ["selected_members"]:
+      //       memberProfile?.permissions?.tracking?.selected_members,
+      //   };
+      // } else {
+      //   selectedfilters = {
+      //     ...selectedfilters,
+      //     ["selected_members"]: [memberProfile?._id],
+      //   };
+      // }
 
       await dispatch(getliveActivity(selectedfilters));
       setSpinner(false);
@@ -371,22 +371,6 @@ useEffect(() => {
       selectedfilters = { ...selectedfilters, ...currentFilters };
     }
 
-    if (
-      memberProfile?.permissions?.tracking?.view_others === true &&
-      memberProfile?.permissions?.tracking?.selected_members?.length > 0
-    ) {
-      selectedfilters = {
-        ...selectedfilters,
-        ["selected_members"]:
-          memberProfile?.permissions?.tracking?.selected_members,
-      };
-    } else {
-      selectedfilters = {
-        ...selectedfilters,
-        ["selected_members"]: [memberProfile?._id],
-      };
-    }
-
     await dispatch(getliveActivity(selectedfilters));
     setSpinner(false);
   };
@@ -404,21 +388,6 @@ useEffect(() => {
       selectedfilters = { ...selectedfilters, ...currentFilters };
     }
 
-    if (
-      memberProfile?.permissions?.tracking?.view_others === true &&
-      memberProfile?.permissions?.tracking?.selected_members?.length > 0
-    ) {
-      selectedfilters = {
-        ...selectedfilters,
-        ["selected_members"]:
-          memberProfile?.permissions?.tracking?.selected_members,
-      };
-    } else {
-      selectedfilters = {
-        ...selectedfilters,
-        ["selected_members"]: [memberProfile?._id],
-      };
-    }
     selectedfilters = { ...selectedfilters, ["status"]: "recordings" };
     await dispatch(getliveActivity(selectedfilters));
     setSpinner(false);
@@ -506,40 +475,28 @@ useEffect(() => {
     if (memberProfile?.role?.slug === "owner") {
       await dispatch(ListProjectsByMembers({ members: "all" }));
     } else {
-      const members = Array.from(
-        new Set(
-          [
-            memberProfile?._id,
-            ...(memberProfile?.permissions?.reports?.view_others
-              ? memberProfile?.permissions?.reports?.selected_members || []
-              : []),
-          ].filter(Boolean)
-        )
-      );
-
-      await dispatch(ListProjectsByMembers({ members: members }));
+      await dispatch(ListProjectsByMembers({ members: [memberProfile?._id] }));
     }
 
     await dispatch(ListMemberProjects(currentMember?._id));
   };
 
-  function formatTime(seconds) {
-    // Validate input: check if seconds is a valid non-negative number
-    if (typeof seconds !== "number" || seconds < 0 || isNaN(seconds)) {
-      return "00:00";
-    }
-    // Calculate hours, minutes, and seconds
-    const hours = Math.floor(seconds / 3600)
-      .toString()
-      .padStart(2, "0");
-    const minutes = Math.floor((seconds % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
-    return `${hours}:${minutes}`;
-  }
+  // function formatTime(seconds) {
+  //   // Validate input: check if seconds is a valid non-negative number
+  //   if (typeof seconds !== "number" || seconds < 0 || isNaN(seconds)) {
+  //     return "00:00";
+  //   }
+  //   // Calculate hours, minutes, and seconds
+  //   const hours = Math.floor(seconds / 3600)
+  //     .toString()
+  //     .padStart(2, "0");
+  //   const minutes = Math.floor((seconds % 3600) / 60)
+  //     .toString()
+  //     .padStart(2, "0");
+  //   return `${hours}:${minutes}`;
+  // }
 
   useEffect(() => {
-    //setActSpinner(false);
     setLiveStreaming({...liveStreaming, [currentActivity?._id] : currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"});
 
     if (
@@ -625,8 +582,60 @@ useEffect(() => {
     }
   }, [occupiedRanges]);
 
+  useEffect(() => {
+    setTimeslots(generateTimeSlots(10));
+  }, [timings.date])
+
+  const generateTimeSlots = (intervalMinutes = 10) => {
+  const slots = [];
+
+  const selectedDate = (timings?.date && timings?.date !== "")
+    ? new Date(timings.date)
+    : new Date();
+
+  // Start of selected day
+  const startOfDay = new Date(selectedDate);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  // Current real time
+  const now = new Date();
+
+  // Determine end time
+  let endTime;
+
+  const isToday =
+    selectedDate.toDateString() === now.toDateString();
+
+  if (isToday) {
+    // If selected date is today → stop at current time
+    endTime = now;
+  } else {
+    // If past date → allow full day
+    endTime = new Date(startOfDay);
+    endTime.setHours(23, 59, 59, 999);
+  }
+
+  let current = new Date(startOfDay);
+
+  while (current <= endTime) {
+    let hours = current.getHours();
+    const minutes = current.getMinutes().toString().padStart(2, "0");
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+
+    const formattedHours = hours.toString().padStart(2, "0");
+
+    slots.push(`${formattedHours}:${minutes} ${ampm}`);
+
+    current.setMinutes(current.getMinutes() + intervalMinutes);
+  }
+
+  return slots;
+};
+
   // Generate time slots for the day
-  const generateTimeSlots = (intervalMinutes = 15) => {
+  const generateTimeSlotsOld = (intervalMinutes = 10) => {
     const slots = [];
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0); // Set to start of the day
@@ -1802,8 +1811,8 @@ const ymd = (dateLike) => {
                         </Form.Group>
                       </Form>
                     </ListGroup.Item>
-                    {(memberProfile?.permissions?.reports
-                      ?.create_edit_delete === true ||
+                    {(memberProfile?.role?.permissions?.time_tracking
+                      ?.add_manual_time === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <Dropdown className="select--dropdown manual--dropdown">
                         <Dropdown.Toggle variant="success" id="dropdown-basic">
@@ -1813,7 +1822,7 @@ const ymd = (dateLike) => {
                           <Dropdown.Item onClick={handleShow}>
                             Manual Time
                           </Dropdown.Item>
-                          {memberProfile?.permissions?.reports
+                          {memberProfile?.role?.permissions?.reports
                             ?.update_manual_time === true && (
                             <Dropdown.Item
                               onClick={handleNewShow}
@@ -2697,8 +2706,8 @@ const ymd = (dateLike) => {
                                               <Card.Body>
                                                 {screenshotData?.is_deleted !==
                                                   true &&
-                                                  memberProfile?.permissions
-                                                    ?.tracking
+                                                  memberProfile?.role?.permissions
+                                                    ?.time_tracking
                                                     ?.delete_recordings ===
                                                     true &&
                                                   memberProfile?._id ===
@@ -2901,8 +2910,8 @@ const ymd = (dateLike) => {
                                                       {videoData?.is_deleted !==
                                                         true &&
                                                         memberProfile
-                                                          ?.permissions
-                                                          ?.tracking
+                                                          ?.role?.permissions
+                                                          ?.time_tracking
                                                           ?.delete_recordings ===
                                                           true &&
                                                         memberProfile?._id ===
@@ -3416,7 +3425,7 @@ const ymd = (dateLike) => {
                 </Col>
                 <Col md={6} className="mb-3 mb-md-0">
                   
-                  <Dropdown className="select--dropdown" datattimeeee={timings?.start_time} key={`dropdown-${timings?.start_time || 'start'}`}>
+                  <Dropdown className="select--dropdown" key={`dropdown-${timings?.start_time}-${timeSlots.length}`}>
                     <Dropdown.Toggle variant="success" key={'start-timing'}>
                       {timings?.start_time || "Start Time"}
                     </Dropdown.Toggle>

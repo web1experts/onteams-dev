@@ -38,7 +38,8 @@ const apiKeys = {
     post: 'post',
     custom_field: 'custom_field',
     quote: '/workspace/getQuote',
-    system_field: 'system_field'
+    system_field: 'system_field',
+    teams: '/teams'
 };
   
 export default apiKeys;

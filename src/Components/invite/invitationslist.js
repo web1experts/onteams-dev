@@ -128,7 +128,7 @@ function InvitationList(props) {
                                 <Dropdown.Toggle variant="primary">
                                   <FaEllipsisV />
                                 </Dropdown.Toggle>
-                                {memberProfile?.permissions?.members
+                                {memberProfile?.role?.permissions?.members
                                   ?.create_edit_delete === true ||
                                 memberProfile?.role?.slug === "owner" ? (
                                   <>

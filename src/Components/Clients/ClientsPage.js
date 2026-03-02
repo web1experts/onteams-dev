@@ -590,7 +590,7 @@ function ClientsPage() {
                       >
                         <GrExpand />
                       </ListGroup.Item>
-                      {(memberProfile?.permissions?.clients
+                      {(memberProfile?.role?.permissions?.clients
                         ?.create_edit_delete === true ||
                         memberProfile?.role?.slug === "owner") && (
                         <ListGroup.Item
@@ -970,7 +970,7 @@ function ClientsPage() {
                     accept=".jpg, .jpeg, .png, .gif"
                   />
                 )}
-                {memberProfile?.permissions?.clients?.create_edit_delete ===
+                {memberProfile?.role?.permissions?.clients?.create_edit_delete ===
                   true || memberProfile?.role?.slug === "owner" ? (
                   <>
                     <Form.Label 
@@ -1015,7 +1015,7 @@ function ClientsPage() {
               <Card.Body>
                 <Card.Title>
                   <FiMail /> Client Information
-                  {(memberProfile?.permissions?.clients?.create_edit_delete ===
+                  {(memberProfile?.role?.permissions?.clients?.create_edit_delete ===
                     true ||
                     memberProfile?.role?.slug === "owner") && (
                     <Dropdown>
@@ -1130,7 +1130,7 @@ function ClientsPage() {
                 </Card.Text>
                 {isEditing === true && (
                   <div className="text-end mt-3">
-                    {(memberProfile?.permissions?.clients
+                    {(memberProfile?.role?.permissions?.clients
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <>

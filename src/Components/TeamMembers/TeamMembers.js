@@ -33,12 +33,12 @@ import RolesPage from "../Settings/RolesPage";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { logout } from "../../redux/actions/auth.actions";
 import { getActiveSubscription } from "../../redux/actions/subscription.action";
+import { getTeams } from "../../redux/actions/team.action";
 
 function TeamMembersPage() {
   const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
   const currentMember = getMemberdata();
-  //const addToast = useToast();
   const [isActive, setIsActive] = useState(0);
   const [activeItems, setActiveItems] = useState([]);
   const handleClick = (event) => {
@@ -51,21 +51,11 @@ function TeamMembersPage() {
       : [...prev, index] // add if not selected
   );
 };
+const [teamfeed, setTeamFeed] = useState([]);
   const subscriptionState = useSelector((state) => state.subscription);
   const [invitationsTotal, setInvitationsTotal] = useState(0)
   const [activeSubscription, setActiveSubscription] = useState(null)
-  const [showdelete, setShowDelete] = useState(false);
-  const [activeKey, setActiveKey] = useState(null);
-  const [activeRole, setActiveRole] = useState({});
-
-  const handleDeleteRole = async (e) => {
-    setLoader(true); 
-    dispatch(deleteRole(activeRole._id))
-  }
-
-  const [screenshots, setScreenshots] = useState(true);
-  const [screenRecording, setScreenRecording] = useState(false);
-  const [liveScreen, setLiveScreen] = useState(false);
+   const teamsState = useSelector((state) => state.teams)
 
   const [showSetting, setSettingShow] = useState(false);
   const handleSettingClose = () => setSettingShow(false);
@@ -73,9 +63,6 @@ function TeamMembersPage() {
 
   const handleTableToggle = (member) => {
     setSelectedMember(member);
-    // if (!isActive) {
-    //   setIsActive(true);
-    // }
   };
   const apiPermission = useSelector((state) => state.permissions);
   const apiCustomfields = useSelector((state) => state.customfields);
@@ -92,8 +79,6 @@ function TeamMembersPage() {
   const [updateloader, setUpdateLoader] = useState(false);
   const [showPermissions, setShowPermissions] = useState(false);
   const [memberIndex, setMemberIndex] = useState("");
-  // const [memberMeta, setMemberMeta] = useState({})
-  // const [disable, setDisable] = useState(true);
   const [visiblePasswords, setVisiblePasswords] = useState({});
   const [showCustomFields, setShowCustomFields] = useState(false);
   const [customFields, setCustomFields] = useState([]);
@@ -111,11 +96,11 @@ function TeamMembersPage() {
     setSearch(e.target.value);
   };
   const [tab, setTab] = useState("details");
-  const handleShow = () => setShow(true);
+  const handleShow = () => {
+    setShow(true)
+    selectboxObserver()
+  };
   const [activeTab, setActiveTab] = useState("Members");
-  // const [activeSubTab, setActiveSubTab] = useState("Grid");
-  const [activeSubTab, setActiveSubTab] = useState("GridView");
-  const [resetmemberList, setresetmemberList] = useState(false);
   const handleSidebar = () =>
     dispatch(toggleSidebar(commonState.sidebar_open ? false : true));
   const handleSidebarSmall = () =>
@@ -169,13 +154,6 @@ function TeamMembersPage() {
     );
   };
 
-  useEffect(() => {
-    console.log('invitationsTotal:: ', invitationsTotal)
-  }, [invitationsTotal])
-  
-  useEffect(() => {
-    console.log('memberfeed length:: ', memberFeeds.length)
-  }, [memberFeeds])
   const toggleCustomFields = () => {
     setShowCustomFields((prev) => !prev);
   };
@@ -232,6 +210,16 @@ function TeamMembersPage() {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
+    dispatch(getTeams());
+  }, [dispatch])
+
+  useEffect(() => {
+    if (teamsState && teamsState.teams) {
+      setTeamFeed(teamsState.teams);
+    }
+  }, [teamsState])
+
+  useEffect(() => {
     if (isEditing === true) {
       selectboxObserver();
     }
@@ -260,7 +248,7 @@ useEffect(() => {
   useEffect(() => {
     if (apiResult.success) { console.log('on success', activeTab)
       if (activeTab === "Members") {
-        if (apiResult.updatedMember) { console.log('I am here')
+        if (apiResult.updatedMember) { 
           socket.emit("refresh_record_type", selectedMember?._id);
           socket.emit("refresh_record_types", selectedMember?._id);
           const updatedMemberFeeds = memberFeeds.map((m) =>
@@ -271,6 +259,7 @@ useEffect(() => {
 
           setMemberFeed(updatedMemberFeeds);
           setSelectedMember(apiResult.updatedMember);
+          setIsEditing(false)
         } else {
           handleListMember();
         }
@@ -328,14 +317,6 @@ useEffect(() => {
     if (apiCustomfields.customFields) {
       setCustomFields(apiCustomfields.customFields);
     }
-
-    // if (apiCustomfields.newField) {
-    //   setCustomFields((prevCustomFields) => [
-    //     apiCustomfields.newField,
-    //     ...prevCustomFields,
-    //   ]);
-    // }
-
     if (
       apiCustomfields.newField &&
         apiCustomfields.newField?.module === "members"
@@ -374,9 +355,6 @@ useEffect(() => {
     if (selectedMember !== null) {
       const cleanedMeta = { ...selectedMember?.memberMeta };
 
-      // if (cleanedMeta?.permissions) {
-      //   delete cleanedMeta.permissions;
-      // }
       // Add 'recordings' key with value 'both' if not present
       if (!("screenshot_recording" in cleanedMeta)) {
         cleanedMeta.screenshot_recording = {
@@ -400,6 +378,7 @@ useEffect(() => {
       let fieldsSetup = {
         name: selectedMember?.name,
         role: selectedMember?.role?._id,
+        selected_teams: selectedMember?.teams || []
       };
 
       if (cleanedMeta && Object.keys(cleanedMeta).length > 0) {
@@ -456,10 +435,6 @@ useEffect(() => {
       });
     }
   }, [selectedMember]);
-
-  const handleEditClick = (fieldName) => {
-    setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
-  };
 
   // Debounced search handler
       const debouncedUpdateSearch = useMemo(
@@ -624,6 +599,10 @@ useEffect(() => {
       updatedErrors["email"] = "Email must be unique";
     }
 
+    if(fields?.selected_teams && fields?.selected_teams?.length === 0 || !fields?.selected_teams ){
+      updatedErrors["selected_teams"] = "You must assigned 1 team to a member.";
+    }
+
     // Check if there are any errors
     const hasError = Object.keys(updatedErrors).length > 0;
 
@@ -631,7 +610,7 @@ useEffect(() => {
     if (hasError) {
       setLoader(false);
       setErrors(updatedErrors);
-    } else {
+    } else { 
       const formData = new FormData();
       Object.entries(fields).forEach(([fieldName, value]) => {
         if (Array.isArray(value)) {
@@ -822,6 +801,10 @@ useEffect(() => {
         }
       });
 
+      if(fields?.selected_teams && fields?.selected_teams?.length === 0 || !fields?.selected_teams ){
+        fieldErrors["selected_teams"] = "You must assigned atleast 1 team to a member.";
+      }
+
       // Check if there are any errors
       const hasError = Object.keys(fieldErrors).length > 0;
       // If there are errors, update the errors state
@@ -925,7 +908,7 @@ useEffect(() => {
                 <ListGroup horizontal className={isActive ? "d-none" : "me-2 ms-auto d-none d-xl-flex" }>
                   <ListGroup horizontal>
                     <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
-                    {(memberProfile?.permissions?.members
+                    {(memberProfile?.role?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
@@ -948,9 +931,14 @@ useEffect(() => {
                   <ListGroup horizontal className={isActive ? "d-none" : "d-flex bg-white expand--icon"}>
                     <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdFilterList /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>
-                    <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
+                    {
+                      (memberProfile?.role?.slug === "owner") && (
+                        <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
+                      )
+                    }
+                    
                     <ListGroup.Item className="d-none d-lg-flex" onClick={handleToggles}><GrExpand /></ListGroup.Item>
-                    {(memberProfile?.permissions?.members
+                    {(memberProfile?.role?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <ListGroup.Item className="btn btn-primary"  onClick={() => {
@@ -1210,14 +1198,13 @@ useEffect(() => {
                 <Card.Body className="p-0">
                   <Card.Title>
                     <LuUser /> Member Information
-                    {(memberProfile?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( 
+                    {(memberProfile?.role?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( 
                       <Dropdown>
                         <Dropdown.Toggle variant="dark" id="dropdown-basic">
                           <FaEllipsisV />
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
-                          <Dropdown.Item onClick={() => handleTeamsShow()} className="d-flex align-items-center gap-1"><AiOutlineTeam className="me-1" /> Change</Dropdown.Item>
                           <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> 
                           {
                             memberProfile?._id === selectedMember?._id ? 
@@ -1281,7 +1268,7 @@ useEffect(() => {
                               {selectedMember?.email}
                             </p>
                           </ListGroup.Item>
-                          {(memberProfile?.permissions?.members
+                          {(memberProfile?.role?.permissions?.members
                             ?.create_edit_delete === true &&
                             selectedMember?._id !== memberProfile?._id) ||
                           (memberProfile?.role?.slug === "owner" &&
@@ -1323,6 +1310,41 @@ useEffect(() => {
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>
+                          <ListGroup.Item>
+                            <span className="info--icon">
+                              <FiMail />
+                            </span>
+                            <p>
+                              <small>Teams</small>
+                              </p>
+                              {teamfeed?.map(
+                                (team) => (
+                                  <Form.Check
+                                    inline
+                                    label={team?.name}
+                                    name="selected_teams[]"
+                                    type="checkbox"
+                                    id={`inline-${team?._id}`}
+                                    checked={fields?.selected_teams?.includes(team?._id)}
+                                    onChange={(e) => {
+                                      handleChange({
+                                        target: {
+                                          name: "selected_teams[]",
+                                          value: team?._id,
+                                          type: "checkbox",
+                                          checked: e.target.checked,
+                                        },
+                                      });
+                                    }}
+                                  />
+                                ),
+                              )}
+                            {errors["selected_teams"] || ''}  
+                      </ListGroup.Item>
+                      </ListGroup>
+                      </Card.Text>
+                      <Card.Text>
+                        <ListGroup>
                           
                           {customFields?.length > 0 && (
                             <>
@@ -1361,7 +1383,7 @@ useEffect(() => {
                   )}
                   {isEditing === true && (
                     <div className="text-end mt-3">
-                      {(memberProfile?.permissions?.members
+                      {(memberProfile?.role?.permissions?.members
                         ?.create_edit_delete === true &&
                         selectedMember?._id !== currentMember?._id) ||
                       memberProfile?.role?.slug === "owner" ? (
@@ -1371,7 +1393,7 @@ useEffect(() => {
                       ) : (
                         <></>
                       )}
-                      {memberProfile?.permissions?.members?.create_edit_delete ===
+                      {memberProfile?.role?.permissions?.members?.create_edit_delete ===
                         true || memberProfile?.role?.slug === "owner" ? (
                         <Button variant="primary" disabled={updateloader} onClick={handleUpdateSubmit}>{updateloader ? "Please Wait..." : "Save Changes"}</Button>
                       ) : (
@@ -1452,113 +1474,7 @@ useEffect(() => {
                   </div>
                 </Card.Body>
               </Card>
-              <Card className="permission--card">
-                <Card.Body>
-                  <Card.Title>
-                    <FiShield /> Permissions & Access{" "}
-                    {
-                      (memberProfile &&
-                      Object.keys(memberProfile).length > 0 &&
-                      memberProfile?.permissions?.members?.create_edit_delete === true ||
-                      memberProfile?.role?.slug !== "owner") ? (
-                        <Button variant="primary" className="ms-auto d-flex align-items-center gap-1" onClick={() => {setAdjustPermissions(true);}}><FaCog /> Manage Permissions</Button>) : <></>                    
-                      }
-                    </Card.Title>
-                  <Card.Text>
-                   
-                    {/* /*New Accordion Design*/}
-                    <Accordion className="new--accordion--block">
-                      {permissionModules.map((mod, ind) => {
-                         const modSlug = mod.slug;
-                        const modPerms = permissions?.[modSlug] || {};
-                        const isExpanded = expanded?.[modSlug] || false;
-                        const truePermissionCount = Object.values(
-                          modPerms
-                        ).filter((val) => val === true).length;
-                        if(truePermissionCount === 0){
-                          return;
-                        }
-                        return (
-                          <Accordion.Item eventKey={ind} className="bg--blue--accordion">
-                            <Accordion.Header>
-                              <div className="d-flex gap-3 align-items-center">
-                                {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                                <h6 className="mb-0">{permissionsLabel[modSlug]?.heading}<small className="d-block"> {permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                              </div>
-                            </Accordion.Header>
-                            <Accordion.Body>
-                               {(mod.permissions || []).map((perm) => {
-                                  const isChecked = !!modPerms[perm];
-                                  if (!isChecked) return null;
-
-                                  const label = perm
-                                    .replace(/[_-]/g, " ")
-                                    .replace(/^\w/, (l) => l.toUpperCase());
-
-                                  return (
-                                    <Card className="mb-3" key={`${modSlug}-${perm}`}>
-                                      <span className="card--icon icon--green">
-                                        {permissionsLabel[modSlug][perm]?.icon || <BsEye />}
-                                      </span>
-                                      <Card.Body>
-                                        <Card.Title>{permissionsLabel[modSlug][perm]?.heading}</Card.Title>
-                                        <Card.Text>{permissionsLabel[modSlug][perm]?.sub_heading}</Card.Text>
-
-                                        {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
-                                          perm === "view_others" &&
-                                          Array.isArray(modPerms["selected_members"]) &&
-                                          modPerms["selected_members"].length > 0 && (
-                                            <div className="team--card--grid" key={`members-grid-${modSlug}`}>
-                                              {memberFeeds.map((member) => {
-                                                if (!modPerms["selected_members"].includes(String(member._id))) {
-                                                  return null;
-                                                }
-                                                return (
-                                                  
-                                                    <Card className="team--card">
-                                                      <span className="team--initial">
-                                                        {member.name?.charAt(0) || "U"}
-                                                      </span>
-                                                      <Card.Body>
-                                                        <h4>
-                                                          {member.name}{" "}
-                                                          <small className="d-block">{member.role?.name}</small>
-                                                        </h4>
-                                                      </Card.Body>
-                                                    </Card>
-                                                  
-                                                );
-                                              })}
-
-                                              {modSlug === "projects" &&
-                                                modPerms["selected_members"].includes("unassigned") && (
-                                                  <Card className="team--card">
-                                                    <span className="team--initial">
-                                                      {"U"}
-                                                    </span>
-                                                    <Card.Body>
-                                                      <h4>
-                                                        Unassigned
-                                                      </h4>
-                                                    </Card.Body>
-                                                  </Card>
-                                                )}
-                                            </div>
-                                          )}
-                                      </Card.Body>
-                                    </Card>
-                                  );
-                                })}
-
-                            </Accordion.Body>
-                          </Accordion.Item>
-                        )
-                      })}
-                      
-                    </Accordion>
-                  </Card.Text>
-                </Card.Body>
-              </Card>
+              
             </div>
           </>
         </div>
@@ -1596,18 +1512,70 @@ useEffect(() => {
                     />
                   </FloatingLabel>
                   {showError("email")}
-                  <span className="badge bg-success px-3 py-2">{fields?.rolename || ''}</span>
+                 
                 </Form.Group>
-
-                <Button
+                {/* <Button
                   variant="primary"
                   onClick={() => {
                     showPermissionsModal();
                   }}
                 >
                   Select Role
-                </Button>
+                </Button> */}
                 {showError("role")}
+              </div>
+              <div className="form-row pb-3" key={'row-role'}>
+                <Form.Group className="mb-0 form-group">
+                  <Form.Select
+                    placeholder="Select role"
+                    area-label="Role"
+                    name="role"
+                    controlId="floatingSelect"
+                    className={"form-control custom-selectbox"}
+                    value={fields?.role || roles?.[0]?._id || ""}
+                    onChange={(e) => {
+                      handleChange(e);
+                      const matchedRole = roles.find(
+                        (role) => role._id === e.target.value
+                      );
+                      // handleChange({ target: { name: 'rolename', value: matchedRole.name } });
+                      const matchedPermissions = matchedRole
+                        ? matchedRole.permissions
+                        : [];
+                      setPermissions(matchedPermissions);
+                    }}
+                  >
+                    {roles.map((role, roleIndex) => (
+                      <option key={`role-${roleIndex}`} value={role._id}>
+                        {role.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </div>
+              <div className="form-row pb-3">
+                    {teamfeed?.map(
+                      (team) => (
+                        <Form.Check
+                          inline
+                          label={team?.name}
+                          name="selected_teams[]"
+                          type="checkbox"
+                          id={`inline-${team?._id}`}
+                          onChange={(e) => {
+                            handleChange({
+                              target: {
+                                name: "selected_teams[]",
+                                value: team?._id,
+                                type: "checkbox",
+                                checked: e.target.checked,
+                              },
+                            });
+                          }}
+                        />
+                      ),
+                    )}
+                  {showError("selected_teams")}  
               </div>
               <div className="form-row" key={`row-1`}>
                 <Form.Group className="mb-0 form-group other__fields">
@@ -1756,7 +1724,7 @@ useEffect(() => {
                                       />
                                     </div>
                                     {[
-                                      "tracking",
+                                      "time_tracking",
                                       "projects",
                                       "reports",
                                       "attendance",
@@ -1881,7 +1849,7 @@ useEffect(() => {
                           />
                         </div>
                         {[
-                          "tracking",
+                          "time_tracking",
                           "projects",
                           "reports",
                           "attendance",
@@ -1954,7 +1922,7 @@ useEffect(() => {
       (selectedMember?._id !== memberProfile?._id &&
         memberProfile &&
         Object.keys(memberProfile).length > 0 &&
-        memberProfile?.permissions?.members?.create_edit_delete === true ||
+        memberProfile?.role?.permissions?.members?.create_edit_delete === true ||
         memberProfile?.role?.slug !== "owner") ? (
         <>
           <AlertDialog
@@ -2008,18 +1976,10 @@ useEffect(() => {
             </Form.Group>
           </Form>
           <ListGroup className="status--list">
-            {[
-              "#3b82f6",
-              "#8b5cf6",
-              "#ec4899",
-              "#f59e0b",
-              "#10b981",
-              "#6366f1",
-              "#14b8a6"
-            ].map((color, index) => (
-              <ListGroup.Item key={index} onClick={() => handleClickTeams(index)} className={activeItems.includes(index) ? "status--active" : ""}> 
-                <span className="team--color" style={{ background: color }}></span> 
-                <p>Default Team {activeItems.includes(index) && <FaCheck />} </p>
+            {teamfeed.map((team, index) => (
+              <ListGroup.Item key={index} onClick={() => handleClickTeams(team?._id)} className={fields?.selected_teams?.includes(team?._id) ? "status--active" : ""}> 
+                <span className="team--color" style={{ background: team?.color }}></span> 
+                <p>{team?.name} {fields?.selected_teams?.includes(team?._id) && <FaCheck />} </p>
               </ListGroup.Item>
             ))}
           </ListGroup>
@@ -2043,7 +2003,7 @@ useEffect(() => {
                 <Dropdown.Menu>
                   <div className="drop--scroll">
                     <Dropdown.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
-                    {(memberProfile?.permissions?.members
+                    {(memberProfile?.role?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <Dropdown.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</Dropdown.Item>

@@ -122,7 +122,7 @@ function Roles() {
       });
 
       // For modules that have selected_members, add them
-      if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
+      if (["time_tracking", "projects", "reports", "attendance"].includes(modSlug)) {
         if (isChecked) {
           const allMemberIds = memberFeeds.map((m) => String(m._id));
           if (modSlug === "projects") {
@@ -658,7 +658,7 @@ function Roles() {
                                 />
                             </div>
                             {[
-                                "tracking",
+                                "time_tracking",
                                 "projects",
                                 "reports",
                                 "attendance",
@@ -799,7 +799,7 @@ function Roles() {
                                         />
                                     </div>
                                     {[
-                                        "tracking",
+                                        "time_tracking",
                                         "projects",
                                         "reports",
                                         "attendance",

@@ -231,7 +231,7 @@ const privateRoutes = [
         key: 'TIME_TRACKING',
         component: <TimeTrackingPage/>,
         route: '/time-tracking',
-        module: 'tracking'
+        module: 'time_tracking'
     },
     {
         type: 'page',

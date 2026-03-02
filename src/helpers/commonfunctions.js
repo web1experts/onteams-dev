@@ -562,3 +562,31 @@ export function  hexToRgba (hex, opacity) {
   }
   return hex;
 };
+
+export const getMembersFromTeams = (teamFeed, selectedTeamIds) => {
+    if (!Array.isArray(teamFeed) || !Array.isArray(selectedTeamIds)) {
+      return [];
+    }
+
+    const seen = new Set();
+    const result = [];
+
+    teamFeed.forEach((team) => {
+      if (!selectedTeamIds.includes(String(team?._id))) return;
+
+      if (!Array.isArray(team?.members)) return;
+
+      team.members.forEach((member) => {
+        const memberId = String(member?._id);
+        if (!memberId || seen.has(memberId)) return;
+
+        seen.add(memberId);
+        result.push({
+          value: memberId,
+          label: member.name,
+        });
+      });
+    });
+
+    return result;
+  };

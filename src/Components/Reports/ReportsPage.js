@@ -27,6 +27,7 @@ import {
   showAmPmtime,
   getMemberdata,
   selectboxObserver,
+  getMembersFromTeams
 } from "../../helpers/commonfunctions";
 import {
   LuFolderOpen,
@@ -62,7 +63,7 @@ import {
   ListMemberProjects,
 } from "../../redux/actions/project.action";
 import DatePicker from "react-multi-date-picker";
-import { ListTasks } from "../../redux/actions/task.action";
+import { getTeams } from "../../redux/actions/team.action";
 import { currentMemberProfile } from "../../helpers/auth";
 import { Link } from "react-router-dom";
 import "media-chrome";
@@ -91,6 +92,8 @@ function ReportsPage() {
   const [showNew, setShowNew] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [teamfeed, setTeamFeed] = useState([]);
+  const teamsState = useSelector((state) => state.teams)
 
   const filterDisplayLabels = {
     today: "Today",
@@ -296,26 +299,26 @@ function ReportsPage() {
       [filters]
     );
 
-  const handleListProjects = async () => {
-    if (memberProfile?.role?.slug === "owner") {
-      await dispatch(ListProjectsByMembers({ members: "all" }));
-    } else {
-      const members = Array.from(
-        new Set(
-          [
-            memberProfile?._id,
-            ...(memberProfile?.permissions?.reports?.view_others
-              ? memberProfile?.permissions?.reports?.selected_members || []
-              : []),
-          ].filter(Boolean)
-        )
-      );
+  // const handleListProjects = async () => {
+  //   if (memberProfile?.role?.slug === "owner") {
+  //     await dispatch(ListProjectsByMembers({ members: "all" }));
+  //   } else {
+  //     const members = Array.from(
+  //       new Set(
+  //         [
+  //           memberProfile?._id,
+  //           ...(memberProfile?.role?.permissions?.reports?.
+  //             ? memberProfile?.role?.permissions?.reports?.selected_members || []
+  //             : []),
+  //         ].filter(Boolean)
+  //       )
+  //     );
 
-      await dispatch(ListProjectsByMembers({ members: members }));
-    }
+  //     await dispatch(ListProjectsByMembers({ members: members }));
+  //   }
 
-    await dispatch(ListMemberProjects(memberdata?._id));
-  };
+  //   await dispatch(ListMemberProjects(memberdata?._id));
+  // };
 
   const handleReports = async () => {
     setSpinner(true);
@@ -328,10 +331,17 @@ function ReportsPage() {
   };
 
   useEffect(() => {
-    dispatch(Listmembers(0, "", false));
-    handleListProjects();
+    // dispatch(Listmembers(0, "", false));
+    // handleListProjects();
+    dispatch(getTeams())
     selectboxObserver();
   }, [dispatch]);
+
+  useEffect(() => {
+    if (teamsState && teamsState.teams) {
+      setTeamFeed(teamsState.teams);
+    }
+  }, [teamsState])
 
   useEffect(() => {
     if(remarksActive === true){
@@ -427,11 +437,11 @@ function ReportsPage() {
     }
   }, [reportState]);
 
-  useEffect(() => {
-    if (memberFeed && memberFeed.memberData) {
-      setMembers(memberFeed.memberData);
-    }
-  }, [memberFeed, dispatch]);
+  // useEffect(() => {
+  //   if (memberFeed && memberFeed.memberData) {
+  //     setMembers(memberFeed.memberData);
+  //   }
+  // }, [memberFeed, dispatch]);
 
   useEffect(() => {
     if (view === "single") {
@@ -597,7 +607,20 @@ function ReportsPage() {
     setReportOpen(true);
   };
 
-  const showRecordedTabs = () => {
+  const isMemberInTeam = (teams, memberId) => {
+    const combinedTeamMembers = getMembersFromTeams(teamfeed, teams);
+
+    if (!Array.isArray(combinedTeamMembers) || combinedTeamMembers.length === 0) {
+      return false;
+    }
+
+    return combinedTeamMembers.some(
+      (member) => String(member?.value) === String(memberId)
+    );
+
+  }
+
+  /*const showRecordedTabs = () => {
     return (
       <>
         <ListGroup horizontal className="screens--shots">
@@ -620,7 +643,7 @@ function ReportsPage() {
         </ListGroup>
       </>
     );
-  };
+  }; */
 
   const FilterButton = ({ position }) => {
     return (
@@ -1718,7 +1741,16 @@ const formattedDate = (date) => {
                           </Col>
                         </Row>
                         
-                        { memberProfile?.role?.slug === 'owner' || memberProfile?.permissions?.reports?.view_others && memberProfile?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.permissions?.reports?.selected_members.includes(singleMemberReport?.member?._id) || memberdata?._id === singleMemberReport?.member?._id ?
+                        { memberProfile?.role?.slug === 'owner' || 
+
+                          memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true 
+                          && memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 
+                          && memberProfile?.role?.permissions?.assigned_teams?.selected_team_members.includes(singleMemberReport?.member?._id) ||
+
+                          memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true 
+                          && memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 
+                          && isMemberInTeam(memberProfile?.role?.permissions?.assigned_teams?.selected_teams, singleMemberReport?.member?._id )
+                          || memberdata?._id === singleMemberReport?.member?._id ?
                           <Row>
                             <Col sm={12}>
                               <div className="border-top pt-3 mt-3">
@@ -1842,7 +1874,7 @@ const formattedDate = (date) => {
                             )}
                           </ul>
                             {
-                              memberProfile?.role?.slug === 'owner'  || memberProfile?.permissions?.reports?.view_others === true && memberProfile?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.permissions?.reports?.selected_members.includes(member?._id) 
+                              memberProfile?.role?.slug === 'owner'  || memberProfile?.role?.permissions?.reports?.view_others === true && memberProfile?.role?.permissions?.reports?.selected_members?.length > 0 && memberProfile?.role?.permissions?.reports?.selected_members.includes(member?._id) 
                               || memberdata?._id === member?._id ?
 
                               <Row>

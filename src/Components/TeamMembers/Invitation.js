@@ -10,9 +10,10 @@ import {
   ListGroup,
   Table,
   Dropdown,
+  FloatingLabel,
 } from "react-bootstrap";
+import { useToast } from "../../context/ToastContext";
 import { currentMemberProfile } from "../../helpers/auth";
-import { useNavigate } from "react-router-dom";
 import {
   permissionModules,
   permissionsLabel,
@@ -25,10 +26,17 @@ import {
 import { LuFolderOpen } from "react-icons/lu";
 import { FcInvite } from "react-icons/fc";
 import { GrExpand } from "react-icons/gr";
+import { AiOutlineTeam } from "react-icons/ai";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
-import { FaList, FaPlus, FaCog, FaEllipsisV } from "react-icons/fa";
+import { FaCheck, FaCog, FaEllipsisV } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
-import { FiMail, FiBriefcase, FiShield, FiCheck, FiTrash2 } from "react-icons/fi";
+import {
+  FiMail,
+  FiBriefcase,
+  FiShield,
+  FiCheck,
+  FiTrash2,
+} from "react-icons/fi";
 import {
   acceptCompanyinvite,
   listCompanyinvite,
@@ -46,6 +54,7 @@ import {
 } from "../../helpers/commonfunctions";
 import { renderDynamicField } from "../common/dynamicFields";
 import { BadgesModal } from "../modals/badges";
+import { getTeams } from "../../redux/actions/team.action";
 function Invitation(props) {
   const [isActiveView, setIsActiveView] = useState(2);
   const [showPermissions, setShowPermissions] = useState(false);
@@ -57,7 +66,9 @@ function Invitation(props) {
   const [showBadges, setShowBadges] = useState(null);
   const [visiblePasswords, setVisiblePasswords] = useState({});
   const dispatch = useDispatch();
+  const addToast = useToast();
   const [currentPage, setCurrentPage] = useState(0);
+  const [teamfeed, setTeamFeed] = useState([]);
   const apiCustomfields = useSelector((state) => state.customfields);
   const [customFields, setCustomFields] = useState([]);
   const [fields, setFields] = useState({ email: "", name: "", role: "" });
@@ -66,6 +77,7 @@ function Invitation(props) {
   const memberstate = useSelector((state) => state.member);
   const memberFeed = useSelector((state) => state.member.members);
   const invitationsFeed = useSelector((state) => state.member.invitations);
+  const teamsState = useSelector((state) => state.teams);
   const handleSidebarSmall = () =>
     dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
   const handleSidebar = () =>
@@ -81,18 +93,22 @@ function Invitation(props) {
   const workspaceState = useSelector((state) => state.workspace);
   const [roles, setRoles] = useState([]);
 
+
+
   const toggleVisibility = (key) => {
     setVisiblePasswords((prev) => ({
       ...prev,
       [key]: !prev[key],
     }));
   };
+
+
   const handleInvitationList = async () => {
     if (props.activeTab === "Invitations") {
       setInvitationsFeed([]);
 
       await dispatch(
-        listCompanyinvite(currentPage, props.listfor, props.searchTerm)
+        listCompanyinvite(currentPage, props.listfor, props.searchTerm),
       );
       setShowloader(false);
     }
@@ -110,7 +126,15 @@ function Invitation(props) {
     });
 
     setPermissions(prm);
+
+    dispatch(getTeams());
   }, []);
+
+  useEffect(() => {
+    if (teamsState && teamsState.teams) {
+      setTeamFeed(teamsState.teams);
+    }
+  }, [teamsState]);
 
   const toggleView = (module) => {
     const isChecked = !(permissions?.[module]?.view || false);
@@ -231,6 +255,8 @@ function Invitation(props) {
 
       let fieldsSetup = {
         role: selectedInvitation?.role?._id,
+        selected_teams: selectedInvitation?.teams || []
+
       };
 
       if (cleanedMeta && Object.keys(cleanedMeta).length > 0) {
@@ -365,6 +391,11 @@ function Invitation(props) {
   };
 
   const sentInviteAgain = (inviteId) => {
+
+    if (!fields?.selected_teams || fields?.selected_teams?.length === 0 ) {
+        addToast("You must assign atleast 1 team to a member.", 'danger');
+        return;
+    }
     const formData = new FormData();
     Object.entries(fields).forEach(([fieldName, value]) => {
       if (Array.isArray(value)) {
@@ -383,7 +414,6 @@ function Invitation(props) {
       }
     });
     dispatch(updateInvite(inviteId, formData));
-    // dispatch(resendInvite({ id: inviteId }));
   };
 
   const toggleShowPassword = (fieldId) => {
@@ -409,10 +439,11 @@ function Invitation(props) {
       const updatedinviteFeeds = invitationsFeeds.map((m) =>
         m._id.toString() === memberstate?.udpatedInvite?._id.toString()
           ? memberstate?.udpatedInvite
-          : m
+          : m,
       );
       setInvitationsFeed(updatedinviteFeeds);
       setSelectedInvitation(memberstate?.udpatedInvite);
+      setIsEditing(false)
     }
   }, [memberstate]);
 
@@ -433,8 +464,8 @@ function Invitation(props) {
         prevCustomFields.map((field) =>
           field._id === apiCustomfields.updatedField._id
             ? apiCustomfields.updatedField
-            : field
-        )
+            : field,
+        ),
       );
     }
   }, [apiCustomfields]);
@@ -473,219 +504,224 @@ function Invitation(props) {
                     props.activeSubTab === 1
                       ? "project--grid--table project--grid--new--table table-responsive-xl"
                       : props.activeSubTab === 2
-                      ? "project--table draggable--table new--project--rows table-responsive-xl"
-                      : "project--table new--project--rows table-responsive-xl"
+                        ? "project--table draggable--table new--project--rows table-responsive-xl"
+                        : "project--table new--project--rows table-responsive-xl"
                   }
                 >
-                  {invitationsFeeds && invitationsFeeds.length > 0
-                  ?
-                  <Table>
-                    <thead className="onHide">
-                      <tr key="project-table-header">
-                        <th
-                          scope="col"
-                          className="sticky p-0 border-bottom-0"
-                          key="client-name-header"
-                        >
-                          <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">
-                            Member{" "}
-                            <span key="client-action-header" className="onHide">
-                              Actions
-                            </span>
-                          </div>
-                        </th>
-                        {Array.isArray(customFields) &&
-                          customFields
-                            .filter((field) => field?.showInTable !== false)
-                            .map((field, idx) => (
-                              <th
-                                scope="col"
-                                key={`member-field-${idx}-header`}
-                                className="onHide p-0 border-bottom-0"
+                  {invitationsFeeds && invitationsFeeds.length > 0 ? (
+                    <Table>
+                      <thead className="onHide">
+                        <tr key="project-table-header">
+                          <th
+                            scope="col"
+                            className="sticky p-0 border-bottom-0"
+                            key="client-name-header"
+                          >
+                            <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">
+                              Member{" "}
+                              <span
+                                key="client-action-header"
+                                className="onHide"
                               >
-                                <div className="border-bottom padd--x">
-                                  {field.label}
-                                </div>
-                              </th>
-                            ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      { invitationsFeeds.map((invitation, index) => {
-                            return (
-                              <>
-                                <tr
-                                  key={`member-table-row-${index}`}
-                                  className={
-                                    invitation._id === selectedInvitation?._id
-                                      ? "project--active"
-                                      : ""
-                                  }
-                                  onClick={
-                                    isActive
-                                      ? () => handleTableToggle(invitation)
-                                      : () => {
-                                          return false;
-                                        }
-                                  }
+                                Actions
+                              </span>
+                            </div>
+                          </th>
+                          {Array.isArray(customFields) &&
+                            customFields
+                              .filter((field) => field?.showInTable !== false)
+                              .map((field, idx) => (
+                                <th
+                                  scope="col"
+                                  key={`member-field-${idx}-header`}
+                                  className="onHide p-0 border-bottom-0"
                                 >
-                                  <td
-                                    className="project--title--td sticky"
-                                    data-label="Member Name"
-                                  >
-                                    <div className="d-flex justify-content-between border-end flex-wrap">
-                                      <div className="project--name">
-                                        <div className="drag--indicator">
-                                          <abbr>{index + 1}</abbr>
-                                        </div>
-                                        <div className="title--initial">
-                                          {invitation.email.charAt(0)}
-                                        </div>
-                                        <div className="title--span flex-column align-items-start gap-0">
-                                          <span>{invitation.email}</span>
-                                          <strong>
-                                            {invitation.role?.name?.replace(
-                                              /\b\w/g,
-                                              function (char) {
-                                                return char.toUpperCase();
-                                              }
-                                            )}
-                                          </strong>
-                                        </div>
+                                  <div className="border-bottom padd--x">
+                                    {field.label}
+                                  </div>
+                                </th>
+                              ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {invitationsFeeds.map((invitation, index) => {
+                          return (
+                            <>
+                              <tr
+                                key={`member-table-row-${index}`}
+                                className={
+                                  invitation._id === selectedInvitation?._id
+                                    ? "project--active"
+                                    : ""
+                                }
+                                onClick={
+                                  isActive
+                                    ? () => handleTableToggle(invitation)
+                                    : () => {
+                                        return false;
+                                      }
+                                }
+                              >
+                                <td
+                                  className="project--title--td sticky"
+                                  data-label="Member Name"
+                                >
+                                  <div className="d-flex justify-content-between border-end flex-wrap">
+                                    <div className="project--name">
+                                      <div className="drag--indicator">
+                                        <abbr>{index + 1}</abbr>
                                       </div>
-                                      <div className="onHide task--buttons">
-                                        <Button
-                                          variant="primary"
-                                          className="px-3 py-2"
-                                          onClick={() => {
-                                            handleTableToggle(invitation);
-                                            setIsActive(true);
-                                          }}
-                                        >
-                                          <BsEye />
-                                        </Button>
+                                      <div className="title--initial">
+                                        {invitation.email.charAt(0)}
+                                      </div>
+                                      <div className="title--span flex-column align-items-start gap-0">
+                                        <span>{invitation.email}</span>
+                                        <strong>
+                                          {invitation.role?.name?.replace(
+                                            /\b\w/g,
+                                            function (char) {
+                                              return char.toUpperCase();
+                                            },
+                                          )}
+                                        </strong>
                                       </div>
                                     </div>
-                                  </td>
-                                  {Array.isArray(customFields) &&
-                                    customFields
-                                      .filter(
-                                        (field) => field?.showInTable !== false
-                                      )
-                                      .map((field, idx) => {
-                                        const fieldname = field.name;
-                                        let mvalue =
-                                          invitation?.custom_fields?.[
-                                            fieldname
-                                          ] || "";
-                                        const fieldType = field.type;
-                                        const uniqueKey = `${
-                                          fieldname || idx
-                                        }-${mvalue}`;
-                                        if (
-                                          field.type === "badge" &&
-                                          Array.isArray(field.options)
-                                        ) {
-                                          const matchedOption =
-                                            field.options.find(
-                                              (opt) => opt.value === mvalue
-                                            );
-                                          if (matchedOption) {
-                                            mvalue = (
-                                              <span
-                                                className="priority--badge"
-                                                style={{
-                                                  backgroundColor:
-                                                    matchedOption.color,
-                                                  color: "#fff",
-                                                  display: "inline-block",
-                                                  borderColor:
-                                                    matchedOption.color,
-                                                  borderWidth: "1px",
-                                                  borderStyle: "solid",
-                                                }}
-                                                onClick={() =>
-                                                  toggleBadges(field)
-                                                }
-                                              >
-                                                {
-                                                  invitation?.custom_fields?.[
-                                                    fieldname
-                                                  ]?.meta_value
-                                                }
-                                              </span>
-                                            );
-                                          }
-                                        } else if (fieldType === "password") {
-                                          return (
-                                            <span className="d-flex align-items-center gap-2">
-                                              {visiblePasswords[uniqueKey]
-                                                ? mvalue
-                                                : "*****"}
-                                              <span
-                                                style={{ cursor: "pointer" }}
-                                                onClick={() =>
-                                                  toggleVisibility(uniqueKey)
-                                                }
-                                              >
-                                                {visiblePasswords[uniqueKey] ? (
-                                                  <BsEyeSlash />
-                                                ) : (
-                                                  <BsEye />
-                                                )}
-                                              </span>
+                                    <div className="onHide task--buttons">
+                                      <Button
+                                        variant="primary"
+                                        className="px-3 py-2"
+                                        onClick={() => {
+                                          handleTableToggle(invitation);
+                                          setIsActive(true);
+                                        }}
+                                      >
+                                        <BsEye />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </td>
+                                {Array.isArray(customFields) &&
+                                  customFields
+                                    .filter(
+                                      (field) => field?.showInTable !== false,
+                                    )
+                                    .map((field, idx) => {
+                                      const fieldname = field.name;
+                                      let mvalue =
+                                        invitation?.custom_fields?.[
+                                          fieldname
+                                        ] || "";
+                                      const fieldType = field.type;
+                                      const uniqueKey = `${
+                                        fieldname || idx
+                                      }-${mvalue}`;
+                                      if (
+                                        field.type === "badge" &&
+                                        Array.isArray(field.options)
+                                      ) {
+                                        const matchedOption =
+                                          field.options.find(
+                                            (opt) => opt.value === mvalue,
+                                          );
+                                        if (matchedOption) {
+                                          mvalue = (
+                                            <span
+                                              className="priority--badge"
+                                              style={{
+                                                backgroundColor:
+                                                  matchedOption.color,
+                                                color: "#fff",
+                                                display: "inline-block",
+                                                borderColor:
+                                                  matchedOption.color,
+                                                borderWidth: "1px",
+                                                borderStyle: "solid",
+                                              }}
+                                              onClick={() =>
+                                                toggleBadges(field)
+                                              }
+                                            >
+                                              {
+                                                invitation?.custom_fields?.[
+                                                  fieldname
+                                                ]?.meta_value
+                                              }
                                             </span>
                                           );
                                         }
+                                      } else if (fieldType === "password") {
                                         return (
-                                          <td
-                                            key={`client-${
-                                              fieldname || idx
-                                            }-${mvalue}`}
-                                            className="onHide new--td"
-                                          >
-                                            <strong
-                                              className={
-                                                isActiveView === 1
-                                                  ? "d-flex text-uppercase fs-small"
-                                                  : isActiveView === 2
-                                                  ? "d-flex d-lg-none text-uppercase fs-small mb-1"
-                                                  : "d-flex d-lg-none text-uppercase fs-small mb-1"
+                                          <span className="d-flex align-items-center gap-2">
+                                            {visiblePasswords[uniqueKey]
+                                              ? mvalue
+                                              : "*****"}
+                                            <span
+                                              style={{ cursor: "pointer" }}
+                                              onClick={() =>
+                                                toggleVisibility(uniqueKey)
                                               }
                                             >
-                                              {field.label}
-                                            </strong>
-                                            {mvalue}
-                                          </td>
+                                              {visiblePasswords[uniqueKey] ? (
+                                                <BsEyeSlash />
+                                              ) : (
+                                                <BsEye />
+                                              )}
+                                            </span>
+                                          </span>
                                         );
-                                      })}
-                                  <td className="task--last--buttons mt-auto">
-                                    <div className="d-flex justify-content-between flex-wrap">
-                                      <div className="onHide">
-                                        <Button
-                                          variant="dark"
-                                          className="px-3 py-1"
-                                          onClick={() => {
-                                            handleTableToggle(invitation);
-                                            setIsActive(true);
-                                          }}
+                                      }
+                                      return (
+                                        <td
+                                          key={`client-${
+                                            fieldname || idx
+                                          }-${mvalue}`}
+                                          className="onHide new--td"
                                         >
-                                          <BsEye /> View
-                                        </Button>
-                                      </div>
+                                          <strong
+                                            className={
+                                              isActiveView === 1
+                                                ? "d-flex text-uppercase fs-small"
+                                                : isActiveView === 2
+                                                  ? "d-flex d-lg-none text-uppercase fs-small mb-1"
+                                                  : "d-flex d-lg-none text-uppercase fs-small mb-1"
+                                            }
+                                          >
+                                            {field.label}
+                                          </strong>
+                                          {mvalue}
+                                        </td>
+                                      );
+                                    })}
+                                <td className="task--last--buttons mt-auto">
+                                  <div className="d-flex justify-content-between flex-wrap">
+                                    <div className="onHide">
+                                      <Button
+                                        variant="dark"
+                                        className="px-3 py-1"
+                                        onClick={() => {
+                                          handleTableToggle(invitation);
+                                          setIsActive(true);
+                                        }}
+                                      >
+                                        <BsEye /> View
+                                      </Button>
                                     </div>
-                                  </td>
-                                </tr>
-                              </>
-                            );
-                          })
-                        }
-                    </tbody>
-                  </Table>
-                  : !showloader && invitationsFeeds && invitationsFeeds.length === 0 && (
-                    <div className="text-center">
+                                  </div>
+                                </td>
+                              </tr>
+                            </>
+                          );
+                        })}
+                      </tbody>
+                    </Table>
+                  ) : (
+                    !showloader &&
+                    invitationsFeeds &&
+                    invitationsFeeds.length === 0 && (
+                      <div className="text-center">
                         <h2>No Invitations Found</h2>
-                    </div>
+                      </div>
+                    )
                   )}
                 </div>
               </>
@@ -769,24 +805,40 @@ function Invitation(props) {
                 {(memberProfile?.permissions?.members?.create_edit_delete ===
                   true ||
                   memberProfile?.role?.slug === "owner") && (
-                    <Dropdown>
-                      <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                        <FaEllipsisV />
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => sentInviteAgain(selectedInvitation?._id)} className="d-flex align-items-center gap-1">
-                          <FcInvite className="me-1" /> Resend
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={() => {setIsEditing(true);
+                  <Dropdown>
+                    <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                      <FaEllipsisV />
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item
+                        onClick={() => sentInviteAgain(selectedInvitation?._id)}
+                        className="d-flex align-items-center gap-1"
+                      >
+                        <FcInvite className="me-1" /> Resend
+                      </Dropdown.Item>
+                      <Dropdown.Item
+                        onClick={() => {
+                          setIsEditing(true);
                           setTimeout(() => {
                             selectboxObserver();
-                          }, 650);}} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
-                        <Dropdown.Item onClick={() => rejectInvite(selectedInvitation?._id)} className="d-flex align-items-center gap-1"><FiTrash2 />  {props.listfor && props.listfor === "company"
-                    ? "Delete"
-                    : "Decline"}</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  
+                          }, 650);
+                        }}
+                        className="d-flex align-items-center gap-1"
+                      >
+                        <FiEdit className="me-1" /> Edit
+                      </Dropdown.Item>
+                      
+                      <Dropdown.Item
+                        onClick={() => rejectInvite(selectedInvitation?._id)}
+                        className="d-flex align-items-center gap-1"
+                      >
+                        <FiTrash2 />{" "}
+                        {props.listfor && props.listfor === "company"
+                          ? "Delete"
+                          : "Decline"}
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
                 )}
               </Card.Title>
               {isEditing === false ? (
@@ -874,6 +926,41 @@ function Invitation(props) {
                   </Card.Text>
                   <Card.Text>
                     <ListGroup>
+                      <ListGroup.Item>
+                        <span className="info--icon">
+                          <FiMail />
+                        </span>
+                        <p>
+                          <small>Teams</small>
+                          </p>
+                          {teamfeed?.map(
+                            (team) => (
+                              <Form.Check
+                                inline
+                                label={team?.name}
+                                name="selected_teams[]"
+                                type="checkbox"
+                                id={`inline-${team?._id}`}
+                                checked={fields?.selected_teams?.includes(team?._id)}
+                                onChange={(e) => {
+                                  handleChange({
+                                    target: {
+                                      name: "selected_teams[]",
+                                      value: team?._id,
+                                      type: "checkbox",
+                                      checked: e.target.checked,
+                                    },
+                                  });
+                                }}
+                              />
+                            ),
+                          )}
+                        {errors["selected_teams"] || ''}  
+                  </ListGroup.Item>
+                  </ListGroup>
+                  </Card.Text>
+                  <Card.Text>
+                    <ListGroup>
                       {customFields?.length > 0 && (
                         <>
                           {customFields.map((field, index) => (
@@ -886,7 +973,7 @@ function Invitation(props) {
                                   field.type === "date" &&
                                   fields[`custom_field[${field.name}]`]
                                     ? convertDDMMYYYYtoYYYYMMDD(
-                                        fields[`custom_field[${field.name}]`]
+                                        fields[`custom_field[${field.name}]`],
                                       )
                                     : fields[`custom_field[${field.name}]`] ||
                                       "",
@@ -896,7 +983,7 @@ function Invitation(props) {
                                   if (field.type === "date") {
                                     handleDateChange(
                                       e,
-                                      `custom_field[${field.name}]`
+                                      `custom_field[${field.name}]`,
                                     );
                                   } else {
                                     handleChange(e);
@@ -909,7 +996,7 @@ function Invitation(props) {
                                   ] || false,
                                 toggleShowPassword: () =>
                                   toggleShowPassword(
-                                    `custom_field[${field.name}]`
+                                    `custom_field[${field.name}]`,
                                   ),
                                 toggleBadges: () => toggleBadges(field),
                               })}
@@ -923,8 +1010,14 @@ function Invitation(props) {
               )}
               {isEditing === true && (
                 <div className="text-end mt-4">
-                  <Button variant="secondary" className="me-3" onClick={() => setIsEditing(false)}>Cancel</Button>
-                   
+                  <Button
+                    variant="secondary"
+                    className="me-3"
+                    onClick={() => setIsEditing(false)}
+                  >
+                    Cancel
+                  </Button>
+
                   {props.listfor && props.listfor === "company" ? (
                     <>
                       <Button
@@ -952,129 +1045,9 @@ function Invitation(props) {
               )}
             </Card.Body>
           </Card>
-          <Card className="permission--card">
-            <Card.Body>
-              <Card.Title>
-                <FiShield /> Permissions & Access{" "}
-                <Button
-                  variant="primary"
-                  className="ms-auto"
-                  onClick={() => {
-                    showPermissionsModal();
-                  }}
-                >
-                  <FaCog /> Manage Permissions
-                </Button>
-              </Card.Title>
-              <Card.Text>
-
-                <Accordion
-                  // activeKey={Object.entries(expanded)
-                  //   .filter(([_, v]) => v)
-                  //   .map(([k]) => k)}
-                  // alwaysOpen
-                  className="new--accordion--block"
-                >
-                  {permissionModules.map((mod, ind) => {
-                    const modSlug = mod.slug;
-                    const modPerms = permissions?.[modSlug] || {};
-                    const isExpanded = expanded?.[modSlug] || false;
-                    const truePermissionCount = Object.values(modPerms).filter(
-                      (val) => val === true
-                    ).length;
-
-                    // Show only modules with some true permissions
-                    if (truePermissionCount === 0) return;
-
-                    return (
-                      <Accordion.Item eventKey={ind} className="bg--blue--accordion">
-                        <Accordion.Header
-                          onClick={() => {
-                            setExpanded((prev) => ({
-                              ...prev,
-                              [modSlug]: !prev[modSlug],
-                            }));
-                          }}
-                        >
-                          <div className="d-flex gap-3 align-items-center">
-                            {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                            <h6 className="mb-0">{permissionsLabel[modSlug]?.heading}<small className="d-block"> {permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                           
-                          </div>
-                        </Accordion.Header>
-                        <Accordion.Body>
-                            {(mod.permissions || []).map((perm) => {
-                              const isChecked = !!modPerms[perm];
-                              if (!isChecked) return null;
-
-                              const label = perm
-                                .replace(/[_-]/g, " ")
-                                .replace(/^\w/, (l) => l.toUpperCase());
-
-                              return (
-                                <Card className="mb-3" key={`${modSlug}-${perm}`}>
-                                  <span className="card--icon icon--green">
-                                    {permissionsLabel[modSlug][perm]?.icon || <BsEye />}
-                                  </span>
-                                  <Card.Body>
-                                    <Card.Title>{permissionsLabel[modSlug][perm]?.heading}</Card.Title>
-                                    <Card.Text>{permissionsLabel[modSlug][perm]?.sub_heading}</Card.Text>
-
-                                    {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
-                                      perm === "view_others" &&
-                                      Array.isArray(modPerms["selected_members"]) &&
-                                      modPerms["selected_members"].length > 0 && (
-                                        <div className="team--card--grid" key={`members-grid-${modSlug}`}>
-                                          {memberFeeds.map((member) => {
-                                            if (!modPerms["selected_members"].includes(String(member._id))) {
-                                              return null;
-                                            }
-                                            return (
-                                              
-                                                <Card className="team--card">
-                                                  <span className="team--initial">
-                                                    {member.name?.charAt(0) || "U"}
-                                                  </span>
-                                                  <Card.Body>
-                                                    <h4>
-                                                      {member.name}{" "}
-                                                      <small className="d-block">{member.role?.name}</small>
-                                                    </h4>
-                                                  </Card.Body>
-                                                </Card>
-                                              
-                                            );
-                                          })}
-
-                                          {modSlug === "projects" &&
-                                            modPerms["selected_members"].includes("unassigned") && (
-                                              <Card className="team--card">
-                                                <span className="team--initial">
-                                                  {"U"}
-                                                </span>
-                                                <Card.Body>
-                                                  <h4>
-                                                    Unassigned
-                                                  </h4>
-                                                </Card.Body>
-                                              </Card>
-                                            )}
-                                        </div>
-                                      )}
-                                  </Card.Body>
-                                </Card>
-                              );
-                            })}
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    );
-                  })}
-                </Accordion>
-              </Card.Text>
-            </Card.Body>
-          </Card>
         </div>
       </div>
+      
       {showPermissions && (
         <Modal
           show={showPermissions}
@@ -1108,7 +1081,7 @@ function Invitation(props) {
                   onChange={(e) => {
                     handleChange(e);
                     const matchedRole = roles.find(
-                      (role) => role._id === e.target.value
+                      (role) => role._id === e.target.value,
                     );
                     // handleChange({ target: { name: 'rolename', value: matchedRole.name } });
                     const matchedPermissions = matchedRole
@@ -1138,7 +1111,7 @@ function Invitation(props) {
                         const isExpanded = expanded?.[modSlug] || false;
                         const isViewChecked = !!modPerms.view;
                         const truePermissionCount = Object.values(
-                          modPerms
+                          modPerms,
                         ).filter((val) => val === true).length;
 
                         return (
@@ -1200,7 +1173,7 @@ function Invitation(props) {
                                     />
                                   </div>
                                   {[
-                                    "tracking",
+                                    "time_tracking",
                                     "projects",
                                     "reports",
                                     "attendance",
@@ -1222,7 +1195,7 @@ function Invitation(props) {
                                               toggleMembers(
                                                 modSlug,
                                                 "selected_members",
-                                                member._id
+                                                member._id,
                                               );
                                               // }
                                             }}
@@ -1256,7 +1229,7 @@ function Invitation(props) {
                                               toggleMembers(
                                                 modSlug,
                                                 "selected_members",
-                                                "unassigned"
+                                                "unassigned",
                                               );
                                               // }
                                             }}

@@ -310,7 +310,7 @@ function HolidaysPage() {
                         <GrExpand />
                       </ListGroup.Item>
                       <ListGroup.Item>
-                        {(memberProfile?.permissions?.holidays
+                        {(memberProfile?.role?.permissions?.holidays
                           ?.create_edit_delete === true ||
                           memberProfile?.role?.slug === "owner") && (
                           <ListGroup.Item
@@ -447,7 +447,7 @@ function HolidaysPage() {
                                       key={`edit-item-${index}`}
                                       onClick={() => {
                                         if (
-                                          memberProfile?.permissions?.holidays
+                                          memberProfile?.role?.permissions?.holidays
                                             ?.create_edit_delete === true ||
                                           memberProfile?.role?.slug === "owner"
                                         ) {
@@ -464,7 +464,7 @@ function HolidaysPage() {
                                       key={`delete-item-${index}`}
                                       onClick={() => {
                                         if (
-                                          memberProfile?.permissions?.holidays
+                                          memberProfile?.role?.permissions?.holidays
                                             ?.create_edit_delete === true ||
                                           memberProfile?.role?.slug === "owner"
                                         ) {

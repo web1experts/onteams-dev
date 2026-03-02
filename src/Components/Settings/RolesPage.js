@@ -1,45 +1,79 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Form, Accordion, Tab, Badge, Card, Modal, FloatingLabel, Tabs, Row, Col, ListGroup} from "react-bootstrap";
-import { FaPlus } from "react-icons/fa";
-import { FiCheck, FiLock, FiUsers} from "react-icons/fi";
+import {
+  Button,
+  Form,
+  Accordion,
+  Tab,
+  Badge,
+  Card,
+  Modal,
+  FloatingLabel,
+  Tabs,
+  Row,
+  Col,
+  ListGroup,
+  Alert
+} from "react-bootstrap";
+import { FaPlus, FaTimesCircle, FaCheck, FaTrash } from "react-icons/fa";
+import { FiCheck, FiLock, FiUsers } from "react-icons/fi";
 import { LuFolderOpen, LuPencilLine } from "react-icons/lu";
 import Spinner from "react-bootstrap/Spinner";
-import { getUserProfile, updateProfile } from "../../redux/actions/auth.actions";
-import { getFieldRules, validateField } from "../../helpers/rules";
 import { AlertDialog } from "../modals";
-import { permissionModules, permissionsLabel } from "../../helpers/permissionsModules";
-import { updatePermissions, addRoleWithPermissions, deleteRole} from "../../redux/actions/permission.action";
+import {
+  permissionModules,
+  permissionsLabel,
+} from "../../helpers/permissionsModules";
+import {
+  updatePermissions,
+  addRoleWithPermissions,
+  deleteRole,
+} from "../../redux/actions/permission.action";
+import { currentMemberProfile } from "../../helpers/auth";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
-const secretKey = process.env.REACT_APP_SECRET_KEY;
+import { getTeams, createTeam, updateTeam, deleteTeam } from "../../redux/actions/team.action";
 
 function RolesPage() {
   const dispatch = useDispatch();
-  const [activeTab, setActiveTab] = useState("Profile");
-  const [isActive, setIsActive] = useState(false);
   const [fieldserrors, setFieldErrors] = useState({ name: "" });
-  const [profile, setProfile] = useState({});
-  const [profileFields, setProfileFields] = useState({});
-  const authprofile = useSelector((state) => state.auth.profile);
-  const [userProfile, setUserProfile] = useState({});
   const [loader, setLoader] = useState(false);
   const [spinner, setSpinner] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState(null);
+  const memberProfile = currentMemberProfile();
   let fieldErrors = {};
   let hasError = false;
-  const [isEditing, setIsEditing] = useState({
-    name: false,
-    avatar: false,
-  });
-  let defaultrole;
+  const [search, setSearch] = useState("");
   const [fields, setFields] = useState({ name: "" });
   const [errors, setErrors] = useState({});
+  const [teamfields, setTeamFields] = useState({
+    name: "",
+    color: "#3b82f6",
+    members: [],
+  });
+  const [teamerrors, setTeamErrors] = useState({});
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [roleFields, setRoleFields] = useState({
+    name: "",
+    permissions: {},
+  });
+  const [showTeamAssign, setShowTeamAssign] = useState(false)
+  const [roleErrors, setRoleErrors] = useState({});
+  const [roleLoader, setRoleLoader] = useState(false);
   const [show, setShow] = useState(false);
   const [showCreate, setCreateShow] = useState(false);
-  const handleCreateClose = () => setCreateShow(false);
-  const handleCreateShow = () => setCreateShow(true);
+  const [isteamEdit, setIsTeamEdit] = useState( null )
+  const handleCreateClose = () => {
+    setCreateShow(false);
+    setTeamFields({
+        name: "",
+        color: "#3b82f6",
+        members: [],
+      })
+    };
+  const handleCreateShow = () => {
+    setCreateShow(true)
+  };
   const [showdelete, setShowDelete] = useState(false);
   const [activeKey, setActiveKey] = useState(null);
   const [activeRole, setActiveRole] = useState({});
@@ -47,30 +81,13 @@ function RolesPage() {
   const members = useSelector((state) => state.member);
   const apiPermission = useSelector((state) => state.permissions);
   const memberFeed = useSelector((state) => state.member.members);
+  const teamsState = useSelector((state) => state.teams)
   const [roles, setRoles] = useState([]);
   const [memberslist, setMemberslist] = useState([]);
   const [permissions, setPermissions] = useState({});
   const [expanded, setExpanded] = useState({});
   const [memberFeeds, setMemberFeed] = useState([]);
-
-  const handleToggleExpandAll = () => {
-    const areAllExpanded = permissionModules.every((mod) => expanded[mod.slug]);
-
-    const newExpandedState = {};
-    permissionModules.forEach((mod) => {
-      newExpandedState[mod.slug] = !areAllExpanded;
-    });
-
-    setExpanded(newExpandedState);
-  };
-
-  const toggleExpand = (module) => {
-    setExpanded((prev) => ({
-      ...prev,
-      [module]: !prev[module],
-    }));
-  };
-
+  const [teamfeed, setTeamFeed] = useState([]);
   const toggleView = (module) => {
     const isChecked = !(permissions?.[module]?.view || false);
 
@@ -96,79 +113,41 @@ function RolesPage() {
       [module]: updated,
     }));
   };
-  const togglePermission = (module, perm) => {
+  // const togglePermission = (module, perm) => {
+  //   setPermissions((prev) => {
+  //     const currentPerms = prev?.[module] || {};
+  //     return {
+  //       ...prev,
+  //       [module]: {
+  //         ...currentPerms,
+  //         [perm]: !currentPerms?.[perm],
+  //       },
+  //     };
+  //   });
+  // };
+  const togglePermission = (module, perm, value) => {
     setPermissions((prev) => {
       const currentPerms = prev?.[module] || {};
-      return {
-        ...prev,
-        [module]: {
-          ...currentPerms,
-          [perm]: !currentPerms?.[perm],
-        },
+
+      const updatedPerms = {
+        ...currentPerms,
+        [perm]: value //!currentPerms?.[perm],
       };
-    });
-  };
 
-  const handleSelectAllPermissions = (isChecked) => {
-    const updatedPermissions = {};
-
-    permissionModules.forEach((mod) => {
-      const modSlug = mod.slug;
-      const currentModPerms = permissions?.[modSlug] || {};
-
-      const updatedModPerms = {};
-
-      // Set all boolean permissions to true/false
-      (mod.permissions || []).forEach((perm) => {
-        updatedModPerms[perm] = isChecked;
-      });
-
-      // For modules that have selected_members, add them
-      if (["tracking", "projects", "reports", "attendance"].includes(modSlug)) {
-        if (isChecked) {
-          const allMemberIds = memberFeeds.map((m) => String(m._id));
-          if (modSlug === "projects") {
-            allMemberIds.push("unassigned");
-          }
-          updatedModPerms["selected_members"] = allMemberIds;
-        } else {
-          updatedModPerms["selected_members"] = [];
-        }
+      // 🔁 Mutual exclusion logic
+      if (perm === "specific_teams_only" && updatedPerms[perm]) {
+        updatedPerms.specific_peoples_only = false;
       }
 
-      updatedPermissions[modSlug] = updatedModPerms;
+      if (perm === "specific_peoples_only" && updatedPerms[perm]) {
+        updatedPerms.specific_teams_only = false;
+      }
+
+      return {
+        ...prev,
+        [module]: updatedPerms,
+      };
     });
-
-    setPermissions((prev) => ({ ...prev, ...updatedPermissions }));
-  };
-
-  const handleSelectAll = (modSlug, isChecked) => {
-    const memberIds = memberFeeds.map((member) => String(member._id));
-    if (isChecked) {
-      setPermissions((prev) => {
-        const currentPerms = prev?.[modSlug] || {};
-        const currentMembers = currentPerms["selected_members"] || [];
-
-        return {
-          ...prev,
-          [modSlug]: {
-            ...currentPerms,
-            ["selected_members"]: memberIds,
-          },
-        };
-      });
-    } else {
-      setPermissions((prev) => {
-        const currentPerms = prev?.[modSlug] || {};
-        return {
-          ...prev,
-          [modSlug]: {
-            ...currentPerms,
-            ["selected_members"]: [],
-          },
-        };
-      });
-    }
   };
 
   const toggleMembers = (module, perm, memberId) => {
@@ -190,52 +169,89 @@ function RolesPage() {
     });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const autoAddTeamToggle = (module, perm, value) => {
     setPermissions((prev) => ({
       ...prev,
-      [name]: value,
+      [module]: {
+        ...prev?.[module],
+        [perm]: value,
+      },
     }));
   };
-  const handleClick = (event) => {
-    setIsActive((current) => !current);
-  };
 
-  const handleEditClick = (fieldName) => {
-    setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
-  };
+  const autoAddTeamMembersToggle = (module, perm, teamId) => {
+    setPermissions((prev) => {
+      const currentPerms = prev?.[module] || {};
+      const currentAutoTeams = currentPerms[perm] || [];
 
-  const refreshProfile = async () => {
-    setSpinner(true);
-    await dispatch(getUserProfile());
-    setSpinner(false);
-  };
+      const updatedTeams = currentAutoTeams.includes(teamId)
+        ? currentAutoTeams.filter((id) => id !== teamId)
+        : [...currentAutoTeams, teamId];
 
-  useEffect(() => {
-    refreshProfile();
-    setTimeout(() => {
-      selectboxObserver()
-    },700)
-    
-  }, []);
+      return {
+        ...prev,
+        [module]: {
+          ...currentPerms,
+          [perm]: updatedTeams,
+        },
+      };
+    });
+  }
 
-  const handleFieldChange = (field, value) => {
-    if (field === "avatar") {
-      setProfile((prevState) => ({
-        ...prevState,
-        [field]: value.target.files[0],
-        ["remove_avatar"]: false,
-      }));
-      setAvatarPreview(URL.createObjectURL(value.target.files[0]));
-    } else {
-      setProfile((prevState) => ({
-        ...prevState,
-        [field]: value,
-      }));
-      if (value !== "") {
-        setFieldErrors({ ...fieldErrors, [field]: "" });
+  const toggleTeamMembers = (module, perm, teamId, memberId) => {
+    setPermissions((prev) => {
+      const currentPerms = prev?.[module] || {};
+      const currentTeams = currentPerms?.[perm] || {};
+
+      const teamKey = String(teamId);
+      const memberKey = String(memberId);
+
+      // ✅ HARD SAFETY: ensure array
+      const teamMembers = Array.isArray(currentTeams[teamKey])
+        ? currentTeams[teamKey]
+        : [];
+
+      const updatedTeamMembers = teamMembers?.includes(memberKey)
+        ? teamMembers.filter((id) => id !== memberKey)
+        : [...teamMembers, memberKey];
+
+      const updatedTeams = {
+        ...currentTeams,
+        [teamKey]: updatedTeamMembers,
+      };
+
+      // optional cleanup
+      if (updatedTeamMembers.length === 0) {
+        delete updatedTeams[teamKey];
       }
-    }
+
+      return {
+        ...prev,
+        [module]: {
+          ...currentPerms,
+          [perm]: updatedTeams,
+        },
+      };
+    });
+  };
+
+  const toggleTeams = (module, perm, teamId) => {
+    setPermissions((prev) => {
+      const currentPerms = prev?.[module] || {};
+      const currentTeams = currentPerms[perm] || [];
+
+      const updatedTeams = currentTeams.includes(teamId)
+        ? currentTeams.filter((id) => id !== teamId)
+        : [...currentTeams, teamId];
+
+      return {
+        ...prev,
+        [module]: {
+          ...currentPerms,
+          [perm]: updatedTeams,
+        },
+      };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -247,7 +263,7 @@ function RolesPage() {
         } else {
           return { fieldName, error: "" };
         }
-      }
+      },
     );
 
     // Wait for all promises to resolve
@@ -269,120 +285,13 @@ function RolesPage() {
         name: fields.name,
         permissions,
       };
-      
+
       setLoader(true);
       dispatch(addRoleWithPermissions(roleData));
     } catch (err) {
       console.error("Error adding role:", err);
       alert("Error adding role");
     }
-  };
-  useEffect(() => {
-    if (authprofile) {
-      setUserProfile(authprofile);
-      // if( localStorage.hasItem('current_loggedin_user')){
-      //   const jsondata = parseIfValidJSON(localStorage.getItem('current_loggedin_user'));
-
-      //   if( jsondata){
-      //     jsondata['name'] = authprofile?.name
-      //     jsondata['avatar'] = authprofile?.avatar
-      //     jsondata['name'] = authprofile?.name
-      //     localStorage.setItem('current_loggedin_user', JSON.stringify(jsondata, secretKey));
-      //   }
-      // }
-    }
-  }, [authprofile]);
-
-  useEffect(() => {
-    setProfile({
-      email: userProfile.email,
-      name: userProfile.name,
-      avatar: userProfile.avatar,
-    });
-    setProfileFields({
-      email: userProfile.email,
-      name: userProfile.name,
-      avatar: userProfile.avatar,
-    });
-    setIsEditing({
-      name: false,
-      avatar: false,
-      remove_avatar: false,
-    });
-  }, [userProfile]);
-
-  const compareProfile = (original, edited) => {
-    const changes = {};
-    for (const [key, value] of Object.entries(edited)) {
-      if (original[key] !== value) {
-        changes[key] = value;
-      }
-    }
-    return changes;
-  };
-
-  const handleUpdateSubmit = async (event) => {
-    event.preventDefault();
-
-    const changes = compareProfile(profileFields, profile);
-    if (Object.keys(changes).length > 0) {
-      setLoader(true);
-
-      const updatedErrorsPromises = Object.entries(changes).map(
-        async ([fieldName, value]) => {
-          // Get rules for the current field
-          const rules = getFieldRules("profile", fieldName);
-          // Validate the field
-          const error = await validateField("profile", fieldName, value, rules);
-          // If error exists, return it as part of the resolved promise
-          return { fieldName, error };
-        }
-      );
-
-      // Wait for all promises to resolve
-      const updatedErrorsArray = await Promise.all(updatedErrorsPromises);
-
-      updatedErrorsArray.forEach(({ fieldName, error }) => {
-        if (error) {
-          fieldErrors[fieldName] = error;
-        }
-      });
-
-      // Check if there are any errors
-      const hasError = Object.keys(fieldErrors).length > 0;
-
-      // If there are errors, update the errors state
-      if (hasError) {
-        setFieldErrors(fieldErrors);
-        setLoader(false);
-      } else {
-        console.log("Profile changes: ", changes);
-        if (Object.keys(changes).length > 0) {
-          const formData = new FormData();
-          for (const [key, value] of Object.entries(changes)) {
-            formData.append(key, value);
-          }
-          if (isEditing.remove_avatar === true) {
-            formData.append("remove_avatar", true);
-          }
-          await dispatch(updateProfile(userProfile?._id, formData));
-        }
-        setIsEditing({
-          name: false,
-          avatar: false,
-          remove_avatar: false,
-        });
-        setLoader(false);
-      }
-    } else {
-      setLoader(false);
-    }
-  };
-
-  const removeAvatar = () => {
-    setAvatarPreview(null);
-    setIsEditing({ ...isEditing, ["remove_avatar"]: true });
-    setProfile({ ...profile, ["avatar"]: false });
   };
 
   useEffect(() => {
@@ -397,10 +306,8 @@ function RolesPage() {
         });
       });
 
-     
       setPermissions((prev) => {
         const newPerms = activeRole.permissions || {};
-
         // Clone merged to avoid mutating the original reference
         const updated = { ...merged };
 
@@ -430,14 +337,14 @@ function RolesPage() {
 
         return updated;
       });
-      setFields({...fields, ['name']: activeRole?.name})
+      setFields({ ...fields, ["name"]: activeRole?.name });
     }
   }, [activeRole]);
 
   const handleDeleteRole = async (e) => {
-    setLoader(true); 
-    dispatch(deleteRole(activeRole._id))
-  }
+    setLoader(true);
+    dispatch(deleteRole(activeRole._id));
+  };
 
   const handleSave = async (e) => {
     try {
@@ -445,7 +352,7 @@ function RolesPage() {
         role: activeRole._id,
         permissions,
         type: "default",
-        name: fields['name']
+        name: fields["name"],
       };
       setLoader(true);
       dispatch(updatePermissions(roleData));
@@ -456,18 +363,19 @@ function RolesPage() {
   };
   const handleShow = () => {
     setShow((prev) => !prev);
-    setFields({})
+    setFields({});
   };
 
   useEffect(() => {
-    if( show === true){
-      setActiveRole({})
-    }else{ 
-      if (Array.isArray(roles) && roles.length > 0) {
-        setActiveRole(roles[0]);
-      }
+    if (show === true) {
+      setActiveRole({});
     }
-  },[show])
+    //  else {
+    //   if (Array.isArray(roles) && roles.length > 0) {
+    //     setActiveRole(roles[0]);
+    //   }
+    // }
+  }, [show]);
 
   const showError = (name) => {
     if (errors[name]) return <span className="error">{errors[name]}</span>;
@@ -476,7 +384,7 @@ function RolesPage() {
 
   const handleRoleList = async () => {
     await dispatch(
-      getAvailableRolesByWorkspace({ fields: "_id name permissions" })
+      getAvailableRolesByWorkspace({ fields: "_id name permissions type" }),
     );
   };
 
@@ -487,31 +395,53 @@ function RolesPage() {
   }, [memberFeed]);
 
   useEffect(() => {
+    if(permissions?.assigned_teams?.specific_peoples_only === true || permissions?.assigned_teams?.specific_teams_only === true){
+      setShowTeamAssign(true)
+    }
+  }, [permissions])
+
+  useEffect(() => {
+    if (teamsState && teamsState.teams) {
+      setTeamFeed(teamsState.teams);
+    }
+  }, [teamsState])
+
+  let filteredMembers = memberFeed?.memberData;
+
+  if (memberFeed?.memberData && memberFeed?.memberData.length > 0) {
+    filteredMembers = memberFeed.memberData.filter((member) =>
+      member.name.toLowerCase().includes(search.toLowerCase()),
+    );
+  }
+
+  useEffect(() => {
     setLoader(false);
-    setShowDelete(false)
+    setShowDelete(false);
     if (apiPermission.success) {
       setShow(false);
-      setPermissions({})
+      setPermissions({});
       if (apiPermission.savedrole) {
         const savedrole = apiPermission.savedrole;
-        setFields({...fields, ['name']: savedrole.name})
+        setFields({ ...fields, ["name"]: savedrole.name });
+        setActiveRole(savedrole)
         setRoles((prev) => {
           const index = prev.findIndex((role) => role._id === savedrole._id);
           if (index !== -1) {
             // Replace existing role
             return prev.map((role) =>
-              role._id === savedrole._id ? savedrole : role
+              role._id === savedrole._id ? savedrole : role,
             );
           } else {
             // Add new role
             return [...prev, savedrole];
           }
         });
-        
       }
-      if( apiPermission.deletedRole){
-        setRoles((prev) => prev.filter((role) => role._id !== apiPermission.deletedRole?._id));
-        setFields({name: ""})
+      if (apiPermission.deletedRole) {
+        setRoles((prev) =>
+          prev.filter((role) => role._id !== apiPermission.deletedRole?._id),
+        );
+        setFields({ name: "" });
       }
       if (apiPermission.updatedMeta) {
         const meta = apiPermission.updatedMeta?.meta_value;
@@ -556,25 +486,22 @@ function RolesPage() {
 
     setPermissions(prm);
     dispatch(Listmembers());
-    
+    dispatch(getTeams());
   }, [dispatch]);
 
   useEffect(() => {
     if (workspace.available_roles) {
       setRoles(workspace.available_roles);
-      defaultrole = workspace.available_roles[0];
-      setActiveRole(workspace.available_roles[0]);
+      // setActiveRole(workspace.available_roles[0]);
     }
   }, [workspace]);
-  const [activeItems, setActiveItems] = useState([]);
-  const handleSelectTeams = (index) => {
-  setActiveItems(prev =>
-    prev.includes(index)
-      ? prev.filter(item => item !== index) // remove if already selected
-      : [...prev, index] // add if not selected
-  );
-};
-  const [selected, setSelected] = useState(0);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const [selected, setSelected] = useState("#4A80D8");
+  const [activeItems, setActiveItems] = useState({});
   const colors = [
     "#4A80D8", // blue (selected)
     "#7E5BEF", // purple
@@ -588,220 +515,710 @@ function RolesPage() {
     "#7BC70E", // lime
   ];
 
+  const handleTeamField = ({ target: { name, value, type } }) => {
+    setTeamFields({ ...teamfields, [name]: value });
+    setTeamErrors({ ...teamerrors, [name]: "" });
+  };
+
+  const handleAddMember = (member) => {
+    setActiveItems((prev) => ({
+      ...prev,
+      [member._id]: {
+        id: member._id,
+        name: member.name,
+        email: member.email,
+        avatar: member.avatar,
+      },
+    }));
+    setTeamFields((prev) => ({
+      ...prev,
+      members: [...(prev.members || []), member._id],
+    }));
+  };
+
+  const handleRemoveMember = (memberId) => {
+    setActiveItems((prev) => {
+      const updated = { ...prev };
+      delete updated[memberId];
+      return updated;
+    });
+
+    setTeamFields((prev) => ({
+      ...prev,
+      members: prev.members.filter((id) => id !== memberId),
+    }));
+  };
+
+  const handleMemberSelect = (member) => {
+    const isSelected = !!activeItems[member._id];
+
+    if (isSelected) {
+      handleRemoveMember(member._id);
+    } else {
+      handleAddMember(member);
+    }
+  };
+
+  const handleTeamSubmit = async () => {
+    setLoader(true)
+    
+    if( teamfields?.name === ""){
+      setTeamErrors("Team name cannot be blank.");
+      setLoader( false )
+      return; 
+    }
+    if(isteamEdit !== null ){
+      await dispatch(updateTeam(isteamEdit, teamfields));
+    }else{
+      await dispatch(createTeam(teamfields));
+    }
+  
+    setLoader(false);
+    setCreateShow( false )
+  }
+
+  const buildActiveItemsFromTeam = (team) => {
+  if (!Array.isArray(team?.members)) {
+    setActiveItems({});
+    return;
+  }
+
+  const membersMap = team.members.reduce((acc, member) => {
+    acc[member._id] = {
+      _id: member._id,
+      name: member.name,
+      email: member.email,
+      avatar: member.avatar,
+    };
+    return acc;
+  }, {});
+
+  setActiveItems(membersMap);
+};
+
+ const handleEditTeam = (team) => {
+  setTeamFields({
+    name: team?.name,
+    color: team?.color || "#4e73df",
+    members: team?.members?.map(m => m._id || m) || [],
+  });
+  setIsTeamEdit( team._id )
+  buildActiveItemsFromTeam(team);
+  setSelected(team?.color || "#4e73df")
+  setCreateShow(true)
+};
+
+const handleDeleteTeam = (team) => {
+  setLoader(true)
+  dispatch(deleteTeam(team?._id))
+  setLoader(false)
+}
+
+  const handleRoleFieldChange = (e) => {
+    const { name, value } = e.target;
+
+    setRoleFields((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setRoleErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
+
+  const handleCopyPermissions = (roleId) => {
+
+    const merged = {};
+
+    // Step 1: Initialize merged with empty string values
+    permissionModules.forEach((mod) => {
+      merged[mod.slug] = {};
+      mod.permissions.forEach((p) => {
+        merged[mod.slug][p] = "";
+      });
+    });
+  if (roleId === "none") {
+
+    setRoleFields((prev) => ({
+      ...prev,
+      permissions: merged,
+    }));
+    return;
+  }else{
+    const sourceRole = roles?.find((r) => r._id === roleId)
+    
+    const newPerms = sourceRole.permissions || {};
+
+      // Clone merged to avoid mutating the original reference
+      const updated = { ...merged };
+
+      // First, update existing keys in merged
+      for (const module in updated) {
+        updated[module] = { ...updated[module] }; // clone inner object
+        for (const key in updated[module]) {
+          if (newPerms?.[module] && key in newPerms[module]) {
+            updated[module][key] = newPerms[module][key];
+          } else {
+            updated[module][key] = "";
+          }
+        }
+      }
+
+      // Then, add any missing modules or keys from newPerms
+      for (const module in newPerms) {
+        if (!updated[module]) {
+          updated[module] = {};
+        }
+        for (const key in newPerms[module]) {
+          if (!(key in updated[module])) {
+            updated[module][key] = newPerms[module][key];
+          }
+        }
+      }
+
+    setRoleFields((prev) => ({
+      ...prev,
+      permissions: updated,
+    }));
+      
+  }
+};
+
+const handleCreateRole = async (e) => {
+  e.preventDefault();
+
+  if (!roleFields.name) {
+    setRoleErrors({ name: "Role name is required" });
+    return;
+  }
+
+  setRoleLoader(true);
+
+
+
+  // API call here
+   await dispatch(addRoleWithPermissions(roleFields))
+
+  setRoleLoader(false);
+  setShowRoleModal(false);
+};
+
+
   return (
     <>
-        <div className="page--wrapper setting--page">
-          <div className="rounded--box permission__page">
-            <Tabs defaultActiveKey="roles">
-              <Tab eventKey="roles" title="Roles">
-                {activeRole && Object.keys(activeRole).length > 0 && (
-                  <>
-                  <Accordion >
-                   {roles.map((role, index) => {
+      <div className="page--wrapper setting--page">
+        <div className="rounded--box permission__page">
+          <Tabs defaultActiveKey="roles">
+            <Tab eventKey="roles" title="Roles">
+              <Button variant="primary" onClick={() => setShowRoleModal(true)}>Create Custom Role</Button>
+              {roles && roles?.length > 0 && (
+                <>
+                  <Accordion onSelect={(eventKey) => {
+                      const selectedRole = roles.find((role) => role._id === eventKey);
+                      setActiveRole(selectedRole);
+                    }}>
+                    {roles.map((role, index) => {
                       return (
                         <Accordion.Item eventKey={role._id}>
                           <Accordion.Header>
                             <div className="d-flex gap-3 align-items-center">
-                              <span className="lock--icon d-flex align-items-center justify-content-center p-3 bg-light rounded-3"><FiLock /></span>
+                              <span className="lock--icon d-flex align-items-center justify-content-center p-3 bg-light rounded-3">
+                                <FiLock />
+                              </span>
                               <div className="role---name">
                                 <h4 className="d-flex align-items-center gap-2 mb-0">
                                   <span>{role.name}</span>
-                                  <Badge bg="secondary" className="rounded-5 fw-medium">System</Badge>
+                                  <Badge
+                                    bg="secondary"
+                                    className="rounded-5 fw-medium"
+                                  >
+                                    {
+                                      (!role?.type || role?.type === 'system') ? 'System' : 'Custom'
+                                    }
+                                  </Badge>
                                 </h4>
-                                <p className="mb-0"><small>Full System Access</small></p>
                               </div>
                             </div>
                           </Accordion.Header>
                           <Accordion.Body>
+                            {activeRole && Object.keys(activeRole).length > 0 && (
                             <div className="new--accordion--block w-100">
-                              <Accordion className="mb-3">
-                                <Accordion.Item eventKey="0">
-                                  <Accordion.Header>
-                                    <div className="d-flex gap-3 align-items-center">
-                                      <FiUsers />
-                                      <h6 className="mb-0">Assigned Teams <small className="d-block">For team leads, managers, and HRs to view their team's data, projects, time tracking, reports, and attendance</small></h6>
-                                    </div>
-                                  </Accordion.Header>
-                                  <Accordion.Body>
-                                    <Card className="p-0 mb-0 border-0 rounded-0 bg-white radio--card">
-                                      <Form>
-                                        <div className="p-3 border border-gray rounded-3 mb-3">
-                                          <Form.Check
-                                            type="radio"
-                                            label="Can see specific teams only"
-                                            name="visibility"
-                                            id="specific-teams-only"
-                                          />
-                                          <Form.Text className="text-muted ms-4">
-                                            Ideal for team leads and managers.
-                                          </Form.Text>
-                                        </div>
-                                        <div className="p-3 border border-gray rounded-3 mb-3">
-                                          <Form.Check
-                                            type="radio"
-                                            label="Can see specific people only"
-                                            name="visibility"
-                                            id="specific-people-only"
-                                          />
-                                          <Form.Text className="text-muted ms-4">
-                                            Suitable for roles that need visibility to individuals.
-                                          </Form.Text>
-                                        </div>
-                                        <div className="p-3 border border-gray bg-light rounded-3 mb-3">
-                                          <p><strong>Select Teams - All members (current & future) from these teams will be visible:</strong></p>
-                                          <div className="p-3 border border-gray bg-white rounded-3 mb-3">
-                                            <Form.Check
-                                              type="checkbox"
-                                              label="Default Team"
-                                              name="visibility"
-                                              id="default-team"
-                                            />
-                                            <Form.Text className="text-muted ms-4">4 members</Form.Text>
-                                          </div>
-                                          <div className="p-3 border border-warning bg-warning rounded-3">
-                                            <Form.Check
-                                              type="switch"
-                                              label="Automatically include new teams"
-                                              name="visibility"
-                                              id="auto-include-new-teams"
-                                              className="text-dark"
-                                            />
-                                            <Form.Text className="text-muted ms-4 fw-normal ps-3">When new teams are created in the future, automatically grant visibility to their members</Form.Text>
-                                          </div>
-                                        </div>
-                                        
-                                      </Form>
-                                    </Card>
-                                  </Accordion.Body>
-                                </Accordion.Item>
-                              </Accordion>
+                              
                               {permissionModules.map((mod) => {
                                 const modSlug = mod.slug;
                                 const modPerms = permissions?.[modSlug] || {};
                                 const isExpanded = expanded?.[modSlug] || false;
                                 const isViewChecked = !!modPerms.view;
                                 const truePermissionCount = Object.values(
-                                modPerms
+                                  modPerms,
                                 ).filter((val) => val === true).length;
                                 return (
-                                    <Accordion className="mb-3">
-                                      <Accordion.Item eventKey="1">
-                                        <Accordion.Header>
-                                          <div className="d-flex gap-3 align-items-center">
-                                            {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                                            <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                                          </div>
-                                        </Accordion.Header>
-                                        <Accordion.Body>
-                                          {(mod.permissions || []).map((perm) => {
-                                            if (perm === "view") {
-                                                return (
-                                                <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
-                                                  <Form.Check key={`${modSlug}--view`} type="checkbox" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}
-                                                    id={`default-${modSlug}-view`}
-                                                    label='View'
-                                                  />
-                                                    {/* <Form.Check key={`${modSlug}--view`} type="switch" className="switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
-                                                    <p className="mb-0">View</p> */}
-                                                </div>
-                                                )
-                                            }
+                                  <Accordion className="mb-3">
+                                    <Accordion.Item eventKey="1">
+                                      <Accordion.Header>
+                                        <div className="d-flex gap-3 align-items-center">
+                                          {permissionsLabel[modSlug]?.icon || (
+                                            <LuFolderOpen />
+                                          )}
+                                          <h6 className="mb-0">
+                                            {permissionsLabel[modSlug]?.heading}{" "}
+                                            <small className="d-block">
+                                              {
+                                                permissionsLabel[modSlug]
+                                                  ?.sub_heading
+                                              }
+                                            </small>
+                                          </h6>
+                                        </div>
+                                      </Accordion.Header>
+                                      <Accordion.Body>
+                                        {
+                                          (modSlug === 'assigned_teams' && showTeamAssign === false) && (
+                                            <>
+                                              <p>This role is not assigned to any teams. Use this feature for team leads, 
+                                                managers, and HRs who need to view their team members' projects, time 
+                                                tracking, reports, attendance, and other team-related data.</p>
+                                              <Button variant="primary" onClick={() => setShowTeamAssign(true)}>+ Assign Team</Button>
+                                            </>
+                                            
+                                          )
+                                        }
+                                        {
+                                          (modSlug === 'assigned_teams' && showTeamAssign === true) && (
+                                            <Alert variant="warning" className="d-flex justify-content-end align-items-center">
+                                              <Button
+                                                variant="link"
+                                                className="p-0 text-decoration-none"
+                                                onClick={() => {
+                                                  setShowTeamAssign( false);
+                                                  setPermissions((prev) => ({
+                                                    ...prev,
+                                                    assigned_teams: {
+                                                      ...prev?.assigned_teams,
+                                                      specific_teams_only: false,
+                                                      specific_peoples_only: false,
+                                                      selected_teams: [],
+                                                      selected_team_members: {},
+                                                    },
+                                                  }));
+                                                }}
+                                              >
+                                               x Remove Team Assignement
+                                              </Button>
+                                            </Alert>
+                                          )
+                                        }
+                                        {(mod.permissions || []).map((perm) => {
+                                          if (perm === "view") {
                                             return (
-                                                <>
-                                                  <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
-                                                      <Form.Check id={`${modSlug}-${perm}`} key={perm}
-                                                        disabled={!isViewChecked}
-                                                        checked={!!modPerms[perm]}
-                                                        onChange={() =>
-                                                            togglePermission(modSlug, perm)
-                                                        }
-                                                        label={perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}
-                                                      />
-                                                      {/* <Form.Check type="switch" className="switch--small" id={`${modSlug}-${perm}`} key={perm}
-                                                      disabled={!isViewChecked}
-                                                      checked={!!modPerms[perm]}
-                                                      onChange={() =>
-                                                          togglePermission(modSlug, perm)
-                                                      }
-                                                      />
-                                                      <p className="mb-0">{perm
-                                                                          .replace(/[_-]/g, " ")
-                                                                          .replace(/^\w/, (l) => l.toUpperCase())}</p> */}
-                                                  </div>
-                                                  {[
-                                                    "tracking",
-                                                    "projects",
-                                                    "reports",
-                                                    "attendance",
-                                                    ].includes(modSlug) &&
-                                                    perm === "view_others" &&
-                                                    modPerms[perm] === true && (
-                                                    <div className="team--card--grid">
-                                                        {memberFeeds.map((member) => (
-                                                        <Card className={`team--card ${modPerms[
-                                                            "selected_members"
-                                                            ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
-                                                            //if (selectedMember?.role?.slug !== "owner") {
-                                                            toggleMembers(
+                                              <>
+                                              <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                                <Form.Check
+                                                  key={`${modSlug}--view`}
+                                                  type="checkbox"
+                                                  checked={!!modPerms.view}
+                                                  onChange={() =>
+                                                    toggleView(modSlug)
+                                                  }
+                                                  name="assign_team_option"
+                                                  id={`default-${modSlug}-view`}
+                                                  label={permissionsLabel[modSlug][perm]
+                                                        ?.heading}
+                                                  disabled={role?.type === 'system'}
+                                                />
+                                                <small className="d-block">
+                                                    {
+                                                      permissionsLabel[modSlug][perm]
+                                                        ?.sub_heading
+                                                    }
+                                                  </small>
+                                              </div>
+                                              
+                                              </>
+                                            );
+                                          }else if (perm === "specific_teams_only") {
+                                            return (
+                                              <div className={ showTeamAssign === false ? 'd-none': ''}>
+                                                <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                                  <Form.Check
+                                                    key={`${modSlug}--assigned-team`}
+                                                    type="radio"
+                                                    checked={!!modPerms[perm]}
+                                                    onChange={(e) =>
+                                                      togglePermission(modSlug, perm, e.target.checked)
+                                                    }
+                                                    name="assign_team_option"
+                                                    id={`default-${perm}-view`}
+                                                    label={permissionsLabel[modSlug][perm]
+                                                        ?.heading}
+                                                    data-val={modPerms[perm]}
+                                                    disabled={role?.type === 'system'}
+                                                  />
+                                                  <small className="d-block">
+                                                    {
+                                                      permissionsLabel[modSlug][perm]
+                                                        ?.sub_heading
+                                                    }
+                                                  </small>
+                                                </div>
+                                                {(modPerms[perm] === true) && (
+                                                  <>
+                                                  <div className="team--card--grid">
+                                                      {teamfeed?.map(
+                                                        (team) => (
+                                                          <Card
+                                                            className={`team--card ${
+                                                              modPerms[
+                                                                "selected_teams"
+                                                              ]?.includes(
+                                                                String(
+                                                                  team._id,
+                                                                ),
+                                                              )
+                                                                ? "selected--card"
+                                                                : ""
+                                                            }`}
+                                                            onClick={() => {
+                                                              toggleTeams(
                                                                 modSlug,
-                                                                "selected_members",
-                                                                member._id
-                                                            )
-                                                            // }
-                                                            }}>
-                                                            <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
+                                                                "selected_teams",
+                                                                team._id,
+                                                              );
+                                                            }}
+                                                            
+                                                          >
+                                                            <span className="team--initial">
+                                                              {team.name?.charAt(
+                                                                0,
+                                                              ) || "U"}
+                                                            </span>
                                                             <Card.Body>
-                                                            <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
+                                                              <h4>
+                                                                {team.name}{" "}
+                                                                <small className="d-block">
+                                                                  Total Members {
+                                                                    team?.members?.length
+                                                                      || 0
+                                                                  }
+                                                                </small>
+                                                              </h4>
                                                             </Card.Body>
                                                             <FiCheck className="ms-auto" />
-                                                        </Card>
-                                                        ))}
-                            
-                                                        {modSlug === "projects" && (
-                                                        <Card className={`team--card ${modPerms[
-                                                            "selected_members"
-                                                            ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                                            //if (selectedMember?.role?.slug !== "owner") {
-                                                            if(activeRole.slug !==
-                                                                    "owner"
-                                                                    ) {
-                                                                    toggleMembers(
-                                                                        modSlug,
-                                                                        "selected_members",
-                                                                        "unassigned"
-                                                                    );
-                                                                    }
-                                                            // }
-                                                            }} key={`${modSlug}-${perm}-unassigned`}>
-                                                            <span className="team--initial">U</span>
-                                                            <Card.Body>
-                                                            <h4>Unassigned</h4>
-                                                            </Card.Body>
-                                                            <FiCheck className="ms-auto" />
-                                                        </Card>
-                                                        )}
+                                                          </Card>
+                                                        ),
+                                                      )}
                                                     </div>
+                                                    <div className="auto-add-box mt-4 p-3">
+                                                      <Form.Check
+                                                        type="switch"
+                                                        id={`auto-add-new-teams`}
+                                                        onChange={(e) => {autoAddTeamToggle(modSlug,
+                                                          "auto_add_new_teams", e.target.checked)}}
+                                                        checked={modPerms?.auto_add_new_teams}
+                                                        label={
+                                                          <>
+                                                            <div className="fw-semibold">
+                                                              Auto-add future Default Team members
+                                                            </div>
+                                                            <div className="text-muted small">
+                                                              New people joining this team will be automatically visible
+                                                            </div>
+                                                          </>
+                                                        }
+                                                        disabled={role?.type === 'system'}
+                                                      />
+                                                    </div>
+                                                    </>
                                                   )}
-                                                </>
-                                              )
-                                            })}
-                                        </Accordion.Body>
-                                      </Accordion.Item>
-                                    </Accordion>
-                                  )
-                                })}
+                                              </div>
+                                            );
+                                          }else if (perm === "specific_peoples_only") {
+                                            return (
+                                              <div className={ showTeamAssign === false ? 'd-none': ''}>
+                                              <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                                <Form.Check
+                                                  key={`${modSlug}--assigned-team`}
+                                                  type="radio"
+                                                  checked={!!modPerms[perm]}
+                                                  onChange={(e) =>
+                                                    togglePermission(modSlug, perm, e.target.checked)
+                                                  }
+                                                  id={`default-${perm}-view`}
+                                                  label={permissionsLabel[modSlug][perm]
+                                                        ?.heading}
+                                                  disabled={role?.type === 'system'}
+                                                />
+                                                <small className="d-block">
+                                                    {
+                                                      permissionsLabel[modSlug][perm]
+                                                        ?.sub_heading
+                                                    }
+                                                  </small>
+                                              </div>
+                                              {modPerms[perm] === true && (
+                                                <div className="team-container">
 
-                              <div className="mt-4 text-end fixed--bottom">
-                                <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete</Button>
-                                <Button variant="primary" className="ms-3" onClick={handleSave}>Save</Button>
-                              </div>
-                            </div>
+                                                  {teamfeed?.map((team) => {
+                                                    // const allSelected =
+                                                    //   team?.members?.length > 0 &&
+                                                    //   team?.members?.every((m) =>
+                                                    //     modPerms[perm]?.selected_team_members?.includes(String(m._id))
+                                                    //   );
+
+                                                    return (
+                                                      <Card key={team._id} className="team-group-card mb-3">
+                                                        {/* TEAM HEADER */}
+                                                        <Card.Header className="d-flex align-items-center justify-content-between">
+                                                          <div className="d-flex align-items-center gap-2">
+                                                            <span
+                                                              className="team-color"
+                                                              style={{ background: team.color || "#3b82f6" }}
+                                                            />
+                                                            <strong>{team.name}</strong>
+                                                            <span className="text-muted">
+                                                              ({team?.members?.length || 0} members)
+                                                            </span>
+                                                          </div>
+                                                          <Button
+                                                            size="sm"
+                                                            variant="outline-primary"
+                                                            onClick={() => {
+                                                              setPermissions((prev) => {
+                                                                const currentPerms = prev?.[modSlug] || {};
+                                                                const currentTeams = currentPerms?.["selected_team_members"] || {};
+
+                                                                const teamKey = String(team._id);
+
+                                                                const existingMembers = Array.isArray(currentTeams[teamKey])
+                                                                  ? currentTeams[teamKey]
+                                                                  : [];
+
+                                                                const allMemberIds = team.members.map((m) => String(m._id));
+
+                                                                // ✅ check if all already selected
+                                                                const isAllSelected =
+                                                                  allMemberIds.length > 0 &&
+                                                                  allMemberIds.every((id) => existingMembers.includes(id));
+
+                                                                const updatedTeams = {
+                                                                  ...currentTeams,
+                                                                  [teamKey]: isAllSelected ? [] : allMemberIds,
+                                                                };
+
+                                                                // optional cleanup
+                                                                if (isAllSelected) {
+                                                                  delete updatedTeams[teamKey];
+                                                                }
+
+                                                                return {
+                                                                  ...prev,
+                                                                  [modSlug]: {
+                                                                    ...currentPerms,
+                                                                    selected_team_members: updatedTeams,
+                                                                  },
+                                                                };
+                                                              });
+                                                            }}
+                                                          >
+                                                            Select All
+                                                          </Button>
+                                                        </Card.Header>
+
+                                                        {/* TEAM MEMBERS */}
+                                                        <Card.Body className="p-0">
+                                                          {team?.members?.map((member) => { 
+                                                           const isChecked =
+                                                                  modPerms?.selected_team_members?.[String(team?._id)]?.includes(
+                                                                    String(member._id)
+                                                                  ) || false;
+
+                                                            return (
+                                                              <div
+                                                                key={member._id}
+                                                                className="member-row d-flex align-items-center px-3 py-3"
+                                                              >
+                                                                <Form.Check
+                                                                  type="checkbox"
+                                                                  checked={isChecked}
+                                                                  onChange={(e) =>
+                                                                    toggleTeamMembers(
+                                                                      modSlug,
+                                                                      "selected_team_members",
+                                                                      team._id,
+                                                                      member._id,
+                                                                      e.target.checked
+                                                                    )
+                                                                  }
+                                                                  disabled={role?.type === 'system'}
+                                                                />
+
+                                                                <div
+                                                                  className="member-avatar ms-3"
+                                                                  style={{ background: "#6366f1" }}
+                                                                >
+                                                                  {member.name?.slice(0, 2)?.toUpperCase()}
+                                                                </div>
+
+                                                                <div className="ms-3">
+                                                                  <div className="fw-semibold">{member.name}</div>
+                                                                  <div className="text-muted small">
+                                                                    {member.role || "Member"}
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                            );
+                                                          })}
+                                                          {/* AUTO ADD SECTION */}
+                                                            <div className="auto-add-box mt-4 p-3">
+                                                              <Form.Check
+                                                                type="switch"
+                                                                id={`auto-add-${team?._id}`}
+                                                                onChange={() => {autoAddTeamMembersToggle(modSlug,
+                                                                  "auto_add_teams", team?._id)}}
+                                                                checked={
+                                                                  modPerms?.auto_add_teams?.includes(
+                                                                    String(team?._id)
+                                                                  ) || false
+                                                                }
+                                                                label={
+                                                                  <>
+                                                                    <div className="fw-semibold">
+                                                                      Auto-add future Default Team members
+                                                                    </div>
+                                                                    <div className="text-muted small">
+                                                                      New people joining this team will be automatically visible
+                                                                    </div>
+                                                                  </>
+                                                                }
+                                                                disabled={role?.type === 'system'}
+                                                              />
+                                                            </div>
+                                                        </Card.Body>
+                                                      </Card>
+                                                    );
+                                                  })}
+
+                                                  
+                                                </div>
+                                              )}
+                                              </div>
+                                            );
+                                          }
+                                          return (
+                                            <>
+                                              <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                                <Form.Check
+                                                  id={`${modSlug}-${perm}`}
+                                                  key={perm}
+                                                  disabled={role.type === "system" || !isViewChecked}
+                                                  checked={!!modPerms[perm]}
+                                                  onChange={(e) =>
+                                                    togglePermission(
+                                                      modSlug,
+                                                      perm,
+                                                      e.target.checked
+                                                    )
+                                                  }
+                                                  label={permissionsLabel[modSlug][perm]
+                                                        ?.heading}
+                                                />
+                                                <small className="d-block">
+                                                    {
+                                                      permissionsLabel[modSlug][perm]
+                                                        ?.sub_heading || ''
+                                                    }
+                                                  </small>
+                                              </div>
+                                              {
+                                                perm === "view_others" && modPerms[perm] === true && (
+                                                  <Alert variant="primary">
+                                                    <Alert.Heading>
+                                                      Team visibility applies to {modSlug.replace(/_/g, " ")}
+                                                    </Alert.Heading>
+
+                                                    <p>
+                                                      {(() => {
+                                                        const assigned = permissions?.assigned_teams;
+
+                                                        // ✅ Specific people only
+                                                        if (
+                                                          assigned?.specific_peoples_only === true &&
+                                                          Object.keys(assigned?.selected_team_members || {}).length > 0
+                                                        ) {
+                                                          const memberCount = Object.keys(
+                                                            assigned.selected_team_members
+                                                          ).length;
+
+                                                          const autoTeamCount = assigned?.auto_add_teams?.length || 0;
+
+                                                          return `This role can see selected ${memberCount} members${
+                                                            autoTeamCount > 0
+                                                              ? ` + auto from ${autoTeamCount} team${
+                                                                  autoTeamCount > 1 ? "s" : ""
+                                                                }`
+                                                              : ""
+                                                          }`;
+                                                        }
+
+                                                        // ✅ Specific teams only
+                                                        if (
+                                                          assigned?.specific_teams_only === true &&
+                                                          assigned?.selected_teams?.length > 0
+                                                        ) {
+                                                          const teamCount = assigned.selected_teams.length;
+
+                                                          return `This role can see ${teamCount} team${
+                                                            teamCount > 1 ? "s" : ""
+                                                          }${
+                                                            assigned?.auto_add_new_teams === true
+                                                              ? " + future teams"
+                                                              : ""
+                                                          }`;
+                                                        }
+
+                                                        return null;
+                                                      })()}
+                                                    </p>
+                                                  </Alert>
+                                                )
+                                              }
+                                            </>
+                                          );
+                                        })}
+                                      </Accordion.Body>
+                                    </Accordion.Item>
+                                  </Accordion>
+                                );
+                              })}
+                              {(role?.type === 'custom') && (
+                                <div className="mt-4 text-end fixed--bottom">
+                                  <Button
+                                    variant="secondary"
+                                    onClick={() => setShowDelete(true)}
+                                  >
+                                    Delete
+                                  </Button>
+                                  <Button
+                                    variant="primary"
+                                    className="ms-3"
+                                    onClick={handleSave}
+                                    disabled={loader}
+                                  >
+                                    {
+                                      loader ? 'Please wait...' : 'Save'
+                                    }
+                                  </Button>
+                                </div>
+                              )}
+                            </div>)}
                           </Accordion.Body>
                         </Accordion.Item>
-                        );
-                      })}
+                      );
+                    })}
                   </Accordion>
-                      {/* <Row className="mt-4">
+                  {/* <Row className="mt-4">
                         <Col lg={6}>
                           <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
                           <FloatingLabel label="Select Role">
@@ -840,10 +1257,80 @@ function RolesPage() {
                         </Col>
                       
                       </Row> */}
-                      
-                  </>
-                )}
-              </Tab>
+                      <Modal
+                        show={showRoleModal}
+                        onHide={() => setShowRoleModal(false)}
+                        size="lg"
+                        centered
+                        onShow={() => {
+                          selectboxObserver();
+                        }}
+                      >
+                        <Modal.Header closeButton>
+                          <Modal.Title>Create Custom Role</Modal.Title>
+                        </Modal.Header>
+
+                        <Modal.Body>
+                          <Form onSubmit={handleCreateRole}>
+                            {/* Role Name */}
+                            <Form.Group className="mb-4">
+                              <FloatingLabel label="Role Name *">
+                                <Form.Control
+                                  type="text"
+                                  name="name"
+                                  value={roleFields.name}
+                                  onChange={handleRoleFieldChange}
+                                  disabled={roleLoader}
+                                  placeholder="e.g. Contractor, Reviewer"
+                                />
+                              </FloatingLabel>
+                              {roleErrors.name && (
+                                <small className="text-danger">{roleErrors.name}</small>
+                              )}
+                            </Form.Group>
+
+                            {/* Copy Permissions */}
+                            <Form.Group className="mb-3">
+                              <Form.Label className="fw-semibold">
+                                Copy permissions from
+                              </Form.Label>
+
+                              <Form.Select
+                                value={roleFields.copy_from}
+                                name="copy_from"
+                                onChange={(e) => handleCopyPermissions(e.target.value)}
+                                className="custom-selectbox"
+                              >
+                                <option value="none">No permissions (start fresh)</option>
+
+                                <optgroup label="Roles">
+                                  {roles?.map((role) => (
+                                    <option key={role._id} value={role._id}>
+                                      {role.name}
+                                    </option>
+                                  ))}
+                                </optgroup>
+
+                                
+                              </Form.Select>
+                            </Form.Group>
+                          </Form>
+                        </Modal.Body>
+
+                        <Modal.Footer>
+                          <Button
+                            variant="primary"
+                            onClick={handleCreateRole}
+                            disabled={roleLoader}
+                          >
+                            {roleLoader ? "Please wait..." : "Save Role"}
+                          </Button>
+                        </Modal.Footer>
+                      </Modal>
+                </>
+              )}
+            </Tab>
+            { (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.teams?.view === true) && (
               <Tab eventKey="teams" title="Teams">
                 <Card className="shadow-sm mb-5">
                   <Card.Body className="p-0">
@@ -851,128 +1338,183 @@ function RolesPage() {
                       <Col>
                         <h4 className="mb-1">Teams</h4>
                         <div className="text-muted" style={{ fontSize: "14px" }}>
-                          1 team in your organization
+                          {teamfeed?.length} team in your organization
                         </div>
                       </Col>
+                      {
+                        (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.teams?.create_edit_delete === true) && (
+                      
                       <Col xs="auto">
-                        <Button variant="primary" onClick={() => handleCreateShow()}><FaPlus className="me-2" />Create Team</Button>
-                      </Col>
+                        <Button
+                          variant="primary"
+                          onClick={() => handleCreateShow()}
+                        >
+                          <FaPlus className="me-2" />
+                          Create Team
+                        </Button>
+                      </Col>)}
                     </Row>
 
                     {/* Team Item */}
-                    <Card className="border rounded bg-light">
-                      <Card.Body className="p-0">
-                        <Row className="align-items-center">
-                          <Col xs="auto">
-                            <div
-                              style={{
-                                width: "45px",
-                                height: "45px",
-                                backgroundColor: "#4e73df",
-                                borderRadius: "8px",
-                              }}
-                            />
-                          </Col>
+                    {
+                      (teamfeed && teamfeed?.length > 0) && (
+                        teamfeed.map((team, index) => {
+                          return (
+                            <Card className="border rounded bg-light">
+                              <Card.Body className="p-0">
+                                <Row className="align-items-center">
+                                  <Col xs="auto">
+                                    <div
+                                      style={{
+                                        width: "45px",
+                                        height: "45px", 
+                                        backgroundColor: team?.color || "#4e73df",
+                                        borderRadius: "8px",
+                                      }}
+                                    />
+                                  </Col>
 
-                          <Col>
-                            <div className="fw-semibold">Default Team</div>
-                            <div className="text-muted" style={{ fontSize: "14px" }}>
-                              Default team for all members · 4 members
-                            </div>
-                          </Col>
-
-                          <Col xs="auto">
-                            <LuPencilLine onClick={() => handleCreateShow()} style={{ cursor: "pointer", color: "#6c757d" }}/>
-                          </Col>
-                        </Row>
-                      </Card.Body>
-                    </Card>
+                                  <Col>
+                                    <div className="fw-semibold">{team?.name}</div>
+                                    <div
+                                      className="text-muted"
+                                      style={{ fontSize: "14px" }}
+                                    >
+                                      {team?.members?.length || 0 } members
+                                    </div>
+                                  </Col>
+                                   {
+                                    (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.teams?.create_edit_delete === true) && (
+                      
+                                  <Col xs="auto">
+                                    <LuPencilLine
+                                      onClick={() => {
+                                        handleEditTeam(team)
+                                      }}
+                                      style={{ cursor: "pointer", color: "#6c757d" }}
+                                    />
+                                    {
+                                      (team?.type && team?.type === 'custom') &&(
+                                        <FaTrash onClick={() => {
+                                          handleDeleteTeam(team)
+                                        }}
+                                        style={{ cursor: "pointer", color: "#6c757d" }} />
+                                      )
+                                    }
+                                    
+                                  </Col>)}
+                                </Row>
+                              </Card.Body>
+                            </Card>)
+                          })
+                      )
+                    }
+                    
                   </Card.Body>
                 </Card>
-              </Tab>
-            </Tabs>
-            {/* <h3 className="d-flex align-items-center justify-content-end">
+              </Tab>)}
+          </Tabs>
+          {/* <h3 className="d-flex align-items-center justify-content-end">
                 <Button variant="primary" onClick={() => handleShow()}><FaPlus /> Add New</Button>
             </h3> */}
-            
-            
         </div>
         {showdelete && (
-          <AlertDialog showdialog={showdelete} toggledialog={setShowDelete} msg="Are you sure?" callback={handleDeleteRole}/>
+          <AlertDialog
+            showdialog={showdelete}
+            toggledialog={setShowDelete}
+            msg="Are you sure?"
+            callback={handleDeleteRole}
+          />
         )}
       </div>
       {show && (
-        <Modal show={show} onHide={() => {setShow(false);
-          setTimeout(() => {
-            selectboxObserver()
-          },650)
-        }} size="lg">
-            <Modal.Header closeButton>
-                <Modal.Title>Add New Role</Modal.Title>
-            </Modal.Header>
+        <Modal
+          show={show}
+          onHide={() => {
+            setShow(false);
+            setTimeout(() => {
+              selectboxObserver();
+            }, 650);
+          }}
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Add New Role</Modal.Title>
+          </Modal.Header>
 
-            <Modal.Body>
-                <Form onSubmit={handleSubmit}>
-                    <Form.Group controlId="roleName">
-                        <FloatingLabel label="Role Name *">
-                        <Form.Control
-                            type="text"
-                            name="name"
-                            value={fields?.name}
-                            onChange={(e) => {
-                            setFields({
-                                ...fields,
-                                ["name"]: e.target.value,
-                            });
-                            setErrors({ ...errors, ["name"]: "" });
-                            }}
-                            disabled={loader}
-                        />
-                        </FloatingLabel>
+          <Modal.Body>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group controlId="roleName">
+                <FloatingLabel label="Role Name *">
+                  <Form.Control
+                    type="text"
+                    name="name"
+                    value={fields?.name}
+                    onChange={(e) => {
+                      setFields({
+                        ...fields,
+                        ["name"]: e.target.value,
+                      });
+                      setErrors({ ...errors, ["name"]: "" });
+                    }}
+                    disabled={loader}
+                  />
+                </FloatingLabel>
 
-                        {showError("name")}
-                    </Form.Group>
-                    <h5 className="mt-4">Permissions</h5>
-                    <div className="new--accordion--block mb-4">
-                        {permissionModules.map((mod) => {
-                            const modSlug = mod.slug;
-                            const modPerms = permissions?.[modSlug] || {};
-                            const isExpanded = expanded?.[modSlug] || false;
-                            const isViewChecked = !!modPerms.view;
-                            const truePermissionCount = Object.values(
-                            modPerms
-                            ).filter((val) => val === true).length;
-                            return (
-                            <div className="bg--blue--accordion">
-                                <div className="d-flex gap-3 align-items-center">
-                                    {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                                    <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                                </div>
-                                {(mod.permissions || []).map((perm) => {
-                                if (perm === "view") {
-                                    return (
-                                    <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
-                                      <Form.Check key={`${modSlug}--view`} type="checkbox" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}
-                                        id={`default-${modSlug}-view`}
-                                        label='View'
-                                      />
-                                        {/* <Form.Check key={`${modSlug}--view`} type="switch" className="switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
+                {showError("name")}
+              </Form.Group>
+              <h5 className="mt-4">Permissions</h5>
+              <div className="new--accordion--block mb-4">
+                {permissionModules.map((mod) => {
+                  const modSlug = mod.slug;
+                  const modPerms = permissions?.[modSlug] || {};
+                  const isExpanded = expanded?.[modSlug] || false;
+                  const isViewChecked = !!modPerms.view;
+                  const truePermissionCount = Object.values(modPerms).filter(
+                    (val) => val === true,
+                  ).length;
+                  return (
+                    <div className="bg--blue--accordion">
+                      <div className="d-flex gap-3 align-items-center">
+                        {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                        <h6 className="mb-0">
+                          {permissionsLabel[modSlug]?.heading}{" "}
+                          <small className="d-block">
+                            {permissionsLabel[modSlug]?.sub_heading}
+                          </small>
+                        </h6>
+                      </div>
+                      {(mod.permissions || []).map((perm) => {
+                        if (perm === "view") {
+                          return (
+                            <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                              <Form.Check
+                                key={`${modSlug}--view`}
+                                type="checkbox"
+                                checked={!!modPerms.view}
+                                onChange={() => toggleView(modSlug)}
+                                id={`default-${modSlug}-view`}
+                                label="View"
+                              />
+                              {/* <Form.Check key={`${modSlug}--view`} type="switch" className="switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
                                         <p className="mb-0">View</p> */}
-                                    </div>
-                                    )
-                                }
-                                return (
-                                    <>
-                                    <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
-                                      <Form.Check id={`${modSlug}-${perm}`} key={perm}
-                                        disabled={!isViewChecked}
-                                        checked={!!modPerms[perm]}
-                                        onChange={() =>
-                                            togglePermission(modSlug, perm)
-                                        }
-                                        label={perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}
-                                      />
-                                        {/* <Form.Check type="switch" className="switch--small" id={`${modSlug}-${perm}`} key={perm}
+                            </div>
+                          );
+                        }
+                        return (
+                          <>
+                            <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                              <Form.Check
+                                id={`${modSlug}-${perm}`}
+                                key={perm}
+                                disabled={!isViewChecked}
+                                checked={!!modPerms[perm]}
+                                onChange={(e) => togglePermission(modSlug, perm, e.target.checked)}
+                                label={perm
+                                  .replace(/[_-]/g, " ")
+                                  .replace(/^\w/, (l) => l.toUpperCase())}
+                              />
+                              {/* <Form.Check type="switch" className="switch--small" id={`${modSlug}-${perm}`} key={perm}
                                         disabled={!isViewChecked}
                                         checked={!!modPerms[perm]}
                                         onChange={() =>
@@ -981,93 +1523,138 @@ function RolesPage() {
                                         />
 
                                         <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p> */}
-                                    </div>
-                                    {[
-                                        "tracking",
-                                        "projects",
-                                        "reports",
-                                        "attendance",
-                                    ].includes(modSlug) &&
-                                        perm === "view_others" &&
-                                        modPerms[perm] === true && (
-                                        <div className="team--card--grid">
-                                            {memberFeeds.map((member) => (
-                                            <Card className={`team--card ${modPerms[
-                                                "selected_members"
-                                                ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
-                                                //if (selectedMember?.role?.slug !== "owner") {
-                                                toggleMembers(
-                                                    modSlug,
-                                                    "selected_members",
-                                                    member._id
-                                                )
-                                                // }
-                                                }}>
-                                                <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
-                                                <Card.Body>
-                                                <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
-                                                </Card.Body>
-                                                <FiCheck className="ms-auto" />
-                                            </Card>
-                                            ))}
-                
-                                            {modSlug === "projects" && (
-                                            <Card className={`team--card ${modPerms[
-                                                "selected_members"
-                                                ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                                //if (selectedMember?.role?.slug !== "owner") {
-                                                toggleMembers(
-                                                    modSlug,
-                                                    "selected_members",
-                                                    "unassigned"
-                                                );
-                                                // }
-                                                }} key={`${modSlug}-${perm}-unassigned`}>
-                                                <span className="team--initial">U</span>
-                                                <Card.Body>
-                                                <h4>Unassigned</h4>
-                                                </Card.Body>
-                                                <FiCheck className="ms-auto" />
-                                            </Card>
-                                            )}
-                                        </div>
-                                        )}
-                                    </>
-                                )
-                                })}
+                            </div>
+                            {[
+                              "tracking",
+                              "projects",
+                              "reports",
+                              "attendance",
+                            ].includes(modSlug) &&
+                              perm === "view_others" &&
+                              modPerms[perm] === true && (
+                                <div className="team--card--grid">
+                                  {memberFeeds.map((member) => (
+                                    <Card
+                                      className={`team--card ${
+                                        modPerms["selected_members"]?.includes(
+                                          String(member._id),
+                                        )
+                                          ? "selected--card"
+                                          : ""
+                                      }`}
+                                      onClick={() => {
+                                        //if (selectedMember?.role?.slug !== "owner") {
+                                        toggleMembers(
+                                          modSlug,
+                                          "selected_members",
+                                          member._id,
+                                        );
+                                        // }
+                                      }}
+                                    >
+                                      <span className="team--initial">
+                                        {member.name?.charAt(0) || "U"}
+                                      </span>
+                                      <Card.Body>
+                                        <h4>
+                                          {member.name}{" "}
+                                          <small className="d-block">
+                                            {member?.role?.name}
+                                          </small>
+                                        </h4>
+                                      </Card.Body>
+                                      <FiCheck className="ms-auto" />
+                                    </Card>
+                                  ))}
 
-                        </div>
-                        )
-                    })}
+                                  {modSlug === "projects" && (
+                                    <Card
+                                      className={`team--card ${
+                                        modPerms["selected_members"]?.includes(
+                                          "unassigned",
+                                        )
+                                          ? "selected--card"
+                                          : ""
+                                      }`}
+                                      onClick={() => {
+                                        //if (selectedMember?.role?.slug !== "owner") {
+                                        toggleMembers(
+                                          modSlug,
+                                          "selected_members",
+                                          "unassigned",
+                                        );
+                                        // }
+                                      }}
+                                      key={`${modSlug}-${perm}-unassigned`}
+                                    >
+                                      <span className="team--initial">U</span>
+                                      <Card.Body>
+                                        <h4>Unassigned</h4>
+                                      </Card.Body>
+                                      <FiCheck className="ms-auto" />
+                                    </Card>
+                                  )}
+                                </div>
+                              )}
+                          </>
+                        );
+                      })}
                     </div>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" onClick={handleSubmit} type="submit" disabled={loader}>{loader ? "Please wait..." : "Save Role"}</Button>
-            </Modal.Footer>
+                  );
+                })}
+              </div>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="primary"
+              onClick={handleSubmit}
+              type="submit"
+              disabled={loader}
+            >
+              {loader ? "Please wait..." : "Save Role"}
+            </Button>
+          </Modal.Footer>
         </Modal>
       )}
-      
+
       {/*--=-=Create Teams Modal**/}
-      <Modal show={showCreate} onHide={handleCreateClose} size="md" centered className="status--modal assign--task--modal">
+      <Modal
+        show={showCreate}
+        onHide={handleCreateClose}
+        size="md"
+        centered
+        className="status--modal assign--task--modal"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Create Team</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          
             <Form.Group>
               <FloatingLabel label="Team Name">
-                <Form.Control type="text" placeholder="Designing, Marketing, etc."/>
+                <Form.Control
+                  type="text"
+                  placeholder="Designing, Marketing, etc."
+                  name="name"
+                  value={teamfields?.name}
+                  onChange={handleTeamField}
+                />
               </FloatingLabel>
             </Form.Group>
-          </Form>
+          
 
           <p className="mb-3 mt-4 fw-semibold">Color</p>
           <div className="d-flex flex-wrap gap-3 mb-3">
             {colors.map((color, index) => (
               <div
                 key={index}
-                onClick={() => setSelected(index)}
+                onClick={() => {
+                  setSelected(color);
+                  handleTeamField({
+                    target: { name: "color", value: color },
+                  });
+                }}
                 className="rounded-2"
                 style={{
                   width: "40px",
@@ -1075,49 +1662,75 @@ function RolesPage() {
                   backgroundColor: color,
                   cursor: "pointer",
                   border:
-                    selected === index
+                    selected === color
                       ? "4px solid #212529"
                       : "2px solid transparent",
-                  boxShadow:
-                    selected === index
-                      ? "0 0 0 4px #ffffff"
-                      : "none",
+                  boxShadow: selected === color ? "0 0 0 4px #ffffff" : "none",
                   transition: "all 0.2s ease-in-out",
                 }}
               />
             ))}
           </div>
-
-          <Form className="mb-3">
+          <Form>
             <Form.Group>
-              <FloatingLabel label="Team Members">
-                <Form.Control type="text" placeholder="Search members..."/>
+              <FloatingLabel label="Search here">
+                <Form.Control
+                  type="text"
+                  placeholder="Search here"
+                  value={search}
+                  onChange={handleSearchChange}
+                />
               </FloatingLabel>
             </Form.Group>
           </Form>
-
-         {memberFeeds.map((member, index) => (
-          <ListGroup
-            key={index}
-            className="status--list mt-0"
-          >
-            <ListGroup.Item onClick={() => handleSelectTeams(index)}
-            className={activeItems.includes(index) ? "status--active" : ""}>
-              <span>
-                <img src="../images/default.jpg" alt="" />
-              </span>
-              <p>
-                {member.name}
-                {activeItems.includes(index) && <FiCheck />}
-              </p>
-            </ListGroup.Item>
+          <ListGroup className="added--list">
+            {activeItems &&
+              Object.keys(activeItems).length > 0 &&
+              Object.entries(activeItems).map(([id, memberInfo], index) => (
+                <ListGroup.Item
+                  key={`listkey-${index}`}
+                  onClick={() => handleRemoveMember(memberInfo.id)}
+                >
+                  <span>
+                    <img
+                      src={memberInfo?.avatar || "../images/default.jpg"}
+                      alt=""
+                    />
+                  </span>
+                  <p>
+                    {memberInfo?.name} <FaTimesCircle />
+                  </p>
+                </ListGroup.Item>
+              ))}
           </ListGroup>
-        ))}
-
+          <ListGroup className="status--list">
+            {filteredMembers &&
+              filteredMembers.length > 0 &&
+              filteredMembers.map((member) => (
+                <ListGroup.Item
+                  key={member?._id || `listkey-${member.name}`}
+                  onClick={() => handleMemberSelect(member)}
+                  className={activeItems[member?._id] ? "status--active" : ""}
+                >
+                  <span>
+                    <img
+                      src={member?.avatar || "../images/default.jpg"}
+                      alt={member?.name || "Default"}
+                    />
+                  </span>
+                  <p>
+                    {member?.name}
+                    {activeItems[member?._id] && <FaCheck />}
+                  </p>
+                </ListGroup.Item>
+              ))}
+          </ListGroup>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onHide={handleCreateClose}>Close</Button>
-          <Button variant="primary">Create Team</Button>
+          <Button variant="secondary" onClick={handleCreateClose}>
+            Close
+          </Button>
+          <Button onClick={handleTeamSubmit} variant="primary" disabled={loader}>{loader ? 'Please wait...' : 'Create Team' }</Button>
         </Modal.Footer>
       </Modal>
     </>

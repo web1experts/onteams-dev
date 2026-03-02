@@ -18,6 +18,7 @@ import subscriptionReducer from "./subscription.reducer";
 import postReducer from "./post.reducer";
 import customfieldReducer from "./customfield.reducer";
 import systemfieldReducer from "./systemfield.reducer";
+import teamReducer from "./team.reducer";
 export default combineReducers({
   auth: authReducer,
   project: projectReducer,
@@ -37,5 +38,6 @@ export default combineReducers({
   subscription: subscriptionReducer,
   post: postReducer,
   customfields: customfieldReducer,
-  systemfields: systemfieldReducer
+  systemfields: systemfieldReducer,
+  teams: teamReducer
 });

@@ -1487,7 +1487,7 @@ useEffect(() => {
                                         <Card.Title>{permissionsLabel[modSlug][perm]?.heading}</Card.Title>
                                         <Card.Text>{permissionsLabel[modSlug][perm]?.sub_heading}</Card.Text>
 
-                                        {["tracking", "projects", "reports", "attendance"].includes(modSlug) &&
+                                        {["time_tracking", "projects", "reports", "attendance"].includes(modSlug) &&
                                           perm === "view_others" &&
                                           Array.isArray(modPerms["selected_members"]) &&
                                           modPerms["selected_members"].length > 0 && (
@@ -1739,7 +1739,7 @@ useEffect(() => {
                                       />
                                     </div>
                                     {[
-                                      "tracking",
+                                      "time_tracking",
                                       "projects",
                                       "reports",
                                       "attendance",
@@ -1864,7 +1864,7 @@ useEffect(() => {
                           />
                         </div>
                         {[
-                          "tracking",
+                          "time_tracking",
                           "projects",
                           "reports",
                           "attendance",

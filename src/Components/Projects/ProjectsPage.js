@@ -95,19 +95,19 @@ import {
 } from "../../redux/actions/types";
 import { LuSettings2 } from "react-icons/lu";
 import { fetchSystemFields } from "../../redux/actions/systemfield.action";
+import { getTeams } from "../../redux/actions/team.action";
 Quill.register("modules/autoLinks", AutoLinks);
 
 function ProjectsPage() {
   const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
-  
   const [isActiveView, setIsActiveView] = useState(2);
   const [customFields, setCustomFields] = useState([]);
   const [clientcustomFields, setClientCustomFields] = useState([]);
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
   const memberdata = getMemberdata();
-  
+  const [teamfeed, setTeamFeed] = useState([]);
   const [projects, setProjects] = useState([]);
   const [filters, setFilters] = useState({});
   const [fields, setFields] = useState({
@@ -115,6 +115,7 @@ function ProjectsPage() {
     status: "in-progress",
     members: [],
   });
+  const [filterBy, setFilterBy] = useState('members')
   const [errors, setErrors] = useState({ title: "" });
   const [loader, setLoader] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -151,7 +152,7 @@ function ProjectsPage() {
   const workflowstate = useSelector((state) => state.workflow);
   const [isdescEditor, setIsDescEditor] = useState(false);
   const [activeTab, setActiveTab] = useState("GridView");
-  
+  const teamsState = useSelector((state) => state.teams)
   const modules = {
     toolbar: [
       [{ header: "1" }, { header: "2" }],
@@ -180,6 +181,7 @@ function ProjectsPage() {
 
   const formats = ["header", "bold", "italic", "underline", "strike", "blockquote", "list", "bullet", "indent", "link"];
 
+  
   useEffect(() => {
     dispatch(
       updateStateData(PROJECT_FORM, {
@@ -231,7 +233,8 @@ function ProjectsPage() {
       setFilters({
         ...filters,
         ["status"]: systemFields?.status?.options[0]?.value || 'in-progress',
-        member: (memberProfile?.permissions?.projects?.view_others === true || memberProfile?.role?.slug === "owner") ? 'all' : memberdata?._id,
+         member: memberdata?._id,//(memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true || memberProfile?.role?.slug === "owner") ? 'all' : 
+        
       });
       setFields({
         ...fields,
@@ -479,7 +482,14 @@ function ProjectsPage() {
   useEffect(() => {
     dispatch(Listmembers(0, "", false));
     dispatch(ListClients());
+    dispatch(getTeams())
   }, []);
+
+  useEffect(() => {
+      if (teamsState && teamsState.teams) {
+        setTeamFeed(teamsState.teams);
+      }
+    }, [teamsState])
 
   useEffect(() => {
     if (commonState.projectForm.images?.length > 0) {
@@ -543,11 +553,13 @@ function ProjectsPage() {
     }
   }, [filters]);
 
-  const dofilters = () => {
-    handleListProjects();
-    handleFilterClose();
-    selectboxObserver();
-  };
+
+  const toggleFilterby = (value) => {
+    setFilterBy(value)
+    setTimeout(()=> {
+      selectboxObserver()
+    }, [1000])
+  }
 
   const handleDateChange = (value, name) => {
     setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
@@ -626,7 +638,21 @@ function ProjectsPage() {
       debouncedUpdateSearch(value);
     } else {
       // instant update for other filters
-      setFilters((prev) => ({ ...prev, [name]: value }));
+      // setFilters((prev) => ({ ...prev, [name]: value }));
+      setFilters((prev) => {
+        const updated = { ...prev };
+
+        if (name === "member") {
+          delete updated.team_id;   // remove team when member changes
+        }
+
+        if (name === "team_id") {
+          delete updated.member;    // remove member when team changes
+        }
+
+        updated[name] = value;
+        return updated;
+      });
     }
   };
 
@@ -1102,6 +1128,40 @@ function ProjectsPage() {
     }, 500);
   };
 
+  const isMemberSelected = (selectedTeamMembers = {}, memberId) => {
+    return Object.values(selectedTeamMembers).some((membersArray) =>
+      membersArray.includes(memberId)
+    );
+  };
+
+  const getMembersFromTeams = (selectedTeamIds) => { 
+    if (!Array.isArray(teamfeed) || !Array.isArray(selectedTeamIds)) {
+      return [];
+    }
+
+    const seen = new Set();
+    const result = [];
+
+    teamfeed.forEach((team) => {
+      if (!selectedTeamIds.includes(String(team?._id))) return;
+
+      if (!Array.isArray(team?.members)) return;
+
+      team.members.forEach((member) => {
+        const memberId = String(member?._id);
+        if (!memberId || seen.has(memberId)) return;
+
+        seen.add(memberId);
+        result.push({
+          value: memberId,
+          label: member.name,
+        });
+      });
+    });
+
+    return result;
+  };
+
   useEffect(() => {
     // Add the paste listener to the editor
     if (quillRef.current) {
@@ -1157,60 +1217,169 @@ function ProjectsPage() {
                     horizontal
                     className={isActive !== 0 ? "" : "ms-auto d-flex"}
                   >
-                    <ListGroup.Item
-                      className={
-                        isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
-                      }
-                      key="member-filter-list"
-                    >
-                      <Form.Select
-                        className="custom-selectbox"
-                        onChange={(event) =>
-                          handlefilterchange("member", event.target.value)
-                        }
-                        value={filters["member"] || "all"}
-                        
-                      >
-                        <option
-                          value={memberdata?._id}
-                          key="my-projects-option"
+                    {
+                      (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true ) && (
+                        <ListGroup.Item
+                          className={
+                            isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
+                          }
+                          key="filter-by-list"
                         >
-                          My Projects
-                        </option>
-                        {(memberProfile?.permissions?.projects?.view_others ===
-                          true ||
-                          memberProfile?.role?.slug === "owner") && (
-                          <>
-                            {(memberProfile?.permissions?.projects
-                              ?.selected_members?.length > 0 ||
-                              memberProfile?.role?.slug === "owner") && (
-                              <option key={`member-projects-all`} value={"all"}>
-                                All Members
+                          <Form.Select
+                            className="custom-selectbox"
+                            onChange={(event) =>
+                              toggleFilterby(event.target.value)
+                            }
+                            value={filterBy || "members"}
+                          >
+                            
+                              <option
+                                key={`by-members`}
+                                value={'members'}
+                              >
+                                Filter by members
                               </option>
-                            )}
-
-                            {allMembers.map((member, index) =>
-                              memberProfile?.permissions?.projects?.selected_members?.includes(
-                                member.value
-                              ) || memberProfile?.role?.slug === "owner" ? (
-                                <option
-                                  key={`member-projects-${index}`}
-                                  value={member.value}
-                                >
-                                  {member.label}
+                              <option
+                                key={`by-teams`}
+                                value={'teams'}
+                              >
+                                Filter by teams
+                              </option>
+                          </Form.Select>
+                        </ListGroup.Item>
+                      )
+                    }
+                     
+                    {
+                     ( filterBy === 'members') && (
+                        <ListGroup.Item
+                        className={
+                          isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
+                        }
+                        key="member-filter-list"
+                      >
+                        <Form.Select
+                          className="custom-selectbox"
+                          onChange={(event) =>
+                            handlefilterchange("member", event.target.value)
+                          }
+                          value={filters["member"] || "all"}
+                          
+                        >
+                          <option
+                            value={memberdata?._id}
+                            key="my-projects-option"
+                          >
+                            My Projects
+                          </option>
+                          {(memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
+                            true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                            true ||
+                            memberProfile?.role?.slug === "owner") && (
+                            <>
+                              {(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 || memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ||
+                                memberProfile?.role?.slug === "owner") && (
+                                <option key={`member-projects-all`} value={"all"}>
+                                  All Members
                                 </option>
-                              ) : null
-                            )}
-                          </>
-                        )}
-                        {(memberProfile?.permissions?.projects?.view_others === true && memberProfile?.permissions?.projects?.selected_members?.includes(
-                          "unassigned"
-                        ) ||
-                          memberProfile?.role?.slug === "owner") && (
-                          <option value="unassigned">Unassigned</option>
-                        )}
-                      </Form.Select>
-                    </ListGroup.Item>
+                              )}
+                              {
+                                (memberProfile?.role?.slug === "owner") ? (
+
+                                  // ✅ OWNER sees all members
+                                  allMembers.map((member, index) => (
+                                    <option
+                                      key={`member-projects-${index}`}
+                                      value={member.value}
+                                    >
+                                      {member.label}
+                                    </option>
+                                  ))
+
+                                ) : (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true) ? (
+
+                                  // ✅ Specific people only
+                                  allMembers
+                                    .filter((member) =>
+                                      isMemberSelected(
+                                        memberProfile?.role?.permissions?.assigned_teams?.selected_team_members,
+                                        member.value
+                                      )
+                                    )
+                                    .map((member, index) => (
+                                      <option
+                                        key={`member-projects-${index}`}
+                                        value={member.value}
+                                      >
+                                        {member.label}
+                                      </option>
+                                    ))
+
+                                ) : (
+
+                                  // ✅ Team-based selection
+                                  getMembersFromTeams(
+                                    memberProfile?.role?.permissions?.assigned_teams?.selected_teams || []
+                                  ).map((member) => (
+                                    <option key={member.value} value={member.value}>
+                                      {member.label}
+                                    </option>
+                                  ))
+
+                                )
+                              }
+                            </>
+                          )}
+                          {
+                          // (memberProfile?.permissions?.projects?.view_others === true && memberProfile?.permissions?.projects?.selected_members?.includes(
+                          //   "unassigned"
+                          // ) ||
+                            (memberProfile?.role?.slug === "owner") && (
+                            <option value="unassigned">Unassigned</option>
+                          )}
+                        </Form.Select>
+                      </ListGroup.Item>
+                     )
+                    }
+                    
+                    {
+                      (filterBy === "teams") &&
+                      (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true ) && (
+                    
+                      <ListGroup.Item
+                        className={
+                          isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
+                        }
+                        key="team-filter-list"
+                      >
+                        <Form.Select
+                          className="custom-selectbox"
+                          onChange={(event) =>
+                            handlefilterchange("team_id", event.target.value)
+                          }
+                          value={filters["team_id"] || "all"}
+                        >
+                          <option value="none">Select Team</option>
+                          {teamfeed.map((team, index) => {
+                            if(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.includes(team._id)){
+                              return (
+                                <option
+                                  key={`team-projects-${index}`}
+                                  value={team._id}
+                                >
+                                  {team.name}
+                                </option>
+                              )
+                            }
+                            
+                          }
+                           
+                              
+                          )}
+                          
+                        </Form.Select>
+                      </ListGroup.Item>
+                      )}
                     <ListGroup.Item
                       className={isActive !== 0 ? "d-none" : "d-none d-xl-flex"}
                       key={`project-status-filter-list-desktop`}
@@ -1306,7 +1475,7 @@ function ProjectsPage() {
                       >
                         <GrExpand />
                       </ListGroup.Item>
-                      {(memberProfile?.permissions?.projects
+                      {(memberProfile?.role?.permissions?.projects
                         ?.create_edit_delete_project === true ||
                         memberProfile?.role?.slug === "owner") && (
                         <ListGroup.Item
@@ -1330,7 +1499,7 @@ function ProjectsPage() {
             </div>
           ) : (
             <Container fluid>
-              {memberProfile?.permissions?.projects?.update_projects_order ===
+              {memberProfile?.role?.permissions?.projects?.update_projects_order ===
                 true || memberProfile?.role?.slug === "owner" ? (
                 <DragDropContext onDragEnd={handleDragEnd}>
                   <div
@@ -1424,7 +1593,7 @@ function ProjectsPage() {
                                           {...provided.draggableProps}
                                           {...provided.dragHandleProps}
                                           onDoubleClick={(event) => {
-                                            memberProfile?.permissions?.projects
+                                            memberProfile?.role?.permissions?.projects
                                               ?.create_edit_delete_project ===
                                               true ||
                                             memberProfile?.role?.slug ===
@@ -1499,7 +1668,7 @@ function ProjectsPage() {
                                                   variant="primary"
                                                   onClick={() => {
                                                     if (
-                                                      memberProfile?.permissions
+                                                      memberProfile?.role?.permissions
                                                         ?.projects?.view ===
                                                         true ||
                                                       memberProfile?.role
@@ -1595,7 +1764,7 @@ function ProjectsPage() {
                                                     onClick={() => {
                                                       if (
                                                         memberProfile
-                                                          ?.permissions
+                                                          ?.role?.permissions
                                                           ?.projects
                                                           ?.create_edit_delete_project ===
                                                           true ||
@@ -1652,7 +1821,7 @@ function ProjectsPage() {
                                               key={`MemberNames-${index}-${project._id}`}
                                               members={project.members}
                                               showRemove={
-                                                memberProfile?.permissions
+                                                memberProfile?.role?.permissions
                                                   ?.projects
                                                   ?.create_edit_delete_project ===
                                                   true ||
@@ -1662,7 +1831,7 @@ function ProjectsPage() {
                                                   : false
                                               }
                                               showAssignBtn={
-                                                memberProfile?.permissions
+                                                memberProfile?.role?.permissions
                                                   ?.members?.view === true ||
                                                 memberProfile?.role?.slug ===
                                                   "owner"
@@ -1693,7 +1862,7 @@ function ProjectsPage() {
                                                 className="px-3 py-1"
                                                 onClick={() => {
                                                   if (
-                                                    memberProfile?.permissions
+                                                    memberProfile?.role?.permissions
                                                       ?.projects?.view ===
                                                       true ||
                                                     memberProfile?.role
@@ -1950,7 +2119,7 @@ function ProjectsPage() {
                             <>
                               <tr
                                 onDoubleClick={(event) => {
-                                  memberProfile?.permissions?.projects
+                                  memberProfile?.role?.permissions?.projects
                                     ?.create_edit_delete_project === true ||
                                   memberProfile?.role?.slug === "owner"
                                     ? handleRowDoubleClick(project, index)
@@ -2017,7 +2186,7 @@ function ProjectsPage() {
                                         variant="primary"
                                         onClick={() => {
                                           if (
-                                            memberProfile?.permissions?.projects
+                                            memberProfile?.role?.permissions?.projects
                                               ?.view === true ||
                                             memberProfile?.role?.slug ===
                                               "owner"
@@ -2048,7 +2217,7 @@ function ProjectsPage() {
                                     <Dropdown.Toggle
                                       onClick={() => {
                                         if (
-                                          memberProfile?.permissions?.projects
+                                          memberProfile?.role?.permissions?.projects
                                             ?.create_edit_delete_project ===
                                             true ||
                                           memberProfile?.role?.slug === "owner"
@@ -2097,14 +2266,14 @@ function ProjectsPage() {
                                     key={`MemberNames-${index}-${project._id}`}
                                     members={project.members}
                                     showRemove={
-                                      memberProfile?.permissions?.projects
+                                      memberProfile?.role?.permissions?.projects
                                         ?.create_edit_delete_project === true ||
                                       memberProfile?.role?.slug === "owner"
                                         ? true
                                         : false
                                     }
                                     showAssignBtn={
-                                      memberProfile?.permissions?.members
+                                      memberProfile?.role?.permissions?.members
                                         ?.view === true ||
                                       memberProfile?.role?.slug === "owner"
                                         ? true
@@ -2134,7 +2303,7 @@ function ProjectsPage() {
                                       className="px-3 py-1"
                                       onClick={() => {
                                         if (
-                                          memberProfile?.permissions?.projects
+                                          memberProfile?.role?.permissions?.projects
                                             ?.view === true ||
                                           memberProfile?.role?.slug === "owner"
                                         ) {
@@ -2380,14 +2549,14 @@ function ProjectsPage() {
                 directUpdate={true}
                 key={`MemberNames-header-${currentProject?._id}`}
                 showRemove={
-                  memberProfile?.permissions?.projects
+                  memberProfile?.role?.permissions?.projects
                     ?.create_edit_delete_project === true ||
                   memberProfile?.role?.slug === "owner"
                     ? true
                     : false
                 }
                 showAssignBtn={
-                  memberProfile?.permissions?.members?.view === true ||
+                  memberProfile?.role?.permissions?.members?.view === true ||
                   memberProfile?.role?.slug === "owner"
                     ? true
                     : false
@@ -2432,7 +2601,7 @@ function ProjectsPage() {
             >
               <LuSettings2 />
             </ListGroup.Item>
-            {(memberProfile?.permissions?.projects
+            {(memberProfile?.role?.permissions?.projects
               ?.create_edit_delete_project === true ||
               memberProfile?.role?.slug === "owner") && (
               <ListGroup.Item
@@ -2566,7 +2735,7 @@ function ProjectsPage() {
                       <small>Client</small>
                     </Form.Label>
                     <div className="client--input">
-                      {(memberProfile?.permissions?.clients?.view === true &&
+                      {(memberProfile?.role?.permissions?.clients?.view === true &&
                         clientlist &&
                         clientlist.length > 0) ||
                       (memberProfile?.role?.slug === "owner" &&
@@ -2594,7 +2763,7 @@ function ProjectsPage() {
                           <small>None</small>
                         </Form.Label>
                       )}
-                      { (memberProfile?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
+                      { (memberProfile?.role?.permissions?.clients?.create_edit_delete === true || memberProfile?.role?.slug === 'owner') && (
                                                 <Button variant="primary" onClick={handleClientShow}><FaPlus /> Clients</Button>
                                             )}
                     </div>
@@ -2881,39 +3050,73 @@ function ProjectsPage() {
                   handlefilterchange("member", event.target.value)
                 }
                 value={filters["member"] || "all"}
+                
               >
                 <option value={memberdata?._id} key="my-projects-option">
                   My Projects
                 </option>
-                {(memberProfile?.permissions?.projects?.view_others === true ||
-                  memberProfile?.role?.slug === "owner") && (
-                  <>
-                    {(memberProfile?.permissions?.projects?.selected_members
-                      ?.length > 0 ||
+                
+                    {(memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
+                      true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                      true ||
                       memberProfile?.role?.slug === "owner") && (
-                      <option key={`member-projects-all`} value={"all"}>
-                        All Members
-                      </option>
-                    )}
+                      <>
+                        {(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 || memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ||
+                          memberProfile?.role?.slug === "owner") && (
+                          <option key={`member-projects-all`} value={"all"}>
+                            All Members
+                          </option>
+                        )}
+                        {
+                          memberProfile?.role?.slug === "owner" ? (
+                            
+                            // ✅ OWNER sees all members
+                            allMembers.map((member, index) => (
+                              <option
+                                key={`member-projects-${index}`}
+                                value={member.value}
+                              >
+                                {member.label}
+                              </option>
+                            ))
 
-                    {allMembers.map((member, index) =>
-                      memberProfile?.permissions?.projects?.selected_members?.includes(
-                        member.value
-                      ) || memberProfile?.role?.slug === "owner" ? (
-                        <option
-                          key={`member-projects-${index}`}
-                          value={member.value}
-                        >
-                          {member.label}
-                        </option>
-                      ) : null
+                          ) : memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ? (
+
+                            // ✅ Specific people only
+                            allMembers
+                              .filter((member) =>
+                                isMemberSelected(
+                                  memberProfile?.role?.permissions?.assigned_teams?.selected_team_members,
+                                  member.value
+                                )
+                              )
+                              .map((member, index) => (
+                                <option
+                                  key={`member-projects-${index}`}
+                                  value={member.value}
+                                >
+                                  {member.label}
+                                </option>
+                              ))
+
+                          ) : (
+
+                            // ✅ Team-based selection
+                            getMembersFromTeams(
+                              memberProfile?.role?.permissions?.assigned_teams?.selected_teams || []
+                            ).map((member) => (
+                              <option key={member.value} value={member.value}>
+                                {member.label}
+                              </option>
+                            ))
+
+                          )
+                        }
+                      </>
                     )}
-                  </>
-                )}
-                {(memberProfile?.permissions?.projects?.selected_members?.includes(
-                  "unassigned"
-                ) ||
-                  memberProfile?.role?.slug === "owner") && (
+                {
+                
+                  (memberProfile?.role?.slug === "owner") && (
                   <option value="unassigned">Unassigned</option>
                 )}
               </Form.Select>

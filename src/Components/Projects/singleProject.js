@@ -763,7 +763,7 @@ function SingleProject(props) {
             </ListGroup.Item>
             <MemberInitials
               showRemove={
-                memberProfile?.permissions?.projects
+                memberProfile?.role?.permissions?.projects
                   ?.create_edit_delete_project === true ||
                 memberProfile?.role?.slug === "owner"
                   ? true
@@ -772,7 +772,7 @@ function SingleProject(props) {
               members={fields?.members || []}
               directUpdate={true}
               showAssignBtn={
-                memberProfile?.permissions?.members?.view === true ||
+                memberProfile?.role?.permissions?.members?.view === true ||
                 memberProfile?.role?.slug === "owner"
                   ? true
                   : false
@@ -825,7 +825,7 @@ function SingleProject(props) {
             </ListGroupItem>
           </ListGroup>
         </div>
-        {memberProfile?.permissions?.projects?.create_edit_delete_project ===
+        {memberProfile?.role?.permissions?.projects?.create_edit_delete_project ===
           true || memberProfile?.role?.slug === "owner" ? (
           <>
             <div className="project--form rounded--box">
@@ -873,7 +873,7 @@ function SingleProject(props) {
                       <small>Client</small>
                     </Form.Label>
                     <div className="client--input">
-                      {(memberProfile?.permissions?.clients?.view === true &&
+                      {(memberProfile?.role?.permissions?.clients?.view === true &&
                         filteredItems &&
                         filteredItems.length > 0) ||
                       memberProfile?.role?.slug === "owner" ? (
@@ -1134,7 +1134,7 @@ function SingleProject(props) {
                           showRemove={true}
                           showall={true}
                           showAssignBtn={
-                            memberProfile?.permissions?.members?.view ===
+                            memberProfile?.role?.permissions?.members?.view ===
                               true || memberProfile?.role?.slug === "owner"
                               ? true
                               : false
