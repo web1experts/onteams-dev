@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { Container, Row, Col, Button, Modal, Alert, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
-import { FaList, FaPlus, FaCog, FaEllipsisV, FaCheck } from "react-icons/fa";
-import { FiEdit, FiMail, FiSidebar, FiTrash2, FiShield, FiVideo, FiCamera, FiMonitor, FiCheck} from "react-icons/fi";
+import { FaList, FaPlus, FaEllipsisV, FaCheck } from "react-icons/fa";
+import { FiEdit, FiMail, FiSidebar, FiTrash2, FiVideo, FiCamera, FiMonitor, FiCheck, FiUsers} from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { RiUserSettingsLine } from "react-icons/ri";
 import { LuFolderOpen, LuUser, LuSettings2 } from 'react-icons/lu';
@@ -1240,11 +1240,10 @@ useEffect(() => {
                         <ListGroup>
                           <ListGroup.Item>
                             <span className="info--icon">
-                              <FiMail />
+                              <FiUsers />
                             </span>
                             <p>
                               <small>Teams</small>
-                              </p>
                               {teamfeed?.map((team) => {
                                 if (selectedMember?.teams?.includes(team?._id)) {
                                   return (
@@ -1263,9 +1262,9 @@ useEffect(() => {
 
                                 return null;
                               })}
-                            
-                      </ListGroup.Item>
-                      </ListGroup>
+                            </p>
+                          </ListGroup.Item>
+                        </ListGroup>
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>
@@ -1339,11 +1338,10 @@ useEffect(() => {
                         <ListGroup>
                           <ListGroup.Item>
                             <span className="info--icon">
-                              <FiMail />
+                              <FiUsers />
                             </span>
                             <p>
                               <small>Teams</small>
-                              </p>
                               {teamfeed?.map(
                                 (team) => (
                                   <Form.Check
@@ -1355,7 +1353,7 @@ useEffect(() => {
                                     checked={fields?.selected_teams?.includes(team?._id)}
                                     onChange={(e) => {
                                       if(memberProfile?.role?.permissions?.members?.update_permissions === true &&
-                            selectedMember?._id !== memberProfile?._id){
+                                      selectedMember?._id !== memberProfile?._id){
                                         handleChange({
                                           target: {
                                             name: "selected_teams[]",
@@ -1372,9 +1370,10 @@ useEffect(() => {
                                   />
                                 ),
                               )}
+                            </p>
                             {errors["selected_teams"] || ''}  
-                      </ListGroup.Item>
-                      </ListGroup>
+                          </ListGroup.Item>
+                        </ListGroup>
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>

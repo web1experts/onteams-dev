@@ -15,8 +15,8 @@ import {
   ListGroup,
   Alert
 } from "react-bootstrap";
-import { FaPlus, FaTimesCircle, FaCheck, FaTrash } from "react-icons/fa";
-import { FiCheck, FiLock, FiUsers } from "react-icons/fi";
+import { FaPlus, FaTimesCircle, FaCheck } from "react-icons/fa";
+import { FiCheck, FiLock, FiTrash2 } from "react-icons/fi";
 import { LuFolderOpen, LuPencilLine } from "react-icons/lu";
 import { useToast } from "../../context/ToastContext";
 import Spinner from "react-bootstrap/Spinner";
@@ -766,7 +766,7 @@ const handleCreateRole = async (e) => {
             <Tab eventKey="roles" title="Roles">
               {
                 (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.update_permissions === true) && (
-                  <Button variant="primary" onClick={() => setShowRoleModal(true)}>Create Custom Role</Button>
+                  <Button variant="primary" className="mb-3" onClick={() => setShowRoleModal(true)}>Create Custom Role</Button>
                 )
               }
               
@@ -788,16 +788,13 @@ const handleCreateRole = async (e) => {
                               <div className="role---name">
                                 <h4 className="d-flex align-items-center gap-2 mb-0">
                                   <span>{role.name}</span>
-                                  <Badge
-                                    bg="secondary"
-                                    className="rounded-5 fw-medium"
-                                  >
+                                  <Badge bg="secondary" className="rounded-5 fw-medium">
                                     {
                                       (!role?.type || role?.type === 'system') ? 'System' : 'Custom'
                                     }
                                   </Badge>
-                                 <span>{getRoleLabel(role)}</span>
                                 </h4>
+                                <small>{getRoleLabel(role)}</small>
                               </div>
                             </div>
                           </Accordion.Header>
@@ -845,22 +842,23 @@ const handleCreateRole = async (e) => {
 
                                 return (
                                   <Accordion className="mb-3">
-                                    <Accordion.Item eventKey="1">
-                                      <Accordion.Header>
+                                    
+                                    <Accordion.Item eventKey="1" className={(modSlug === 'assigned_teams') ? 'border-primary':''}>
+                                      <Accordion.Header className={(modSlug === 'assigned_teams') ? 'bg-light':''}>
                                         <div className="d-flex gap-3 align-items-center w-100">
                                           {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
                                           
                                           <div>
-                                            <h6 className="mb-0">
+                                            <h6 className={(modSlug === 'assigned_teams') ? 'text-primary mb-0':'mb-0'}>
                                               {permissionsLabel[modSlug]?.heading}
                                             </h6>
-                                            <small className="d-block">
+                                            <small className="d-block mt-1">
                                               {permissionsLabel[modSlug]?.sub_heading}
                                             </small>
                                           </div>
 
                                           {/* ACCESS BADGE */}
-                                          <div className="ms-auto">
+                                          <div className="ms-auto me-4">
                                             {accessType === "none" && (
                                               <span className="badge bg-secondary">No Access</span>
                                             )}
@@ -920,7 +918,7 @@ const handleCreateRole = async (e) => {
                                           if (perm === "view") {
                                             return (
                                               <>
-                                              <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                              <div className="d-flex flex-column mt-2 bg-light px-3 py-2 rounded-3">
                                                 <Form.Check
                                                   key={`${modSlug}--view`}
                                                   type="checkbox"
@@ -934,7 +932,7 @@ const handleCreateRole = async (e) => {
                                                         ?.heading}
                                                   disabled={role?.type === 'system'}
                                                 />
-                                                <small className="d-block">
+                                                <small className="d-block ms-4">
                                                     {
                                                       permissionsLabel[modSlug][perm]
                                                         ?.sub_heading
@@ -947,7 +945,7 @@ const handleCreateRole = async (e) => {
                                           }else if (perm === "specific_teams_only") {
                                             return (
                                               <div className={ showTeamAssign === false ? 'd-none': ''}>
-                                                <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                                <div className="d-flex flex-column mt-2 bg-light px-3 py-2 rounded-3">
                                                   <Form.Check
                                                     key={`${modSlug}--assigned-team`}
                                                     type="radio"
@@ -962,7 +960,7 @@ const handleCreateRole = async (e) => {
                                                     data-val={modPerms[perm]}
                                                     disabled={role?.type === 'system'}
                                                   />
-                                                  <small className="d-block">
+                                                  <small className="d-block ms-4">
                                                     {
                                                       permissionsLabel[modSlug][perm]
                                                         ?.sub_heading
@@ -1016,7 +1014,7 @@ const handleCreateRole = async (e) => {
                                                         ),
                                                       )}
                                                     </div>
-                                                    <div className="auto-add-box mt-4 p-3">
+                                                    <div className="auto-add-box mt-3 mb-3 p-3">
                                                       <Form.Check
                                                         type="switch"
                                                         id={`auto-add-new-teams`}
@@ -1043,7 +1041,7 @@ const handleCreateRole = async (e) => {
                                           }else if (perm === "specific_peoples_only") {
                                             return (
                                               <div className={ showTeamAssign === false ? 'd-none': ''}>
-                                              <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                              <div className="d-flex flex-column mt-2 bg-light px-3 py-2 rounded-3">
                                                 <Form.Check
                                                   key={`${modSlug}--assigned-team`}
                                                   type="radio"
@@ -1056,7 +1054,7 @@ const handleCreateRole = async (e) => {
                                                         ?.heading}
                                                   disabled={role?.type === 'system'}
                                                 />
-                                                <small className="d-block">
+                                                <small className="d-block ms-4">
                                                     {
                                                       permissionsLabel[modSlug][perm]
                                                         ?.sub_heading
@@ -1177,7 +1175,7 @@ const handleCreateRole = async (e) => {
                                                             );
                                                           })}
                                                           {/* AUTO ADD SECTION */}
-                                                            <div className="auto-add-box mt-4 p-3">
+                                                            <div className="auto-add-box mt-3 mb-3 p-3">
                                                               <Form.Check
                                                                 type="switch"
                                                                 id={`auto-add-${team?._id}`}
@@ -1214,7 +1212,7 @@ const handleCreateRole = async (e) => {
                                           }
                                           return (
                                             <>
-                                              <div className="d-flex gap-3 align-items-center mt-3 bg-light px-3 py-2 rounded-3">
+                                              <div className="d-flex flex-column mt-2 bg-light px-3 py-2 rounded-3">
                                                 <Form.Check
                                                   id={`${modSlug}-${perm}`}
                                                   key={perm}
@@ -1230,7 +1228,7 @@ const handleCreateRole = async (e) => {
                                                   label={permissionsLabel[modSlug][perm]
                                                         ?.heading}
                                                 />
-                                                <small className="d-block">
+                                                <small className="d-block ms-4">
                                                     {
                                                       permissionsLabel[modSlug][perm]
                                                         ?.sub_heading || ''
@@ -1454,9 +1452,9 @@ const handleCreateRole = async (e) => {
             </Tab>
             { (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.teams?.view === true) && (
               <Tab eventKey="teams" title="Teams">
-                <Card className="shadow-sm mb-5">
+                <Card className="shadow-sm mb-5 border bg-none">
                   <Card.Body className="p-0">
-                    <Row className="align-items-center mb-4">
+                    <Row className="align-items-center mb-4 border-bottom pb-3">
                       <Col>
                         <h4 className="mb-1">Teams</h4>
                         <div className="text-muted" style={{ fontSize: "14px" }}>
@@ -1482,7 +1480,7 @@ const handleCreateRole = async (e) => {
                       (teamfeed && teamfeed?.length > 0) && (
                         teamfeed.map((team, index) => {
                           return (
-                            <Card className="border rounded bg-light">
+                            <Card className="border-bottom mt-3 rounded-0 p-0 pb-3 bg-none">
                               <Card.Body className="p-0">
                                 <Row className="align-items-center">
                                   <Col xs="auto">
@@ -1515,7 +1513,7 @@ const handleCreateRole = async (e) => {
                                       }}
                                       style={{ cursor: "pointer", color: "#6c757d" }}
                                     />
-                                    <FaTrash onClick={() => {
+                                    <FiTrash2 className="ms-2" onClick={() => {
                                       handleDeleteTeam(team)
                                     }}
                                     style={{ cursor: "pointer", color: "#6c757d" }} />
@@ -1760,7 +1758,7 @@ const handleCreateRole = async (e) => {
                   className={teamerrors['name'] ? "input-error" : ''}
                 />
               </FloatingLabel>
-               <span className="team-error">{teamerrors['name'] || ''}</span>
+               <small className="text-danger">{teamerrors['name'] || ''}</small>
             </Form.Group>
           
 
@@ -1777,15 +1775,14 @@ const handleCreateRole = async (e) => {
                 }}
                 className="rounded-2"
                 style={{
-                  width: "40px",
-                  height: "40px",
+                  width: "35px",
+                  height: "35px",
                   backgroundColor: color,
                   cursor: "pointer",
                   border:
                     selected === color
-                      ? "4px solid #212529"
+                      ? "2px solid #212529"
                       : "2px solid transparent",
-                  boxShadow: selected === color ? "0 0 0 4px #ffffff" : "none",
                   transition: "all 0.2s ease-in-out",
                 }}
               />
