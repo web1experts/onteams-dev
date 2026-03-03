@@ -3804,12 +3804,12 @@ Project Task View CSS=-=-=
   color: rgb(17 24 39);
   font-weight: 500;
   text-decoration: none;
-  padding: 1.5rem;
+  padding: 1rem;
   position: relative;
   align-items: flex-start;
   justify-content: space-between;
   flex-flow: column wrap;
-  padding-right: 2rem;
+ 
   background: none;
   border: 0;
   box-shadow: none;
@@ -3885,7 +3885,7 @@ Project Task View CSS=-=-=
 .accordion-button::after {
   display: inline-block;
   position: absolute;
-  right: 35px;
+  right: 25px;
   top: 0;
   bottom: 0;
   margin: auto;
@@ -3931,7 +3931,7 @@ Project Task View CSS=-=-=
 
 .accordion .accordion-body {
   margin-top: 0;
-  padding: 1.5rem;
+  padding: 1rem;
   padding-top: 0;
   border: 0;
   border-top: 0;
@@ -3961,6 +3961,7 @@ Project Task View CSS=-=-=
   transition-duration: .2s;
   transition-property: box-shadow;
   transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+  overflow: hidden;
 }
 
 .new--accordion--block .accordion-button svg,
@@ -4028,6 +4029,10 @@ Project Task View CSS=-=-=
   background: linear-gradient(to right, #ededed70, #eeeeee);
 }
 
+.setting--page .bg-none {
+  background: none;
+}
+
 .modal .setting--page .bg--blue--accordion p {
   flex: 1 1;
 }
@@ -4069,7 +4074,7 @@ Project Task View CSS=-=-=
 }
 
 .modal .new--accordion--block .team--card--grid {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   margin-top: 1rem;
 }
 

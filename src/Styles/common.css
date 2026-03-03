@@ -1349,6 +1349,7 @@ Add Project Modal CSS-=-=-
   color: #de0606;
   font-size: 14px;
   margin-left: .25rem;
+  cursor: pointer;
 }
 
 .assign--task--modal .status--list .list-group-item span {

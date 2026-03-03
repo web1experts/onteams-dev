@@ -487,14 +487,14 @@ if (endMinutes - startMinutes < 1) {
                 {colorOptions.map((color) => (
                   <div
                     key={color}
+                    className="rounded-2"
                     onClick={() => handleColorSelect(color)}
                     style={{
                       backgroundColor: color,
-                      width: 30,
-                      height: 30,
-                      borderRadius: "50%",
+                      width: 35,
+                      height: 35,
                       cursor: "pointer",
-                      border: form.color === color ? "2px solid black" : "1px solid #ccc",
+                      border: form.color === color ? "2px solid #212529" : "1px solid #ccc",
                     }}
                   />
                 ))}
