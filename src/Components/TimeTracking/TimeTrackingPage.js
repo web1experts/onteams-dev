@@ -461,7 +461,7 @@ useEffect(() => {
 
     if (
       reportState.manualTimeList &&
-      Object.keys(reportState.manualTimeList)?.length > 0
+      Object.keys(reportState.manualTimeList)?.length
     ) {
       setManualListCount(Object.keys(reportState.manualTimeList)?.length);
     }
@@ -599,6 +599,47 @@ useEffect(() => {
   }, [timings.date])
 
   const generateTimeSlots = (intervalMinutes = 10) => {
+  const slots = [];
+
+  const selectedDate =
+    timings?.date && timings?.date !== ""
+      ? new Date(timings.date)
+      : new Date();
+
+  const startOfDay = new Date(selectedDate);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const now = new Date();
+
+  let endTime;
+  const isToday =
+    selectedDate.toDateString() === now.toDateString();
+
+  if (isToday) {
+    endTime = now;
+  } else {
+    endTime = new Date(startOfDay);
+    endTime.setHours(23, 59, 59, 999);
+  }
+
+  let current = new Date(startOfDay);
+
+  while (current <= endTime) {
+    const hours24 = current.getHours().toString().padStart(2, "0");
+    const minutes = current.getMinutes().toString().padStart(2, "0");
+
+    const ampm = current.getHours() >= 12 ? "PM" : "AM";
+
+    // 24-hour format WITH AM/PM
+    slots.push(`${hours24}:${minutes} ${ampm}`);
+
+    current.setMinutes(current.getMinutes() + intervalMinutes);
+  }
+
+  return slots;
+};
+
+  const generateTimeSlotsNew = (intervalMinutes = 10) => {
   const slots = [];
 
   const selectedDate = (timings?.date && timings?.date !== "")
@@ -3343,11 +3384,12 @@ const ymd = (dateLike) => {
             </div>
             {entries?.length > 0 &&
               entries.map((entry, i) => {
+                const baseDate = new Date(entry.date);
                 const startTime = timeStringToDate(
                   entry.start_time,
-                  new Date()
+                  baseDate
                 );
-                const endTime = timeStringToDate(entry.end_time, new Date());
+                const endTime = timeStringToDate(entry.end_time, baseDate);
                 const taskDurationInMilliseconds = endTime - startTime;
                 const taskDuration = Math.round(
                   taskDurationInMilliseconds / 1000

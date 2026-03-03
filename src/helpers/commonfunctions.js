@@ -415,7 +415,7 @@ export function secondstoMinutes(seconds) {
 //     return `${paddedHours}:${paddedMinutes}`;
 // }
 
-export function convertSecondstoTime(totalSeconds) { 
+export function convertSecondstoTime(totalSeconds) {
     if (totalSeconds === 0 || totalSeconds == null) {
         return `00:00`;
     } else if (totalSeconds < 60) {
