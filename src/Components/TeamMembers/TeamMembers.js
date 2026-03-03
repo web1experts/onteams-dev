@@ -170,7 +170,7 @@ const [teamfeed, setTeamFeed] = useState([]);
     };
 
   useEffect(() => {
-    dispatch(getAvailableRolesByWorkspace({ fields: "_id name permissions" }));
+    dispatch(getAvailableRolesByWorkspace({ fields: "_id name slug permissions" }));
     let prm = {};
     permissionModules.forEach((mod) => {
       prm[mod.slug] = {}; // Initialize object for each module
@@ -227,15 +227,22 @@ const [teamfeed, setTeamFeed] = useState([]);
   
   useEffect(() => {
   if (!fields?.role && roles?.length > 0) {
-    const defaultRoleId = roles[0]._id;
+    // const defaultRoleId = roles[0]._id;
 
-    // Simulate handleChange for default role
-    handleChange({ target: { name: "role", value: defaultRoleId } });
+    // // Simulate handleChange for default role
+    // handleChange({ target: { name: "role", value: defaultRoleId } });
 
-    // Set permissions for default role
-    setPermissions(roles[0].permissions || []);
+    // // Set permissions for default role
+    // setPermissions(roles[0].permissions || []);
+    const memberRole = roles.find((role) => role.slug === "member");
+
+    if (memberRole) {
+      handleChange({ target: { name: "role", value: memberRole?._id } });
+
+      setPermissions(memberRole.permissions || {});
+    }
   }
-}, [fields?.role, roles]);
+}, [roles]);
 
 useEffect(() => {
   
@@ -246,7 +253,7 @@ useEffect(() => {
 
 
   useEffect(() => {
-    if (apiResult.success) { console.log('on success', activeTab)
+    if (apiResult.success) {
       if (activeTab === "Members") {
         if (apiResult.updatedMember) { 
           socket.emit("refresh_record_type", selectedMember?._id);
@@ -589,18 +596,9 @@ useEffect(() => {
       }
     }
 
-    // Check for unique email values across all rows
-    const emailSet = new Set();
-
-    const email = fields.email;
-    if (email === "") return;
-
-    if (emailSet.has(email)) {
-      updatedErrors["email"] = "Email must be unique";
-    }
 
     if(fields?.selected_teams && fields?.selected_teams?.length === 0 || !fields?.selected_teams ){
-      updatedErrors["selected_teams"] = "You must assigned 1 team to a member.";
+      updatedErrors["selected_teams"] = "Please select at least one team.";
     }
 
     // Check if there are any errors
@@ -802,7 +800,7 @@ useEffect(() => {
       });
 
       if(fields?.selected_teams && fields?.selected_teams?.length === 0 || !fields?.selected_teams ){
-        fieldErrors["selected_teams"] = "You must assigned atleast 1 team to a member.";
+        fieldErrors["selected_teams"] = "Please select at least one team.";
       }
 
       // Check if there are any errors
@@ -932,7 +930,7 @@ useEffect(() => {
                     <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdFilterList /></ListGroup.Item>
                     <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>
                     {
-                      (memberProfile?.role?.slug === "owner") && (
+                      (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.update_permissions === true) && (
                         <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
                       )
                     }
@@ -1240,6 +1238,37 @@ useEffect(() => {
                       </Card.Text>
                       <Card.Text>
                         <ListGroup>
+                          <ListGroup.Item>
+                            <span className="info--icon">
+                              <FiMail />
+                            </span>
+                            <p>
+                              <small>Teams</small>
+                              </p>
+                              {teamfeed?.map((team) => {
+                                if (selectedMember?.teams?.includes(team?._id)) {
+                                  return (
+                                    <Form.Check
+                                      key={team?._id}
+                                      inline
+                                      label={team?.name}
+                                      type="checkbox"
+                                      id={`inline-${team?._id}`}
+                                      checked={true}
+                                      disabled
+                                      readOnly
+                                    />
+                                  );
+                                }
+
+                                return null;
+                              })}
+                            
+                      </ListGroup.Item>
+                      </ListGroup>
+                      </Card.Text>
+                      <Card.Text>
+                        <ListGroup>
                           {customFields?.length > 0 && (
                             <>
                               {customFields.map((field, index) => (
@@ -1269,9 +1298,7 @@ useEffect(() => {
                             </p>
                           </ListGroup.Item>
                           {(memberProfile?.role?.permissions?.members
-                            ?.create_edit_delete === true &&
-                            selectedMember?._id !== memberProfile?._id) ||
-                          (memberProfile?.role?.slug === "owner" &&
+                            ?.update_permissions === true &&
                             selectedMember?._id !== memberProfile?._id) ? (
                             <ListGroup.Item>
                               <Form.Group className="mb-0 form-group pb-0">
@@ -1327,15 +1354,21 @@ useEffect(() => {
                                     id={`inline-${team?._id}`}
                                     checked={fields?.selected_teams?.includes(team?._id)}
                                     onChange={(e) => {
-                                      handleChange({
-                                        target: {
-                                          name: "selected_teams[]",
-                                          value: team?._id,
-                                          type: "checkbox",
-                                          checked: e.target.checked,
-                                        },
-                                      });
+                                      if(memberProfile?.role?.permissions?.members?.update_permissions === true &&
+                            selectedMember?._id !== memberProfile?._id){
+                                        handleChange({
+                                          target: {
+                                            name: "selected_teams[]",
+                                            value: team?._id,
+                                            type: "checkbox",
+                                            checked: e.target.checked,
+                                          },
+                                        });
+                                      }else{
+                                        return;
+                                      }
                                     }}
+                                    
                                   />
                                 ),
                               )}
@@ -1503,7 +1536,7 @@ useEffect(() => {
               {/* {rows.map((row, index) => ( */}
               <div className="form-row pb-3" key={`row-0`}>
                 <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
-                  <FloatingLabel className="flex-fill" label="Email address *" controlId={`floatingInput-0`}>
+                  <FloatingLabel className="flex-fill" label="Email address *">
                     <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
                       placeholder="Email address"
                       name="email"
@@ -1522,7 +1555,36 @@ useEffect(() => {
                 >
                   Select Role
                 </Button> */}
-                {showError("role")}
+                
+              </div>
+              
+              <div className="form-row pb-3">
+                    {teamfeed?.map(
+                      (team) => (
+                        <>
+                        <span className="team--color" style={{ background: team?.color }}></span> 
+                        <Form.Check
+                          inline
+                          label={team?.name}
+                          name="selected_teams[]"
+                          type="checkbox"
+                          id={`inline-${team?._id}`}
+                          onChange={(e) => {
+                            handleChange({
+                              target: {
+                                name: "selected_teams[]",
+                                value: team?._id,
+                                type: "checkbox",
+                                checked: e.target.checked,
+                              },
+                            });
+                          }}
+                        />
+                        </>
+                        
+                      ),
+                    )}
+                  {showError("selected_teams")}  
               </div>
               <div className="form-row pb-3" key={'row-role'}>
                 <Form.Group className="mb-0 form-group">
@@ -1530,7 +1592,6 @@ useEffect(() => {
                     placeholder="Select role"
                     area-label="Role"
                     name="role"
-                    controlId="floatingSelect"
                     className={"form-control custom-selectbox"}
                     value={fields?.role || roles?.[0]?._id || ""}
                     onChange={(e) => {
@@ -1551,31 +1612,9 @@ useEffect(() => {
                       </option>
                     ))}
                   </Form.Select>
+                  <p>The role determines what permissions and access this member will have in your organization.</p>
+                  {showError("role")}
                 </Form.Group>
-              </div>
-              <div className="form-row pb-3">
-                    {teamfeed?.map(
-                      (team) => (
-                        <Form.Check
-                          inline
-                          label={team?.name}
-                          name="selected_teams[]"
-                          type="checkbox"
-                          id={`inline-${team?._id}`}
-                          onChange={(e) => {
-                            handleChange({
-                              target: {
-                                name: "selected_teams[]",
-                                value: team?._id,
-                                type: "checkbox",
-                                checked: e.target.checked,
-                              },
-                            });
-                          }}
-                        />
-                      ),
-                    )}
-                  {showError("selected_teams")}  
               </div>
               <div className="form-row" key={`row-1`}>
                 <Form.Group className="mb-0 form-group other__fields">
@@ -1643,7 +1682,6 @@ useEffect(() => {
                   placeholder="Select role"
                   area-label="Role"
                   name="role"
-                  controlId="floatingSelect"
                   className={"form-control custom-selectbox"}
                   value={fields?.role || roles?.[0]?._id || ""}
                   onChange={(e) => {

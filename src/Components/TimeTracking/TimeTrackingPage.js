@@ -559,7 +559,7 @@ useEffect(() => {
     }
   }
 
-  const calculateOccupiedRanges = (data) => {
+  const calculateOccupiedRangesOLd = (data) => {
     return data.map((item) => {
       const startUTC = new Date(item.createdAt);
       const endUTC = new Date(startUTC.getTime() + item.duration * 1000);
@@ -572,6 +572,18 @@ useEffect(() => {
       return {
         start: startIST.toISOString().replace("Z", "+05:30"),
         end: endIST.toISOString().replace("Z", "+05:30"),
+      };
+    });
+  };
+
+  const calculateOccupiedRanges = (data) => {
+    return data.map((item) => {
+      const start = new Date(item.createdAt);
+      const end = new Date(start.getTime() + item.duration * 1000);
+
+      return {
+        start,
+        end,
       };
     });
   };
@@ -3432,7 +3444,7 @@ const ymd = (dateLike) => {
                     <Dropdown.Menu>
                       <div className="drop--scroll">
                        
-                        {timeSlots.map((slot, idx) => {
+                        {/*timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
                             slot.replace(/\s?(AM|PM)$/i, ""),
                             occupiedRanges
@@ -3463,6 +3475,48 @@ const ymd = (dateLike) => {
                             </Dropdown.Item>
                           );
                           // }
+                        })*/}
+                        {timeSlots.map((slot, idx) => {
+                          const selectedDate = new Date(timings.date);
+                          selectedDate.setSeconds(0, 0);
+
+                          // Convert "02:30 PM" to 24hr
+                          const [time, modifier] = slot.split(" ");
+                          let [hours, minutes] = time.split(":").map(Number);
+
+                          if (modifier === "PM" && hours !== 12) hours += 12;
+                          if (modifier === "AM" && hours === 12) hours = 0;
+
+                          const slotDate = new Date(selectedDate);
+                          slotDate.setHours(hours, minutes, 0, 0);
+
+                          let isOccupied = occupiedRanges?.some((range) => {
+                            const start = new Date(range.start);
+                            const end = new Date(range.end);
+                            return slotDate >= start && slotDate < end;
+                          });
+
+                          if (!isOccupied) {
+                            isOccupied = entries.some((entry) => {
+                              const entryStart = new Date(`${timings.date}T${entry.start_time}`);
+                              const entryEnd = new Date(`${timings.date}T${entry.end_time}`);
+                              return slotDate >= entryStart && slotDate <= entryEnd;
+                            });
+                          }
+
+                          return (
+                            <Dropdown.Item
+                              key={`slot-${slot}-${idx}`}
+                              onClick={() => handleTimeChange("start_time", time)}
+                              disabled={isOccupied}
+                              style={{
+                                pointerEvents: isOccupied ? "none" : "auto",
+                                opacity: isOccupied ? 0.5 : 1,
+                              }}
+                            >
+                              {slot}
+                            </Dropdown.Item>
+                          );
                         })}
                       </div>
                     </Dropdown.Menu>
@@ -3481,7 +3535,7 @@ const ymd = (dateLike) => {
                                       <Form.Control type="text" placeholder="Search here.."  value={timings?.end_time} onChange={(e) => {handleSearchChange('end_time', 0, e.target.value)}} />
                                   </Form.Group>
                               </Form> */}
-                        {timeSlots.map((slot, idx) => {
+                        {/*timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
                             slot.replace(/\s?(AM|PM)$/i, ""),
                             occupiedRanges
@@ -3508,6 +3562,48 @@ const ymd = (dateLike) => {
                             </Dropdown.Item>
                           );
                           // }
+                        })*/}
+                        {timeSlots.map((slot, idx) => {
+                          const selectedDate = new Date(timings.date);
+                          selectedDate.setSeconds(0, 0);
+
+                          // Convert "02:30 PM" to 24hr
+                          const [time, modifier] = slot.split(" ");
+                          let [hours, minutes] = time.split(":").map(Number);
+
+                          if (modifier === "PM" && hours !== 12) hours += 12;
+                          if (modifier === "AM" && hours === 12) hours = 0;
+
+                          const slotDate = new Date(selectedDate);
+                          slotDate.setHours(hours, minutes, 0, 0);
+
+                          let isOccupied = occupiedRanges?.some((range) => {
+                            const start = new Date(range.start);
+                            const end = new Date(range.end);
+                            return slotDate >= start && slotDate < end;
+                          });
+
+                          if (!isOccupied) {
+                            isOccupied = entries.some((entry) => {
+                              const entryStart = new Date(`${timings.date}T${entry.start_time}`);
+                              const entryEnd = new Date(`${timings.date}T${entry.end_time}`);
+                              return slotDate >= entryStart && slotDate <= entryEnd;
+                            });
+                          }
+
+                          return (
+                            <Dropdown.Item
+                              key={`slot-${slot}-${idx}`}
+                              onClick={() => handleTimeChange("end_time", time)}
+                              disabled={isOccupied}
+                              style={{
+                                pointerEvents: isOccupied ? "none" : "auto",
+                                opacity: isOccupied ? 0.5 : 1,
+                              }}
+                            >
+                              {slot}
+                            </Dropdown.Item>
+                          );
                         })}
                       </div>
                     </Dropdown.Menu>

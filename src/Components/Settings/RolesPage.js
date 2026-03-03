@@ -18,6 +18,7 @@ import {
 import { FaPlus, FaTimesCircle, FaCheck, FaTrash } from "react-icons/fa";
 import { FiCheck, FiLock, FiUsers } from "react-icons/fi";
 import { LuFolderOpen, LuPencilLine } from "react-icons/lu";
+import { useToast } from "../../context/ToastContext";
 import Spinner from "react-bootstrap/Spinner";
 import { AlertDialog } from "../modals";
 import {
@@ -30,11 +31,12 @@ import {
   deleteRole,
 } from "../../redux/actions/permission.action";
 import { currentMemberProfile } from "../../helpers/auth";
-import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
+import { getAllRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { Listmembers } from "../../redux/actions/members.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { getTeams, createTeam, updateTeam, deleteTeam } from "../../redux/actions/team.action";
-
+import { updateStateData } from "../../redux/actions/common.action";
+import { ALL_MEMBERS } from "../../redux/actions/types";
 function RolesPage() {
   const dispatch = useDispatch();
   const [fieldserrors, setFieldErrors] = useState({ name: "" });
@@ -43,9 +45,11 @@ function RolesPage() {
   const memberProfile = currentMemberProfile();
   let fieldErrors = {};
   let hasError = false;
+   const addToast = useToast();
   const [search, setSearch] = useState("");
   const [fields, setFields] = useState({ name: "" });
   const [errors, setErrors] = useState({});
+  const [activeAccordionKey, setActiveAccordionKey] = useState(null);
   const [teamfields, setTeamFields] = useState({
     name: "",
     color: "#3b82f6",
@@ -57,6 +61,7 @@ function RolesPage() {
     name: "",
     permissions: {},
   });
+    const [activeItems, setActiveItems] = useState({});
   const [showTeamAssign, setShowTeamAssign] = useState(false)
   const [roleErrors, setRoleErrors] = useState({});
   const [roleLoader, setRoleLoader] = useState(false);
@@ -70,8 +75,16 @@ function RolesPage() {
         color: "#3b82f6",
         members: [],
       })
-    };
+      setActiveItems({})
+  };
+    
   const handleCreateShow = () => {
+    setTeamFields({
+        name: "",
+        color: "#3b82f6",
+        members: [],
+    })
+   
     setCreateShow(true)
   };
   const [showdelete, setShowDelete] = useState(false);
@@ -81,6 +94,7 @@ function RolesPage() {
   const members = useSelector((state) => state.member);
   const apiPermission = useSelector((state) => state.permissions);
   const memberFeed = useSelector((state) => state.member.members);
+  const commonState = useSelector((state) => state.common);
   const teamsState = useSelector((state) => state.teams)
   const [roles, setRoles] = useState([]);
   const [memberslist, setMemberslist] = useState([]);
@@ -384,13 +398,14 @@ function RolesPage() {
 
   const handleRoleList = async () => {
     await dispatch(
-      getAvailableRolesByWorkspace({ fields: "_id name permissions type" }),
+      getAllRolesByWorkspace({ fields: "_id name permissions type" }),
     );
   };
 
   useEffect(() => {
     if (memberFeed && memberFeed.memberData) {
       setMemberFeed(memberFeed.memberData);
+      dispatch(updateStateData(ALL_MEMBERS, memberFeed.memberData));
     }
   }, [memberFeed]);
 
@@ -403,17 +418,26 @@ function RolesPage() {
   useEffect(() => {
     if (teamsState && teamsState.teams) {
       setTeamFeed(teamsState.teams);
+      setIsTeamEdit(null)
+      // if (isteamEdit) {
+      //   const teamToEdit = teamsState.teams.find(
+      //     (team) => team._id === isteamEdit
+      //   );
+
+      //   if (teamToEdit) {
+      //     handleEditTeam(teamToEdit);
+      //   }
+      // }
     }
   }, [teamsState])
 
-  let filteredMembers = memberFeed?.memberData;
+  let filteredMembers = commonState.allmembers;
 
-  if (memberFeed?.memberData && memberFeed?.memberData.length > 0) {
-    filteredMembers = memberFeed.memberData.filter((member) =>
-      member.name.toLowerCase().includes(search.toLowerCase()),
-    );
-  }
-
+ if(commonState.allmembers && commonState.allmembers.length > 0){
+      filteredMembers = commonState.allmembers.filter(member => 
+        member.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
   useEffect(() => {
     setLoader(false);
     setShowDelete(false);
@@ -423,7 +447,7 @@ function RolesPage() {
       if (apiPermission.savedrole) {
         const savedrole = apiPermission.savedrole;
         setFields({ ...fields, ["name"]: savedrole.name });
-        setActiveRole(savedrole)
+        
         setRoles((prev) => {
           const index = prev.findIndex((role) => role._id === savedrole._id);
           if (index !== -1) {
@@ -436,6 +460,10 @@ function RolesPage() {
             return [...prev, savedrole];
           }
         });
+       
+          setActiveRole(savedrole)
+          setActiveAccordionKey(savedrole._id);
+       
       }
       if (apiPermission.deletedRole) {
         setRoles((prev) =>
@@ -490,8 +518,8 @@ function RolesPage() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (workspace.available_roles) {
-      setRoles(workspace.available_roles);
+    if (workspace.all_roles) {
+      setRoles(workspace.all_roles);
       // setActiveRole(workspace.available_roles[0]);
     }
   }, [workspace]);
@@ -500,8 +528,26 @@ function RolesPage() {
     setSearch(e.target.value);
   };
 
+  const getRoleLabel = (role) => {
+    if (!role?.type || role?.type === "system") {
+      switch (role?.slug) {
+        case "owner":
+          return "Full system access";
+        case "admin":
+          return "Manage teams & projects";
+        case "member":
+          return "Standard team member";
+        case "viewer":
+          return "Read only access";
+        default:
+          return "Custom access";
+      }
+    }
+
+    return "Custom access";
+  };
+
   const [selected, setSelected] = useState("#4A80D8");
-  const [activeItems, setActiveItems] = useState({});
   const colors = [
     "#4A80D8", // blue (selected)
     "#7E5BEF", // purple
@@ -543,10 +589,12 @@ function RolesPage() {
       return updated;
     });
 
-    setTeamFields((prev) => ({
-      ...prev,
-      members: prev.members.filter((id) => id !== memberId),
-    }));
+   setTeamFields((prev) => ({
+    ...prev,
+    members: prev.members.filter(
+      (id) => id?.toString() !== memberId?.toString()
+    ),
+  }));
   };
 
   const handleMemberSelect = (member) => {
@@ -563,7 +611,7 @@ function RolesPage() {
     setLoader(true)
     
     if( teamfields?.name === ""){
-      setTeamErrors("Team name cannot be blank.");
+      setTeamErrors({...teamerrors, ['name']: "Team name cannot be blank."});
       setLoader( false )
       return; 
     }
@@ -578,25 +626,25 @@ function RolesPage() {
   }
 
   const buildActiveItemsFromTeam = (team) => {
-  if (!Array.isArray(team?.members)) {
-    setActiveItems({});
-    return;
-  }
+    if (!Array.isArray(team?.members)) {
+      setActiveItems({});
+      return;
+    }
 
-  const membersMap = team.members.reduce((acc, member) => {
-    acc[member._id] = {
-      _id: member._id,
-      name: member.name,
-      email: member.email,
-      avatar: member.avatar,
-    };
-    return acc;
-  }, {});
+    const membersMap = team.members.reduce((acc, member) => {
+      acc[member._id] = {
+        id: member._id,
+        name: member.name,
+        email: member.email,
+        avatar: member.avatar,
+      };
+      return acc;
+    }, {});
 
-  setActiveItems(membersMap);
-};
+    setActiveItems(membersMap);
+  };
 
- const handleEditTeam = (team) => {
+ const handleEditTeam = (team) => { 
   setTeamFields({
     name: team?.name,
     color: team?.color || "#4e73df",
@@ -609,6 +657,10 @@ function RolesPage() {
 };
 
 const handleDeleteTeam = (team) => {
+  if(teamfeed?.length <= 1){
+    addToast("You cannot delete the team. There should be atleast 1 team in a workspace.", 'danger');
+    return;
+  }
   setLoader(true)
   dispatch(deleteTeam(team?._id))
   setLoader(false)
@@ -712,10 +764,16 @@ const handleCreateRole = async (e) => {
         <div className="rounded--box permission__page">
           <Tabs defaultActiveKey="roles">
             <Tab eventKey="roles" title="Roles">
-              <Button variant="primary" onClick={() => setShowRoleModal(true)}>Create Custom Role</Button>
+              {
+                (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.update_permissions === true) && (
+                  <Button variant="primary" onClick={() => setShowRoleModal(true)}>Create Custom Role</Button>
+                )
+              }
+              
               {roles && roles?.length > 0 && (
                 <>
-                  <Accordion onSelect={(eventKey) => {
+                  <Accordion activeKey={activeAccordionKey} onSelect={(eventKey) => {
+                    setActiveAccordionKey(eventKey);
                       const selectedRole = roles.find((role) => role._id === eventKey);
                       setActiveRole(selectedRole);
                     }}>
@@ -738,6 +796,7 @@ const handleCreateRole = async (e) => {
                                       (!role?.type || role?.type === 'system') ? 'System' : 'Custom'
                                     }
                                   </Badge>
+                                 <span>{getRoleLabel(role)}</span>
                                 </h4>
                               </div>
                             </div>
@@ -749,33 +808,80 @@ const handleCreateRole = async (e) => {
                               {permissionModules.map((mod) => {
                                 const modSlug = mod.slug;
                                 const modPerms = permissions?.[modSlug] || {};
-                                const isExpanded = expanded?.[modSlug] || false;
+                                
                                 const isViewChecked = !!modPerms.view;
-                                const truePermissionCount = Object.values(
-                                  modPerms,
-                                ).filter((val) => val === true).length;
+                                // const truePermissionCount = Object.values(
+                                //   modPerms,
+                                // ).filter((val) => val === true).length;
+
+                                const allPermissions = (mod.permissions || []).filter(
+                                  (p) =>
+                                    ![
+                                      "selected_teams",
+                                      "selected_team_members",
+                                      "auto_add_new_teams",
+                                      "auto_add_teams",
+                                    ].includes(p)
+                                );
+
+                                // Count only boolean permission keys
+                                const totalPermissionCount = allPermissions.length;
+                                const truePermissionCount = Object.values(modPerms).filter((val) => val === true).length;
+                                let accessType = "none";
+
+                                if (truePermissionCount === 0) {
+                                  accessType = "none";
+                                } else if (truePermissionCount === totalPermissionCount) {
+                                  accessType = "full";
+                                } else if (truePermissionCount === 1 && modPerms.view === true) {
+                                  accessType = "view";
+                                } else {
+                                  accessType = "limited";
+                                }
+
+                                if(modSlug === 'assigned_teams' && activeRole?.slug === "owner" || modSlug === 'assigned_teams' && activeRole?.slug === "admin"){
+                                  accessType = "all_teams_and_future_teams"
+                                }
+
                                 return (
                                   <Accordion className="mb-3">
                                     <Accordion.Item eventKey="1">
                                       <Accordion.Header>
-                                        <div className="d-flex gap-3 align-items-center">
-                                          {permissionsLabel[modSlug]?.icon || (
-                                            <LuFolderOpen />
-                                          )}
-                                          <h6 className="mb-0">
-                                            {permissionsLabel[modSlug]?.heading}{" "}
+                                        <div className="d-flex gap-3 align-items-center w-100">
+                                          {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
+                                          
+                                          <div>
+                                            <h6 className="mb-0">
+                                              {permissionsLabel[modSlug]?.heading}
+                                            </h6>
                                             <small className="d-block">
-                                              {
-                                                permissionsLabel[modSlug]
-                                                  ?.sub_heading
-                                              }
+                                              {permissionsLabel[modSlug]?.sub_heading}
                                             </small>
-                                          </h6>
+                                          </div>
+
+                                          {/* ACCESS BADGE */}
+                                          <div className="ms-auto">
+                                            {accessType === "none" && (
+                                              <span className="badge bg-secondary">No Access</span>
+                                            )}
+                                            {accessType === "view" && (
+                                              <span className="badge bg-info">View Only</span>
+                                            )}
+                                            {accessType === "limited" && (
+                                              <span className="badge bg-warning text-dark">Limited</span>
+                                            )}
+                                            {accessType === "full" && (
+                                              <span className="badge bg-success">Full Access</span>
+                                            )}
+                                            {accessType === "all_teams_and_future_teams" && (
+                                              <span className="badge bg-warning">All teams + future teams</span>
+                                            )}
+                                          </div>
                                         </div>
                                       </Accordion.Header>
                                       <Accordion.Body>
                                         {
-                                          (modSlug === 'assigned_teams' && showTeamAssign === false) && (
+                                          (modSlug === 'assigned_teams' && showTeamAssign === false && activeRole?.type !== 'system') && (
                                             <>
                                               <p>This role is not assigned to any teams. Use this feature for team leads, 
                                                 managers, and HRs who need to view their team members' projects, time 
@@ -786,7 +892,7 @@ const handleCreateRole = async (e) => {
                                           )
                                         }
                                         {
-                                          (modSlug === 'assigned_teams' && showTeamAssign === true) && (
+                                          (modSlug === 'assigned_teams' && showTeamAssign === true && activeRole?.type !== 'system') && (
                                             <Alert variant="warning" className="d-flex justify-content-end align-items-center">
                                               <Button
                                                 variant="link"
@@ -849,7 +955,7 @@ const handleCreateRole = async (e) => {
                                                     onChange={(e) =>
                                                       togglePermission(modSlug, perm, e.target.checked)
                                                     }
-                                                    name="assign_team_option"
+                                                    // name="assign_team_option"
                                                     id={`default-${perm}-view`}
                                                     label={permissionsLabel[modSlug][perm]
                                                         ?.heading}
@@ -1184,6 +1290,16 @@ const handleCreateRole = async (e) => {
                                                   </Alert>
                                                 )
                                               }
+                                              {
+                                                (permissionsLabel[modSlug][perm]?.caution && permissionsLabel[modSlug][perm]?.caution === true) && (
+                                                  <Alert variant="danger">
+                                                    <Alert.Heading>
+                                                      Caution Required:
+                                                    </Alert.Heading>
+                                                    <p>{permissionsLabel[modSlug][perm]?.caution_text}</p>
+                                                  </Alert>
+                                                )
+                                              }
                                             </>
                                           );
                                         })}
@@ -1192,7 +1308,7 @@ const handleCreateRole = async (e) => {
                                   </Accordion>
                                 );
                               })}
-                              {(role?.type === 'custom') && (
+                              {(role?.type === 'custom' && memberProfile?.role?.slug === "owner" || role?.type === 'custom' && memberProfile?.role?.permissions?.members?.update_permissions === true) && (
                                 <div className="mt-4 text-end fixed--bottom">
                                   <Button
                                     variant="secondary"
@@ -1263,6 +1379,10 @@ const handleCreateRole = async (e) => {
                         size="lg"
                         centered
                         onShow={() => {
+                          setRoleFields({
+                            name: "",
+                            permissions: {},
+                          })
                           selectboxObserver();
                         }}
                       >
@@ -1304,11 +1424,13 @@ const handleCreateRole = async (e) => {
                                 <option value="none">No permissions (start fresh)</option>
 
                                 <optgroup label="Roles">
-                                  {roles?.map((role) => (
-                                    <option key={role._id} value={role._id}>
-                                      {role.name}
-                                    </option>
-                                  ))}
+                                  {roles?.map((role) => {
+                                    if(role?.slug !== "owner"){
+                                      return (
+                                      <option key={role._id} value={role._id}>
+                                        {role.name}
+                                      </option>
+                                    )}})}
                                 </optgroup>
 
                                 
@@ -1393,15 +1515,10 @@ const handleCreateRole = async (e) => {
                                       }}
                                       style={{ cursor: "pointer", color: "#6c757d" }}
                                     />
-                                    {
-                                      (team?.type && team?.type === 'custom') &&(
-                                        <FaTrash onClick={() => {
-                                          handleDeleteTeam(team)
-                                        }}
-                                        style={{ cursor: "pointer", color: "#6c757d" }} />
-                                      )
-                                    }
-                                    
+                                    <FaTrash onClick={() => {
+                                      handleDeleteTeam(team)
+                                    }}
+                                    style={{ cursor: "pointer", color: "#6c757d" }} />
                                   </Col>)}
                                 </Row>
                               </Card.Body>
@@ -1468,7 +1585,7 @@ const handleCreateRole = async (e) => {
                 {permissionModules.map((mod) => {
                   const modSlug = mod.slug;
                   const modPerms = permissions?.[modSlug] || {};
-                  const isExpanded = expanded?.[modSlug] || false;
+                  
                   const isViewChecked = !!modPerms.view;
                   const truePermissionCount = Object.values(modPerms).filter(
                     (val) => val === true,
@@ -1627,7 +1744,8 @@ const handleCreateRole = async (e) => {
         className="status--modal assign--task--modal"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Create Team</Modal.Title>
+          <Modal.Title>
+            { (isteamEdit !== null ) ? 'Edit' : 'Create' } Team</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           
@@ -1639,8 +1757,10 @@ const handleCreateRole = async (e) => {
                   name="name"
                   value={teamfields?.name}
                   onChange={handleTeamField}
+                  className={teamerrors['name'] ? "input-error" : ''}
                 />
               </FloatingLabel>
+               <span className="team-error">{teamerrors['name'] || ''}</span>
             </Form.Group>
           
 

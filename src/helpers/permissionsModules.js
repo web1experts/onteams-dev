@@ -172,6 +172,8 @@ export const permissionsLabel = {
     "update_permissions": {
       "icon": <BsEye />,
       heading: "Manage permissions - Can assign roles and customize any member's permissions",
+      caution: true,
+      caution_text: "This is a powerful permission that grants full control over who can do what. Anyone with this permission can assign themselves or others any role and customize permissions. Only grant this to highly trusted team members."
       // sub_heading: "Modify member's permissions"
     }
   },

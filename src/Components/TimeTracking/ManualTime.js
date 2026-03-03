@@ -70,8 +70,7 @@ function ManualTime() {
     }
 
     if (
-      reportState.manualTimeList &&
-      Object.keys(reportState.manualTimeList)?.length > 0
+      reportState.manualTimeList
     ) {
       setManualTimeList(reportState.manualTimeList);
     }

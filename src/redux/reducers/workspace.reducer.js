@@ -10,7 +10,8 @@ import {
     UPDATE_OWNERSHIP_FAILED,
     WORKSPACE_UPDATE_SUCCESS,
     WORKSPACE_DELETE_SUCCESS,
-    REFRESH_DASHBOARDS
+    REFRESH_DASHBOARDS,
+    GET_ALL_ROLE_SUCCESS
 } from "../actions/types";
 import * as auth from '../../helpers/auth';
 const token = auth.getToken();
@@ -53,6 +54,10 @@ export default (state = initialState, action) => {
         case GET_WORKSPACE_ROLE_SUCCESS:
             return {
                 available_roles: action.payload.roles
+            }
+        case GET_ALL_ROLE_SUCCESS: 
+            return {
+                all_roles: action.payload.roles
             }
         case CLEAR_MESSAGES:
             return {

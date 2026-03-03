@@ -12,7 +12,8 @@ import {
     LEAVE_WORKSPACE_FAILED,
     UPDATE_OWNERSHIP_SUCCESS,
     UPDATE_OWNERSHIP_FAILED,
-    WORKSPACE_DELETE_SUCCESS
+    WORKSPACE_DELETE_SUCCESS,
+    GET_ALL_ROLE_SUCCESS
 
 } from "./types";
 
@@ -81,6 +82,20 @@ export const setupworkspace = (payload) => {
   
         if (response.data && response.data.success) {
           await dispatch({ type: GET_WORKSPACE_ROLE_SUCCESS, payload: response.data });
+        }
+      } catch (err) {
+        errorRequest(err, dispatch);
+      }
+    };
+  }
+
+  export const getAllRolesByWorkspace = ( payload = '' ) => {
+    return async (dispatch) => {
+      try {
+        const response = await API.apiGetByKey('roles', '/all',payload)
+  
+        if (response.data && response.data.success) {
+          await dispatch({ type: GET_ALL_ROLE_SUCCESS, payload: response.data });
         }
       } catch (err) {
         errorRequest(err, dispatch);
