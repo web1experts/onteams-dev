@@ -52,7 +52,7 @@ function RolesPage() {
   const [activeAccordionKey, setActiveAccordionKey] = useState(null);
   const [teamfields, setTeamFields] = useState({
     name: "",
-    color: "#3b82f6",
+    color: "#3B82F6",
     members: [],
   });
   const [teamerrors, setTeamErrors] = useState({});
@@ -68,23 +68,25 @@ function RolesPage() {
   const [show, setShow] = useState(false);
   const [showCreate, setCreateShow] = useState(false);
   const [isteamEdit, setIsTeamEdit] = useState( null )
+  const [selected, setSelected] = useState("#3B82F6");
   const handleCreateClose = () => {
     setCreateShow(false);
     setTeamFields({
         name: "",
-        color: "#3b82f6",
+        color: "#3B82F6",
         members: [],
       })
+      setSelected("#3B82F6")
       setActiveItems({})
   };
     
   const handleCreateShow = () => {
     setTeamFields({
         name: "",
-        color: "#3b82f6",
+        color: "#3B82F6",
         members: [],
     })
-   
+    setSelected("#3B82F6")
     setCreateShow(true)
   };
   const [showdelete, setShowDelete] = useState(false);
@@ -547,9 +549,9 @@ function RolesPage() {
     return "Custom access";
   };
 
-  const [selected, setSelected] = useState("#4A80D8");
+  
   const colors = [
-    "#4A80D8", // blue (selected)
+    "#3B82F6", // blue (selected)
     "#7E5BEF", // purple
     "#E0448F", // pink
     "#F5A000", // orange
@@ -622,7 +624,7 @@ function RolesPage() {
     }
   
     setLoader(false);
-    setCreateShow( false )
+    handleCreateClose()
   }
 
   const buildActiveItemsFromTeam = (team) => {
@@ -647,12 +649,12 @@ function RolesPage() {
  const handleEditTeam = (team) => { 
   setTeamFields({
     name: team?.name,
-    color: team?.color || "#4e73df",
+    color: team?.color || "#3B82F6",
     members: team?.members?.map(m => m._id || m) || [],
   });
   setIsTeamEdit( team._id )
   buildActiveItemsFromTeam(team);
-  setSelected(team?.color || "#4e73df")
+  setSelected(team?.color || "#3B82F6")
   setCreateShow(true)
 };
 
@@ -970,6 +972,7 @@ const handleCreateRole = async (e) => {
                                                 {(modPerms[perm] === true) && (
                                                   <>
                                                   <div className="team--card--grid">
+                                                    <p>Select Teams - All members (current & future) from these teams will be visible:</p>
                                                       {teamfeed?.map(
                                                         (team) => (
                                                           <Card
@@ -1027,7 +1030,7 @@ const handleCreateRole = async (e) => {
                                                               Auto-add future Default Team members
                                                             </div>
                                                             <div className="text-muted small">
-                                                              New people joining this team will be automatically visible
+                                                              When new teams are created in the future, automatically grant visibility to their members
                                                             </div>
                                                           </>
                                                         }
@@ -1065,12 +1068,7 @@ const handleCreateRole = async (e) => {
                                                 <div className="team-container">
 
                                                   {teamfeed?.map((team) => {
-                                                    // const allSelected =
-                                                    //   team?.members?.length > 0 &&
-                                                    //   team?.members?.every((m) =>
-                                                    //     modPerms[perm]?.selected_team_members?.includes(String(m._id))
-                                                    //   );
-
+                                                   
                                                     return (
                                                       <Card key={team._id} className="team-group-card mb-3">
                                                         {/* TEAM HEADER */}
@@ -1078,56 +1076,60 @@ const handleCreateRole = async (e) => {
                                                           <div className="d-flex align-items-center gap-2">
                                                             <span
                                                               className="team-color"
-                                                              style={{ background: team.color || "#3b82f6" }}
+                                                              style={{ background: team.color || "#3B82F6" }}
                                                             />
                                                             <strong>{team.name}</strong>
                                                             <span className="text-muted">
                                                               ({team?.members?.length || 0} members)
                                                             </span>
                                                           </div>
-                                                          <Button
-                                                            size="sm"
-                                                            variant="outline-primary"
-                                                            onClick={() => {
-                                                              setPermissions((prev) => {
-                                                                const currentPerms = prev?.[modSlug] || {};
-                                                                const currentTeams = currentPerms?.["selected_team_members"] || {};
+                                                          {(team?.members?.length > 0) ?
+                                                            <Button
+                                                              size="sm"
+                                                              variant="outline-primary"
+                                                              onClick={() => {
+                                                                setPermissions((prev) => {
+                                                                  const currentPerms = prev?.[modSlug] || {};
+                                                                  const currentTeams = currentPerms?.["selected_team_members"] || {};
 
-                                                                const teamKey = String(team._id);
+                                                                  const teamKey = String(team._id);
 
-                                                                const existingMembers = Array.isArray(currentTeams[teamKey])
-                                                                  ? currentTeams[teamKey]
-                                                                  : [];
+                                                                  const existingMembers = Array.isArray(currentTeams[teamKey])
+                                                                    ? currentTeams[teamKey]
+                                                                    : [];
 
-                                                                const allMemberIds = team.members.map((m) => String(m._id));
+                                                                  const allMemberIds = team.members.map((m) => String(m._id));
 
-                                                                // ✅ check if all already selected
-                                                                const isAllSelected =
-                                                                  allMemberIds.length > 0 &&
-                                                                  allMemberIds.every((id) => existingMembers.includes(id));
+                                                                  // ✅ check if all already selected
+                                                                  const isAllSelected =
+                                                                    allMemberIds.length > 0 &&
+                                                                    allMemberIds.every((id) => existingMembers.includes(id));
 
-                                                                const updatedTeams = {
-                                                                  ...currentTeams,
-                                                                  [teamKey]: isAllSelected ? [] : allMemberIds,
-                                                                };
+                                                                  const updatedTeams = {
+                                                                    ...currentTeams,
+                                                                    [teamKey]: isAllSelected ? [] : allMemberIds,
+                                                                  };
 
-                                                                // optional cleanup
-                                                                if (isAllSelected) {
-                                                                  delete updatedTeams[teamKey];
-                                                                }
+                                                                  // optional cleanup
+                                                                  if (isAllSelected) {
+                                                                    delete updatedTeams[teamKey];
+                                                                  }
 
-                                                                return {
-                                                                  ...prev,
-                                                                  [modSlug]: {
-                                                                    ...currentPerms,
-                                                                    selected_team_members: updatedTeams,
-                                                                  },
-                                                                };
-                                                              });
-                                                            }}
-                                                          >
-                                                            Select All
-                                                          </Button>
+                                                                  return {
+                                                                    ...prev,
+                                                                    [modSlug]: {
+                                                                      ...currentPerms,
+                                                                      selected_team_members: updatedTeams,
+                                                                    },
+                                                                  };
+                                                                });
+                                                              }}
+                                                            >
+                                                              Select All
+                                                            </Button>
+                                                            :
+                                                            <span>No members in this team yet.</span>
+                                                          }
                                                         </Card.Header>
 
                                                         {/* TEAM MEMBERS */}
@@ -1228,13 +1230,13 @@ const handleCreateRole = async (e) => {
                                                   label={permissionsLabel[modSlug][perm]
                                                         ?.heading}
                                                 />
-                                                <small className="d-block ms-4">
+                                                  <small className="d-block ms-4">
                                                     {
                                                       permissionsLabel[modSlug][perm]
                                                         ?.sub_heading || ''
                                                     }
                                                   </small>
-                                              </div>
+                                                </div>
                                               {
                                                 perm === "view_others" && modPerms[perm] === true && (
                                                   <Alert variant="primary">
@@ -1488,7 +1490,7 @@ const handleCreateRole = async (e) => {
                                       style={{
                                         width: "45px",
                                         height: "45px", 
-                                        backgroundColor: team?.color || "#4e73df",
+                                        backgroundColor: team?.color || "#3B82F6",
                                         borderRadius: "8px",
                                       }}
                                     />
@@ -1780,7 +1782,7 @@ const handleCreateRole = async (e) => {
                   backgroundColor: color,
                   cursor: "pointer",
                   border:
-                    selected === color
+                    selected.toLowerCase() === color.toLowerCase()
                       ? "2px solid #212529"
                       : "2px solid transparent",
                   transition: "all 0.2s ease-in-out",
@@ -1847,7 +1849,7 @@ const handleCreateRole = async (e) => {
           <Button variant="secondary" onClick={handleCreateClose}>
             Close
           </Button>
-          <Button onClick={handleTeamSubmit} variant="primary" disabled={loader}>{loader ? 'Please wait...' : 'Create Team' }</Button>
+          <Button onClick={handleTeamSubmit} variant="primary" disabled={loader}>{loader ? 'Please wait...' : 'Save Team' }</Button>
         </Modal.Footer>
       </Modal>
     </>

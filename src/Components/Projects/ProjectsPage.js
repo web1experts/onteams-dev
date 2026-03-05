@@ -103,6 +103,7 @@ function ProjectsPage() {
   const memberProfile = currentMemberProfile();
   const [isActiveView, setIsActiveView] = useState(2);
   const [customFields, setCustomFields] = useState([]);
+  const [spinner, setSpinner] = useState(true);
   const [clientcustomFields, setClientCustomFields] = useState([]);
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
@@ -141,7 +142,7 @@ function ProjectsPage() {
   const [currentProject, setCurrentProject] = useState({});
   const [showdialog, setShowDialog] = useState(false);
   const [allMembers, setAllmembers] = useState([]);
-  const [spinner, setSpinner] = useState(false);
+  
   const [showCustomFields, setShowCustomFields] = useState(false);
   let fieldErrors = {};
   const quillRef = useRef(null);
@@ -1218,7 +1219,7 @@ function ProjectsPage() {
                     className={isActive !== 0 ? "" : "ms-auto d-flex"}
                   >
                     {
-                      (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true ) && (
+                      (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true && memberProfile?.permissions?.projects?.view_others === true) && (
                         <ListGroup.Item
                           className={
                             isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
@@ -1272,7 +1273,7 @@ function ProjectsPage() {
                           >
                             My Projects
                           </option>
-                          {(memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
+                          {(memberProfile?.permissions?.projects?.view_others === true) && (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
                             true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
                             true ||
                             memberProfile?.role?.slug === "owner") && (
@@ -2044,14 +2045,9 @@ function ProjectsPage() {
                           )}
                         </Droppable>
                       </Table>
-                    ) : (
-                      !spinner &&
-                      isActiveView === 2 && (
-                        <div className="text-center py-3">
-                          <h2>No Projects Found</h2>
-                        </div>
-                      )
-                    )}
+                    ) 
+                    : null
+                    }
                   </div>
                 </DragDropContext>
               ) : (
@@ -2448,26 +2444,12 @@ function ProjectsPage() {
                           );
                         })
                       : 
-                        (isActiveView === 2) && (
-                          <>
-                            <tr key={`noresults-row`} className="no--invite">
-                              <td
-                                key={`empty-index`}
-                                colSpan={9}
-                                className="text-center"
-                              >
-                                <h2 className="mt-2 text-center py-3">
-                                  No Projects Found
-                                </h2>
-                              </td>
-                            </tr>
-                          </>
-                        )}
+                      null}
                   </tbody>
                 </Table>
               )}
-              {(isActiveView === 1 &&
-                !spinner &&
+              {
+                (!spinner &&
                 projects &&
                 projects.length === 0) && (
                   <div className="mt-2 text-center py-3">

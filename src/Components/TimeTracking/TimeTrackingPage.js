@@ -1865,16 +1865,20 @@ const ymd = (dateLike) => {
                       </Form>
                     </ListGroup.Item>
                     {(memberProfile?.role?.permissions?.time_tracking
-                      ?.add_manual_time === true ||
+                      ?.add_manual_time === true || memberProfile?.role?.permissions?.reports
+                      ?.update_manual_time === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <Dropdown className="select--dropdown manual--dropdown">
                         <Dropdown.Toggle variant="success" id="dropdown-basic">
                           <LuTimer />
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                          <Dropdown.Item onClick={handleShow}>
-                            Manual Time
-                          </Dropdown.Item>
+                           {memberProfile?.role?.permissions?.time_tracking
+                            ?.add_manual_time === true && (
+                              <Dropdown.Item onClick={handleShow}>
+                                Manual Time
+                              </Dropdown.Item>
+                            )}
                           {memberProfile?.role?.permissions?.reports
                             ?.update_manual_time === true && (
                             <Dropdown.Item

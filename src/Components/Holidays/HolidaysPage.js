@@ -309,7 +309,7 @@ function HolidaysPage() {
                       >
                         <GrExpand />
                       </ListGroup.Item>
-                      <ListGroup.Item>
+                      
                         {(memberProfile?.role?.permissions?.holidays
                           ?.create_edit_delete === true ||
                           memberProfile?.role?.slug === "owner") && (
@@ -320,7 +320,6 @@ function HolidaysPage() {
                             <FaPlus />
                           </ListGroup.Item>
                         )}
-                      </ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
                 </h2>

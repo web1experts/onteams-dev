@@ -34,24 +34,44 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { logout } from "../../redux/actions/auth.actions";
 import { getActiveSubscription } from "../../redux/actions/subscription.action";
 import { getTeams } from "../../redux/actions/team.action";
+import { useToast } from "../../context/ToastContext";
 
 function TeamMembersPage() {
   const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
   const currentMember = getMemberdata();
+  const addToast = useToast();
   const [isActive, setIsActive] = useState(0);
   const [activeItems, setActiveItems] = useState([]);
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
-  const handleClickTeams = (index) => {
-  setActiveItems(prev =>
-    prev.includes(index)
-      ? prev.filter(item => item !== index) // remove if already selected
-      : [...prev, index] // add if not selected
-  );
-};
+  const handleClickTeams = (teamId) => {
+    setFields((prev) => {
+      const selectedTeams = prev?.selected_teams || [];
+
+      const updatedTeams = selectedTeams.includes(teamId)
+        ? selectedTeams.filter((id) => id !== teamId) // remove
+        : [...selectedTeams, teamId]; // add
+
+      return {
+        ...prev,
+        selected_teams: updatedTeams,
+      };
+    });
+  };
+
+  const handleClickRoles = (roleId) => {
+    setFields((prev) => {
+      return {
+        ...prev,
+        role: roleId,
+      };
+    });
+  };
+
 const [teamfeed, setTeamFeed] = useState([]);
+const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const subscriptionState = useSelector((state) => state.subscription);
   const [invitationsTotal, setInvitationsTotal] = useState(0)
   const [activeSubscription, setActiveSubscription] = useState(null)
@@ -67,7 +87,6 @@ const [teamfeed, setTeamFeed] = useState([]);
   const apiPermission = useSelector((state) => state.permissions);
   const apiCustomfields = useSelector((state) => state.customfields);
   const [isActiveView, setIsActiveView] = useState(2);
-  const [adjustPermissions, setAdjustPermissions] = useState(false);
   const [rows, setRows] = useState([{ email: "", role: "" }]);
   const [errors, setErrors] = useState([]);
   let fieldErrors = {};
@@ -94,6 +113,13 @@ const [teamfeed, setTeamFeed] = useState([]);
   };
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
+    let filteredteams = [];
+    if( teamfeed && teamfeed.length > 0 ){ 
+      filteredteams = teamfeed.filter(team => 
+        team.name.toLowerCase().includes(e.target.value.toLowerCase())
+      );
+      setFilteredTeamFeed(filteredteams)
+    }
   };
   const [tab, setTab] = useState("details");
   const handleShow = () => {
@@ -140,6 +166,15 @@ const [teamfeed, setTeamFeed] = useState([]);
   const [showTeams, setTeamsShow] = useState(false);
   const handleTeamsClose = () => setTeamsShow(false);
   const handleTeamsShow = () => setTeamsShow(true);
+
+  const [showRoles, setShowRoles] = useState(false);
+  const handleRoleClose = () => setShowRoles(false);
+  const handleRoleShow = () => {
+    setShowRoles(true);
+    setTimeout(() => {
+      selectboxObserver()
+    },500)
+  }
 
   const handledeleteMember = async () => {
     await dispatch(deleteMember(selectedMember._id));
@@ -216,6 +251,7 @@ const [teamfeed, setTeamFeed] = useState([]);
   useEffect(() => {
     if (teamsState && teamsState.teams) {
       setTeamFeed(teamsState.teams);
+      setFilteredTeamFeed(teamsState.teams)
     }
   }, [teamsState])
 
@@ -769,6 +805,36 @@ useEffect(() => {
     }
   };
 
+  const handleSaveRole = async () => {
+    if(!fields?.role && fields?.role === "" ){
+      addToast("Please select a role.", "danger");
+      return;
+    }
+    setLoader(true)
+    const formData = new FormData()
+    
+    formData.append(`role`, fields?.role);
+   
+    await dispatch(updateMember(selectedMember?._id, formData));
+    setLoader(false)
+    handleRoleClose()
+  }
+
+  const handleSaveTeams = async () => {
+    if(fields?.selected_teams && fields?.selected_teams?.length === 0 || !fields?.selected_teams ){
+      addToast("Please select at least one team.", "danger");
+      return;
+    }
+    setLoader(true)
+    const formData = new FormData()
+    fields['selected_teams'].forEach((item) => {
+      formData.append(`selected_teams[]`, item);
+    });
+    await dispatch(updateMember(selectedMember?._id, formData));
+    setLoader(false)
+    handleTeamsClose()
+  }
+
   const handleUpdateSubmit = async (event) => {
     event.preventDefault();
     // const changes = compareMembers(selectedMember, editedMember);
@@ -839,24 +905,24 @@ useEffect(() => {
     }
   };
 
-  const showPermissionsModal = () => {
-    const permissionsField = fields[`custom_field[permissions]`];
+  // const showPermissionsModal = () => {
+  //   const permissionsField = fields[`custom_field[permissions]`];
 
-    if (permissionsField) {
-      setPermissions(permissionsField);
-    }
+  //   if (permissionsField) {
+  //     setPermissions(permissionsField);
+  //   }
 
-    setShowPermissions(true);
-  };
+  //   setShowPermissions(true);
+  // };
 
-  const handleSavePermissions = () => {
-    setFields({
-      ...fields,
-      [`custom_field[permissions]`]: permissions,
-    });
+  // const handleSavePermissions = () => {
+  //   setFields({
+  //     ...fields,
+  //     [`custom_field[permissions]`]: permissions,
+  //   });
 
-    setShowPermissions(false);
-  };
+  //   setShowPermissions(false);
+  // };
 
   const [showTeamGrid, setShowTeamGrid] = useState(false);
   const [selectedCardIndex, setSelectedCardIndex] = useState(null);
@@ -1196,22 +1262,41 @@ useEffect(() => {
                 <Card.Body className="p-0">
                   <Card.Title>
                     <LuUser /> Member Information
-                    {(memberProfile?.role?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && ( 
+                    {(memberProfile?.role?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.update_permissions === true) && ( 
                       <Dropdown>
                         <Dropdown.Toggle variant="dark" id="dropdown-basic">
                           <FaEllipsisV />
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                          <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>
-                          <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1"><FiTrash2 /> 
                           {
-                            memberProfile?._id === selectedMember?._id ? 
-                            'Leave'
-                            :
-                            'Delete'
+                            (memberProfile?.role?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                            <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>)
                           }
+                          {
+                            (memberProfile?.role?.permissions?.members?.update_permissions === true || memberProfile?.role?.slug === "owner") && (
+                              <>
+                              <Dropdown.Item onClick={() => handleRoleShow()} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Change 
+                              Role</Dropdown.Item>
+                              <Dropdown.Item onClick={() => handleTeamsShow()} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Change 
+                              Teams</Dropdown.Item>
+                              </>
+                            )
+                          }
+                          {
+                            (memberProfile?.role?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
+                              <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1">
+                              {
+                                memberProfile?._id === selectedMember?._id ? 
+                                <><FiTrash2 /> Leave</>
+                                :
+                              ( memberProfile?._id !== selectedMember?._id && selectedMember?.role?.slug !== 'owner') ? 
+                                <><FiTrash2 /> Delete</>
+                                :
+                                <></>
+                              }
                           
-                          </Dropdown.Item>
+                           </Dropdown.Item>)
+                          }
                         </Dropdown.Menu>
                       </Dropdown>
                     )}
@@ -1296,7 +1381,7 @@ useEffect(() => {
                               {selectedMember?.email}
                             </p>
                           </ListGroup.Item>
-                          {(memberProfile?.role?.permissions?.members
+                          {/*(memberProfile?.role?.permissions?.members
                             ?.update_permissions === true &&
                             selectedMember?._id !== memberProfile?._id) ? (
                             <ListGroup.Item>
@@ -1321,7 +1406,7 @@ useEffect(() => {
                                 </Form.Select>
                               </Form.Group>
                             </ListGroup.Item>
-                          ) : (
+                          ) : ( */}
                             <ListGroup.Item>
                               <span className="info--icon">
                                 <BsBriefcase />
@@ -1331,7 +1416,7 @@ useEffect(() => {
                                 {selectedMember?.role?.name}
                               </p>
                             </ListGroup.Item>
-                          )}
+                          
                         </ListGroup>
                       </Card.Text>
                       <Card.Text>
@@ -1342,7 +1427,7 @@ useEffect(() => {
                             </span>
                             <p>
                               <small>Teams</small>
-                              {teamfeed?.map(
+                              {/*teamfeed?.map(
                                 (team) => (
                                   <Form.Check
                                     inline
@@ -1351,25 +1436,45 @@ useEffect(() => {
                                     type="checkbox"
                                     id={`inline-${team?._id}`}
                                     checked={fields?.selected_teams?.includes(team?._id)}
-                                    onChange={(e) => {
-                                      if(memberProfile?.role?.permissions?.members?.update_permissions === true &&
-                                      selectedMember?._id !== memberProfile?._id){
-                                        handleChange({
-                                          target: {
-                                            name: "selected_teams[]",
-                                            value: team?._id,
-                                            type: "checkbox",
-                                            checked: e.target.checked,
-                                          },
-                                        });
-                                      }else{
-                                        return;
-                                      }
-                                    }}
+                                    disabled
+                                    readOnly
+                                    // onChange={(e) => {
+                                    //   if(memberProfile?.role?.permissions?.members?.update_permissions === true &&
+                                    //   selectedMember?._id !== memberProfile?._id){
+                                    //     handleChange({
+                                    //       target: {
+                                    //         name: "selected_teams[]",
+                                    //         value: team?._id,
+                                    //         type: "checkbox",
+                                    //         checked: e.target.checked,
+                                    //       },
+                                    //     });
+                                    //   }else{
+                                    //     return;
+                                    //   }
+                                    // }}
                                     
                                   />
                                 ),
-                              )}
+                              )*/}
+                              {teamfeed?.map((team) => {
+                                if (selectedMember?.teams?.includes(team?._id)) {
+                                  return (
+                                    <Form.Check
+                                      key={team?._id}
+                                      inline
+                                      label={team?.name}
+                                      type="checkbox"
+                                      id={`inline-${team?._id}`}
+                                      checked={true}
+                                      disabled
+                                      readOnly
+                                    />
+                                  );
+                                }
+
+                                return null;
+                              })}
                             </p>
                             {errors["selected_teams"] || ''}  
                           </ListGroup.Item>
@@ -1416,8 +1521,7 @@ useEffect(() => {
                   {isEditing === true && (
                     <div className="text-end mt-3">
                       {(memberProfile?.role?.permissions?.members
-                        ?.create_edit_delete === true &&
-                        selectedMember?._id !== currentMember?._id) ||
+                        ?.create_edit_delete === true) ||
                       memberProfile?.role?.slug === "owner" ? (
                         <>
                           <Button variant="secondary" className="me-3" onClick={() => setIsEditing(false)}>Cancel</Button>
@@ -1546,15 +1650,6 @@ useEffect(() => {
                   {showError("email")}
                  
                 </Form.Group>
-                {/* <Button
-                  variant="primary"
-                  onClick={() => {
-                    showPermissionsModal();
-                  }}
-                >
-                  Select Role
-                </Button> */}
-                
               </div>
               
               <div className="form-row pb-3">
@@ -1666,7 +1761,7 @@ useEffect(() => {
           }
         </Modal.Footer>
       </Modal>
-      {showPermissions && (
+      { /*showPermissions && (
         <Modal show={showPermissions} onShow={() => {selectboxObserver()}} onHide={() => setShowPermissions(false)} centered size="lg" className="add--team--member--modal add--member--modal theme--modal">
           <Modal.Header closeButton>
               <Modal.Title>
@@ -1674,7 +1769,6 @@ useEffect(() => {
               </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {/* {rows.map((row, index) => ( */}
             <div className="form-row" key={`row-role-select`}>
               <Form.Group className="mb-0 form-group">
                 <Form.Select
@@ -1695,7 +1789,7 @@ useEffect(() => {
                     setPermissions(matchedPermissions);
                   }}
                 >
-                  {/* <option value="role">Select role</option> */}
+                 
                   {roles.map((role, roleIndex) => (
                     <option key={`role-${roleIndex}`} value={role._id}>
                       {role.name}
@@ -1704,7 +1798,7 @@ useEffect(() => {
                 </Form.Select>
               </Form.Group>
             </div>
-            {/* ))} */}
+           
             {fields?.role !== null && fields?.role !== "role" && (
               <Card className="border-0">
                 <Card.Body className="p-0 border-0">
@@ -1753,9 +1847,9 @@ useEffect(() => {
                                       <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
                                         disabled={!isViewChecked}
                                         checked={!!modPerms[perm]}
-                                        //onChange={(e) => setShowTeamGrid(e.target.checked)} 
+                                        
                                           onChange={() => {
-                                            //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
+                                           
                                             togglePermission(modSlug, perm);
                                           }}
                                       />
@@ -1793,13 +1887,13 @@ useEffect(() => {
                                             <Card className={`team--card ${modPerms[
                                                 "selected_members"
                                               ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                                //if (selectedMember?.role?.slug !== "owner") {
+                                               
                                                 toggleMembers(
                                                   modSlug,
                                                   "selected_members",
                                                   "unassigned"
                                                 );
-                                                // }
+                                                
                                               }} key={`${modSlug}-${perm}-unassigned`}>
                                               <span className="team--initial">U</span>
                                               <Card.Body>
@@ -1829,138 +1923,16 @@ useEffect(() => {
             </Button>
           </Modal.Footer>
         </Modal>
-      )}
+      ) */}
 
-      {adjustPermissions && (
-        <Modal className="theme--modal" show={adjustPermissions} onHide={() => setAdjustPermissions(false)} size="lg" centered>
-          <Modal.Header closeButton>
-              <Modal.Title>
-                  <strong>Edit Permissions <small>Manage access permissions</small></strong>
-              </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="new--accordion--block">
-              {permissionModules.map((mod) => {
-                const modSlug = mod.slug;
-                const modPerms = permissions?.[modSlug] || {};
-                const isExpanded = expanded?.[modSlug] || false;
-                const isViewChecked = !!modPerms.view;
-                const truePermissionCount = Object.values(
-                  modPerms
-                ).filter((val) => val === true).length;
-
-                return (
-                <div className="bg--blue--accordion">
-                  <div className="d-flex gap-3 align-items-center">
-                    {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                    <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                    
-                  </div>
-                  {(mod.permissions || []).map((perm) => {
-                    if (perm === "view") {
-                      return (
-                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                          <p className="mb-0">View</p>
-                          <Form.Check key={`${modSlug}--view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
-                            () => {
-                              // if(selectedMember?.role?.slug !== "owner"){
-                              toggleView(modSlug);
-                            }
-                            //}
-                          }/>
-                        </div>
-                      )
-                    }
-                    return (
-                      <>
-                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                          <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p>
-                          <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
-                            disabled={!isViewChecked}
-                            checked={!!modPerms[perm]}
-                            //onChange={(e) => setShowTeamGrid(e.target.checked)} 
-                              onChange={() => {
-                                //if(selectedMember?.role?.slug !== "owner"){ togglePermission(modSlug, perm)}
-                                togglePermission(modSlug, perm);
-                              }}
-                          />
-                        </div>
-                        {[
-                          "time_tracking",
-                          "projects",
-                          "reports",
-                          "attendance",
-                        ].includes(modSlug) &&
-                          perm === "view_others" &&
-                          modPerms[perm] === true && (
-                            <div className="team--card--grid">
-                              {memberFeeds.map((member) => (
-                                <Card className={`team--card ${modPerms[
-                                    "selected_members"
-                                  ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
-                                    //if (selectedMember?.role?.slug !== "owner") {
-                                    toggleMembers(
-                                      modSlug,
-                                      "selected_members",
-                                      member._id
-                                    );
-                                    // }
-                                  }}>
-                                  <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
-                                  <Card.Body>
-                                    <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
-                                  </Card.Body>
-                                  <FiCheck className="ms-auto" />
-                                </Card>
-                              ))}
-
-                              {modSlug === "projects" && (
-                                <Card className={`team--card ${modPerms[
-                                    "selected_members"
-                                  ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                    //if (selectedMember?.role?.slug !== "owner") {
-                                    toggleMembers(
-                                      modSlug,
-                                      "selected_members",
-                                      "unassigned"
-                                    );
-                                    // }
-                                  }} key={`${modSlug}-${perm}-unassigned`}>
-                                  <span className="team--initial">U</span>
-                                  <Card.Body>
-                                    <h4>Unassigned</h4>
-                                  </Card.Body>
-                                  <FiCheck className="ms-auto" />
-                                </Card>
-                              )}
-                            </div>
-                          )}
-                      </>
-                    )
-                  })}
-                  
-                </div>
-                )
-              })}
-              
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <div className="m-0 text-end">
-              <Button variant="primary" onClick={handleSave} disabled={loader}>{loader ? "Please wait..." : "Save"}</Button>
-            </div>
-          </Modal.Footer>
-        </Modal>)
-      }
-
+      
       {(memberProfile &&
         memberProfile.role?.slug === "owner" &&
         selectedMember?._id !== memberProfile?._id) ||
       (selectedMember?._id !== memberProfile?._id &&
         memberProfile &&
         Object.keys(memberProfile).length > 0 &&
-        memberProfile?.role?.permissions?.members?.create_edit_delete === true ||
-        memberProfile?.role?.slug !== "owner") ? (
+        memberProfile?.role?.permissions?.members?.create_edit_delete === true) ? (
         <>
           <AlertDialog
             showdialog={showdialog}
@@ -1999,32 +1971,94 @@ useEffect(() => {
       ) : (
         <></>
       )}
-      {/*--=-=Teams Modal**/}
-      <Modal show={showTeams} onHide={handleTeamsClose} size="md" centered className="status--modal assign--task--modal">
-        <Modal.Header closeButton>
-          <Modal.Title>Change Teams</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group>
-              <FloatingLabel label="Search here">
-                <Form.Control type="text" placeholder="Search here" value={search} onChange={handleSearchChange} />
-              </FloatingLabel>
+      {/*--=-=Teams Modal**/
+      (showTeams === true) && (
+      
+        <Modal show={showTeams} onHide={handleTeamsClose} size="md" centered className="status--modal assign--task--modal">
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <div className="title--initial">{
+                (selectedMember?.avatar && selectedMember?.avatar !== null ) ? 
+                  <span><img src={selectedMember?.avatar} alt={'member-avatar'} /></span>
+                  :
+                  selectedMember?.name.charAt(0)
+              }</div>Change Teams
+              <span>{selectedMember?.name}</span>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group>
+                <FloatingLabel label="Search here">
+                  <Form.Control type="text" placeholder="Search here" value={search} onChange={handleSearchChange} />
+                </FloatingLabel>
+              </Form.Group>
+            </Form>
+            <ListGroup className="status--list">
+              {filteredteamfeed.map((team, index) => (
+                <ListGroup.Item key={index} onClick={() => handleClickTeams(team?._id)} className={fields?.selected_teams?.includes(team?._id) ? "status--active" : ""}> 
+                  <span className="team--color" style={{ background: team?.color }}></span> 
+                  <p>{team?.name} {fields?.selected_teams?.includes(team?._id) && <FaCheck />} </p>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+              <span>Teams organize members into groups. Members with visibility to specific teams can see data, time entries, reports, and projects from only those teams.</span>
+          </Modal.Body>
+          <Modal.Footer>
+              <Button variant="secondary" onClick={handleTeamsClose} disabled={loader}>
+                {loader ? "Please Wait..." : "Save"}
+              </Button>
+              <Button variant="primary" onClick={handleSaveTeams} disabled={loader}>
+                {loader ? "Please Wait..." : "Save"}
+              </Button>
+            </Modal.Footer>
+        </Modal>)
+      }
+
+      {(showRoles === true) && (
+      
+        <Modal show={showRoles} onHide={handleRoleClose} size="md" centered className="status--modal assign--task--modal">
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <div className="title--initial">{
+                (selectedMember?.avatar && selectedMember?.avatar !== null ) ? 
+                  <span><img src={selectedMember?.avatar} alt={'member-avatar'} /></span>
+                  :
+                  selectedMember?.name.charAt(0)
+              }</div>Change Role
+              <span>{selectedMember?.name}</span>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            
+           <Form.Group>
+            <Form.Select
+              className={"form-control custom-selectbox conditional-box"}
+              value={fields?.role || ""}
+              onChange={(e) => handleClickRoles(e.target.value)}
+              name="role"
+            >
+              {roles.map((role, index) => (
+                <option key={`role-id-${index}`} value={role?._id}> 
+                  {role?.name}
+                </option>
+              ))}
+            </Form.Select>
             </Form.Group>
-          </Form>
-          <ListGroup className="status--list">
-            {teamfeed.map((team, index) => (
-              <ListGroup.Item key={index} onClick={() => handleClickTeams(team?._id)} className={fields?.selected_teams?.includes(team?._id) ? "status--active" : ""}> 
-                <span className="team--color" style={{ background: team?.color }}></span> 
-                <p>{team?.name} {fields?.selected_teams?.includes(team?._id) && <FaCheck />} </p>
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
+              
+          </Modal.Body>
+          <Modal.Footer>
+            <span>Changing the role will update this member's permissions to match the selected role's defaults.</span>
+              <Button variant="secondary" onClick={handleRoleClose} disabled={loader}>
+                {loader ? "Please Wait..." : "Save"}
+              </Button>
+              <Button variant="primary" onClick={handleSaveRole} disabled={loader}>
+                {loader ? "Please Wait..." : "Save"}
+              </Button>
+            </Modal.Footer>
+        </Modal>)
+      }
 
-
-
-        </Modal.Body>
-      </Modal>
       {/*--=-=Search Modal**/}
       <Modal show={showSearch} onHide={handleSearchClose} size="md" className="search--modal">
         <Modal.Header closeButton>

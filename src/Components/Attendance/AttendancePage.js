@@ -338,7 +338,14 @@ useEffect(() => {
                     </ListGroup>
                     <ListGroup horizontal className={'bg-white expand--icon d-flex'}>
                       <ListGroup.Item className='d-flex d-md-none' onClick={handleFilterShow}><MdFilterList /></ListGroup.Item>
-                      <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleAttendanceStatus }><FaCog /></ListGroup.Item>
+                      {
+                        (memberProfile?.role?.permissions?.attendance
+                            ?.create_edit === true ||
+                          memberProfile?.role?.slug === "owner") && (
+                             <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleAttendanceStatus }><FaCog /></ListGroup.Item>
+                          )
+                      }
+                     
                     </ListGroup>
                     <ListGroup horizontal className='bg-white expand--icon d-none d-lg-flex'>
                       <ListGroup.Item onClick={() => {handleSidebarSmall(false);}}><GrExpand /></ListGroup.Item>
