@@ -73,14 +73,13 @@ function DashboardPage() {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentPostIds, setCommentPostIds] = useState([]);
   const memberstate = useSelector((state) => state.member);
-  const invitationsFeed = useSelector((state) => state.member.invitations);
+  const invitationsFeed = useSelector((state) => state.member);
   const postFeed = useSelector((state) => state.post.posts);
   const postApi = useSelector((state) => state.post);
   const [invitationsFeeds, setInvitationsFeed] = useState([]);
   const [selectedPost, setSelectedPost] = useState({});
   const [isEdit, setIseEdit] = useState(false);
   const [quote, setQuote] = useState("");
-  const [isActive, setIsActive] = useState(0);
   const [show, setShow] = useState(false);
   const [posts, setPosts] = useState([]);
   const [loader, setLoader] = useState(false)
@@ -537,8 +536,8 @@ function DashboardPage() {
   useEffect(() => {
     const check = ["undefined", undefined, "null", null, ""];
 
-    if (invitationsFeed && invitationsFeed.inviteData && invitationsFeed?.Invitelistfor === 'member') {
-      setInvitationsFeed(invitationsFeed.inviteData);
+    if (invitationsFeed && invitationsFeed.invitations && invitationsFeed?.Invitelistfor === 'member') {
+      setInvitationsFeed(invitationsFeed.invitations?.inviteData);
     }
   }, [invitationsFeed]);
 
@@ -603,11 +602,7 @@ function DashboardPage() {
     <>
       <div
         className={
-          isActive === 1
-            ? "show--details team--page dashboard--page"
-            : isActive === 2
-            ? " view--project team--page dashboard--page"
-            : "team--page dashboard--page"
+          "team--page dashboard--page"
         }
       >
         <div className="page--wrapper px-md-2 pb-4 pt-4 text-center">

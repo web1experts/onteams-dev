@@ -392,7 +392,12 @@ const showError = (name) => {
                           <Card.Title>{plan.name}</Card.Title>
                           <Card.Body className="d-flex flex-column p-4">
                             
-                            <p>{plan.members_text}</p>
+                           {
+                              (plan.id === "free") ?
+                                 <p>{plan.members_text}</p>
+                                :
+                                <p className="pb-4"></p>
+                            }
                             {plan.id === 'free' ? 
                               <div className="bg-gradient-primary p-3 mb-3 rounded-3">
                                   <div className="text--small mb-1 text-uppercase">Free Forever</div>

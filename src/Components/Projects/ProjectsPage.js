@@ -234,7 +234,7 @@ function ProjectsPage() {
       setFilters({
         ...filters,
         ["status"]: systemFields?.status?.options[0]?.value || 'in-progress',
-         member: memberdata?._id,//(memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true || memberProfile?.role?.slug === "owner") ? 'all' : 
+         member: (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true) ? 'all' : memberdata?._id
         
       });
       setFields({
@@ -542,7 +542,7 @@ function ProjectsPage() {
 
   useEffect(() => {
     if (currentPage > 0) {
-      setProjects([]); console.log('I am here')
+      setProjects([]);
       handleListProjects();
       setSpinner(true);
     }
@@ -559,7 +559,15 @@ function ProjectsPage() {
     setFilterBy(value)
     setTimeout(()=> {
       selectboxObserver()
-    }, [1000])
+      if(value === "teams"){
+        if(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0){
+          handlefilterchange("team_id", memberProfile?.role?.permissions?.assigned_teams?.selected_teams[0])
+        }
+      }else{
+        handlefilterchange("member", 'all')
+      }
+    }, [700])
+    
   }
 
   const handleDateChange = (value, name) => {
@@ -613,16 +621,6 @@ function ProjectsPage() {
       dispatch(updateProject(currentProject._id, payload));
     }
   };
-
-  // const handlefilterchange = (name, value) => {
-  //   if (
-  //     (name === "search" && value === "") ||
-  //     (name === "search" && value.length > 1) ||
-  //     name !== "search"
-  //   ) {
-  //     setFilters({ ...filters, [name]: value });
-  //   }
-  // };
 
    // Debounced search handler
   const debouncedUpdateSearch = useMemo(
@@ -1219,7 +1217,7 @@ function ProjectsPage() {
                     className={isActive !== 0 ? "" : "ms-auto d-flex"}
                   >
                     {
-                      (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true && memberProfile?.permissions?.projects?.view_others === true) && (
+                      (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true && memberProfile?.role?.permissions?.projects?.view_others === true) && (
                         <ListGroup.Item
                           className={
                             isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
@@ -1273,31 +1271,30 @@ function ProjectsPage() {
                           >
                             My Projects
                           </option>
-                          {(memberProfile?.permissions?.projects?.view_others === true) && (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
+                          {(memberProfile?.role?.permissions?.projects?.view_others === true) && (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
                             true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
-                            true ||
-                            memberProfile?.role?.slug === "owner") && (
+                            true ) && (
                             <>
-                              {(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 || memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ||
-                                memberProfile?.role?.slug === "owner") && (
+                              {(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 || memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ) && (
                                 <option key={`member-projects-all`} value={"all"}>
                                   All Members
                                 </option>
                               )}
                               {
-                                (memberProfile?.role?.slug === "owner") ? (
+                                // (memberProfile?.role?.slug === "owner") ? (
 
                                   // ✅ OWNER sees all members
-                                  allMembers.map((member, index) => (
-                                    <option
-                                      key={`member-projects-${index}`}
-                                      value={member.value}
-                                    >
-                                      {member.label}
-                                    </option>
-                                  ))
+                                //   allMembers.map((member, index) => (
+                                //     <option
+                                //       key={`member-projects-${index}`}
+                                //       value={member.value}
+                                //     >
+                                //       {member.label}
+                                //     </option>
+                                //   ))
 
-                                ) : (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true) ? (
+                                // ) : 
+                                (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true) ? (
 
                                   // ✅ Specific people only
                                   allMembers
@@ -1360,7 +1357,6 @@ function ProjectsPage() {
                           }
                           value={filters["team_id"] || "all"}
                         >
-                          <option value="none">Select Team</option>
                           {teamfeed.map((team, index) => {
                             if(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.includes(team._id)){
                               return (
@@ -3038,13 +3034,11 @@ function ProjectsPage() {
                   My Projects
                 </option>
                 
-                    {(memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
+                    {(memberProfile?.role?.permissions?.projects?.view_others === true) && (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
                       true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
-                      true ||
-                      memberProfile?.role?.slug === "owner") && (
+                      true ) && (
                       <>
-                        {(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 || memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ||
-                          memberProfile?.role?.slug === "owner") && (
+                        {(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 || memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0) && (
                           <option key={`member-projects-all`} value={"all"}>
                             All Members
                           </option>

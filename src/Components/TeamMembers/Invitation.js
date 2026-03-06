@@ -802,7 +802,7 @@ function Invitation(props) {
             <Card.Body className="p-0 ps-4">
               <Card.Title>
                 <FiMail /> Member Information
-                {(memberProfile?.permissions?.members?.create_edit_delete ===
+                {(memberProfile?.role?.permissions?.members?.create_edit_delete ===
                   true ||
                   memberProfile?.role?.slug === "owner") && (
                   <Dropdown>
@@ -897,7 +897,7 @@ function Invitation(props) {
                           {selectedInvitation?.email}
                         </p>
                       </ListGroup.Item>
-                      {memberProfile?.permissions?.members
+                      {memberProfile?.role?.permissions?.members
                         ?.create_edit_delete === true && (
                         <ListGroup.Item>
                           <Form.Group className="mb-0 form-group pb-0">

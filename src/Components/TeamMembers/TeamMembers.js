@@ -88,7 +88,7 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const apiCustomfields = useSelector((state) => state.customfields);
   const [isActiveView, setIsActiveView] = useState(2);
   const [rows, setRows] = useState([{ email: "", role: "" }]);
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState({});
   let fieldErrors = {};
   let hasError = false;
   const deleteSuccess = useSelector((state) => state.member.deletedMember);
@@ -106,8 +106,8 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const [show, setShow] = useState(false);
   const handleClose = () => {
     requestAnimationFrame(() => {
-      setRows([{ email: "", role: "" }]);
-      setErrors([]);
+      setFields({ email: "", name: "", role: "" });
+      setErrors({});
       setShow(false);
     });
   };
@@ -187,6 +187,7 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
         companyId: currentMember.company._id,
       })
     );
+    setShowDialog(false)
   };
 
   const toggleCustomFields = () => {
@@ -310,8 +311,8 @@ useEffect(() => {
       setLoader(false);
       setUpdateLoader(false);
       setRows([{ email: "", role: "" }]);
-      setErrors([]);
-      setShow(false);
+      setErrors({});
+      handleClose()
     }
     if (
       workspaceState.available_roles &&
@@ -345,6 +346,22 @@ useEffect(() => {
         setMemberFeed(updatedMemberFeeds);
       }
     }
+      if (apiPermission.savedrole) {
+        const savedrole = apiPermission.savedrole;
+        
+        setRoles((prev) => {
+          const index = prev.findIndex((role) => role._id === savedrole._id);
+          if (index !== -1) {
+            // Replace existing role
+            return prev.map((role) =>
+              role._id === savedrole._id ? savedrole : role,
+            );
+          } else {
+            // Add new role
+            return [...prev, savedrole];
+          }
+        });
+      }
   }, [apiPermission]);
 
   useEffect(() => {
@@ -499,53 +516,7 @@ useEffect(() => {
     setErrors({ ...fieldErrors, [field]: "" });
   };
 
-  const handleFieldChange = (field, value) => {
-    // if (field in editedMember) {
-    if (field === "avatar") {
-      setAvatarPreview(URL.createObjectURL(value.target.files[0]));
-      setEditedMember((prevState) => ({
-        ...prevState,
-        [field]: value.target.files[0],
-      }));
-    } else if (field === "memberMeta") {
-      const metakey = value.target.name;
-      const meta_value = value.target.value;
-
-      setEditedMember((prevState) => ({
-        ...prevState,
-        memberMeta: {
-          ...prevState.memberMeta,
-          [metakey]: meta_value,
-        },
-      }));
-    } else if (field === "role") {
-      if( value !== "role"){
-         const matchingRole = roles.find((role) => role._id === value);
-        setEditedMember((prevState) => ({
-          ...prevState,
-          ["rolename"]: matchingRole?.name,
-          ["role"]: matchingRole._id,
-          memberMeta: {
-            ...prevState.memberMeta,
-            ["permissions"]: matchingRole.permissions,
-          },
-        }));
-      }
-      if (value !== "") {
-       
-        removeError(field);
-      }
-    } else {
-      setEditedMember((prevState) => ({
-        ...prevState,
-        [field]: value,
-      }));
-
-      if (value !== "") {
-        removeError(field);
-      }
-    }
-  };
+  
   const handleDateChange = (value, name) =>{ 
         setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
         setErrors({ ...errors, [name]: '' })
@@ -668,32 +639,11 @@ useEffect(() => {
     }
   };
 
-  const addRow = () => {
-    setRows([...rows, { email: "", role: "" }]);
-  };
-
-  const removeRow = (index) => {
-    const updatedRows = rows.filter((_, i) => i !== index);
-    const updatedErrors = errors.filter((_, i) => i !== index);
-    setRows(updatedRows);
-    setErrors(updatedErrors);
-  };
-
   useEffect(() => {
     if (rows.length > 0) {
       selectboxObserver();
     }
   }, [rows]);
-
-  const compareMembers = (original, edited) => {
-    const changes = {};
-    for (const [key, value] of Object.entries(edited)) {
-      if (original[key] !== value) {
-        changes[key] = value;
-      }
-    }
-    return changes;
-  };
 
   const [permissions, setPermissions] = useState({});
   const [expanded, setExpanded] = useState({});
@@ -767,43 +717,6 @@ useEffect(() => {
   };
 
 
-  const toggleMembers = (module, perm, memberId) => {
-    setPermissions((prev) => {
-      const currentPerms = prev?.[module] || {};
-      const currentMembers = currentPerms[perm] || [];
-
-      const updatedMembers = currentMembers.includes(memberId)
-        ? currentMembers.filter((id) => id !== memberId)
-        : [...currentMembers, memberId];
-
-      return {
-        ...prev,
-        [module]: {
-          ...currentPerms,
-          [perm]: updatedMembers,
-        },
-      };
-    });
-  };
-
-
-
-  const handleSave = async (e) => {
-    setLoader(true);
-    try {
-      const roleData = {
-        memberId: selectedMember._id,
-        permissions,
-        type: "member",
-      };
-      setLoader(true);
-      dispatch(updatePermissions(roleData));
-    } catch (err) {
-      setLoader(false);
-      console.error("Error adding role:", err);
-      alert("Error adding role");
-    }
-  };
 
   const handleSaveRole = async () => {
     if(!fields?.role && fields?.role === "" ){
@@ -904,29 +817,6 @@ useEffect(() => {
     } else {
     }
   };
-
-  // const showPermissionsModal = () => {
-  //   const permissionsField = fields[`custom_field[permissions]`];
-
-  //   if (permissionsField) {
-  //     setPermissions(permissionsField);
-  //   }
-
-  //   setShowPermissions(true);
-  // };
-
-  // const handleSavePermissions = () => {
-  //   setFields({
-  //     ...fields,
-  //     [`custom_field[permissions]`]: permissions,
-  //   });
-
-  //   setShowPermissions(false);
-  // };
-
-  const [showTeamGrid, setShowTeamGrid] = useState(false);
-  const [selectedCardIndex, setSelectedCardIndex] = useState(null);
-
 
   const handleDragEnd = (result) => {
     const { source, destination, draggableId } = result;
@@ -1262,7 +1152,7 @@ useEffect(() => {
                 <Card.Body className="p-0">
                   <Card.Title>
                     <LuUser /> Member Information
-                    {(memberProfile?.role?.permissions?.members ?.create_edit_delete === true || memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.update_permissions === true) && ( 
+                     
                       <Dropdown>
                         <Dropdown.Toggle variant="dark" id="dropdown-basic">
                           <FaEllipsisV />
@@ -1299,7 +1189,7 @@ useEffect(() => {
                           }
                         </Dropdown.Menu>
                       </Dropdown>
-                    )}
+                  
                   </Card.Title>
                   {isEditing === false ? (
                     <>

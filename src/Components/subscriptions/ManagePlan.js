@@ -556,7 +556,7 @@ const handleSubmit = (e) => {
                               <Card.Text className="small">
                                 {plan.id === 'free'
                                   ? `Free for up to 3 members`
-                                  : "Unlimited Team Members"}
+                                  : ""}
                               </Card.Text>
                             </Card.Body>
                           </Card>

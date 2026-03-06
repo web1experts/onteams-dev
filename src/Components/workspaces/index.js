@@ -102,6 +102,7 @@ function Workspace(props) {
         memberId: selectedWorkspace.memberData._id,
       })
     );
+    handleCloseWarning()
   }
 
   const handleEdit = (workspace) => {
