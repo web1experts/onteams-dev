@@ -1538,6 +1538,24 @@ ul#subtasks-ul .form-group .quill--editor svg {
     align-items: center;
 }
 
+.success--page span.circle--check {
+  background-color: rgb(209 250 229);
+    border-radius: 9999px;
+    justify-content: center;
+    align-items: center;
+    width: 6rem;
+    height: 6rem;
+    display: flex;
+    margin: auto;
+    margin-bottom: 1rem;
+}
+
+.success--page span.circle--check svg {
+    color: rgb(5 150 105);
+    width: 4rem;
+    height: 4rem;
+}
+
 @media (max-width:1199px) {
   .project--form {
     height: auto;

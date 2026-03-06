@@ -969,6 +969,18 @@ input.form-control.br-red {
   border: 1px solid rgb(226 232 240);
 }
 
+.project--table:empty {
+  display: none;
+}
+
+.bg--gray {
+    margin-left: 28px;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
 table.draggable--table {
   overflow: auto;
   position: relative;
@@ -4093,9 +4105,26 @@ Project Task View CSS=-=-=
   cursor: pointer;
 }
 
+.modal .team--card--grid .team--card svg {
+  opacity: 0;
+  font-size: 1.2rem;
+}
+
+.alert-heading {
+    color: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
 .modal .team--card--grid .selected--card {
-  border: 1px solid rgba(var(--theme-primary), .2);
+  border: 1px solid rgba(var(--theme-primary), .4);
   background-color: rgba(var(--theme-primary), .03);
+}
+
+.modal .team--card--grid .selected--card svg {
+  opacity: 1;
+  color: rgba(var(--theme-primary), 1);
 }
 
 .modal .switch--big .form-check-input {
