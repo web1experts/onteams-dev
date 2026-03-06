@@ -714,7 +714,10 @@ function Invitation(props) {
                         })}
                       </tbody>
                     </Table>
-                  ) : (
+                  ) : <></>}
+                </div>
+                {
+                  (
                     !showloader &&
                     invitationsFeeds &&
                     invitationsFeeds.length === 0 && (
@@ -722,8 +725,8 @@ function Invitation(props) {
                         <h2>No Invitations Found</h2>
                       </div>
                     )
-                  )}
-                </div>
+                  )
+                }
               </>
             )}
           </Container>
