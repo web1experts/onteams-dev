@@ -43,6 +43,7 @@ function TeamMembersPage() {
   const addToast = useToast();
   const [isActive, setIsActive] = useState(0);
   const [activeItems, setActiveItems] = useState([]);
+  const [newOwnerId, setNewOwnerId] = useState(null)
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
@@ -69,6 +70,10 @@ function TeamMembersPage() {
       };
     });
   };
+
+  const handleClickMember = (memberId) => {
+    setNewOwnerId(memberId)
+  }
 
 const [teamfeed, setTeamFeed] = useState([]);
 const [filteredteamfeed, setFilteredTeamFeed] = useState([])
@@ -174,6 +179,8 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
     setTimeout(() => {
       selectboxObserver()
     },500)
+    
+    handleClickRoles(roles?.[0] || '')
   }
 
   const handledeleteMember = async () => {
@@ -313,6 +320,7 @@ useEffect(() => {
       setRows([{ email: "", role: "" }]);
       setErrors({});
       handleClose()
+      setNewOwnerId(null)
     }
     if (
       workspaceState.available_roles &&
@@ -727,6 +735,11 @@ useEffect(() => {
     const formData = new FormData()
     
     formData.append(`role`, fields?.role);
+
+    if(selectedMember?.role?.slug === memberProfile?.role?.slug){
+      formData.append(`transfer_role_to`, newOwnerId);
+      formData.append(`ownership_transfer`, true);
+    }
    
     await dispatch(updateMember(selectedMember?._id, formData));
     setLoader(false)
@@ -1921,7 +1934,7 @@ useEffect(() => {
           </Modal.Header>
           <Modal.Body>
             
-           <Form.Group>
+          <Form.Group>
             <Form.Select
               className={"form-control custom-selectbox conditional-box"}
               value={fields?.role || ""}
@@ -1934,7 +1947,26 @@ useEffect(() => {
                 </option>
               ))}
             </Form.Select>
-            </Form.Group>
+          </Form.Group>
+          {
+            (selectedMember?.role?.slug === memberProfile?.role?.slug) && (
+              <Form.Group>
+                <p className="mb-4">Select a member to make owner</p>
+                <Form.Select
+                  className={"form-control custom-selectbox conditional-box"}
+                  value={fields?.transfer_role_to || ""}
+                  onChange={(e) => handleClickMember(e.target.value)}
+                  name="transfer_role_to"
+                >
+                  {memberFeeds.map((member, index) => (
+                    <option key={`role-id-${index}`} value={member?._id}> 
+                      {member?.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            )
+          }
               
           </Modal.Body>
           <Modal.Footer>
