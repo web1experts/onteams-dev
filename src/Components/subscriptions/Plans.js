@@ -9,19 +9,24 @@ import { currentMemberProfile } from "../../helpers/auth";
 import { createSubscription, saveAuthorization, getUpcomingInvoice, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan } from "../../redux/actions/subscription.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { countries } from "../../helpers/countries";
-import { plans } from "../../helpers/plans";
+import { getPlans } from "../../helpers/plans";
 import { useToast } from "../../context/ToastContext";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import InvoicePreview from "./InvoicePreview";
 import Spinner from 'react-bootstrap/Spinner';
-const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
+import { getOption } from "../../redux/actions/option.actions";
+
   
 function PlansPage() {
   const addToast = useToast();
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [plans, setPlans] = useState({})
+  const optionState = useSelector((state) => state.option)
+  const [stripePromise, setStripePromise] = useState(null)
+  const [stripeMode, setStripeMode] = useState( 'sandbox')
   const [loader, setLoader] = useState(true)
   const [ spin, setSpin] = useState( false)
   const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
@@ -52,22 +57,9 @@ function PlansPage() {
   const [billingCycle, setBillingCycle] = useState("yearly"); // monthly | quarterly | yearly
   const [showConfirm, setShowConfirm] = useState(false);
   const [priceDetails, setPriceDetails] = useState(null);
-  // Adjust price based on billing cycle
-  const getDiscountedPrice = (plan) => {
-    switch (billingCycle) {
-      case "yearly":
-        return plan.originalPrice * 0.6; // 40% OFF
-      case "quarterly":
-        return plan.originalPrice * 0.8; // 20% OFF
-      default:
-        return plan.pricePerUser;
-    }
-  };
-
-  const handlePlanSelect = (plan) => setSelectedPlan(plan);
-
+ 
   useEffect(() => {
-
+    dispatch(getOption('stripe_mode'))
     fetch("https://ipapi.co/json/")
       .then(res => res.json())
       .then(data => { console.log(data.country_code)
@@ -76,6 +68,8 @@ function PlansPage() {
     setTimeout(() => {
       dispatch(getActiveSubscription())
     }, 1000)
+
+    
   }, [])
 
   useEffect(() => {
@@ -112,6 +106,21 @@ function PlansPage() {
       }
       
     }, [subscriptionState.activeSubscription])
+
+    useEffect(() => {
+      if(optionState?.option?.key === 'stripe_mode'){
+        setStripeMode(optionState?.option.value || 'sandbox')
+        if(optionState?.option.value === 'sandbox'){
+          setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+        }else{
+          setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+        }
+      }
+    }, [optionState?.option])
+
+    useEffect(() => {
+      setPlans(getPlans(stripeMode))
+    }, [stripeMode])
 
     useEffect(() => {
       setSpin(false)
@@ -367,11 +376,11 @@ const showError = (name) => {
 
               {/* Plan Cards */}
               <Row className="g-4">
-                {plans[billingCycle].map((plan) => {
+                {plans?.[billingCycle].map((plan) => {
                   
                   if(plan.currency === selectedCurrency && plan.billing_cycle === false || plan.currency === selectedCurrency && plan.billing_cycle === billingCycle){
                     
-                    const finalPricePerUser = plan.pricePerUser;//getDiscountedPrice(plan);
+                    const finalPricePerUser = plan.pricePerUser;
                     const baseAmount = plan.originalPrice * members
                     const total = finalPricePerUser * members;
                     let months = 1;

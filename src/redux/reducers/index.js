@@ -19,6 +19,7 @@ import postReducer from "./post.reducer";
 import customfieldReducer from "./customfield.reducer";
 import systemfieldReducer from "./systemfield.reducer";
 import teamReducer from "./team.reducer";
+import optionReducer from "./option.reducer";
 export default combineReducers({
   auth: authReducer,
   project: projectReducer,
@@ -39,5 +40,6 @@ export default combineReducers({
   post: postReducer,
   customfields: customfieldReducer,
   systemfields: systemfieldReducer,
-  teams: teamReducer
+  teams: teamReducer,
+  option: optionReducer
 });

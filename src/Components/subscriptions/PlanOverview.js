@@ -4,25 +4,19 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button, Badge, ListGroup, Alert } from "react-bootstrap";
 import { FiArrowUpRight, FiCalendar, FiCheckCircle, FiClock, FiUsers, FiSettings, FiDownload } from "react-icons/fi";
 import { BsExclamationTriangle } from "react-icons/bs";
-import { BiFile } from "react-icons/bi";
 import { getActiveSubscriptionDetails, cancelSchedule, getScheduledPlan } from "../../redux/actions/subscription.action";
-import { plans } from "../../helpers/plans";
+import { getPlans, planNames } from "../../helpers/plans";
 import { AlertDialog } from "../modals";
 import { currentMemberProfile } from "../../helpers/auth";
 import Spinner from 'react-bootstrap/Spinner';
+import { getOption } from "../../redux/actions/option.actions";
 const PlanOverview = () => {
   const dispatch = useDispatch()
    const navigate = useNavigate()
-
-   const planNames =  {
-      'price_1Sd5xOSZtJkrH95e6De3lu49': 'Pro',
-      'price_1SseHESZtJkrH95eo0T8FSjF': 'Pro',
-      'price_1SseGYSZtJkrH95encqmjvOc': 'Pro',
-      'price_1Sd5xcSZtJkrH95eunkuqn5L': 'Elite',
-      'price_1SseEhSZtJkrH95einCYWefE': 'Elite',
-      'price_1SseEMSZtJkrH95eK49kldme': 'Elite',
-      'free' : 'Free'
-   }
+  const [plans, setPlans] = useState({})
+  const optionState = useSelector((state) => state.option)
+  const [stripePromise, setStripePromise] = useState(null)
+  const [stripeMode, setStripeMode] = useState( 'sandbox')
 
   const memberProfile = currentMemberProfile();
    const [showdialog, setShowDialog] = useState(false);
@@ -32,9 +26,20 @@ const PlanOverview = () => {
   const [scheduledSub, setScheduledSub] = useState(null)
   useEffect(() => {
     setSpinner(true)
+    dispatch(getOption('stripe_mode'))
     dispatch(getActiveSubscriptionDetails())
     dispatch(getScheduledPlan())
   }, [])
+
+  useEffect(() => {
+    if(optionState?.option?.key === 'stripe_mode'){
+      setStripeMode(optionState?.option.value || 'sandbox')
+    }
+  }, [optionState?.option])
+
+  useEffect(() => {
+    setPlans(getPlans(stripeMode))
+  }, [stripeMode])
 
   useEffect(() => {
     if(subscriptionState.activeSubscription && subscriptionState.activeSubscription?.plandId === 'free' || subscriptionState?.activeSubscription?.plandId === 'trial'){

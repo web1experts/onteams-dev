@@ -5,7 +5,7 @@ import { FiUsers, FiCalendar, FiCheck, FiSave } from "react-icons/fi";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { BsTags } from "react-icons/bs";
 import { checkInvoiceStatus, saveAuthorization,getUpcomingInvoice, getScheduledPlan, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
-import { plans } from "../../helpers/plans";
+import { getPlans } from "../../helpers/plans";
 import { countries } from "../../helpers/countries";
 import { useToast } from "../../context/ToastContext";
 import { selectboxObserver } from "../../helpers/commonfunctions";
@@ -18,17 +18,22 @@ import InvoicePreview from "./InvoicePreview";
 import { CLEAR_CLIENT_SECRET } from "../../redux/actions/types";
 import Spinner from 'react-bootstrap/Spinner';
 import CheckoutForm from "./CheckoutForm";
+import { getOption } from "../../redux/actions/option.actions";
 import {
   PaymentElement,
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
+// const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
   
 export default function ManagePlan() {
   const dispatch = useDispatch()
   const addToast = useToast();
   const qtyRef = useRef(null);
+  const [plans, setPlans] = useState({})
+  const optionState = useSelector((state) => state.option)
+  const [stripePromise, setStripePromise] = useState(null)
+  const [stripeMode, setStripeMode] = useState( 'sandbox')
   const [spinner, setSpinner] = useState(true);
   const [showdialog, setShowDialog] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
@@ -101,6 +106,7 @@ export default function ManagePlan() {
     };
 
   useEffect(() => {
+    dispatch(getOption('stripe_mode'))
     setSpinner(true)
     fetch("https://ipapi.co/json/")
       .then(res => res.json())
@@ -112,6 +118,21 @@ export default function ManagePlan() {
     dispatch(getBillingdetails())
     dispatch(getScheduledPlan())
   }, [])
+
+  useEffect(() => {
+    if(optionState?.option?.key === 'stripe_mode'){
+      setStripeMode(optionState?.option.value || 'sandbox')
+      if(optionState?.option.value === 'sandbox'){
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+      }else{
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+      }
+    }
+  }, [optionState?.option])
+
+  useEffect(() => {
+    setPlans(getPlans(stripeMode))
+  }, [stripeMode])
 
   useEffect(() => {
     setTeamMembers(totalmembers)
@@ -538,7 +559,7 @@ const handleSubmit = (e) => {
                   <h4 className="text-xl fw-bold mb-4">Choose Your Plan & Price Summary</h4>
                   <h6 className="fw-bold mb-2">Choose Your Plan</h6>
                   <Row className="mb-4">
-                    {plans[billingCycle].map((plan) => {
+                    {plans?.[billingCycle]?.map((plan) => {
                       if(plan.currency === selectedCurrency){
                         return (
                         <Col key={plan.id} data-plan={plan.id} xl={4} className="mb-3">

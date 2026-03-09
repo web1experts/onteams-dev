@@ -9,20 +9,25 @@ import { createSubscription, saveAuthorization, getActiveSubscription,getUpcomin
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
 import { countries } from "../../helpers/countries";
-import { plans } from "../../helpers/plans";
+import { getPlans } from "../../helpers/plans";
 import { useToast } from "../../context/ToastContext";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import InvoicePreview from "./InvoicePreview";
 import Spinner from 'react-bootstrap/Spinner';
-const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
+import { getOption } from "../../redux/actions/option.actions";
+// const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
   
 
 function SubscriptionPlans() {
   const addToast = useToast();
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [plans, setPlans] = useState({})
+  const optionState = useSelector((state) => state.option)
+  const [stripePromise, setStripePromise] = useState(null)
+  const [stripeMode, setStripeMode] = useState( 'sandbox')
   const [spinner, setSpinner] = useState(true);
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
@@ -74,7 +79,23 @@ function SubscriptionPlans() {
   const handlePlanSelect = (plan) => setSelectedPlan(plan);
 
   useEffect(() => {
+    if(optionState?.option?.key === 'stripe_mode'){
+      setStripeMode(optionState?.option.value || 'sandbox')
+      if(optionState?.option.value === 'sandbox'){
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+      }else{
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+      }
+    }
+  }, [optionState?.option])
+
+  useEffect(() => {
+    setPlans(getPlans(stripeMode))
+  }, [stripeMode])
+
+  useEffect(() => {
     setSpinner(true)
+    dispatch(getOption('stripe_mode'))
     fetch("https://ipapi.co/json/")
       .then(res => res.json())
       .then(data => { console.log(data.country_code)
@@ -84,6 +105,7 @@ function SubscriptionPlans() {
       dispatch(getActiveSubscription())
       dispatch(getBillingdetails())
     }, 1000)
+   
     
   }, [])
 
@@ -372,7 +394,7 @@ const showError = (name) => {
 
             {/* Plan Cards */}
             <Row className="g-4">
-              {plans[billingCycle].map((plan) => {
+              {plans?.[billingCycle].map((plan) => {
                 if(plan.currency === selectedCurrency && plan.billing_cycle === false || plan.currency === selectedCurrency && plan.billing_cycle === billingCycle){
                 const finalPricePerUser = plan.pricePerUser;//getDiscountedPrice(plan);
                 const baseAmount = plan.originalPrice * members
