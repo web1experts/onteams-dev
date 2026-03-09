@@ -2536,6 +2536,33 @@ table tr.marked-project td {
 .rounded--box .contact--card.card .card-title .dropdown-menu {
   min-width: 120px;
   margin-top: 20px;
+  width: max-content;
+  max-width: max-content;
+}
+
+.rounded--box .contact--card.card .card-title .dropdown-item:empty {
+  display: none;
+}
+
+.change--team--icon .title--initial span {
+    width: 40px;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    height: 40px;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.change--team--icon .title--initial img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.change--team--icon .title--span {
+    font-size: 1rem;
+    color: rgb(17 24 39);
 }
 
 .wrapper--title .dropdown-menu {
@@ -4038,7 +4065,8 @@ Project Task View CSS=-=-=
 .setting--page .card {
   padding: 1.5rem;
   border-radius: 1rem;
-  background: linear-gradient(to right, #ededed70, #eeeeee);
+  background-color: #ededed40;
+  /* background: linear-gradient(to right, #ededed70, #eeeeee); */
 }
 
 .setting--page .bg-none {

@@ -137,15 +137,17 @@ function ForgotPassword() {
                         :
                                 
                         <>
-                         <div className="common--form">
-                            <span className='new--logo'><img className="logo--sm" src="../images/logo-prime-team-icon.png" alt="MyTeams" /></span>
-                            <h6>We've sent a password reset email to {fields['email']}.</h6>
-                            <p className='paragraph text-center '>Didn't see an email?</p>
-                            <div className="">
-                                <Button variant="primary" onClick={() => resendLoader ? null : handleRequestAgain()}><span style={{ cursor: 'pointer' }}>{resendLoader ? 'Please wait...' : 'Resend'}</span></Button>
-                            </div>
-                            <p><span>OR</span></p>
-                            <p><Link to="/login">Login Here</Link></p>
+                            <div className="common--form">
+                                <div className='middle--align'>
+                                    <span className='new--logo'><img className="logo--sm" src="../images/logo-prime-team-icon.png" alt="MyTeams" /></span>
+                                    <h6>We've sent a password reset email to {fields['email']}.</h6>
+                                    <p className='paragraph text-center '>Didn't see an email?</p>
+                                    <div className="">
+                                        <Button variant="primary" onClick={() => resendLoader ? null : handleRequestAgain()}><span style={{ cursor: 'pointer' }}>{resendLoader ? 'Please wait...' : 'Resend'}</span></Button>
+                                    </div>
+                                    <p><span>OR</span></p>
+                                    <p><Link to="/login">Login Here</Link></p>
+                                </div>
                             </div>
                         </>
                     }
