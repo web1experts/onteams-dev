@@ -16,7 +16,7 @@ import {
   Alert
 } from "react-bootstrap";
 import { FaPlus, FaTimesCircle, FaCheck } from "react-icons/fa";
-import { FiCheck, FiLock, FiTrash2 } from "react-icons/fi";
+import { FiCheck, FiInfo, FiLock, FiTrash2 } from "react-icons/fi";
 import { LuFolderOpen, LuPencilLine } from "react-icons/lu";
 import { useToast } from "../../context/ToastContext";
 import Spinner from "react-bootstrap/Spinner";
@@ -37,6 +37,7 @@ import { selectboxObserver } from "../../helpers/commonfunctions";
 import { getTeams, createTeam, updateTeam, deleteTeam } from "../../redux/actions/team.action";
 import { updateStateData } from "../../redux/actions/common.action";
 import { ALL_MEMBERS } from "../../redux/actions/types";
+import { BsExclamation, BsExclamationTriangle } from "react-icons/bs";
 function RolesPage() {
   const dispatch = useDispatch();
   const [fieldserrors, setFieldErrors] = useState({ name: "" });
@@ -883,10 +884,12 @@ const handleCreateRole = async (e) => {
                                         {
                                           (modSlug === 'assigned_teams' && showTeamAssign === false && activeRole?.type !== 'system') && (
                                             <>
-                                              <p>This role is not assigned to any teams. Use this feature for team leads, 
-                                                managers, and HRs who need to view their team members' projects, time 
-                                                tracking, reports, attendance, and other team-related data.</p>
-                                              <Button variant="primary" onClick={() => setShowTeamAssign(true)}>+ Assign Team</Button>
+                                              <div className="text-center">
+                                                <p><small className="text-secondary">This role is not assigned to any teams. Use this feature for team leads, 
+                                                  managers, and HRs who need to view their team members' projects, time 
+                                                  tracking, reports, attendance, and other team-related data.</small></p>
+                                                <Button variant="primary" onClick={() => setShowTeamAssign(true)}>+ Assign Team</Button>
+                                              </div>
                                             </>
                                             
                                           )
@@ -895,8 +898,8 @@ const handleCreateRole = async (e) => {
                                           (modSlug === 'assigned_teams' && showTeamAssign === true && activeRole?.type !== 'system') && (
                                             <Alert variant="warning" className="d-flex justify-content-end align-items-center">
                                               <Button
-                                                variant="link"
-                                                className="p-0 text-decoration-none"
+                                                variant="light"
+                                                className="text-decoration-none"
                                                 onClick={() => {
                                                   setShowTeamAssign( false);
                                                   setPermissions((prev) => ({
@@ -911,7 +914,7 @@ const handleCreateRole = async (e) => {
                                                   }));
                                                 }}
                                               >
-                                               x Remove Team Assignement
+                                               Remove Team Assignement
                                               </Button>
                                             </Alert>
                                           )
@@ -1068,14 +1071,14 @@ const handleCreateRole = async (e) => {
                                                   </small>
                                               </div>
                                               {modPerms[perm] === true && (
-                                                <div className="team-container">
+                                                <div className="team-container mt-3 ms-4">
 
                                                   {teamfeed?.map((team) => {
                                                    
                                                     return (
-                                                      <Card key={team._id} className="team-group-card mb-3">
+                                                      <Card key={team._id} className="team-group-card mb-3 flex-column">
                                                         {/* TEAM HEADER */}
-                                                        <Card.Header className="d-flex align-items-center justify-content-between">
+                                                        <Card.Header className="d-flex align-items-center justify-content-between w-100 bg-none p-0 border-0">
                                                           <div className="d-flex align-items-center gap-2">
                                                             <span
                                                               className="team-color"
@@ -1136,7 +1139,7 @@ const handleCreateRole = async (e) => {
                                                         </Card.Header>
 
                                                         {/* TEAM MEMBERS */}
-                                                        <Card.Body className="p-0">
+                                                        <Card.Body className="p-0 w-100 mt-3 rounded-3 overflow-hidden">
                                                           {team?.members?.map((member) => { 
                                                            const isChecked =
                                                                   modPerms?.selected_team_members?.[String(team?._id)]?.includes(
@@ -1146,7 +1149,7 @@ const handleCreateRole = async (e) => {
                                                             return (
                                                               <div
                                                                 key={member._id}
-                                                                className="member-row d-flex align-items-center px-3 py-3"
+                                                                className="member-row d-flex align-items-center px-3 py-2 bg-white"
                                                               >
                                                                 <Form.Check
                                                                   type="checkbox"
@@ -1180,7 +1183,7 @@ const handleCreateRole = async (e) => {
                                                             );
                                                           })}
                                                           {/* AUTO ADD SECTION */}
-                                                            <div className="auto-add-box mt-3 mb-3 p-3">
+                                                            <div className="auto-add-box mt-3 p-3">
                                                               <Form.Check
                                                                 type="switch"
                                                                 id={`auto-add-${team?._id}`}
@@ -1243,53 +1246,55 @@ const handleCreateRole = async (e) => {
                                                 </div>
                                               {
                                                 perm === "view_others" && modPerms[perm] === true && (
-                                                  <Alert variant="primary">
+                                                  <Alert variant="primary" className="mt-3 border-left-2">
                                                     <Alert.Heading>
-                                                      Team visibility applies to {modSlug.replace(/_/g, " ")}
+                                                      <small><FiInfo/> Team visibility applies to {modSlug.replace(/_/g, " ")}</small>
                                                     </Alert.Heading>
 
-                                                    <p>
-                                                      {(() => {
-                                                        const assigned = permissions?.assigned_teams;
+                                                    <p className="mb-0">
+                                                      <small>
+                                                        {(() => {
+                                                          const assigned = permissions?.assigned_teams;
 
-                                                        // ✅ Specific people only
-                                                        if (
-                                                          assigned?.specific_peoples_only === true &&
-                                                          Object.keys(assigned?.selected_team_members || {}).length > 0
-                                                        ) {
-                                                          const memberCount = Object.keys(
-                                                            assigned.selected_team_members
-                                                          ).length;
+                                                          // ✅ Specific people only
+                                                          if (
+                                                            assigned?.specific_peoples_only === true &&
+                                                            Object.keys(assigned?.selected_team_members || {}).length > 0
+                                                          ) {
+                                                            const memberCount = Object.keys(
+                                                              assigned.selected_team_members
+                                                            ).length;
 
-                                                          const autoTeamCount = assigned?.auto_add_teams?.length || 0;
+                                                            const autoTeamCount = assigned?.auto_add_teams?.length || 0;
 
-                                                          return `This role can see selected ${memberCount} members${
-                                                            autoTeamCount > 0
-                                                              ? ` + auto from ${autoTeamCount} team${
-                                                                  autoTeamCount > 1 ? "s" : ""
-                                                                }`
-                                                              : ""
-                                                          }`;
-                                                        }
+                                                            return `This role can see selected ${memberCount} members${
+                                                              autoTeamCount > 0
+                                                                ? ` + auto from ${autoTeamCount} team${
+                                                                    autoTeamCount > 1 ? "s" : ""
+                                                                  }`
+                                                                : ""
+                                                            }`;
+                                                          }
 
-                                                        // ✅ Specific teams only
-                                                        if (
-                                                          assigned?.specific_teams_only === true &&
-                                                          assigned?.selected_teams?.length > 0
-                                                        ) {
-                                                          const teamCount = assigned.selected_teams.length;
+                                                          // ✅ Specific teams only
+                                                          if (
+                                                            assigned?.specific_teams_only === true &&
+                                                            assigned?.selected_teams?.length > 0
+                                                          ) {
+                                                            const teamCount = assigned.selected_teams.length;
 
-                                                          return `This role can see ${teamCount} team${
-                                                            teamCount > 1 ? "s" : ""
-                                                          }${
-                                                            assigned?.auto_add_new_teams === true
-                                                              ? " + future teams"
-                                                              : ""
-                                                          }`;
-                                                        }
+                                                            return `This role can see ${teamCount} team${
+                                                              teamCount > 1 ? "s" : ""
+                                                            }${
+                                                              assigned?.auto_add_new_teams === true
+                                                                ? " + future teams"
+                                                                : ""
+                                                            }`;
+                                                          }
 
-                                                        return null;
-                                                      })()}
+                                                          return null;
+                                                        })()}
+                                                      </small>
                                                     </p>
                                                   </Alert>
                                                 )
@@ -1297,7 +1302,7 @@ const handleCreateRole = async (e) => {
                                               {
                                                 (permissionsLabel[modSlug][perm]?.caution && permissionsLabel[modSlug][perm]?.caution === true) && (
                                                   <Alert variant="danger" className="mt-3">
-                                                    <Alert.Heading><small>Caution Required:</small></Alert.Heading>
+                                                    <Alert.Heading><small><BsExclamationTriangle/> Caution Required:</small></Alert.Heading>
                                                     <p className="mb-0"><small>{permissionsLabel[modSlug][perm]?.caution_text}</small></p>
                                                   </Alert>
                                                 )

@@ -421,7 +421,7 @@ textarea.form-control {
   letter-spacing: 0em;
 }
 
-.common--form form {
+.common--form form, .common--form .middle--align {
   width: 100%;
   flex: 1 1 100%;
   max-width: 500px;
