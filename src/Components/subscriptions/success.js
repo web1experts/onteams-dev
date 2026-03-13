@@ -14,7 +14,7 @@ function SuccessPage() {
                     <span className="circle--check"><FaRegCheckCircle /></span>
                     <h2 className="text-center mb-1">Welcome to Prime Teams!</h2>
                     <p className="text-center mb-4">Your payment has been processed successfully and your subscription is now active.</p>
-                    <Link className="btn btn-primary" to="/dashboard">Go toDashboard</Link>
+                    <Link className="btn btn-primary" to="/dashboard">Go to Dashboard</Link>
                 </Container>
             </div>
         </div>

@@ -42,6 +42,13 @@ const commonRouter = [
         component: <MemberSignUp />,
         route: '/member-signup/:token'
     },
+    {
+        type: 'page',
+        name: 'Success page',
+        key: 'SUCCESS_PAGE',
+        component: <SuccessPage />,
+        route: '/success'
+    }
 ]
 const publicRoutes = [
     ...commonRouter,
@@ -100,7 +107,7 @@ const publicRoutes = [
         key: 'PRIMETEAMS',
         component: <DesktopPage/>,
         route: '/primeteamsio',
-    },
+    }
 ];
 
 const privateRoutes = [
@@ -114,13 +121,7 @@ const privateRoutes = [
         route: "*"
 
     },
-    {
-        type: 'page',
-        name: 'Success page',
-        key: 'SUCCESS_PAGE',
-        component: <SuccessPage />,
-        route: '/success'
-    },
+    
     {
         type: 'page',
         name: 'Cancel page',

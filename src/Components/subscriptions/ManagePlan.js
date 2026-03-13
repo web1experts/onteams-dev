@@ -174,7 +174,7 @@ export default function ManagePlan() {
       
       setTotalMembers(subscriptionState.activeSubscription?.quantity)
       setBillingCycle(subscriptionState.activeSubscription?.interval || 'monthly')
-      const allPlans = [...plans.monthly, ...plans.quarterly, ...plans.yearly];
+      const allPlans = [...plans?.monthly, ...plans?.quarterly, ...plans?.yearly];
 
       const matchedPlan = allPlans.find(plan => plan.id === subscriptionState.activeSubscription.planId);
       // If found, set it in state

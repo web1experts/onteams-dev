@@ -19,11 +19,10 @@ import { leaveCompany } from "../../redux/actions/workspace.action";
 import { useNavigate } from "react-router-dom";
 import { getAvailableRolesByWorkspace } from "../../redux/actions/workspace.action";
 import { getFieldRules, validateField } from "../../helpers/rules";
-import { createMember, reorderedMember } from "../../redux/actions/members.action";
+import { createMember, reorderedMember, getOwnerTransferRequest, updateOwnershipRequest } from "../../redux/actions/members.action";
 import Invitation from "./Invitation";
 import { AlertDialog, TransferOnwerShip } from "../modals";
 import { selectboxObserver, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
-import { updatePermissions, deleteRole} from "../../redux/actions/permission.action";
 import { socket, currentMemberProfile } from "../../helpers/auth";
 import { permissionModules, permissionsLabel } from "../../helpers/permissionsModules";
 import { CustomFieldModal } from "../modals/customFields";
@@ -44,6 +43,7 @@ function TeamMembersPage() {
   const [isActive, setIsActive] = useState(0);
   const [activeItems, setActiveItems] = useState([]);
   const [newOwnerId, setNewOwnerId] = useState(null)
+  const [hasOwnershipRequest, setHasOwnershipRequest] = useState({})
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
@@ -180,7 +180,7 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
       selectboxObserver()
     },500)
     
-    handleClickRoles(roles?.[0] || '')
+    handleClickRoles(roles?.[0]?._id || '')
   }
 
   const handledeleteMember = async () => {
@@ -240,8 +240,10 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
     if (currentPage !== "" && activeTab === "Members") {
       setShowloader(true);
       handleListMember();
+      dispatch(getOwnerTransferRequest())
     }
     dispatch(fetchCustomFields({ module: "members" }));
+    
   }, [currentPage, searchTerm, activeTab]);
 
   useEffect(() => {
@@ -313,6 +315,7 @@ useEffect(() => {
           setIsEditing(false)
         } else {
           handleListMember();
+          dispatch(getOwnerTransferRequest())
         }
       }
       setLoader(false);
@@ -340,6 +343,10 @@ useEffect(() => {
       },1000)
     }
   }, [apiResult, workspaceState]);
+
+  useEffect(() => {
+    setHasOwnershipRequest(apiResult?.OwnershipRequest)
+  }, [apiResult?.OwnershipRequest])
 
   useEffect(() => {
     setLoader(false);
@@ -831,6 +838,12 @@ useEffect(() => {
     }
   };
 
+  const cancelOwnerInvite = () => {
+    dispatch(updateOwnershipRequest({
+      id: hasOwnershipRequest?._id, status: 'reject'
+    }));
+  }
+
   const handleDragEnd = (result) => {
     const { source, destination, draggableId } = result;
     // If there's no destination (i.e., the item was dropped outside), do nothing
@@ -1178,7 +1191,12 @@ useEffect(() => {
                           {
                             (memberProfile?.role?.permissions?.members?.update_permissions === true || memberProfile?.role?.slug === "owner") && (
                               <>
-                                <Dropdown.Item onClick={() => handleRoleShow()} className="d-flex align-items-center gap-1"><LuUser className="me-1" /> Change Role</Dropdown.Item>
+                              {
+                                (selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === "owner" || selectedMember?.role?.slug !== 'owner') && (
+                                  <Dropdown.Item onClick={() => handleRoleShow()} className="d-flex align-items-center gap-1"><LuUser className="me-1" /> Change Role</Dropdown.Item>
+                                )
+                              }
+                                
                                 <Dropdown.Item onClick={() => handleTeamsShow()} className="d-flex align-items-center gap-1"><LuUsers className="me-1" /> Change Teams</Dropdown.Item>
                               </>
                             )
@@ -1556,6 +1574,7 @@ useEffect(() => {
               </div>
               
               <div className="form-row pb-3">
+                <Form.Label>Assign Team</Form.Label>
                     {teamfeed?.map(
                       (team) => (
                         <>
@@ -1963,7 +1982,7 @@ useEffect(() => {
               </Form.Select>
             </Form.Group>
             {
-              (selectedMember?.role?.slug === memberProfile?.role?.slug) && (
+              (selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === 'owner' && !hasOwnershipRequest?._id) && (
                 <Form.Group>
                   <Form.Label className="mb-2 fw-semibold">Select a member to make owner</Form.Label>
                   <Form.Select
@@ -1981,15 +2000,30 @@ useEffect(() => {
                 </Form.Group>
               )
             }
+            
           </Modal.Body>
           <Modal.Footer>
             <small>Changing the role will update this member's permissions to match the selected role's defaults.</small>
-              <Button variant="secondary" onClick={handleRoleClose} disabled={loader}>
-                {loader ? "Please Wait..." : "Cancel"}
-              </Button>
-              <Button variant="primary" onClick={handleSaveRole} disabled={loader}>
-                {loader ? "Please Wait..." : "Save"}
-              </Button>
+              
+              {
+              (selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === 'owner' && hasOwnershipRequest?._id) ? (
+                  <>
+                  <p>You already have 1 pending invite for ownership transfer.</p>
+                  <Button variant="danger" onClick={cancelOwnerInvite}>Cancel Invite</Button>
+                  </>
+                )
+                :
+                <>
+                  <Button variant="secondary" onClick={handleRoleClose} disabled={loader}>
+                    {loader ? "Please Wait..." : "Cancel"}
+                  </Button>
+                  <Button variant="primary" onClick={handleSaveRole} disabled={loader}>
+                    {loader ? "Please Wait..." : "Save"}
+                  </Button>
+                </>
+                
+              }
+              
             </Modal.Footer>
         </Modal>)
       }

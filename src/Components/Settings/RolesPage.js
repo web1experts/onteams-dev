@@ -993,11 +993,13 @@ const handleCreateRole = async (e) => {
                                                                 : ""
                                                             }`}
                                                             onClick={() => {
-                                                              toggleTeams(
-                                                                modSlug,
-                                                                "selected_teams",
-                                                                team._id,
-                                                              );
+                                                              if(role?.type !== 'system'){
+                                                                toggleTeams(
+                                                                  modSlug,
+                                                                  "selected_teams",
+                                                                  team._id,
+                                                                );
+                                                              }
                                                             }}
                                                             
                                                           >
@@ -1094,41 +1096,43 @@ const handleCreateRole = async (e) => {
                                                               size="sm"
                                                               variant="outline-primary"
                                                               onClick={() => {
-                                                                setPermissions((prev) => {
-                                                                  const currentPerms = prev?.[modSlug] || {};
-                                                                  const currentTeams = currentPerms?.["selected_team_members"] || {};
+                                                                if(role?.type !== 'system'){
+                                                                  setPermissions((prev) => {
+                                                                    const currentPerms = prev?.[modSlug] || {};
+                                                                    const currentTeams = currentPerms?.["selected_team_members"] || {};
 
-                                                                  const teamKey = String(team._id);
+                                                                    const teamKey = String(team._id);
 
-                                                                  const existingMembers = Array.isArray(currentTeams[teamKey])
-                                                                    ? currentTeams[teamKey]
-                                                                    : [];
+                                                                    const existingMembers = Array.isArray(currentTeams[teamKey])
+                                                                      ? currentTeams[teamKey]
+                                                                      : [];
 
-                                                                  const allMemberIds = team.members.map((m) => String(m._id));
+                                                                    const allMemberIds = team.members.map((m) => String(m._id));
 
-                                                                  // ✅ check if all already selected
-                                                                  const isAllSelected =
-                                                                    allMemberIds.length > 0 &&
-                                                                    allMemberIds.every((id) => existingMembers.includes(id));
+                                                                    // ✅ check if all already selected
+                                                                    const isAllSelected =
+                                                                      allMemberIds.length > 0 &&
+                                                                      allMemberIds.every((id) => existingMembers.includes(id));
 
-                                                                  const updatedTeams = {
-                                                                    ...currentTeams,
-                                                                    [teamKey]: isAllSelected ? [] : allMemberIds,
-                                                                  };
+                                                                    const updatedTeams = {
+                                                                      ...currentTeams,
+                                                                      [teamKey]: isAllSelected ? [] : allMemberIds,
+                                                                    };
 
-                                                                  // optional cleanup
-                                                                  if (isAllSelected) {
-                                                                    delete updatedTeams[teamKey];
-                                                                  }
+                                                                    // optional cleanup
+                                                                    if (isAllSelected) {
+                                                                      delete updatedTeams[teamKey];
+                                                                    }
 
-                                                                  return {
-                                                                    ...prev,
-                                                                    [modSlug]: {
-                                                                      ...currentPerms,
-                                                                      selected_team_members: updatedTeams,
-                                                                    },
-                                                                  };
-                                                                });
+                                                                    return {
+                                                                      ...prev,
+                                                                      [modSlug]: {
+                                                                        ...currentPerms,
+                                                                        selected_team_members: updatedTeams,
+                                                                      },
+                                                                    };
+                                                                  });
+                                                                }
                                                               }}
                                                             >
                                                               Select All

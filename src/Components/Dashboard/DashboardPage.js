@@ -17,7 +17,6 @@ import {
   Form,
   Dropdown,
 } from "react-bootstrap";
-import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import {
   FaRegStar,
   FaDesktop,
@@ -64,7 +63,7 @@ import {
 } from "../../helpers/commonfunctions";
 import CommentThread from "../common/CommentThread";
 import API from "../../helpers/api";
-import { useDropzone } from 'react-dropzone'
+import { updateOwnershipRequest, getGeneralRequests } from "../../redux/actions/members.action";
 
 dayjs.extend(relativeTime);
 function DashboardPage() {
@@ -72,6 +71,7 @@ function DashboardPage() {
   const memberdata = getMemberdata();
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentPostIds, setCommentPostIds] = useState([]);
+  const [generalRequests, setGeneralRequests] = useState([])
   const memberstate = useSelector((state) => state.member);
   const invitationsFeed = useSelector((state) => state.member);
   const postFeed = useSelector((state) => state.post.posts);
@@ -576,19 +576,41 @@ function DashboardPage() {
     dispatch(deleteInvite(inviteId));
   };
 
+  const handleRequest = (id, status) =>{
+    dispatch(updateOwnershipRequest({
+      id, status
+    }));
+  }
+
   useEffect(() => {
     if (memberstate.invite) {
       handleInvitationList();
     }
+
+    if(memberstate?.generalRequests){
+      setGeneralRequests(memberstate?.generalRequests)
+    }
   }, [memberstate]);
+  
+  useEffect(() => {
+    if(memberstate?.ownershipUpdate === true || memberstate?.ownershipUpdate === false){
+      dispatch(getGeneralRequests())
+    }
+    if(memberstate?.ownershipUpdate === true){
+     setTimeout(() => {
+       window.location.reload(true);
+     },1500)
+    }
+  }, [memberstate?.ownershipUpdate]);
 
   useEffect(() => {
     setTimeout(function(){
       handleInvitationList();
       handlePosts();
       getQuote();
+      dispatch(getGeneralRequests())
     },1500)
-  }, []);
+  }, [dispatch]);
 
   const handleLike = async (postId) => {
     try {
@@ -653,6 +675,46 @@ function DashboardPage() {
                           </ListGroup.Item>
                       );
                     })}
+
+                  {generalRequests &&
+                    generalRequests.length > 0 &&
+                    generalRequests.map((grequest, index) => {
+                      return (
+                        
+                          <ListGroup.Item key={`invite-item-${grequest._id}`}>
+                            <p className="mb-0">
+                              You got an invitation from{" "}
+                              <strong>{grequest.company?.name}</strong> to
+                              become the owner.
+                            </p>
+                            <div className="ms-lg-auto mt-3 mt-lg-0">
+                              <Button
+                                onClick={() => handleRequest(grequest._id, 'reject')}
+                                className="me-2"
+                                variant="secondary"
+                              >
+                                Decline
+                              </Button>
+                              <Button
+                                onClick={() =>
+                                {
+                                  setLoader(true)
+                                  handleRequest(grequest._id, 'accept')
+                                }
+                                  
+                                }
+                                disabled={loader}
+                                variant="primary"
+                              >
+                                {
+                                  loader ? 'Please wait...' : 'Accept'
+                                }
+                              </Button>
+                            </div>
+                          </ListGroup.Item>
+                      );
+                    })}
+                    
                 </ListGroup>
               </Col>
               <Col xl={8}>

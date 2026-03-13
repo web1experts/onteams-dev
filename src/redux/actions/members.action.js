@@ -24,7 +24,11 @@ import {
     GET_SINGLE_MEMBER_FAILED,
     MEMBERS_BY_ROLES,
     MEMBERS_REORDER,
-    PUT_INVITE_SUCCESS
+    PUT_INVITE_SUCCESS,
+    UPDATE_OWNER_SUCCESS,
+    LIST_REQUESTS_FAILED,
+    LIST_REQUESTS_SUCCESS,
+    OWNERSHIP_REQUEST_SUCCESS
 } from "./types";
 
 const config = {
@@ -70,6 +74,35 @@ export const Listmembers = (currentPage, searchterm, has_limit = true) => {
     }
 }
 
+export const getGeneralRequests = () => {
+    return async (dispatch) => {
+        try {
+            const response = await API.apiGetByKey('member', '/general_requests');
+            if (response.data && response.data.success) {
+                await dispatch({ type: LIST_REQUESTS_SUCCESS, payload: response.data })
+            } else {
+                await dispatch({ type: LIST_REQUESTS_FAILED, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+}
+
+export const getOwnerTransferRequest = () => {
+    return async (dispatch) => {
+        try {
+            const response = await API.apiGetByKey('member', '/ownership_request');
+            if (response.data && response.data.success) {
+                await dispatch({ type: OWNERSHIP_REQUEST_SUCCESS, payload: response.data })
+            } else {
+                await dispatch({ type: LIST_REQUESTS_FAILED, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+}
 
 export const createMember = (payload) => {
     return async (dispatch) => {
@@ -114,6 +147,22 @@ export const updateMember = (memberId, payload) => {
             const response = await API.apiPutUrl('member', `/update/${memberId}`, payload);
             if (response.data && response.data.success) {
                 await dispatch({ type: PUT_MEMBER_SUCCESS, payload: response.data });
+            } else {
+                await dispatch({ type: PUT_MEMBER_FAILED, payload: response.data.message });
+            }
+        } catch (err) {
+            errorRequest(err, dispatch);
+        }
+    }
+}
+
+export const updateOwnershipRequest = (payload) => {
+
+    return async (dispatch) => {
+        try {
+            const response = await API.apiPostUrl('member','/update_owner',payload);
+            if (response.data && response.data.success) {
+                await dispatch({ type: UPDATE_OWNER_SUCCESS, payload: response.data });
             } else {
                 await dispatch({ type: PUT_MEMBER_FAILED, payload: response.data.message });
             }

@@ -21,7 +21,11 @@ import {
     CLEAR_MESSAGES,
     MEMBERS_BY_ROLES,
     MEMBERS_REORDER,
-    PUT_INVITE_SUCCESS
+    PUT_INVITE_SUCCESS,
+    UPDATE_OWNER_SUCCESS,
+    LIST_REQUESTS_FAILED,
+    OWNERSHIP_REQUEST_SUCCESS,
+    LIST_REQUESTS_SUCCESS
 } from "../actions/types";
 
 const initialState = {
@@ -62,6 +66,18 @@ export default (state = initialState, action) => {
             createMember: initialState.createMember,
             invite: false,
         }
+    case LIST_REQUESTS_SUCCESS: {
+        return {
+            ...state,
+            generalRequests: action.payload.generalRequests,
+        }
+    }
+    case OWNERSHIP_REQUEST_SUCCESS: {
+        return {
+            ...state,
+            OwnershipRequest: action.payload.OwnershipRequest,
+        }
+    }
     case MEMBERS_BY_ROLES:
         
         return {
@@ -181,6 +197,14 @@ export default (state = initialState, action) => {
             createMember: initialState.createMember,
             invite: false,
         }
+    case UPDATE_OWNER_SUCCESS: {
+        return {
+            ...state,
+            ownershipUpdate: action.payload.isUpdate,
+            message: action.payload.message,
+            message_variant: 'success',
+        }
+    }
     case PUT_MEMBER_FAILED:
         return{
             ...state,

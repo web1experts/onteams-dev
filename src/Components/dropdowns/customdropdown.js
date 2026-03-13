@@ -49,16 +49,30 @@ const CustomDropdown = ({ items, value, extraClass, onChange }) => {
                         </Form>
                     }
                     
-                    {filteredItems.map((item, idx) => (
-                        <Dropdown.Item
-                            key={`${item.value}--${idx}`}
-                            className={item.value === selectedValue ? 'selected--option' : ''}
-                            onClick={() => handleSelect(item.value)}
-                            href="#"
-                        >
-                            {item.label} {item.value === selectedValue && <FaCheck />}
-                        </Dropdown.Item>
-                    ))}
+                    {filteredItems.map((item, idx) => {
+                        // GROUP LABEL
+                        if (item.isGroupLabel) {
+                            return (
+                                <div 
+                                    key={`group-${idx}`} 
+                                    className="dropdown-group-label"
+                                >
+                                    {item.label}
+                                </div>
+                            );
+                        }
+                        // NORMAL OPTION
+                        return (
+                            <Dropdown.Item
+                                key={`${item.value}--${idx}`}
+                                className={item.value === selectedValue ? 'selected--option' : ''}
+                                onClick={() => handleSelect(item.value)}
+                                href="#"
+                            >
+                                {item.label} {item.value === selectedValue && <FaCheck />}
+                            </Dropdown.Item>
+                        )
+                    })}
                 </div>
             </Dropdown.Menu>
         </Dropdown>

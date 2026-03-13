@@ -59,6 +59,7 @@ import { AlertDialog } from "../modals";
 import AddClient from "../Clients/AddClient";
 import {
   selectboxObserver,
+  groupSelectboxObserver,
   getMemberdata,
   formatDateToDDMMYYYY,
   convertDDMMYYYYtoYYYYMMDD,
@@ -226,6 +227,7 @@ function ProjectsPage() {
     }
     setTimeout(() => {
       selectboxObserver();
+      groupSelectboxObserver()
     }, 600);
   }, [apiSystemfields]);
 
@@ -642,10 +644,10 @@ function ProjectsPage() {
         const updated = { ...prev };
 
         if (name === "member") {
-          delete updated.team_id;   // remove team when member changes
+          delete updated.team;   // remove team when member changes
         }
 
-        if (name === "team_id") {
+        if (name === "team") {
           delete updated.member;    // remove member when team changes
         }
 
@@ -1216,41 +1218,10 @@ function ProjectsPage() {
                     horizontal
                     className={isActive !== 0 ? "" : "ms-auto d-flex"}
                   >
-                    {
-                      (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true && memberProfile?.role?.permissions?.projects?.view_others === true) && (
-                        <ListGroup.Item
-                          className={
-                            isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
-                          }
-                          key="filter-by-list"
-                        >
-                          <Form.Select
-                            className="custom-selectbox"
-                            onChange={(event) =>
-                              toggleFilterby(event.target.value)
-                            }
-                            value={filterBy || "members"}
-                          >
-                            
-                              <option
-                                key={`by-members`}
-                                value={'members'}
-                              >
-                                Filter by members
-                              </option>
-                              <option
-                                key={`by-teams`}
-                                value={'teams'}
-                              >
-                                Filter by teams
-                              </option>
-                          </Form.Select>
-                        </ListGroup.Item>
-                      )
-                    }
-                     
-                    {
-                     ( filterBy === 'members') && (
+                    
+                  {
+                     ( memberProfile?.role?.permissions?.projects?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
+                            true) ? (
                         <ListGroup.Item
                         className={
                           isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
@@ -1271,112 +1242,114 @@ function ProjectsPage() {
                           >
                             My Projects
                           </option>
-                          {(memberProfile?.role?.permissions?.projects?.view_others === true) && (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
-                            true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
-                            true ) && (
-                            <>
-                              {(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 || memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ) && (
-                                <option key={`member-projects-all`} value={"all"}>
-                                  All Members
-                                </option>
-                              )}
-                              {
-                                // (memberProfile?.role?.slug === "owner") ? (
-
-                                  // ✅ OWNER sees all members
-                                //   allMembers.map((member, index) => (
-                                //     <option
-                                //       key={`member-projects-${index}`}
-                                //       value={member.value}
-                                //     >
-                                //       {member.label}
-                                //     </option>
-                                //   ))
-
-                                // ) : 
-                                (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true) ? (
-
-                                  // ✅ Specific people only
-                                  allMembers
-                                    .filter((member) =>
-                                      isMemberSelected(
-                                        memberProfile?.role?.permissions?.assigned_teams?.selected_team_members,
-                                        member.value
-                                      )
-                                    )
-                                    .map((member, index) => (
-                                      <option
-                                        key={`member-projects-${index}`}
-                                        value={member.value}
-                                      >
-                                        {member.label}
-                                      </option>
-                                    ))
-
-                                ) : (
-
-                                  // ✅ Team-based selection
-                                  getMembersFromTeams(
-                                    memberProfile?.role?.permissions?.assigned_teams?.selected_teams || []
-                                  ).map((member) => (
-                                    <option key={member.value} value={member.value}>
-                                      {member.label}
-                                    </option>
-                                  ))
-
-                                )
-                              }
-                            </>
+                         
+                          {(memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ) && (
+                            <option key={`member-projects-all`} value={"all"}>
+                              All Members
+                            </option>
                           )}
+                          <>   
+                            {  allMembers
+                                .filter((member) =>
+                                  isMemberSelected(
+                                    memberProfile?.role?.permissions?.assigned_teams?.selected_team_members,
+                                    member.value
+                                  )
+                                )
+                                .map((member, index) => (
+                                  <option
+                                    key={`member-projects-${index}`}
+                                    value={member.value}
+                                  >
+                                    {member.label}
+                                  </option>
+                                ))
+
+                            }
+                          </>
                           {
-                          // (memberProfile?.permissions?.projects?.view_others === true && memberProfile?.permissions?.projects?.selected_members?.includes(
-                          //   "unassigned"
-                          // ) ||
                             (memberProfile?.role?.slug === "owner") && (
                             <option value="unassigned">Unassigned</option>
                           )}
                         </Form.Select>
                       </ListGroup.Item>
                      )
+                     :
+                     (memberProfile?.role?.permissions?.projects?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                            true) ?
+                     <ListGroup.Item 
+                      className={
+                        isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
+                      }
+                      key="teams-filter-list">
+                    <Form.Select
+                        className="custom-group-selectbox"
+                        onChange={(event) => {
+                          const group = event.target.selectedOptions[0].dataset.group;
+                          handlefilterchange(group, event.target.value);
+                        }}
+                        value={filters["member"] || "all"}
+                      >
+
+                        {memberProfile?.role?.permissions?.projects?.view_others === true ? (
+                          <>
+                            {/* MEMBERS GROUP */}
+                            <optgroup label="Members">
+                              <option value={memberdata?._id} data-group="member">
+                                My Projects
+                              </option>
+                              <option value="all" data-group="member">
+                                All Members
+                              </option>
+                              {getMembersFromTeams(
+                                    memberProfile?.role?.permissions?.assigned_teams
+                                      ?.selected_teams || []
+                                  ).map((member) => (
+                                    <option
+                                      key={member.value}
+                                      value={member.value}
+                                      data-group="member"
+                                    >
+                                      {member.label}
+                                    </option>
+                                  ))}
+                                  {memberProfile?.role?.slug === "owner" && (
+                                    <option value="unassigned" data-group="member">
+                                      Unassigned
+                                    </option>
+                                  )}
+                            </optgroup>
+                            <optgroup label="Teams">
+
+                              {teamfeed.map((team, index) => {
+                                if(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.includes(team._id)){
+                                  return (
+                                    <option
+                                      key={`team-projects-${index}`}
+                                      value={team._id}
+                                      data-group="team"
+                                    >
+                                      {team.name}
+                                    </option>
+                                  )
+                                }
+                              })}
+                            </optgroup>
+                          </>
+                        ):
+                          <option value={memberdata?._id} data-group="member">
+                            My Projects
+                          </option>
+                        }
+
+                        
+
+                      </Form.Select>
+                    </ListGroup.Item>
+                    :<></>
                     }
                     
-                    {
-                      (filterBy === "teams") &&
-                      (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true ) && (
                     
-                      <ListGroup.Item
-                        className={
-                          isActive !== 0 ? "d-none" : "ms-auto d-none d-xl-flex"
-                        }
-                        key="team-filter-list"
-                      >
-                        <Form.Select
-                          className="custom-selectbox"
-                          onChange={(event) =>
-                            handlefilterchange("team_id", event.target.value)
-                          }
-                          value={filters["team_id"] || "all"}
-                        >
-                          {teamfeed.map((team, index) => {
-                            if(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.includes(team._id)){
-                              return (
-                                <option
-                                  key={`team-projects-${index}`}
-                                  value={team._id}
-                                >
-                                  {team.name}
-                                </option>
-                              )
-                            }
-                            
-                          }
-                           
-                              
-                          )}
-                          
-                        </Form.Select>
-                      </ListGroup.Item>
-                      )}
                     <ListGroup.Item
                       className={isActive !== 0 ? "d-none" : "d-none d-xl-flex"}
                       key={`project-status-filter-list-desktop`}
@@ -3021,82 +2994,156 @@ function ProjectsPage() {
         </Modal.Header>
         <Modal.Body>
           <ListGroup>
-            <ListGroup.Item key="member-filter-list">
-              <Form.Select
-                className="custom-selectbox"
-                onChange={(event) =>
-                  handlefilterchange("member", event.target.value)
-                }
-                value={filters["member"] || "all"}
-                
-              >
-                <option value={memberdata?._id} key="my-projects-option">
-                  My Projects
-                </option>
-                
-                    {(memberProfile?.role?.permissions?.projects?.view_others === true) && (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
-                      true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
-                      true ) && (
-                      <>
-                        {(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0 || memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0) && (
-                          <option key={`member-projects-all`} value={"all"}>
-                            All Members
+            
+            {
+                     ( memberProfile?.role?.permissions?.projects?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===
+                            true) ? (
+                        <ListGroup.Item
+                        
+                        key="member-filter-list-mobile"
+                      >
+                        <Form.Select
+                          className="custom-selectbox"
+                          onChange={(event) =>
+                            handlefilterchange("member", event.target.value)
+                          }
+                          value={filters["member"] || "all"}
+                          
+                        >
+                          <option
+                            value={memberdata?._id}
+                            key="my-projects-option"
+                          >
+                            My Projects
                           </option>
-                        )}
-                        {
-                          memberProfile?.role?.slug === "owner" ? (
-                            
-                            // ✅ OWNER sees all members
-                            allMembers.map((member, index) => (
-                              <option
-                                key={`member-projects-${index}`}
-                                value={member.value}
-                              >
-                                {member.label}
-                              </option>
-                            ))
-
-                          ) : memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ? (
-
-                            // ✅ Specific people only
-                            allMembers
-                              .filter((member) =>
-                                isMemberSelected(
-                                  memberProfile?.role?.permissions?.assigned_teams?.selected_team_members,
-                                  member.value
+                         
+                          {(memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ) && (
+                            <option key={`member-projects-all`} value={"all"}>
+                              All Members
+                            </option>
+                          )}
+                          <>   
+                            {  allMembers
+                                .filter((member) =>
+                                  isMemberSelected(
+                                    memberProfile?.role?.permissions?.assigned_teams?.selected_team_members,
+                                    member.value
+                                  )
                                 )
-                              )
-                              .map((member, index) => (
-                                <option
-                                  key={`member-projects-${index}`}
-                                  value={member.value}
-                                >
-                                  {member.label}
-                                </option>
-                              ))
+                                .map((member, index) => (
+                                  <option
+                                    key={`member-projects-${index}`}
+                                    value={member.value}
+                                  >
+                                    {member.label}
+                                  </option>
+                                ))
 
-                          ) : (
+                            }
+                          </>
+                          {
+                            (memberProfile?.role?.slug === "owner") && (
+                            <option value="unassigned">Unassigned</option>
+                          )}
+                        </Form.Select>
+                      </ListGroup.Item>
+                     )
+                     :
+                     (memberProfile?.role?.permissions?.projects?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                            true) ?
+                     <ListGroup.Item key="team-filter-list-mobile">
+                    <Form.Select
+                        className="custom-group-selectbox"
+                        onChange={(event) => {
+                          const group = event.target.selectedOptions[0].dataset.group;
+                          handlefilterchange(group, event.target.value);
+                        }}
+                        value={filters["member"] || "all"}
+                      >
 
-                            // ✅ Team-based selection
-                            getMembersFromTeams(
-                              memberProfile?.role?.permissions?.assigned_teams?.selected_teams || []
-                            ).map((member) => (
-                              <option key={member.value} value={member.value}>
-                                {member.label}
-                              </option>
-                            ))
+                        {/* Default */}
+                        <option value={memberdata?._id} data-group="member">
+                          My Projects
+                        </option>
 
-                          )
-                        }
-                      </>
-                    )}
-                {
-                
-                  (memberProfile?.role?.slug === "owner") && (
-                  <option value="unassigned">Unassigned</option>
-                )}
-              </Form.Select>
-            </ListGroup.Item>
+                        {memberProfile?.role?.permissions?.projects?.view_others === true && (
+                          <>
+                            <option value="all" data-group="member">
+                              All Members
+                            </option>
+
+                            {/* MEMBERS GROUP */}
+                            <optgroup label="Members">
+
+                              {memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true
+                                ? allMembers
+                                    .filter((member) =>
+                                      isMemberSelected(
+                                        memberProfile?.role?.permissions?.assigned_teams
+                                          ?.selected_team_members,
+                                        member.value
+                                      )
+                                    )
+                                    .map((member) => (
+                                      <option
+                                        key={member.value}
+                                        value={member.value}
+                                        data-group="member"
+                                      >
+                                        {member.label}
+                                      </option>
+                                    ))
+
+                                : getMembersFromTeams(
+                                    memberProfile?.role?.permissions?.assigned_teams
+                                      ?.selected_teams || []
+                                  ).map((member) => (
+                                    <option
+                                      key={member.value}
+                                      value={member.value}
+                                      data-group="member"
+                                    >
+                                      {member.label}
+                                    </option>
+                                  ))}
+                                  {memberProfile?.role?.slug === "owner" && (
+                                    <option value="unassigned" data-group="member">
+                                      Unassigned
+                                    </option>
+                                  )}
+                            </optgroup>
+
+                            {(memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true ) && (
+                    
+                                <optgroup label="Teams">
+
+                                  {teamfeed.map((team, index) => {
+                                    if(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.includes(team._id)){
+                                      return (
+                                        <option
+                                          key={`team-projects-${index}`}
+                                          value={team._id}
+                                          data-group="team"
+                                        >
+                                          {team.name}
+                                        </option>
+                                      )
+                                    }
+                                  })}
+
+                                </optgroup>
+                            )}
+
+                            
+                          </>
+                        )}
+
+                        
+
+                      </Form.Select>
+                    </ListGroup.Item>
+                    :<></>
+                    }
             <ListGroup.Item key="status-filter-list-mobile">
               <Form.Select
                 className="custom-selectbox"

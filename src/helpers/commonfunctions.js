@@ -590,3 +590,99 @@ export const getMembersFromTeams = (teamFeed, selectedTeamIds) => {
 
     return result;
   };
+
+ export const renderGroupedDropdown = (select) => {
+
+    const options = [];
+
+    const groups = select.querySelectorAll("optgroup");
+
+    groups.forEach(group => {
+
+        // Add group label as disabled item
+        options.push({
+            value: `group-${group.label}`,
+            label: group.label,
+            isGroupLabel: true
+        });
+
+        const groupOptions = group.querySelectorAll("option");
+
+        groupOptions.forEach(option => {
+            options.push({
+                value: option.value,
+                label: option.text,
+                isGroupOption: true
+            });
+        });
+    });
+
+    const value = select.value;
+
+    let container = select.nextElementSibling;
+
+    if (!container || !container.classList.contains('custom-dropdown-container')) {
+        container = document.createElement('div');
+        container.classList.add('custom-dropdown-container');
+
+        if (select.classList.contains('conditional-box')) {
+            container.classList.add('conditional-box');
+        }
+
+        select.parentNode.insertBefore(container, select.nextSibling);
+    }
+
+    if (!roots.has(container)) {
+        const root = createRoot(container);
+        roots.set(container, root);
+    }
+
+    const root = roots.get(container);
+
+    root.render(
+        <CustomDropdown
+            items={options}
+            value={value}
+            extraClass={select.classList.contains('input-error') ? 'input-error' : ''}
+            onChange={(newValue) => {
+                select.value = newValue;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }}
+        />
+    );
+
+    select.style.display = 'none';
+};
+
+export const groupSelectboxObserver = () => {
+
+    const selects = document.querySelectorAll('select.custom-group-selectbox');
+
+    if (!selects || selects.length === 0) {
+        return;
+    }
+
+    selects.forEach(select => {
+
+        renderGroupedDropdown(select);
+
+        const observer = new MutationObserver((mutations) => {
+
+            mutations.forEach((mutation) => {
+
+                if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                    renderGroupedDropdown(select);
+                }
+
+            });
+
+        });
+
+        observer.observe(select, {
+            childList: true,
+            subtree: true,
+            attributes: true
+        });
+
+    });
+};
