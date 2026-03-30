@@ -1673,6 +1673,10 @@ span.open--sidebar {
   transition: all .3s ease-in-out;
 }
 
+button#dropdown-basic-single::before {
+    content: none !important;
+}
+
 .wrapper--title .show::before {
   transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
@@ -3235,7 +3239,7 @@ table tr.marked-project td {
   color: rgb(6 95 70);
   background-color: rgb(209 250 229) !important;
   font-weight: 700;
-  text-transform: capitalize;
+  /* text-transform: capitalize; */
 }
 
 .bg-danger {
@@ -3243,7 +3247,7 @@ table tr.marked-project td {
   border: 1px solid rgb(254 202 202);
   color: rgb(153 27 27);
   font-weight: 700;
-  text-transform: capitalize;
+  /* text-transform: capitalize; */
 }
 
 .bg-warning {
@@ -3251,7 +3255,7 @@ table tr.marked-project td {
   border: 1px solid rgb(253 230 138);
   color: rgb(146 64 14);
   font-weight: 700;
-  text-transform: capitalize;
+  /* text-transform: capitalize; */
 }
 
 .projects--page .table .badge {

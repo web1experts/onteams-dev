@@ -5,7 +5,8 @@ import {
     PERMISSIONS_SUCCESS,
     ROLE_SUCCESS,
     CLEAR_MESSAGES,
-    ROLE_DELETE_SUCCESS
+    ROLE_DELETE_SUCCESS,
+    ASSIGN_TEAMS_AND_MEMBERS
 } from "../actions/types";
 import * as auth from '../../helpers/auth';
 
@@ -55,6 +56,11 @@ export default (state = initialState, action) => {
                 message: action.payload.message,
                 message_variant: 'success',
                 deletedRole: action.payload.deletedRole
+            }
+        case ASSIGN_TEAMS_AND_MEMBERS: 
+            return {
+                ...state,
+                assignedTeamsOrMembers: action.payload.assigned_teams_or_members
             }
         case CLEAR_MESSAGES: {
             return {

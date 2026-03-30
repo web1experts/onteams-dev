@@ -87,6 +87,7 @@ import isEqual from "lodash/isEqual";
                 success: action.payload.refresh,
                 // message: action.payload.message,
                 // message_variant: 'success',
+                refresh: action.payload.refresh
             }
         case PUT_TASK_FAILED:
             return{
@@ -121,26 +122,56 @@ import isEqual from "lodash/isEqual";
                 reorder: false,
                 singleTask: {}
             };
-       
         case CURRENT_TASK: {
+            const payload = action.payload || {};
             const updated = { ...state.currentTask };
 
-            for (const key in action.payload) {
-                if (key === "subtasks" && Array.isArray(action.payload.subtasks)) {
-                // replace only if changed (avoid re-adding duplicates)
-                if (!isEqual(updated.subtasks, action.payload.subtasks)) {
-                    updated.subtasks = [...action.payload.subtasks];
-                }
-                } else {
-                updated[key] = action.payload[key];
-                }
-            }
+            Object.keys(payload).forEach((key) => {
+                if (key === "subtasks") {
+                    const incomingSubtasks = Array.isArray(payload.subtasks)
+                        ? payload.subtasks
+                        : [];
 
-                    return {
-                        ...state,
-                        currentTask: updated,
-                    };
+                    const currentSubtasks = Array.isArray(updated.subtasks)
+                        ? updated.subtasks
+                        : [];
+
+                    if (!isEqual(currentSubtasks, incomingSubtasks)) {
+                        updated.subtasks = [...incomingSubtasks];
+                    }
+                } else if (payload[key] !== undefined) {
+                    updated[key] = payload[key];
+                }
+            });
+            if( Object.keys(payload)?.length === 0){
+                return {
+                ...state,
+                currentTask: {},
+            };
             }
+            return {
+                ...state,
+                currentTask: updated,
+            };
+        }
+        // case CURRENT_TASK: {
+        //     const updated = { ...state.currentTask };
+
+        //     for (const key in action.payload) {
+        //         if (key === "subtasks" && Array.isArray(action.payload.subtasks)) {
+        //             // replace only if changed (avoid re-adding duplicates)
+        //             if (!isEqual(updated.subtasks, action.payload.subtasks)) {
+        //                 updated.subtasks = [...action.payload.subtasks];
+        //             }
+        //             } else {
+        //                 updated[key] = action.payload[key];
+        //             }
+        //         }
+        //         return {
+        //             ...state,
+        //             currentTask: updated,
+        //         };
+        //     }
 
             case CREATE_POST_LIST_COMMENT: {
                 if(action.payload.type !== 'task'){return {...state}}

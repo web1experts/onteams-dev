@@ -11,6 +11,7 @@ import {
   Table,
   Dropdown,
   FloatingLabel,
+  Badge
 } from "react-bootstrap";
 import { useToast } from "../../context/ToastContext";
 import { currentMemberProfile } from "../../helpers/auth";
@@ -23,13 +24,13 @@ import {
   toggleSidebar,
   toggleSidebarSmall,
 } from "../../redux/actions/common.action";
-import { LuFolderOpen } from "react-icons/lu";
+import { LuUser, LuSettings2, LuUsers, LuFolderOpen } from 'react-icons/lu';
 import { FcInvite } from "react-icons/fc";
 import { GrExpand } from "react-icons/gr";
 import { AiOutlineTeam } from "react-icons/ai";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { FaCheck, FaCog, FaEllipsisV } from "react-icons/fa";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiUsers } from "react-icons/fi";
 import {
   FiMail,
   FiBriefcase,
@@ -51,6 +52,7 @@ import {
   selectboxObserver,
   convertDDMMYYYYtoYYYYMMDD,
   formatDateToDDMMYYYY,
+  roleHelperText
 } from "../../helpers/commonfunctions";
 import { renderDynamicField } from "../common/dynamicFields";
 import { BadgesModal } from "../modals/badges";
@@ -69,6 +71,7 @@ function Invitation(props) {
   const addToast = useToast();
   const [currentPage, setCurrentPage] = useState(0);
   const [teamfeed, setTeamFeed] = useState([]);
+  const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const apiCustomfields = useSelector((state) => state.customfields);
   const [customFields, setCustomFields] = useState([]);
   const [fields, setFields] = useState({ email: "", name: "", role: "" });
@@ -92,8 +95,80 @@ function Invitation(props) {
   const [expanded, setExpanded] = useState({});
   const workspaceState = useSelector((state) => state.workspace);
   const [roles, setRoles] = useState([]);
+  const [search, setSearch] = useState('');
+  const [showTeams, setTeamsShow] = useState(false);
+  const handleTeamsClose = () => setTeamsShow(false);
+  const handleTeamsShow = () => setTeamsShow(true);
 
+  const [showRoles, setShowRoles] = useState(false);
+  const handleRoleClose = () => setShowRoles(false);
+  const handleRoleShow = () => {
+    setShowRoles(true);
+    setTimeout(() => {
+      selectboxObserver()
+    },500)
 
+    // setTimeout(() => {
+      if(selectedInvitation?.role?._id === roles?.[0]?._id ){
+        handleClickRoles(roles?.[1]?._id)
+      }else{
+        handleClickRoles(roles?.[0]?._id)
+      }
+      
+    // },700)
+    
+    
+  }
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    let filteredteams = [];
+    if( teamfeed && teamfeed.length > 0 ){ 
+      filteredteams = teamfeed.filter(team => 
+        team.name.toLowerCase().includes(e.target.value.toLowerCase())
+      );
+      setFilteredTeamFeed(filteredteams)
+    }
+  };
+
+  const handleClickTeams = (teamId) => {
+    setFields((prev) => {
+      const selectedTeams = prev?.selected_teams || [];
+
+      const updatedTeams = selectedTeams.includes(teamId)
+        ? selectedTeams.filter((id) => id !== teamId) // remove
+        : [...selectedTeams, teamId]; // add
+
+      return {
+        ...prev,
+        selected_teams: updatedTeams,
+      };
+    });
+  };
+
+  const handleSaveTeams = async () => {
+    if(fields?.selected_teams && fields?.selected_teams?.length === 0 || !fields?.selected_teams ){
+      addToast("Please select at least one team.", "danger");
+      return;
+    }
+    setLoader(true)
+    const formData = new FormData()
+    fields['selected_teams'].forEach((item) => {
+      formData.append(`selected_teams[]`, item);
+    });
+    await dispatch(updateInvite(selectedInvitation?._id, formData));
+    setLoader(false)
+    handleTeamsClose()
+  }
+
+  const handleClickRoles = (roleId) => {
+    setFields((prev) => {
+      return {
+        ...prev,
+        role: roleId,
+      };
+    });
+  };
 
   const toggleVisibility = (key) => {
     setVisiblePasswords((prev) => ({
@@ -130,9 +205,13 @@ function Invitation(props) {
     dispatch(getTeams());
   }, []);
 
+  
+
   useEffect(() => {
     if (teamsState && teamsState.teams) {
       setTeamFeed(teamsState.teams);
+      setFilteredTeamFeed(teamsState.teams)
+      
     }
   }, [teamsState]);
 
@@ -214,22 +293,29 @@ function Invitation(props) {
     setShowloader(false);
   };
 
-  const showPermissionsModal = () => {
-    if (selectedInvitation?.custom_fields?.permissions) {
-      setPermissions(selectedInvitation?.custom_fields?.permissions);
+
+  const handleSaveRole = async () => {
+    if(!fields?.role && fields?.role === "" ){
+      addToast("Please select a role.", "danger");
+      return;
     }
-    setShowPermissions(true);
-  };
+    setLoader(true)
+    const formData = new FormData()
+    
+    formData.append(`role`, fields?.role);
+    
+    await dispatch(updateInvite(selectedInvitation?._id, formData));
+    setLoader(false)
+    handleRoleClose()
+  }
+
 
   const handleSavePermissions = () => {
     setFields({
       ...fields,
       [`custom_field[permissions]`]: permissions,
     });
-    // dispatch(updateInvite(selectedInvitation?._id, {
-    //   ...fields,
-    //   [`custom_field[permissions]`]: permissions,
-    // }))
+
     sentInviteAgain(selectedInvitation?._id);
     setShowPermissions(false);
   };
@@ -805,9 +891,7 @@ function Invitation(props) {
             <Card.Body className="p-0 ps-4">
               <Card.Title>
                 <FiMail /> Member Information
-                {(memberProfile?.role?.permissions?.members?.create_edit_delete ===
-                  true ||
-                  memberProfile?.role?.slug === "owner") && (
+                 {(memberProfile?.role?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.permissions?.members?.update_permissions === true) && (
                   <Dropdown>
                     <Dropdown.Toggle variant="dark" id="dropdown-basic">
                       <FaEllipsisV />
@@ -819,27 +903,46 @@ function Invitation(props) {
                       >
                         <FcInvite className="me-1" /> Resend
                       </Dropdown.Item>
-                      <Dropdown.Item
-                        onClick={() => {
-                          setIsEditing(true);
-                          setTimeout(() => {
-                            selectboxObserver();
-                          }, 650);
-                        }}
-                        className="d-flex align-items-center gap-1"
-                      >
-                        <FiEdit className="me-1" /> Edit
-                      </Dropdown.Item>
-                      
-                      <Dropdown.Item
-                        onClick={() => rejectInvite(selectedInvitation?._id)}
-                        className="d-flex align-items-center gap-1"
-                      >
-                        <FiTrash2 />{" "}
-                        {props.listfor && props.listfor === "company"
-                          ? "Delete"
-                          : "Decline"}
-                      </Dropdown.Item>
+                      {
+                        (memberProfile?.role?.permissions?.members?.create_edit_delete === true) && (
+                          
+                          <Dropdown.Item
+                            onClick={() => {
+                              setIsEditing(true);
+                              setTimeout(() => {
+                                selectboxObserver();
+                              }, 650);
+                            }}
+                            className="d-flex align-items-center gap-1"
+                          >
+                            <FiEdit className="me-1" /> Edit
+                          </Dropdown.Item>)
+                        }
+                        
+
+                        {
+                          (memberProfile?.role?.permissions?.members?.update_permissions === true) && (
+                            <Dropdown.Item onClick={() => handleRoleShow()} className="d-flex align-items-center gap-1"><LuUser className="me-1" /> Change Role</Dropdown.Item>    
+                          )
+                        }
+                        {
+                          (memberProfile?.role?.permissions?.members?.manage_teams === true) && (
+                          <Dropdown.Item onClick={() => handleTeamsShow()} className="d-flex align-items-center gap-1"><LuUsers className="me-1" /> Change Teams</Dropdown.Item>)
+                        }
+
+                        {
+                        (memberProfile?.role?.permissions?.members?.create_edit_delete === true) && (
+                          <Dropdown.Item
+                            onClick={() => rejectInvite(selectedInvitation?._id)}
+                            className="d-flex align-items-center gap-1"
+                          >
+                            <FiTrash2 />{" "}
+                            {props.listfor && props.listfor === "company"
+                              ? "Delete"
+                              : "Decline"}
+                          </Dropdown.Item>
+                        
+                        )}
                     </Dropdown.Menu>
                   </Dropdown>
                 )}
@@ -864,6 +967,28 @@ function Invitation(props) {
                         <p>
                           <small>Role</small>
                           {selectedInvitation?.role?.name}
+                        </p>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </Card.Text>
+                  <Card.Text>
+                    <ListGroup>
+                      <ListGroup.Item>
+                        <span className="info--icon">
+                          <FiUsers />
+                        </span>
+                        <p>
+                          <small>Teams</small>
+                          {teamfeed?.map((team) => {
+                            if (selectedInvitation?.teams?.includes(team?._id)) {
+                              return (
+                                <Badge bg="primary" className="me-2" key={team?._id}>{team?.name}</Badge>
+                                
+                              );
+                            }
+
+                            return null;
+                          })}
                         </p>
                       </ListGroup.Item>
                     </ListGroup>
@@ -903,7 +1028,14 @@ function Invitation(props) {
                       {memberProfile?.role?.permissions?.members
                         ?.create_edit_delete === true && (
                         <ListGroup.Item>
-                          <Form.Group className="mb-0 form-group pb-0">
+                          <span className="info--icon">
+                            <FiBriefcase />
+                          </span>
+                          <p>
+                            <small>Role</small>
+                            {selectedInvitation?.role?.name}
+                          </p>
+                          {/* <Form.Group className="mb-0 form-group pb-0">
                             <Form.Label>Role</Form.Label>
                             <Form.Select
                               className={
@@ -922,7 +1054,7 @@ function Invitation(props) {
                                 </option>
                               ))}
                             </Form.Select>
-                          </Form.Group>
+                          </Form.Group> */}
                         </ListGroup.Item>
                       )}
                     </ListGroup>
@@ -936,29 +1068,19 @@ function Invitation(props) {
                         <p>
                           <small>Teams</small>
                           </p>
-                          {teamfeed?.map(
-                            (team) => (
-                              <Form.Check
-                                inline
-                                label={team?.name}
-                                name="selected_teams[]"
-                                type="checkbox"
-                                id={`inline-${team?._id}`}
-                                checked={fields?.selected_teams?.includes(team?._id)}
-                                onChange={(e) => {
-                                  handleChange({
-                                    target: {
-                                      name: "selected_teams[]",
-                                      value: team?._id,
-                                      type: "checkbox",
-                                      checked: e.target.checked,
-                                    },
-                                  });
-                                }}
-                              />
-                            ),
-                          )}
-                        {errors["selected_teams"] || ''}  
+                          
+                        {
+                          teamfeed?.map((team) => {
+                            if (selectedInvitation?.teams?.includes(team?._id)) {
+                              return (
+                                <Badge bg="primary" className="me-2" key={team?._id}>{team?.name}</Badge>
+                                
+                              );
+                            }
+
+                            return null;
+                          })
+                        } 
                   </ListGroup.Item>
                   </ListGroup>
                   </Card.Text>
@@ -1282,6 +1404,103 @@ function Invitation(props) {
           value={fields[`custom_field[${showBadges?.name}]`] || ""}
         />
       )}
+
+      {(showRoles === true) && (
+            
+          <Modal show={showRoles} onHide={handleRoleClose} size="md" centered className="status--modal assign--task--modal">
+            <Modal.Header closeButton>
+              <Modal.Title>
+                <div className="change--team--icon d-flex align-items-center gap-3">
+                  
+                  <div className="title--span d-flex flex-column align-items-start gap-2">
+                    <strong>Change Role</strong>
+                    <small className="text-secondary">{selectedInvitation?.email}</small>
+                  </div>
+                </div>
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              
+                    <Form.Group className="mb-3">
+                      <Form.Label className="mb-2 fw-semibold">Select Role</Form.Label>
+                      <Form.Select
+                        className={"form-control custom-selectbox conditional-box"}
+                        value={fields?.role || ""}
+                        onChange={(e) => handleClickRoles(e.target.value)}
+                        name="role"
+                      >
+                        {roles?.map((role, index) => {
+                          if(selectedInvitation?.role?._id !== role?._id){
+                            return(
+                              <option key={`role-id-${index}`} value={role._id}>
+                                {(() => {
+                                  const helperText = roleHelperText(role.slug);
+                                  return helperText
+                                    ? `${role.name} - ${helperText}`
+                                    : role.name;
+                                })()}
+                              </option>
+                            )
+                          }
+                      })}
+                      </Form.Select>
+                  </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <small>Changing the role will update this member's permissions to match the selected role's defaults.</small>
+              <Button variant="secondary" onClick={handleRoleClose} disabled={loader}>
+              {loader ? "Please Wait..." : "Cancel"}
+              </Button>
+              <Button variant="primary" onClick={handleSaveRole} disabled={loader}>
+              {loader ? "Please Wait..." : "Save"}
+              </Button>
+            </Modal.Footer>
+          </Modal>)
+        }
+
+        {/*--=-=Teams Modal**/
+          (showTeams === true) && (
+          
+            <Modal show={showTeams} onHide={handleTeamsClose} size="md" centered className="status--modal assign--task--modal">
+              <Modal.Header closeButton>
+                <Modal.Title>
+                  <div className="change--team--icon d-flex align-items-center gap-3">
+                    
+                    <div className="title--span d-flex flex-column align-items-start gap-2">
+                      <strong>Change Teams</strong>
+                      <small className="text-secondary">{selectedInvitation?.email}</small>
+                    </div>
+                  </div>
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form>
+                  <Form.Group>
+                    <FloatingLabel label="Search here">
+                      <Form.Control type="text" placeholder="Search here" value={search} onChange={handleSearchChange} />
+                    </FloatingLabel>
+                  </Form.Group>
+                </Form>
+                <ListGroup className="status--list mb-1">
+                  {filteredteamfeed.map((team, index) => (
+                    <ListGroup.Item key={index} onClick={() => handleClickTeams(team?._id)} className={fields?.selected_teams?.includes(team?._id) ? "status--active" : ""}> 
+                      <span className="team--color" style={{ background: team?.color }}></span> 
+                      <p>{team?.name} {fields?.selected_teams?.includes(team?._id) && <FaCheck />} </p>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+                <small>Teams organize members into groups. Members with visibility to specific teams can see data, time entries, reports, and projects from only those teams.</small>
+              </Modal.Body>
+              <Modal.Footer>
+                  <Button variant="secondary" onClick={handleTeamsClose} disabled={loader}>
+                    {loader ? "Please Wait..." : "Cancel"}
+                  </Button>
+                  <Button variant="primary" onClick={handleSaveTeams} disabled={loader}>
+                    {loader ? "Please Wait..." : "Save"}
+                  </Button>
+                </Modal.Footer>
+            </Modal>)
+          }
     </>
   );
 }

@@ -56,7 +56,11 @@ function HolidaysPage() {
   const handleFilterShow = () => setFilterShow(true);
   const [loader, setLoader] = useState(false);
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setFields({ date: "", occasion: "", type: "" });
+    setEditItem(false);
+    setShow(false);
+  }
   const handleShow = () => setShow(true);
   const [spinner, setSpinner] = useState(false);
   const [nextHoliday, setNextHoliday] = useState(null);
@@ -150,7 +154,6 @@ function HolidaysPage() {
 
   useEffect(() => {
     if (apiResult.success) {
-      setFields({ date: "", occasion: "", type: "" });
       handleClose();
       setEditItem(false);
       setLoader(false);
@@ -224,7 +227,7 @@ function HolidaysPage() {
       return <span className="text-muted">Past Holiday</span>;
     }
 
-    return diff === 1 ? `1 day left` : `${diff} days left`;
+    return diff === 1 ? `1 day left` : diff === 0 ? `0 day left` : `${diff} days left`;
   };
 
 
@@ -311,8 +314,7 @@ function HolidaysPage() {
                       </ListGroup.Item>
                       
                         {(memberProfile?.role?.permissions?.holidays
-                          ?.create_edit_delete === true ||
-                          memberProfile?.role?.slug === "owner") && (
+                          ?.create_edit_delete === true) && (
                           <ListGroup.Item
                             className="btn btn-primary"
                             onClick={handleShow}
@@ -437,46 +439,48 @@ function HolidaysPage() {
                                 {getDaysLeft(holiday.date)}
                               </span>
                               <div key={`action-td-${index}`} className="ms-3">
-                                <Dropdown>
-                                  <Dropdown.Toggle variant="dark">
-                                    <FaEllipsisV />{" "}
-                                  </Dropdown.Toggle>
-                                  <Dropdown.Menu>
-                                    <Dropdown.Item
-                                      key={`edit-item-${index}`}
-                                      onClick={() => {
-                                        if (
-                                          memberProfile?.role?.permissions?.holidays
-                                            ?.create_edit_delete === true ||
-                                          memberProfile?.role?.slug === "owner"
-                                        ) {
-                                          setEditItem(holiday);
-                                          handleShow();
-                                        } else {
-                                          console.log("action not allowed");
-                                        }
-                                      }}
-                                    >
-                                      Edit
-                                    </Dropdown.Item>
-                                    <Dropdown.Item
-                                      key={`delete-item-${index}`}
-                                      onClick={() => {
-                                        if (
-                                          memberProfile?.role?.permissions?.holidays
-                                            ?.create_edit_delete === true ||
-                                          memberProfile?.role?.slug === "owner"
-                                        ) {
-                                          handleDelete(holiday._id);
-                                        } else {
-                                          console.log("action not allowed");
-                                        }
-                                      }}
-                                    >
-                                      Delete
-                                    </Dropdown.Item>
-                                  </Dropdown.Menu>
-                                </Dropdown>
+                                {(memberProfile?.role?.permissions?.holidays?.create_edit_delete === true) && (
+
+                                
+                                  <Dropdown>
+                                    <Dropdown.Toggle variant="dark">
+                                      <FaEllipsisV />{" "}
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                      <Dropdown.Item
+                                        key={`edit-item-${index}`}
+                                        onClick={() => {
+                                          if (
+                                            memberProfile?.role?.permissions?.holidays
+                                              ?.create_edit_delete === true
+                                          ) {
+                                            setEditItem(holiday);
+                                            handleShow();
+                                          } else {
+                                            console.log("action not allowed");
+                                          }
+                                        }}
+                                      >
+                                        Edit
+                                      </Dropdown.Item>
+                                      <Dropdown.Item
+                                        key={`delete-item-${index}`}
+                                        onClick={() => {
+                                          if (
+                                            memberProfile?.role?.permissions?.holidays
+                                              ?.create_edit_delete === true
+                                          ) {
+                                            handleDelete(holiday._id);
+                                          } else {
+                                            console.log("action not allowed");
+                                          }
+                                        }}
+                                      >
+                                        Delete
+                                      </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                  </Dropdown>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -571,7 +575,11 @@ function HolidaysPage() {
                         <Form.Control type="text" placeholder="Search here.." />
                       </Form.Group>
                     </Form>
-                    <Dropdown.Item className="selected--option">
+                    <Dropdown.Item className="selected--option" onClick={() => {
+                        handleChange({
+                          target: { name: "type", value: "" },
+                        });
+                      }}>
                       Type{" "}
                       {!fields["type"] || fields["type"] === "" ? (
                         <FaCheck />
@@ -608,7 +616,7 @@ function HolidaysPage() {
           <Button
             variant="secondary"
             onClick={() => {
-              setShow(false);
+              handleClose()
             }}
           >
             Cancel

@@ -19,7 +19,6 @@ import { FaPlus, FaTimesCircle, FaCheck } from "react-icons/fa";
 import { FiCheck, FiInfo, FiLock, FiTrash2 } from "react-icons/fi";
 import { LuFolderOpen, LuPencilLine } from "react-icons/lu";
 import { useToast } from "../../context/ToastContext";
-import Spinner from "react-bootstrap/Spinner";
 import { AlertDialog } from "../modals";
 import {
   permissionModules,
@@ -40,17 +39,16 @@ import { ALL_MEMBERS } from "../../redux/actions/types";
 import { BsExclamation, BsExclamationTriangle } from "react-icons/bs";
 function RolesPage() {
   const dispatch = useDispatch();
-  const [fieldserrors, setFieldErrors] = useState({ name: "" });
   const [loader, setLoader] = useState(false);
-  const [spinner, setSpinner] = useState(false);
   const memberProfile = currentMemberProfile();
-  let fieldErrors = {};
+ 
   let hasError = false;
    const addToast = useToast();
   const [search, setSearch] = useState("");
   const [fields, setFields] = useState({ name: "" });
   const [errors, setErrors] = useState({});
   const [activeAccordionKey, setActiveAccordionKey] = useState(null);
+  const [activeModuleKey, setActiveModuleKey] = useState({});
   const [teamfields, setTeamFields] = useState({
     name: "",
     color: "#3B82F6",
@@ -124,24 +122,63 @@ function RolesPage() {
         });
       }
     }
-
+   
     setPermissions((prev) => ({
       ...prev,
       [module]: updated,
     }));
   };
-  // const togglePermission = (module, perm) => {
-  //   setPermissions((prev) => {
-  //     const currentPerms = prev?.[module] || {};
-  //     return {
-  //       ...prev,
-  //       [module]: {
-  //         ...currentPerms,
-  //         [perm]: !currentPerms?.[perm],
-  //       },
-  //     };
-  //   });
-  // };
+
+  const toggleTimeTrackingViewOthers = (module) => {
+    const isChecked = !(permissions?.[module]?.view_others || false);
+    const currentPerms = permissions?.[module] || {};
+    const updated = {
+      ...currentPerms,
+      view_others: isChecked,
+    };
+ 
+    if (!isChecked) {
+      const moduleData = permissionModules.find((m) => m.slug === module);
+      if (moduleData) {
+        (moduleData.permissions || []).forEach((perm) => {
+          if (perm === "update_manual_time") { 
+            updated[perm] = false;
+          }
+        });
+      }
+    }
+
+   
+    setPermissions((prev) => ({
+      ...prev,
+      [module]: updated,
+    }));
+  };
+
+  const toggleProjectsViewOthers = (module) => {
+    const isChecked = !(permissions?.[module]?.view_others || false);
+    const currentPerms = permissions?.[module] || {};
+    const updated = {
+      ...currentPerms,
+      view_others: isChecked,
+    };
+ 
+    if (!isChecked) {
+      const moduleData = permissionModules.find((m) => m.slug === module);
+      if (moduleData) {
+        (moduleData.permissions || []).forEach((perm) => {
+          if (perm === "view_unassigned") { 
+            updated[perm] = false;
+          }
+        });
+      }
+    }
+    setPermissions((prev) => ({
+      ...prev,
+      [module]: updated,
+    }));
+  };
+
   const togglePermission = (module, perm, value) => {
     setPermissions((prev) => {
       const currentPerms = prev?.[module] || {};
@@ -216,41 +253,68 @@ function RolesPage() {
   }
 
   const toggleTeamMembers = (module, perm, teamId, memberId) => {
-    setPermissions((prev) => {
-      const currentPerms = prev?.[module] || {};
-      const currentTeams = currentPerms?.[perm] || {};
+  setPermissions((prev) => {
+    const currentPerms = prev?.[module] || {};
+    const currentTeams = currentPerms?.[perm] || {};
 
-      const teamKey = String(teamId);
-      const memberKey = String(memberId);
+    const teamKey = String(teamId);
+    const memberKey = String(memberId);
 
-      // ✅ HARD SAFETY: ensure array
-      const teamMembers = Array.isArray(currentTeams[teamKey])
-        ? currentTeams[teamKey]
-        : [];
+    const isMemberInTeam =
+      Array.isArray(currentTeams[teamKey]) &&
+      currentTeams[teamKey].includes(memberKey);
 
-      const updatedTeamMembers = teamMembers?.includes(memberKey)
-        ? teamMembers.filter((id) => id !== memberKey)
-        : [...teamMembers, memberKey];
+    let updatedTeams = {};
 
-      const updatedTeams = {
-        ...currentTeams,
-        [teamKey]: updatedTeamMembers,
-      };
+    if (isMemberInTeam) {
+      // 🔴 REMOVE from ALL teams
+      teamfeed.forEach((team) => {
+        const key = String(team._id);
 
-      // optional cleanup
-      if (updatedTeamMembers.length === 0) {
-        delete updatedTeams[teamKey];
-      }
+        const members = Array.isArray(currentTeams[key])
+          ? currentTeams[key].filter((id) => id !== memberKey)
+          : [];
 
-      return {
-        ...prev,
-        [module]: {
-          ...currentPerms,
-          [perm]: updatedTeams,
-        },
-      };
-    });
-  };
+        updatedTeams[key] = members;
+      });
+    } else {
+      // 🟢 ADD to all teams where member belongs
+
+      teamfeed.forEach((team) => {
+        const key = String(team._id);
+
+        const existingMembers = Array.isArray(currentTeams[key])
+          ? currentTeams[key]
+          : [];
+
+        // ✅ FIXED membership check
+        const isMemberPartOfThisTeam = Array.isArray(team.members)
+          ? team.members.some((m) =>
+              typeof m === "string"
+                ? m === memberKey
+                : String(m._id) === memberKey
+            )
+          : false;
+
+        if (isMemberPartOfThisTeam) {
+          updatedTeams[key] = existingMembers.includes(memberKey)
+            ? existingMembers
+            : [...existingMembers, memberKey];
+        } else {
+          updatedTeams[key] = existingMembers;
+        }
+      });
+    }
+
+    return {
+      ...prev,
+      [module]: {
+        ...currentPerms,
+        [perm]: updatedTeams,
+      },
+    };
+  });
+};
 
   const toggleTeams = (module, perm, teamId) => {
     setPermissions((prev) => {
@@ -707,7 +771,7 @@ const handleDeleteTeam = (team) => {
     const newPerms = sourceRole.permissions || {};
 
       // Clone merged to avoid mutating the original reference
-      const updated = { ...merged };
+     /* const updated = { ...merged };
 
       // First, update existing keys in merged
       for (const module in updated) {
@@ -731,11 +795,11 @@ const handleDeleteTeam = (team) => {
             updated[module][key] = newPerms[module][key];
           }
         }
-      }
+      } */
 
     setRoleFields((prev) => ({
       ...prev,
-      permissions: updated,
+      permissions: newPerms,
     }));
       
   }
@@ -765,13 +829,22 @@ const handleCreateRole = async (e) => {
     <>
       <div className="page--wrapper setting--page">
         <div className="rounded--box permission__page">
-          <Tabs defaultActiveKey="roles">
-            <Tab eventKey="roles" title="Roles">
-              {
-                (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.update_permissions === true) && (
+         <Tabs
+            defaultActiveKey={
+              memberProfile?.role?.permissions?.members?.update_permissions === true
+                ? "roles"
+                : 
+                memberProfile?.role?.permissions?.members?.manage_teams === true 
+                ? "teams"
+                : undefined
+            }
+          >
+            {
+                (memberProfile?.role?.permissions?.members?.update_permissions === true) && (
+                  <Tab eventKey="roles" title="Roles">
+              
                   <Button variant="primary" className="mb-3" onClick={() => setShowRoleModal(true)}>Create Custom Role</Button>
-                )
-              }
+               
               
               {roles && roles?.length > 0 && (
                 <>
@@ -804,16 +877,19 @@ const handleCreateRole = async (e) => {
                           <Accordion.Body>
                             {activeRole && Object.keys(activeRole).length > 0 && (
                             <div className="new--accordion--block w-100">
-                              
+                              <Accordion className="mb-3" activeKey={activeModuleKey[role._id] || null}
+                                onSelect={(key) =>
+                                  setActiveModuleKey((prev) => ({
+                                    ...prev,
+                                    [role._id]: key,
+                                  }))
+                                }>
                               {permissionModules.map((mod) => {
                                 const modSlug = mod.slug;
                                 const modPerms = permissions?.[modSlug] || {};
                                 
                                 const isViewChecked = !!modPerms.view;
-                                // const truePermissionCount = Object.values(
-                                //   modPerms,
-                                // ).filter((val) => val === true).length;
-
+                                
                                 const allPermissions = (mod.permissions || []).filter(
                                   (p) =>
                                     ![
@@ -841,12 +917,25 @@ const handleCreateRole = async (e) => {
 
                                 if(modSlug === 'assigned_teams' && activeRole?.slug === "owner" || modSlug === 'assigned_teams' && activeRole?.slug === "admin"){
                                   accessType = "all_teams_and_future_teams"
+                                }else if(modSlug === 'assigned_teams'){
+                                  
+                                  if ( modPerms?.selected_teams?.length === teamfeed?.length && modPerms?.specific_teams_only === true && modPerms.auto_add_new_teams === true) {
+                                    accessType = "all_teams_and_future_teams"
+                                  }else if (modPerms?.selected_teams?.length === teamfeed?.length && modPerms?.specific_teams_only === true || modPerms?.selected_teams?.length !== teamfeed?.length && modPerms?.specific_teams_only === true) {
+                                    accessType = "selected_teams"
+                                  }
+
+                                  if ( modPerms?.specific_peoples_only === true && modPerms.auto_add_teams === true) {
+                                    accessType = "all_members_and_future"
+                                  }else if(modPerms?.specific_peoples_only === true){
+                                     accessType = "only_selected_members"
+                                  }
                                 }
 
                                 return (
-                                  <Accordion className="mb-3">
+                                  
                                     
-                                    <Accordion.Item eventKey="1" className={(modSlug === 'assigned_teams') ? 'border-primary border-2':''}>
+                                    <Accordion.Item  eventKey={modSlug} key={modSlug} className={(modSlug === 'assigned_teams') ? 'border-primary border-2':''}>
                                       <Accordion.Header className={(modSlug === 'assigned_teams') ? 'bg-light':''}>
                                         <div className="d-flex gap-3 align-items-center w-100">
                                           {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
@@ -875,8 +964,76 @@ const handleCreateRole = async (e) => {
                                               <span className="badge bg-success">Full Access</span>
                                             )}
                                             {accessType === "all_teams_and_future_teams" && (
-                                              <span className="badge bg-warning">All teams + future teams</span>
+                                              <span className="badge bg-warning">
+                                                
+                                                {teamfeed
+                                                  ?.filter(team =>
+                                                    modPerms?.selected_teams?.includes(team?._id)
+                                                  )
+                                                  .map(team => team.name)
+                                                  .join(" + ")}
+                                                + (future teams)</span>
                                             )}
+                                            {accessType === "selected_teams" && (
+                                              <span className="badge bg-warning">
+                                                {teamfeed
+                                                  ?.filter(team =>
+                                                    modPerms?.selected_teams?.includes(team?._id)
+                                                  )
+                                                  .map(team => team.name)
+                                                  .join(" + ")}
+                                                  {
+                                                    (modPerms.auto_add_new_teams === true) && (
+                                                      <> + (future teams)</>
+                                                    )
+                                                  }
+                                              </span>
+                                            )}
+                                            {
+                                              (accessType === "all_members_and_future" || accessType === "only_selected_members") && (() => {
+                                                const data = modPerms?.selected_team_members || {};
+                                                const autoTeams = modPerms?.auto_add_teams || [];
+
+                                                const result = Object.entries(data)
+                                                  .map(([teamId, members]) => {
+                                                    const team = teamfeed?.find(t => t._id === teamId);
+                                                    const isAuto = autoTeams.includes(teamId);
+
+                                                    const uniqueCount = new Set(members || []).size;
+
+                                                    // Case 1: members exist
+                                                    if (uniqueCount > 0) {
+                                                      return isAuto
+                                                        ? `${team?.name || "Unknown"} (${uniqueCount}m + auto)`
+                                                        : `${team?.name || "Unknown"} (${uniqueCount}m)`;
+                                                    }
+
+                                                    // Case 2: no members but auto enabled
+                                                    if (isAuto) {
+                                                      return `${team?.name || "Unknown"} (auto)`;
+                                                    }
+
+                                                    return null;
+                                                  })
+                                                  .filter(Boolean);
+
+                                                // 👉 Also handle case where team exists ONLY in auto_add_teams but not in selected_team_members
+                                                autoTeams.forEach(teamId => {
+                                                  if (!data[teamId]) {
+                                                    const team = teamfeed?.find(t => t._id === teamId);
+                                                    result.push(`${team?.name || "Unknown"} (auto)`);
+                                                  }
+                                                });
+
+                                                if (!result.length) return null;
+
+                                                return (
+                                                  <span className="badge bg-info">
+                                                    {result.join(" + ")}
+                                                  </span>
+                                                );
+                                              })()
+                                            }
                                           </div>
                                         </div>
                                       </Accordion.Header>
@@ -933,14 +1090,14 @@ const handleCreateRole = async (e) => {
                                                     toggleView(modSlug)
                                                   }
                                                   name="assign_team_option"
-                                                  id={`default-${modSlug}-view`}
-                                                  label={permissionsLabel[modSlug][perm]
+                                                  id={`default-${modSlug}-view-${role?._id}`}
+                                                  label={permissionsLabel[modSlug]?.[perm]
                                                         ?.heading}
                                                   disabled={role?.type === 'system'}
                                                 />
                                                 <small className="d-block ms-4 text-secondary">
                                                     {
-                                                      permissionsLabel[modSlug][perm]
+                                                      permissionsLabel[modSlug]?.[perm]
                                                         ?.sub_heading
                                                     }
                                                   </small>
@@ -961,15 +1118,16 @@ const handleCreateRole = async (e) => {
                                                       togglePermission(modSlug, perm, e.target.checked)
                                                     }
                                                     // name="assign_team_option"
-                                                    id={`default-${perm}-view`}
-                                                    label={permissionsLabel[modSlug][perm]
+                                                    id={`default-${perm}-view-${role?._id}`}
+                                                    label={permissionsLabel[modSlug]?.[perm]
                                                         ?.heading}
                                                     data-val={modPerms[perm]}
                                                     disabled={role?.type === 'system'}
+                                                    name={`permission-${modSlug}`}
                                                   />
                                                   <small className="d-block ms-4 text-secondary">
                                                     {
-                                                      permissionsLabel[modSlug][perm]
+                                                      permissionsLabel[modSlug]?.[perm]
                                                         ?.sub_heading
                                                     }
                                                   </small>
@@ -1027,14 +1185,14 @@ const handleCreateRole = async (e) => {
                                                     <div className="auto-add-box mt-3 mb-0 p-3">
                                                       <Form.Check
                                                         type="switch"
-                                                        id={`auto-add-new-teams`}
+                                                        id={`auto-add-new-teams-${role?._id}`}
                                                         onChange={(e) => {autoAddTeamToggle(modSlug,
                                                           "auto_add_new_teams", e.target.checked)}}
                                                         checked={modPerms?.auto_add_new_teams}
                                                         label={
                                                           <>
                                                             <div className="fw-semibold">
-                                                              Auto-add future Default Team members
+                                                              Automatically include new teams
                                                             </div>
                                                             <div className="text-muted small">
                                                               When new teams are created in the future, automatically grant visibility to their members
@@ -1060,14 +1218,14 @@ const handleCreateRole = async (e) => {
                                                   onChange={(e) =>
                                                     togglePermission(modSlug, perm, e.target.checked)
                                                   }
-                                                  id={`default-${perm}-view`}
-                                                  label={permissionsLabel[modSlug][perm]
+                                                  id={`default-${perm}-view-${role?._id}`}
+                                                  label={permissionsLabel[modSlug]?.[perm]
                                                         ?.heading}
                                                   disabled={role?.type === 'system'}
                                                 />
                                                 <small className="d-block ms-4 text-secondary">
                                                     {
-                                                      permissionsLabel[modSlug][perm]
+                                                      permissionsLabel[modSlug]?.[perm]
                                                         ?.sub_heading
                                                     }
                                                   </small>
@@ -1095,11 +1253,13 @@ const handleCreateRole = async (e) => {
                                                             <Button
                                                               size="sm"
                                                               variant="outline-primary"
+                                                              
                                                               onClick={() => {
-                                                                if(role?.type !== 'system'){
+                                                                if (role?.type !== "system") {
                                                                   setPermissions((prev) => {
                                                                     const currentPerms = prev?.[modSlug] || {};
-                                                                    const currentTeams = currentPerms?.["selected_team_members"] || {};
+                                                                    const currentTeams =
+                                                                      currentPerms?.["selected_team_members"] || {};
 
                                                                     const teamKey = String(team._id);
 
@@ -1107,21 +1267,61 @@ const handleCreateRole = async (e) => {
                                                                       ? currentTeams[teamKey]
                                                                       : [];
 
-                                                                    const allMemberIds = team.members.map((m) => String(m._id));
+                                                                    const allMemberIds = team.members.map((m) =>
+                                                                      String(m._id)
+                                                                    );
 
                                                                     // ✅ check if all already selected
                                                                     const isAllSelected =
                                                                       allMemberIds.length > 0 &&
-                                                                      allMemberIds.every((id) => existingMembers.includes(id));
+                                                                      allMemberIds.every((id) =>
+                                                                        existingMembers.includes(id)
+                                                                      );
 
-                                                                    const updatedTeams = {
-                                                                      ...currentTeams,
-                                                                      [teamKey]: isAllSelected ? [] : allMemberIds,
-                                                                    };
+                                                                    let updatedTeams = { ...currentTeams };
 
-                                                                    // optional cleanup
                                                                     if (isAllSelected) {
-                                                                      delete updatedTeams[teamKey];
+                                                                      // 🔴 REMOVE all these members from ALL teams
+                                                                      teamfeed.forEach((t) => {
+                                                                        const key = String(t._id);
+
+                                                                        const members = Array.isArray(updatedTeams[key])
+                                                                          ? updatedTeams[key]
+                                                                          : [];
+
+                                                                        updatedTeams[key] = members.filter(
+                                                                          (id) => !allMemberIds.includes(id)
+                                                                        );
+                                                                      });
+                                                                    } else {
+                                                                      // 🟢 ADD all members to all relevant teams
+
+                                                                      allMemberIds.forEach((memberId) => {
+                                                                        teamfeed.forEach((t) => {
+                                                                          const key = String(t._id);
+
+                                                                          const existing = Array.isArray(updatedTeams[key])
+                                                                            ? updatedTeams[key]
+                                                                            : [];
+
+                                                                          // 🔥 check if member belongs to this team
+                                                                          const isMemberPartOfThisTeam = Array.isArray(
+                                                                            t.members
+                                                                          )
+                                                                            ? t.members.some(
+                                                                                (m) => String(m._id) === memberId
+                                                                              )
+                                                                            : false;
+
+                                                                          if (isMemberPartOfThisTeam) {
+                                                                            if (!existing.includes(memberId)) {
+                                                                              updatedTeams[key] = [...existing, memberId];
+                                                                            } else {
+                                                                              updatedTeams[key] = existing;
+                                                                            }
+                                                                          }
+                                                                        });
+                                                                      });
                                                                     }
 
                                                                     return {
@@ -1154,20 +1354,29 @@ const handleCreateRole = async (e) => {
                                                               <div
                                                                 key={member._id}
                                                                 className="member-row d-flex align-items-center px-3 py-2 bg-white"
-                                                              >
-                                                                <Form.Check
-                                                                  type="checkbox"
-                                                                  checked={isChecked}
-                                                                  onChange={(e) =>
+                                                                onClick={(e) =>
                                                                     toggleTeamMembers(
                                                                       modSlug,
                                                                       "selected_team_members",
                                                                       team._id,
-                                                                      member._id,
-                                                                      e.target.checked
+                                                                      member._id
                                                                     )
                                                                   }
+                                                              >
+                                                                <Form.Check
+                                                                  type="checkbox"
+                                                                  checked={isChecked}
+                                                                  // onChange={(e) =>
+                                                                  //   toggleTeamMembers(
+                                                                  //     modSlug,
+                                                                  //     "selected_team_members",
+                                                                  //     team._id,
+                                                                  //     member._id,
+                                                                  //     e.target.checked
+                                                                  //   )
+                                                                  // }
                                                                   disabled={role?.type === 'system'}
+                                                                  id={`team-member-${member._id}-${team._id}`}
                                                                 />
 
                                                                 <div
@@ -1190,7 +1399,7 @@ const handleCreateRole = async (e) => {
                                                             <div className="auto-add-box mt-3 p-3">
                                                               <Form.Check
                                                                 type="switch"
-                                                                id={`auto-add-${team?._id}`}
+                                                                id={`auto-add-${team?._id}-${role?._id}`}
                                                                 onChange={() => {autoAddTeamMembersToggle(modSlug,
                                                                   "auto_add_teams", team?._id)}}
                                                                 checked={
@@ -1221,12 +1430,245 @@ const handleCreateRole = async (e) => {
                                               )}
                                               </div>
                                             );
+                                          }else if (perm === "view_others" && modSlug === "time_tracking") {
+                                            return (
+                                              <>
+                                              <div className="d-flex flex-column mt-2">
+                                                <Form.Check
+                                                  key={`${modSlug}--view_others`}
+                                                  type="checkbox"
+                                                  className="fw-semibold"
+                                                  checked={!!modPerms[perm]}
+                                                  onChange={() =>
+                                                    toggleTimeTrackingViewOthers(modSlug)
+                                                  }
+                                                  name="assign_team_option"
+                                                  id={`default-${modSlug}-view_others-${role?._id}`}
+                                                  label={permissionsLabel[modSlug]?.[perm]
+                                                        ?.heading}
+                                                  disabled={role?.type === 'system'}
+                                                />
+                                                <small className="d-block ms-4 text-secondary">
+                                                    {
+                                                      permissionsLabel[modSlug]?.[perm]
+                                                        ?.sub_heading
+                                                    }
+                                                  </small>
+                                              </div>
+                                              {
+                                                (perm === "view_others" && modPerms[perm] === true || modSlug === 'members' && perm === "view" && modPerms[perm] === true) && (
+                                                  <Alert variant="primary" className="mt-3 border-left-2">
+                                                    <Alert.Heading>
+                                                      <small><FiInfo/> Team visibility applies to {modSlug.replace(/_/g, " ")}</small>
+                                                    </Alert.Heading>
+
+                                                    <p className="mb-0">
+                                                      <small>
+                                                        {(() => {
+                                                          const assigned = permissions?.assigned_teams;
+
+                                                          // ✅ Specific people only
+                                                          if (
+                                                            assigned?.specific_peoples_only === true &&
+                                                            Object.keys(assigned?.selected_team_members || {}).length > 0
+                                                          ) {
+                                                            // const memberCount = Object.keys(
+                                                            //   assigned.selected_team_members
+                                                            // ).length;
+
+                                                            const memberCount = Object.values(assigned?.selected_team_members || {})?.flat()?.map(
+                                                                id => String(id)
+                                                              ).length;
+
+                                                            const autoTeamCount = assigned?.auto_add_teams?.length || 0;
+
+                                                            return `This role can see ${memberCount} members${
+                                                              autoTeamCount > 0
+                                                                ? ` + auto from ${autoTeamCount} team${
+                                                                    autoTeamCount > 1 ? "s" : ""
+                                                                  }`
+                                                                : ""
+                                                            }`;
+                                                          }
+
+                                                          // ✅ Specific teams only
+                                                          if (
+                                                            assigned?.specific_teams_only === true &&
+                                                            assigned?.selected_teams?.length > 0
+                                                          ) {
+                                                            const teamCount = assigned.selected_teams.length;
+
+                                                            return `This role can see ${teamCount} team${
+                                                              teamCount > 1 ? "s" : ""
+                                                            }${
+                                                              assigned?.auto_add_new_teams === true
+                                                                ? " + future teams"
+                                                                : ""
+                                                            }`;
+                                                          }
+
+                                                          return null;
+                                                        })()}
+                                                      </small>
+                                                    </p>
+                                                  </Alert>
+                                                )
+                                              }
+                                              </>
+                                            );
+                                          }else if (perm === "update_manual_time") {
+                                            return (
+                                              <>
+                                              <div className="d-flex flex-column mt-2">
+                                                <Form.Check
+                                                  key={`${modSlug}--view-${perm}`}
+                                                  type="checkbox"
+                                                  className="fw-semibold"
+                                                  checked={!!modPerms[perm]}
+                                                  onChange={(e) =>
+                                                    togglePermission(
+                                                      modSlug,
+                                                      perm,
+                                                      e.target.checked
+                                                    )
+                                                  }
+                                                  name="assign_team_option"
+                                                  id={`default-${perm}-view-${role?._id}`}
+                                                  label={permissionsLabel[modSlug]?.[perm]
+                                                        ?.heading}
+                                                  disabled={role?.type === 'system' || !modPerms?.view_others}
+                                                />
+                                                <small className="d-block ms-4 text-secondary">
+                                                    {
+                                                      permissionsLabel[modSlug]?.[perm]
+                                                        ?.sub_heading
+                                                    }
+                                                  </small>
+                                              </div>
+                                              
+                                              </>
+                                            );
+                                          }
+                                          else if (perm === "view_others" && modSlug === "projects") {
+                                            return (
+                                              <>
+                                              <div className="d-flex flex-column mt-2">
+                                                <Form.Check
+                                                  key={`${modSlug}--view_others`}
+                                                  type="checkbox"
+                                                  className="fw-semibold"
+                                                  checked={!!modPerms[perm]}
+                                                  onChange={() =>
+                                                    toggleProjectsViewOthers(modSlug)
+                                                  }
+                                                  name="view_others_projects"
+                                                  id={`default-${modSlug}-view_others-${role?._id}`}
+                                                  label={permissionsLabel[modSlug]?.[perm]
+                                                        ?.heading}
+                                                  disabled={role?.type === 'system'}
+                                                />
+                                                <small className="d-block ms-4 text-secondary">
+                                                    {
+                                                      permissionsLabel[modSlug]?.[perm]
+                                                        ?.sub_heading
+                                                    }
+                                                  </small>
+                                              </div>
+                                              {
+                                                perm === "view_others" && modPerms[perm] === true && (
+                                                  <Alert variant="primary" className="mt-3 border-left-2">
+                                                    <Alert.Heading>
+                                                      <small><FiInfo/> Team visibility applies to {modSlug.replace(/_/g, " ")}</small>
+                                                    </Alert.Heading>
+
+                                                    <p className="mb-0">
+                                                      <small>
+                                                        {(() => {
+                                                          const assigned = permissions?.assigned_teams;
+
+                                                          // ✅ Specific people only
+                                                          if (
+                                                            assigned?.specific_peoples_only === true &&
+                                                            Object.keys(assigned?.selected_team_members || {}).length > 0
+                                                          ) {
+                                                            const memberCount = Object.keys(
+                                                              assigned.selected_team_members
+                                                            ).length;
+
+                                                            const autoTeamCount = assigned?.auto_add_teams?.length || 0;
+
+                                                            return `This role can see selected ${memberCount} members${
+                                                              autoTeamCount > 0
+                                                                ? ` + auto from ${autoTeamCount} team${
+                                                                    autoTeamCount > 1 ? "s" : ""
+                                                                  }`
+                                                                : ""
+                                                            }`;
+                                                          }
+
+                                                          // ✅ Specific teams only
+                                                          if (
+                                                            assigned?.specific_teams_only === true &&
+                                                            assigned?.selected_teams?.length > 0
+                                                          ) {
+                                                            const teamCount = assigned.selected_teams.length;
+
+                                                            return `This role can see ${teamCount} team${
+                                                              teamCount > 1 ? "s" : ""
+                                                            }${
+                                                              assigned?.auto_add_new_teams === true
+                                                                ? " + future teams"
+                                                                : ""
+                                                            }`;
+                                                          }
+
+                                                          return null;
+                                                        })()}
+                                                      </small>
+                                                    </p>
+                                                  </Alert>
+                                                )
+                                              }
+                                              </>
+                                            );
+                                          }else if (perm === "view_unassigned") {
+                                            return (
+                                              <>
+                                              <div className="d-flex flex-column mt-2">
+                                                <Form.Check
+                                                  key={`${modSlug}--view-${perm}`}
+                                                  type="checkbox"
+                                                  className="fw-semibold"
+                                                  checked={!!modPerms[perm]}
+                                                  onChange={(e) =>
+                                                    togglePermission(
+                                                      modSlug,
+                                                      perm,
+                                                      e.target.checked
+                                                    )
+                                                  }
+                                                  name="assign_team_option"
+                                                  id={`default-${perm}-view-${role?._id}`}
+                                                  label={permissionsLabel[modSlug]?.[perm]
+                                                        ?.heading}
+                                                  disabled={role?.type === 'system' || !modPerms?.view_others}
+                                                />
+                                                <small className="d-block ms-4 text-secondary">
+                                                    {
+                                                      permissionsLabel[modSlug]?.[perm]
+                                                        ?.sub_heading
+                                                    }
+                                                  </small>
+                                              </div>
+                                              
+                                              </>
+                                            );
                                           }
                                           return (
                                             <>
                                               <div className="d-flex flex-column mt-2">
                                                 <Form.Check
-                                                  id={`${modSlug}-${perm}`}
+                                                  id={`${modSlug}-${perm}-${role?._id}`}
                                                   key={perm}
                                                   className="fw-semibold"
                                                   disabled={role.type === "system" || !isViewChecked}
@@ -1238,12 +1680,12 @@ const handleCreateRole = async (e) => {
                                                       e.target.checked
                                                     )
                                                   }
-                                                  label={permissionsLabel[modSlug][perm]
+                                                  label={permissionsLabel[modSlug]?.[perm]
                                                         ?.heading}
                                                 />
                                                   <small className="d-block ms-4 text-secondary">
                                                     {
-                                                      permissionsLabel[modSlug][perm]
+                                                      permissionsLabel[modSlug]?.[perm]
                                                         ?.sub_heading || ''
                                                     }
                                                   </small>
@@ -1304,10 +1746,10 @@ const handleCreateRole = async (e) => {
                                                 )
                                               }
                                               {
-                                                (permissionsLabel[modSlug][perm]?.caution && permissionsLabel[modSlug][perm]?.caution === true) && (
+                                                (permissionsLabel[modSlug]?.[perm]?.caution && permissionsLabel[modSlug]?.[perm]?.caution === true) && (
                                                   <Alert variant="danger" className="mt-3">
                                                     <Alert.Heading><small><BsExclamationTriangle/> Caution Required:</small></Alert.Heading>
-                                                    <p className="mb-0"><small>{permissionsLabel[modSlug][perm]?.caution_text}</small></p>
+                                                    <p className="mb-0"><small>{permissionsLabel[modSlug]?.[perm]?.caution_text}</small></p>
                                                   </Alert>
                                                 )
                                               }
@@ -1316,9 +1758,10 @@ const handleCreateRole = async (e) => {
                                         })}
                                       </Accordion.Body>
                                     </Accordion.Item>
-                                  </Accordion>
+                                  
                                 );
                               })}
+                              </Accordion>
                               {(role?.type === 'custom' && memberProfile?.role?.slug === "owner" || role?.type === 'custom' && memberProfile?.role?.permissions?.members?.update_permissions === true) && (
                                 <div className="mt-4 text-end fixed--bottom">
                                   <Button
@@ -1345,45 +1788,7 @@ const handleCreateRole = async (e) => {
                       );
                     })}
                   </Accordion>
-                  {/* <Row className="mt-4">
-                        <Col lg={6}>
-                          <FormGroup className="form-group mb-3 mb-lg-0 pb-0">
-                          <FloatingLabel label="Select Role">
-                              <Form.Select className="custom-selectbox" key={`rolelist`}  onChange={(e) => {
-                                const selectedRole = roles.find((role) => role._id === e.target.value);
-                                setActiveRole(selectedRole);
-                              }}>
-                              {roles.map((role, index) => {
-                                  return (
-                                  <option key={`role-${role._id}`} value={role?._id} action active={activeRole?._id === role._id}>{role.name}</option>
-                                  );
-                              })}
-                              </Form.Select>
-                          </FloatingLabel>
-                          
-                          </FormGroup>
-                        </Col>
-                        <Col lg={6}>
-                          <FormGroup className="form-group mb-0 pb-0">
-                            <FloatingLabel label="Role name">
-                              <Form.Control
-                              type="text"
-                              className={
-                              "form-control"
-                              }
-                              placeholder="Role name"
-                              name="name"
-                              value={fields['name']}
-                              onChange={(e) => {
-                                  const { value} = e.target;
-                                  setFields({...fields, ['name']: value})
-                              }}
-                              />
-                            </FloatingLabel>
-                          </FormGroup>
-                        </Col>
-                      
-                      </Row> */}
+                 
                       <Modal
                         show={showRoleModal}
                         onHide={() => setShowRoleModal(false)}
@@ -1464,7 +1869,8 @@ const handleCreateRole = async (e) => {
                 </>
               )}
             </Tab>
-            { (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.teams?.view === true) && (
+            )}
+            { (memberProfile?.role?.permissions?.members?.manage_teams === true) && (
               <Tab eventKey="teams" title="Teams">
                 <Card className="shadow-sm mb-5 border bg-none">
                   <Card.Body className="p-0">
@@ -1476,7 +1882,7 @@ const handleCreateRole = async (e) => {
                         </div>
                       </Col>
                       {
-                        (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.teams?.create_edit_delete === true) && (
+                        (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.manage_teams === true) && (
                       
                       <Col xs="auto">
                         <Button
@@ -1518,7 +1924,7 @@ const handleCreateRole = async (e) => {
                                     </div>
                                   </Col>
                                    {
-                                    (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.teams?.create_edit_delete === true) && (
+                                    (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.manage_teams === true) && (
                       
                                   <Col xs="auto">
                                     <LuPencilLine
@@ -1543,9 +1949,7 @@ const handleCreateRole = async (e) => {
                 </Card>
               </Tab>)}
           </Tabs>
-          {/* <h3 className="d-flex align-items-center justify-content-end">
-                <Button variant="primary" onClick={() => handleShow()}><FaPlus /> Add New</Button>
-            </h3> */}
+         
         </div>
         {showdelete && (
           <AlertDialog
@@ -1556,7 +1960,7 @@ const handleCreateRole = async (e) => {
           />
         )}
       </div>
-      {show && (
+      {/*show && (
         <Modal
           show={show}
           onHide={() => {
@@ -1625,8 +2029,7 @@ const handleCreateRole = async (e) => {
                                 id={`default-${modSlug}-view`}
                                 label="View"
                               />
-                              {/* <Form.Check key={`${modSlug}--view`} type="switch" className="switch--small" checked={!!modPerms.view} onChange={() => toggleView(modSlug)}/>
-                                        <p className="mb-0">View</p> */}
+                              
                             </div>
                           );
                         }
@@ -1643,15 +2046,7 @@ const handleCreateRole = async (e) => {
                                   .replace(/[_-]/g, " ")
                                   .replace(/^\w/, (l) => l.toUpperCase())}
                               />
-                              {/* <Form.Check type="switch" className="switch--small" id={`${modSlug}-${perm}`} key={perm}
-                                        disabled={!isViewChecked}
-                                        checked={!!modPerms[perm]}
-                                        onChange={() =>
-                                            togglePermission(modSlug, perm)
-                                        }
-                                        />
-
-                                        <p className="mb-0">{perm.replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase())}</p> */}
+                             
                             </div>
                             {[
                               "tracking",
@@ -1672,13 +2067,11 @@ const handleCreateRole = async (e) => {
                                           : ""
                                       }`}
                                       onClick={() => {
-                                        //if (selectedMember?.role?.slug !== "owner") {
                                         toggleMembers(
                                           modSlug,
                                           "selected_members",
                                           member._id,
                                         );
-                                        // }
                                       }}
                                     >
                                       <span className="team--initial">
@@ -1706,13 +2099,12 @@ const handleCreateRole = async (e) => {
                                           : ""
                                       }`}
                                       onClick={() => {
-                                        //if (selectedMember?.role?.slug !== "owner") {
+                                        
                                         toggleMembers(
                                           modSlug,
                                           "selected_members",
                                           "unassigned",
                                         );
-                                        // }
                                       }}
                                       key={`${modSlug}-${perm}-unassigned`}
                                     >
@@ -1745,7 +2137,7 @@ const handleCreateRole = async (e) => {
             </Button>
           </Modal.Footer>
         </Modal>
-      )}
+      )*/}
 
       {/*--=-=Create Teams Modal**/}
       <Modal
@@ -1863,7 +2255,10 @@ const handleCreateRole = async (e) => {
           <Button variant="secondary" onClick={handleCreateClose}>
             Close
           </Button>
-          <Button onClick={handleTeamSubmit} variant="primary" disabled={loader}>{loader ? 'Please wait...' : 'Save Team' }</Button>
+          <Button onClick={handleTeamSubmit} variant="primary" disabled={loader}>{loader ? 'Please wait...' : 
+          (isteamEdit !== null ) ? 'Save Team' : 'Create Team' }
+          
+          </Button>
         </Modal.Footer>
       </Modal>
     </>

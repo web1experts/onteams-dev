@@ -254,16 +254,6 @@ function ProjectsPage() {
       setCustomFields(apiCustomfields.customFields);
     }
 
-    // if (
-    //   apiCustomfields.newField &&
-    //   apiCustomfields.newField?.module === "projects"
-    // ) {
-    //   setCustomFields((prevCustomFields) => [
-    //     apiCustomfields.newField,
-    //     ...prevCustomFields,
-    //   ]);
-    // }
-
     if (
   apiCustomfields.newField &&
     apiCustomfields.newField?.module === "projects"
@@ -483,7 +473,7 @@ function ProjectsPage() {
   };
 
   useEffect(() => {
-    dispatch(Listmembers(0, "", false));
+    dispatch(Listmembers({currentPage: 0, searchTerm: '', has_limit: false}));
     dispatch(ListClients());
     dispatch(getTeams())
   }, []);
@@ -556,21 +546,6 @@ function ProjectsPage() {
     }
   }, [filters]);
 
-
-  const toggleFilterby = (value) => {
-    setFilterBy(value)
-    setTimeout(()=> {
-      selectboxObserver()
-      if(value === "teams"){
-        if(memberProfile?.role?.permissions?.assigned_teams?.selected_teams?.length > 0){
-          handlefilterchange("team_id", memberProfile?.role?.permissions?.assigned_teams?.selected_teams[0])
-        }
-      }else{
-        handlefilterchange("member", 'all')
-      }
-    }, [700])
-    
-  }
 
   const handleDateChange = (value, name) => {
     setFields({ ...fields, [name]: formatDateToDDMMYYYY(value) });
@@ -1243,7 +1218,7 @@ function ProjectsPage() {
                             My Projects
                           </option>
                          
-                          {(memberProfile?.role?.permissions?.assigned_teams?.selected_team_members?.length > 0 ) && (
+                          {(Object.keys(memberProfile?.role?.permissions?.assigned_teams?.selected_team_members)?.length > 0 ) && (
                             <option key={`member-projects-all`} value={"all"}>
                               All Members
                             </option>
@@ -1268,9 +1243,10 @@ function ProjectsPage() {
                             }
                           </>
                           {
-                            (memberProfile?.role?.slug === "owner") && (
+                            (memberProfile?.role?.permissions?.projects?.view_unassigned === true) && (
                             <option value="unassigned">Unassigned</option>
                           )}
+                          
                         </Form.Select>
                       </ListGroup.Item>
                      )
@@ -1313,7 +1289,7 @@ function ProjectsPage() {
                                       {member.label}
                                     </option>
                                   ))}
-                                  {memberProfile?.role?.slug === "owner" && (
+                                  {(memberProfile?.role?.permissions?.projects?.view_unassigned === true) && (
                                     <option value="unassigned" data-group="member">
                                       Unassigned
                                     </option>
@@ -1393,6 +1369,19 @@ function ProjectsPage() {
                         </Form.Group>
                       </Form>
                     </ListGroup.Item>
+                    {(memberProfile?.role?.permissions?.projects
+                      ?.create_edit_delete_project === true) && (
+                      <ListGroup.Item
+                        className="d-xl-flex"
+                        key={`workflow-settingskey`}
+                        onClick={() => {
+                          dispatch(updateStateData(DIRECT_UPDATE, false));
+                          dispatch(togglePopups("workflow", true));
+                        }}
+                      >
+                        <FaCog />
+                      </ListGroup.Item>
+                    )}
                     <ListGroup
                       horizontal
                       className={isActive !== 0 ? "d-none" : "d-none d-lg-flex"}
@@ -1430,13 +1419,19 @@ function ProjectsPage() {
                       >
                         <MdFilterList />
                       </ListGroup.Item>
-                      <ListGroup.Item
-                        className="d-lg-flex"
-                        key={`settingskey`}
-                        onClick={toggleCustomFields}
-                      >
-                        <LuSettings2 />
-                      </ListGroup.Item>
+                      {
+                        (memberProfile?.role?.permissions?.projects
+                        ?.manage_custom_fields === true) && (
+                          <ListGroup.Item
+                            className="d-lg-flex"
+                            key={`settingskey`}
+                            onClick={toggleCustomFields}
+                          >
+                            <LuSettings2 />
+                          </ListGroup.Item>
+                        )
+                      }
+                      
                       <ListGroup.Item
                         className="d-none d-lg-flex"
                         onClick={() => {
@@ -1737,9 +1732,7 @@ function ProjectsPage() {
                                                           ?.role?.permissions
                                                           ?.projects
                                                           ?.create_edit_delete_project ===
-                                                          true ||
-                                                        memberProfile?.role
-                                                          ?.slug === "owner"
+                                                          true
                                                       ) {
                                                         dispatch(
                                                           updateStateData(
@@ -1794,9 +1787,7 @@ function ProjectsPage() {
                                                 memberProfile?.role?.permissions
                                                   ?.projects
                                                   ?.create_edit_delete_project ===
-                                                  true ||
-                                                memberProfile?.role?.slug ===
-                                                  "owner"
+                                                  true 
                                                   ? true
                                                   : false
                                               }
@@ -1834,9 +1825,7 @@ function ProjectsPage() {
                                                   if (
                                                     memberProfile?.role?.permissions
                                                       ?.projects?.view ===
-                                                      true ||
-                                                    memberProfile?.role
-                                                      ?.slug === "owner"
+                                                      true
                                                   ) {
                                                     setIsActive(1);
                                                   } else {
@@ -1900,8 +1889,18 @@ function ProjectsPage() {
                                                           borderStyle: "solid",
                                                           borderWidth: "1px",
                                                         }}
-                                                        onClick={() =>
-                                                          toggleBadges(field)
+                                                        onClick={() => {
+                                                          if (
+                                                              memberProfile?.role?.permissions?.projects
+                                                                ?.create_edit_delete_project ===
+                                                                true
+                                                            ) {
+                                                              toggleBadges(field)
+                                                            }else {
+                                                              console.log("Not allowed");
+                                                            }
+                                                        }
+                                                          
                                                         }
                                                       >
                                                         {
@@ -2020,8 +2019,8 @@ function ProjectsPage() {
                   </div>
                 </DragDropContext>
               ) : (
+                (!spinner && projects && projects.length > 0) ?
                 <Table
-                  responsive="xl"
                   className={
                     isActiveView === 1
                       ? "project--grid--table project--grid--new--table"
@@ -2085,8 +2084,7 @@ function ProjectsPage() {
                               <tr
                                 onDoubleClick={(event) => {
                                   memberProfile?.role?.permissions?.projects
-                                    ?.create_edit_delete_project === true ||
-                                  memberProfile?.role?.slug === "owner"
+                                    ?.create_edit_delete_project === true
                                     ? handleRowDoubleClick(project, index)
                                     : console.log("not allowed");
                                 }}
@@ -2184,8 +2182,7 @@ function ProjectsPage() {
                                         if (
                                           memberProfile?.role?.permissions?.projects
                                             ?.create_edit_delete_project ===
-                                            true ||
-                                          memberProfile?.role?.slug === "owner"
+                                            true
                                         ) {
                                           dispatch(
                                             updateStateData(DIRECT_UPDATE, true)
@@ -2232,8 +2229,7 @@ function ProjectsPage() {
                                     members={project.members}
                                     showRemove={
                                       memberProfile?.role?.permissions?.projects
-                                        ?.create_edit_delete_project === true ||
-                                      memberProfile?.role?.slug === "owner"
+                                        ?.create_edit_delete_project === true
                                         ? true
                                         : false
                                     }
@@ -2269,8 +2265,7 @@ function ProjectsPage() {
                                       onClick={() => {
                                         if (
                                           memberProfile?.role?.permissions?.projects
-                                            ?.view === true ||
-                                          memberProfile?.role?.slug === "owner"
+                                            ?.view === true
                                         ) {
                                           setIsActive(1);
                                         } else {
@@ -2329,8 +2324,18 @@ function ProjectsPage() {
                                                 borderStyle: "solid",
                                                 borderWidth: "1px",
                                               }}
-                                              onClick={() =>
-                                                toggleBadges(field)
+                                              onClick={() => {
+                                                if (
+                                                    memberProfile?.role?.permissions?.projects
+                                                      ?.create_edit_delete_project ===
+                                                      true
+                                                  ) {
+                                                    toggleBadges(field)
+                                                  }else {
+                                                    console.log("Not allowed");
+                                                  }
+                                              }
+                                                
                                               }
                                             >
                                               {
@@ -2416,6 +2421,8 @@ function ProjectsPage() {
                       null}
                   </tbody>
                 </Table>
+                :
+                <></>
               )}
               {
                 (!spinner &&
@@ -2545,13 +2552,17 @@ function ProjectsPage() {
             horizontal
             className="expand--icon gap-2 p-0 b-0 rounded-0 align-items-center ms-auto ms-md-0"
           >
-            <ListGroup.Item
-              className="d-lg-flex"
-              key={`settingskey`}
-              onClick={toggleCustomFields}
-            >
-              <LuSettings2 />
-            </ListGroup.Item>
+            {
+              (memberProfile?.role?.permissions?.projects
+                ?.manage_custom_fields === true) && (
+                <ListGroup.Item
+                  className="d-lg-flex"
+                  key={`settingskey`}
+                  onClick={toggleCustomFields}
+                >
+                  <LuSettings2 />
+                </ListGroup.Item>)
+            }
             {(memberProfile?.role?.permissions?.projects
               ?.create_edit_delete_project === true ||
               memberProfile?.role?.slug === "owner") && (
@@ -2941,7 +2952,7 @@ function ProjectsPage() {
         />
       )}
       {commonState?.membersModal && <MemberModal isedit={isEdit} />}
-      {commonState?.workflowmodal && <WorkFlowModal />}
+      {commonState?.workflowmodal && <WorkFlowModal tab={isActive === 0 ? 'new': 'current'} />}
       {commonState?.filesmodal && <FilesModal />}
       {showPreview && (
         <FilesPreviewModal
@@ -3042,7 +3053,7 @@ function ProjectsPage() {
                             }
                           </>
                           {
-                            (memberProfile?.role?.slug === "owner") && (
+                            (memberProfile?.role?.permissions?.projects?.view_unassigned === true) && (
                             <option value="unassigned">Unassigned</option>
                           )}
                         </Form.Select>
@@ -3106,7 +3117,7 @@ function ProjectsPage() {
                                       {member.label}
                                     </option>
                                   ))}
-                                  {memberProfile?.role?.slug === "owner" && (
+                                  {memberProfile?.role?.permissions?.projects?.view_unassigned === true && (
                                     <option value="unassigned" data-group="member">
                                       Unassigned
                                     </option>

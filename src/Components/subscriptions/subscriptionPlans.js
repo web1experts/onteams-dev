@@ -32,11 +32,19 @@ function SubscriptionPlans() {
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
   const [selectedCurrency, setSelectedCurrency] = useState('inr')
-  const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
+  // const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const [clientSecret, setClientSecret] = useState(null);
     const [mode, setMode] = useState('payment')
   const [showCheckout, setShowCheckout] = useState( false)
   const [ loader, setLoader] = useState(false)
+
+  const [search, setSearch] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const filtered = countries.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase())
+  );
+  
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -47,6 +55,8 @@ function SubscriptionPlans() {
     postal: "",
     country: "India",
     agree: false,
+    phoneCode: countries[0]?.phoneCode || "",
+    isoCode:  countries[0]?.isoCode || ""
   });
 
   const [memberFeeds, setMemberFeed] = useState([]);
@@ -96,10 +106,28 @@ function SubscriptionPlans() {
   useEffect(() => {
     setSpinner(true)
     dispatch(getOption('stripe_mode'))
+    // fetch("https://ipapi.co/json/")
+    //   .then(res => res.json())
+    //   .then(data => { console.log(data.country_code)
+    //     setSelectedCurrency(data?.country_code === "IN" ? "inr" : "usd");
+    //   });
     fetch("https://ipapi.co/json/")
-      .then(res => res.json())
-      .then(data => { console.log(data.country_code)
-        setSelectedCurrency(data?.country_code === "IN" ? "inr" : "usd");
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setSelectedCurrency(
+          data?.country_code === "IN" ? "inr" : "usd"
+        );
+      })
+      .catch((error) => {
+        console.error("Error fetching location:", error);
+
+        // fallback (important)
+        setSelectedCurrency("inr");
       });
     setTimeout(() => {
       dispatch(getActiveSubscription())
@@ -740,7 +768,7 @@ const showError = (name) => {
                               </Row>
               
                               <Row>
-                                <Form.Group className="position-relative mb-0 form-group">
+                                {/*<Form.Group className="position-relative mb-0 form-group">
                                   <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
                                   <Row>
                                     <Col className="d-flex align-items-start gap-3">
@@ -758,7 +786,75 @@ const showError = (name) => {
                                       </div>
                                     </Col>
                                   </Row>
-                                </Form.Group>
+                                </Form.Group>*/}
+                                <div className="position-relative">
+                                  {/* Input Row */}
+                                  <div className="d-flex gap-2">
+                                    
+                                    {/* Country Selector */}
+                                    <div
+                                      className="border rounded px-3 py-2 d-flex align-items-center cursor-pointer"
+                                      style={{ minWidth: "120px" }}
+                                      onClick={() => setShowDropdown(!showDropdown)}
+                                    >
+                                      <span className={`fi fi-${formData?.isoCode?.toLowerCase()} me-2`}></span>
+                                      {formData?.phoneCode}
+                                    </div>
+              
+                                    {/* Phone Input */}
+                                    <Form.Group className="position-relative mb-0 form-group">
+                                      <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
+                                      <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                                      {showError("phone")}
+                                    </Form.Group>
+                                  </div>
+              
+                                  {/* Dropdown */}
+                                  {showDropdown && (
+                                    <div
+                                      className="position-absolute bg-white border rounded mt-2 shadow"
+                                      style={{ width: "100%", zIndex: 1000 }}
+                                    >
+                                      
+                                      {/* Search */}
+                                      <div className="p-2">
+                                        <input
+                                          type="text"
+                                          className="form-control"
+                                          placeholder="Search countries..."
+                                          value={search}
+                                          onChange={(e) => setSearch(e.target.value)}
+                                        />
+                                      </div>
+              
+                                      {/* List */}
+                                      <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                                        {filtered.map((c) => (
+                                          <div
+                                            key={c.isoCode}
+                                            className="d-flex justify-content-between align-items-center px-3 py-2 hover-bg"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() => {
+                                              setFormData({
+                                                ...formData,
+                                                phoneCode: c.phoneCode,
+                                                isoCode: c.isoCode
+                                              })
+                                              setShowDropdown(false);
+                                              setSearch("");
+                                            }}
+                                          >
+                                            <div>
+                                              <span className={`fi fi-${c?.isoCode?.toLowerCase()} me-2`}></span>
+                                              {c.name}
+                                            </div>
+                                            <span>{c.phoneCode}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </Row>
               
                               <Form.Group  className="position-relative mb-0 form-group">
@@ -852,6 +948,7 @@ const showError = (name) => {
                                     type="checkbox"
                                     name="agree"
                                     className=""
+                                    id="terms-checkbox-input-sub-plans"
                                     checked={formData.agree}
                                     onChange={handleChange}
                                     label={

@@ -1401,6 +1401,36 @@ function SingleProject(props) {
                     )}
                   </Row>
                 </Form.Group>
+                <Form.Group className="mb-0 form-group pb-0 other__fields">
+                    {projectCustomFields?.length > 0 && (
+                      <>
+                        {/* <h4>Other Fields</h4> */}
+                        {projectCustomFields?.map((field, index) =>
+                          renderDynamicField({
+                            name: `custom_field[${field.name}]`,
+                            type: field.type,
+                            label: field.label,
+                            value:
+                              field.type === "date" &&
+                              fields[`custom_field[${field.name}]`]
+                                ? convertDDMMYYYYtoYYYYMMDD(
+                                    fields[`custom_field[${field.name}]`]
+                                  )
+                                : fields[`custom_field[${field.name}]`] || "",
+                            options: field?.options || [],
+                            range_options: field?.range_options || {},
+                            showPassword:
+                              showPasswordFields[
+                                `custom_field[${field.name}]`
+                              ] || false,
+                            toggleShowPassword: () =>
+                              toggleShowPassword(`custom_field[${field.name}]`),
+                            readOnly: true
+                          })
+                        )}
+                      </>
+                    )}
+                  </Form.Group>
               </Form>
             </div>
             <div className="project--form--actions">

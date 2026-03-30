@@ -19,6 +19,7 @@ import { GrDrag } from "react-icons/gr";
 import { dataObject } from '../../helpers/objectdata';
 import { useDropzone } from 'react-dropzone'
 import { useToast } from '../../context/ToastContext';
+import { getOwnerTransferRequest, updateOwnershipRequest } from '../../redux/actions/members.action';
 export function AlertDialog(props) {
   const [open, setOpen] = useState(false);
   const [ loader, setLoader ] = useState(false);
@@ -64,13 +65,15 @@ export function AlertDialog(props) {
 }
 
 export function TransferOnwerShip(props) { 
-  // const addToast = useToast();
+  const addToast = useToast();
   useFilledClass('.form-floating .form-control');
   const [open, setOpen] = React.useState(false );
   const [selectedmember, setSelectedmember] = useState(false )
+  const [hasOwnershipRequest, setHasOwnershipRequest] = useState({})
   const currentMember  =  props?.currentMember || {} 
   const [ loader, setLoader ]= useState( false )
   const workspace = useSelector(state => state.workspace)
+  const memberapiResult = useSelector((state) => state.member);
   const dispatch = useDispatch()
   const handleOpen = () => {
     setOpen(true);
@@ -83,6 +86,9 @@ export function TransferOnwerShip(props) {
   const handleMemberChange = ({ target: { name, value } }) => {
     setSelectedmember( value )
   }
+  useEffect(() =>{
+    dispatch(getOwnerTransferRequest())
+  }, [dispatch])
 
   useEffect(() => {
     if( props.showdialog ){
@@ -97,7 +103,23 @@ export function TransferOnwerShip(props) {
     }
   },[workspace])
 
+  useEffect(() => {
+      setHasOwnershipRequest(memberapiResult?.OwnershipRequest)
+    }, [memberapiResult?.OwnershipRequest])
+
+    const cancelOwnerInvite = () => {
+      dispatch(updateOwnershipRequest({
+        id: hasOwnershipRequest?._id, status: 'reject'
+      }));
+      handleClose()
+    }
   const saveOwnership = () => {
+    
+    if(selectedmember === ''){
+      addToast("Please select a member.", 'danger');
+      return false;
+    }
+    
     setLoader(true)
     dispatch( updateOwnership({ memberId: selectedmember, companyId: currentMember?.company?._id, removeMemberId: currentMember._id}))
     setLoader(false)
@@ -120,46 +142,59 @@ export function TransferOnwerShip(props) {
           
           <div className='modalBody'>
            <div className='setStatusWrapper'>
-              <form>
-                  <div className='modalRow'>
-                      <div className='modalCol'> 
-                      {
-                        props.members && props.members.length > 0 ?
-                        <>
-                        <div className='form-group'>
-                        <label id="demo-simple-select-required-label">Select a member</label>
-                        <Form.Select className="form-control custom-selectbox" id="members"
-                          value={selectedmember} onChange={handleMemberChange} name="member">
-                            <option key='defaultkey' value={false}>
-                                  Select a member
-                                </option>
-                         {
-                            props.members.map((member) =>
-                              member._id !==currentMember._id ? (   // 👈 your condition here
-                                <option key={member._id} value={member._id}>
-                                  {member.name}
-                                </option>
-                              ) : null
-                            )
-                          }
+            
+              
+                 <> 
+                  {
+                  (!hasOwnershipRequest?._id) && (
+                 <p>You are currently the Owner. To leave the team, please select a member to transfer ownership. An invitation will be sent to the selected member, and you will be removed from the team once they accept the request.</p>
+                   )}
+                <form>
+                    <div className='modalRow'>
+                        <div className='modalCol'> 
+                       
+                          {
+                            (!hasOwnershipRequest?._id) && (
+                          <div className='form-group'>
+                            <label id="demo-simple-select-required-label">Select a member</label>
+                            <Form.Select className="form-control custom-selectbox" id="members"
+                              value={selectedmember} onChange={handleMemberChange} name="member">
+                                <option key='defaultkey' value={""}>
+                                      Select a member to make owner
+                                    </option>
+                            {
+                                props?.members?.map((member) =>
+                                  member._id !==currentMember._id ? (   // 👈 your condition here
+                                    <option key={member._id} value={member._id}>
+                                      {member.name}
+                                    </option>
+                                  ) : null
+                                )
+                              }
 
 
-                        </Form.Select>
+                            </Form.Select>
+                          </div>
+                          )}
+                          <div>
+                            {(hasOwnershipRequest?._id) ? (
+                              <>
+                                <p>Ownership transfer is already in progress. An invitation has been sent to the selected member. Please wait for them to accept.</p>
+                                <Button variant="danger" onClick={cancelOwnerInvite}>Cancel Invite</Button>
+                              </>
+                              )
+                              :
+                              <>
+                                <small>Changing the role will update this member's permissions to match the selected role's defaults.</small>
+                                <Button className='primary btn' onClick={saveOwnership} disabled={loader || selectedmember === false} >{ loader ? 'Please wait..' : 'Transfer'}</Button>
+                              </>
+                            }
+                          </div>
                         </div>
-                        <div>
-                        <Button className='primary btn' onClick={saveOwnership} disabled={loader || selectedmember === false} >{ loader ? 'Please wait..' : 'Transfer'}</Button>
-                        </div>
-                        </>
-                        :
-                        <>
-                          <h5>
-                            You don't have any members.
-                        </h5>
-                        </>
-                      }
-                      </div>
-                  </div>
-              </form>
+                    </div>
+                </form>
+                </>
+            
           </div>
           </div>
           </Modal.Body>
@@ -476,7 +511,7 @@ export const  WorkFlowModal =  (props) => {
   const modalstate = useSelector(state => state.common.workflowmodal);
   const commonState = useSelector( state => state.common)
   const [formtype, setFormType] = useState(commonState.active_formtype || false)
-  const [ activeTab, setActiveTab ] = useState('current')
+  const [ activeTab, setActiveTab ] = useState(props?.tab || 'current')
   const [showWorkflow, setWorkflowShow] = useState(false);
   const [fields, setFields] = useState({color: '#3b82f6'})
   const [ error, setErrors ] = useState({})
@@ -612,6 +647,7 @@ export const  WorkFlowModal =  (props) => {
 
   const handleCancelClick = () => {
     setWorkflowFields({name: '', tabs: []});
+    setSelectedWorkflow({})
   };
 
   const saveWorkflow = () => {
@@ -686,50 +722,7 @@ export const  WorkFlowModal =  (props) => {
             { title: fields['workspace_title'], color: fields['color'] } // append a new tab object
           ],
         });
-
-        
       }else{
-    
-        // // Get the last tab and its order based on the type (object or simple array)
-        // const lastTab = workflowModalState?.workflow?.tabs.length 
-        //   ? workflowModalState?.workflow?.tabs[workflowModalState?.workflow?.tabs.length - 1] 
-        //   : null;
-      
-        // const lastOrder = (typeof lastTab === 'object' && lastTab?.order !== undefined)
-        //   ? lastTab.order
-        //   : workflowModalState?.workflow?.tabs.length - 1; // Fallback to length-based index if tabs are a simple array
-      
-        // const newOrder = lastTab ? lastOrder + 1 : 0; // Set the order for the new tab
-      
-        // // Create the new tab object
-        // const newTab = (typeof lastTab === 'object' && lastTab !== null) ? {
-        //   title: fields['workspace_title'],
-        //   _id: false,
-        //   order: newOrder,
-        // } : fields['workspace_title']; // Use simple title if tabs is a simple array
-      
-        // // Insert the new tab before the last tab
-        // const updatedTabs = Array.isArray(workflowModalState?.workflow?.tabs)
-        //   ? [
-        //       ...workflowModalState?.workflow?.tabs.slice(0, -1), // All tabs except the last one
-        //       newTab, // Insert the new tab
-        //       lastTab // Add the last tab
-        //     ]
-        //   : [newTab]; // If tabs is empty, start with just the new tab
-      
-        // // Update the state with the new array
-        // setWorkflowModalState(prevWorkflowModalState => ({
-        //   ...prevWorkflowModalState,
-        //   workflow: {
-        //     ...prevWorkflowModalState?.workflow,
-        //     tabs: updatedTabs.map((tab, index) => {
-        //       // If tab is an object, update its order; otherwise, return simple tab
-        //       return typeof tab === 'object'
-        //         ? { ...tab, order: index }
-        //         : tab;
-        //     }) // Ensure correct order sequence
-        //   }
-        // }));
         // Get last tab (if any)
         const tabs = workflowModalState?.workflow?.tabs || [];
         const lastTab = tabs.length ? tabs[tabs.length - 1] : null;
@@ -964,12 +957,18 @@ export const  WorkFlowModal =  (props) => {
             <Modal.Title>Workflow Settings</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            {commonState.active_formtype === "edit_project" &&
+            {/*commonState.active_formtype === "edit_project" &&
               <ListGroup horizontal className="field__tabs">
+                {
+                  (activeTab === 'current') ? 
                   <ListGroup.Item className={`btn--view ${activeTab === 'current' ? 'active' : ''}`} onClick={() => setActiveTab('current')}>Selected Workflow</ListGroup.Item>
-                  <ListGroup.Item className={`btn--view ${activeTab === 'new' ? 'active' : ''}`} onClick={() => setActiveTab('new')}>Add New</ListGroup.Item>
+                  :
+                  <></>
+                  // <ListGroup.Item className={`btn--view ${activeTab === 'new' ? 'active' : ''}`} onClick={() => setActiveTab('new')}>Add New</ListGroup.Item>
+                }
+                  
               </ListGroup>
-            }
+            */}
               { activeTab === 'current' && commonState.active_formtype !== "edit_project" &&
                 <Form.Group className="mb-3 form-group">
                     <Form.Label>Select Workflow</Form.Label>
@@ -1140,7 +1139,7 @@ export const  WorkFlowModal =  (props) => {
               <>
               <div className="field--options">
                 <div className="add--new--field">
-                  <h5>Edit Workflow</h5>
+                  <h5>{Object.keys(selectedWorkflow)?.length > 0 ? 'Edit' : 'Add' } Workflow</h5>
                   <Form ref={formRef}>
                     <Row>
                       <Col>
@@ -1162,9 +1161,11 @@ export const  WorkFlowModal =  (props) => {
                         <Form.Group className="mb-3">
                         <Form.Label><strong>Taskboard setup</strong></Form.Label>
                         <p>Add, remove, reorder and rename the worksteps to reflect the way you work.</p>
-                        <Form.Control.Feedback type="invalid">
-                        {workflowErrors.tabs}
-                        </Form.Control.Feedback>
+                        <div className={(workflowErrors.tabs && workflowErrors.tabs !== "" ? 'is-invalid': '')}></div>
+                          <Form.Control.Feedback type="invalid">
+                          {workflowErrors.tabs}
+                          </Form.Control.Feedback>
+                        
                         {
                           
                         <>

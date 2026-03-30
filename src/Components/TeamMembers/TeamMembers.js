@@ -4,15 +4,15 @@ import debounce from "lodash.debounce";
 import { Container, Row, Col, Button, Modal, Alert, Form, FloatingLabel, Card, ListGroup, Table, Accordion, Dropdown, FormGroup, Badge} from "react-bootstrap";
 import { BadgesModal } from "../modals/badges";
 import { FaList, FaPlus, FaEllipsisV, FaCheck } from "react-icons/fa";
-import { FiEdit, FiMail, FiSidebar, FiTrash2, FiVideo, FiCamera, FiMonitor, FiCheck, FiUsers} from "react-icons/fi";
+import { FiEdit, FiMail, FiSidebar, FiTrash2, FiVideo, FiCamera, FiMonitor, FiUsers} from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { RiUserSettingsLine } from "react-icons/ri";
-import { LuFolderOpen, LuUser, LuSettings2, LuUsers } from 'react-icons/lu';
+import { LuUser, LuSettings2, LuUsers } from 'react-icons/lu';
 import { TbUsersPlus } from "react-icons/tb";
 import { BsBriefcase, BsEye, BsGrid, BsEyeSlash} from "react-icons/bs";
 import { GrExpand } from "react-icons/gr";
 import { MdOutlineSearch, MdOutlineClose, MdDragIndicator, MdSearch, MdFilterList } from "react-icons/md";
-import { getMemberdata } from "../../helpers/commonfunctions";
+import { getMemberdata, roleHelperText } from "../../helpers/commonfunctions";
 import { Listmembers, deleteMember, updateMember, listCompanyinvite} from "../../redux/actions/members.action";
 import { toggleSidebar, toggleSidebarSmall} from "../../redux/actions/common.action";
 import { leaveCompany } from "../../redux/actions/workspace.action";
@@ -22,9 +22,9 @@ import { getFieldRules, validateField } from "../../helpers/rules";
 import { createMember, reorderedMember, getOwnerTransferRequest, updateOwnershipRequest } from "../../redux/actions/members.action";
 import Invitation from "./Invitation";
 import { AlertDialog, TransferOnwerShip } from "../modals";
-import { selectboxObserver, formatDateToDDMMYYYY, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
+import { selectboxObserver, formatDateToDDMMYYYY, groupSelectboxObserver, convertDDMMYYYYtoYYYYMMDD } from "../../helpers/commonfunctions";
 import { socket, currentMemberProfile } from "../../helpers/auth";
-import { permissionModules, permissionsLabel } from "../../helpers/permissionsModules";
+import { permissionModules } from "../../helpers/permissionsModules";
 import { CustomFieldModal } from "../modals/customFields";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
@@ -34,6 +34,7 @@ import { logout } from "../../redux/actions/auth.actions";
 import { getActiveSubscription } from "../../redux/actions/subscription.action";
 import { getTeams } from "../../redux/actions/team.action";
 import { useToast } from "../../context/ToastContext";
+import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 
 function TeamMembersPage() {
   const inputRef = useRef(null);
@@ -41,6 +42,7 @@ function TeamMembersPage() {
   const currentMember = getMemberdata();
   const addToast = useToast();
   const [isActive, setIsActive] = useState(0);
+  const [filters, setFilters] = useState({})
   const [activeItems, setActiveItems] = useState([]);
   const [newOwnerId, setNewOwnerId] = useState(null)
   const [hasOwnershipRequest, setHasOwnershipRequest] = useState({})
@@ -74,7 +76,7 @@ function TeamMembersPage() {
   const handleClickMember = (memberId) => {
     setNewOwnerId(memberId)
   }
-
+const [assignedTeamsOrMembers, setAssignedTeamsOrMembers] = useState({})
 const [teamfeed, setTeamFeed] = useState([]);
 const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const subscriptionState = useSelector((state) => state.subscription);
@@ -111,7 +113,6 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const [show, setShow] = useState(false);
   const handleClose = () => {
     requestAnimationFrame(() => {
-      setFields({ email: "", name: "", role: "" });
       setErrors({});
       setShow(false);
     });
@@ -154,9 +155,9 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const [roles, setRoles] = useState([]);
   const handleListMember = async () => {
     if (activeTab === "Members") {
+      setShowloader(true);
       setMemberFeed([]);
-
-      await dispatch(Listmembers(currentPage, searchTerm));
+      await dispatch(Listmembers({currentPage, searchTerm, ...filters}));
       await dispatch(
         listCompanyinvite(0, 'company')
       );
@@ -180,7 +181,13 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
       selectboxObserver()
     },500)
     
-    handleClickRoles(roles?.[0]?._id || '')
+    if(selectedMember?.role?._id === roles?.[0]?._id ){
+      handleClickRoles(roles?.[1]?._id)
+    }else{
+      handleClickRoles(roles?.[0]?._id)
+    }
+    
+    
   }
 
   const handledeleteMember = async () => {
@@ -241,6 +248,7 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
       setShowloader(true);
       handleListMember();
       dispatch(getOwnerTransferRequest())
+      groupSelectboxObserver()
     }
     dispatch(fetchCustomFields({ module: "members" }));
     
@@ -255,6 +263,7 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
+    dispatch(getAssignedTeamsOrMembersByRole(memberProfile?.role?._id))
     dispatch(getTeams());
   }, [dispatch])
 
@@ -273,15 +282,7 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   
   useEffect(() => {
   if (!fields?.role && roles?.length > 0) {
-    // const defaultRoleId = roles[0]._id;
-
-    // // Simulate handleChange for default role
-    // handleChange({ target: { name: "role", value: defaultRoleId } });
-
-    // // Set permissions for default role
-    // setPermissions(roles[0].permissions || []);
     const memberRole = roles.find((role) => role.slug === "member");
-
     if (memberRole) {
       handleChange({ target: { name: "role", value: memberRole?._id } });
 
@@ -289,6 +290,19 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
     }
   }
 }, [roles]);
+
+
+useEffect(() => {
+  if (show === false && roles?.length > 0) {
+    setTimeout(() => {
+      const memberRole = roles.find((role) => role.slug === "member");
+      if (memberRole) {
+        handleChange({ target: { name: "role", value: memberRole?._id } });
+      }
+    },700)
+    
+  }
+}, [show]);
 
 useEffect(() => {
   
@@ -361,23 +375,32 @@ useEffect(() => {
         setMemberFeed(updatedMemberFeeds);
       }
     }
-      if (apiPermission.savedrole) {
-        const savedrole = apiPermission.savedrole;
-        
-        setRoles((prev) => {
-          const index = prev.findIndex((role) => role._id === savedrole._id);
-          if (index !== -1) {
-            // Replace existing role
-            return prev.map((role) =>
-              role._id === savedrole._id ? savedrole : role,
-            );
-          } else {
-            // Add new role
-            return [...prev, savedrole];
-          }
-        });
-      }
+    if (apiPermission.savedrole) {
+      const savedrole = apiPermission.savedrole;
+      
+      setRoles((prev) => {
+        const index = prev.findIndex((role) => role._id === savedrole._id);
+        if (index !== -1) {
+          // Replace existing role
+          return prev.map((role) =>
+            role._id === savedrole._id ? savedrole : role,
+          );
+        } else {
+          // Add new role
+          return [...prev, savedrole];
+        }
+      });
+    }
   }, [apiPermission]);
+
+  useEffect(() => {
+    if(apiPermission?.assignedTeamsOrMembers){
+      setAssignedTeamsOrMembers(apiPermission?.assignedTeamsOrMembers)
+      setTimeout(() => {
+        groupSelectboxObserver()
+      },700)
+    }
+  }, [apiPermission?.assignedTeamsOrMembers])
 
   useEffect(() => {
     if (
@@ -427,6 +450,7 @@ useEffect(() => {
   }, [memberFeed]);
 
   useEffect(() => {
+    
     if (selectedMember !== null) {
       const cleanedMeta = { ...selectedMember?.memberMeta };
 
@@ -660,25 +684,14 @@ useEffect(() => {
     }
   }, [rows]);
 
+  useEffect(() => {
+    handleListMember()
+  }, [filters])
+
   const [permissions, setPermissions] = useState({});
   const [expanded, setExpanded] = useState({});
-  const handleToggleExpandAll = () => {
-    const areAllExpanded = permissionModules.every((mod) => expanded[mod.slug]);
 
-    const newExpandedState = {};
-    permissionModules.forEach((mod) => {
-      newExpandedState[mod.slug] = !areAllExpanded;
-    });
 
-    setExpanded(newExpandedState);
-  };
-
-  const toggleExpand = (module) => {
-    setExpanded((prev) => ({
-      ...prev,
-      [module]: !prev[module],
-    }));
-  };
 
   const toggleView = (module) => {
     const isChecked = !(permissions?.[module]?.view || false);
@@ -744,6 +757,11 @@ useEffect(() => {
     formData.append(`role`, fields?.role);
 
     if(selectedMember?.role?.slug === memberProfile?.role?.slug){
+      if(!newOwnerId){
+        setLoader(false)
+        addToast("Please select a member.", "danger");
+        return;
+      }
       formData.append(`transfer_role_to`, newOwnerId);
       formData.append(`ownership_transfer`, true);
     }
@@ -844,6 +862,20 @@ useEffect(() => {
     }));
   }
 
+  const handlefilterchange = (name, value) => {
+      setFilters((prev) => {
+        const updated = { ...prev };
+        if (name === "member") {
+          delete updated.team;   // remove team when member changes
+        }
+        if (name === "team") {
+          delete updated.member;    // remove member when team changes
+        }
+        updated[name] = value;
+        return updated;
+      }); 
+  };
+
   const handleDragEnd = (result) => {
     const { source, destination, draggableId } = result;
     // If there's no destination (i.e., the item was dropped outside), do nothing
@@ -889,12 +921,118 @@ useEffect(() => {
                   <ListGroup horizontal>
                     <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
                     {(memberProfile?.role?.permissions?.members
-                      ?.create_edit_delete === true ||
-                      memberProfile?.role?.slug === "owner") && (
+                      ?.create_edit_delete === true) && (
                       <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
                     )}
+                    
                   </ListGroup>
+                  {
+                      (activeTab == "Members") && (
+                        
+                        ( memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===  true) ? 
+                          (
+                            <ListGroup.Item
+                              className={
+                                "ms-auto d-none d-xl-flex"
+                              }
+                              key="member-filter-list"
+                            >
+                              <Form.Select
+                                className="custom-selectbox"
+                                onChange={(event) => 
+                                  handlefilterchange("member", event.target.value)
+                                }
+                                value={filters?.["member"] || "all"}
+                                
+                              >
+                                <option
+                                  value={memberProfile?._id}
+                                  key="my-info-option"
+                                >
+                                  Me
+                                </option>
+                                
+                                {(assignedTeamsOrMembers?.members?.length > 0 ) && (
+                                  <option key={`member-info-all`} value={"all"}>
+                                    All Members
+                                  </option>
+                                )}
+                                <>   
+                                  {  assignedTeamsOrMembers?.members?.map((member, index) => (
+                                        <option
+                                          key={`member-projects-${index}`}
+                                          value={member._id}
+                                        >
+                                          {member.name}
+                                        </option>
+                                      ))
+    
+                                  }
+                                </>
+                                
+                              </Form.Select>
+                            </ListGroup.Item>
+                            )
+                            :
+                            (memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                                  true) ?
+                            <ListGroup.Item 
+                            className={
+                              "ms-auto d-none d-xl-flex"
+                            }
+                            key="teams-filter-list">
+                          <Form.Select
+                              className="custom-group-selectbox"
+                              onChange={(event) => {
+                                const group = event.target.selectedOptions[0].dataset.group;
+                                handlefilterchange(group, event.target.value);
+                              }}
+                              value={filters?.["member"] || "all"}
+                            >
+                                <>
+                                  {/* MEMBERS GROUP */}
+                                  <optgroup label="Members">
+                                    <option value={memberProfile?._id} data-group="member">
+                                      My Details
+                                    </option>
+                                    <option value="all" data-group="member">
+                                      All Members
+                                    </option>
+                                    {assignedTeamsOrMembers?.members?.map((member) => (
+                                          <option
+                                            key={member._id}
+                                            value={member._id}
+                                            data-group="member"
+                                          >
+                                            {member.name}
+                                          </option>
+                                        ))}
+                                        
+                                  </optgroup>
+                                  <optgroup label="Teams">
+    
+                                    {assignedTeamsOrMembers?.teams?.map((team, index) => {
+                                        return (
+                                          <option
+                                            key={`team-info-${index}`}
+                                            value={team._id}
+                                            data-group="team"
+                                          >
+                                            {team.name}
+                                          </option>
+                                        )
+                                    })}
+                                  </optgroup>
+                                </>
+                              
+                            </Form.Select>
+                          </ListGroup.Item>
+                          :<></>
+                          
+                      )
+                    }
                   <ListGroup.Item className="d-none d-xl-flex ms-3">
+                    
                     <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                       <Form.Group className="mb-0 form-group">
                         <MdOutlineSearch />
@@ -910,9 +1048,13 @@ useEffect(() => {
                   </ListGroup>
                   <ListGroup horizontal className={isActive ? "d-none" : "d-flex bg-white expand--icon"}>
                     <ListGroup.Item className="d-flex d-xl-none" onClick={handleSearchShow}><MdFilterList /></ListGroup.Item>
-                    <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>
                     {
-                      (memberProfile?.role?.slug === "owner" || memberProfile?.role?.permissions?.members?.update_permissions === true) && (
+                        (memberProfile?.role?.permissions?.members
+                        ?.manage_custom_fields === true) && (
+                     <ListGroup.Item className="d-lg-flex" key={`settingskey`} onClick={toggleCustomFields}><LuSettings2 /></ListGroup.Item>)
+                    }
+                    {
+                      (memberProfile?.role?.permissions?.members?.manage_teams === true || memberProfile?.role?.permissions?.members?.update_permissions === true) && (
                         <ListGroup.Item className="d-lg-flex" onClick={handleSettingShow}><RiUserSettingsLine /></ListGroup.Item>
                       )
                     }
@@ -922,15 +1064,9 @@ useEffect(() => {
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <ListGroup.Item className="btn btn-primary"  onClick={() => {
-                          // if (
-                          //   activeSubscription?.planId === 'free' &&
-                          //   (invitationsTotal + memberFeeds?.length === activeSubscription?.quantity) || activeSubscription?.quantity <=
-                          //   invitationsTotal + memberFeeds?.length
-                          // ) {
-                          //   navigate('/subscription-plans', { replace: true });
-                          // } else {
+                          
                             handleShow();
-                          // }
+                         
                         }}><FaPlus /></ListGroup.Item>
                     )}
                   </ListGroup>
@@ -1054,7 +1190,18 @@ useEffect(() => {
                                                         borderWidth: '1px',
                                                         borderStyle: 'solid'
                                                       }}
-                                                      onClick={() => toggleBadges(field)}
+                                                      onClick={() => {
+                                                          if (
+                                                              memberProfile?.role?.permissions?.members
+                                                                ?.create_edit_delete ===
+                                                                true
+                                                            ) {
+                                                              toggleBadges(field)
+                                                            }else {
+                                                              console.log("Not allowed");
+                                                            }
+                                                        }
+                                                        }
                                                     >
                                                       {
                                                         member?.memberMeta?.[fieldname]
@@ -1123,45 +1270,69 @@ useEffect(() => {
             <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
             <div className="projecttitle">
               <Dropdown>
-                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                    <div className="title--initial">
-                      {(selectedMember?.avatar && selectedMember?.avatar !== null ) ? 
-                        <span><img src={selectedMember?.avatar} alt={'member-avatar'} /></span>
-                        :
-                      selectedMember?.name?.charAt(0)}
+                {
+                  (memberFeeds && memberFeeds.length === 1 ) ? 
+                    <>
+                    <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
+                      <div className="title--initial">
+                        {(selectedMember?.avatar && selectedMember?.avatar !== null ) ? 
+                          <span><img src={selectedMember?.avatar} alt={'member-avatar'} /></span>
+                          :
+                        selectedMember?.name?.charAt(0)}
+                        </div>
+                      <div className="title--span flex-column align-items-start gap-0">
+                          <h3>
+                            <strong>{selectedMember?.name}</strong>
+                            <span>{selectedMember?.role?.name}</span>
+                          </h3>
                       </div>
-                    <div className="title--span flex-column align-items-start gap-0">
-                        <h3>
-                          <strong>{selectedMember?.name}</strong>
-                          <span>{selectedMember?.role?.name}</span>
-                        </h3>
-                    </div>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    <div className="drop--scroll">
-                      {memberFeeds &&
-                        memberFeeds.length > 0 &&
-                        memberFeeds.map((member, idx) => (
-                          <Dropdown.Item onClick={() => {handleTableToggle(member);setIsActive(true); }} key={`item-${idx}`} className={(selectedMember?._id === member?._id) ? 'active-project': ''}>
-                            <div className="title--initial">
-                              {(member?.avatar && member?.avatar !== null ) ? 
-                                <span><img src={member?.avatar} alt={'member-avatar'} /></span>
-                                :
-                              member?.name.charAt(0)}
-                              </div>
-                            <div className="title--span flex-column align-items-start gap-0">
-                              <strong>{member?.name}</strong>
-                              <span>{member.role?.name}</span>
-                            </div>
-                          </Dropdown.Item>
-                        ))}
-                    </div>
-                </Dropdown.Menu>
+                      </button>
+                    </>
+                  :
+                  <>
+                    <Dropdown.Toggle variant="link" id="dropdown-basic">
+                        <div className="title--initial">
+                          {(selectedMember?.avatar && selectedMember?.avatar !== null ) ? 
+                            <span><img src={selectedMember?.avatar} alt={'member-avatar'} /></span>
+                            :
+                          selectedMember?.name?.charAt(0)}
+                          </div>
+                        <div className="title--span flex-column align-items-start gap-0">
+                            <h3>
+                              <strong>{selectedMember?.name}</strong>
+                              <span>{selectedMember?.role?.name}</span>
+                            </h3>
+                        </div>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        <div className="drop--scroll">
+                            {memberFeeds &&
+                            memberFeeds.length > 0 &&
+                            memberFeeds.map((member, idx) => (
+                              <Dropdown.Item onClick={() => {handleTableToggle(member);setIsActive(true); }} key={`item-${idx}`} className={(selectedMember?._id === member?._id) ? 'active-project': ''}>
+                                <div className="title--initial">
+                                  {(member?.avatar && member?.avatar !== null ) ? 
+                                    <span><img src={member?.avatar} alt={'member-avatar'} /></span>
+                                    :
+                                  member?.name.charAt(0)}
+                                  </div>
+                                <div className="title--span flex-column align-items-start gap-0">
+                                  <strong>{member?.name}</strong>
+                                  <span>{member.role?.name}</span>
+                                </div>
+                              </Dropdown.Item>
+                            ))}
+                            
+                        </div>
+                    </Dropdown.Menu>
+                  </>
+                }
+                
               </Dropdown>
             </div>
             <ListGroup horizontal className="expand--icon ms-auto">
               <ListGroup.Item onClick={handleToggles} className="d-none d-lg-flex"><GrExpand /></ListGroup.Item>
-              <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0); setSelectedMember({});dispatch(toggleSidebarSmall( false))}}><MdOutlineClose /></ListGroup.Item>
+              <ListGroup.Item className="btn btn-primary" key={`closekey`} onClick={() => {setIsActive(0); setSelectedMember({});dispatch(toggleSidebarSmall( false));setIsEditing(false)}}><MdOutlineClose /></ListGroup.Item>
             </ListGroup>
           </div>
 
@@ -1178,46 +1349,61 @@ useEffect(() => {
                 <Card.Body className="p-0">
                   <Card.Title>
                     <LuUser /> Member Information
-                     
-                      <Dropdown>
-                        <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                          <FaEllipsisV />
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                          {
-                            (memberProfile?.role?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                            <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>)
-                          }
-                          {
-                            (memberProfile?.role?.permissions?.members?.update_permissions === true || memberProfile?.role?.slug === "owner") && (
-                              <>
-                              {
-                                (selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === "owner" || selectedMember?.role?.slug !== 'owner') && (
-                                  <Dropdown.Item onClick={() => handleRoleShow()} className="d-flex align-items-center gap-1"><LuUser className="me-1" /> Change Role</Dropdown.Item>
-                                )
-                              }
-                                
-                                <Dropdown.Item onClick={() => handleTeamsShow()} className="d-flex align-items-center gap-1"><LuUsers className="me-1" /> Change Teams</Dropdown.Item>
-                              </>
-                            )
-                          }
-                          {
-                            (memberProfile?.role?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.slug === "owner") && (
-                              <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1 text-danger">
-                              {
-                                memberProfile?._id === selectedMember?._id ? 
-                                <><FiTrash2 /> Leave</>
-                                :
-                              ( memberProfile?._id !== selectedMember?._id && selectedMember?.role?.slug !== 'owner') ? 
-                                <><FiTrash2 /> Delete</>
-                                :
-                                <></>
-                              }
-                          
-                           </Dropdown.Item>)
-                          }
-                        </Dropdown.Menu>
-                      </Dropdown>
+                      {
+                        
+                      
+                        <Dropdown>
+                          <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                            <FaEllipsisV />
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu>
+                            {
+                              (memberProfile?.role?.permissions?.members?.create_edit_delete === true) && (
+                              <Dropdown.Item onClick={() => setIsEditing(true)} className="d-flex align-items-center gap-1"><FiEdit className="me-1" /> Edit</Dropdown.Item>)
+                            }
+                            {
+                              (memberProfile?.role?.permissions?.members?.update_permissions === true) && (
+                                <>
+                                {
+                                  (selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === "owner" || selectedMember?.role?.slug !== 'owner') && (
+                                    <Dropdown.Item onClick={() => handleRoleShow()} className="d-flex align-items-center gap-1"><LuUser className="me-1" /> Change Role</Dropdown.Item>
+                                  )
+                                }
+                                </>
+                              )
+                            }
+                            {
+                              (memberProfile?.role?.permissions?.members?.manage_teams === true) && (
+                                <>
+                                {
+                                  (selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === "owner" || selectedMember?.role?.slug !== 'owner') && (
+                                    <Dropdown.Item onClick={() => handleTeamsShow()} className="d-flex align-items-center gap-1"><LuUsers className="me-1" /> Change Teams</Dropdown.Item>
+                                  )
+                                }
+                                </>
+                              )
+                            }
+                            <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1 text-danger">
+                              <FiTrash2 /> Leave
+                            </Dropdown.Item>
+                            {
+                              (memberProfile?.role?.permissions?.members?.create_edit_delete === true) && (
+                                <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1 text-danger">
+                                {
+                                  // memberProfile?._id === selectedMember?._id ? 
+                                  // <><FiTrash2 /> Leave</>
+                                  // :
+                                ( memberProfile?._id !== selectedMember?._id && selectedMember?.role?.slug !== 'owner') ? 
+                                  <><FiTrash2 /> Remove Member</>
+                                  :
+                                  <></>
+                                }
+                            
+                            </Dropdown.Item>)
+                            }
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      }
                   
                   </Card.Title>
                   {isEditing === false ? (
@@ -1252,16 +1438,7 @@ useEffect(() => {
                                 if (selectedMember?.teams?.includes(team?._id)) {
                                   return (
                                     <Badge bg="primary" className="me-2" key={team?._id}>{team?.name}</Badge>
-                                    // <Form.Check
-                                    //   key={team?._id}
-                                    //   inline
-                                    //   label={team?.name}
-                                    //   type="checkbox"
-                                    //   id={`inline-${team?._id}`}
-                                    //   checked={true}
-                                    //   disabled
-                                    //   readOnly
-                                    // />
+                                    
                                   );
                                 }
 
@@ -1301,38 +1478,44 @@ useEffect(() => {
                               {selectedMember?.email}
                             </p>
                           </ListGroup.Item>
-                          {/*(memberProfile?.role?.permissions?.members
-                            ?.update_permissions === true &&
-                            selectedMember?._id !== memberProfile?._id) ? (
-                            <ListGroup.Item>
-                              <Form.Group className="mb-0 form-group pb-0">
-                                <Form.Label>Role</Form.Label>
-                                <Form.Select
-                                  className={
-                                    errors["role"]
-                                      ? "input-error form-control custom-selectbox conditional-box"
-                                      : "form-control custom-selectbox conditional-box"
-                                  }
-                                  value={fields?.role || ""}
-                                  onChange={handleChange}
-                                  name="role"
-                                >
-                                  <option value="">None</option>
-                                  {roles.map((role, index) => (
-                                    <option key={index} value={role._id}>
-                                      {role.name}
-                                    </option>
-                                  ))}
-                                </Form.Select>
-                              </Form.Group>
-                            </ListGroup.Item>
-                          ) : ( */}
+                          
                             <ListGroup.Item>
                               <span className="info--icon">
                                 <BsBriefcase />
                               </span>
                               <p>
                                 <small>Role</small>
+                                
+                                {/*
+                                  (memberProfile?.role?.permissions?.members?.update_permissions === true) ?
+                                  <div className="form-row pb-3" key={'row-role'}>
+                                    <Form.Group className="mb-0 form-group">
+                                      <Form.Select
+                                      placeholder="Select role"
+                                      aria-label="Role"
+                                      name="role"
+                                      className={"form-control custom-selectbox"}
+                                      value={fields?.role || roles?.[0]?._id || ""}
+                                      onChange={(e) => {
+                                        handleChange(e);
+                                      }}
+                                    >
+                                      {roles?.map((role) => (
+                                        <option key={role._id} value={role._id}>
+                                          {(() => {
+                                            const helperText = roleHelperText(role.slug);
+                                            return helperText
+                                              ? `${role.name} - ${helperText}`
+                                              : role.name;
+                                          })()}
+                                        </option>
+                                      ))}
+                                    </Form.Select>
+                                  </Form.Group>
+                                  </div>
+                                :
+                                
+                                */}
                                 {selectedMember?.role?.name}
                               </p>
                             </ListGroup.Item>
@@ -1347,55 +1530,59 @@ useEffect(() => {
                             </span>
                             <p>
                               <small>Teams</small>
-                              {/*teamfeed?.map(
+                              {
+                               /* (memberProfile?.role?.permissions?.members?.manage_teams === true) ?
+                              teamfeed?.map(
                                 (team) => (
+                                  <>
+                                  <span className="team--color" style={{ background: team?.color }}></span> 
                                   <Form.Check
                                     inline
                                     label={team?.name}
                                     name="selected_teams[]"
                                     type="checkbox"
                                     id={`inline-${team?._id}`}
-                                    checked={fields?.selected_teams?.includes(team?._id)}
-                                    disabled
-                                    readOnly
-                                    // onChange={(e) => {
-                                    //   if(memberProfile?.role?.permissions?.members?.update_permissions === true &&
-                                    //   selectedMember?._id !== memberProfile?._id){
-                                    //     handleChange({
-                                    //       target: {
-                                    //         name: "selected_teams[]",
-                                    //         value: team?._id,
-                                    //         type: "checkbox",
-                                    //         checked: e.target.checked,
-                                    //       },
-                                    //     });
-                                    //   }else{
-                                    //     return;
-                                    //   }
-                                    // }}
-                                    
+                                    checked={
+                                      fields?.selected_teams?.includes(team?._id)
+                                    }
+                                    onChange={(e) => {
+                                      handleChange({
+                                        target: {
+                                          name: "selected_teams[]",
+                                          value: team?._id,
+                                          type: "checkbox",
+                                          checked: e.target.checked,
+                                        },
+                                      });
+                                    }}
                                   />
+                                  </>
+                                  
                                 ),
-                              )*/}
-                              {teamfeed?.map((team) => {
+                              )
+                              :*/
+                              teamfeed?.map((team) => {
                                 if (selectedMember?.teams?.includes(team?._id)) {
                                   return (
                                     <Badge bg="primary" className="me-2" key={team?._id}>{team?.name}</Badge>
-                                    // <Form.Check
-                                    //   key={team?._id}
-                                    //   inline
-                                    //   label={team?.name}
-                                    //   type="checkbox"
-                                    //   id={`inline-${team?._id}`}
-                                    //   checked={true}
-                                    //   disabled
-                                    //   readOnly
-                                    // />
+                                    
                                   );
                                 }
 
                                 return null;
-                              })}
+                              })
+                            }
+                              
+                              {/* {teamfeed?.map((team) => {
+                                if (selectedMember?.teams?.includes(team?._id)) {
+                                  return (
+                                    <Badge bg="primary" className="me-2" key={team?._id}>{team?.name}</Badge>
+                                    
+                                  );
+                                }
+
+                                return null;
+                              })} */}
                             </p>
                             {errors["selected_teams"] || ''}  
                           </ListGroup.Item>
@@ -1606,13 +1793,13 @@ useEffect(() => {
                 <Form.Group className="mb-0 form-group">
                   <Form.Select
                     placeholder="Select role"
-                    area-label="Role"
+                    aria-label="Role"
                     name="role"
                     className={"form-control custom-selectbox"}
                     value={fields?.role || roles?.[0]?._id || ""}
                     onChange={(e) => {
                       handleChange(e);
-                      const matchedRole = roles.find(
+                      const matchedRole = roles?.find(
                         (role) => role._id === e.target.value
                       );
                       // handleChange({ target: { name: 'rolename', value: matchedRole.name } });
@@ -1622,9 +1809,17 @@ useEffect(() => {
                       setPermissions(matchedPermissions);
                     }}
                   >
-                    {roles.map((role, roleIndex) => (
-                      <option key={`role-${roleIndex}`} value={role._id}>
-                        {role.name}
+                    {roles?.map((role, roleIndex) => (
+                      // <option key={`role-${role._id}`} value={role._id}>
+                      //   {role.name} {roleHelperText(role.slug)}
+                      // </option>
+                      <option key={role._id} value={role._id}>
+                        {(() => {
+                          const helperText = roleHelperText(role.slug);
+                          return helperText
+                            ? `${role.name} - ${helperText}`
+                            : role.name;
+                        })()}
                       </option>
                     ))}
                   </Form.Select>
@@ -1683,169 +1878,7 @@ useEffect(() => {
           }
         </Modal.Footer>
       </Modal>
-      { /*showPermissions && (
-        <Modal show={showPermissions} onShow={() => {selectboxObserver()}} onHide={() => setShowPermissions(false)} centered size="lg" className="add--team--member--modal add--member--modal theme--modal">
-          <Modal.Header closeButton>
-              <Modal.Title>
-                  <strong>Roles & Permissions <small>Manage members role & permissions</small></strong>
-              </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <div className="form-row" key={`row-role-select`}>
-              <Form.Group className="mb-0 form-group">
-                <Form.Select
-                  placeholder="Select role"
-                  area-label="Role"
-                  name="role"
-                  className={"form-control custom-selectbox"}
-                  value={fields?.role || roles?.[0]?._id || ""}
-                  onChange={(e) => {
-                    handleChange(e);
-                    const matchedRole = roles.find(
-                      (role) => role._id === e.target.value
-                    );
-                    // handleChange({ target: { name: 'rolename', value: matchedRole.name } });
-                    const matchedPermissions = matchedRole
-                      ? matchedRole.permissions
-                      : [];
-                    setPermissions(matchedPermissions);
-                  }}
-                >
-                 
-                  {roles.map((role, roleIndex) => (
-                    <option key={`role-${roleIndex}`} value={role._id}>
-                      {role.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-            </div>
-           
-            {fields?.role !== null && fields?.role !== "role" && (
-              <Card className="border-0">
-                <Card.Body className="p-0 border-0">
-                  <>
-                    
-                    <div className="new--accordion--block">
-                      {permissionModules.map((mod) => {
-                        const modSlug = mod.slug;
-                        const modPerms = permissions?.[modSlug] || {};
-                        const isExpanded = expanded?.[modSlug] || false;
-                        const isViewChecked = !!modPerms.view;
-                        const truePermissionCount = Object.values(
-                          modPerms
-                        ).filter((val) => val === true).length;
-
-                        return (
-                          <div className="bg--blue--accordion">
-                            <div className="d-flex gap-3 align-items-center">
-                              {permissionsLabel[modSlug]?.icon || <LuFolderOpen />}
-                              <h6 className="mb-0">{permissionsLabel[modSlug]?.heading} <small className="d-block">{permissionsLabel[modSlug]?.sub_heading}</small></h6>
-                            </div>
-                                {(mod.permissions || []).map((perm) => {
-                                  if (perm === "view") {
-                                     return (
-                                        <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                          <p className="mb-0">View</p>
-                                          <Form.Check key={`${modSlug}--view`} id={`${modSlug}-view`} type="switch" className="ms-auto switch--small" checked={!!modPerms.view} onChange={
-                                            () => {
-                                              // if(selectedMember?.role?.slug !== "owner"){
-                                              toggleView(modSlug);
-                                            }
-                                            //}
-                                          }/>
-                                        </div>
-                                      )
-                                  }
-
-                                  return (
-                                    <>
-                                    <div className="d-flex gap-3 align-items-center mt-3 bg-white px-3 py-2 rounded-3">
-                                      <p className="mb-0">
-                                       {perm
-                                                          .replace(/[_-]/g, " ")
-                                                          .replace(/^\w/, (l) => l.toUpperCase())}
-                                                          </p>
-                                      <Form.Check type="switch" className="ms-auto switch--small" id={`${modSlug}-${perm}`} key={perm}
-                                        disabled={!isViewChecked}
-                                        checked={!!modPerms[perm]}
-                                        
-                                          onChange={() => {
-                                           
-                                            togglePermission(modSlug, perm);
-                                          }}
-                                      />
-                                    </div>
-                                    {[
-                                      "time_tracking",
-                                      "projects",
-                                      "reports",
-                                      "attendance",
-                                    ].includes(modSlug) &&
-                                      perm === "view_others" &&
-                                      modPerms[perm] === true && (
-                                        <div className="team--card--grid">
-                                          {memberFeeds.map((member) => (
-                                            <Card className={`team--card ${modPerms[
-                                                "selected_members"
-                                              ]?.includes(String(member._id))? 'selected--card' : ''}`} onClick={() => {
-                                                //if (selectedMember?.role?.slug !== "owner") {
-                                                toggleMembers(
-                                                  modSlug,
-                                                  "selected_members",
-                                                  member._id
-                                                );
-                                                // }
-                                              }}>
-                                              <span className="team--initial">{member.name?.charAt(0) || "U"}</span>
-                                              <Card.Body>
-                                                <h4>{member.name} <small className="d-block">{member?.role?.name}</small></h4>
-                                              </Card.Body>
-                                              <FiCheck className="ms-auto" />
-                                            </Card>
-                                          ))}
-
-                                          {modSlug === "projects" && (
-                                            <Card className={`team--card ${modPerms[
-                                                "selected_members"
-                                              ]?.includes("unassigned")? 'selected--card' : ''}`} onClick={() => {
-                                               
-                                                toggleMembers(
-                                                  modSlug,
-                                                  "selected_members",
-                                                  "unassigned"
-                                                );
-                                                
-                                              }} key={`${modSlug}-${perm}-unassigned`}>
-                                              <span className="team--initial">U</span>
-                                              <Card.Body>
-                                                <h4>Unassigned</h4>
-                                              </Card.Body>
-                                              <FiCheck className="ms-auto" />
-                                            </Card>
-                                          )}
-                                        </div>
-                                      )}
-                                      
-                                    </>
-                                  );
-                                })}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </>
-                </Card.Body>
-              </Card>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" onClick={handleSavePermissions} disabled={loader}>
-              {loader ? "Please Wait..." : "Save"}
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      ) */}
+      
 
       
       {(memberProfile &&
@@ -1966,23 +1999,44 @@ useEffect(() => {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label className="mb-2 fw-semibold">Select Role</Form.Label>
-              <Form.Select
-                className={"form-control custom-selectbox conditional-box"}
-                value={fields?.role || ""}
-                onChange={(e) => handleClickRoles(e.target.value)}
-                name="role"
-              >
-                {roles.map((role, index) => (
-                  <option key={`role-id-${index}`} value={role?._id}> 
-                    {role?.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-            {
+            {(selectedMember?.role?.slug !== 'owner' || selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === 'owner' && !hasOwnershipRequest?._id) && (
+                <Form.Group className="mb-3">
+                    <Form.Label className="mb-2 fw-semibold">Select Role</Form.Label>
+                    <Form.Select
+                      className={"form-control custom-selectbox conditional-box"}
+                      value={fields?.role || ""}
+                      onChange={(e) => handleClickRoles(e.target.value)}
+                      name="role"
+                    >
+                      {roles?.map((role, index) => {
+                        if(selectedMember?.role?._id !== role?._id){
+                          return(
+                            <option key={`role-id-${index}`} value={role._id}>
+                              {(() => {
+                                const helperText = roleHelperText(role.slug);
+                                return helperText
+                                  ? `${role.name} - ${helperText}`
+                                  : role.name;
+                              })()}
+                            </option>
+                          )
+                        }
+                    })}
+                    </Form.Select>
+                </Form.Group>
+            )}
+                {
               (selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === 'owner' && !hasOwnershipRequest?._id) && (
+                 <> 
+                
+                  <div className="d-flex flex-column align-items-start gap-2">
+                    <strong>Transfer onwership</strong>
+                    <p>
+                      You are currently the Owner. To change the role, please select a member to transfer ownership. An invitation will be sent to the selected member, and you will be removed from the team once they accept the request.
+                    </p>
+                  </div>
+                
+              
                 <Form.Group>
                   <Form.Label className="mb-2 fw-semibold">Select a member to make owner</Form.Label>
                   <Form.Select
@@ -1991,29 +2045,36 @@ useEffect(() => {
                     onChange={(e) => handleClickMember(e.target.value)}
                     name="transfer_role_to"
                   >
-                    {memberFeeds.map((member, index) => (
-                      <option key={`role-id-${index}`} value={member?._id}> 
-                        {member?.name}
-                      </option>
-                    ))}
+                    {memberFeeds.map((member, index) => {
+                      if(member?._id !== selectedMember?._id){
+                        return (
+                          <option key={`role-id-${index}`} value={member?._id}> 
+                            {member?.name}
+                          </option>
+                        )
+                      }
+                      })}
                   </Form.Select>
                 </Form.Group>
+              
+                </>
               )
             }
             
           </Modal.Body>
           <Modal.Footer>
-            <small>Changing the role will update this member's permissions to match the selected role's defaults.</small>
+            
               
               {
               (selectedMember?.role?.slug === 'owner' && memberProfile?.role?.slug === 'owner' && hasOwnershipRequest?._id) ? (
                   <>
-                  <p>You already have 1 pending invite for ownership transfer.</p>
+                  <p>Ownership transfer is already in progress. An invitation has been sent to the selected member. Please wait for them to accept.</p>
                   <Button variant="danger" onClick={cancelOwnerInvite}>Cancel Invite</Button>
                   </>
                 )
                 :
                 <>
+                <small>Changing the role will update this member's permissions to match the selected role's defaults.</small>
                   <Button variant="secondary" onClick={handleRoleClose} disabled={loader}>
                     {loader ? "Please Wait..." : "Cancel"}
                   </Button>
@@ -2076,7 +2137,7 @@ useEffect(() => {
         <Modal show={showSetting} onHide={handleSettingClose} size="xl" centered className="theme--modal">
           <Modal.Header closeButton>
               <Modal.Title>
-                  <strong>Role & Permissions <small>Manage access permissions</small></strong>
+                  <strong>Roles & Teams <small>Manage roles and teams</small></strong>
               </Modal.Title>
           </Modal.Header>
           <Modal.Body>

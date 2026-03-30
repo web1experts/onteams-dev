@@ -255,6 +255,11 @@ function ClientsPage() {
       setIsActive( false )
       setIsEditing(false);
       setSelectedClient({})
+      setClientFeed((prevClients) =>
+        prevClients.filter(
+          (client) => client._id !== deleteSuccess._id
+        )
+      );
     }
   }, [deleteSuccess]);
 
@@ -577,13 +582,17 @@ function ClientsPage() {
                       >
                         <MdSearch />
                       </ListGroup.Item>
-                      <ListGroup.Item
-                        className="d-md-flex"
-                        key={`settingskey`}
-                        onClick={toggleCustomFields}
-                      >
-                        <LuSettings2 />
-                      </ListGroup.Item>
+                      {
+                        (memberProfile?.role?.permissions?.clients
+                        ?.manage_custom_fields === true) && (
+                        <ListGroup.Item
+                          className="d-md-flex"
+                          key={`settingskey`}
+                          onClick={toggleCustomFields}
+                        >
+                          <LuSettings2 />
+                        </ListGroup.Item>)
+                      }
                       <ListGroup.Item
                         className="d-none d-lg-flex"
                         onClick={handleToggles}
@@ -767,9 +776,19 @@ function ClientsPage() {
                                                         borderWidth: "1px",
                                                         borderStyle: "solid",
                                                       }}
-                                                      onClick={() =>
-                                                        toggleBadges(field)
-                                                      }
+                                                      onClick={() => {
+                                                          if (
+                                                              memberProfile?.role?.permissions?.clients
+                                                                ?.create_edit_delete ===
+                                                                true
+                                                            ) {
+                                                              toggleBadges(field)
+                                                            }else {
+                                                              console.log("Not allowed");
+                                                            }
+                                                        }
+                                                          
+                                                        }
                                                     >
                                                       {
                                                         client?.customFields?.[
@@ -1080,7 +1099,14 @@ function ClientsPage() {
                               value={fields?.name}
                               onChange={handleChange}
                             />
+                            
+                           
                           </Form.Group>
+                          {
+                              (fieldserrors['name'] && fieldserrors['name'] !== "") && (
+                                 <span className="error">{fieldserrors['name']}</span>
+                              )
+                            }
                         </ListGroup.Item>
                         {customFields?.length > 0 && (
                           <>

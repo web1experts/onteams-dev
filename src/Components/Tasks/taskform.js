@@ -26,6 +26,7 @@ import 'react-quill/dist/quill.snow.css';
 import AutoLinks from "quill-auto-links";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
+import { BadgesModal } from "../modals/badges";
 Quill.register("modules/autoLinks", AutoLinks);
 
 export const TaskForm = (props) => {
@@ -621,12 +622,11 @@ useEffect(() => {
 
     const handleTaskClose = () => {
         const cf = clearTaskForm(taskForm)
-        setIsDescEditor(false)
         dispatch(updateStateData(TASK_FORM, cf));
-
+        setIsDescEditor(false)
         setDatePickerModal(false);
         setCurrentTask({});
-        
+        setFields({})
     }
 
     const renderPreview = (type, preview, index) => {
@@ -693,7 +693,7 @@ useEffect(() => {
     const [taskModalState, setTaskModalState] = useState(refreshstates(commonState.active_formtype || false))
 
     const handlesubtaskChange = (index, oldval, newval, directupdate = false) => {
-        if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+        if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true ){
             skipOutsideRef.current = true;
             const newSubtasks = [...subtasks];
             newSubtasks[index] = (typeof oldval === "object" && oldval._id) ? { ...oldval, ['title']: newval } : newval; // Update the specific subtask
@@ -751,7 +751,7 @@ useEffect(() => {
         // }
     };
     const addSubtask = () => {
-        if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+        if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true ){
             setissubopen(true)
             setSubtasks([...subtasks, '']);
         }
@@ -783,7 +783,7 @@ useEffect(() => {
 
     // Function to handle blur event on subtask input
     const handleBlur = (index) => {
-        if((memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' )){
+        if((memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true)){
             const subtaskValue = subtasks[index];
             if (subtaskValue === '') {
                 removeSubtask(index);
@@ -1207,7 +1207,7 @@ const renderSubtasks = () => {
     return (
         <>
             <Modal show={modalstate} onHide={async () => {
-                if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true ){
                     TaskUpdate()
                 }
                 
@@ -1227,7 +1227,7 @@ const renderSubtasks = () => {
                         </div>
                     )}
                     <div className="project--form">
-                        { (memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ) ?
+                        { (memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true ) ?
                         <>
                         <div className="project--form--inputs" data-tabid={fields['tab']}>
                             <Form onSubmit={() => { return false }} key={`taskform-${currentTask?.tab}`}>
@@ -1235,7 +1235,7 @@ const renderSubtasks = () => {
                                     <Form.Label><small>Title</small></Form.Label>
                                     <Form.Control type="text" key={`task-title-${currentTask?.tab}`} name="title" placeholder="Task Title" value={fields['title'] || currentTask?.title || ""} onChange={handleChange} onBlur={(e) => {
                                         if (currentTask.title !== fields['title']) {
-                                            if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                                            if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true ){
                                                 dispatch(updateTask(currentTask._id, { title: fields['title'] }))
                                             }
                                             
@@ -1323,10 +1323,7 @@ const renderSubtasks = () => {
                                 <Form.Group className="mb-0 form-group pb-0">
                                 {customFields?.length > 0 &&
                                     <>
-                                    {/* <hr />
-                                    <Form.Label>
-                                        <small>Other Fields</small>
-                                    </Form.Label> */}
+                                    
                                     {customFields?.map((field, index) =>
                                         renderDynamicField({
                                             name: `custom_field[${field.name}]`,
@@ -1345,7 +1342,7 @@ const renderSubtasks = () => {
                                             },
                                             onBlur: (e) => {
                                                 if (currentTask.customFields?.[field.name]?.meta_value !== fields[`custom_field[${field.name}]`]) {
-                                                    if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner' ){
+                                                    if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true ){
                                                         const formData = new FormData();
                                                         const dynamicKey = `custom_field[${field.name}]`;
                                                         formData.append(dynamicKey, fields[`custom_field[${field.name}]`]);
@@ -1367,7 +1364,7 @@ const renderSubtasks = () => {
                                 </Form.Group>
                                 <Form.Group className="mb-0 mt-3 form-group">
                                     <Form.Label className="w-100 m-0">
-                                        <small>Task chat</small>
+                                        <small>Task Comments</small>
                                     </Form.Label>
                                     {
                                         currentTask && currentTask.comments && currentTask.comments.length > 0 &&
@@ -1433,19 +1430,24 @@ const renderSubtasks = () => {
 
                                                                         </div>
                                                                     </div>
-                                                                    <Dropdown>
-                                                                        <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
-                                                                            <FaEllipsisV />
-                                                                        </Dropdown.Toggle>
-                                                                        <Dropdown.Menu>
-                                                                            <div className="over--scroll">
-                                                                                <Dropdown.Item key={`dropdown-member-${index}`}>
-                                                                                    <Button onClick={() => { setEditMessage({ [comment._id]: { show: true, msg: comment.text } }) }}>Edit message</Button>
-                                                                                    <Button onClick={() => handleDelteComment(comment?._id, currentTask?._id)}>Delete message</Button>
-                                                                                </Dropdown.Item>
-                                                                            </div>
-                                                                        </Dropdown.Menu>
-                                                                    </Dropdown>
+                                                                    {
+                                                                        (comment?.author?._id === memberProfile?._id) && (
+                                                                            <Dropdown>
+                                                                                <Dropdown.Toggle variant="primary" id={`toogle-btn-${currentTask?._id}`}>
+                                                                                    <FaEllipsisV />
+                                                                                </Dropdown.Toggle>
+                                                                                <Dropdown.Menu>
+                                                                                    <div className="over--scroll">
+                                                                                        <Dropdown.Item key={`dropdown-member-${index}`}>
+                                                                                            <Button onClick={() => { setEditMessage({ [comment._id]: { show: true, msg: comment.text } }) }}>Edit message</Button>
+                                                                                            <Button onClick={() => handleDelteComment(comment?._id, currentTask?._id)}>Delete message</Button>
+                                                                                        </Dropdown.Item>
+                                                                                    </div>
+                                                                                </Dropdown.Menu>
+                                                                            </Dropdown>
+                                                                        )
+                                                                    }
+                                                                    
                                                                 </p>
                                                             )
                                                         }
@@ -1607,7 +1609,7 @@ const renderSubtasks = () => {
                                     </Form.Group>
                                 </ListGroup.Item>
                                 <ListGroup.Item className='text-danger' onClick={async () => {
-                                    if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true || memberProfile?.role?.slug === 'owner'){
+                                    if(memberProfile?.role?.permissions?.projects?.create_edit_delete_task === true){
                                         setLoader(true)
                                         await dispatch(deleteTask(currentTask._id))
                                         setLoader(false)
@@ -1710,10 +1712,37 @@ const renderSubtasks = () => {
                                                     ))}
                                                 </ul>
                                             </div>
+                                            <Form.Group className="mb-0 form-group pb-0">
+                                                {customFields?.length > 0 &&
+                                                    <>
+                                                    
+                                                    {customFields?.map((field, index) =>
+                                                        renderDynamicField({
+                                                            name: `custom_field[${field.name}]`,
+                                                            type: field.type,
+                                                            label: field.label,
+                                                            value: field.type === 'date' && fields[`custom_field[${field.name}]`]
+                                                                    ? convertDDMMYYYYtoYYYYMMDD(fields[`custom_field[${field.name}]`])
+                                                                    : fields[`custom_field[${field.name}]`] || '',
+                                                            options: field?.options || [],
+                                                            
+                                                            range_options: field?.range_options || {},
+                                                            showPassword: showPasswordFields[`custom_field[${field.name}]`] || false,
+                                                            toggleShowPassword: () => toggleShowPassword(`custom_field[${field.name}]`),
+                                                            toggleBadges: () => toggleBadges(field),
+                                                            readOnly: true,
+                                                            fieldId: currentTask && typeof currentTask === "object" && currentTask._id
+                                                            ? `edit-${currentTask._id}-${field.name}-${index}`
+                                                            : `new-${field.name}-${index}`
+                                                        })
+                                                    )}
+                                                    </>
+                                                }
+                                                </Form.Group>
                                                 
                                         <Form.Group className="mb-0 mt-3 form-group">
                                             <Form.Label className="w-100 m-0">
-                                                <small>Task chat</small>
+                                                <small>Task Comments</small>
                                             </Form.Label>
                                             {
                                                 currentTask && currentTask.comments && currentTask.comments.length > 0 &&
@@ -1897,7 +1926,14 @@ const renderSubtasks = () => {
                     </ListGroup>
                 </Modal.Body>
             </Modal>
-
+           {showBadges !== null && (
+            <BadgesModal
+                badgesData={showBadges}
+                toggleBadges={toggleBadges}
+                handleSelect={handleChange}
+                value={fields[`custom_field[${showBadges?.name}]`] || ""}
+            />
+            )}
         </>
     )
 }

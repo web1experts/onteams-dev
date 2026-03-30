@@ -128,7 +128,7 @@ function TeamMembersPage() {
     if (activeTab === "Members") {
       setMemberFeed([]);
 
-      await dispatch(Listmembers(currentPage, searchTerm));
+      await dispatch(Listmembers({currentPage, searchTerm}));
       await dispatch(
         listCompanyinvite(0, 'company')
       );

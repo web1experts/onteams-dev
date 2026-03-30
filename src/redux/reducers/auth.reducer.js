@@ -24,7 +24,7 @@ import {
     PROFILE_SUCCESS,
     PUT_USER_SUCCESS,
     PUT_USER_FAILED,
-    UPDATE_PASSWORD_SUCCESS
+    UPDATE_PASSWORD_SUCCESS,
 } from "../actions/types";
 import * as auth from '../../helpers/auth';
 const token = auth.getToken();

@@ -19,8 +19,7 @@ import {
   FaRegUser,
   FaEllipsisV,
 } from "react-icons/fa";
-import { FiGlobe } from "react-icons/fi";
-import { MdLockOutline, MdOutlineEmail } from "react-icons/md";
+import { MdLockOutline } from "react-icons/md";
 import {
   getUserProfile,
   updateProfile,
@@ -34,6 +33,8 @@ import ManagePlan from "../subscriptions/ManagePlan";
 import { currentMemberProfile } from "../../helpers/auth";
 import PlanOverview from "../subscriptions/PlanOverview";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import ChangeEmailModal from "../modals/ChangeEmailModal";
+import { DeleteAccount } from "../modals/deleteAccount";
 const secretKey = process.env.REACT_APP_SECRET_KEY;
 function EditableField({
   field,
@@ -124,9 +125,19 @@ function SettingPage(props) {
   const [loader, setLoader] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const [securityFields, setSecurityFields] = useState({});
+  const [securityFields, setSecurityFields] = useState({new_password: '', confirm_password: '', current_password: ''});
   const [secutiryErrors, setSecutiryErrors] = useState({});
   const [showAlert, setShowAlert] = useState(false);
+  const [ showEmailchange, setShowEmailchange] = useState( false )
+
+  const handleshowEmailchange = () => {
+    setShowEmailchange(true)
+  }
+
+  const handlecloseEmailchange = () => {
+    setShowEmailchange(false)
+  }
+
   const handleAlertClose = () => {
      setShowAlert(false);
      setSpinner(false)
@@ -160,7 +171,7 @@ function SettingPage(props) {
 
     Object.entries(securityFields).forEach(([key, value]) => {
       if (!value || value.trim() === "") {
-        errors[key] = "error";
+        errors[key] = key.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) + ' cannot be blank';
       }
     });
     if (
@@ -203,13 +214,15 @@ function SettingPage(props) {
 
   useEffect(() => {
     if (authAPI.success) {
-      setSecurityFields({});
+      setSecurityFields({new_password: '', confirm_password: '', current_password: ''});
     }
 
     if(authAPI.accountDelete && authAPI.accountDelete === true){
       dispatch(logout())
     }
   }, [authAPI]);
+
+
 
 
 
@@ -455,9 +468,13 @@ function SettingPage(props) {
 
               <Card.Body>
                 {
+                  <>
                   <ListGroup>
                     <ListGroup.Item>
                       <strong>Email</strong> {profile?.email}
+                    </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Button variant="primary" onClick={() => {handleshowEmailchange()}}>Change Email</Button>
                     </ListGroup.Item>
                     <EditableField
                       field="name"
@@ -470,6 +487,13 @@ function SettingPage(props) {
                       error={fieldserrors["name"] && fieldserrors["name"]}
                     />
                   </ListGroup>
+                  
+                  {
+                    (showEmailchange === true) && (
+                      <ChangeEmailModal show= {showEmailchange} handleClose={handlecloseEmailchange} currentEmail={memberProfile?.email} />
+                    )
+                  }
+                  </>
                 }
 
                 <div className="text-end mt-3">
@@ -482,6 +506,11 @@ function SettingPage(props) {
                     {loader ? "Please wait..." : "Save Changes"}
                   </Button>
                 </div>
+                <ListGroup>
+                  <ListGroup.Item onClick={() => setShowAlert(true)}>
+                    <FaRegBell /> Delete Account
+                  </ListGroup.Item>
+                </ListGroup>
               </Card.Body>
             </Card>
           </div>
@@ -592,23 +621,8 @@ function SettingPage(props) {
         }
         {
         showAlert && 
-      
-        <Modal show={showAlert} onHide={handleAlertClose} size="md" centered className="theme--modal">
-          <Modal.Header closeButton>
-              <Modal.Title>
-                  <strong>Are you sure you want to close you account.</strong>
-              </Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="pb-0">
-              <p>You will lost all you account data. This action cannot be undone.</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="outline-primary" onClick={handleAlertClose}>Disagree</Button>
-            <Button variant="primary" disabled={spinner} onClick={() => handleCloseAccount()}>
-              { spinner ? 'Please wait...' : 'Agree' }
-            </Button>
-          </Modal.Footer>
-        </Modal>
+          <DeleteAccount showdialog={showAlert} toggledialog={handleAlertClose}/>
+        
       }
       </div>
     </>

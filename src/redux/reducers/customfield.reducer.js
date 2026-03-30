@@ -25,7 +25,8 @@ export default (state = initialState, action) => {
             message: action.payload.message,
             message_variant: 'success',
             success: true,
-            newField: action.payload.field
+            customFields: action.payload.customFields,
+            fieldModule: action.payload.module
         };
     case DELETE_FIELD_SUCCESS :
         return {
@@ -33,7 +34,8 @@ export default (state = initialState, action) => {
             message: action.payload.message,
             message_variant: 'success',
             success: true,
-            deletedField: action.payload.deletedField
+            customFields: action.payload.customFields,
+            fieldModule: action.payload.module
         };
     case FIELD_COMMON_ERROR: 
         return {
@@ -55,7 +57,8 @@ export default (state = initialState, action) => {
     case UPDATE_FIELD_SUCCESS: 
         return {
             ...state,
-            updatedField: action.payload.field
+            customFields: action.payload.customFields,
+            fieldModule: action.payload.module
         }
     case FIELDS_REORDER:
         return {

@@ -150,38 +150,39 @@ export const CustomFieldModal = (props) => {
     setShowOptions(false);
     setFields({ name: "", type: "", showInTable: false, options: [] });
     if (apiCustomfields.customFields) {
+      
       setCustomFields(apiCustomfields.customFields);
     }
 
-    if (apiCustomfields.newField) {
-      setCustomFields((prevCustomFields) => {
-        const updated = [
-          ...prevCustomFields.filter(
-            (field) => field._id !== apiCustomfields.newField._id
-          ),
-          apiCustomfields.newField,
-        ];
-        return updated;
-      });
-    }
+    // if (apiCustomfields?.newField?._id) {
+    //   setCustomFields((prevCustomFields) => {
+    //     const updated = [
+    //       ...prevCustomFields.filter(
+    //         (field) => field?._id !== apiCustomfields.newField._id
+    //       ),
+    //       apiCustomfields.newField,
+    //     ];
+    //     return updated;
+    //   });
+    // }
 
-    if (apiCustomfields.updatedField) {
-      setCustomFields((prevCustomFields) =>
-        prevCustomFields.map((field) =>
-          field._id === apiCustomfields.updatedField._id
-            ? apiCustomfields.updatedField
-            : field
-        )
-      );
-    }
+    // if (apiCustomfields.updatedField) {
+    //   setCustomFields((prevCustomFields) =>
+    //     prevCustomFields.map((field) =>
+    //       field._id === apiCustomfields.updatedField._id
+    //         ? apiCustomfields.updatedField
+    //         : field
+    //     )
+    //   );
+    // }
 
-    if (apiCustomfields.deletedField) {
-      setCustomFields((prevCustomFields) =>
-        prevCustomFields.filter(
-          (field) => field._id !== apiCustomfields.deletedField
-        )
-      );
-    }
+    // if (apiCustomfields.deletedField) {
+    //   setCustomFields((prevCustomFields) =>
+    //     prevCustomFields.filter(
+    //       (field) => field._id !== apiCustomfields.deletedField
+    //     )
+    //   );
+    // }
   }, [apiCustomfields]);
 
   const handleFieldEdit = (field) => {
@@ -374,6 +375,11 @@ export const CustomFieldModal = (props) => {
 
   const deleteCustomField = () => {
     dispatch(deleteField(selectedField._id));
+    // setCustomFields((prevCustomFields) =>
+    //   prevCustomFields.filter(
+    //     (field) => field._id !== selectedField._id
+    //   )
+    // );
   };
 
   const handleCheck = (e) => {

@@ -16,6 +16,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import { BsTrash2, BsEye } from "react-icons/bs";
 import { getActiveSubscription } from "../../redux/actions/subscription.action";
 import { useNavigate } from "react-router-dom";
+import { DeleteWorkspace } from "../modals/deleteWorkspace";
 function Workspace(props) {
   const [spinner, setSpinner] = useState( true)
   const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
@@ -130,6 +131,7 @@ function Workspace(props) {
                           // ) {
                           //   navigate('/subscription-plans', { replace: true });
                           // } else {
+                            setEditWorkspace('')
                             handleShow();
                           // }
                           }}><FaPlus /></ListGroup.Item>
@@ -217,7 +219,7 @@ function Workspace(props) {
           {
             (
               activeSubscription?.planId === 'free' &&
-              (workspaces?.length >= 1 ) 
+              workspaces?.length >= 1  && !editworkspace?._id
             ) ?
               <Alert key={'danger'} variant={'danger'}>
                 Your current Free plan allows only 1 workspace. To add additional workspaces, please upgrade to a paid plan.
@@ -233,9 +235,11 @@ function Workspace(props) {
           currentUser._id === editworkspace?.owner &&
         
         <>
-          <AlertDialog
+          <DeleteWorkspace
             showdialog={showdialog}
             toggledialog={setShowDialog}
+            workspacename={editworkspace.name}
+            workspaceId={editworkspace?._id}
             msg={`Are you sure you want delete workspace: ${editworkspace.name}`}
             callback={() => handledeleteWorkspace( editworkspace._id)}
           />

@@ -11,7 +11,7 @@ import { GoDotFill } from "react-icons/go";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
 import { FaCog } from "react-icons/fa";
-import { formatDateinString, selectboxObserver, getAttendanceBadges, hexToRgba } from "../../helpers/commonfunctions";
+import { formatDateinString, selectboxObserver, groupSelectboxObserver, hexToRgba } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { ListAttendance,getAttendanceByMember, getAttendanceSummary, getMonthlyAttendanceExcelView, ListAttendanceStatuses } from "../../redux/actions/attendance.action";
 import { Listmembers } from "../../redux/actions/members.action";
@@ -20,7 +20,9 @@ import { currentMemberProfile } from "../../helpers/auth";
 import MonthHeader from "./monthheader";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { getTeams } from "../../redux/actions/team.action";
 import AttendanceStatusManager from "../modals/attendanceStatus";
+import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 const today = new Date();
 const currentMonthValue = `${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`; // 'MM/YYYY'
 
@@ -39,33 +41,29 @@ function AttendancePage() {
     return `${mm}/${yyyy}`;
   };
 
-  const bgColors = {
-    'Present': 'bg--green',
-    'Absent': 'bg--red',
-    'Short Leave': 'bg--purple',
-    'Half Day': 'bg--blue'
-  }
-
-  function getBadgeColor(status){
-    return (bgColors[status]) ? bgColors[status] : 'bg--orange'
-  }
-
   const dispatch = useDispatch()
   const memberProfile = currentMemberProfile()
   const attendanceFeed = useSelector(state => state.attendance.attendances)
+  const apiPermission = useSelector((state) => state.permissions);
   const apiResult = useSelector(state => state.attendance)
+  const teamsState = useSelector((state) => state.teams)
   const [memberAttendance, setMemberAttendance] = useState([])
   const [attendanceStatus, setAttendanceStatus] = useState([]);
   const [statusObject, setStatusObject] = useState({})
   const [ attendances, setAttendances] = useState([])
   const memberFeed = useSelector((state) => state.member.members)
   const [members, setMembers] = useState([])
+  const [teamfeed, setTeamFeed] = useState([]);
   const [selectedMember, setSelectedMember] = useState({})
   const [isActive, setIsActive] = useState(0);
   const [attendanceSummary, setAttendanceSummary] = useState({})
   const [ excelData, setExcelData] = useState([])
   const [ showAttendanceStatus, setShowAttendacneStatus] = useState( false )
-  const [ filters, setFilters] = useState({month: getCurrentMonthValue()});
+  const [assignedTeamsOrMembers, setAssignedTeamsOrMembers] = useState({})
+  const [ filters, setFilters] = useState({
+    month: getCurrentMonthValue(),
+    member: (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true) ? 'all' : memberProfile?._id
+  });
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -92,7 +90,20 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
 
   const handlefilterchange = (name, value) => {
     // if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
-        setFilters({ ...filters, [name]: value })
+        setFilters((prev) => {
+          const updated = { ...prev };
+
+          if (name === "member") {
+            delete updated.team;   // remove team when member changes
+          }
+
+          if (name === "team") {
+            delete updated.member;    // remove member when team changes
+          }
+
+          updated[name] = value;
+          return updated;
+        });
     // }
   }
 
@@ -106,9 +117,14 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
 
   useEffect(() => {
     // selectboxObserver()
-    dispatch(Listmembers(0, '', false));
+    // dispatch(Listmembers({currentPage: 0, searchTerm: '', has_limit: false}));
+    dispatch(getAssignedTeamsOrMembersByRole(memberProfile?.role?._id))
     handleAttendanceList()
+    // dispatch(getTeams())
     selectboxObserver()
+    setTimeout(() => {
+      groupSelectboxObserver()
+    },700)
   },[])
 
   useEffect(() => { 
@@ -118,6 +134,15 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
   useEffect(() => {
     handleAttendanceList()
   },[filters])
+
+  useEffect(() => {
+    if(apiPermission?.assignedTeamsOrMembers){
+      setAssignedTeamsOrMembers(apiPermission?.assignedTeamsOrMembers)
+      setTimeout(() => {
+        groupSelectboxObserver()
+      },700)
+    }
+  }, [apiPermission?.assignedTeamsOrMembers])
 
   useEffect(() => {
     const statusMap = attendanceStatus?.reduce((acc, status) => {
@@ -134,6 +159,12 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
         setMembers(memberFeed.memberData);
     }
 }, [memberFeed, dispatch]);
+
+useEffect(() => {
+  if (teamsState && teamsState.teams) {
+    setTeamFeed(teamsState.teams);
+  }
+}, [teamsState])
 
 useEffect(() => {
   if( apiResult.attendanceStatuses){
@@ -288,6 +319,89 @@ useEffect(() => {
   saveAs(fileBlob, `Attendance_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
 };
 
+const isMemberSelected = (selectedTeamMembers = {}, memberId) => {
+    return Object.values(selectedTeamMembers).some((membersArray) =>
+      membersArray.includes(memberId)
+    );
+  };
+
+const getMembersFromTeams = (selectedTeamIds) => { 
+    if (!Array.isArray(teamfeed) || !Array.isArray(selectedTeamIds)) {
+      return [];
+    }
+
+    const seen = new Set();
+    const result = [];
+
+    teamfeed.forEach((team) => {
+      if (!selectedTeamIds.includes(String(team?._id))) return;
+
+      if (!Array.isArray(team?.members)) return;
+
+      team.members.forEach((member) => {
+        const memberId = String(member?._id);
+        if (!memberId || seen.has(memberId)) return;
+
+        seen.add(memberId);
+        result.push({
+          _id: memberId,
+          name: member.name,
+        });
+      });
+    });
+console.log('result:: ', result)
+    return result;
+  };
+
+  const MemberDropdown = ({ list = [], selected, onSelect }) => {
+  if (list?.length === 1) {
+    return (
+      <button
+        type="button"
+        id="dropdown-basic-single"
+        className="dropdown-toggle btn btn-link"
+      >
+        <div className="title--span flex-column align-items-start gap-0">
+          <h3>
+            <strong>{list?.[0]?.name}</strong>
+            <span>{list?.[0]?.role || ""}</span>
+          </h3>
+        </div>
+      </button>
+    );
+  }
+
+  return (
+    <Dropdown>
+      <Dropdown.Toggle variant="link" id="dropdown-basic">
+        <h3>
+          <strong>{selected?.name}</strong>
+          <span>{selected?.role || ""}</span>
+        </h3>
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu>
+        <div className="drop--scroll">
+          {list?.map((member) => (
+            <Dropdown.Item
+              key={member._id}
+              onClick={() => onSelect(member)}
+            >
+              <div className="title--initial">
+                {member?.name?.charAt(0)}
+              </div>
+              <div className="title--span flex-column align-items-start gap-0">
+                <strong>{member.name}</strong>
+                <span>{member?.role}</span>
+              </div>
+            </Dropdown.Item>
+          ))}
+        </div>
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+};
+
   return (
     <>
       <div className={ `${isActive === 1 ? 'show--details team--page project-collapse holidays--page' : isActive === 2 ? 'view--project team--page project-collapse holidays--page' :  'team--page holidays--page'} ${projectToggle === true ? 'project-collapse' : ''}`}>
@@ -332,6 +446,109 @@ useEffect(() => {
                         </Dropdown.Menu>
                       </Dropdown>
                     </ListGroup.Item>
+                    {                 
+                        ( memberProfile?.role?.permissions?.attendance?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===  true) ? 
+                          (
+                            <ListGroup.Item
+                              className={
+                                "ms-auto d-none d-xl-flex"
+                              }
+                              key="member-filter-list"
+                            >
+                              <Form.Select
+                                className="custom-selectbox"
+                                onChange={(event) => 
+                                  handlefilterchange("member", event.target.value)
+                                }
+                                value={filters?.["member"] || "all"}
+                                
+                              >
+                                <option
+                                  value={memberProfile?._id}
+                                  key="my-info-option"
+                                >
+                                  My Attendance
+                                </option>
+                                
+                                {(assignedTeamsOrMembers?.members?.length > 0 ) && (
+                                  <option key={`member-info-all`} value={"all"}>
+                                    All Members
+                                  </option>
+                                )}
+                                <>   
+                                  {  assignedTeamsOrMembers?.members?.map((member, index) => (
+                                        <option
+                                          key={`member-projects-${index}`}
+                                          value={member._id}
+                                        >
+                                          {member.name}
+                                        </option>
+                                      ))
+    
+                                  }
+                                </>
+                                
+                              </Form.Select>
+                            </ListGroup.Item>
+                            )
+                            :
+                            (memberProfile?.role?.permissions?.attendance?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                                  true) ?
+                            <ListGroup.Item 
+                            className={
+                              "ms-auto d-none d-xl-flex"
+                            }
+                            key="teams-filter-list">
+                          <Form.Select
+                              className="custom-group-selectbox"
+                              onChange={(event) => {
+                                const group = event.target.selectedOptions[0].dataset.group;
+                                handlefilterchange(group, event.target.value);
+                              }}
+                              value={filters?.["member"] || "all"}
+                            >
+                                <>
+                                  {/* MEMBERS GROUP */}
+                                  <optgroup label="Members">
+                                    <option value={memberProfile?._id} data-group="member">
+                                      My Attendance
+                                    </option>
+                                    <option value="all" data-group="member">
+                                      All Members
+                                    </option>
+                                    {assignedTeamsOrMembers?.members?.map((member) => (
+                                          <option
+                                            key={member._id}
+                                            value={member._id}
+                                            data-group="member"
+                                          >
+                                            {member.name}
+                                          </option>
+                                        ))}
+                                        
+                                  </optgroup>
+                                  <optgroup label="Teams">
+    
+                                    {assignedTeamsOrMembers?.teams?.map((team, index) => {
+                                        return (
+                                          <option
+                                            key={`team-info-${index}`}
+                                            value={team._id}
+                                            data-group="team"
+                                          >
+                                            {team.name}
+                                          </option>
+                                        )
+                                    })}
+                                  </optgroup>
+                                </>
+                              
+                            </Form.Select>
+                          </ListGroup.Item>
+                          :<></>
+                          
+                    }
+                    
                     <ListGroup horizontal className="d-none d-md-flex">
                       <ListGroup.Item action onClick={() => setActiveTab('team')} className={`${activeTab === 'team'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><AiOutlineTeam /> Team View</ListGroup.Item>
                       <ListGroup.Item action onClick={() => setActiveTab('excel')} className={`${activeTab === 'excel'? 'd-md-flex view--icon active': 'd-md-flex view--icon'}`}><FiCalendar /> Excel View</ListGroup.Item>
@@ -591,7 +808,29 @@ useEffect(() => {
           <div className="wrapper--title py-2 bg-white border-bottom">
               <span className="open--sidebar" onClick={() => {handleSidebarSmall(false);setIsActive(0);}}><FiSidebar /></span>
               <div className="projecttitle">
-                <Dropdown key={'member-filter'}>
+                <Dropdown key="member-filter">
+                    <MemberDropdown
+                      list={attendances}
+                      selected={selectedMember}
+                      onSelect={handleMemberAttendance}
+                    />
+                </Dropdown>
+                {/* <Dropdown key={'member-filter'}>
+                  {
+                  (attendances?.length === 1 ) ? 
+                    <>
+                    <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
+                      
+                      <div className="title--span flex-column align-items-start gap-0">
+                        <h3>
+                          <strong>{attendances?.[0]?.name}</strong>
+                          <span>{attendances?.[0]?.role?.name || ""}</span>
+                        </h3>
+                      </div>
+                    </button>
+                    </>
+                  :
+                  <>
                   <Dropdown.Toggle variant="link" id="dropdown-basic" key={'member-filter-toggle'}>
                     <h3>
                       <strong>{selectedMember?.name}</strong>
@@ -600,20 +839,33 @@ useEffect(() => {
                   </Dropdown.Toggle>
                   <Dropdown.Menu key={`member-drop`}>
                       <div className="drop--scroll">
-                          {members.map((member, index) => {
-                              return (
-                                <Dropdown.Item key={`drop-item-${member._id}`} value={member._id} onClick={() => { handleMemberAttendance(member) }}>
-                                  <div className="title--initial">{member?.name.charAt(0)}</div>
-                                  <div className="title--span flex-column align-items-start gap-0">
-                                    <strong>{member.name}</strong>
-                                    <span>{member.role?.name}</span>
-                                  </div>
-                                </Dropdown.Item>
-                              )
-                          })}
+                        {
+                      ( attendances && attendances?.length > 0) && (
+                        <>
+                            {  
+                                attendances.map((member, index) => {
+                                  
+                                  return (
+                                    <Dropdown.Item key={`drop-item-${member._id}`} value={member._id} onClick={() => { handleMemberAttendance(member) }}>
+                                      <div className="title--initial">{member?.name.charAt(0)}</div>
+                                      <div className="title--span flex-column align-items-start gap-0">
+                                        <strong>{member.name}</strong>
+                                        <span>{member?.role?.name}</span>
+                                      </div>
+                                    </Dropdown.Item>
+                                  )
+                                })
+
+                            }
+                            </> 
+                          )
+                          
+                          }
                       </div>
                   </Dropdown.Menu>
-                </Dropdown>
+                  </>
+                  }
+                </Dropdown> */}
               </div>
               <ListGroup horizontal className="expand--icon ms-auto">
                 <ListGroup.Item className="day--dropdown w-auto h-auto d-none d-xxl-flex">

@@ -14,6 +14,7 @@ export default function CheckoutForm({mode}) {
     e.preventDefault();
     let result;
     setLoader(true)
+    console.log(mode)
     if (mode === "setup") {
       result = await stripe.confirmSetup({
         elements,
@@ -41,7 +42,7 @@ export default function CheckoutForm({mode}) {
   return (
     <form onSubmit={handleSubmit}>
       <PaymentElement />
-      <button class="btn btn-primary mt-3">{ loader ? 'Please wait...': 'Subscribe'}</button>
+      <button class="btn btn-primary mt-3" disabled={loader}>{ loader ? 'Please wait...': 'Subscribe'}</button>
     </form>
   );
 }

@@ -6,7 +6,7 @@ import { FiCheckCircle } from "react-icons/fi";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import { LuFileText } from 'react-icons/lu';
 import { getMemberdata, generateTimeRange, convertSecondstoTime} from "../../helpers/commonfunctions";
-import { updateManualTimeStatus, getManualTimeList, getSingleActivityData } from "../../redux/actions/report.action";
+import { updateManualTimeStatus, getManualTimeList } from "../../redux/actions/report.action";
 import { currentMemberProfile } from "../../helpers/auth";
 import { LuClock } from "react-icons/lu";
 
@@ -113,12 +113,7 @@ function ManualTime() {
     return `${hours}h ${minutes}m`;
   }
 
-  // const handleView = async (date, member_id) => {
-  //   setFields({ ...fields, date: date, memberId: member_id });
-  //   setShow(true);
-  //   setSpinner(true);
-  //   dispatch(getSingleActivityData(date, member_id));
-  // };
+
 
   return (
     <>

@@ -13,6 +13,7 @@
     "@wojtekmaj/react-daterange-picker": "^6.0.0",
     "axios": "^1.7.2",
     "bootstrap": "^5.3.7",
+    "country-flag-icons": "^1.6.15",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "dompurify": "^3.2.6",

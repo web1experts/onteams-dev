@@ -19,6 +19,7 @@ import {
     SIDEBAR_SMALL,
     THEME_COLOR
 ,} from "../actions/types";
+import API from '../../helpers/api';
 export const updateStateData  = ( type, data = '' ) => {
     return async (dispatch) => {
         try {
@@ -74,3 +75,4 @@ export const toggleTheme = (theme) => {
         await dispatch({ type: THEME_COLOR, payload: theme})
     }
 }
+

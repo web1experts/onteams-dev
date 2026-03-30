@@ -19,11 +19,7 @@ import { CLEAR_CLIENT_SECRET } from "../../redux/actions/types";
 import Spinner from 'react-bootstrap/Spinner';
 import CheckoutForm from "./CheckoutForm";
 import { getOption } from "../../redux/actions/option.actions";
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+
 // const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
   
 export default function ManagePlan() {
@@ -31,6 +27,26 @@ export default function ManagePlan() {
   const addToast = useToast();
   const qtyRef = useRef(null);
   const [plans, setPlans] = useState({})
+  const [formData, setFormData] = useState({
+      fullName: "",
+      phone: "",
+      address1: "",
+      address2: "",
+      city: "",
+      state: "",
+      postal: "",
+      country: "",
+      agree: false,
+      phoneCode: countries[0]?.phoneCode || "",
+      isoCode:  countries[0]?.isoCode || ""
+    });
+  const [search, setSearch] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const filtered = countries.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase())
+  );
+  
   const optionState = useSelector((state) => state.option)
   const [stripePromise, setStripePromise] = useState(null)
   const [stripeMode, setStripeMode] = useState( 'sandbox')
@@ -44,7 +60,7 @@ export default function ManagePlan() {
   const [invoiceData, setInvoiceData] = useState(null)
   const [mode, setMode] = useState('payment')
     const [scheduledSub, setScheduledSub] = useState(null)
-  const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
+  // const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
   const [billingCycle, setBillingCycle] = useState('yearly');
@@ -61,17 +77,7 @@ export default function ManagePlan() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [errors, setErrors] = useState({});
-    const [formData, setFormData] = useState({
-      fullName: "",
-      phone: "",
-      address1: "",
-      address2: "",
-      city: "",
-      state: "",
-      postal: "",
-      country: "India",
-      agree: false,
-    });
+    
 
     const doCancel = () => {
       setShowDialog(true)
@@ -99,7 +105,7 @@ export default function ManagePlan() {
 
   const handleListMember = async () => {
      
-        await dispatch(Listmembers(1,''));
+        await dispatch(Listmembers({currentPage: 1, searchTerm: '', has_limit: false}));
         await dispatch(
           listCompanyinvite(0, 'company')
         );
@@ -108,10 +114,23 @@ export default function ManagePlan() {
   useEffect(() => {
     dispatch(getOption('stripe_mode'))
     setSpinner(true)
-    fetch("https://ipapi.co/json/")
-      .then(res => res.json())
-      .then(data => { console.log(data.country_code)
-        setSelectedCurrency(data?.country_code === "IN" ? "inr" : "usd");
+   fetch("https://ipapi.co/json/")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setSelectedCurrency(
+          data?.country_code === "IN" ? "inr" : "usd"
+        );
+      })
+      .catch((error) => {
+        console.error("Error fetching location:", error);
+
+        // fallback (important)
+        setSelectedCurrency("inr");
       });
     dispatch(getActiveSubscription())
     handleListMember();
@@ -174,9 +193,15 @@ export default function ManagePlan() {
       
       setTotalMembers(subscriptionState.activeSubscription?.quantity)
       setBillingCycle(subscriptionState.activeSubscription?.interval || 'monthly')
-      const allPlans = [...plans?.monthly, ...plans?.quarterly, ...plans?.yearly];
+     
+      // const allPlans = [...plans?.monthly, ...plans?.quarterly, ...plans?.yearly];
+      const allPlans = [
+        ...(plans?.monthly || []),
+        ...(plans?.quarterly || []),
+        ...(plans?.yearly || []),
+      ];
 
-      const matchedPlan = allPlans.find(plan => plan.id === subscriptionState.activeSubscription.planId);
+      const matchedPlan = allPlans?.find(plan => plan.id === subscriptionState.activeSubscription.planId);
       // If found, set it in state
       if (matchedPlan) {
         setSelectedPlan(matchedPlan);
@@ -268,6 +293,7 @@ export default function ManagePlan() {
 };
 
 useEffect(() => {
+  setLoading(false)
       if(subscriptionState.billing_info){
         const billingInfo = {
           fullName: subscriptionState.billing_info?.meta_value?.fullName || "",
@@ -277,13 +303,17 @@ useEffect(() => {
           city: subscriptionState.billing_info?.meta_value?.city || "",
           state: subscriptionState.billing_info?.meta_value?.state || "",
           postal: subscriptionState.billing_info?.meta_value?.postal || "",
-          country: subscriptionState.billing_info?.meta_value?.country || "India"
+          country: subscriptionState.billing_info?.meta_value?.country || "India",
+          phoneCode: subscriptionState.billing_info?.meta_value?.phoneCode || countries[0]?.phoneCode,
+          isoCode: subscriptionState.billing_info?.meta_value?.isoCode || countries[0]?.isoCode
         };
 
         setFormData(billingInfo)
 
       }
-      selectboxObserver()
+      setTimeout(() => {
+        selectboxObserver()
+      },700)
     }, [subscriptionState.billing_info])
 
       const handleChange = (e) => {
@@ -297,7 +327,9 @@ useEffect(() => {
     setErrors(newErrors);
   };
 
-
+useEffect(() => {
+  console.log('formdata changed:: ', formData)
+}, [formData])
 const handleSubmit = (e) => {
   e.preventDefault()
   
@@ -442,7 +474,7 @@ const handleSubmit = (e) => {
     }
   }, [subscriptionState.InvoiceData])
 
-  const authorizeSubscriptionPayment = async (payload) => {
+  /*const authorizeSubscriptionPayment = async (payload) => {
     try {
       setLoading(true)
       const { customer_id, subscription_id, planId } = payload;
@@ -490,7 +522,7 @@ const handleSubmit = (e) => {
     } finally {
       setLoading(false);
     }
-  }
+  }*/
 
   return (
     <>
@@ -624,25 +656,78 @@ const handleSubmit = (e) => {
                   </Row>
   
                   <Row>
-                    <Form.Group className="position-relative mb-0 form-group">
-                      <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                      <Row>
-                        <Col className="d-flex align-items-start gap-3">
-                          <Form.Select className="w-auto pe-5 custom-selectbox">
-                            {countries.map((country) => (
-                              <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
-                                {country.phoneCode}
-                              </option>
-                            ))}
-                          </Form.Select>
+
+                  <div className="position-relative">
+      
+                    {/* Input Row */}
+                    <div className="d-flex gap-2">
+                      
+                      {/* Country Selector */}
+                      <div
+                        className="border rounded px-3 py-2 d-flex align-items-center cursor-pointer"
+                        style={{ minWidth: "120px" }}
+                        onClick={() => setShowDropdown(!showDropdown)}
+                      >
+                        <span className={`fi fi-${formData?.isoCode?.toLowerCase()} me-2`}></span>
+                        {formData?.phoneCode}
+                      </div>
+
+                      {/* Phone Input */}
+                      <Form.Group className="position-relative mb-0 form-group">
+                        <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
+                        <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                        {showError("phone")}
+                      </Form.Group>
+                    </div>
+
+                    {/* Dropdown */}
+                    {showDropdown && (
+                      <div
+                        className="position-absolute bg-white border rounded mt-2 shadow"
+                        style={{ width: "100%", zIndex: 1000 }}
+                      >
                         
-                          <div className="flex-fill position-relative">
-                            <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
-                            {showError("phone")}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Form.Group>
+                        {/* Search */}
+                        <div className="p-2">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search countries..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                          />
+                        </div>
+
+                        {/* List */}
+                        <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                          {filtered.map((c) => (
+                            <div
+                              key={c.isoCode}
+                              className="d-flex justify-content-between align-items-center px-3 py-2 hover-bg"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => {
+                                setFormData({
+                                  ...formData,
+                                  phoneCode: c.phoneCode,
+                                  isoCode: c.isoCode
+                                })
+                                setShowDropdown(false);
+                                setSearch("");
+                              }}
+                            >
+                              <div>
+                                <span className={`fi fi-${c?.isoCode?.toLowerCase()} me-2`}></span>
+                                {c.name}
+                              </div>
+                              <span>{c.phoneCode}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                   
                   </Row>
   
                   <Form.Group  className="position-relative mb-0 form-group">
@@ -717,12 +802,12 @@ const handleSubmit = (e) => {
                     <Form.Select
                       className="custom-selectbox"
                       name="country"
-                      value={formData.country}
+                      value={formData?.country.toLowerCase()}
                       onChange={handleChange}
                       required
                     >
                       {countries.map((country) => (
-                        <option key={`country-${country.isoCode}--${country.phoneCode}`} value={country.value}>
+                        <option key={`country-${country.isoCode}--${country.phoneCode}`} value={country.value.toLowerCase()}>
                           {country.name}
                         </option>
                       ))}

@@ -17,12 +17,14 @@ export default function ToastAlerts() {
     const apiResultHoliday = useSelector( state => state.holiday);
     const apiPermission = useSelector( state => state.permissions)
     const postResult = useSelector( state => state.post);
+    const apiCustomfields = useSelector((state) => state.customfields);
     const dispatch = useDispatch();
     const { currentMember } = useSelector(state => state.member);
     const reportState = useSelector((state) => state.reports)
     const activityState = useSelector((state) => state.activity)
     const attendance = useSelector((state) => state.attendance)
     const subscription = useSelector((state) => state.subscription)
+    const useractions = useSelector((state) => state.useractions)
     const teams = useSelector((state) => state.teams)
     const [loggedIn, setLoggedIn] = useState(false);
 
@@ -48,6 +50,11 @@ export default function ToastAlerts() {
 
       if(subscription.message ){ 
           addToast(subscription.message, subscription.message_variant);
+          handleClearMessages()
+      }
+
+      if(useractions.message ){ 
+          addToast(useractions.message, useractions.message_variant);
           handleClearMessages()
       }
 
@@ -126,8 +133,13 @@ export default function ToastAlerts() {
           addToast(postResult.message, postResult.message_variant);
           handleClearMessages()
         }
+
+        if(apiCustomfields.message){
+          addToast(apiCustomfields.message, apiCustomfields.message_variant);
+          handleClearMessages()
+        }
     
-      },[apiResultMember,workflow, teams, reportState,attendance,subscription, activityState, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask,apiResultHoliday,apiPermission,postResult, dispatch]);
+      },[apiResultMember,workflow, teams,apiCustomfields,useractions, reportState,attendance,subscription, activityState, apiResultProject, apiResultAuth, apiResultClient, workspace, currentMember, loggedIn, apiResultTask,apiResultHoliday,apiPermission,postResult, dispatch]);
 
       const clearMessages = () => ({
         type: CLEAR_MESSAGES,

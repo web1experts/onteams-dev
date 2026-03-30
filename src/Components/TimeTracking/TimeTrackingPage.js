@@ -34,8 +34,7 @@ import {
   FiCalendar,
   FiUser,
   FiTrash2,
-  FiCheckCircle,
-  FiCheck,
+  FiCheckCircle
 } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
@@ -50,7 +49,6 @@ import {
   BsArrowClockwise,
   BsArrowLeftCircleFill,
   BsArrowRightCircleFill,
-  BsDashLg,
 } from "react-icons/bs";
 import {
   MdOutlineClose,
@@ -65,10 +63,9 @@ import {
   getliveActivity,
   getRecoredActivity,
   deleteRecoredActivity,
-  getAllMembersRecordedActivity,
   getMemberRecoredActivity,
 } from "../../redux/actions/activity.action";
-import { selectboxObserver } from "../../helpers/commonfunctions";
+import { selectboxObserver, groupSelectboxObserver } from "../../helpers/commonfunctions";
 import {
   socket,
   refreshSocket,
@@ -94,6 +91,9 @@ import {
 } from "../../redux/actions/project.action";
 import debounce from "lodash.debounce";
 import { getActiveSubscription } from "../../redux/actions/subscription.action";
+import { Listmembers } from "../../redux/actions/members.action";
+import { getTeams } from "../../redux/actions/team.action";
+import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 
 
 function TimeTrackingPage() {
@@ -111,11 +111,12 @@ function TimeTrackingPage() {
   const [selected, setSelected] = useState(null);
   const subscriptionState = useSelector((state) => state.subscription);
   const [projectFilter, setProjectFilter] = useState({ status: "in-progress" });
+  const apiPermission = useSelector((state) => state.permissions);
   const memberProfile = currentMemberProfile();
   let totalhours = 0;
   let totalProjecthours = 0;
   const currentMember = getMemberdata();
-  const [spinner, setSpinner] = useState(false);
+  const [spinner, setSpinner] = useState(true);
   const [activityspinner, setActSpinner] = useState(false);
   const [ streamError, setStreamError] = useState('')
   const [cardNumbers, setCardNumbers] = useState({
@@ -124,6 +125,8 @@ function TimeTrackingPage() {
     inactiveCount: 0,
     totalHours: 0,
   });
+  // const memberFeed = useSelector((state) => state.member.members);
+  //  const [allMembers, setAllmembers] = useState([]);
   const handleShow = () => setShow(true);
   const [totalTaskDuration, setTotalTaskDuration] = useState(0);
   const handleProjectShow = () => setProjectShow(true);
@@ -132,6 +135,9 @@ function TimeTrackingPage() {
   const MemberprojectFeed = useSelector(
     (state) => state.project.memberProjects
   );
+  const teamsState = useSelector((state) => state.teams)
+  const [teamfeed, setTeamFeed] = useState([]);
+  const [assignedTeamsOrMembers, setAssignedTeamsOrMembers] = useState({})
   const [isActiveView, setIsActiveView] = useState(2);
   const [liveStreaming, setLiveStreaming] = useState({});
   const [isScreenActive, setIsScreenActive] = useState(false);
@@ -177,7 +183,9 @@ function TimeTrackingPage() {
   const [memberActivities, setMemberActivities] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setsearchTerm] = useState("");
-  const [filters, setFilters] = useState({ status: "live" });
+  const [filters, setFilters] = useState({ status: "live",
+    member: (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true) ? 'all' : memberProfile?._id
+   });
   const filtersRef = useRef(filters);
   const [date, setDate] = useState("");
   const [showFilter, setFilterShow] = useState(false);
@@ -222,6 +230,22 @@ useEffect(() => {
     setActiveSubscription(subscriptionState.activeSubscription) 
   }
 }, [subscriptionState.activeSubscription])
+
+// useEffect(() => {
+//   if (memberFeed && memberFeed.memberData) {
+//     const memberarray = [];
+//     memberFeed.memberData.forEach((member) => {
+//       memberarray.push({ value: member._id, label: member.name });
+//     });
+//     setAllmembers(memberarray);
+//   }
+// }, [memberFeed, dispatch]);
+
+useEffect(() => {
+  if (teamsState && teamsState.teams) {
+    setTeamFeed(teamsState.teams);
+  }
+}, [teamsState])
 
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
@@ -330,35 +354,15 @@ useEffect(() => {
       if (Object.keys(currentFilters).length > 0) {
         selectedfilters = { ...selectedfilters, ...currentFilters };
       }
-
-      // if (
-      //   memberProfile?.permissions?.tracking?.view_others === true &&
-      //   memberProfile?.permissions?.tracking?.selected_members?.length > 0
-      // ) {
-      //   selectedfilters = {
-      //     ...selectedfilters,
-      //     ["selected_members"]:
-      //       memberProfile?.permissions?.tracking?.selected_members,
-      //   };
-      // } else {
-      //   selectedfilters = {
-      //     ...selectedfilters,
-      //     ["selected_members"]: [memberProfile?._id],
-      //   };
-      // }
-
       await dispatch(getliveActivity(selectedfilters));
-      setSpinner(false);
+      
     }
   };
 
   const handleLiveActivityList = async () => {
     setSpinner(true);
     const currentFilters = filtersRef.current;
-    
-    // if (currentFilters.status === "recordings") {
-    //   return;
-    // }
+
     let selectedfilters = {
       currentPage: currentPage,
       status: currentFilters.status,
@@ -372,7 +376,7 @@ useEffect(() => {
     }
 
     await dispatch(getliveActivity(selectedfilters));
-    setSpinner(false);
+    
   };
 
   const handleFilteredLiveActivityList = async () => { 
@@ -417,28 +421,14 @@ useEffect(() => {
       handleFilteredLiveActivityList();
     }
   }, [filtereddate]);
-  // useEffect(() => {
-  //   const [fromDate, toDate] = filtereddate;
-
-  //   // condition: at least one date OR both dates are different
-  //   const hasValidDates =
-  //     (fromDate && fromDate.trim() !== "") ||
-  //     (toDate && toDate.trim() !== "") ||
-  //     (fromDate && toDate && fromDate !== toDate);
-
-  //   if (hasValidDates) {
-  //     if (isActive === true) {
-  //       handleRecordedActivity();
-  //     } else {
-  //       handleFilteredLiveActivityList();
-  //     }
-  //   }
-  // }, [filtereddate]);
-
+  
 
   useEffect(() => {
     handleListProjects();
     dispatch(getActiveSubscription())
+    dispatch(getAssignedTeamsOrMembersByRole(memberProfile?.role?._id))
+    // dispatch(Listmembers({currentPage: 0, searchTerm: '', has_limit: false}));
+    dispatch(getTeams())
   }, [dispatch]);
 
   useEffect(() => {
@@ -448,9 +438,6 @@ useEffect(() => {
     }
   }, [MemberprojectFeed]);
 
-  const handlechange = ({ target: { name, value } }) => {
-    setFields({ ...fields, [name]: value });
-  };
 
   useEffect(() => {
     setLoader(false);
@@ -481,21 +468,7 @@ useEffect(() => {
     await dispatch(ListMemberProjects(currentMember?._id));
   };
 
-  // function formatTime(seconds) {
-  //   // Validate input: check if seconds is a valid non-negative number
-  //   if (typeof seconds !== "number" || seconds < 0 || isNaN(seconds)) {
-  //     return "00:00";
-  //   }
-  //   // Calculate hours, minutes, and seconds
-  //   const hours = Math.floor(seconds / 3600)
-  //     .toString()
-  //     .padStart(2, "0");
-  //   const minutes = Math.floor((seconds % 3600) / 60)
-  //     .toString()
-  //     .padStart(2, "0");
-  //   return `${hours}:${minutes}`;
-  // }
-
+  
   useEffect(() => {
     setLiveStreaming({...liveStreaming, [currentActivity?._id] : currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"});
 
@@ -867,13 +840,21 @@ const ymd = (dateLike) => {
    
   };
 
-  useEffect(() =>{
-      console.log('current Activity:: ', currentActivity)
-    },[currentActivity])
+  useEffect(() => {
+    if(apiPermission?.assignedTeamsOrMembers){
+      setAssignedTeamsOrMembers(apiPermission?.assignedTeamsOrMembers)
+      setTimeout(() => {
+        groupSelectboxObserver()
+      },700)
+    }
+  }, [apiPermission?.assignedTeamsOrMembers])
 
   useEffect(() => {
     refreshSocket();
     selectboxObserver();
+    setTimeout(() => {
+      groupSelectboxObserver()
+    }, 600);
     // handleLiveActivityList();
 
     socket.on("receive_record_types", async (record_types = {}) => {
@@ -1147,7 +1128,21 @@ const ymd = (dateLike) => {
       // only debounce search
       debouncedUpdateSearch(value);
     } else  {
-      setFilters({ ...filters, [name]: value });
+      setFilters((prev) => {
+        const updated = { ...prev };
+
+        if (name === "member") {
+          delete updated.team;   // remove team when member changes
+        }
+
+        if (name === "team") {
+          delete updated.member;    // remove member when team changes
+        }
+
+        updated[name] = value;
+        return updated;
+      });
+      // setFilters({ ...filters, [name]: value });
     }
   };
 
@@ -1315,11 +1310,39 @@ const ymd = (dateLike) => {
     }
   }, [taskFeed, dispatch]);
 
-  // useEffect(() => {
-  //   if (filteredTasks?.length > 0 && entries.length === 0) {
-  //     setEntries([...entries, { task: filteredTasks[0]._id, start_time: "", end_time: "" }]);
-  //   }
-  // }, [filteredTasks])
+  const isMemberSelected = (selectedTeamMembers = {}, memberId) => {
+    return Object.values(selectedTeamMembers).some((membersArray) =>
+      membersArray.includes(memberId)
+    );
+  };
+
+const getMembersFromTeams = (selectedTeamIds) => { 
+    if (!Array.isArray(teamfeed) || !Array.isArray(selectedTeamIds)) {
+      return [];
+    }
+
+    const seen = new Set();
+    const result = [];
+
+    teamfeed.forEach((team) => {
+      if (!selectedTeamIds.includes(String(team?._id))) return;
+
+      if (!Array.isArray(team?.members)) return;
+
+      team.members.forEach((member) => {
+        const memberId = String(member?._id);
+        if (!memberId || seen.has(memberId)) return;
+
+        seen.add(memberId);
+        result.push({
+          value: memberId,
+          label: member.name,
+        });
+      });
+    });
+
+    return result;
+  };
 
   useEffect(() => {
     setFilteredTasks(taskslists[selectedWorkflow]?.tasks);
@@ -1578,85 +1601,14 @@ const ymd = (dateLike) => {
                   plugins={[<FilterButton position="bottom" />]}
                 />
               </Form.Group>
-              {/* <Form.Group className="mb-0 form-group ms-2">
-                <DatePicker
-                  key={"date-filter-from"}
-                  ref={datePickerRef}
-                  name="from_date"
-                  weekStartDayIndex={1}
-                  id="datepicker-filter-from"
-                  value={filtereddate[0] || ""}
-                  format="YYYY-MM-DD"
-                  multiple={false}
-                  editable={false}
-                  numberOfMonths={1}
-                  onChange={(value) => {
-                    const formatDate = (date) => {
-                      const d = new Date(date);
-                      const year = d.getFullYear();
-                      const month = String(d.getMonth() + 1).padStart(2, "0");
-                      const day = String(d.getDate()).padStart(2, "0");
-                      return `${year}-${month}-${day}`;
-                    };
-
-                    const fromDate = formatDate(value);
-                    setFilteredDate([fromDate, filtereddate[1] || ""]);
-                  }}
-                  className="form-control"
-                  placeholder="From date"
-                  open={isPickerOpen}
-                  onOpen={() => setIsPickerOpen(true)}
-                  onClose={() => setIsPickerOpen(false)}
-                  plugins={[<FilterButton position="bottom" />]}
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-0 form-group ms-2">
-                <DatePicker
-                  key={"date-filter-to"}
-                  ref={datePickerRefto}
-                  name="to_date"
-                  weekStartDayIndex={1}
-                  id="datepicker-filter-to"
-                  value={filtereddate[1] || ""}
-                  format="YYYY-MM-DD"
-                  multiple={false}
-                  numberOfMonths={1}
-                  editable={false}
-                  minDate={filtereddate[0] || null} // ✅ To-date cannot be before from-date
-                  onChange={(value) => {
-                    const formatDate = (date) => {
-                      const d = new Date(date);
-                      const year = d.getFullYear();
-                      const month = String(d.getMonth() + 1).padStart(2, "0");
-                      const day = String(d.getDate()).padStart(2, "0");
-                      return `${year}-${month}-${day}`;
-                    };
-
-                    const toDate = formatDate(value);
-                    setFilteredDate([filtereddate[0] || "", toDate]);
-                  }}
-                  className="form-control"
-                  placeholder="To date"
-                  open={isPickerOpen}
-                  onOpen={() => setIsPickerOpen(true)}
-                  onClose={() => setIsPickerOpen(false)}
-                  plugins={[<FilterButton position="bottom" />]}
-                />
-              </Form.Group> */}
-
+              
               </>
             )}
           </Form>
         </ListGroup.Item>
       </>
     );
-    // } else {
-    //   return (
-    //     <>
-    //     </>
-    //   )
-    // }
+   
   };
 
   const showRecordedTabs = () => {
@@ -1675,7 +1627,12 @@ const ymd = (dateLike) => {
                 <TbScreenshot className="me-1" /> Screenshots
               </Button>
               {
-                (activeSubscription && activeSubscription?.planId === 'elite' ) ? (
+                (activeSubscription && ['price_1Sm6h8SZtJkrH95eYrwqvWQx',
+                                        'price_1Sm6hhSZtJkrH95e3hAKkKBG',
+                                        'price_1Sm6hhSZtJkrH95e3hAKkKBG',
+                                        'price_1T1kNISZtJkrH95epkJdx2QN',
+                                        'price_1T1kNUSZtJkrH95eeWlP2oMU',
+                                        'price_1T1kNhSZtJkrH95eEKKOZ2LG', 'plan_ReKagUnhkdX86V'].includes(activeSubscription?.planId) ) ? (
                   <Button
                     variant="primary"
                     className="btn--view"
@@ -1820,7 +1777,113 @@ const ymd = (dateLike) => {
                         <FiVideo className="me-1" /> Recorded
                       </ListGroup.Item>
                     </ListGroup>
+                    {
+                      
+                        
+                        ( memberProfile?.role?.permissions?.time_tracking?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===  true) ? 
+                          (
+                            <ListGroup.Item
+                              className={
+                                "ms-auto d-none d-xl-flex"
+                              }
+                              key="member-filter-list"
+                            >
+                              <Form.Select
+                                className="custom-selectbox"
+                                onChange={(event) => 
+                                  handlefilterchange("member", event.target.value)
+                                }
+                                value={filters?.["member"] || "all"}
+                                
+                              >
+                                <option
+                                  value={memberProfile?._id}
+                                  key="my-info-option"
+                                >
+                                  My Time Logs
+                                </option>
+                                
+                                {(assignedTeamsOrMembers?.members?.length > 0 ) && (
+                                  <option key={`member-info-all`} value={"all"}>
+                                    All Members
+                                  </option>
+                                )}
+                                <>   
+                                  {  assignedTeamsOrMembers?.members?.map((member, index) => (
+                                        <option
+                                          key={`member-projects-${index}`}
+                                          value={member._id}
+                                        >
+                                          {member.name}
+                                        </option>
+                                      ))
+    
+                                  }
+                                </>
+                                
+                              </Form.Select>
+                            </ListGroup.Item>
+                            )
+                            :
+                            (memberProfile?.role?.permissions?.time_tracking?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                                  true) ?
+                            <ListGroup.Item 
+                            className={
+                              "ms-auto d-none d-xl-flex"
+                            }
+                            key="teams-filter-list">
+                          <Form.Select
+                              className="custom-group-selectbox"
+                              onChange={(event) => {
+                                const group = event.target.selectedOptions[0].dataset.group;
+                                handlefilterchange(group, event.target.value);
+                              }}
+                              value={filters?.["member"] || "all"}
+                            >
+                                <>
+                                  {/* MEMBERS GROUP */}
+                                  <optgroup label="Members">
+                                    <option value={memberProfile?._id} data-group="member">
+                                      My Time Logs
+                                    </option>
+                                    <option value="all" data-group="member">
+                                      All Members
+                                    </option>
+                                    {assignedTeamsOrMembers?.members?.map((member) => (
+                                          <option
+                                            key={member._id}
+                                            value={member._id}
+                                            data-group="member"
+                                          >
+                                            {member.name}
+                                          </option>
+                                        ))}
+                                        
+                                  </optgroup>
+                                  <optgroup label="Teams">
+    
+                                    {assignedTeamsOrMembers?.teams?.map((team, index) => {
+                                        return (
+                                          <option
+                                            key={`team-info-${index}`}
+                                            value={team._id}
+                                            data-group="team"
+                                          >
+                                            {team.name}
+                                          </option>
+                                        )
+                                    })}
+                                  </optgroup>
+                                </>
+                              
+                            </Form.Select>
+                          </ListGroup.Item>
+                          :<></>
+                          
+                    }
+                    
                     {showTabs()}
+                    
                     {activeTab === "Live" && (
                       <ListGroup.Item
                         key="filter-key-6"
@@ -1865,7 +1928,7 @@ const ymd = (dateLike) => {
                       </Form>
                     </ListGroup.Item>
                     {(memberProfile?.role?.permissions?.time_tracking
-                      ?.add_manual_time === true || memberProfile?.role?.permissions?.reports
+                      ?.add_manual_time === true || memberProfile?.role?.permissions?.time_tracking
                       ?.update_manual_time === true ||
                       memberProfile?.role?.slug === "owner") && (
                       <Dropdown className="select--dropdown manual--dropdown">
@@ -1879,8 +1942,8 @@ const ymd = (dateLike) => {
                                 Manual Time
                               </Dropdown.Item>
                             )}
-                          {memberProfile?.role?.permissions?.reports
-                            ?.update_manual_time === true && (
+                          {(memberProfile?.role?.permissions?.time_tracking
+                            ?.update_manual_time === true && memberProfile?.role?.permissions?.time_tracking?.view_others === true) && (
                             <Dropdown.Item
                               onClick={handleNewShow}
                               to="/manual-time"
@@ -2393,6 +2456,36 @@ const ymd = (dateLike) => {
             </span>
             <div className="projecttitle">
               <Dropdown>
+                {
+                  ( liveactivities && liveactivities.length === 1 ) ? 
+                    <>
+                    <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
+                      <div className="title--initial">
+                        {currentActivity?.name?.charAt(0)}
+                        {currentActivity?.latestActivity?.status ? (
+                          <p className="anim--circle">
+                            <small className="status--circle active--color"></small>
+                          </p>
+                        ) : currentActivity?.latestActivity?.status === false ? (
+                          <p className="anim--circle">
+                            <small className="status--circle idle--color"></small>
+                          </p>
+                        ) : (
+                          <p className="anim--circle">
+                            <small className="status--circle inactive--color"></small>
+                          </p>
+                        )}
+                      </div>
+                      <div className="title--span flex-column align-items-start gap-0">
+                        <h3>
+                          <strong>{currentActivity?.name}</strong>
+                          <span>{currentActivity?.role?.name || ""}</span>
+                        </h3>
+                      </div>
+                    </button>
+                    </>
+                  :
+                  <>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <div className="title--initial">
                     {currentActivity?.name?.charAt(0)}
@@ -2457,6 +2550,8 @@ const ymd = (dateLike) => {
                       })}
                   </div>
                 </Dropdown.Menu>
+                </>
+              }
               </Dropdown>
             </div>
             <ListGroup
@@ -2563,20 +2658,27 @@ const ymd = (dateLike) => {
                   key={`activity-${currentActivity?._id}`}
                 >
                   <div className="timer--task">
-                    <h5
-                      key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}
-                    >
-                      {currentActivity?.latestActivity?.project?.title || (
-                        <BsDash />
-                      )}{" "}
-                      [{currentActivity?.latestActivity?.project?.client?.name}]
-                      -{" "}
-                      <small>
-                        {currentActivity?.latestActivity?.task?.title || (
-                          <BsDash />
-                        )}
-                      </small>
-                    </h5>
+                    {
+                      (currentActivity?.latestActivity?._id) && (
+                        <h5
+                          key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}
+                        >
+                          {currentActivity?.latestActivity?.project?.title || (
+                            <BsDash />
+                          )}{" "}
+                          {currentActivity?.latestActivity?.project?.client?.name
+                            ? `[${currentActivity.latestActivity.project.client.name}]`
+                            : ""}
+                          -{" "}
+                          <small>
+                            {currentActivity?.latestActivity?.task?.title || (
+                              <BsDash />
+                            )}
+                          </small>
+                        </h5>
+                      )
+                    }
+                    
                     {/* <span className="ms-md-3">
                       {currentActivity?.latestActivity?.app_version}
                     </span> */}

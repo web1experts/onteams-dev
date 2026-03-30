@@ -157,21 +157,26 @@ export function renderDynamicField(config) {
 
       {/* Select */}
       {(type === 'select' || type === 'dropdown') && (
-        <Form.Select {...sharedProps} key={fieldId} className='custom-selectbox'>
-          <option value="">-- Select --</option>
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </Form.Select>
+        (readOnly === true) ?
+          <p>{value}</p>
+        :
+        <>
+          <Form.Select {...sharedProps} key={fieldId} className='custom-selectbox'>
+            <option value="">-- Select --</option>
+            {options.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </Form.Select>
+        </>
       )}
 
       {(type === 'badge') && (
         <>
         <Form.Label>
             <small>{label}</small>
-            <div className="status--modal" onClick={toggleBadges}>
+            <div className="status--modal" onClick={!readOnly ? toggleBadges : undefined}>
                 {value || 'Select'} <FaChevronDown />
             </div>
         </Form.Label>

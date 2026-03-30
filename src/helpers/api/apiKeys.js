@@ -40,7 +40,8 @@ const apiKeys = {
     quote: '/workspace/getQuote',
     system_field: 'system_field',
     teams: '/teams',
-    options: '/options'
+    options: '/options',
+    useractions: '/useractions'
 };
   
 export default apiKeys;

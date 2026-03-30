@@ -185,9 +185,9 @@ function AccountSetup() {
                                                 name="agree"
                                                 checked={fields?.agree}
                                                 onChange={handleChange}
-                                                
+                                                id="terms-checkbox-input"
                                             />
-                                             <label className="form-check-label">
+                                             <label className="form-check-label" htmlFor="terms-checkbox-input">
                                                 I agree to the <a href="https://primeteams.ai/terms-and-conditions/" target="_blank" rel="noreferrer">Terms & Conditions</a>
                                             </label>
                                         </div>

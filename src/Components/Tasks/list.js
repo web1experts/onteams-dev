@@ -31,7 +31,10 @@ const TasksList = React.memo((props) => {
   const [showtaskform, setShowtaskform] = useState({});
   const taskFeed = useSelector((state) => state.task?.tasks);
   const [taskslists, setTasksLists] = useState([]);
-  const handleTaskShow = () => dispatch(togglePopups("taskform", true));
+  const handleTaskShow = () => {
+    console.log('trigger')
+    dispatch(togglePopups("taskform", true))
+  };
   const [currentProject, setCurrentProject] = useState({});
   const [spinner, setSpinner] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -39,7 +42,7 @@ const TasksList = React.memo((props) => {
   let fieldErrors = {};
   const handleListTasks = async () => {
     await dispatch(ListTasks(commonState?.currentProject?._id));
-    setSpinner(false);
+    
   };
 
   useEffect(() => {
@@ -65,6 +68,7 @@ const TasksList = React.memo((props) => {
     if (taskFeed?.taskData && Object.keys(taskFeed.taskData).length > 0) {
       setTasksLists(taskFeed.taskData);
     }
+    setSpinner(false);
   }, [taskFeed, dispatch]);
 
   useEffect(() => {
@@ -128,7 +132,10 @@ const TasksList = React.memo((props) => {
 
           return updatedState;
         });
-     
+        
+        if(apiResult.refresh){
+          handleListTasks()
+        }
     }
   },[apiResult.UpdatedTask])
 
@@ -480,16 +487,7 @@ const TasksList = React.memo((props) => {
                                       dispatch(getTaskById(task?._id))
                                       setSpinner(false)
                                       setSelectedTask(task)
-                                      // await dispatch(
-                                      //   updateStateData(
-                                      //     ACTIVE_FORM_TYPE,
-                                      //     "task_edit"
-                                      //   )
-                                      // );
-                                      // await dispatch(
-                                      //   updateStateData(CURRENT_TASK, task)
-                                      // );
-                                      // handleTaskShow();
+                                      
                                     }}
                                     style={getStyle(
                                       provided.draggableProps.style,

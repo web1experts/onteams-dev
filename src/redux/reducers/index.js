@@ -20,6 +20,7 @@ import customfieldReducer from "./customfield.reducer";
 import systemfieldReducer from "./systemfield.reducer";
 import teamReducer from "./team.reducer";
 import optionReducer from "./option.reducer";
+import useractionsReducer from "./useractions.reducer";
 export default combineReducers({
   auth: authReducer,
   project: projectReducer,
@@ -41,5 +42,6 @@ export default combineReducers({
   customfields: customfieldReducer,
   systemfields: systemfieldReducer,
   teams: teamReducer,
-  option: optionReducer
+  option: optionReducer,
+  useractions: useractionsReducer
 });

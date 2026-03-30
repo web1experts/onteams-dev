@@ -64,7 +64,9 @@ export default (state = initialState, action) => {
     case BILLING_SUCCESS: 
         return {
             ...state,
-            billing_info: action.payload.billingInfo
+            billing_info: action.payload.billingInfo,
+            message: action.payload.message,
+            message_variant: 'success',
         }
     case AUTHORIZE_PAYMENT_SUCCESS: 
         return {

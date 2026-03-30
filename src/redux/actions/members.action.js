@@ -59,10 +59,10 @@ function errorRequest(err, dispatch) {
  * @function ListMEMBERs
  * @returns {Object}
  */
-export const Listmembers = (currentPage, searchterm, has_limit = true) => {
+export const Listmembers = (payload = {}) => {
     return async (dispatch) => {
         try {
-            const response = await API.apiGet('member', { search: searchterm, currentPage: currentPage, has_limit: has_limit });
+            const response = await API.apiGet('member', payload);
             if (response.data && response.data.success) {
                 await dispatch({ type: LIST_MEMBER_SUCCESS, payload: response.data })
             } else {

@@ -19,10 +19,12 @@ export const permissionModules = [
     permissions: [
       "view",
       "view_others",
+      "view_unassigned",
       "create_edit_delete_project",
       "create_edit_delete_task",
       "update_projects_order",
       "update_tasks_order",
+      "manage_custom_fields"
     ],
   },
   {
@@ -30,7 +32,8 @@ export const permissionModules = [
     slug: 'clients',
     permissions: [
       "view",
-      "create_edit_delete"
+      "create_edit_delete",
+      "manage_custom_fields"
     ],
   },
   {
@@ -39,6 +42,8 @@ export const permissionModules = [
     permissions: [
       "view",
       "create_edit_delete",
+      "manage_custom_fields",
+      "manage_teams",
       "update_permissions"
     ],
   },
@@ -48,6 +53,7 @@ export const permissionModules = [
     permissions: [
       "view",
       "view_others",
+      "update_manual_time",
       "delete_recordings",
       "add_manual_time"
     ],
@@ -57,9 +63,7 @@ export const permissionModules = [
     slug: 'reports',
     permissions: [
       "view",
-      "view_others",
-      "create_edit_delete",
-      "update_manual_time"
+      "view_others"
     ],
   },
   {
@@ -75,18 +79,10 @@ export const permissionModules = [
     slug: 'attendance',
     permissions: [
       "view",
-      "create_edit",
-      "view_others"
+      "view_others",
+      "create_edit"
     ],
-  },
-  {
-    name: "Teams",
-    slug: 'teams',
-    permissions: [
-      "view",
-      "create_edit_delete"
-    ],
-  }  
+  }
 ];
 
 export const permissionsLabel = {
@@ -107,10 +103,10 @@ export const permissionsLabel = {
   },
   "projects": {
     "heading": 'Project Management',
-    "sub_heading": "Project and tasks access",
+    "sub_heading": "Projects and tasks access",
     "icon": <LuFolderOpen />,
     "view": {
-      heading: "View Projects",
+      heading: "View projects",
       // sub_heading: 'Can view assigned projects and tasks',
       "icon": <BsEye />,
     },
@@ -119,13 +115,17 @@ export const permissionsLabel = {
       // sub_heading: "This role can see: All teams + future teams",
       "icon": <LuUsers />,
     } ,
+    "view_unassigned": {
+      heading: "View unassigned projects",
+      "icon": <LuUsers />,
+    },
     "create_edit_delete_project":  {
-      heading: "Manage projects (create, edit, delete)",
+      heading: "Manage projects (add, edit, delete)",
       // sub_heading: "Create, edit, and delete projects",
       "icon": <LuFolderOpen />,
     },
     "create_edit_delete_task": {
-      heading: "Manage tasks (create, edit, delete)",
+      heading: "Manage tasks (add, edit, delete)",
       // sub_heading: "Create, edit, and delete tasks",
       "icon": <FiEdit />,
     } ,
@@ -138,7 +138,11 @@ export const permissionsLabel = {
       heading: "Reorder tasks",
       // sub_heading: "Reorder and organize tasks",
       "icon": <TbArrowsDownUp />,
-    }
+    },
+    "manage_custom_fields": {
+      heading: "Manage custom fields (add, edit, delete)",
+      "icon": <TbArrowsDownUp />,
+    },
   },
   clients: {
     "heading" : 'Client Management',
@@ -146,14 +150,18 @@ export const permissionsLabel = {
     "icon": <LuUsers />,
     "view": {
       "icon": <BsEye />,
-      heading: "Client Viewing",
+      heading: "View clients",
       // sub_heading: "View client lists"
     },
     "create_edit_delete": {
       "icon": <LuFolderOpen />,
-      heading: "Client Management",
+      heading: "Manage clients (add, edit, delete)",
       // sub_heading: "Create, edit, and delete clients"
-    }
+    },
+    "manage_custom_fields": {
+      heading: "Manage custom fields (add, edit, delete)",
+      "icon": <TbArrowsDownUp />,
+    },
   },
   members: {
     "icon": <BsEye />,
@@ -166,15 +174,23 @@ export const permissionsLabel = {
     },
     "create_edit_delete": {
       "icon": <BsEye />,
-      heading: "Invite or remove members",
+      heading: "Manage team members (add, edit, remove member)",
       // sub_heading: "Create, edit, and delete members"
+    },
+    "manage_custom_fields": {
+      heading: "Manage custom fields (add, edit, delete)",
+      "icon": <TbArrowsDownUp />,
     },
     "update_permissions": {
       "icon": <BsEye />,
-      heading: "Manage permissions - Can assign roles and customize any member's permissions",
+      heading: "Manage roles (add, edit, delete)",
       caution: true,
       caution_text: "This is a powerful permission that grants full control over who can do what. Anyone with this permission can assign themselves or others any role and customize permissions. Only grant this to highly trusted team members."
       // sub_heading: "Modify member's permissions"
+    },
+    "manage_teams": {
+      "icon": <BsEye />,
+      heading: "Manage teams (add, edit, delete)"
     }
   },
   time_tracking: {
@@ -192,13 +208,18 @@ export const permissionsLabel = {
     },
     "delete_recordings": {
       "icon": <LuFolderOpen />,
-      heading: "Delete time entries",
+      heading: "Delete screenshots/screen recordings",
       // sub_heading: "Can delete recordings"
     },
     "add_manual_time": {
       "icon": <LuFolderOpen />,
       heading: "Add manual time",
       // sub_heading: "Can delete recordings"
+    },
+    "update_manual_time": {
+      "icon": <FiEdit />,
+      heading: "Approve/Reject manual time"
+      // sub_heading: "Manual time approve/disapprove"
     }
     
   },
@@ -214,16 +235,6 @@ export const permissionsLabel = {
     "view_others": { heading: "View team reports",
       "icon": <LuUsers />,
       // sub_heading: "Can view other team members work"
-      },
-    "create_edit_delete": {
-      "icon": <LuFolderOpen />,
-      heading: "Edit reports"
-      // sub_heading: "Create, edit, and delete reports"
-    },
-    "update_manual_time": {
-      "icon": <FiEdit />,
-      heading: "Approve/Reject manual time in reports"
-      // sub_heading: "Manual time approve/disapprove"
     }
   },
   holidays: {
@@ -237,7 +248,7 @@ export const permissionsLabel = {
     },
     "create_edit_delete": {
       "icon": <LuFolderOpen />,
-      heading: "Manage holidays"
+      heading: "Manage holidays (add, edit, delete)"
       // sub_heading: "Create, edit, and delete holidays"
     }
   },
@@ -252,28 +263,13 @@ export const permissionsLabel = {
     },
     "create_edit": {
       "icon": <LuFolderOpen />,
-      heading: "Edit attendance"
+      heading: "Attendance rules (add, edit, delete)"
       // sub_heading: "Create, edit, and delete member attendance"
     },
     "view_others": {
       "icon": <LuUsers />,
       heading: "View team attendance"
       // sub_heading: "Can view other team members attendance"
-    },
-  },
-  teams: {
-     "icon": <CgCalendarDates />,
-    "heading": "Teams",
-    "sub_heading": "Teams access and management",
-    "view": {
-      "icon": <BsEye />,
-      heading: "View teams"
-      // sub_heading: "View mambers daily attendance"
-    },
-    "create_edit_delete": {
-      "icon": <LuFolderOpen />,
-      heading: "Manage teams (create, edit, delete, assign members)"
-      // sub_heading: "Create, edit, and delete member attendance"
     },
   }
 }

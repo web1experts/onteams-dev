@@ -686,3 +686,13 @@ export const groupSelectboxObserver = () => {
 
     });
 };
+
+export const roleHelperText = (slug) => {
+  const helperTxtObj = {
+    'owner': 'Full access',
+    'admin': 'Manage teams & projects',
+    'member': 'Standard team member',
+    'viewer': 'Read-only access'
+  }
+  return helperTxtObj[slug] || 'Custom permissions'
+}

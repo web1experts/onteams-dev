@@ -31,7 +31,7 @@ function WorkspaceForm(props) {
   const location = useLocation();
   const { pathname } = location;
     const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const [fields, setFields] = useState({ name: props.editworkspace?.name || '', industry: props.editworkspace?.industry || "", timezone: tzMap[userTZ] || userTZ });
+  const [fields, setFields] = useState({ name: props.editworkspace?.name || '', industry: props.editworkspace?.industry || "", timezone: props.editworkspace?.timezone || "IST"});
   /** -- Form Fields Errors -- */
   const [errors, setErrors] = useState({ name: '', industry: "" });
   const [loader, setLoader] = useState(false);

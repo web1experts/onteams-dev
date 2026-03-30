@@ -9,7 +9,8 @@ import {
   PERMISSIONS_FAILED,
   PERMISSIONS_SUCCESS,
   ROLE_DELETE_SUCCESS,
-  ROLE_SUCCESS
+  ROLE_SUCCESS,
+  ASSIGN_TEAMS_AND_MEMBERS
 } from "./types";
 const config = {
   headers: {
@@ -78,4 +79,20 @@ export const deleteRole = (roleId) => {
         errorRequest(err, dispatch);
     }
   }
+}
+
+export const getAssignedTeamsOrMembersByRole = (roleId) => {
+    return async (dispatch) => {
+        try {
+        const response = await API.apiGetByKey('roles', `/assigned_teams_or_members/${roleId}`)
+        
+        if (response.data && response.data.success) {
+            await dispatch({ type: ASSIGN_TEAMS_AND_MEMBERS, payload: response.data });
+        } else {
+            // await dispatch({ type: PERMISSIONS_FAILED, payload: response.data.message });
+        }
+        } catch (err) {
+        errorRequest(err, dispatch);
+        }
+    };
 }

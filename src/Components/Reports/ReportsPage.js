@@ -27,7 +27,8 @@ import {
   showAmPmtime,
   getMemberdata,
   selectboxObserver,
-  getMembersFromTeams
+  groupSelectboxObserver
+  //getMembersFromTeams
 } from "../../helpers/commonfunctions";
 import {
   LuFolderOpen,
@@ -65,10 +66,9 @@ import {
 import DatePicker from "react-multi-date-picker";
 import { getTeams } from "../../redux/actions/team.action";
 import { currentMemberProfile } from "../../helpers/auth";
-import { Link } from "react-router-dom";
 import "media-chrome";
 import "media-chrome/dist/menu";
-
+import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 
 function ReportsPage() {
   const inputRef = useRef(null);
@@ -77,6 +77,7 @@ function ReportsPage() {
   const [isActive, setIsActive] = useState(false);
   const [activeMemberTab, setActiveViewTab] = useState("members");
   const commonState = useSelector((state) => state.common);
+  const apiPermission = useSelector((state) => state.permissions);
   const dispatch = useDispatch();
   const memberProfile = currentMemberProfile();
   const datePickerRef = useRef(null);
@@ -161,7 +162,7 @@ function ReportsPage() {
   const [selectedFilter, setSelectedFilter] = useState("today");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const [assignedTeamsOrMembers, setAssignedTeamsOrMembers] = useState({})
   const [ViewReport, setViewReport] = useState(false);
   const [showRemarks, setShowRemarks] = useState(false);
   const [activeTab, setActiveTab] = useState("screenshots");
@@ -177,7 +178,7 @@ function ReportsPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
   const [filters, setFilters] = useState({
-    member: memberdata?._id,
+    member: (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true) ? 'all' : memberProfile?._id,
     sort_by: "members",
     project_status: "in-progress",
     page: 1,
@@ -217,12 +218,60 @@ function ReportsPage() {
   }
 
   const handlefilterchange = (name, value) => {
-    setFilters({ ...filters, [name]: value });
+    // setFilters({ ...filters, [name]: value });
+    setFilters((prev) => {
+      const updated = { ...prev };
+
+      if (name === "member") {
+        delete updated.team;   // remove team when member changes
+      }
+
+      if (name === "team") {
+        delete updated.member;    // remove member when team changes
+      }
+
+      updated[name] = value;
+      return updated;
+    });
     if (name === "sort_by") {
       setTimeout(function () {
         selectboxObserver();
       }, 10);
     }
+  };
+
+  const isMemberSelected = (selectedTeamMembers = {}, memberId) => {
+    return Object.values(selectedTeamMembers).some((membersArray) =>
+      membersArray.includes(memberId)
+    );
+  };
+
+  const getMembersFromTeams = (selectedTeamIds) => { 
+    if (!Array.isArray(teamfeed) || !Array.isArray(selectedTeamIds)) {
+      return [];
+    }
+
+    const seen = new Set();
+    const result = [];
+
+    teamfeed.forEach((team) => {
+      if (!selectedTeamIds.includes(String(team?._id))) return;
+
+      if (!Array.isArray(team?.members)) return;
+
+      team.members.forEach((member) => {
+        const memberId = String(member?._id);
+        if (!memberId || seen.has(memberId)) return;
+
+        seen.add(memberId);
+        result.push({
+          value: memberId,
+          label: member.name,
+        });
+      });
+    });
+
+    return result;
   };
 
   function getProjectSummary(memberReport, arg) {
@@ -319,6 +368,7 @@ function ReportsPage() {
 
   //   await dispatch(ListMemberProjects(memberdata?._id));
   // };
+  
 
   const handleReports = async () => {
     setSpinner(true);
@@ -331,10 +381,13 @@ function ReportsPage() {
   };
 
   useEffect(() => {
-    // dispatch(Listmembers(0, "", false));
-    // handleListProjects();
-    dispatch(getTeams())
+    dispatch(getAssignedTeamsOrMembersByRole(memberProfile?.role?._id))
+    // dispatch(Listmembers({currentPage: 0, searchTerm: '', has_limit: false}));
+    // dispatch(getTeams())
     selectboxObserver();
+    // setTimeout(() => {
+    //   groupSelectboxObserver()
+    // },700)
   }, [dispatch]);
 
   useEffect(() => {
@@ -455,6 +508,15 @@ function ReportsPage() {
     }
  
   }, [view]);
+
+  useEffect(() => {
+    if(apiPermission?.assignedTeamsOrMembers){
+      setAssignedTeamsOrMembers(apiPermission?.assignedTeamsOrMembers)
+      setTimeout(() => {
+        groupSelectboxObserver()
+      },700)
+    }
+  }, [apiPermission?.assignedTeamsOrMembers])
 
   useEffect(() => {
     const check = ["undefined", undefined, "null", null, ""];
@@ -1070,7 +1132,111 @@ const formattedDate = (date) => {
                         <LuFolderOpen /> Projects
                       </ListGroup.Item>
                     </ListGroup>
+                    {                  
+                      ( memberProfile?.role?.permissions?.reports?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===  true && filters["sort_by"] === "members") ? 
+                        (
+                          <ListGroup.Item
+                            className={
+                              "ms-auto d-none d-xl-flex"
+                            }
+                            key="member-filter-list"
+                          >
+                            <Form.Select
+                              className="custom-selectbox"
+                              onChange={(event) => 
+                                handlefilterchange("member", event.target.value)
+                              }
+                              value={filters?.["member"] || "all"}
+                              
+                            >
+                              <option
+                                value={memberProfile?._id}
+                                key="my-info-option"
+                              >
+                                My Reports
+                              </option>
+                              
+                              {(assignedTeamsOrMembers?.members?.length > 0 ) && (
+                                <option key={`member-info-all`} value={"all"}>
+                                  All Members
+                                </option>
+                              )}
+                              <>   
+                                {  assignedTeamsOrMembers?.members?.map((member, index) => (
+                                      <option
+                                        key={`member-projects-${index}`}
+                                        value={member._id}
+                                      >
+                                        {member.name}
+                                      </option>
+                                    ))
+  
+                                }
+                              </>
+                              
+                            </Form.Select>
+                          </ListGroup.Item>
+                          )
+                          :
+                          (memberProfile?.role?.permissions?.reports?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                                true && filters["sort_by"] === "members") ?
+                          <ListGroup.Item 
+                          className={
+                            "ms-auto d-none d-xl-flex"
+                          }
+                          key="teams-filter-list">
+                        <Form.Select
+                            className="custom-group-selectbox"
+                            onChange={(event) => {
+                              const group = event.target.selectedOptions[0].dataset.group;
+                              handlefilterchange(group, event.target.value);
+                            }}
+                            value={filters?.["member"] || "all"}
+                          >
+                              <>
+                                {/* MEMBERS GROUP */}
+                                <optgroup label="Members">
+                                  <option value={memberProfile?._id} data-group="member">
+                                    My Reports
+                                  </option>
+                                  <option value="all" data-group="member">
+                                    All Members
+                                  </option>
+                                  {assignedTeamsOrMembers?.members?.map((member) => (
+                                        <option
+                                          key={member._id}
+                                          value={member._id}
+                                          data-group="member"
+                                        >
+                                          {member.name}
+                                        </option>
+                                      ))}
+                                      
+                                </optgroup>
+                                <optgroup label="Teams">
+  
+                                  {assignedTeamsOrMembers?.teams?.map((team, index) => {
+                                      return (
+                                        <option
+                                          key={`team-info-${index}`}
+                                          value={team._id}
+                                          data-group="team"
+                                        >
+                                          {team.name}
+                                        </option>
+                                      )
+                                  })}
+                                </optgroup>
+                              </>
+                            
+                          </Form.Select>
+                        </ListGroup.Item>
+                        :<></>
+                        
+                  }
+                    
                   </ListGroup>
+                  
                   <ListGroup horizontal className="mx-2">
                     <ListGroup.Item
                       className={"d-none d-xxl-flex"}
@@ -1388,7 +1554,7 @@ const formattedDate = (date) => {
                                               />
                                             </span>
                                           ) : (
-                                            report?.member?.name.substring(0, 1)
+                                            report?.member?.name?.substring(0, 1)
                                           )}
                                         </div>
                                         <div className="title--span flex-column d-flex align-items-start gap-0">
@@ -1466,47 +1632,66 @@ const formattedDate = (date) => {
           <div className="projecttitle">
             {isActive === 1 && activeMemberTab === "members" ? (
               <Dropdown>
-                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                  <div className="title--initial">
-                    {singleMemberReport?.member?.name?.charAt(0)}
-                  </div>
-                  <div className="title--span flex-column align-items-start gap-0">
-                    <h3>
-                      <strong>{singleMemberReport?.member?.name}</strong>
-                      <span>{singleMemberReport?.member?.role}</span>
-                    </h3>
-                  </div>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <div className="drop--scroll">
-                    {memberReports &&
-                      memberReports.length > 0 &&
-                      memberReports.map((report, index) => {
-                        return (
-                          <Dropdown.Item
-                            onClick={() => {
-                              setSingleMemberReport(report);
-                              setIsActive(1);
-                            }}
-                            className={
-                              singleMemberReport?.member?._id ===
-                              report.member?._id
-                                ? "active-project"
-                                : ""
-                            }
-                          >
-                            <div className="title--initial">
-                              {report?.member?.name.charAt(0)}
-                            </div>
-                            <div className="title--span flex-column align-items-start gap-0">
-                              <strong>{report?.member?.name}</strong>
-                              <span>{report?.member?.role}</span>
-                            </div>
-                          </Dropdown.Item>
-                        );
-                      })}
-                  </div>
-                </Dropdown.Menu>
+                {
+                  ( memberReports && memberReports.length === 1 ) ? 
+                    <>
+                    <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
+                      <div className="title--initial">
+                        {singleMemberReport?.member?.name?.charAt(0)}
+                      </div>
+                      <div className="title--span flex-column align-items-start gap-0">
+                        <h3>
+                          <strong>{singleMemberReport?.member?.name}</strong>
+                          <span>{singleMemberReport?.member?.role}</span>
+                        </h3>
+                      </div>
+                      </button>
+                    </>
+                  :
+                  <>
+                  <Dropdown.Toggle variant="link" id="dropdown-basic">
+                    <div className="title--initial">
+                      {singleMemberReport?.member?.name?.charAt(0)}
+                    </div>
+                    <div className="title--span flex-column align-items-start gap-0">
+                      <h3>
+                        <strong>{singleMemberReport?.member?.name}</strong>
+                        <span>{singleMemberReport?.member?.role}</span>
+                      </h3>
+                    </div>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <div className="drop--scroll">
+                      {memberReports &&
+                        memberReports.length > 0 &&
+                        memberReports.map((report, index) => {
+                          return (
+                            <Dropdown.Item
+                              onClick={() => {
+                                setSingleMemberReport(report);
+                                setIsActive(1);
+                              }}
+                              className={
+                                singleMemberReport?.member?._id ===
+                                report.member?._id
+                                  ? "active-project"
+                                  : ""
+                              }
+                            >
+                              <div className="title--initial">
+                                {report?.member?.name?.charAt(0)}
+                              </div>
+                              <div className="title--span flex-column align-items-start gap-0">
+                                <strong>{report?.member?.name}</strong>
+                                <span>{report?.member?.role}</span>
+                              </div>
+                            </Dropdown.Item>
+                          );
+                        })}
+                    </div>
+                  </Dropdown.Menu>
+                  </>
+                }
               </Dropdown>
             ) : (
               <Dropdown>
@@ -1951,6 +2136,7 @@ const formattedDate = (date) => {
                 </Dropdown.Menu>
               </Dropdown>
             </ListGroup.Item>
+            
 
             <ListGroup.Item key="search-filter-list">
               <Form

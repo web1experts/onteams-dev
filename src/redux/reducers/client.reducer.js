@@ -51,7 +51,7 @@ export default (state = initialState, action) => {
     
     case DELETE_CLIENT_SUCCESS:
         return {
-            deletedClient: action.payload.message,
+            deletedClient: action.payload.deletedClient,
             message: action.payload.message,
             message_variant: 'success',
             success: true

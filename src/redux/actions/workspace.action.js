@@ -13,7 +13,9 @@ import {
     UPDATE_OWNERSHIP_SUCCESS,
     UPDATE_OWNERSHIP_FAILED,
     WORKSPACE_DELETE_SUCCESS,
-    GET_ALL_ROLE_SUCCESS
+    GET_ALL_ROLE_SUCCESS,
+    VALIDATE_PASSWORD_SUCCESS,
+    VALIDATE_WS_OTP_SUCCESS
 
 } from "./types";
 
@@ -135,6 +137,22 @@ export const updateOwnership = (payload ) => {
   }
 }
 
+export const validatePassword = (payload) => {
+  return async (dispatch) => {
+    try {
+        const response = await API.apiPostUrl('workspace', `/validate-password-send-otp`, payload);
+        if (response.data && response.data.success) {
+            await dispatch({ type: VALIDATE_PASSWORD_SUCCESS, payload: response.data });
+        } else {
+            await dispatch({ type: WORKSPACE_COMMON_ERROR, payload: response.data });
+        }
+    } catch (err) {
+        errorRequest(err, dispatch);
+    }
+  }
+}
+
+
 export const deleteWorkspace = (workspaceid) => {
   return async (dispatch) => {
     try {
@@ -162,6 +180,21 @@ export const updateWorkSpaceTheme = (theme) => {
             dispatch(refreshUserWorkspace())
         } else {
             await dispatch({ type: WORKSPACE_COMMON_ERROR, payload: response.data.message });
+        }
+    } catch (err) {
+        errorRequest(err, dispatch);
+    }
+  }
+}
+
+export const validateWorkspaceDeleteOTP = (payload) => {
+  return async (dispatch) => {
+    try {
+        const response = await API.apiPostUrl('workspace', `/validate-workspace-delete-otp`, payload);
+        if (response.data && response.data.success) {
+            await dispatch({ type: VALIDATE_WS_OTP_SUCCESS, payload: response.data });
+        } else {
+            await dispatch({ type: WORKSPACE_COMMON_ERROR, payload: response.data });
         }
     } catch (err) {
         errorRequest(err, dispatch);

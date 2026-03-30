@@ -11,7 +11,9 @@ import {
     WORKSPACE_UPDATE_SUCCESS,
     WORKSPACE_DELETE_SUCCESS,
     REFRESH_DASHBOARDS,
-    GET_ALL_ROLE_SUCCESS
+    GET_ALL_ROLE_SUCCESS,
+    VALIDATE_PASSWORD_SUCCESS,
+    VALIDATE_WS_OTP_SUCCESS
 } from "../actions/types";
 import * as auth from '../../helpers/auth';
 const token = auth.getToken();
@@ -59,6 +61,16 @@ export default (state = initialState, action) => {
             return {
                 all_roles: action.payload.roles
             }
+        case VALIDATE_PASSWORD_SUCCESS: 
+            return {
+                password_validate: true
+            }
+        case VALIDATE_WS_OTP_SUCCESS: 
+            return {
+                // message: action.payload.message,
+                // message_variant: 'success',
+                workspace_delelete_otp_verified: true
+            }
         case CLEAR_MESSAGES:
             return {
                 // ...state,
@@ -81,7 +93,7 @@ export default (state = initialState, action) => {
             return {
                 message_variant: 'success',
                 message: action.payload.message,
-                ownershipUpdate: true
+                // ownershipUpdate: true
             }
         case UPDATE_OWNERSHIP_FAILED : 
             return {
@@ -92,7 +104,8 @@ export default (state = initialState, action) => {
             return {
                 message_variant: 'success',
                 message: action.payload.message,
-                success: true
+                success: true,
+                workspace_deleted: true
             }
         case REFRESH_DASHBOARDS: 
             return {
