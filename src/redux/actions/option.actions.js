@@ -4,6 +4,7 @@ import {
     LOGIN_COMMON_ERROR,
     OPTIONS_ERROR,
     OPTION_SUCCESS,
+    ALL_OPTION_SUCCESS
 } from "./types";
 const config = {
   headers: {
@@ -36,6 +37,20 @@ function errorRequest(err, dispatch) {
   
         if (response.data && response.data.success) {
           await dispatch({ type: OPTION_SUCCESS, payload: response.data });
+        }
+      } catch (err) {
+        errorRequest(err, dispatch);
+      }
+    };
+  }
+
+  export const getAllOptions = () => {
+    return async (dispatch) => {
+      try {
+        const response = await API.apiGet('options')
+  
+        if (response.data && response.data.success) {
+          await dispatch({ type: ALL_OPTION_SUCCESS, payload: response.data });
         }
       } catch (err) {
         errorRequest(err, dispatch);

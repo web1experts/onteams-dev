@@ -6,7 +6,7 @@ import { BsTags } from "react-icons/bs";
 import { MdOutlineClose } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { currentMemberProfile } from "../../helpers/auth";
-import { createSubscription, saveAuthorization, getUpcomingInvoice, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan } from "../../redux/actions/subscription.action";
+import { createSubscription, checkifTrialPlanExist, getUpcomingInvoice, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan } from "../../redux/actions/subscription.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
 import { countries } from "../../helpers/countries";
 import { getPlans } from "../../helpers/plans";
@@ -16,7 +16,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import InvoicePreview from "./InvoicePreview";
 import Spinner from 'react-bootstrap/Spinner';
-import { getOption } from "../../redux/actions/option.actions";
+import { getOption, getAllOptions } from "../../redux/actions/option.actions";
 
   
 function PlansPage() {
@@ -27,6 +27,7 @@ function PlansPage() {
   const optionState = useSelector((state) => state.option)
   const [stripePromise, setStripePromise] = useState(null)
   const [stripeMode, setStripeMode] = useState( 'sandbox')
+  const [options, setOptions] = useState({stripe_mode: 'sandbox', stripe_trial_days: 14})
   const [loader, setLoader] = useState(true)
   const [ spin, setSpin] = useState( false)
   // const razorPayKey = process.env.REACT_APP_RAZORPAY_KEY
@@ -55,6 +56,7 @@ function PlansPage() {
     phoneCode: countries[0]?.phoneCode || "",
     isoCode:  countries[0]?.isoCode || ""
   });
+   const [hasAlreadyTrialPlan, setHasAlreadyTrialPlan] = useState( false )
   const [invoicePreview, setInvoicePreview] = useState(false)
   const subscriptionState = useSelector((state) => state.subscription);
   const [activeSubscription, setActiveSubscription] = useState(null)
@@ -67,7 +69,9 @@ function PlansPage() {
   const [priceDetails, setPriceDetails] = useState(null);
  
   useEffect(() => {
-    dispatch(getOption('stripe_mode'))
+    dispatch(checkifTrialPlanExist())
+    // dispatch(getOption('stripe_mode'));
+    dispatch(getAllOptions())
    fetch("https://ipapi.co/json/")
       .then((res) => {
         if (!res.ok) {
@@ -106,6 +110,12 @@ function PlansPage() {
     }
   }, [subscriptionState])
 
+  useEffect(() => {
+    if( subscriptionState?.hasAlreadyTrialPlan){
+      setHasAlreadyTrialPlan(true)
+    }
+  }, [ subscriptionState?.hasAlreadyTrialPlan])
+
     useEffect(() => {
       setLoader(false)
       if(subscriptionState.activeSubscription){
@@ -138,6 +148,16 @@ function PlansPage() {
         }
       }
     }, [optionState?.option])
+
+    useEffect(() => {
+        setOptions(optionState?.optionSet)
+        setStripeMode(optionState?.optionSet?.stripe_mode || 'sandbox')
+        if(optionState?.optionSet?.stripe_mode === 'sandbox'){
+          setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+        }else{
+          setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+        }
+      }, [optionState?.optionSet])
 
     useEffect(() => {
       setPlans(getPlans(stripeMode))
@@ -307,7 +327,7 @@ const showError = (name) => {
           ) : (
             <Container>
               <h2 className="text-center mb-1">Choose Your Plan</h2>
-              <p className="text-center mb-4">Start with a 14-day free trial. Charges apply only after the trial period.</p>
+              <p className="text-center mb-4">Start with a {Number(options?.stripe_trial_days)}-day free trial. Charges apply only after the trial period.</p>
               {/* Number of Members Input */}
               <Form className="text-center">
                 {/*<Form.Group className="select--currency">
@@ -498,7 +518,7 @@ const showError = (name) => {
                                 
                                 
                                 <div className="in--pro--plan">
-                                  <p className="mb-0"><strong>14 Days Free Trial</strong></p>
+                                  <p className="mb-0"><strong>{ hasAlreadyTrialPlan ? 0 : (options?.stripe_trial_days ?? 14) } Days Free Trial</strong></p>
                                   <p><small>Charges will apply after trial period</small></p>
                                 </div>
                               </>
@@ -574,13 +594,13 @@ const showError = (name) => {
                   }
                 })}
               </Row>
-              {(memberProfile?.role?.slug === "owner") && (
+              {(memberProfile?.role?.slug === "owner" && Number(options?.stripe_trial_days) > 0) && (
               <Row className="mt-5">
                 <Col md="12">
                   <div className="flex justify-center">
                     <Button disabled={loading} onClick={activateTrialPlan} className="d-flex align-items-center gap-2 px-6 py-3 shadow-3 mx-auto">
                       <span>{
-                        loading ? 'Please wait...' : 'Skip for now and activate the 14 days free trial'
+                        loading ? 'Please wait...' : `Skip for now and activate the ${Number(options?.stripe_trial_days)} days free trial`
                       }</span>
                       <MdOutlineClose />
                     </Button>
@@ -609,7 +629,7 @@ const showError = (name) => {
             <>
             {
               (invoicePreview !== false && invoicePreview !== null) && (
-                <InvoicePreview invoice={invoicePreview} />
+                <InvoicePreview invoice={invoicePreview}  billingCycle={billingCycle} />
               )
             }
             
@@ -626,24 +646,7 @@ const showError = (name) => {
                 </Row>
 
                 <Row>
-                  {/*<Form.Group className="position-relative mb-0 form-group">
-                    <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                    <Row>
-                      <Col className="d-flex align-items-start gap-3">
-                        <Form.Select className="w-auto pe-5 custom-selectbox">
-                         {countries.map((country) => (
-                            <option key={`${country.isoCode}--${country.phoneCode}`} value={country.phoneCode}>
-                              {country.phoneCode}
-                            </option>
-                          ))}
-                        </Form.Select>
-                        <div className="flex-fill position-relative">
-                          <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
-                          {showError("phone")}
-                        </div>
-                      </Col>
-                    </Row>
-                  </Form.Group>*/}
+                 
                   <div className="position-relative">
                     {/* Input Row */}
                     <div className="d-flex gap-2">

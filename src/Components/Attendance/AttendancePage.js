@@ -1,30 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Form, Dropdown, ListGroup, Table, Modal, Button, Card, ListGroupItem } from "react-bootstrap";
-import { FaCheck, FaEye } from "react-icons/fa";
-import { FiCheckCircle, FiCoffee, FiClock, FiCalendar, FiDownload, FiLogIn, FiLogOut, FiEdit3, FiSidebar } from "react-icons/fi";
+import { FaEye } from "react-icons/fa";
+import { FiCoffee, FiClock, FiCalendar, FiDownload, FiLogIn, FiLogOut, FiEdit3, FiSidebar } from "react-icons/fi";
 import { MdOutlineCheck, MdOutlineClose, MdFilterList } from 'react-icons/md';
 import { GrExpand } from "react-icons/gr";
-import { LuTimer, LuCircleDot } from "react-icons/lu";
+import { LuCircleDot } from "react-icons/lu";
 import { BsDash } from "react-icons/bs";
 import { GoDotFill } from "react-icons/go";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
-import { AiOutlineCloseCircle, AiOutlineTeam } from "react-icons/ai";
+import { AiOutlineTeam } from "react-icons/ai";
 import { FaCog } from "react-icons/fa";
 import { formatDateinString, selectboxObserver, groupSelectboxObserver, hexToRgba } from "../../helpers/commonfunctions";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { ListAttendance,getAttendanceByMember, getAttendanceSummary, getMonthlyAttendanceExcelView, ListAttendanceStatuses } from "../../redux/actions/attendance.action";
-import { Listmembers } from "../../redux/actions/members.action";
-import DatePicker from "react-multi-date-picker";
 import { currentMemberProfile } from "../../helpers/auth";
 import MonthHeader from "./monthheader";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { getTeams } from "../../redux/actions/team.action";
 import AttendanceStatusManager from "../modals/attendanceStatus";
 import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 const today = new Date();
-const currentMonthValue = `${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`; // 'MM/YYYY'
 
 function getMonthLabel(monthYear) {
   const [mm, yyyy] = monthYear.split('/');
@@ -116,11 +112,9 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
   }
 
   useEffect(() => {
-    // selectboxObserver()
-    // dispatch(Listmembers({currentPage: 0, searchTerm: '', has_limit: false}));
+
     dispatch(getAssignedTeamsOrMembersByRole(memberProfile?.role?._id))
     handleAttendanceList()
-    // dispatch(getTeams())
     selectboxObserver()
     setTimeout(() => {
       groupSelectboxObserver()
@@ -318,40 +312,6 @@ useEffect(() => {
   const fileBlob = new Blob([excelBuffer], { type: 'application/octet-stream' });
   saveAs(fileBlob, `Attendance_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
 };
-
-const isMemberSelected = (selectedTeamMembers = {}, memberId) => {
-    return Object.values(selectedTeamMembers).some((membersArray) =>
-      membersArray.includes(memberId)
-    );
-  };
-
-const getMembersFromTeams = (selectedTeamIds) => { 
-    if (!Array.isArray(teamfeed) || !Array.isArray(selectedTeamIds)) {
-      return [];
-    }
-
-    const seen = new Set();
-    const result = [];
-
-    teamfeed.forEach((team) => {
-      if (!selectedTeamIds.includes(String(team?._id))) return;
-
-      if (!Array.isArray(team?.members)) return;
-
-      team.members.forEach((member) => {
-        const memberId = String(member?._id);
-        if (!memberId || seen.has(memberId)) return;
-
-        seen.add(memberId);
-        result.push({
-          _id: memberId,
-          name: member.name,
-        });
-      });
-    });
-console.log('result:: ', result)
-    return result;
-  };
 
   const MemberDropdown = ({ list = [], selected, onSelect }) => {
   if (list?.length === 1) {

@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button, Badge, ListGroup, Alert } from "react-bootstrap";
-import { FiArrowUpRight, FiCalendar, FiCheckCircle, FiClock, FiUsers, FiSettings, FiDownload } from "react-icons/fi";
+import { FiCalendar, FiCheckCircle, FiClock, FiUsers } from "react-icons/fi";
 import { BsExclamationTriangle } from "react-icons/bs";
 import { getActiveSubscriptionDetails, cancelSchedule, getScheduledPlan } from "../../redux/actions/subscription.action";
 import { getPlans, planNames } from "../../helpers/plans";
 import { AlertDialog } from "../modals";
 import { currentMemberProfile } from "../../helpers/auth";
 import Spinner from 'react-bootstrap/Spinner';
-import { getOption } from "../../redux/actions/option.actions";
+import { getOption, getAllOptions } from "../../redux/actions/option.actions";
 const PlanOverview = () => {
   const dispatch = useDispatch()
    const navigate = useNavigate()
@@ -17,7 +17,7 @@ const PlanOverview = () => {
   const optionState = useSelector((state) => state.option)
   const [stripePromise, setStripePromise] = useState(null)
   const [stripeMode, setStripeMode] = useState( 'sandbox')
-
+  const [options, setOptions] = useState({stripe_mode: 'sandbox', stripe_trial_days: 14})
   const memberProfile = currentMemberProfile();
    const [showdialog, setShowDialog] = useState(false);
   const [spinner, setSpinner] = useState(true);
@@ -26,7 +26,8 @@ const PlanOverview = () => {
   const [scheduledSub, setScheduledSub] = useState(null)
   useEffect(() => {
     setSpinner(true)
-    dispatch(getOption('stripe_mode'))
+    // dispatch(getOption('stripe_mode'))
+    dispatch(getAllOptions())
     dispatch(getActiveSubscriptionDetails())
     dispatch(getScheduledPlan())
   }, [])
@@ -36,6 +37,11 @@ const PlanOverview = () => {
       setStripeMode(optionState?.option.value || 'sandbox')
     }
   }, [optionState?.option])
+
+  useEffect(() => {
+      setOptions(optionState?.optionSet)
+      setStripeMode(optionState?.optionSet?.stripe_mode || 'sandbox')
+    }, [optionState?.optionSet])
 
   useEffect(() => {
     setPlans(getPlans(stripeMode))

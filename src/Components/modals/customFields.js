@@ -603,17 +603,23 @@ export const CustomFieldModal = (props) => {
                   )}
 
                   <Row>
-                    <Col sm={12} md={6}>
-                      <Form.Group controlId="formBasicCheckbox">
-                        <Form.Check
-                          type="checkbox"
-                          label="Include in columns"
-                          name="showInTable"
-                          checked={fields?.showInTable}
-                          onChange={handleChange}
-                        />
-                      </Form.Group>
-                    </Col>
+                    {
+                      (props.module !== 'tasks')
+                       && (
+                        <Col sm={12} md={6}>
+                          <Form.Group controlId="formBasicCheckbox">
+                            <Form.Check
+                              type="checkbox"
+                              label="Include in columns"
+                              name="showInTable"
+                              checked={fields?.showInTable}
+                              onChange={handleChange}
+                            />
+                          </Form.Group>
+                        </Col>
+                       )
+                    }
+                    
                     <Col sm={12} md={6} className="text-end mt-3 mt-md-0">
                       <Button
                         variant="secondary"

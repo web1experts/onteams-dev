@@ -11,7 +11,8 @@ import {
     SUBSCRIPTION_UPDATE_SUCCESS,
     SUBSCRIPTION_INVOICE_SUCCESS,
     UPCOMING_INVOICE,
-    CLEAR_CLIENT_SECRET
+    CLEAR_CLIENT_SECRET,
+    HAS_TRIAL_PLAN
 } from "../actions/types";
 
 const initialState = {
@@ -60,7 +61,12 @@ export default (state = initialState, action) => {
             message_variant: 'success',
             success: true,
             scheduledSubscription: action.payload.subscription
-        };    
+        };   
+    case HAS_TRIAL_PLAN:
+        return {
+            ...state,
+            hasAlreadyTrialPlan: action.payload.activeTrialSub
+        } 
     case BILLING_SUCCESS: 
         return {
             ...state,

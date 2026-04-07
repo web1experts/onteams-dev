@@ -18,7 +18,7 @@ import InvoicePreview from "./InvoicePreview";
 import { CLEAR_CLIENT_SECRET } from "../../redux/actions/types";
 import Spinner from 'react-bootstrap/Spinner';
 import CheckoutForm from "./CheckoutForm";
-import { getOption } from "../../redux/actions/option.actions";
+import { getOption, getAllOptions } from "../../redux/actions/option.actions";
 
 // const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
   
@@ -27,6 +27,7 @@ export default function ManagePlan() {
   const addToast = useToast();
   const qtyRef = useRef(null);
   const [plans, setPlans] = useState({})
+  const [billingInfomation, setBillingInfomation] = useState({})
   const [formData, setFormData] = useState({
       fullName: "",
       phone: "",
@@ -50,6 +51,7 @@ export default function ManagePlan() {
   const optionState = useSelector((state) => state.option)
   const [stripePromise, setStripePromise] = useState(null)
   const [stripeMode, setStripeMode] = useState( 'sandbox')
+  const [options, setOptions] = useState({stripe_mode: 'sandbox', stripe_trial_days: 14})
   const [spinner, setSpinner] = useState(true);
   const [showdialog, setShowDialog] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
@@ -112,7 +114,8 @@ export default function ManagePlan() {
     };
 
   useEffect(() => {
-    dispatch(getOption('stripe_mode'))
+    // dispatch(getOption('stripe_mode'));
+    dispatch(getAllOptions())
     setSpinner(true)
    fetch("https://ipapi.co/json/")
       .then((res) => {
@@ -148,6 +151,16 @@ export default function ManagePlan() {
       }
     }
   }, [optionState?.option])
+
+  useEffect(() => {
+      setOptions(optionState?.optionSet)
+      setStripeMode(optionState?.optionSet?.stripe_mode || 'sandbox')
+      if(optionState?.optionSet?.stripe_mode === 'sandbox'){
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+      }else{
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+      }
+    }, [optionState?.optionSet])
 
   useEffect(() => {
     setPlans(getPlans(stripeMode))
@@ -295,6 +308,7 @@ export default function ManagePlan() {
 useEffect(() => {
   setLoading(false)
       if(subscriptionState.billing_info){
+        
         const billingInfo = {
           fullName: subscriptionState.billing_info?.meta_value?.fullName || "",
           phone: subscriptionState.billing_info?.meta_value?.phone || "",
@@ -307,7 +321,7 @@ useEffect(() => {
           phoneCode: subscriptionState.billing_info?.meta_value?.phoneCode || countries[0]?.phoneCode,
           isoCode: subscriptionState.billing_info?.meta_value?.isoCode || countries[0]?.isoCode
         };
-
+        setBillingInfomation(billingInfo)
         setFormData(billingInfo)
 
       }
@@ -410,15 +424,22 @@ const handleSubmit = (e) => {
       if(selectedPlan.id === 'free'){
         activateFreePlan()
       }else{
-   
-      dispatch(updateSubscription({
-        ...selectedPlan,
-        total_count: 12,
-        initial_quantity: qtyRef.current.value,
-        billingCycle: billingCycle,
-        name: selectedPlan?.name,
-        subId: activeSubscription?.subscriptionId
-      }))
+        const isBillingEmpty = Object.keys(billingInfomation || {}).length === 0;
+        if(isBillingEmpty === true){
+          setLoading(false)
+          if (!validateForm()) return;
+        }
+        
+        dispatch(updateSubscription({
+          ...selectedPlan,
+          total_count: 12,
+          initial_quantity: qtyRef.current.value,
+          billingCycle: billingCycle,
+          name: selectedPlan?.name,
+          subId: activeSubscription?.subscriptionId,
+          ...(Object.keys(billingInfomation || {}).length === 0 ? formData : {}),
+          isBillingEmpty
+        }))
     
       }
   }
@@ -578,7 +599,7 @@ const handleSubmit = (e) => {
                         })()}
                         {
                           (selectedPlanData?.planId !== 'free' && selectedPlanData?.planId !== 'trial') && (
-                            <Button type="submit" variant="primary" disabled={loading}>{ loading ? 'Please wait...': 'Update Members'}</Button>
+                            <Button type="submit" variant="primary" disabled={loading || Number(activeSubscription?.quantity) === Number(teamMembers)}>{ loading ? 'Please wait...': 'Update Members'}</Button>
                           )
                         }
                       </div>
@@ -853,9 +874,183 @@ const handleSubmit = (e) => {
           }
           {
               (invoicePreview !== false && invoicePreview !== null) && (
-                <InvoicePreview invoice={invoicePreview} />
-              )
-            }
+                <>
+                <InvoicePreview invoice={invoicePreview} billingCycle={billingCycle} />
+              
+                {(Object.keys(billingInfomation)?.length === 0) && (
+                <>
+                <h6 className="fw-bold mb-3 text-uppercase">Billing Information</h6>
+                <Row>
+                  <Form.Group as={Col} md="12" className="position-relative mb-0 form-group">
+                    <Form.Label>Full Name <sup className="text-danger">*</sup></Form.Label>
+                    <Form.Control type="text" className={errors?.fullName ? 'br-red' : ''} name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleChange} required/>
+                    {showError("fullName")}
+                  </Form.Group>
+                </Row>
+
+                <Row>
+
+                <div className="position-relative">
+    
+                  {/* Input Row */}
+                  <div className="d-flex gap-2">
+                    
+                    {/* Country Selector */}
+                    <div
+                      className="border rounded px-3 py-2 d-flex align-items-center cursor-pointer"
+                      style={{ minWidth: "120px" }}
+                      onClick={() => setShowDropdown(!showDropdown)}
+                    >
+                      <span className={`fi fi-${formData?.isoCode?.toLowerCase()} me-2`}></span>
+                      {formData?.phoneCode}
+                    </div>
+
+                    {/* Phone Input */}
+                    <Form.Group className="position-relative mb-0 form-group">
+                      <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
+                      <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                      {showError("phone")}
+                    </Form.Group>
+                  </div>
+
+                  {/* Dropdown */}
+                  {showDropdown && (
+                    <div
+                      className="position-absolute bg-white border rounded mt-2 shadow"
+                      style={{ width: "100%", zIndex: 1000 }}
+                    >
+                      
+                      {/* Search */}
+                      <div className="p-2">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Search countries..."
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                        />
+                      </div>
+
+                      {/* List */}
+                      <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                        {filtered.map((c) => (
+                          <div
+                            key={c.isoCode}
+                            className="d-flex justify-content-between align-items-center px-3 py-2 hover-bg"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => {
+                              setFormData({
+                                ...formData,
+                                phoneCode: c.phoneCode,
+                                isoCode: c.isoCode
+                              })
+                              setShowDropdown(false);
+                              setSearch("");
+                            }}
+                          >
+                            <div>
+                              <span className={`fi fi-${c?.isoCode?.toLowerCase()} me-2`}></span>
+                              {c.name}
+                            </div>
+                            <span>{c.phoneCode}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                  
+                </Row>
+
+                <Form.Group  className="position-relative mb-0 form-group">
+                  <Form.Label>Address Line 1 <sup className="text-danger">*</sup></Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="address1"
+                    className={errors?.address1 ? 'br-red' : ''} 
+                    placeholder="Street address, building, apartment"
+                    value={formData.address1}
+                    onChange={handleChange}
+                    required
+                  />
+                  {showError("address1")}
+                </Form.Group>
+
+                <Form.Group className="position-relative mb-0 form-group">
+                  <Form.Label>Address Line 2</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="address2"
+                    placeholder="Additional address details (optional)"
+                    value={formData.address2}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
+
+                <Row className="">
+                  <Form.Group as={Col} xl="4" className="position-relative mb-0 form-group">
+                    <Form.Label>City <sup className="text-danger">*</sup></Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="city"
+                      className={errors?.city ? 'br-red' : ''} 
+                      placeholder="City"
+                      value={formData.city}
+                      onChange={handleChange}
+                      required
+                    />
+                    {showError("city")}
+                  </Form.Group>
+                  <Form.Group as={Col} xl="4" className="position-relative mb-0 form-group">
+                    <Form.Label>State/Province <sup className="text-danger">*</sup></Form.Label>
+                    <Form.Control
+                      className={errors?.state ? 'br-red' : ''} 
+                      type="text"
+                      name="state"
+                      placeholder="State or Province"
+                      value={formData.state}
+                      onChange={handleChange}
+                      required
+                    />
+                    {showError("state")}
+                  </Form.Group>
+                  <Form.Group as={Col} xl="4" className="position-relative mb-0 form-group">
+                    <Form.Label>Postal Code <sup className="text-danger">*</sup></Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="postal"
+                      className={errors?.postal ? 'br-red' : ''} 
+                      placeholder="Postal code"
+                      value={formData.postal}
+                      onChange={handleChange}
+                      required
+                    />
+                    {showError("postal")}
+                  </Form.Group>
+                </Row>
+
+                <Form.Group className="position-relative mb-0 form-group">
+                  <Form.Label>Country <sup className="text-danger">*</sup></Form.Label>
+                  <Form.Select
+                    className="custom-selectbox"
+                    name="country"
+                    value={formData?.country.toLowerCase()}
+                    onChange={handleChange}
+                    required
+                  >
+                    {countries.map((country) => (
+                      <option key={`country-${country.isoCode}--${country.phoneCode}`} value={country.value.toLowerCase()}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  {showError("country")}
+                </Form.Group>
+                </>
+              )}
+            </>)
+          }
         </Modal.Body>
 
         <Modal.Footer>

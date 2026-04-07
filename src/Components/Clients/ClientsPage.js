@@ -1090,7 +1090,7 @@ function ClientsPage() {
                             <Form.Control
                               type="text"
                               className={
-                                errors["name"] && errors["name"] !== ""
+                                fieldserrors["name"] && fieldserrors["name"] !== ""
                                   ? "input-error"
                                   : "form-control"
                               }
@@ -1102,11 +1102,11 @@ function ClientsPage() {
                             
                            
                           </Form.Group>
-                          {
+                          {/* {
                               (fieldserrors['name'] && fieldserrors['name'] !== "") && (
                                  <span className="error">{fieldserrors['name']}</span>
                               )
-                            }
+                            } */}
                         </ListGroup.Item>
                         {customFields?.length > 0 && (
                           <>

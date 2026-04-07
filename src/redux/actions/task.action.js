@@ -14,7 +14,8 @@ import {
     GET_SINGLE_TASK_FAILED,
     TASK_COMMON_ERROR,
     TASK_REORDER_ERROR,
-    TASK_REORDER
+    TASK_REORDER,
+    PUT_TASK_SUCCESS_SOCKET
 } from "./types";
 
 const config = {

@@ -1350,7 +1350,7 @@ useEffect(() => {
                   <Card.Title>
                     <LuUser /> Member Information
                       {
-                        
+                        (memberProfile?.role?.permissions?.members?.create_edit_delete === true || memberProfile?.role?.permissions?.members?.update_permissions === true || memberProfile?.role?.permissions?.members?.manage_teams === true || memberProfile?._id === selectedMember?._id) && (
                       
                         <Dropdown>
                           <Dropdown.Toggle variant="dark" id="dropdown-basic">
@@ -1383,9 +1383,14 @@ useEffect(() => {
                                 </>
                               )
                             }
-                            <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1 text-danger">
-                              <FiTrash2 /> Leave
-                            </Dropdown.Item>
+                            {
+                              (memberProfile?._id === selectedMember?._id) && 
+                              (
+                                <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1 text-danger">
+                                <FiTrash2 /> Leave
+                              </Dropdown.Item>
+                              )
+                            }
                             {
                               (memberProfile?.role?.permissions?.members?.create_edit_delete === true) && (
                                 <Dropdown.Item onClick={() => setShowDialog(true)} className="d-flex align-items-center gap-1 text-danger">
@@ -1402,7 +1407,7 @@ useEffect(() => {
                             </Dropdown.Item>)
                             }
                           </Dropdown.Menu>
-                        </Dropdown>
+                        </Dropdown>)
                       }
                   
                   </Card.Title>

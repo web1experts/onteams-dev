@@ -1,7 +1,8 @@
 import {
     OPTIONS_ERROR,
     OPTION_SUCCESS,
-    CLEAR_MESSAGES
+    CLEAR_MESSAGES,
+    ALL_OPTION_SUCCESS
 } from "../actions/types";
 
 const initialState = {
@@ -19,7 +20,13 @@ export default (state = initialState, action) => {
                 ...state,
                 success: true,
                 option: action.payload.option,
-            };
+            }
+        case ALL_OPTION_SUCCESS: 
+            return {
+                ...state,
+                success: true,
+                optionSet: action.payload.optionSet,
+            }
         case OPTIONS_ERROR:
             return {
                 ...state,

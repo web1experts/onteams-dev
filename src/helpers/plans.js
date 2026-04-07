@@ -818,47 +818,47 @@ export const planNames =  {
     'price_1T1kMfSZtJkrH95eJecoIR1e': 'Pro',
     'price_1Sm6h8SZtJkrH95eYrwqvWQx': 'Elite',
     'price_1Sm6hhSZtJkrH95e3hAKkKBG': 'Elite',
-    'price_1Sm6hhSZtJkrH95e3hAKkKBG': 'Elite',
+    'price_1Sm6hSSZtJkrH95e3ouAIMxd': 'Elite',
     'price_1T1kNISZtJkrH95epkJdx2QN': 'Elite',
     'price_1T1kNUSZtJkrH95eeWlP2oMU': 'Elite',
     'price_1T1kNhSZtJkrH95eEKKOZ2LG': 'Elite',
 }
 
 export const planPrices =  {
-    'price_1T1kHASZtJkrH95eQL9A6yDo': 66600,
-    'price_1T1kHcSZtJkrH95eh134b9bb': 53300,
-    'price_1T1kHsSZtJkrH95en1y7PPEF': 40000,
+    'price_1T1kHASZtJkrH95eQL9A6yDo': 66600, // INR monthly dev
+    'price_1T1kHcSZtJkrH95eh134b9bb': 159800, // INR quaterly dev
+    'price_1T1kHsSZtJkrH95en1y7PPEF': 479500, // INR yearly dev
 
-    'price_1T1kI7SZtJkrH95e0GJmug6u': 800,
-    'price_1T1kIPSZtJkrH95eeutEK3Ju': 640,
-    'price_1T1kIlSZtJkrH95eQ5T5a2OD': 480,
+    'price_1T1kI7SZtJkrH95e0GJmug6u': 800, // usd monthly dev
+    'price_1T1kIPSZtJkrH95eeutEK3Ju': 1920, // usd quaterly dev
+    'price_1T1kIlSZtJkrH95eQ5T5a2OD': 5760, // USD yearly dev
 
-    'price_1T1kKxSZtJkrH95e14uVND57': 91600,
-    'price_1T1kKxSZtJkrH95etWdAjHqI': 55000,
-    'price_1T1kKxSZtJkrH95eJMnYM4aa': 73300,
+    'price_1T1kKxSZtJkrH95e14uVND57': 91600, // INR monthly elite dev
+    'price_1T1kKxSZtJkrH95etWdAjHqI': 219800, // INR quaterly elite dev
+    'price_1T1kKxSZtJkrH95eJMnYM4aa': 659500, // INR yearly elite dev
 
-    'price_1T1kKxSZtJkrH95ehbhfAbCK': 1200,
-    'price_1T1kKxSZtJkrH95e27mYWXim': 960,
-    'price_1T1kKxSZtJkrH95eEELZw0G3': 720,
+    'price_1T1kKxSZtJkrH95ehbhfAbCK': 1200, // usd monthly elite dev
+    'price_1T1kKxSZtJkrH95e27mYWXim': 2880, // usd quaterly elite dev
+    'price_1T1kKxSZtJkrH95eEELZw0G3': 8640, // usd yearly elite dev
 
     'free': 0,
     'trial': 0,
 
     // LIVe plans
 
-    'price_1Sm6f9SZtJkrH95eY3adt6dK': 66600,
-    'price_1Sm6g9SZtJkrH95efBqhCMs0': 53300,
-    'price_1Sm6gZSZtJkrH95eBNmdopyx': 40000,
-    'price_1T1kMCSZtJkrH95eUTsOzj28': 800,
-    'price_1T1kMPSZtJkrH95eTU4yhf2n': 640,
-    'price_1T1kMfSZtJkrH95eJecoIR1e': 480,
+    'price_1Sm6f9SZtJkrH95eY3adt6dK': 66600, // INR monthly live
+    'price_1Sm6g9SZtJkrH95efBqhCMs0': 159800,  // INR quaterly live
+    'price_1Sm6gZSZtJkrH95eBNmdopyx': 479500, // INR yearly live
+    'price_1T1kMCSZtJkrH95eUTsOzj28': 800, // usd monthly live
+    'price_1T1kMPSZtJkrH95eTU4yhf2n': 1920, // usd quaterly live
+    'price_1T1kMfSZtJkrH95eJecoIR1e': 5760, // usd yearly live
 
-    'price_1Sm6h8SZtJkrH95eYrwqvWQx': 91600,
-    'price_1Sm6hhSZtJkrH95e3hAKkKBG': 55000,
-    'price_1Sm6hhSZtJkrH95e3hAKkKBG': 73300,
-    'price_1T1kNISZtJkrH95epkJdx2QN': 1200,
-    'price_1T1kNUSZtJkrH95eeWlP2oMU': 960,
-    'price_1T1kNhSZtJkrH95eEKKOZ2LG': 720,
+    'price_1Sm6h8SZtJkrH95eYrwqvWQx': 91600, // INR monthly live elite
+    'price_1Sm6hSSZtJkrH95e3ouAIMxd': 219800, // INR monthly live elite
+    'price_1Sm6hhSZtJkrH95e3hAKkKBG': 659500, // INR monthly live elite
+    'price_1T1kNISZtJkrH95epkJdx2QN': 1200, // usd monthly live elite
+    'price_1T1kNUSZtJkrH95eeWlP2oMU': 2880,// usd quaterly live elite
+    'price_1T1kNhSZtJkrH95eEKKOZ2LG': 8640,// usd monthly live elite
 }
 
 export const getPlans = (mode) => {

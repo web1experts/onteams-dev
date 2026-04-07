@@ -4,14 +4,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
 import { planPrices } from "../../helpers/plans";
-export default function InvoicePreview({ invoice }) {
-  // ✅ Hooks must be called always (even if invoice is null)
-
-  // const formatAmount = (amount) =>
-  //   `₹${((amount || 0) / 100).toLocaleString("en-IN", {
-  //     minimumFractionDigits: 2,
-  //     maximumFractionDigits: 2,
-  //   })}`;
+export default function InvoicePreview({ invoice,  billingCycle }) {
 
   const formatAmount = (amount) => {
   const value = Number(amount) || 0;
@@ -279,7 +272,7 @@ const newPlanText = newPlanLine
           </div>
         </div>
 
-        {showTrial && (
+        {showTrial ? (
           <>
             <div className="mt-3 p-3 rounded bg-primary bg-opacity-10 d-flex justify-content-between align-items-center">
               <div className="fw-semibold">Trial Days Pending</div>
@@ -293,7 +286,12 @@ const newPlanText = newPlanLine
               <div className="fw-semibold">{formatDate(invoice.trialEnd)}</div>
             </div>
           </>
-        )}
+        ) :
+          <div className="mt-3 p-3 rounded bg-light d-flex justify-content-between align-items-center">
+            <div className="fw-semibold">Due on</div>
+            <div className="fw-semibold">{formatDate(invoice?.created || now)}</div>
+          </div>
+        }
       </Card.Body>
     </Card>
   );

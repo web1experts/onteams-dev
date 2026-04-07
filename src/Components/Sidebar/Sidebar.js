@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar, Nav, Dropdown, Modal, Row, Col, Button, Card, Form} from "react-bootstrap";
 import { LuFolderOpen, LuTimer, LuBuilding } from "react-icons/lu";
 import { AiOutlineTeam } from "react-icons/ai";
@@ -22,6 +23,7 @@ import SettingPage from "../Settings/SettingPage";
 function SidebarPanel() {
     const secretKey = process.env.REACT_APP_SECRET_KEY
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const updateDashboard = useSelector( state => state.workspace.updateDashboard)
     const handleSidebarSmall = () => dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true))
     const workspacestate = useSelector( state => state.workspace)
@@ -92,6 +94,28 @@ function SidebarPanel() {
         }
     }, [workspacestate])
 
+    useEffect(() => {
+    if(workspacestate?.newWorkspaceId){
+        setTimeout(() => {
+            const encryptedCompanies = localStorage.getItem('mt_dashboards');
+        
+            if (encryptedCompanies !== null) {
+                const decryptcompanies = parseIfValidJSON(encryptedCompanies)
+             
+                const selected = decryptcompanies.find(company => company.company._id.toString() === workspacestate?.newWorkspaceId.toString());
+                localStorage.setItem('current_dashboard', JSON.stringify({name: selected.company.name, id: selected.company._id, theme: selected.company?.theme || false}));
+                localStorage.setItem('mt_featureSwitches', JSON.stringify(selected?.memberData || null))
+                localStorage.setItem('default_dashboard',  selected.company._id);
+                saveTheme(selected.company?.theme || defaultTheme );
+                setTimeout(function(){
+                    navigate('/dashboard', { replace: true })
+                    window.location.reload();
+                }, 1000)
+            }
+        },2000)
+    }
+    }, [workspacestate?.newWorkspaceId])
+
     const handleThemeChange = (theme) => {
         setSelectedTheme(theme.name); 
         saveTheme(theme);
@@ -99,7 +123,7 @@ function SidebarPanel() {
         dispatch(updateWorkSpaceTheme({theme}))
     }
 
-    const handleClick = (selectedvalue) => {
+    const handleClick = (selectedvalue) => { 
         const selected = companies.find(company => company.company._id === selectedvalue);
         localStorage.setItem('current_dashboard', JSON.stringify({name: selected.company.name, id: selected.company._id, theme: selected.company?.theme || false}));
         localStorage.setItem('mt_featureSwitches', JSON.stringify(selected?.memberData || null))

@@ -34,7 +34,8 @@ export default (state = initialState, action) => {
                 message: action.payload.message,
                 message_variant: 'success',
                 success: true,
-                companies: action.payload.companies
+                companies: action.payload.companies,
+                newWorkspaceId: action.payload?.newWorkspaceId || false
             };
         case WORKSPACE_CREATE_FAILED:
             return {

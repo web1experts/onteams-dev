@@ -136,13 +136,13 @@ function ManualTime() {
                     <div className="d-flex align-items-center gap-2 gap-xl-4 mt-3 mt-xl-0 text-sm">
                       <div className="text-md-end">
                         <div className="text-lg font-bold text--blue">{calculateManualTotalTime(member.projects)}</div>
-                        <div className="text-slate-600">
-                          Submitted{" "}
+                        {/* <div className="text-slate-600">
+                          Added for{" "}
                           {new Date(date).toLocaleString("en-US", {
                             month: "long",
                             day: "numeric",
                           })}
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -173,6 +173,20 @@ function ManualTime() {
                                       activity?.createdAt,
                                       activity?.duration
                                     )}
+                                  </small>
+                                  <small>
+                                    Added for{" "}
+                                    {new Date(date).toLocaleString("en-US", {
+                                      month: "long",
+                                      day: "numeric",
+                                    })}
+                                  </small>
+                                  <small>
+                                    Submitted on {" "} 
+                                    {new Date(activity?.addedAt).toLocaleString("en-US", {
+                                      month: "long",
+                                      day: "numeric",
+                                    })}
                                   </small>
                                 </p>
                               ))

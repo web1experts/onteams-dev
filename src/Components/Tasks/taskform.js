@@ -767,6 +767,7 @@ useEffect(() => {
     // };
 
     const removeSubtask = (index) => {
+        const removedSubtask = subtasks[index];
         // Remove the subtask at the given index
         const newSubtasks = subtasks
             .filter((_, i) => i !== index) // Remove selected subtask
@@ -777,7 +778,9 @@ useEffect(() => {
 
         // Dispatch the updated subtasks
         dispatch(updateStateData(TASK_FORM, { subtasks: newSubtasks }));
-        dispatch(updateTask(currentTask._id, { subtasks: newSubtasks }));
+        if (removedSubtask && typeof removedSubtask === "object" && removedSubtask._id) {
+            dispatch(updateTask(currentTask._id, { removeSubtaskId: removedSubtask._id }));
+        }
     };
 
 

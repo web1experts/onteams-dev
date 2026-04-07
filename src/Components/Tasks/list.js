@@ -20,6 +20,7 @@ import { TiInputChecked } from "react-icons/ti";
 import { MemberInitials } from "../common/memberInitials";
 import { socket } from "../../helpers/auth";
 import { hexToRgba } from "../../helpers/commonfunctions";
+import { PUT_TASK_SUCCESS_SOCKET } from "../../redux/actions/types";
 const TasksList = React.memo((props) => {
   const dispatch = useDispatch();
   const memberProfile = props.memberProfile || {};
@@ -50,9 +51,10 @@ const TasksList = React.memo((props) => {
       setCurrentProject(commonState.currentProject);
     }
 
-    socket.on("refreshTasks", function (msg) {
+    socket.on("refreshTasks", function (data) {
       if (commonState.currentProject) {
-        dispatch(ListTasks(commonState?.currentProject?._id));
+        // dispatch(ListTasks(commonState?.currentProject?._id));
+        dispatch({ type: PUT_TASK_SUCCESS_SOCKET, payload: data});
       }
     });
   }, [commonState.currentProject]);

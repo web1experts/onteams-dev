@@ -448,7 +448,7 @@ textarea.form-control {
   height: 56px;
 }
 
-.form-floating .input-error {
+.input-error {
   border: 1px solid #de0606;
 }
 

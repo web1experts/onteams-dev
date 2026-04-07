@@ -129,7 +129,8 @@ function TimeTrackingPage() {
   //  const [allMembers, setAllmembers] = useState([]);
   const handleShow = () => setShow(true);
   const [totalTaskDuration, setTotalTaskDuration] = useState(0);
-  const handleProjectShow = () => setProjectShow(true);
+  const handleProjectShow = () => {setProjectShow(true)
+  };
   const [showSelect, setProjectShow] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const MemberprojectFeed = useSelector(
@@ -393,7 +394,7 @@ useEffect(() => {
     }
 
     selectedfilters = { ...selectedfilters, ["status"]: "recordings" };
-    await dispatch(getliveActivity(selectedfilters));
+    await dispatch(getliveActivity(selectedfilters)); console.log('one')
     setSpinner(false);
   };
 
@@ -404,7 +405,7 @@ useEffect(() => {
     await dispatch(
       getRecoredActivity(currentActivity._id, "recorded", cleanedFilteredDate)
     );
-    setActSpinner(false);
+    // setActSpinner(false);
   };
 
   const memberTodaysActivity = async (date = null) => {
@@ -458,6 +459,21 @@ useEffect(() => {
     setIsScreenActive((current) => !current);
   };
 
+  useEffect(() => {
+    if(!isScreenActive){
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen(); // Safari
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen(); // Firefox
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen(); // IE/Edge
+      }
+      setIsFullscreen(false);
+    }
+  }, [isScreenActive])
+
   const handleListProjects = async () => {
     if (memberProfile?.role?.slug === "owner") {
       await dispatch(ListProjectsByMembers({ members: "all" }));
@@ -471,7 +487,9 @@ useEffect(() => {
   
   useEffect(() => {
     setLiveStreaming({...liveStreaming, [currentActivity?._id] : currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"});
-
+    if (currentActivity?.latestActivity?.status === false) {
+      setActSpinner(false);
+    }
     if (
       (currentActivity !== false &&
         activeInnerTab === "InnerRecorded" &&
@@ -484,9 +502,7 @@ useEffect(() => {
       setRecordedActivities([])
       handleRecordedActivity();
     }
-    if (currentActivity?.latestActivity?.status === false) {
-      setActSpinner(false);
-    }
+    
     // else{
     //   updateStream()
     // }
@@ -523,7 +539,7 @@ useEffect(() => {
         activeInnerTab === "InnerLive" &&
         liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "enable")
     ) { 
-      leaveRoom(currentActivity?._id);
+      leaveRoom(currentActivity?._id);console.log('two')
       setSpinner(false);
       startsharing(
         currentActivity._id,
@@ -1061,10 +1077,7 @@ const ymd = (dateLike) => {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      setActSpinner(false);
-      setSpinner( false )
-    }, 1000);
+    
     
     if (activitystate?.liveactivities?.memberData) {
       setLiveactivities(activitystate.liveactivities.memberData);
@@ -1074,20 +1087,35 @@ const ymd = (dateLike) => {
         );
         setCurrentActivity(updatedActivity);
       }
+      setTimeout(() => { 
+        setActSpinner(false);
+        setSpinner( false )
+      }, 2500);
     }
 
     if (activitystate?.recordedActivity) {
       setSelectedScreenshots({});
       setRecordedActivities(activitystate?.recordedActivity);
+      setTimeout(() => { 
+        setActSpinner(false);
+        setSpinner( false )
+      }, 700);
     }
 
     if (activitystate?.MemberrecordedActivity) {
+      
       setMemberActivities(activitystate.MemberrecordedActivity);
+      setTimeout(() => {
+        setActSpinner(false);
+        setSpinner( false )
+      }, 2500);
     }
 
     if (activitystate.success) {
       handleRecordedActivity();
     }
+
+    
   }, [activitystate]);
 
   useEffect(() => {
@@ -1228,8 +1256,8 @@ const ymd = (dateLike) => {
   }, [activeTab]);
 
   useEffect(() => {
-    setActSpinner( false );
-    setSpinner( false)
+    // setActSpinner( false );
+    // setSpinner( false)
     if (activeInnerTab === "InnerRecorded" && currentActivity) {
       setRecordedActivities([])
       handleRecordedActivity();
@@ -1269,10 +1297,7 @@ const ymd = (dateLike) => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      setActSpinner(false);
-      setSpinner( false )
-    }, 700);
+    setSelectedScreenshots({})
   }, [screenshotTab])
 
   const handleRemoveEntry = (index) => {
@@ -2256,12 +2281,15 @@ const getMembersFromTeams = (selectedTeamIds) => {
                           </tbody>
                         </Table>
                       ) : (
-                        !spinner &&
-                        liveactivities.length === 0 && (
-                          <div className="text-center">
-                            <h2>No Results</h2>{" "}
+                        <></>)
+                      }
+                      {
+                        (!spinner &&
+                        liveactivities &&
+                        liveactivities.length === 0) && (
+                          <div className="mt-2 text-center py-3">
+                            <h2>No Activities Found</h2>
                           </div>
-                        )
                       )}
                     </div>
                   </div>
@@ -2870,7 +2898,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                     ?.delete_recordings ===
                                                     true &&
                                                   memberProfile?._id ===
-                                                    recording?.member && (
+                                                    recording?.member && 
+                                                    (
                                                     <div className="card--checkbox">
                                                       <Form.Check
                                                         type="checkbox"
@@ -2880,6 +2909,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                           ]?.includes(j) ||
                                                           false
                                                         }
+                                                        key={`screenshot-id-${recording?._id}`}
                                                         onChange={() =>
                                                           handleSelectRecording(
                                                             recording?._id,
@@ -3058,13 +3088,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                     }-${j}`}
                                                   >
                                                     <Card.Body
-                                                      onClick={() =>
-                                                        handleLightBox(
-                                                          "video",
-                                                          meta.meta_value,
-                                                          j
-                                                        )
-                                                      }
+                                                      
                                                     >
                                                       {videoData?.is_deleted !==
                                                         true &&
@@ -3074,7 +3098,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                           ?.delete_recordings ===
                                                           true &&
                                                         memberProfile?._id ===
-                                                          recording?.member && (
+                                                          recording?.member && 
+                                                          (
                                                           <div className="card--checkbox">
                                                             <Form.Check
                                                               type="checkbox"
@@ -3095,6 +3120,13 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                           </div>
                                                         )}
                                                       <video
+                                                        onClick={() =>
+                                                          handleLightBox(
+                                                            "video",
+                                                            meta.meta_value,
+                                                            j
+                                                          )
+                                                        }
                                                         height="175px"
                                                         preload="metadata"
                                                         muted
@@ -3225,7 +3257,9 @@ const getMembersFromTeams = (selectedTeamIds) => {
                       );
                     })
                   ) : (
-                    <p className="text-center mt-5">No activity available.</p>
+                    (activityspinner === false) && (
+                      <p className="text-center mt-5">No activity available.</p>
+                    )
                   )}
                 </Accordion>
               </>
@@ -3789,6 +3823,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
       <Modal
         show={showSelect}
         onHide={handleProjectClose}
+        onShow={() => selectboxObserver()}
         centered
         size="lg"
         className="AddTimeModal theme--modal"

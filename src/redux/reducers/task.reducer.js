@@ -16,7 +16,8 @@ import {
     DELETE_COMMENT,
     TASK_REORDER_ERROR,
     TASK_REORDER,
-    UPDATE_POST_LIST_COMMENT
+    UPDATE_POST_LIST_COMMENT,
+    PUT_TASK_SUCCESS_SOCKET
 
 } from "../actions/types";
 import isEqual from "lodash/isEqual";
@@ -88,6 +89,10 @@ import isEqual from "lodash/isEqual";
                 // message: action.payload.message,
                 // message_variant: 'success',
                 refresh: action.payload.refresh
+            }
+        case PUT_TASK_SUCCESS_SOCKET:
+            return {
+                UpdatedTask: action.payload.updatedTask
             }
         case PUT_TASK_FAILED:
             return{

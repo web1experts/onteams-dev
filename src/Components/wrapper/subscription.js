@@ -63,7 +63,7 @@ const hideSidebarRoutes = [
     activeSubscription?.planId ||
     localSub?.planId;
 
-  const isOnPlansPage =  location.pathname.startsWith("/account-setup");
+  const isOnPlansPage =  location.pathname.startsWith("/account-setup") || location.pathname.startsWith("/plans");
 
   // --- Helper function to check if a trial is expired ---
   const isTrialExpired = (subscription) => {

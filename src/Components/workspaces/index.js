@@ -216,7 +216,7 @@ function Workspace(props) {
           <Modal.Title>Create a Workspace</Modal.Title>
         </Modal.Header>
         <Modal.Body className="overflow-visible">
-          {
+          {/* {
             (
               activeSubscription?.planId === 'free' &&
               workspaces?.length >= 1  && !editworkspace?._id
@@ -224,9 +224,9 @@ function Workspace(props) {
               <Alert key={'danger'} variant={'danger'}>
                 Your current Free plan allows only 1 workspace. To add additional workspaces, please upgrade to a paid plan.
               </Alert>
-            :
+            : */}
             <WorkspaceForm editworkspace={editworkspace} />
-          }
+          {/* } */}
           
         </Modal.Body>
       </Modal>

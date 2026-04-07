@@ -77,6 +77,7 @@ function RolesPage() {
       })
       setSelected("#3B82F6")
       setActiveItems({})
+      setIsTeamEdit(null)
   };
     
   const handleCreateShow = () => {
@@ -641,6 +642,7 @@ function RolesPage() {
         name: member.name,
         email: member.email,
         avatar: member.avatar,
+        role: member.role
       },
     }));
     setTeamFields((prev) => ({
@@ -668,6 +670,9 @@ function RolesPage() {
     const isSelected = !!activeItems[member._id];
 
     if (isSelected) {
+      // if(member?.role?.slug === 'owner' && memberProfile?.role?.slug !== 'owner'){
+      //   return;
+      // }
       handleRemoveMember(member._id);
     } else {
       handleAddMember(member);
@@ -704,6 +709,7 @@ function RolesPage() {
         name: member.name,
         email: member.email,
         avatar: member.avatar,
+        role: member.role
       };
       return acc;
     }, {});
@@ -823,6 +829,85 @@ const handleCreateRole = async (e) => {
   setRoleLoader(false);
   setShowRoleModal(false);
 };
+
+
+const teamvisibilityBadge = (permissions, accessType) => {
+  switch (accessType) {
+    case 'all_teams_and_future_teams':
+      return (
+        <span className="badge bg-warning">
+          
+          {teamfeed
+            ?.filter(team =>
+              permissions?.assigned_teams?.selected_teams?.includes(team?._id)
+            )
+            .map(team => team.name)
+            .join(" + ")}
+          + (future teams)</span>
+      )
+    case "selected_teams": 
+      return (
+        <span className="badge bg-warning">
+          {teamfeed
+            ?.filter(team =>
+              permissions?.assigned_teams?.selected_teams?.includes(team?._id)
+            )
+            .map(team => team.name)
+            .join(" + ")}
+            {
+              (permissions?.assigned_teams.auto_add_new_teams === true) && (
+                <> + (future teams)</>
+              )
+            }
+        </span>
+      )
+      case "all_members_and_future":
+      case "only_selected_members":
+      const data = permissions?.assigned_teams?.selected_team_members || {};
+      const autoTeams = permissions?.assigned_teams?.auto_add_teams || [];
+
+      const result = Object.entries(data)
+        .map(([teamId, members]) => {
+          const team = teamfeed?.find(t => t._id === teamId);
+          const isAuto = autoTeams.includes(teamId);
+
+          const uniqueCount = new Set(members || []).size;
+
+          // Case 1: members exist
+          if (uniqueCount > 0) {
+            return isAuto
+              ? `${team?.name || "Unknown"} (${uniqueCount}m + auto)`
+              : `${team?.name || "Unknown"} (${uniqueCount}m)`;
+          }
+
+          // Case 2: no members but auto enabled
+          if (isAuto) {
+            return `${team?.name || "Unknown"} (auto)`;
+          }
+
+          return null;
+        })
+        .filter(Boolean);
+
+      // 👉 Also handle case where team exists ONLY in auto_add_teams but not in selected_team_members
+      autoTeams.forEach(teamId => {
+        if (!data[teamId]) {
+          const team = teamfeed?.find(t => t._id === teamId);
+          result.push(`${team?.name || "Unknown"} (auto)`);
+        }
+      });
+
+      if (!result.length) return null;
+                                   
+        return (
+          <span className="badge bg-info">
+            {result.join(" + ")}
+          </span>
+        );
+      
+  
+  }
+}
 
 
   return (
@@ -964,75 +1049,78 @@ const handleCreateRole = async (e) => {
                                               <span className="badge bg-success">Full Access</span>
                                             )}
                                             {accessType === "all_teams_and_future_teams" && (
-                                              <span className="badge bg-warning">
+                                              // <span className="badge bg-warning">
                                                 
-                                                {teamfeed
-                                                  ?.filter(team =>
-                                                    modPerms?.selected_teams?.includes(team?._id)
-                                                  )
-                                                  .map(team => team.name)
-                                                  .join(" + ")}
-                                                + (future teams)</span>
+                                              //   {teamfeed
+                                              //     ?.filter(team =>
+                                              //       modPerms?.selected_teams?.includes(team?._id)
+                                              //     )
+                                              //     .map(team => team.name)
+                                              //     .join(" + ")}
+                                              //   + (future teams)</span>
+                                              teamvisibilityBadge(permissions, accessType)
                                             )}
                                             {accessType === "selected_teams" && (
-                                              <span className="badge bg-warning">
-                                                {teamfeed
-                                                  ?.filter(team =>
-                                                    modPerms?.selected_teams?.includes(team?._id)
-                                                  )
-                                                  .map(team => team.name)
-                                                  .join(" + ")}
-                                                  {
-                                                    (modPerms.auto_add_new_teams === true) && (
-                                                      <> + (future teams)</>
-                                                    )
-                                                  }
-                                              </span>
+                                              // <span className="badge bg-warning">
+                                              //   {teamfeed
+                                              //     ?.filter(team =>
+                                              //       modPerms?.selected_teams?.includes(team?._id)
+                                              //     )
+                                              //     .map(team => team.name)
+                                              //     .join(" + ")}
+                                              //     {
+                                              //       (modPerms.auto_add_new_teams === true) && (
+                                              //         <> + (future teams)</>
+                                              //       )
+                                              //     }
+                                              // </span>
+                                              teamvisibilityBadge(permissions, accessType)
                                             )}
                                             {
                                               (accessType === "all_members_and_future" || accessType === "only_selected_members") && (() => {
-                                                const data = modPerms?.selected_team_members || {};
-                                                const autoTeams = modPerms?.auto_add_teams || [];
+                                                teamvisibilityBadge(permissions, accessType)
+                                              //   const data = modPerms?.selected_team_members || {};
+                                              //   const autoTeams = modPerms?.auto_add_teams || [];
 
-                                                const result = Object.entries(data)
-                                                  .map(([teamId, members]) => {
-                                                    const team = teamfeed?.find(t => t._id === teamId);
-                                                    const isAuto = autoTeams.includes(teamId);
+                                              //   const result = Object.entries(data)
+                                              //     .map(([teamId, members]) => {
+                                              //       const team = teamfeed?.find(t => t._id === teamId);
+                                              //       const isAuto = autoTeams.includes(teamId);
 
-                                                    const uniqueCount = new Set(members || []).size;
+                                              //       const uniqueCount = new Set(members || []).size;
 
-                                                    // Case 1: members exist
-                                                    if (uniqueCount > 0) {
-                                                      return isAuto
-                                                        ? `${team?.name || "Unknown"} (${uniqueCount}m + auto)`
-                                                        : `${team?.name || "Unknown"} (${uniqueCount}m)`;
-                                                    }
+                                              //       // Case 1: members exist
+                                              //       if (uniqueCount > 0) {
+                                              //         return isAuto
+                                              //           ? `${team?.name || "Unknown"} (${uniqueCount}m + auto)`
+                                              //           : `${team?.name || "Unknown"} (${uniqueCount}m)`;
+                                              //       }
 
-                                                    // Case 2: no members but auto enabled
-                                                    if (isAuto) {
-                                                      return `${team?.name || "Unknown"} (auto)`;
-                                                    }
+                                              //       // Case 2: no members but auto enabled
+                                              //       if (isAuto) {
+                                              //         return `${team?.name || "Unknown"} (auto)`;
+                                              //       }
 
-                                                    return null;
-                                                  })
-                                                  .filter(Boolean);
+                                              //       return null;
+                                              //     })
+                                              //     .filter(Boolean);
 
-                                                // 👉 Also handle case where team exists ONLY in auto_add_teams but not in selected_team_members
-                                                autoTeams.forEach(teamId => {
-                                                  if (!data[teamId]) {
-                                                    const team = teamfeed?.find(t => t._id === teamId);
-                                                    result.push(`${team?.name || "Unknown"} (auto)`);
-                                                  }
-                                                });
+                                              //   // 👉 Also handle case where team exists ONLY in auto_add_teams but not in selected_team_members
+                                              //   autoTeams.forEach(teamId => {
+                                              //     if (!data[teamId]) {
+                                              //       const team = teamfeed?.find(t => t._id === teamId);
+                                              //       result.push(`${team?.name || "Unknown"} (auto)`);
+                                              //     }
+                                              //   });
 
-                                                if (!result.length) return null;
+                                              //   if (!result.length) return null;
 
-                                                return (
-                                                  <span className="badge bg-info">
-                                                    {result.join(" + ")}
-                                                  </span>
-                                                );
-                                              })()
+                                              //   return (
+                                              //     <span className="badge bg-info">
+                                              //       {result.join(" + ")}
+                                              //     </span>
+                                              //   );
+                                               })()
                                             }
                                           </div>
                                         </div>
@@ -1102,7 +1190,109 @@ const handleCreateRole = async (e) => {
                                                     }
                                                   </small>
                                               </div>
-                                              
+                                              {
+                                                
+                                                (
+                                                modSlug === "members" && modPerms[perm] === true
+                                              ) && (
+                                                  <Alert variant="primary" className="mt-3 border-left-2">
+                                                    <Alert.Heading>
+                                                      <small><FiInfo/> Team visibility applies to {modSlug.replace(/_/g, " ")}</small>
+                                                    </Alert.Heading>
+
+                                                    <p className="mb-0">
+                                                      <small>
+{
+                                                        (() => {
+                                                          if (activeRole?.slug === "owner" || activeRole?.slug === "admin") {
+                                                            return teamvisibilityBadge(permissions, "all_teams_and_future_teams");
+                                                          }
+
+                                                          // 👉 ALL TEAMS CASE
+                                                          if (
+                                                            permissions?.assigned_teams?.selected_teams?.length === teamfeed?.length &&
+                                                            permissions?.assigned_teams?.specific_teams_only === true &&
+                                                            permissions?.assigned_teams?.auto_add_new_teams === true
+                                                          ) {
+                                                            return teamvisibilityBadge(permissions, "all_teams_and_future_teams");
+                                                          }
+
+                                                          // 👉 SELECTED TEAMS CASE
+                                                          if (
+                                                            (permissions?.assigned_teams?.selected_teams?.length === teamfeed?.length &&
+                                                              permissions?.assigned_teams?.specific_teams_only === true) ||
+                                                            (permissions?.assigned_teams?.selected_teams?.length !== teamfeed?.length &&
+                                                              permissions?.assigned_teams?.specific_teams_only === true)
+                                                          ) {
+                                                            return teamvisibilityBadge(permissions, "selected_teams");
+                                                          }
+
+                                                          // 👉 MEMBERS CASE
+                                                          if (
+                                                            permissions?.assigned_teams?.specific_peoples_only === true &&
+                                                            permissions?.assigned_teams?.auto_add_teams === true
+                                                          ) {
+                                                            return teamvisibilityBadge(permissions, "all_members_and_future");
+                                                          }
+
+                                                          if (permissions?.assigned_teams?.specific_peoples_only === true) {
+                                                            return teamvisibilityBadge(permissions, "only_selected_members");
+                                                          }
+
+                                                          return null;
+                                                        })()
+                                                      }
+                                                      </small>
+                                                        
+                                                        {/* {(() => {
+                                                          const assigned = permissions?.assigned_teams;
+
+                                                          // ✅ Specific people only
+                                                          if (
+                                                            assigned?.specific_peoples_only === true &&
+                                                            Object.keys(assigned?.selected_team_members || {}).length > 0
+                                                          ) {
+                                                            // const memberCount = Object.keys(
+                                                            //   assigned.selected_team_members
+                                                            // ).length;
+                                                            const memberCount = Object.values(assigned?.selected_team_members || {})?.flat()?.map(
+                                                                id => String(id)
+                                                              ).length;
+
+                                                            const autoTeamCount = assigned?.auto_add_teams?.length || 0;
+
+                                                            return `This role can see ${memberCount} members${
+                                                              autoTeamCount > 0
+                                                                ? ` + auto from ${autoTeamCount} team${
+                                                                    autoTeamCount > 1 ? "s" : ""
+                                                                  }`
+                                                                : ""
+                                                            }`;
+                                                          }
+
+                                                          // ✅ Specific teams only
+                                                          if (
+                                                            assigned?.specific_teams_only === true &&
+                                                            assigned?.selected_teams?.length > 0
+                                                          ) {
+                                                            const teamCount = assigned.selected_teams.length;
+
+                                                            return `This role can see ${teamCount} team${
+                                                              teamCount > 1 ? "s" : ""
+                                                            }${
+                                                              assigned?.auto_add_new_teams === true
+                                                                ? " + future teams"
+                                                                : ""
+                                                            }`;
+                                                          }
+
+                                                          return null;
+                                                        })()}
+                                                      </small> */}
+                                                    </p>
+                                                  </Alert>
+                                                )
+                                              }
                                               </>
                                             );
                                           }else if (perm === "specific_teams_only") {
@@ -1456,7 +1646,7 @@ const handleCreateRole = async (e) => {
                                                   </small>
                                               </div>
                                               {
-                                                (perm === "view_others" && modPerms[perm] === true || modSlug === 'members' && perm === "view" && modPerms[perm] === true) && (
+                                                (perm === "view_others" && modPerms[perm] === true) && (
                                                   <Alert variant="primary" className="mt-3 border-left-2">
                                                     <Alert.Heading>
                                                       <small><FiInfo/> Team visibility applies to {modSlug.replace(/_/g, " ")}</small>
@@ -1464,7 +1654,49 @@ const handleCreateRole = async (e) => {
 
                                                     <p className="mb-0">
                                                       <small>
-                                                        {(() => {
+                                                        {
+                                                          (() => {
+                                                            if (activeRole?.slug === "owner" || activeRole?.slug === "admin") {
+                                                              return teamvisibilityBadge(permissions, "all_teams_and_future_teams");
+                                                            }
+
+                                                            // 👉 ALL TEAMS CASE
+                                                            if (
+                                                              permissions?.assigned_teams?.selected_teams?.length === teamfeed?.length &&
+                                                              permissions?.assigned_teams?.specific_teams_only === true &&
+                                                              permissions?.assigned_teams?.auto_add_new_teams === true
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "all_teams_and_future_teams");
+                                                            }
+
+                                                            // 👉 SELECTED TEAMS CASE
+                                                            if (
+                                                              (permissions?.assigned_teams?.selected_teams?.length === teamfeed?.length &&
+                                                                permissions?.assigned_teams?.specific_teams_only === true) ||
+                                                              (permissions?.assigned_teams?.selected_teams?.length !== teamfeed?.length &&
+                                                                permissions?.assigned_teams?.specific_teams_only === true)
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "selected_teams");
+                                                            }
+
+                                                            // 👉 MEMBERS CASE
+                                                            if (
+                                                              permissions?.assigned_teams?.specific_peoples_only === true &&
+                                                              permissions?.assigned_teams?.auto_add_teams === true
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "all_members_and_future");
+                                                            }
+
+                                                            if (permissions?.assigned_teams?.specific_peoples_only === true) {
+                                                              return teamvisibilityBadge(permissions, "only_selected_members");
+                                                            }
+
+                                                            return null;
+                                                          })()
+                                                        }
+                                                        </small>
+                                                      <small>
+                                                        {/* {(() => {
                                                           const assigned = permissions?.assigned_teams;
 
                                                           // ✅ Specific people only
@@ -1508,7 +1740,8 @@ const handleCreateRole = async (e) => {
                                                           }
 
                                                           return null;
-                                                        })()}
+                                                        })()} */}
+                                                        
                                                       </small>
                                                     </p>
                                                   </Alert>
@@ -1583,7 +1816,7 @@ const handleCreateRole = async (e) => {
 
                                                     <p className="mb-0">
                                                       <small>
-                                                        {(() => {
+                                                        {/* {(() => {
                                                           const assigned = permissions?.assigned_teams;
 
                                                           // ✅ Specific people only
@@ -1591,13 +1824,17 @@ const handleCreateRole = async (e) => {
                                                             assigned?.specific_peoples_only === true &&
                                                             Object.keys(assigned?.selected_team_members || {}).length > 0
                                                           ) {
-                                                            const memberCount = Object.keys(
-                                                              assigned.selected_team_members
-                                                            ).length;
+                                                            // const memberCount = Object.keys(
+                                                            //   assigned.selected_team_members
+                                                            // ).length;
+
+                                                            const memberCount = Object.values(assigned?.selected_team_members || {})?.flat()?.map(
+                                                                id => String(id)
+                                                              ).length;
 
                                                             const autoTeamCount = assigned?.auto_add_teams?.length || 0;
 
-                                                            return `This role can see selected ${memberCount} members${
+                                                            return `This role can see ${memberCount} members${
                                                               autoTeamCount > 0
                                                                 ? ` + auto from ${autoTeamCount} team${
                                                                     autoTeamCount > 1 ? "s" : ""
@@ -1623,8 +1860,51 @@ const handleCreateRole = async (e) => {
                                                           }
 
                                                           return null;
-                                                        })()}
+                                                        })()} */}
+                                                        
                                                       </small>
+                                                      <small>
+                                                        {
+                                                          (() => {
+                                                            if (activeRole?.slug === "owner" || activeRole?.slug === "admin") {
+                                                              return teamvisibilityBadge(permissions, "all_teams_and_future_teams");
+                                                            }
+
+                                                            // 👉 ALL TEAMS CASE
+                                                            if (
+                                                              permissions?.assigned_teams?.selected_teams?.length === teamfeed?.length &&
+                                                              permissions?.assigned_teams?.specific_teams_only === true &&
+                                                              permissions?.assigned_teams?.auto_add_new_teams === true
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "all_teams_and_future_teams");
+                                                            }
+
+                                                            // 👉 SELECTED TEAMS CASE
+                                                            if (
+                                                              (permissions?.assigned_teams?.selected_teams?.length === teamfeed?.length &&
+                                                                permissions?.assigned_teams?.specific_teams_only === true) ||
+                                                              (permissions?.assigned_teams?.selected_teams?.length !== teamfeed?.length &&
+                                                                permissions?.assigned_teams?.specific_teams_only === true)
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "selected_teams");
+                                                            }
+
+                                                            // 👉 MEMBERS CASE
+                                                            if (
+                                                              permissions?.assigned_teams?.specific_peoples_only === true &&
+                                                              permissions?.assigned_teams?.auto_add_teams === true
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "all_members_and_future");
+                                                            }
+
+                                                            if (permissions?.assigned_teams?.specific_peoples_only === true) {
+                                                              return teamvisibilityBadge(permissions, "only_selected_members");
+                                                            }
+
+                                                            return null;
+                                                          })()
+                                                        }
+                                                        </small>
                                                     </p>
                                                   </Alert>
                                                 )
@@ -1690,8 +1970,10 @@ const handleCreateRole = async (e) => {
                                                     }
                                                   </small>
                                                 </div>
+                                                
                                               {
-                                                perm === "view_others" && modPerms[perm] === true && (
+                                                
+                                                (perm === "view_others" && modPerms[perm] === true) && (
                                                   <Alert variant="primary" className="mt-3 border-left-2">
                                                     <Alert.Heading>
                                                       <small><FiInfo/> Team visibility applies to {modSlug.replace(/_/g, " ")}</small>
@@ -1699,7 +1981,7 @@ const handleCreateRole = async (e) => {
 
                                                     <p className="mb-0">
                                                       <small>
-                                                        {(() => {
+                                                        {/* {(() => {
                                                           const assigned = permissions?.assigned_teams;
 
                                                           // ✅ Specific people only
@@ -1707,13 +1989,16 @@ const handleCreateRole = async (e) => {
                                                             assigned?.specific_peoples_only === true &&
                                                             Object.keys(assigned?.selected_team_members || {}).length > 0
                                                           ) {
-                                                            const memberCount = Object.keys(
-                                                              assigned.selected_team_members
-                                                            ).length;
+                                                            // const memberCount = Object.keys(
+                                                            //   assigned.selected_team_members
+                                                            // ).length;
+                                                            const memberCount = Object.values(assigned?.selected_team_members || {})?.flat()?.map(
+                                                                id => String(id)
+                                                              ).length;
 
                                                             const autoTeamCount = assigned?.auto_add_teams?.length || 0;
 
-                                                            return `This role can see selected ${memberCount} members${
+                                                            return `This role can see ${memberCount} members${
                                                               autoTeamCount > 0
                                                                 ? ` + auto from ${autoTeamCount} team${
                                                                     autoTeamCount > 1 ? "s" : ""
@@ -1739,8 +2024,51 @@ const handleCreateRole = async (e) => {
                                                           }
 
                                                           return null;
-                                                        })()}
+                                                        })()} */}
+                                                        
                                                       </small>
+                                                      <small>
+                                                        {
+                                                          (() => {
+                                                            if (activeRole?.slug === "owner" || activeRole?.slug === "admin") {
+                                                              return teamvisibilityBadge(permissions, "all_teams_and_future_teams");
+                                                            }
+
+                                                            // 👉 ALL TEAMS CASE
+                                                            if (
+                                                              permissions?.assigned_teams?.selected_teams?.length === teamfeed?.length &&
+                                                              permissions?.assigned_teams?.specific_teams_only === true &&
+                                                              permissions?.assigned_teams?.auto_add_new_teams === true
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "all_teams_and_future_teams");
+                                                            }
+
+                                                            // 👉 SELECTED TEAMS CASE
+                                                            if (
+                                                              (permissions?.assigned_teams?.selected_teams?.length === teamfeed?.length &&
+                                                                permissions?.assigned_teams?.specific_teams_only === true) ||
+                                                              (permissions?.assigned_teams?.selected_teams?.length !== teamfeed?.length &&
+                                                                permissions?.assigned_teams?.specific_teams_only === true)
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "selected_teams");
+                                                            }
+
+                                                            // 👉 MEMBERS CASE
+                                                            if (
+                                                              permissions?.assigned_teams?.specific_peoples_only === true &&
+                                                              permissions?.assigned_teams?.auto_add_teams === true
+                                                            ) {
+                                                              return teamvisibilityBadge(permissions, "all_members_and_future");
+                                                            }
+
+                                                            if (permissions?.assigned_teams?.specific_peoples_only === true) {
+                                                              return teamvisibilityBadge(permissions, "only_selected_members");
+                                                            }
+
+                                                            return null;
+                                                          })()
+                                                        }
+                                                        </small>
                                                     </p>
                                                   </Alert>
                                                 )
@@ -2214,7 +2542,15 @@ const handleCreateRole = async (e) => {
               Object.entries(activeItems).map(([id, memberInfo], index) => (
                 <ListGroup.Item
                   key={`listkey-${index}`}
-                  onClick={() => handleRemoveMember(memberInfo.id)}
+                  onClick={() => {
+                    // if(memberInfo?.role?.slug === 'owner' && memberProfile?.role?.slug !== 'owner'){
+                    //   return false;
+                    // }else{
+                      handleRemoveMember(memberInfo.id)
+                    // }
+                    
+                  }
+                  }
                 >
                   <span>
                     <img

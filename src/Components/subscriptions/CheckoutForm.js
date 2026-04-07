@@ -5,8 +5,9 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { Button } from "react-bootstrap";
-
+import { useToast } from "../../context/ToastContext";
 export default function CheckoutForm({mode}) {
+  const addToast = useToast();
   const stripe = useStripe();
   const elements = useElements();
   const [loader, setLoader] = useState( false )
@@ -14,7 +15,7 @@ export default function CheckoutForm({mode}) {
     e.preventDefault();
     let result;
     setLoader(true)
-    console.log(mode)
+    
     if (mode === "setup") {
       result = await stripe.confirmSetup({
         elements,
@@ -33,7 +34,8 @@ export default function CheckoutForm({mode}) {
 
     if (result?.error) {
       setLoader(false)
-      alert(result.error.message);
+      addToast(result.error.message, "danger");
+      // alert(result.error.message);
     }else{
        setLoader(false)
     }

@@ -2657,12 +2657,14 @@ function ProjectsPage() {
                     <FloatingLabel label="Project Title *">
                       <Form.Control
                         type="text"
+                        className={ errors["title"] && errors["title"] !== "" ? "input-error" : "form-control"}
                         name="title"
                         placeholder="Project Title"
                         value={fields["title"] || ""}
                         onChange={handleChange}
                       />
                     </FloatingLabel>
+                     {/* {showError("title")} */}
                   </Form.Group>
                   <Form.Group className="mb-0 form-group">
                     <Form.Label>

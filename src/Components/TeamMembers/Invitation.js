@@ -707,11 +707,12 @@ function Invitation(props) {
                                       ) {
                                         const matchedOption =
                                           field.options.find(
-                                            (opt) => opt.value === mvalue,
+                                            (opt) => opt.value?.toLowerCase() === mvalue?.toLowerCase(),
                                           );
                                         if (matchedOption) {
                                           mvalue = (
                                             <span
+                                            data-value={`${uniqueKey}`}
                                               className="priority--badge"
                                               style={{
                                                 backgroundColor:
@@ -730,7 +731,7 @@ function Invitation(props) {
                                               {
                                                 invitation?.custom_fields?.[
                                                   fieldname
-                                                ]?.meta_value
+                                                ]
                                               }
                                             </span>
                                           );

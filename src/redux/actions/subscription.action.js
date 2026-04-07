@@ -13,7 +13,8 @@ import {
     SUBSCRIPTION_DATA,
     SUBSCRIPTION_SCHEDULED,
     SUBSCRIPTION_INVOICE_SUCCESS,
-    UPCOMING_INVOICE
+    UPCOMING_INVOICE,
+    HAS_TRIAL_PLAN
 } from "./types";
 const config = {
   headers: {
@@ -146,6 +147,21 @@ export const getScheduledPlan = (subscriptionId) => {
       } else {
         await dispatch({ type: SUBSCRIPTION_ERROR, payload: response.data.message });
       }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  }
+}
+
+export const checkifTrialPlanExist = () => {
+
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGetByKey('subscription', '/has-trial-plan')
+      if (response.data && response.data.success) {
+        await dispatch({ type: HAS_TRIAL_PLAN, payload: response.data });
+      }
+      
     } catch (err) {
       errorRequest(err, dispatch);
     }

@@ -200,7 +200,7 @@ function AddClient(props) {
                     onChange={(e) => handleChange(e)}
                   />
                 </FloatingLabel>
-                {showError("name")}
+                {/* {showError("name")} */}
               </Form.Group>
             </div>
             <Form.Group className="mb-0 form-group pb-0 other__fields">

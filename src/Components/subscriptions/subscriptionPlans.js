@@ -5,8 +5,9 @@ import { FiGlobe, FiUsers, FiCheck } from "react-icons/fi";
 import { BsTags } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { currentMemberProfile } from "../../helpers/auth";
-import { createSubscription, saveAuthorization, getActiveSubscription,getUpcomingInvoice, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
+import { createSubscription, checkifTrialPlanExist, getActiveSubscription,getUpcomingInvoice, subscribeFreePlan, subscribeTrialPlan, getBillingdetails } from "../../redux/actions/subscription.action";
 import { selectboxObserver } from "../../helpers/commonfunctions";
+import { MdOutlineClose } from "react-icons/md";
 import { Listmembers, listCompanyinvite} from "../../redux/actions/members.action";
 import { countries } from "../../helpers/countries";
 import { getPlans } from "../../helpers/plans";
@@ -16,7 +17,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import InvoicePreview from "./InvoicePreview";
 import Spinner from 'react-bootstrap/Spinner';
-import { getOption } from "../../redux/actions/option.actions";
+import { getOption, getAllOptions } from "../../redux/actions/option.actions";
 // const stripePromise = loadStripe('pk_test_51ScfXISZtJkrH95ej4yh0KR539dapsZN94WS25bwDiSZYcizgq8lvfATfrNiJveg2TtrpQ21JikDhO2COBelK1dv00WUIWzmrH');
   
 
@@ -26,8 +27,10 @@ function SubscriptionPlans() {
   const navigate = useNavigate()
   const [plans, setPlans] = useState({})
   const optionState = useSelector((state) => state.option)
+  const [hasAlreadyTrialPlan, setHasAlreadyTrialPlan] = useState( false )
   const [stripePromise, setStripePromise] = useState(null)
   const [stripeMode, setStripeMode] = useState( 'sandbox')
+  const [options, setOptions] = useState({stripe_mode: 'sandbox', stripe_trial_days: 14})
   const [spinner, setSpinner] = useState(true);
   const memberProfile = currentMemberProfile();
   const [errors, setErrors] = useState({});
@@ -88,16 +91,26 @@ function SubscriptionPlans() {
 
   const handlePlanSelect = (plan) => setSelectedPlan(plan);
 
+  // useEffect(() => {
+  //   if(optionState?.option?.key === 'stripe_mode'){
+  //     setStripeMode(optionState?.option.value || 'sandbox')
+  //     if(optionState?.option.value === 'sandbox'){
+  //       setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+  //     }else{
+  //       setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+  //     }
+  //   }
+  // }, [optionState?.option])
+
   useEffect(() => {
-    if(optionState?.option?.key === 'stripe_mode'){
-      setStripeMode(optionState?.option.value || 'sandbox')
-      if(optionState?.option.value === 'sandbox'){
-        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
-      }else{
-        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
-      }
+    setOptions(optionState?.optionSet)
+    setStripeMode(optionState?.optionSet?.stripe_mode || 'sandbox')
+    if(optionState?.optionSet?.stripe_mode === 'sandbox'){
+      setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+    }else{
+      setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
     }
-  }, [optionState?.option])
+  }, [optionState?.optionSet])
 
   useEffect(() => {
     setPlans(getPlans(stripeMode))
@@ -105,12 +118,10 @@ function SubscriptionPlans() {
 
   useEffect(() => {
     setSpinner(true)
-    dispatch(getOption('stripe_mode'))
-    // fetch("https://ipapi.co/json/")
-    //   .then(res => res.json())
-    //   .then(data => { console.log(data.country_code)
-    //     setSelectedCurrency(data?.country_code === "IN" ? "inr" : "usd");
-    //   });
+    dispatch(checkifTrialPlanExist())
+    dispatch(getOption('stripe_mode'));
+    dispatch(getAllOptions())
+  
     fetch("https://ipapi.co/json/")
       .then((res) => {
         if (!res.ok) {
@@ -146,14 +157,26 @@ function SubscriptionPlans() {
       setMode(subscriptionState.authorizeData.mode || 'payment')
       setShowCheckout(true)
     }
+    if (subscriptionState.success === 'error') {
+      setLoading(false)
+      setShowConfirm(false);
+    }
+    
   }, [subscriptionState])
+
+  useEffect(() => {
+    if( subscriptionState?.hasAlreadyTrialPlan){
+      setHasAlreadyTrialPlan(true)
+    }
+  }, [ subscriptionState?.hasAlreadyTrialPlan])
 
   useEffect(() => {
     setTimeout(() => {
       setSpinner(false)
     },2000)
+    setLoading(false)
     if(subscriptionState.activeSubscription){
-
+console.log('subscriptionState.activeSubscription:: ', subscriptionState.activeSubscription)
       setActiveSubscription(subscriptionState.activeSubscription)
         const current_dashboard = localStorage.getItem('current_dashboard');
       
@@ -164,8 +187,9 @@ function SubscriptionPlans() {
         localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
       }
 
-      if(subscriptionState?.message && subscriptionState.message_variant === 'success'){
+      if(subscriptionState?.message && subscriptionState.message_variant === 'success'){ console.log('ready to go')
         navigate('/dashboard', { replace: true })
+        window.location.reload();
       }
      
     }
@@ -241,6 +265,15 @@ const showError = (name) => {
   }
   return null;
 };
+
+const activateTrialPlan = () => {
+  if(members < 1){
+    addToast('Please add number of members first.', 'danger');
+    return;
+  }
+  setLoading(true)
+  dispatch(subscribeTrialPlan({initial_quantity: members, selectedCurrency}))
+}
 
   const handlePayment = async () => {
    
@@ -351,7 +384,7 @@ const showError = (name) => {
           ) : (
           <Container>
             <h2 className="text-center mb-1">Choose Your Plan</h2>
-            <p className="text-center mb-4">Start with a 14-day free trial. Charges apply only after the trial period.</p>
+            <p className="text-center mb-4">Start with a {Number(options?.stripe_trial_days)}-day free trial. Charges apply only after the trial period.</p>
             {/* Number of Members Input */}
             <Form className="text-center">
              {/* <Form.Group className="select--currency">
@@ -520,7 +553,7 @@ const showError = (name) => {
                             
                             
                             <div className="in--pro--plan">
-                              <p className="mb-0"><strong>14 Days Free Trial</strong></p>
+                              <p className="mb-0"><strong>{ hasAlreadyTrialPlan ? 0 : (options?.stripe_trial_days ?? 14) } Days Free Trial</strong></p>
                               <p><small>Charges will apply after trial period</small></p>
                             </div>
                           </>
@@ -599,7 +632,20 @@ const showError = (name) => {
               }
               })}
             </Row>
-            
+            {(memberProfile?.role?.slug === "owner" && Number(options?.stripe_trial_days) > 0) && (
+              <Row className="mt-5">
+                <Col md="12">
+                  <div className="flex justify-center">
+                    <Button disabled={loading} onClick={activateTrialPlan} className="d-flex align-items-center gap-2 px-6 py-3 shadow-3 mx-auto">
+                      <span>{
+                        loading ? 'Please wait...' : `Skip for now and activate the ${Number(options?.stripe_trial_days)} days free trial`
+                      }</span>
+                      <MdOutlineClose />
+                    </Button>
+                  </div>
+                </Col>
+              </Row>)
+            }
 
           </Container>)
         }
@@ -621,7 +667,7 @@ const showError = (name) => {
             <>
               {
               (invoicePreview !== false && invoicePreview !== null) && (
-                <InvoicePreview invoice={invoicePreview} />
+                <InvoicePreview invoice={invoicePreview} billingCycle={billingCycle} />
               )
             }
             {/*  <div className="bg-gradient-light rounded p-3 mb-4">
