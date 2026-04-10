@@ -268,6 +268,15 @@ function SingleProject(props) {
       }, 200);
     }
   }, [apiClient]);
+  
+  useEffect(() => {
+  if (quillRef.current) {
+    const editor = quillRef.current.getEditor();
+
+    // override scrollIntoView
+    editor.scrollSelectionIntoView = () => {};
+  }
+}, []);
 
   useEffect(() => {
     if (selectedFiles?.length > 0) {

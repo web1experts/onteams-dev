@@ -51,7 +51,7 @@ function PlansPage() {
     city: "",
     state: "",
     postal: "",
-    country: "India",
+    country: countries[0]?.value || "",
     agree: false,
     phoneCode: countries[0]?.phoneCode || "",
     isoCode:  countries[0]?.isoCode || ""
@@ -138,26 +138,29 @@ function PlansPage() {
       
     }, [subscriptionState.activeSubscription])
 
-    useEffect(() => {
-      if(optionState?.option?.key === 'stripe_mode'){
-        setStripeMode(optionState?.option.value || 'sandbox')
-        if(optionState?.option.value === 'sandbox'){
-          setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
-        }else{
-          setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
-        }
-      }
-    }, [optionState?.option])
+    // useEffect(() => {
+    //   if(optionState?.option?.key === 'stripe_mode'){
+    //     setStripeMode(optionState?.option.value || 'sandbox')
+    //     if(optionState?.option.value === 'sandbox'){
+    //       setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+    //     }else{
+    //       setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+    //     }
+    //   }
+    // }, [optionState?.option])
 
     useEffect(() => {
         setOptions(optionState?.optionSet)
         setStripeMode(optionState?.optionSet?.stripe_mode || 'sandbox')
-        if(optionState?.optionSet?.stripe_mode === 'sandbox'){
-          setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
-        }else{
-          setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
-        }
       }, [optionState?.optionSet])
+
+    useEffect(() => {
+      if(options?.stripe_mode === 'sandbox'){
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+      }else if(options?.stripe_mode === 'live'){
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+      }
+    }, [options])
 
     useEffect(() => {
       setPlans(getPlans(stripeMode))

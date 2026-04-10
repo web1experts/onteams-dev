@@ -376,23 +376,31 @@ function SettingPage(props) {
             </ListGroup.Item>
              {
               memberProfile?.role?.slug === "owner" ?
-                currentSubscription === null ? 
-                  <ListGroup.Item
-                    onClick={() => {
-                      if(props.close){
-                        props.close()
-                      }
-                      navigate('/subscription-plans', { replace: true })
-                    }}
-                  >
-                    <MdLockOutline /> Billing
-                    </ListGroup.Item>
-                :
+                // currentSubscription === null ? 
+                //   <ListGroup.Item
+                //     onClick={() => {
+                //       if(props.close){
+                //         props.close()
+                //       }
+                //       navigate('/subscription-plans', { replace: true })
+                //     }}
+                //   >
+                //     <MdLockOutline /> Billing
+                //     </ListGroup.Item>
+                // :
                 <ListGroup.Item
                   action
                   active={activeTab === "billing"}
                   onClick={() => {
-                    setActiveTab("billing");
+                    if( currentSubscription === null ){
+                      if(props.close){
+                        props.close()
+                      }
+                      navigate('/subscription-plans', { replace: true })
+                    }else{
+                      setActiveTab("billing");
+                    }
+                    
                   }}
                 >
                   <MdLockOutline /> Billing

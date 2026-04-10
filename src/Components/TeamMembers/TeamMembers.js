@@ -115,6 +115,10 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
     requestAnimationFrame(() => {
       setErrors({});
       setShow(false);
+      setFields({
+        email: "", name: "", role: ""
+      })
+      setDefaultMemberRole()
     });
   };
   const handleSearchChange = (e) => {
@@ -281,13 +285,8 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   }, [isEditing]);
   
   useEffect(() => {
-  if (!fields?.role && roles?.length > 0) {
-    const memberRole = roles.find((role) => role.slug === "member");
-    if (memberRole) {
-      handleChange({ target: { name: "role", value: memberRole?._id } });
-
-      setPermissions(memberRole.permissions || {});
-    }
+  if (fields?.role === "" && roles?.length > 0) {
+    setDefaultMemberRole()
   }
 }, [roles]);
 
@@ -543,6 +542,18 @@ useEffect(() => {
         }, 1000), // 1 sec debounce
       []
     );
+
+const setDefaultMemberRole = () => {
+  const memberRole = roles.find((role) => role.slug === "member");
+  if (memberRole) {
+    handleChange({ target: { name: "role", value: memberRole?._id } });
+
+    setPermissions(memberRole.permissions || {});
+  }else{
+      handleChange({ target: { name: "role", value: roles[0]?._id } });
+      setPermissions(roles[0]?.permissions || {});
+  }
+}
 
   const toggleVisibility = (key) => {
         setVisiblePasswords((prev) => ({

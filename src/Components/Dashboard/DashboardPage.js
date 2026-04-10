@@ -69,6 +69,7 @@ dayjs.extend(relativeTime);
 function DashboardPage() {
   const dispatch = useDispatch();
   const memberdata = getMemberdata();
+  const [spinner, setSpinner] = useState( false )
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentPostIds, setCommentPostIds] = useState([]);
   const [generalRequests, setGeneralRequests] = useState([])
@@ -89,7 +90,6 @@ function DashboardPage() {
     content: "",
     files: [],
   });
-  // const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
   const handleClose = () => {
     setFields({
       type: "text",
@@ -539,9 +539,13 @@ function DashboardPage() {
     if (invitationsFeed && invitationsFeed.invitations && invitationsFeed?.Invitelistfor === 'member') {
       setInvitationsFeed(invitationsFeed.invitations?.inviteData);
     }
+   setTimeout(() => {
+     setSpinner( false )
+   },1500)
   }, [invitationsFeed]);
 
   useEffect(() => {
+    
     if (postFeed) {
       setPosts(postFeed);
     }
@@ -604,12 +608,13 @@ function DashboardPage() {
   }, [memberstate?.ownershipUpdate]);
 
   useEffect(() => {
+    setSpinner( true )
     setTimeout(function(){
       handleInvitationList();
       handlePosts();
       getQuote();
       dispatch(getGeneralRequests())
-    },1500)
+    },1000)
   }, [dispatch]);
 
   const handleLike = async (postId) => {
@@ -620,10 +625,17 @@ function DashboardPage() {
     }
   };
 
-  return (
+  return (    
     <>
       <div className="team--page dashboard--page">
         <div className="page--wrapper px-md-2 pb-4 pt-4 text-center">
+          {(spinner === true) ? 
+            <>
+              <div className="loading-bar">
+                <img src="images/OnTeam-icon-gray.png" className="flipchar" />
+              </div>
+            </>
+          :
           <Container fluid>
             <Row className="justify-content-center">
               <Col sm={12} className="mb-4">
@@ -946,14 +958,6 @@ function DashboardPage() {
                                     }}
                                   />
                                 )}
-
-                                {/* {showCommentBox && (
-                                  <CommentThread
-                                    comments={post?.comments}
-                                    post={commentPostId}
-                                    toggle={setShowCommentBox}
-                                  />
-                                )} */}
                               </div>
                             </Col>
                           </Row>
@@ -1105,6 +1109,7 @@ function DashboardPage() {
               </Col>
             </Row>
           </Container>
+        }
         </div>
       </div>
 
@@ -1478,6 +1483,7 @@ function DashboardPage() {
           </Button>
         </Modal.Footer>
       </Modal>
+    
     </>
   );
 }

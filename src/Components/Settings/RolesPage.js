@@ -843,7 +843,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
             )
             .map(team => team.name)
             .join(" + ")}
-          + (future teams)</span>
+           <> + (future teams)</></span>
       )
     case "selected_teams": 
       return (
@@ -1579,7 +1579,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                                                 <div className="ms-3">
                                                                   <div className="fw-semibold">{member.name}</div>
                                                                   <div className="text-muted small">
-                                                                    {member.role || "Member"}
+                                                                    {member?.role?.name || "Member"}
                                                                   </div>
                                                                 </div>
                                                               </div>

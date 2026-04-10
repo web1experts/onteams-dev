@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, Button, Row, Col, Form, Badge, Collapse, Modal, Container } from "react-bootstrap";
-import { FiUsers, FiCalendar, FiCheck, FiSave } from "react-icons/fi";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { FiUsers, FiCalendar, FiSave } from "react-icons/fi";
 import { BsTags } from "react-icons/bs";
-import { checkInvoiceStatus, saveAuthorization,getUpcomingInvoice, getScheduledPlan, getActiveSubscription, subscribeFreePlan, subscribeTrialPlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
+import { checkInvoiceStatus,getUpcomingInvoice, getScheduledPlan, getActiveSubscription, subscribeFreePlan, cancelSubscription, updateSubscription, updateQuantity, getBillingdetails, saveBillingDetails } from "../../redux/actions/subscription.action";
 import { getPlans } from "../../helpers/plans";
 import { countries } from "../../helpers/countries";
 import { useToast } from "../../context/ToastContext";
@@ -26,7 +25,7 @@ export default function ManagePlan() {
   const dispatch = useDispatch()
   const addToast = useToast();
   const qtyRef = useRef(null);
-  const [plans, setPlans] = useState({})
+ 
   const [billingInfomation, setBillingInfomation] = useState({})
   const [formData, setFormData] = useState({
       fullName: "",
@@ -51,6 +50,7 @@ export default function ManagePlan() {
   const optionState = useSelector((state) => state.option)
   const [stripePromise, setStripePromise] = useState(null)
   const [stripeMode, setStripeMode] = useState( 'sandbox')
+   const [plans, setPlans] = useState({})
   const [options, setOptions] = useState({stripe_mode: 'sandbox', stripe_trial_days: 14})
   const [spinner, setSpinner] = useState(true);
   const [showdialog, setShowDialog] = useState(false);
@@ -86,14 +86,15 @@ export default function ManagePlan() {
     }
 
     const closeCallback = () => {
+      dispatch({
+        type: CLEAR_CLIENT_SECRET
+      })
       setShowConfirmation( false);
       setShowConfirm( false);
       setLoading(false);
       setShowCheckout(false)
       setClientSecret(null)
-      dispatch({
-        type: CLEAR_CLIENT_SECRET
-      })
+      
       handleCloseConfirm()
       setTimeout(() => {
         dispatch(getActiveSubscription())
@@ -144,27 +145,40 @@ export default function ManagePlan() {
   useEffect(() => {
     if(optionState?.option?.key === 'stripe_mode'){
       setStripeMode(optionState?.option.value || 'sandbox')
-      if(optionState?.option.value === 'sandbox'){
-        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
-      }else{
-        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
-      }
+      // if(optionState?.option.value === 'sandbox'){
+      //   setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+      // }else{
+      //   setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+      // }
     }
   }, [optionState?.option])
+  
 
   useEffect(() => {
       setOptions(optionState?.optionSet)
       setStripeMode(optionState?.optionSet?.stripe_mode || 'sandbox')
-      if(optionState?.optionSet?.stripe_mode === 'sandbox'){
-        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
-      }else{
-        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
-      }
+      // if(optionState?.optionSet?.stripe_mode === 'sandbox'){
+      //   setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+      // }else{
+      //   setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+      // }
     }, [optionState?.optionSet])
 
-  useEffect(() => {
+    useEffect(() => {
+      if(options?.stripe_mode === 'sandbox'){
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+      }else if(options?.stripe_mode === 'live'){
+        setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+      }
+    }, [options])
+
+  useEffect(() => { console.log('gets plans')
     setPlans(getPlans(stripeMode))
   }, [stripeMode])
+
+  useEffect(() => {
+    console.log('Plans:: ', plans)
+  },[plans])
 
   useEffect(() => {
     setTeamMembers(totalmembers)
@@ -201,7 +215,7 @@ export default function ManagePlan() {
       setLoading(false)
       setActiveSubscription(subscriptionState.activeSubscription)
       if(subscriptionState.activeSubscription?.currency){
-        setSelectedCurrency(subscriptionState.activeSubscription?.currency);
+        setSelectedCurrency(subscriptionState.activeSubscription?.currency?.toLowerCase());
       }
       
       setTotalMembers(subscriptionState.activeSubscription?.quantity)
@@ -317,7 +331,7 @@ useEffect(() => {
           city: subscriptionState.billing_info?.meta_value?.city || "",
           state: subscriptionState.billing_info?.meta_value?.state || "",
           postal: subscriptionState.billing_info?.meta_value?.postal || "",
-          country: subscriptionState.billing_info?.meta_value?.country || "India",
+          country: subscriptionState.billing_info?.meta_value?.country || countries[0]?.value,
           phoneCode: subscriptionState.billing_info?.meta_value?.phoneCode || countries[0]?.phoneCode,
           isoCode: subscriptionState.billing_info?.meta_value?.isoCode || countries[0]?.isoCode
         };
@@ -489,61 +503,15 @@ const handleSubmit = (e) => {
       setShowConfirmation(false)
       handleCloseConfirm()
       addToast('Your subscription has been updated.', 'success');
+      dispatch({
+        type: CLEAR_CLIENT_SECRET
+      })
       setTimeout(() => {
         dispatch(getActiveSubscription())
       },1500)
     }
   }, [subscriptionState.InvoiceData])
 
-  /*const authorizeSubscriptionPayment = async (payload) => {
-    try {
-      setLoading(true)
-      const { customer_id, subscription_id, planId } = payload;
-
-      // Load Razorpay
-      const options = {
-        key: razorPayKey,
-        subscription_id: subscription_id,
-        recurring: 1,
-        name: "Prime Teams",
-        description: `${selectedPlan.name} Plan Subscription`,
-        handler: function (response) {
-          console.log("Subscription Authorized:", response);
-          if (response?.razorpay_payment_id) {
-            dispatch(saveAuthorization({ ...response, subscription_id }))
-          }
-          setLoading(false)
-          setSelectedPlan(null)
-        },
-        modal: {
-          ondismiss: function () {
-            console.warn("⚠️ Payment popup closed by user (cancelled).");
-            setLoading(false);
-            // Optional: show a message or alert
-            alert("Payment was cancelled. You can try again anytime.");
-          },
-        },
-        theme: {
-          color: "#F37254",
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      // 🔴 Handle payment failure
-      rzp.on("payment.failed", function (response) {
-        console.error("❌ Payment Failed:", response.error);
-        alert(`Payment failed: ${response.error.description || "Unknown error"}`);
-        setLoading(false);
-      });
-      rzp.open();
-    } catch (err) {
-      alert("Error creating subscription: " + err.message);
-      console.error(err);
-      //alert("Error creating subscription: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  }*/
 
   return (
     <>
@@ -611,10 +579,10 @@ const handleSubmit = (e) => {
                 <div className="bg-white rounded-4 shadow border p-4 mb-4">
                   <h4 className="text-xl fw-bold mb-4">Choose Your Plan & Price Summary</h4>
                   <h6 className="fw-bold mb-2">Choose Your Plan</h6>
-                  <Row className="mb-4">
-                    {plans?.[billingCycle]?.map((plan) => {
-                      if(plan.currency === selectedCurrency){
-                        return (
+                  <Row className="mb-4" key={`plans-length-${Object.keys(plans)?.length}`}>
+                    {plans?.[billingCycle]
+                      ?.filter(plan => plan.currency === selectedCurrency)
+                      ?.map((plan) => (
                         <Col key={plan.id} data-plan={plan.id} xl={4} className="mb-3">
                           <Card className={`h-100 text-center shadow-sm ${selectedPlan?.name}  ${plan.name} ${selectedPlan?.name === plan.name ? "modal--plan--card--active modal--plan--card p-4" : "modal--plan--card p-4"}`}
                             onClick={() => setSelectedPlan(plan)}
@@ -635,9 +603,9 @@ const handleSubmit = (e) => {
                             </Card.Body>
                           </Card>
                         </Col>
-                        )
+                      )
+                    )
                     }
-                    })}
                   </Row>
                   {/* Billing Cycle */}
                   <Form.Group className="mb-3">

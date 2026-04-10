@@ -18,6 +18,7 @@ export default function ConfirmPayment({invoiceData, closeConfirmation}) {
     const clearClientSecret = () => ({
         type: CLEAR_CLIENT_SECRET,
     });
+   
   const confirmStripePayment = async () => {
      if (!stripe || !invoiceData?.client_secret) return;
      setLoader(true)

@@ -56,7 +56,7 @@ function SubscriptionPlans() {
     city: "",
     state: "",
     postal: "",
-    country: "India",
+    country: countries[0]?.value || "",
     agree: false,
     phoneCode: countries[0]?.phoneCode || "",
     isoCode:  countries[0]?.isoCode || ""
@@ -105,12 +105,20 @@ function SubscriptionPlans() {
   useEffect(() => {
     setOptions(optionState?.optionSet)
     setStripeMode(optionState?.optionSet?.stripe_mode || 'sandbox')
-    if(optionState?.optionSet?.stripe_mode === 'sandbox'){
+    // if(optionState?.optionSet?.stripe_mode === 'sandbox'){
+    //   setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
+    // }else{
+    //   setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
+    // }
+  }, [optionState?.optionSet])
+
+  useEffect(() => {
+    if(options?.stripe_mode === 'sandbox'){
       setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_SANDBOX_KEY));
-    }else{
+    }else if(options?.stripe_mode === 'live'){
       setStripePromise(loadStripe(process.env.REACT_APP_STRIPE_LIVE_KEY));
     }
-  }, [optionState?.optionSet])
+  }, [options])
 
   useEffect(() => {
     setPlans(getPlans(stripeMode))
@@ -176,7 +184,7 @@ function SubscriptionPlans() {
     },2000)
     setLoading(false)
     if(subscriptionState.activeSubscription){
-console.log('subscriptionState.activeSubscription:: ', subscriptionState.activeSubscription)
+
       setActiveSubscription(subscriptionState.activeSubscription)
         const current_dashboard = localStorage.getItem('current_dashboard');
       
@@ -187,7 +195,12 @@ console.log('subscriptionState.activeSubscription:: ', subscriptionState.activeS
         localStorage.setItem('current_dashboard', JSON.stringify(updatedData))
       }
 
-      if(subscriptionState?.message && subscriptionState.message_variant === 'success'){ console.log('ready to go')
+      if(subscriptionState?.message && subscriptionState.message_variant === 'success'){
+        navigate('/dashboard', { replace: true })
+        window.location.reload();
+      }
+
+      if(subscriptionState?.activeSubscription?._id && ['active','trialing'].includes(subscriptionState.activeSubscription?.status) ){
         navigate('/dashboard', { replace: true })
         window.location.reload();
       }

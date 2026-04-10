@@ -110,9 +110,9 @@ function Invitation(props) {
 
     // setTimeout(() => {
       if(selectedInvitation?.role?._id === roles?.[0]?._id ){
-        handleClickRoles(roles?.[1]?._id)
-      }else{
         handleClickRoles(roles?.[0]?._id)
+      }else{
+        handleClickRoles(roles?.[1]?._id)
       }
       
     // },700)
@@ -190,7 +190,7 @@ function Invitation(props) {
   };
 
   useEffect(() => {
-    dispatch(getAvailableRolesByWorkspace({ fields: "_id name permissions" }));
+    dispatch(getAvailableRolesByWorkspace());
     handleListMember();
     let prm = {};
     permissionModules.forEach((mod) => {

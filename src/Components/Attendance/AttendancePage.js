@@ -49,7 +49,6 @@ function AttendancePage() {
   const [ attendances, setAttendances] = useState([])
   const memberFeed = useSelector((state) => state.member.members)
   const [members, setMembers] = useState([])
-  const [teamfeed, setTeamFeed] = useState([]);
   const [selectedMember, setSelectedMember] = useState({})
   const [isActive, setIsActive] = useState(0);
   const [attendanceSummary, setAttendanceSummary] = useState({})
@@ -84,24 +83,24 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
 });
 
 
-  const handlefilterchange = (name, value) => {
-    // if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
-        setFilters((prev) => {
-          const updated = { ...prev };
+const handlefilterchange = (name, value) => {
+  // if (name === "search" && value === "" || name === "search" && value.length > 1 || name !== "search") {
+      setFilters((prev) => {
+        const updated = { ...prev };
 
-          if (name === "member") {
-            delete updated.team;   // remove team when member changes
-          }
+        if (name === "member") {
+          delete updated.team;   // remove team when member changes
+        }
 
-          if (name === "team") {
-            delete updated.member;    // remove member when team changes
-          }
+        if (name === "team") {
+          delete updated.member;    // remove member when team changes
+        }
 
-          updated[name] = value;
-          return updated;
-        });
-    // }
-  }
+        updated[name] = value;
+        return updated;
+      });
+  // }
+}
 
   const handleAttendanceList = async () => {
     setSpinner(true)
@@ -154,11 +153,7 @@ const monthsArray = Array.from({ length: 12 }, (_, i) => {
     }
 }, [memberFeed, dispatch]);
 
-useEffect(() => {
-  if (teamsState && teamsState.teams) {
-    setTeamFeed(teamsState.teams);
-  }
-}, [teamsState])
+
 
 useEffect(() => {
   if( apiResult.attendanceStatuses){
@@ -216,25 +211,6 @@ useEffect(() => {
     newDate.setDate(date.getDate() + days);
     setDate(newDate);
   };
-
-  const lightenColor = (hex, percent = 30) => {
-  // Remove '#' if present
-  hex = hex?.replace(/^#/, '');
-
-  // Parse the hex components
-  const num = parseInt(hex, 16);
-  let r = (num >> 16) + Math.round(2.55 * percent);
-  let g = ((num >> 8) & 0x00FF) + Math.round(2.55 * percent);
-  let b = (num & 0x0000FF) + Math.round(2.55 * percent);
-
-  // Clamp values between 0–255
-  r = Math.min(255, r);
-  g = Math.min(255, g);
-  b = Math.min(255, b);
-
-  return `rgb(${r}, ${g}, ${b})`;
-};
-
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', {
@@ -775,57 +751,7 @@ useEffect(() => {
                       onSelect={handleMemberAttendance}
                     />
                 </Dropdown>
-                {/* <Dropdown key={'member-filter'}>
-                  {
-                  (attendances?.length === 1 ) ? 
-                    <>
-                    <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
-                      
-                      <div className="title--span flex-column align-items-start gap-0">
-                        <h3>
-                          <strong>{attendances?.[0]?.name}</strong>
-                          <span>{attendances?.[0]?.role?.name || ""}</span>
-                        </h3>
-                      </div>
-                    </button>
-                    </>
-                  :
-                  <>
-                  <Dropdown.Toggle variant="link" id="dropdown-basic" key={'member-filter-toggle'}>
-                    <h3>
-                      <strong>{selectedMember?.name}</strong>
-                      <span>{ selectedMember?.role?.name || selectedMember?.role || ''}</span>
-                    </h3>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu key={`member-drop`}>
-                      <div className="drop--scroll">
-                        {
-                      ( attendances && attendances?.length > 0) && (
-                        <>
-                            {  
-                                attendances.map((member, index) => {
-                                  
-                                  return (
-                                    <Dropdown.Item key={`drop-item-${member._id}`} value={member._id} onClick={() => { handleMemberAttendance(member) }}>
-                                      <div className="title--initial">{member?.name.charAt(0)}</div>
-                                      <div className="title--span flex-column align-items-start gap-0">
-                                        <strong>{member.name}</strong>
-                                        <span>{member?.role?.name}</span>
-                                      </div>
-                                    </Dropdown.Item>
-                                  )
-                                })
-
-                            }
-                            </> 
-                          )
-                          
-                          }
-                      </div>
-                  </Dropdown.Menu>
-                  </>
-                  }
-                </Dropdown> */}
+                
               </div>
               <ListGroup horizontal className="expand--icon ms-auto">
                 <ListGroup.Item className="day--dropdown w-auto h-auto d-none d-xxl-flex">

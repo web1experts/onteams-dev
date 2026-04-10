@@ -12,7 +12,7 @@ import {
   Dropdown,
 } from "react-bootstrap";
 import debounce from "lodash.debounce";
-import { FaList, FaPlus, FaTrashAlt, FaEllipsisV } from "react-icons/fa";
+import { FaList, FaPlus, FaEllipsisV } from "react-icons/fa";
 import { LuSettings2 } from "react-icons/lu";
 import { FiEdit, FiMail, FiSidebar, FiTrash2 } from "react-icons/fi";
 import { BsGrid, BsEye, BsEyeSlash } from "react-icons/bs";
@@ -55,8 +55,6 @@ function ClientsPage() {
   const inputRef = useRef(null);
   const [spinner, setSpinner] = useState(false);
   const inputs = document.querySelectorAll(".form-floating .form-control");
-  const handleSidebar = () =>
-    dispatch(toggleSidebar(commonState.sidebar_open ? false : true));
   const handleSidebarSmall = () =>
     dispatch(toggleSidebarSmall(commonState.sidebar_small ? false : true));
   const commonState = useSelector((state) => state.common);
@@ -112,9 +110,8 @@ function ClientsPage() {
   const [search, setSearch] = useState("");
   const [selectedClient, setSelectedClient] = useState(null);
   const [userId, setuserId] = useState("");
-  const pagesToDisplay = [];
+
   const [showPasswordFields, setShowPasswordFields] = useState({});
-  const [showloader, setShowloader] = useState(true);
   const apiResult = useSelector((state) => state.client);
   const [editedClient, setEditedClient] = useState({});
   const [fields, setFields] = useState({ name: "", remove_avatar: false });
@@ -133,7 +130,7 @@ function ClientsPage() {
       remove_avatar: false,
     });
     setIsActive(false);
-    setIsEditing( false )
+    setIsEditing(false);
   };
 
   const handleDragEnd = (result) => {
@@ -183,13 +180,13 @@ function ClientsPage() {
     setIsEditing((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
   };
 
-   // Debounced search handler
-    const debouncedUpdateSearch = useMemo(
+  // Debounced search handler
+  const debouncedUpdateSearch = useMemo(
     () =>
       debounce((value) => {
-        setSearch(value)
+        setSearch(value);
       }, 1000), // 1 sec debounce
-    []
+    [],
   );
 
   const toggleBadges = (fieldIndex) => {
@@ -251,14 +248,12 @@ function ClientsPage() {
   }, [selectedClient]);
 
   useEffect(() => {
-    if( deleteSuccess ){
-      setIsActive( false )
+    if (deleteSuccess) {
+      setIsActive(false);
       setIsEditing(false);
-      setSelectedClient({})
+      setSelectedClient({});
       setClientFeed((prevClients) =>
-        prevClients.filter(
-          (client) => client._id !== deleteSuccess._id
-        )
+        prevClients.filter((client) => client._id !== deleteSuccess._id),
       );
     }
   }, [deleteSuccess]);
@@ -300,8 +295,8 @@ function ClientsPage() {
         prevClients.map((client) =>
           client._id === apiResult.updatedClient._id
             ? apiResult.updatedClient
-            : client
-        )
+            : client,
+        ),
       );
       setSelectedClient(apiResult.updatedClient);
     }
@@ -316,39 +311,32 @@ function ClientsPage() {
       setCustomFields(apiCustomfields.customFields);
     }
 
-    // if (apiCustomfields.newField) {
-    //   setCustomFields((prevCustomFields) => [
-    //     apiCustomfields.newField,
-    //     ...prevCustomFields,
-    //   ]);
-    // }
-
-      if (
+    if (
       apiCustomfields.newField &&
-        apiCustomfields.newField?.module === "clients"
-      ) {
-        setCustomFields((prevCustomFields) => [
-          ...prevCustomFields.filter(
-            (field) => field._id !== apiCustomfields.newField._id
-          ),
-          apiCustomfields.newField
-        ]);
-      }
+      apiCustomfields.newField?.module === "clients"
+    ) {
+      setCustomFields((prevCustomFields) => [
+        ...prevCustomFields.filter(
+          (field) => field._id !== apiCustomfields.newField._id,
+        ),
+        apiCustomfields.newField,
+      ]);
+    }
 
     if (apiCustomfields.updatedField) {
       setCustomFields((prevCustomFields) =>
         prevCustomFields.map((field) =>
           field._id === apiCustomfields.updatedField._id
             ? apiCustomfields.updatedField
-            : field
-        )
+            : field,
+        ),
       );
     }
     if (apiCustomfields.deletedField) {
       setCustomFields((prevCustomFields) =>
         prevCustomFields.filter(
-          (field) => field._id !== apiCustomfields.deletedField
-        )
+          (field) => field._id !== apiCustomfields.deletedField,
+        ),
       );
     }
   }, [apiCustomfields]);
@@ -432,7 +420,7 @@ function ClientsPage() {
           const error = await validateField("clients", fieldName, value, rules);
           // If error exists, return it as part of the resolved promise
           return { fieldName, error };
-        }
+        },
       );
 
       // Wait for all promises to resolve
@@ -483,10 +471,7 @@ function ClientsPage() {
       setLoader(false);
     }
   };
-  const removeAvatar = () => {
-    setAvatarPreview(null);
-    setFields({ ...fields, ["remove_avatar"]: true });
-  };
+
 
   const [projectToggle, setProjectToggle] = useState(false);
   const handleToggles = () => {
@@ -544,7 +529,9 @@ function ClientsPage() {
                             ref={inputRef}
                             readOnly={spinner}
                             placeholder="Search Client.."
-                            onChange={(e) => debouncedUpdateSearch(e.target.value)}
+                            onChange={(e) =>
+                              debouncedUpdateSearch(e.target.value)
+                            }
                           />
                         </Form.Group>
                       </Form>
@@ -582,17 +569,16 @@ function ClientsPage() {
                       >
                         <MdSearch />
                       </ListGroup.Item>
-                      {
-                        (memberProfile?.role?.permissions?.clients
-                        ?.manage_custom_fields === true) && (
+                      {memberProfile?.role?.permissions?.clients
+                        ?.manage_custom_fields === true && (
                         <ListGroup.Item
                           className="d-md-flex"
                           key={`settingskey`}
                           onClick={toggleCustomFields}
                         >
                           <LuSettings2 />
-                        </ListGroup.Item>)
-                      }
+                        </ListGroup.Item>
+                      )}
                       <ListGroup.Item
                         className="d-none d-lg-flex"
                         onClick={handleToggles}
@@ -629,8 +615,8 @@ function ClientsPage() {
                     isActiveView === 1
                       ? "project--grid--table project--grid--new--table table-responsive-xl"
                       : isActiveView === 2
-                      ? "project--table draggable--table new--project--rows table-responsive-xl"
-                      : "project--table new--project--rows table-responsive-xl"
+                        ? "project--table draggable--table new--project--rows table-responsive-xl"
+                        : "project--table new--project--rows table-responsive-xl"
                   }
                 >
                   {!spinner && clientFeeds && clientFeeds.length > 0 ? (
@@ -714,10 +700,17 @@ function ClientsPage() {
                                                 <MdDragIndicator />
                                               </div>
                                               <div className="title--initial">
-                                               { (client?.avatar && client?.avatar !== null ) ? 
-                                                  <span><img src={client?.avatar} alt={'client-avatar'} /></span>
-                                                  :
-                                                client.name.charAt(0)}
+                                                {client?.avatar &&
+                                                client?.avatar !== null ? (
+                                                  <span>
+                                                    <img
+                                                      src={client?.avatar}
+                                                      alt={"client-avatar"}
+                                                    />
+                                                  </span>
+                                                ) : (
+                                                  client.name.charAt(0)
+                                                )}
                                               </div>
                                               <div className="title--span flex-column align-items-start gap-0">
                                                 <span>{client.name}</span>
@@ -741,7 +734,7 @@ function ClientsPage() {
                                           customFields
                                             .filter(
                                               (field) =>
-                                                field?.showInTable !== false
+                                                field?.showInTable !== false,
                                             )
                                             .map((field, idx) => {
                                               const fieldname = field.name;
@@ -760,7 +753,7 @@ function ClientsPage() {
                                                 const matchedOption =
                                                   field.options.find(
                                                     (opt) =>
-                                                      opt.value === mvalue
+                                                      opt.value === mvalue,
                                                   );
                                                 if (matchedOption) {
                                                   mvalue = (
@@ -777,18 +770,20 @@ function ClientsPage() {
                                                         borderStyle: "solid",
                                                       }}
                                                       onClick={() => {
-                                                          if (
-                                                              memberProfile?.role?.permissions?.clients
-                                                                ?.create_edit_delete ===
-                                                                true
-                                                            ) {
-                                                              toggleBadges(field)
-                                                            }else {
-                                                              console.log("Not allowed");
-                                                            }
+                                                        if (
+                                                          memberProfile?.role
+                                                            ?.permissions
+                                                            ?.clients
+                                                            ?.create_edit_delete ===
+                                                          true
+                                                        ) {
+                                                          toggleBadges(field);
+                                                        } else {
+                                                          console.log(
+                                                            "Not allowed",
+                                                          );
                                                         }
-                                                          
-                                                        }
+                                                      }}
                                                     >
                                                       {
                                                         client?.customFields?.[
@@ -812,7 +807,7 @@ function ClientsPage() {
                                                       }}
                                                       onClick={() =>
                                                         toggleVisibility(
-                                                          uniqueKey
+                                                          uniqueKey,
                                                         )
                                                       }
                                                     >
@@ -839,8 +834,8 @@ function ClientsPage() {
                                                       isActiveView === 1
                                                         ? "d-flex text-uppercase fs-small"
                                                         : isActiveView === 2
-                                                        ? "d-flex d-lg-none text-uppercase fs-small mb-1"
-                                                        : "d-flex d-lg-none text-uppercase fs-small mb-1"
+                                                          ? "d-flex d-lg-none text-uppercase fs-small mb-1"
+                                                          : "d-flex d-lg-none text-uppercase fs-small mb-1"
                                                     }
                                                   >
                                                     {field.label}
@@ -916,10 +911,17 @@ function ClientsPage() {
               <Dropdown>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <div className="title--initial">
-                     {(selectedClient?.avatar && selectedClient?.avatar !== null ) ? 
-                      <span><img src={selectedClient?.avatar} alt={'client-avatar'} /></span>
-                      :
-                    selectedClient?.name?.charAt(0)}
+                    {selectedClient?.avatar &&
+                    selectedClient?.avatar !== null ? (
+                      <span>
+                        <img
+                          src={selectedClient?.avatar}
+                          alt={"client-avatar"}
+                        />
+                      </span>
+                    ) : (
+                      selectedClient?.name?.charAt(0)
+                    )}
                   </div>
                   <div className="title--span flex-column align-items-start gap-0">
                     <h3>
@@ -943,11 +945,16 @@ function ClientsPage() {
                           }
                         >
                           <div className="title--initial">
-                            {(client?.avatar && client?.avatar !== null ) ? 
-                              <span><img src={client?.avatar} alt={'client-avatar'} /></span>
-                              :
-                            client?.name.charAt(0)
-                            }
+                            {client?.avatar && client?.avatar !== null ? (
+                              <span>
+                                <img
+                                  src={client?.avatar}
+                                  alt={"client-avatar"}
+                                />
+                              </span>
+                            ) : (
+                              client?.name.charAt(0)
+                            )}
                           </div>
                           <div className="title--span flex-column align-items-start gap-0">
                             <strong>{client?.name}</strong>
@@ -989,12 +996,11 @@ function ClientsPage() {
                     accept=".jpg, .jpeg, .png, .gif"
                   />
                 )}
-                {memberProfile?.role?.permissions?.clients?.create_edit_delete ===
-                  true || memberProfile?.role?.slug === "owner" ? (
+                {memberProfile?.role?.permissions?.clients
+                  ?.create_edit_delete === true ||
+                memberProfile?.role?.slug === "owner" ? (
                   <>
-                    <Form.Label 
-                    htmlFor="upload--img"
-                    >
+                    <Form.Label htmlFor="upload--img">
                       {avatarPreview ? (
                         <Card.Img variant="top" src={avatarPreview} />
                       ) : fields?.remove_avatar === false &&
@@ -1008,12 +1014,6 @@ function ClientsPage() {
                       )}
                     </Form.Label>
                     <h3>{selectedClient?.name}</h3>
-                    {/* {selectedClient?.avatar &&
-                      fields?.remove_avatar === false && (
-                        <span className="remove--photo" onClick={removeAvatar}>
-                          <FaTrashAlt />
-                        </span>
-                      )} */}
                   </>
                 ) : (
                   <Form.Label htmlFor="upload--img">
@@ -1034,8 +1034,8 @@ function ClientsPage() {
               <Card.Body>
                 <Card.Title>
                   <FiMail /> Client Information
-                  {(memberProfile?.role?.permissions?.clients?.create_edit_delete ===
-                    true ||
+                  {(memberProfile?.role?.permissions?.clients
+                    ?.create_edit_delete === true ||
                     memberProfile?.role?.slug === "owner") && (
                     <Dropdown>
                       <Dropdown.Toggle variant="dark" id="dropdown-basic">
@@ -1090,7 +1090,8 @@ function ClientsPage() {
                             <Form.Control
                               type="text"
                               className={
-                                fieldserrors["name"] && fieldserrors["name"] !== ""
+                                fieldserrors["name"] &&
+                                fieldserrors["name"] !== ""
                                   ? "input-error"
                                   : "form-control"
                               }
@@ -1099,8 +1100,6 @@ function ClientsPage() {
                               value={fields?.name}
                               onChange={handleChange}
                             />
-                            
-                           
                           </Form.Group>
                           {/* {
                               (fieldserrors['name'] && fieldserrors['name'] !== "") && (
@@ -1120,7 +1119,7 @@ function ClientsPage() {
                                     field.type === "date" &&
                                     fields[`custom_field[${field.name}]`]
                                       ? convertDDMMYYYYtoYYYYMMDD(
-                                          fields[`custom_field[${field.name}]`]
+                                          fields[`custom_field[${field.name}]`],
                                         )
                                       : fields[`custom_field[${field.name}]`] ||
                                         "",
@@ -1129,7 +1128,7 @@ function ClientsPage() {
                                     if (field.type === "date") {
                                       handleDateChange(
                                         e,
-                                        `custom_field[${field.name}]`
+                                        `custom_field[${field.name}]`,
                                       );
                                     } else {
                                       handleChange(e);
@@ -1142,7 +1141,7 @@ function ClientsPage() {
                                     ] || false,
                                   toggleShowPassword: () =>
                                     toggleShowPassword(
-                                      `custom_field[${field.name}]`
+                                      `custom_field[${field.name}]`,
                                     ),
                                   toggleBadges: () => toggleBadges(field),
                                 })}

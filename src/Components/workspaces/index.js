@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Modal, Table, Dropdown, ListGroup,Alert} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Table, ListGroup} from "react-bootstrap";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
 import { FiSidebar, FiUsers, FiTarget } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
-import { MdDragIndicator } from "react-icons/md";
 import { toggleSidebar, toggleSidebarSmall } from "../../redux/actions/common.action";
 import WorkspaceForm from "./workspaceform";
 import { refreshUserWorkspace } from "../../redux/actions/auth.actions";
 import { useDispatch, useSelector } from "react-redux";
 import { getloggedInUser } from "../../helpers/auth";
-import { AlertDialog, TransferOnwerShip } from "../modals";
-import { getMemberdata } from "../../helpers/commonfunctions";
 import { deleteWorkspace, leaveCompany } from "../../redux/actions/workspace.action";
-import Spinner from 'react-bootstrap/Spinner';
-import { BsTrash2, BsEye } from "react-icons/bs";
+import { BsEye } from "react-icons/bs";
 import { getActiveSubscription } from "../../redux/actions/subscription.action";
 import { useNavigate } from "react-router-dom";
 import { DeleteWorkspace } from "../modals/deleteWorkspace";
@@ -26,7 +22,6 @@ function Workspace(props) {
   const [activeSubscription, setActiveSubscription] = useState(null)
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const currentMember = getMemberdata();
   const currentUser = getloggedInUser();
   
   const [show, setShow] = useState(false);
@@ -61,7 +56,7 @@ function Workspace(props) {
   },[])
 
   useEffect(() => {
-    if( workspacefeed && workspacefeed.length > 0){
+    if( workspacefeed){
       setWorkspaces( workspacefeed )
     }
   },[workspacefeed])

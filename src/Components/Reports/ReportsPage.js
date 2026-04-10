@@ -18,7 +18,6 @@ import {
   ListGroupItem,
   Pagination,
 } from "react-bootstrap";
-import { FaRegEdit } from "react-icons/fa";
 import debounce from "lodash.debounce";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaAngleRight, FaEye } from "react-icons/fa";
@@ -28,7 +27,6 @@ import {
   getMemberdata,
   selectboxObserver,
   groupSelectboxObserver
-  //getMembersFromTeams
 } from "../../helpers/commonfunctions";
 import {
   LuFolderOpen,
@@ -46,25 +44,19 @@ import {
 import { FiSidebar, FiClock, FiTarget, FiUsers, FiUser, FiCheckCircle, FiTrash2, FiEdit } from "react-icons/fi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { GrExpand } from "react-icons/gr";
-import { TbReport, TbScreenshot } from "react-icons/tb";
+import { TbScreenshot } from "react-icons/tb";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import {
   getReportsByMember,
   gerReportsByProject,
-  getSingleProjectReport,
   addRemarkstoProject,
   getActivityMeta,
   getRemarks,
   deleteRemarks,
   updateremark
 } from "../../redux/actions/report.action";
-import { Listmembers } from "../../redux/actions/members.action";
-import {
-  ListProjectsByMembers,
-  ListMemberProjects,
-} from "../../redux/actions/project.action";
+
 import DatePicker from "react-multi-date-picker";
-import { getTeams } from "../../redux/actions/team.action";
 import { currentMemberProfile } from "../../helpers/auth";
 import "media-chrome";
 import "media-chrome/dist/menu";
@@ -240,12 +232,6 @@ function ReportsPage() {
     }
   };
 
-  const isMemberSelected = (selectedTeamMembers = {}, memberId) => {
-    return Object.values(selectedTeamMembers).some((membersArray) =>
-      membersArray.includes(memberId)
-    );
-  };
-
   const getMembersFromTeams = (selectedTeamIds) => { 
     if (!Array.isArray(teamfeed) || !Array.isArray(selectedTeamIds)) {
       return [];
@@ -348,27 +334,6 @@ function ReportsPage() {
       [filters]
     );
 
-  // const handleListProjects = async () => {
-  //   if (memberProfile?.role?.slug === "owner") {
-  //     await dispatch(ListProjectsByMembers({ members: "all" }));
-  //   } else {
-  //     const members = Array.from(
-  //       new Set(
-  //         [
-  //           memberProfile?._id,
-  //           ...(memberProfile?.role?.permissions?.reports?.
-  //             ? memberProfile?.role?.permissions?.reports?.selected_members || []
-  //             : []),
-  //         ].filter(Boolean)
-  //       )
-  //     );
-
-  //     await dispatch(ListProjectsByMembers({ members: members }));
-  //   }
-
-  //   await dispatch(ListMemberProjects(memberdata?._id));
-  // };
-  
 
   const handleReports = async () => {
     setSpinner(true);
@@ -382,12 +347,9 @@ function ReportsPage() {
 
   useEffect(() => {
     dispatch(getAssignedTeamsOrMembersByRole(memberProfile?.role?._id))
-    // dispatch(Listmembers({currentPage: 0, searchTerm: '', has_limit: false}));
-    // dispatch(getTeams())
+    
     selectboxObserver();
-    // setTimeout(() => {
-    //   groupSelectboxObserver()
-    // },700)
+    
   }, [dispatch]);
 
   useEffect(() => {
@@ -2312,7 +2274,7 @@ const formattedDate = (date) => {
               )
                
             }
-             {/* <FaRegEdit onClick={handleRemarks} /> */}
+             
              {loader && (
                 <div className="loading-bar">
                   <img src="images/OnTeam-icon-gray.png" className="flipchar" />

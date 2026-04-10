@@ -903,6 +903,8 @@ const renderSubtasks = () => {
                                                 ...prev,
                                                 [subtask._id]: false,
                                             }));
+                                        }else{
+                                            removeSubtask(index)
                                         }
                                         
                                     }}

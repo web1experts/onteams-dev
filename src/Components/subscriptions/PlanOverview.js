@@ -150,7 +150,7 @@ const PlanOverview = () => {
                       <h3 className="fw-bold mb-0 display-6 d-flex gap-1 align-items-end flex-column">
                         <span>
                           {
-                            (activeSubscription?.subscriptionDetails?.currency === 'usd') ? 
+                            (activeSubscription?.subscriptionDetails?.currency?.toLowerCase() === 'usd') ? 
                             '$'
                             :
                             '₹'

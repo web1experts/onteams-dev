@@ -367,9 +367,7 @@ useEffect(() => {
     let selectedfilters = {
       currentPage: currentPage,
       status: currentFilters.status,
-      date_range: [
-        new Date().toLocaleDateString("en-CA"),
-      ],
+      date_range: filtereddate,
     };
 
     if (Object.keys(currentFilters).length > 0) {
@@ -488,7 +486,10 @@ useEffect(() => {
   useEffect(() => {
     setLiveStreaming({...liveStreaming, [currentActivity?._id] : currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"});
     if (currentActivity?.latestActivity?.status === false) {
-      setActSpinner(false);
+      if(activeInnerTab === "InnerLive"){
+        setActSpinner(false);
+      }
+      
     }
     if (
       (currentActivity !== false &&
@@ -1023,7 +1024,9 @@ const ymd = (dateLike) => {
         console.log('Connection state changed:', peerConnections[id].connectionState);
         if( peerConnections[id].connectionState === 'failed' || peerConnections[id].connectionState === 'disconnected'){
           setStreamError("Unable to connect with the desktop app. Please try later.");
-          setActSpinner( false )
+            if(activeInnerTab === "InnerLive"){
+            
+          }
           socket.emit('tracker-status-update', {userID: currentActivity?._id, status: false });
         }else if(peerConnections[id].connectionState === 'connected'){
           setStreamError("");
@@ -1099,7 +1102,7 @@ const ymd = (dateLike) => {
       setTimeout(() => { 
         setActSpinner(false);
         setSpinner( false )
-      }, 700);
+      }, 2500);
     }
 
     if (activitystate?.MemberrecordedActivity) {
@@ -1173,10 +1176,6 @@ const ymd = (dateLike) => {
       // setFilters({ ...filters, [name]: value });
     }
   };
-
-  //   const handleAddEntry = () => {
-  //     setEntries([...entries, { task: "", task_title: "", start_time: "", end_time: "" }]);
-  // };
 
   const handleTimeChange = (name, value) => {
     setTimings({ ...timings, [name]: value });
@@ -1616,6 +1615,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                     } else {
                       const formatted = formatDate(value);
                       setFilteredDate(formatted);
+                      
                     }
                   }}
                   className="form-control"
@@ -3800,7 +3800,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
                 <Button variant="dark" onClick={handleProjectShow} disabled={
                     !timings?.start_time ||
                     !timings?.end_time ||
-                    timings.end_time === "00:00"
+                    timings.end_time === "00:00" || 
+                    !timings?.date || timings?.date === ""
                   }>
                   Select Project
                 </Button>
