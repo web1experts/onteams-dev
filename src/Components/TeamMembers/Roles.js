@@ -718,7 +718,7 @@ function Roles() {
                         )
                     })}
 
-                  <div className="mt-4 text-end fixed--bottom">
+                  <div className="mt-4 text-end">
                     <Button variant="secondary" onClick={() => setShowDelete(true)}>Delete</Button>
                     <Button variant="primary" className="ms-3" onClick={handleSave}>Save</Button>
                   </div>

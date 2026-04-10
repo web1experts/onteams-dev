@@ -631,7 +631,7 @@ const setDefaultMemberRole = () => {
 
   const showError = (name) => {
     if (errors && errors[name])
-      return <span className="error">{errors[name]}</span>;
+      return <span className="error w-100 d-block">{errors[name]}</span>;
     return null;
   };
 
@@ -1762,51 +1762,59 @@ const setDefaultMemberRole = () => {
             <Form onSubmit={handleSubmit}>
               {/* {rows.map((row, index) => ( */}
               <div className="form-row pb-3" key={`row-0`}>
-                <Form.Group className="mb-0 pb-0 form-group d-flex flex-column flex-md-row gap-2 gap-md-3 mb-2 mb-md-0 align-items-md-center">
-                  <FloatingLabel className="flex-fill" label="Email address *">
-                    <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
-                      placeholder="Email address"
-                      name="email"
-                      value={fields?.email}
-                      onChange={handleChange}
-                    />
-                  </FloatingLabel>
+                <Form.Group className="mb-0 pb-0 form-group d-flex flex-column gap-2 mb-2 mb-md-0">
+                  <Form.Label>Email address <sup className="text-danger">*</sup></Form.Label>
+                  <Form.Control type="text" className={ errors["email"] && errors["email"] !== "" ? "input-error" : "form-control"}
+                    placeholder="Email address"
+                    name="email"
+                    value={fields?.email}
+                    onChange={handleChange}
+                  />
                   {showError("email")}
                  
                 </Form.Group>
               </div>
               
               <div className="form-row pb-3">
-                <Form.Label>Assign Team</Form.Label>
-                    {teamfeed?.map(
-                      (team) => (
-                        <>
-                        <span className="team--color" style={{ background: team?.color }}></span> 
-                        <Form.Check
-                          inline
-                          label={team?.name}
-                          name="selected_teams[]"
-                          type="checkbox"
-                          id={`inline-${team?._id}`}
-                          onChange={(e) => {
-                            handleChange({
-                              target: {
-                                name: "selected_teams[]",
-                                value: team?._id,
-                                type: "checkbox",
-                                checked: e.target.checked,
-                              },
-                            });
-                          }}
-                        />
-                        </>
-                        
-                      ),
-                    )}
+                <Form.Label>Teams <sup className="text-danger">*</sup></Form.Label>
+                  <div className="p-3 bg-light border rounded-3 w-100">
+                    <div className="d-flex flex-wrap gap-3 flex-column">
+                      {teamfeed?.map(
+                        (team) => (
+                          <>
+                            <Form.Check
+                              inline
+                              className="d-flex flex-wrap gap-1 bg-white p-3 rounded border m-0"
+                              label={
+                                <>
+                                  <span className="team--color" style={{ background: team?.color, display: "inline-block", width: 15, height: 15, marginLeft: 6, marginRight: 6 }}></span>
+                                  {team?.name}
+                                </>
+                              }
+                              name="selected_teams[]"
+                              type="checkbox"
+                              id={`inline-${team?._id}`}
+                              onChange={(e) => {
+                                handleChange({
+                                  target: {
+                                    name: "selected_teams[]",
+                                    value: team?._id,
+                                    type: "checkbox",
+                                    checked: e.target.checked,
+                                  },
+                                });
+                              }}
+                            />
+                          </>
+                        ),
+                      )}
+                    </div>
+                  </div>
                   {showError("selected_teams")}  
               </div>
               <div className="form-row pb-3" key={'row-role'}>
-                <Form.Group className="mb-0 form-group">
+                <Form.Group className="mb-0 form-group pb-0">
+                  <Form.Label>Role</Form.Label>
                   <Form.Select
                     placeholder="Select role"
                     aria-label="Role"
@@ -1839,7 +1847,7 @@ const setDefaultMemberRole = () => {
                       </option>
                     ))}
                   </Form.Select>
-                  <p>The role determines what permissions and access this member will have in your organization.</p>
+                  <p className="mb-0 text-muted"><small>The role determines what permissions and access this member will have in your organization.</small></p>
                   {showError("role")}
                 </Form.Group>
               </div>
@@ -1995,7 +2003,7 @@ const setDefaultMemberRole = () => {
 
       {(showRoles === true) && (
       
-        <Modal show={showRoles} onHide={handleRoleClose} size="md" centered className="status--modal assign--task--modal">
+        <Modal show={showRoles} onHide={handleRoleClose} size="md" centered className="status--modal assign--task--modal change--role--modal">
           <Modal.Header closeButton>
             <Modal.Title>
               <div className="change--team--icon d-flex align-items-center gap-3">

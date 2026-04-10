@@ -1967,15 +1967,15 @@ function ProjectsPage() {
                                                         fieldname || idx
                                                       }-${mvalue}`}
                                                     >
-                                                      <div className="flex-1 bg-slate-200 rounded-full h-2">
+                                                      <div className="flex-1 bg-slate-200 rounded-full">
                                                         <div
-                                                          className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"
+                                                          className="rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"
                                                           style={{
                                                             width: `65%`,
                                                           }}
                                                         ></div>
                                                       </div>
-                                                      <span className="text-sm font-bold text-slate-700">
+                                                      <span className="fs-6 fw-semibold">
                                                         {mvalue}
                                                       </span>
                                                     </div>
@@ -2379,13 +2379,13 @@ function ProjectsPage() {
                                             }-${mvalue}`}
                                             className="flex items-center space-x-2 w-full"
                                           >
-                                            <div className="flex-1 bg-slate-200 rounded-full h-2">
+                                            <div className="flex-1 bg-slate-200 rounded-full ">
                                               <div
-                                                className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"
+                                                className=" rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"
                                                 style={{ width: `65%` }}
                                               ></div>
                                             </div>
-                                            <span className="text-sm font-bold text-slate-700">
+                                            <span className="fs-6 fw-semibold">
                                               {mvalue}
                                             </span>
                                           </div>

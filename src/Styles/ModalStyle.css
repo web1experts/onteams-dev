@@ -1414,6 +1414,23 @@ select.form-error {
   border-radius: 12px;
 }
 
+.theme--modal .form-row .team--color {
+    border-radius: 3px;
+}
+
+.theme--modal .form-check .form-check-input {
+    margin-left: 0;
+}
+
+.theme--modal .new--accordion--block .form-check .form-check-input {
+    margin-left: -1.5em;
+}
+
+.theme--modal .form-check .form-check-label {
+    display: inline-flex;
+    align-items: center;
+}
+
 @media (min-width:426px) {
     .add--team--member--modal form .d-md-none {
         display: none;

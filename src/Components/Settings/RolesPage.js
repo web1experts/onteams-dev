@@ -1159,7 +1159,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                                   }));
                                                 }}
                                               >
-                                               Remove Team Assignement
+                                               Remove Team Assignment
                                               </Button>
                                             </Alert>
                                           )
@@ -1168,7 +1168,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                           if (perm === "view") {
                                             return (
                                               <>
-                                              <div className="d-flex flex-column mt-2">
+                                              <div className="d-flex flex-column mt-2 border p-2 rounded-3">
                                                 <Form.Check
                                                   key={`${modSlug}--view`}
                                                   type="checkbox"
@@ -1298,7 +1298,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                           }else if (perm === "specific_teams_only") {
                                             return (
                                               <div className={ showTeamAssign === false ? 'd-none': ''}>
-                                                <div className="d-flex flex-column mt-2">
+                                                <div className="d-flex flex-column mt-2 border p-2 rounded-3">
                                                   <Form.Check
                                                     key={`${modSlug}--assigned-team`}
                                                     type="radio"
@@ -1399,7 +1399,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                           }else if (perm === "specific_peoples_only") {
                                             return (
                                               <div className={ showTeamAssign === false ? 'd-none': ''}>
-                                              <div className="d-flex flex-column mt-2">
+                                              <div className="d-flex flex-column mt-2 border p-2 rounded-3">
                                                 <Form.Check
                                                   key={`${modSlug}--assigned-team`}
                                                   type="radio"
@@ -1623,7 +1623,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                           }else if (perm === "view_others" && modSlug === "time_tracking") {
                                             return (
                                               <>
-                                              <div className="d-flex flex-column mt-2">
+                                              <div className="d-flex flex-column mt-2 border p-2 rounded-3">
                                                 <Form.Check
                                                   key={`${modSlug}--view_others`}
                                                   type="checkbox"
@@ -1752,7 +1752,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                           }else if (perm === "update_manual_time") {
                                             return (
                                               <>
-                                              <div className="d-flex flex-column mt-2">
+                                              <div className="d-flex flex-column mt-2 border p-2 rounded-3">
                                                 <Form.Check
                                                   key={`${modSlug}--view-${perm}`}
                                                   type="checkbox"
@@ -1785,7 +1785,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                           else if (perm === "view_others" && modSlug === "projects") {
                                             return (
                                               <>
-                                              <div className="d-flex flex-column mt-2">
+                                              <div className="d-flex flex-column mt-2 border p-2 rounded-3">
                                                 <Form.Check
                                                   key={`${modSlug}--view_others`}
                                                   type="checkbox"
@@ -1914,7 +1914,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                           }else if (perm === "view_unassigned") {
                                             return (
                                               <>
-                                              <div className="d-flex flex-column mt-2">
+                                              <div className="d-flex flex-column mt-2 border p-2 rounded-3">
                                                 <Form.Check
                                                   key={`${modSlug}--view-${perm}`}
                                                   type="checkbox"
@@ -1946,7 +1946,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                                           }
                                           return (
                                             <>
-                                              <div className="d-flex flex-column mt-2">
+                                              <div className="d-flex flex-column mt-2 border p-2 rounded-3">
                                                 <Form.Check
                                                   id={`${modSlug}-${perm}-${role?._id}`}
                                                   key={perm}
@@ -2091,7 +2091,7 @@ const teamvisibilityBadge = (permissions, accessType) => {
                               })}
                               </Accordion>
                               {(role?.type === 'custom' && memberProfile?.role?.slug === "owner" || role?.type === 'custom' && memberProfile?.role?.permissions?.members?.update_permissions === true) && (
-                                <div className="mt-4 text-end fixed--bottom">
+                                <div className="mt-4 text-end">
                                   <Button
                                     variant="secondary"
                                     onClick={() => setShowDelete(true)}

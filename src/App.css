@@ -904,6 +904,7 @@ input.form-control.br-red {
   text-overflow: ellipsis;
   max-width: 630px;
   width: 100%;
+  min-height: 50px;
 }
 
 .password--new span {
@@ -2174,7 +2175,6 @@ button#dropdown-basic-single::before {
   position: relative;
   margin-bottom: 2rem;
   display: flex;
-  align-items: center;
   gap: 2rem;
   margin-top: -150px;
 }
@@ -2544,8 +2544,24 @@ table tr.marked-project td {
   max-width: max-content;
 }
 
-.rounded--box .contact--card.card .card-title .dropdown-item:empty {
-  display: none;
+.change--team--icon .title--initial {
+    align-items: center;
+    background: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 1rem;
+    font-weight: 500;
+    height: 40px;
+    width: 40px;
+    min-width: 40px;
+    justify-content: center;
+    margin-right: 0;
+    padding: 0;
+    text-align: center;
+    position: relative;
+    text-transform: uppercase;
 }
 
 .change--team--icon .title--initial span {
@@ -2742,6 +2758,10 @@ table tr.marked-project td {
   overflow: hidden;
   max-width: 100%;
   position: relative;
+}
+
+.rounded--box .contact--card.card .card-title .dropdown-item:empty {
+  display: none !important;
 }
 
 .wrapper--title .dropdown-item {
@@ -6995,12 +7015,12 @@ ul#icon-tabs .nav-link span svg {
   border-top: 0;
 }
 
-.project--grid--new--table td.new--td .fs-small,
-.page--wrapper .draggable--table td.new--td .fs-small {
-  font-size: .75rem;
-  line-height: 1;
-  color: rgba(0, 0, 0, .5);
-  margin-bottom: .15rem;
+.project--grid--new--table td.new--td .fs-small, .page--wrapper .draggable--table td.new--td .fs-small {
+    font-size: .65rem;
+    line-height: 1;
+    color: rgb(124 140 168);
+    margin-bottom: .15rem;
+    font-weight: 600;
 }
 
 .project--grid--table td::before {

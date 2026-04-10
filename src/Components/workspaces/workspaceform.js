@@ -161,7 +161,7 @@ function WorkspaceForm(props) {
       </Button>
       {props.show_more_buttons ?
         <>
-          <Button variant="outline-primary" className="mb-3"><Link to="/dashboard" variant="body2">Skip Creating Workspace</Link></Button>
+          <Button variant="outline-primary" className="mb-3"><Link to="/dashboard">Skip Creating Workspace</Link></Button>
         </>
         :
         null
