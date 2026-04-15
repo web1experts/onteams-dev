@@ -35,7 +35,7 @@ export default function ManagePlan() {
       city: "",
       state: "",
       postal: "",
-      country: "",
+      country: countries[0]?.value || "",
       agree: false,
       phoneCode: countries[0]?.phoneCode || "",
       isoCode:  countries[0]?.isoCode || ""

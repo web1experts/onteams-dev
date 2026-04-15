@@ -597,7 +597,7 @@ const showError = (name) => {
                   }
                 })}
               </Row>
-              {(memberProfile?.role?.slug === "owner" && Number(options?.stripe_trial_days) > 0) && (
+              {(memberProfile?.role?.slug === "owner" && Number(options?.stripe_trial_days) > 0 && !hasAlreadyTrialPlan) && (
               <Row className="mt-5">
                 <Col md="12">
                   <div className="flex justify-center">
