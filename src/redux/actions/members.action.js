@@ -28,7 +28,8 @@ import {
     UPDATE_OWNER_SUCCESS,
     LIST_REQUESTS_FAILED,
     LIST_REQUESTS_SUCCESS,
-    OWNERSHIP_REQUEST_SUCCESS
+    OWNERSHIP_REQUEST_SUCCESS,
+    RECORDING_SETTINGS
 } from "./types";
 
 const config = {
@@ -147,6 +148,38 @@ export const updateMember = (memberId, payload) => {
             const response = await API.apiPutUrl('member', `/update/${memberId}`, payload);
             if (response.data && response.data.success) {
                 await dispatch({ type: PUT_MEMBER_SUCCESS, payload: response.data });
+            } else {
+                await dispatch({ type: PUT_MEMBER_FAILED, payload: response.data.message });
+            }
+        } catch (err) {
+            errorRequest(err, dispatch);
+        }
+    }
+}
+
+export const updateMemberRecordingSettings = (memberId, payload) => {
+
+    return async (dispatch) => {
+        try {
+            const response = await API.apiPutUrl('member', `/update-recording-settings/${memberId}`, payload);
+            if (response.data && response.data.success) {
+                await dispatch({ type: PUT_MEMBER_SUCCESS, payload: response.data });
+            } else {
+                await dispatch({ type: PUT_MEMBER_FAILED, payload: response.data.message });
+            }
+        } catch (err) {
+            errorRequest(err, dispatch);
+        }
+    }
+}
+
+export const getRecordingTypes = (memberId) => {
+
+    return async (dispatch) => {
+        try {
+            const response = await API.apiGetByKey('member', `/recording-settings/${memberId}`);
+            if (response.data && response.data.success) {
+                await dispatch({ type:  RECORDING_SETTINGS, payload: response.data });
             } else {
                 await dispatch({ type: PUT_MEMBER_FAILED, payload: response.data.message });
             }

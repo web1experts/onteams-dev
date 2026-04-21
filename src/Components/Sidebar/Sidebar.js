@@ -403,7 +403,7 @@ function SidebarPanel() {
                 <Modal.Header closeButton>
                     <Modal.Title>
                         <span className="nav--item--icon"><RiSettingsLine /></span>
-                        <strong>Account Settings <small>Edit profile and preferences</small></strong>
+                        <strong>Account Settings</strong>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-0">

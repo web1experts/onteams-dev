@@ -2641,11 +2641,8 @@ function ProjectsPage() {
                 <RiFunctionAddLine />
               </span>
               <strong>
-                Create New Project{" "}
-                <small>
-                  Easily initiate a new project to organize tasks, teams, and
-                  timelines
-                </small>
+                Add Project{" "}
+                
               </strong>
             </Modal.Title>
           </Modal.Header>

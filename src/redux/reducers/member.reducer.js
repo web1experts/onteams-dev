@@ -25,7 +25,8 @@ import {
     UPDATE_OWNER_SUCCESS,
     LIST_REQUESTS_FAILED,
     OWNERSHIP_REQUEST_SUCCESS,
-    LIST_REQUESTS_SUCCESS
+    LIST_REQUESTS_SUCCESS,
+    RECORDING_SETTINGS
 } from "../actions/types";
 
 const initialState = {
@@ -51,6 +52,11 @@ export default (state = initialState, action) => {
             success: true,
             invite: true,
         };
+    case RECORDING_SETTINGS: 
+        return {
+            ...state,
+            recordingTypes: action.payload?.recordingTypes
+        }
     case CREATE_MEMBER_FAILED :
         return {
             ...state,

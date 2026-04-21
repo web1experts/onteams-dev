@@ -369,8 +369,8 @@ if (endMinutes - startMinutes < 1) {
         <Modal.Header closeButton className="border-bottom">
           <Modal.Title>
             <strong>
-              Attendance Rules Configuration{" "}
-              <small>Configure time ranges and attendance categories</small>
+              Attendance Rules{" "}
+              <small>Add time ranges and attendance categories</small>
             </strong>
           </Modal.Title>
           {attendanceStatus?.length < 7 && (

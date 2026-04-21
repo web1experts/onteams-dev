@@ -668,7 +668,7 @@ const activateTrialPlan = () => {
         <Modal.Header closeButton>
             <Modal.Title>
                 <span className="nav--item--icon"><BsTags /></span>
-                <strong>Subscription Confirmation <small>Let’s make something amazing together</small></strong>
+                <strong>Subscription Confirmation</strong>
             </Modal.Title>
         </Modal.Header>
         <Modal.Body>

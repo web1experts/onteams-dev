@@ -177,9 +177,7 @@ function AddClient(props) {
             </span>
             <strong>
               Add Client{" "}
-              <small>
-                Build your client list — add contacts and key details fast
-              </small>
+              
             </strong>
           </Modal.Title>
         </Modal.Header>

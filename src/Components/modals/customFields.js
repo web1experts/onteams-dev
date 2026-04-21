@@ -429,7 +429,9 @@ export const CustomFieldModal = (props) => {
         <Modal.Header closeButton>
           <Modal.Title>
             <span className="nav--item--icon"><LuSettings2 /></span>
-            <strong>Custom Fields <small>create custom fields for your projects</small></strong>
+            <strong>Custom Fields <small>Create custom fields for {
+                (props.module === 'members') ? 'team members' : props.module
+              }</small></strong>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

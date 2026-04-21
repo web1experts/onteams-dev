@@ -1551,7 +1551,7 @@ useEffect(() => {
         <Modal.Header closeButton>
           <Modal.Title>
             <span className="nav--item--icon"><TbUsersPlus /></span>
-            <strong>Add Member <small>Add team members to collaborate and manage tasks together</small></strong>
+            <strong>Add Member</strong>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

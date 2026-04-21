@@ -34,7 +34,9 @@ import {
   FiCalendar,
   FiUser,
   FiTrash2,
-  FiCheckCircle
+  FiCheckCircle,
+  FiCamera,
+  FiSettings
 } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
@@ -91,7 +93,7 @@ import {
 } from "../../redux/actions/project.action";
 import debounce from "lodash.debounce";
 import { getActiveSubscription } from "../../redux/actions/subscription.action";
-import { Listmembers } from "../../redux/actions/members.action";
+import { Listmembers, updateMemberRecordingSettings, getRecordingTypes } from "../../redux/actions/members.action";
 import { getTeams } from "../../redux/actions/team.action";
 import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 
@@ -112,7 +114,9 @@ function TimeTrackingPage() {
   const subscriptionState = useSelector((state) => state.subscription);
   const [projectFilter, setProjectFilter] = useState({ status: "in-progress" });
   const apiPermission = useSelector((state) => state.permissions);
+  const [showRecordSettings, setShowRecordSettings] = useState( false )
   const memberProfile = currentMemberProfile();
+  const [recordingSettings, setRecordingSettings] = useState({})
   let totalhours = 0;
   let totalProjecthours = 0;
   const currentMember = getMemberdata();
@@ -125,12 +129,16 @@ function TimeTrackingPage() {
     inactiveCount: 0,
     totalHours: 0,
   });
-  // const memberFeed = useSelector((state) => state.member.members);
+  const memberState = useSelector((state) => state.member);
   //  const [allMembers, setAllmembers] = useState([]);
   const handleShow = () => setShow(true);
   const [totalTaskDuration, setTotalTaskDuration] = useState(0);
   const handleProjectShow = () => {setProjectShow(true)
   };
+
+  const handleRecordSettingsClose = () => {
+    setShowRecordSettings( false )
+  }
   const [showSelect, setProjectShow] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const MemberprojectFeed = useSelector(
@@ -248,6 +256,16 @@ useEffect(() => {
   }
 }, [teamsState])
 
+useEffect(() =>{
+  if(memberState?.recordingTypes){ console.log(memberState?.recordingTypes)
+    setRecordingSettings(memberState?.recordingTypes || {
+      screenshot_recording: 'disabled',
+      video_recording: 'disabled',
+      live_streaming: 'disabled'
+    })
+  }
+}, [memberState?.recordingTypes])
+
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
       handleSidebarSmall();
@@ -339,6 +357,10 @@ useEffect(() => {
   function leaveRoom(room) {
     socket.emit("leaveRoom", socket.id, room);
   }
+
+  const updateRecodingType = async(payload) => {
+      dispatch(updateMemberRecordingSettings(currentActivity?._id, payload));
+    }
 
   const handleLiveActivityListInterval = async () => {
     
@@ -1979,6 +2001,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
                         </Dropdown.Menu>
                       </Dropdown>
                     )}
+                   
+                    
                     <ListGroup horizontal className="bg-white expand--icon">
                       <ListGroup.Item
                         className="d-flex d-xl-none"
@@ -2628,6 +2652,22 @@ const getMembersFromTeams = (selectedTeamIds) => {
             </ListGroup>
             <ListGroup horizontal className="p-0 ms-auto ms-xxl-0">
               {showRecordedTabs()}
+               {
+                  (currentActivity && activeInnerTab === "InnerRecorded" || currentActivity && activeInnerTab === "InnerLive") && (
+                    <ListGroup
+                        horizontal
+                        className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center"
+                      >
+                    <ListGroup.Item onClick={
+                      () => {
+                        dispatch(getRecordingTypes(currentActivity?._id))
+                        setShowRecordSettings(true)
+                      }}>
+                      <FiSettings />
+                    </ListGroup.Item>
+                    </ListGroup>
+                  )
+                }
               <ListGroup
                 horizontal
                 className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center"
@@ -3482,7 +3522,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
               <FiCheckCircle />
             </span>
             <strong>
-              Time Entry Approvals{" "}
+              Manual Time Approval{" "}
               <small>Review and approve manual time entries</small>
             </strong>
           </Modal.Title>
@@ -3509,8 +3549,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
               <LuTimer />
             </span>
             <strong>
-              Manual Time Entry{" "}
-              <small>Add time entries for completed work</small>
+              Add Manual Time {" "}
+              <small>Add time entries manually for completed work.</small>
             </strong>
           </Modal.Title>
         </Modal.Header>
@@ -3835,8 +3875,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
               <LuTimer />
             </span>
             <strong>
-              Manual Time Entry{" "}
-              <small>Add time entries for completed work</small>
+              Add Manual Time{" "}
+              <small>Add time entries manually for completed work.</small>
             </strong>
           </Modal.Title>
         </Modal.Header>
@@ -3949,6 +3989,111 @@ const getMembersFromTeams = (selectedTeamIds) => {
             Save
           </Button>
         </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showRecordSettings}
+        onHide={handleRecordSettingsClose}
+        centered
+        size="lg"
+        className="AddTimeModal theme--modal"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <span className="nav--item--icon">
+              <LuTimer />
+            </span>
+            <strong>
+              Desktop App Tracking Settings
+            </strong>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Card className="work--card">
+            <Card.Body>
+              <Card.Title>
+                <FiMonitor /> Desktop App Tracking Settings
+              </Card.Title>
+              <Card className="mb-3 screenshot--card">
+                <Card.Body className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex gap-3 align-items-center">
+                    <FiCamera />
+                    <h6 className="mb-1"> Screenshots <small className="d-block">Capture 3 random screenshots every 10 minutes</small></h6>
+                  </div>
+                  <Form.Check type="switch" key={`screenshot-only`} checked={recordingSettings?.screenshot_recording === "enable"} value={"enable"} name={`custom_field[screenshot_recording]`}
+                            onChange={(event) => {
+                              setRecordingSettings({
+                                ...recordingSettings,
+                                screenshot_recording: event.target.checked ? "enable" : "disabled"
+                              })
+                              updateRecodingType({
+                                  custom_field: {
+                                      screenshot_recording: event.target.checked ? "enable" : "disabled"
+                                  }
+                              });
+                            }} />
+                </Card.Body>
+              </Card>
+
+              {/* Screen Recording */}
+              <Card className="mb-3 recording--card">
+                <Card.Body className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex gap-3 align-items-center">
+                    <FiVideo />
+                    <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording while time tracking is running</small></h6>
+                  </div>
+                  {
+                    (activeSubscription && activeSubscription?.name === 'Elite' ) ? (
+                      <Form.Check type="switch" key={`video-only`} checked={recordingSettings?.video_recording === "enable"} value={"enable"} onChange={(event) => {
+                        setRecordingSettings({
+                          ...recordingSettings,
+                          video_recording: event.target.checked ? "enable" : "disabled"
+                        })
+                        updateRecodingType({
+                            custom_field: {
+                                video_recording: event.target.checked ? "enable" : "disabled"
+                            }
+                        });
+                      }} name={`custom_field[video_recording]`} />
+                    )
+                    :
+
+                    <Form.Check type="switch" key={`video-only`} disabled checked={false} value={"disabled"} onChange={(event) => {return false;}} name={`custom_field[video_recording]`} />
+                  }
+                  
+                </Card.Body>
+              </Card>
+
+              {/* Live Screen */}
+              <Card className="mb-3 live--card">
+                <Card.Body className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex gap-3 align-items-center">
+                    <FiMonitor />
+                    <h6 className="mb-1">Live Screen <small className="d-block">Real-time screen capture and live view</small></h6>
+                  </div>
+                  <Form.Check type="switch" key={`live-only`} checked={recordingSettings?.live_streaming === "enable"} value={"enable"} onChange={(event) => {
+                              setRecordingSettings({
+                                ...recordingSettings,
+                                live_streaming: event.target.checked ? "enable" : "disabled"
+                              })
+                              updateRecodingType({
+                                  custom_field: {
+                                      live_streaming: event.target.checked ? "enable" : "disabled"
+                                  }
+                              });
+                            }}   name={`custom_field[live_streaming]`}/>
+                </Card.Body>
+              </Card>
+
+              {/* Privacy Notice */}
+              <div className="mt-3">
+                <small>
+                  <strong>Access Notice:</strong> Time tracking data is only accessible to authorized users with roles that have <strong>View Team Time</strong> permission for your assigned team.
+                </small>
+              </div>
+            </Card.Body>
+          </Card>
+        </Modal.Body>
       </Modal>
     </>
   );
