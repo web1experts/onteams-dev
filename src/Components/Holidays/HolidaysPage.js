@@ -507,7 +507,7 @@ function HolidaysPage() {
         onHide={handleClose}
         centered
         size="md"
-        className="add--member--modal theme--modal"
+        className="add--member--modal theme--modal holiday--modal"
       >
         <Modal.Header closeButton>
           <Modal.Title>

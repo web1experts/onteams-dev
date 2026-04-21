@@ -480,9 +480,7 @@ function SettingPage(props) {
                   <ListGroup>
                     <ListGroup.Item>
                       <strong>Email</strong> {profile?.email}
-                    </ListGroup.Item>
-                    <ListGroup.Item>
-                      <Button variant="primary" onClick={() => {handleshowEmailchange()}}>Change Email</Button>
+                      <Button variant="primary" className="mt-2 px-3 py-2" onClick={() => {handleshowEmailchange()}}>Change Email</Button>
                     </ListGroup.Item>
                     <EditableField
                       field="name"
@@ -505,6 +503,9 @@ function SettingPage(props) {
                 }
 
                 <div className="text-end mt-3">
+                  <Button variant="danger" className="me-3" onClick={() => setShowAlert(true)}>
+                    Delete Account
+                  </Button>
                   <Button
                     variant="primary"
                     onClick={handleUpdateSubmit}
@@ -514,11 +515,6 @@ function SettingPage(props) {
                     {loader ? "Please wait..." : "Save Changes"}
                   </Button>
                 </div>
-                <ListGroup>
-                  <ListGroup.Item onClick={() => setShowAlert(true)}>
-                    <FaRegBell /> Delete Account
-                  </ListGroup.Item>
-                </ListGroup>
               </Card.Body>
             </Card>
           </div>

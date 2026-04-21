@@ -206,20 +206,19 @@ export function DeleteWorkspace({ showdialog, toggledialog, workspacename, works
         {/* STEP 3 */}
         {step === 3 && (
           <>
-            <Alert variant="info">
-              Email verification required
-            </Alert>
-            <p>We've sent a verification code to your email. Enter it to continue.</p>
-
-            <div className="d-flex gap-2 justify-content-center mb-3">
-              <Form.Label>Enter 6-digit code</Form.Label>
+            {/* <Alert variant="info">
+              
+            </Alert> */}
+            <p>Email verification required. We've sent a verification code to your email. Enter it to continue.</p>
+            <p>Enter 6-digit code</p>
+            <div className="d-flex gap-2 mb-3">
               {otp.map((digit, index) => (
                 <Form.Control
                   key={index}
                   id={`otp-${index}`}
                   value={digit}
                   maxLength={1}
-                  className="text-center"
+                  className="text-center p-1"
                   style={{ width: 45, height: 45 }}
                   onChange={(e) => handleOtpChange(e.target.value, index)}
                 />

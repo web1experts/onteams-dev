@@ -2977,12 +2977,14 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                     screenshotData?.task_data
                                                       ?.title
                                                   }{" "}
-                                                  <br />
+                                                </p>
+                                                <p>
                                                   <strong>Time:</strong>{" "}
                                                   {showAmPmtime(
                                                     screenshotData?.taken_time
                                                   )}
-                                                  <br />
+                                                </p>
+                                                <p>
                                                   <strong>Date: </strong>
                                                   {screenshotData?.taken_time
                                                     ? new Date(
@@ -3048,12 +3050,15 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                           videoData?.task_data
                                                             ?.title
                                                         }{" "}
-                                                        <br />
+                                                      </p>
+                                                      <p>
                                                         <strong>
                                                           Time:
                                                         </strong>{" "}
                                                         {videoData?.start_time}{" "}
                                                         to {videoData?.end_time}
+                                                      </p>
+                                                      <p>
                                                         <strong>Date:</strong>
                                                         {videoData?.createdAt
                                                           ? new Date(
@@ -3095,12 +3100,15 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                           videoData?.task_data
                                                             ?.title
                                                         }{" "}
-                                                        <br />
+                                                      </p>
+                                                      <p>
                                                         <strong>
                                                           Time:
                                                         </strong>{" "}
                                                         {videoData?.start_time}{" "}
                                                         to {videoData?.end_time}
+                                                      </p>
+                                                      <p>
                                                         <strong>Date:</strong>
                                                         {videoData?.createdAt
                                                           ? new Date(
@@ -3190,13 +3198,15 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                           videoData?.task_data
                                                             ?.title
                                                         }{" "}
-                                                        <br />
+                                                      </p>
+                                                      <p>
                                                         <strong>
                                                           Time:
                                                         </strong>{" "}
                                                         {videoData?.start_time}{" "}
                                                         to {videoData?.end_time}
-                                                        <br />
+                                                      </p>
+                                                      <p>
                                                         <strong>
                                                           Date:
                                                         </strong>{" "}

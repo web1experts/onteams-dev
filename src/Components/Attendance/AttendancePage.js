@@ -597,6 +597,7 @@ useEffect(() => {
                                               <td className={`${atten?.bg} text-center border-bottom`} key={ind} style={{
                                                     color: statusObject?.[key]?.color,
                                                     backgroundColor: rgbaBg,
+                                                    borderRadius: '0',
                                                     borderRight: `1px solid ${rgbaBorder}`
                                                   }}>
                                                       <strong>{atten?.count}</strong>

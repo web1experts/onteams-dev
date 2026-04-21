@@ -616,13 +616,14 @@ export const CustomFieldModal = (props) => {
                               name="showInTable"
                               checked={fields?.showInTable}
                               onChange={handleChange}
+                              className="ps-0 d-flex gap-2"
                             />
                           </Form.Group>
                         </Col>
                        )
                     }
                     
-                    <Col sm={12} md={6} className="text-end mt-3 mt-md-0">
+                    <Col sm={12} md={6} className="text-end mt-3 mt-md-0 ms-auto">
                       <Button
                         variant="secondary"
                         type="button"

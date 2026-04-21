@@ -609,17 +609,17 @@ function ClientsPage() {
             </div>
           ) : (
             <Container fluid>
-              <DragDropContext onDragEnd={handleDragEnd}>
-                <div
-                  className={
-                    isActiveView === 1
-                      ? "project--grid--table project--grid--new--table table-responsive-xl"
-                      : isActiveView === 2
+              {!spinner && clientFeeds && clientFeeds.length > 0 ? (
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <div
+                    className={
+                      isActiveView === 1
+                        ? "project--grid--table project--grid--new--table table-responsive-xl"
+                        : isActiveView === 2
                         ? "project--table draggable--table new--project--rows table-responsive-xl"
                         : "project--table new--project--rows table-responsive-xl"
-                  }
-                >
-                  {!spinner && clientFeeds && clientFeeds.length > 0 ? (
+                    }
+                  >
                     <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">
@@ -630,10 +630,7 @@ function ClientsPage() {
                           >
                             <div className="d-flex align-items-center justify-content-between border-end border-bottom ps-3">
                               Clients{" "}
-                              <span
-                                key="client-action-header"
-                                className="onHide"
-                              >
+                              <span key="client-action-header" className="onHide">
                                 Actions
                               </span>
                             </div>
@@ -655,6 +652,7 @@ function ClientsPage() {
                               ))}
                         </tr>
                       </thead>
+
                       <Droppable
                         droppableId={`droppable-client-table`}
                         type="CLIENTS"
@@ -666,231 +664,206 @@ function ClientsPage() {
                           >
                             {clientFeeds.map((client, index) => {
                               return (
-                                <>
-                                  <Draggable
-                                    key={client?._id}
-                                    draggableId={`client-${client?._id}`}
-                                    index={index}
-                                  >
-                                    {(provided) => (
-                                      <tr
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        key={`client-row-${client._id}`}
-                                        className={
-                                          client._id === selectedClient?._id
-                                            ? "project--active"
-                                            : ""
-                                        }
-                                        onClick={() => handleClick(client)}
+                                <Draggable
+                                  key={client?._id}
+                                  draggableId={`client-${client?._id}`}
+                                  index={index}
+                                >
+                                  {(provided) => (
+                                    <tr
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      key={`client-row-${client._id}`}
+                                      className={
+                                        client._id === selectedClient?._id
+                                          ? "project--active"
+                                          : ""
+                                      }
+                                      onClick={() => handleClick(client)}
+                                    >
+                                      <td
+                                        className="project--title--td sticky border-bottom"
+                                        key={`title-index-${index}`}
+                                        data-label="Client Name"
                                       >
-                                        {/* <td>{index + 1}</td> */}
-                                        <td
-                                          className="project--title--td sticky border-bottom"
-                                          key={`title-index-${index}`}
-                                          data-label="Client Name"
-                                        >
-                                          <div className="d-lg-flex justify-content-between border-end flex-wrap">
-                                            <div className="project--name">
-                                              <div className="drag--indicator">
-                                                <abbr key={`index-${index}`}>
-                                                  {index + 1}
-                                                </abbr>
-                                                <MdDragIndicator />
-                                              </div>
-                                              <div className="title--initial">
-                                                {client?.avatar &&
-                                                client?.avatar !== null ? (
-                                                  <span>
-                                                    <img
-                                                      src={client?.avatar}
-                                                      alt={"client-avatar"}
-                                                    />
-                                                  </span>
-                                                ) : (
-                                                  client.name.charAt(0)
-                                                )}
-                                              </div>
-                                              <div className="title--span flex-column align-items-start gap-0">
-                                                <span>{client.name}</span>
-                                              </div>
+                                        <div className="d-lg-flex justify-content-between border-end flex-wrap">
+                                          <div className="project--name">
+                                            <div className="drag--indicator">
+                                              <abbr key={`index-${index}`}>
+                                                {index + 1}
+                                              </abbr>
+                                              <MdDragIndicator />
                                             </div>
-                                            <div className="onHide task--buttons">
-                                              <Button
-                                                variant="primary"
-                                                className="px-3 py-2"
-                                                onClick={() => {
-                                                  handleClick(client);
-                                                  setIsActive(true);
-                                                }}
-                                              >
-                                                <BsEye />
-                                              </Button>
+
+                                            <div className="title--initial">
+                                              {client?.avatar &&
+                                              client?.avatar !== null ? (
+                                                <span>
+                                                  <img
+                                                    src={client?.avatar}
+                                                    alt="client-avatar"
+                                                  />
+                                                </span>
+                                              ) : (
+                                                client.name.charAt(0)
+                                              )}
+                                            </div>
+
+                                            <div className="title--span flex-column align-items-start gap-0">
+                                              <span>{client.name}</span>
                                             </div>
                                           </div>
-                                        </td>
-                                        {Array.isArray(customFields) &&
-                                          customFields
-                                            .filter(
-                                              (field) =>
-                                                field?.showInTable !== false,
-                                            )
-                                            .map((field, idx) => {
-                                              const fieldname = field.name;
-                                              let mvalue =
-                                                client?.customFields?.[
-                                                  fieldname
-                                                ]?.meta_value;
-                                              const fieldType = field.type;
-                                              const uniqueKey = `${
-                                                fieldname || idx
-                                              }-${mvalue}`;
-                                              if (
-                                                field.type === "badge" &&
-                                                Array.isArray(field.options)
-                                              ) {
-                                                const matchedOption =
-                                                  field.options.find(
-                                                    (opt) =>
-                                                      opt.value === mvalue,
-                                                  );
-                                                if (matchedOption) {
-                                                  mvalue = (
-                                                    <span
-                                                      className="priority--badge"
-                                                      style={{
-                                                        backgroundColor:
-                                                          matchedOption.color,
-                                                        color: "#fff",
-                                                        display: "inline-block",
-                                                        borderColor:
-                                                          matchedOption.color,
-                                                        borderWidth: "1px",
-                                                        borderStyle: "solid",
-                                                      }}
-                                                      onClick={() => {
-                                                        if (
-                                                          memberProfile?.role
-                                                            ?.permissions
-                                                            ?.clients
-                                                            ?.create_edit_delete ===
-                                                          true
-                                                        ) {
-                                                          toggleBadges(field);
-                                                        } else {
-                                                          console.log(
-                                                            "Not allowed",
-                                                          );
-                                                        }
-                                                      }}
-                                                    >
-                                                      {
-                                                        client?.customFields?.[
-                                                          fieldname
-                                                        ]?.meta_value
+
+                                          <div className="onHide task--buttons">
+                                            <Button
+                                              variant="primary"
+                                              className="px-3 py-2"
+                                              onClick={() => {
+                                                handleClick(client);
+                                                setIsActive(true);
+                                              }}
+                                            >
+                                              <BsEye />
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      </td>
+
+                                      {Array.isArray(customFields) &&
+                                        customFields
+                                          .filter(
+                                            (field) => field?.showInTable !== false
+                                          )
+                                          .map((field, idx) => {
+                                            const fieldname = field.name;
+                                            let mvalue =
+                                              client?.customFields?.[fieldname]
+                                                ?.meta_value;
+                                            const fieldType = field.type;
+                                            const uniqueKey = `${fieldname || idx}-${mvalue}`;
+
+                                            if (
+                                              field.type === "badge" &&
+                                              Array.isArray(field.options)
+                                            ) {
+                                              const matchedOption = field.options.find(
+                                                (opt) => opt.value === mvalue
+                                              );
+
+                                              if (matchedOption) {
+                                                mvalue = (
+                                                  <span
+                                                    className="priority--badge"
+                                                    style={{
+                                                      backgroundColor: matchedOption.color,
+                                                      color: "#fff",
+                                                      display: "inline-block",
+                                                      borderColor: matchedOption.color,
+                                                      borderWidth: "1px",
+                                                      borderStyle: "solid",
+                                                    }}
+                                                    onClick={() => {
+                                                      if (
+                                                        memberProfile?.role?.permissions
+                                                          ?.clients?.create_edit_delete ===
+                                                        true
+                                                      ) {
+                                                        toggleBadges(field);
+                                                      } else {
+                                                        console.log("Not allowed");
                                                       }
-                                                    </span>
-                                                  );
-                                                }
-                                              } else if (
-                                                fieldType === "password"
-                                              ) {
-                                                return (
-                                                  <span className="d-flex align-items-center gap-2">
-                                                    {visiblePasswords[uniqueKey]
-                                                      ? mvalue
-                                                      : "*****"}
-                                                    <span
-                                                      style={{
-                                                        cursor: "pointer",
-                                                      }}
-                                                      onClick={() =>
-                                                        toggleVisibility(
-                                                          uniqueKey,
-                                                        )
-                                                      }
-                                                    >
-                                                      {visiblePasswords[
-                                                        uniqueKey
-                                                      ] ? (
-                                                        <BsEyeSlash />
-                                                      ) : (
-                                                        <BsEye />
-                                                      )}
-                                                    </span>
+                                                    }}
+                                                  >
+                                                    {
+                                                      client?.customFields?.[fieldname]
+                                                        ?.meta_value
+                                                    }
                                                   </span>
                                                 );
                                               }
-                                              return (
-                                                <td
-                                                  key={`client-${
-                                                    fieldname || idx
-                                                  }-${mvalue}`}
-                                                  className="onHide new--td"
-                                                >
-                                                  <strong
-                                                    className={
-                                                      isActiveView === 1
-                                                        ? "d-flex text-uppercase fs-small"
-                                                        : isActiveView === 2
-                                                          ? "d-flex d-lg-none text-uppercase fs-small mb-1"
-                                                          : "d-flex d-lg-none text-uppercase fs-small mb-1"
+                                            } else if (fieldType === "password") {
+                                              mvalue = (
+                                                <span className="d-flex align-items-center gap-2">
+                                                  {visiblePasswords[uniqueKey]
+                                                    ? mvalue
+                                                    : "*****"}
+                                                  <span
+                                                    style={{ cursor: "pointer" }}
+                                                    onClick={() =>
+                                                      toggleVisibility(uniqueKey)
                                                     }
                                                   >
-                                                    {field.label}
-                                                  </strong>
-                                                  {mvalue}
-                                                </td>
+                                                    {visiblePasswords[uniqueKey] ? (
+                                                      <BsEyeSlash />
+                                                    ) : (
+                                                      <BsEye />
+                                                    )}
+                                                  </span>
+                                                </span>
                                               );
-                                            })}
-                                        <td
-                                          className="task--last--buttons mt-auto"
-                                          key={`client-td3-${index}`}
-                                        >
-                                          <div className="d-flex justify-content-between">
-                                            <div className="onHide">
-                                              <Button
-                                                variant="dark"
-                                                className="me-2 px-3 py-1"
-                                                onClick={() => {
-                                                  handleClick(client);
-                                                  setIsActive(true);
-                                                }}
+                                            }
+
+                                            return (
+                                              <td
+                                                key={`client-${fieldname || idx}-${index}`}
+                                                className="onHide new--td"
                                               >
-                                                <BsEye /> View
-                                              </Button>
-                                            </div>
+                                                <strong
+                                                  className={
+                                                    isActiveView === 1
+                                                      ? "d-flex text-uppercase fs-small"
+                                                      : isActiveView === 2
+                                                      ? "d-flex d-lg-none text-uppercase fs-small mb-1"
+                                                      : "d-flex d-lg-none text-uppercase fs-small mb-1"
+                                                  }
+                                                >
+                                                  {field.label}
+                                                </strong>
+                                                {mvalue}
+                                              </td>
+                                            );
+                                          })}
+
+                                      <td
+                                        className="task--last--buttons mt-auto"
+                                        key={`client-td3-${index}`}
+                                      >
+                                        <div className="d-flex justify-content-between">
+                                          <div className="onHide">
+                                            <Button
+                                              variant="dark"
+                                              className="me-2 px-3 py-1"
+                                              onClick={() => {
+                                                handleClick(client);
+                                                setIsActive(true);
+                                              }}
+                                            >
+                                              <BsEye /> View
+                                            </Button>
                                           </div>
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </Draggable>
-                                </>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </Draggable>
                               );
                             })}
+                            {provided.placeholder}
                           </tbody>
                         )}
                       </Droppable>
                     </Table>
-                  ) : (
-                    !spinner &&
-                    isActiveView === 2 && (
-                      <div className="text-center py-3">
-                        <h2>No Clients Found</h2>
-                      </div>
-                    )
-                  )}
-                  {isActiveView === 1 &&
-                    !spinner &&
-                    clientFeeds &&
-                    clientFeeds.length == 0 && (
-                      <div className="text-center py-3">
-                        <h2>No Clients Found</h2>
-                      </div>
-                    )}
-                </div>
-              </DragDropContext>
+                  </div>
+                </DragDropContext>
+              ) : (
+                !spinner &&
+                (isActiveView === 1 || isActiveView === 2) && (
+                  <div className="text-center py-3">
+                    <h2>No Clients Found</h2>
+                  </div>
+                )
+              )}
             </Container>
           )}
         </div>
