@@ -6837,6 +6837,10 @@ ul#icon-tabs .nav-link span svg {
   margin-bottom: 2rem;
 }
 
+.invitation--list:empty {
+  display: none;
+}
+
 .invitation--list .list-group-item {
   display: flex;
   align-items: center;
@@ -8472,7 +8476,7 @@ ul#icon-tabs .nav-link span svg {
 }
 
 .plan--overview--page .bg-gradient-blue {
-  background-image: linear-gradient(to right, #3b82f6, #06b6d4);
+  background-image: linear-gradient(to right, rgba(var(--theme-primary), 1), rgba(var(--theme-secondary), 1));
 }
 
 .plan--overview--page .plan--status .status--icon {
@@ -8527,7 +8531,7 @@ ul#icon-tabs .nav-link span svg {
     text-align: center;
 }
 
-.subscription--modal .form-group .error {
+.subscription--modal .form-group .error, .setting__modal form .error {
   position: relative;
 }
 

@@ -652,7 +652,6 @@ function DashboardPage() {
           <Container fluid>
             <Row className="justify-content-center">
               <Col sm={12} className="mb-4">
-                <DateTimeCard />
                 <ListGroup className="invitation--list">
                   {invitationsFeeds &&
                     invitationsFeeds.length > 0 &&
@@ -739,8 +738,9 @@ function DashboardPage() {
                           </ListGroup.Item>
                       );
                     })}
-                    
                 </ListGroup>
+                <DateTimeCard />
+                
               </Col>
               <Col xl={8}>
                 <Card className="daily--star">

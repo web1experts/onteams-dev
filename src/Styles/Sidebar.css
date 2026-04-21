@@ -766,6 +766,10 @@ Sidebar CSS-=-=
   background: none;
 }
 
+.holiday--modal .modal-content {
+  overflow: visible;
+}
+
 .theme--modal .modal-title {
   display: flex;
   align-items: center;

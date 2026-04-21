@@ -31,7 +31,7 @@ import {
   MdDragIndicator,
   MdSearch,
 } from "react-icons/md";
-import { FiSidebar, FiFileText } from "react-icons/fi";
+import { FiSidebar, FiFileText, FiSettings } from "react-icons/fi";
 import { GrAttachment, GrExpand } from "react-icons/gr";
 import { BsGrid, BsEye, BsEyeSlash } from "react-icons/bs";
 import { RiFunctionAddLine } from "react-icons/ri";
@@ -1369,19 +1369,21 @@ function ProjectsPage() {
                         </Form.Group>
                       </Form>
                     </ListGroup.Item>
-                    {(memberProfile?.role?.permissions?.projects
-                      ?.create_edit_delete_project === true) && (
-                      <ListGroup.Item
-                        className="d-xl-flex"
-                        key={`workflow-settingskey`}
-                        onClick={() => {
-                          dispatch(updateStateData(DIRECT_UPDATE, false));
-                          dispatch(togglePopups("workflow", true));
-                        }}
-                      >
-                        <FaCog />
-                      </ListGroup.Item>
-                    )}
+                    <ListGroup horizontal className="bg-white expand--icon">
+                      {(memberProfile?.role?.permissions?.projects
+                        ?.create_edit_delete_project === true) && (
+                        <ListGroup.Item
+                          className="d-xl-flex"
+                          key={`workflow-settingskey`}
+                          onClick={() => {
+                            dispatch(updateStateData(DIRECT_UPDATE, false));
+                            dispatch(togglePopups("workflow", true));
+                          }}
+                        >
+                          <FiSettings />
+                        </ListGroup.Item>
+                      )}
+                    </ListGroup>
                     <ListGroup
                       horizontal
                       className={isActive !== 0 ? "d-none" : "d-none d-lg-flex"}
@@ -2574,7 +2576,7 @@ function ProjectsPage() {
                   dispatch(togglePopups("workflow", true));
                 }}
               >
-                <FaCog />
+                <FiSettings />
               </ListGroup.Item>
             )}
             <ListGroup.Item

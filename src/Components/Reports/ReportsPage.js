@@ -2388,10 +2388,12 @@ const formattedDate = (date) => {
                             <p>
                               <strong>Task Name:</strong>{" "}
                               {screenshotData?.task_data?.title}
-                              <br />
+                            </p>
+                            <p>
                               <strong>Time:</strong>{" "}
                               {showAmPmtime(screenshotData?.taken_time)}
-                              <br />
+                            </p>
+                            <p>
                               <strong>Date:</strong>{" "}
                               {screenshotData?.taken_time
                                 ? new Date(
@@ -2459,11 +2461,13 @@ const formattedDate = (date) => {
                                   <p>
                                     <strong>Task Name:</strong>{" "}
                                     {videoData?.task_data?.title}
-                                    <br />
+                                  </p>
+                                  <p>
                                     <strong>Time:</strong>{" "}
                                     {videoData?.start_time} to{" "}
                                     {videoData?.end_time}
-                                    <br />
+                                  </p>
+                                  <p>
                                     <strong>Date:</strong>{" "}
                                     {videoData?.createdAt
                                       ? new Date(
