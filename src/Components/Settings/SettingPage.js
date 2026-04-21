@@ -169,9 +169,28 @@ function SettingPage(props) {
 
     const errors = {};
 
+    // Object.entries(securityFields).forEach(([key, value]) => { console.log(`${key}`, value.length)
+    //   if (!value || value.trim() === "") {
+    //     errors[key] = key.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) + ' cannot be blank';
+    //   }else if (value.length < 7) {
+    //     errors[key] = key.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) + ' length should be minimum 7 characters';
+    //   }
+    // });
     Object.entries(securityFields).forEach(([key, value]) => {
-      if (!value || value.trim() === "") {
-        errors[key] = key.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, char => char.toUpperCase()) + ' cannot be blank';
+      const stringValue = value ? String(value).trim() : "";
+
+      if (!stringValue) {
+        errors[key] =
+          key.replace(/_/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, char => char.toUpperCase()) +
+          " cannot be blank";
+      } else if (stringValue.length < 7) {
+        errors[key] =
+          key.replace(/_/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, char => char.toUpperCase()) +
+          " length should be minimum 7 characters";
       }
     });
     if (
@@ -184,7 +203,6 @@ function SettingPage(props) {
     setSecutiryErrors(errors);
 
     if (Object.keys(errors).length === 0) {
-      console.log("Security Fields:", securityFields);
       dispatch(updatePassword(securityFields));
       // Proceed with API call or next steps
     } else {

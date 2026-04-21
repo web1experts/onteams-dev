@@ -66,9 +66,13 @@ import API from "../../helpers/api";
 import { updateOwnershipRequest, getGeneralRequests } from "../../redux/actions/members.action";
 
 dayjs.extend(relativeTime);
+
+
+
 function DashboardPage() {
   const dispatch = useDispatch();
   const memberdata = getMemberdata();
+  const [current_dashboard, setCurrentDashboard] = useState( false )
   const [spinner, setSpinner] = useState( false )
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentPostIds, setCommentPostIds] = useState([]);
@@ -90,6 +94,8 @@ function DashboardPage() {
     content: "",
     files: [],
   });
+
+  
   const handleClose = () => {
     setFields({
       type: "text",
@@ -615,7 +621,14 @@ function DashboardPage() {
       getQuote();
       dispatch(getGeneralRequests())
     },1000)
+
+    const crntDashboard = localStorage.getItem('current_dashboard');
+    
+    if(crntDashboard){
+      setCurrentDashboard(JSON.parse(crntDashboard))
+    }
   }, [dispatch]);
+
 
   const handleLike = async (postId) => {
     try {
@@ -743,24 +756,29 @@ function DashboardPage() {
                 </Card>
 
                 <Card className="p-4 border-0 rounded-4 team--updates">
-                  <Row className="align-items-center mb-4">
-                    <Col xs="auto">
-                      <div
-                        className="team--chat p-2 rounded d-flex align-items-center justify-content-center"
-                        style={{ width: 48, height: 48 }}
-                      >
-                        <BsChat color="white" />
-                      </div>
-                    </Col>
-                    <Col>
-                      <h5 className="mb-0 d-flex align-items-center justify-content-between">
-                        Team Updates{" "}
-                        <Button onClick={handleShow} variant="primary">
-                          <FaPlus />
-                        </Button>
-                      </h5>
-                    </Col>
-                  </Row>
+                  {
+                    (current_dashboard?.id) && (
+                      <Row className="align-items-center mb-4">
+                        <Col xs="auto">
+                          <div
+                            className="team--chat p-2 rounded d-flex align-items-center justify-content-center"
+                            style={{ width: 48, height: 48 }}
+                          >
+                            <BsChat color="white" />
+                          </div>
+                        </Col>
+                        <Col>
+                          <h5 className="mb-0 d-flex align-items-center justify-content-between">
+                            Team Updates{" "}
+                            <Button onClick={handleShow} variant="primary">
+                              <FaPlus />
+                            </Button>
+                          </h5>
+                        </Col>
+                      </Row>
+                    )
+                  }
+                  
 
                   {!posts || posts.length === 0 ? (
                     <div className="text-center text-muted py-5">
