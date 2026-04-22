@@ -988,7 +988,7 @@ table.draggable--table {
 }
 
 .new--project--rows tr {
-  border: 1px solid rgb(226 232 240);
+  border-bottom: 1px solid rgb(226 232 240);
   padding: 0;
   border-radius: 0;
   background: #ffffff;
@@ -5574,6 +5574,10 @@ pre {
   color: rgb(17 24 39);
   margin: 0;
   border-radius: .5rem;
+}
+
+.setting--page .rounded--box .card-body .list-group-item .error {
+  position: relative;
 }
 
 .setting--page .rounded--box .card-body strong {

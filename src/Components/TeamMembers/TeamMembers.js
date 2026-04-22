@@ -1146,7 +1146,7 @@ const setDefaultMemberRole = () => {
                                             
                                         }
                                       >
-                                        <td className="project--title--td sticky border-bottom" data-label="Member Name">
+                                        <td className="project--title--td sticky" data-label="Member Name">
                                           <div className="d-flex justify-content-between border-end flex-wrap">
                                             <div className="project--name">
                                               <div className="drag--indicator"><abbr>{idx + 1}</abbr><MdDragIndicator /></div>

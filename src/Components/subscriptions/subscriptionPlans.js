@@ -847,26 +847,21 @@ const activateTrialPlan = () => {
                                   </Row>
                                 </Form.Group>*/}
                                 <div className="position-relative">
-                                  {/* Input Row */}
-                                  <div className="d-flex gap-2">
-                                    
-                                    {/* Country Selector */}
-                                    <div
-                                      className="border rounded px-3 py-2 d-flex align-items-center cursor-pointer"
-                                      style={{ minWidth: "120px" }}
-                                      onClick={() => setShowDropdown(!showDropdown)}
-                                    >
-                                      <span className={`fi fi-${formData?.isoCode?.toLowerCase()} me-2`}></span>
-                                      {formData?.phoneCode}
-                                    </div>
-              
-                                    {/* Phone Input */}
-                                    <Form.Group className="position-relative mb-0 form-group">
+                                  <Form.Group className="position-relative mb-0 form-group">
                                       <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                                      <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
-                                      {showError("phone")}
+                                      <div className="d-flex align-items-start">
+                                        {/* Country Selector */}
+                                        <div
+                                          className="border rounded px-3 py-2 d-flex align-items-center cursor-pointer me-2"
+                                          onClick={() => setShowDropdown(!showDropdown)}
+                                        >
+                                          <span className={`fi fi-${formData?.isoCode?.toLowerCase()} me-2`}></span>
+                                          {formData?.phoneCode}
+                                        </div>
+                                        <Form.Control className={errors?.phone ? 'br-red' : ''}  type="tel" name="phone" placeholder="Enter phone number" value={formData.phone} onChange={handleChange} required/>
+                                        {showError("phone")}
+                                      </div>
                                     </Form.Group>
-                                  </div>
               
                                   {/* Dropdown */}
                                   {showDropdown && (

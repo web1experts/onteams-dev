@@ -556,7 +556,7 @@ useEffect(() => {
                               excelData.map((data, i) => {
                                 return (
                                   <tr>
-                                    <td className="project--title--td sticky border-bottom">
+                                    <td className="project--title--td sticky">
                                       <div className="d-flex justify-content-between">
                                         <div className="project--name d-flex justify-content-start gap-3 align-items-center border-end">
                                             <div className="title--initial">{
