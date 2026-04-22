@@ -125,6 +125,15 @@ function DashboardPage() {
     });
   };
 
+  const isValidUrl = (str) => {
+    try {
+      new URL(str);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const handlevideoTypeChange = (type) => {
     setFields({
       ...fields,
@@ -929,12 +938,26 @@ function DashboardPage() {
                                       )}
                                       {post.videoType === "vimeo" && (
                                         <div className="ratio ratio-16x9 mb-2 rounded-3 w-100">
-                                          <iframe
+                                          {/* <iframe
                                             key={`video-post-${post.content}-0`}
                                             src={post.content}
                                             title="Vimeo Video"
                                             allowFullScreen
-                                          ></iframe>
+                                          ></iframe> */}
+                                          {
+                                            isValidUrl(post.content) ? (
+                                              <iframe
+                                                key={`video-post-${post.content}-0`}
+                                                src={post.content}
+                                                title="Vimeo Video"
+                                                allowFullScreen
+                                              />
+                                            ) : (
+                                              <div style={{ padding: 20, border: '1px solid #ccc' }}>
+                                                Invalid video URL
+                                              </div>
+                                            )
+                                          }
                                         </div>
                                       )}
                                       {post.videoType === "upload" &&
@@ -1438,7 +1461,7 @@ function DashboardPage() {
                           type="file"
                           id="videoUpload"
                           hidden
-                          accept="video/mp4"
+                          accept="video/*"
                           onChange={handleFileChange}
                         />
                         <span>
