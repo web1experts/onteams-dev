@@ -1589,7 +1589,7 @@ function ProjectsPage() {
                                           }`}
                                         >
                                           <td
-                                            className="project--title--td sticky border-bottom"
+                                            className="project--title--td sticky"
                                             key={`title-index-${index}`}
                                             data-label="Project Name"
                                             onClick={viewTasks}
@@ -2106,7 +2106,7 @@ function ProjectsPage() {
                                 }`}
                               >
                                 <td
-                                  className="project--title--td sticky border-bottom"
+                                  className="project--title--td sticky"
                                   key={`title-index-${index}`}
                                   data-label="Project Name"
                                   onClick={viewTasks}

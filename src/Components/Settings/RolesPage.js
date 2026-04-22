@@ -926,9 +926,11 @@ const teamvisibilityBadge = (permissions, accessType) => {
           >
             {
                 (memberProfile?.role?.permissions?.members?.update_permissions === true) && (
-                  <Tab eventKey="roles" title="Roles">
-              
-                  <Button variant="primary" className="mb-3" onClick={() => setShowRoleModal(true)}>Create Custom Role</Button>
+                <Tab eventKey="roles" title="Roles" className="roles--tab">
+                  <div className="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                    <p>Roles set default permissions. Click a role to expand and see what they can do. System roles canno be deleted or modified. To apply a custom role for a member, create a new role and change the role for that member.</p>
+                    <Button variant="primary" className="mb-3" style="min-width:200px" onClick={() => setShowRoleModal(true)}>Create Custom Role</Button>
+                  </div>
                
               
               {roles && roles?.length > 0 && (

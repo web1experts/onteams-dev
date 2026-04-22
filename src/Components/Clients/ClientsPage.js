@@ -683,7 +683,7 @@ function ClientsPage() {
                                       onClick={() => handleClick(client)}
                                     >
                                       <td
-                                        className="project--title--td sticky border-bottom"
+                                        className="project--title--td sticky"
                                         key={`title-index-${index}`}
                                         data-label="Client Name"
                                       >
