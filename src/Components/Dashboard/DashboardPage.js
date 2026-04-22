@@ -1466,7 +1466,7 @@ function DashboardPage() {
                         />
                         <span>
                           <FiUpload /> Click to upload a video{" "}
-                          <small>MP4, MOV, AVI up to 100MB</small>
+                          <small>MP4, MOV, AVI up to 10MB</small>
                         </span>
                       </label>
                       <div className="mt-3">
