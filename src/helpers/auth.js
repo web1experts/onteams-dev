@@ -139,7 +139,7 @@ export function removeSubscription() {
 
 
 export function setupDashboards( companies ){
-  const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(223, 169, 61), rgb(175, 113, 50))', primaryColor: '223, 169, 61', secondaryColor: '175, 113, 50' }
+  const defaultTheme = { name: 'Ocean Blue', color: 'linear-gradient(135deg, rgb(223, 169, 61), rgb(175, 113, 50))', primaryColor: '223, 169, 61', secondaryColor: '175, 113, 50', cid: false }
   if( companies.length > 0){ 
     localStorage.setItem('mt_dashboards', JSON.stringify(companies));
     const current_dashboard = localStorage.getItem('current_dashboard');
@@ -160,13 +160,13 @@ export function setupDashboards( companies ){
         localStorage.setItem('current_dashboard', JSON.stringify({ name: companies[0].company.name, id: companies[0].company._id, theme: companies[0].company?.theme || false, subscription: companies[0].company.subscription || false }));
         axios.defaults.headers.common.companyId =  companies[0].company._id || ''
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
-        saveTheme(companies[0].company?.theme || defaultTheme );
+        saveTheme({...companies[0].company?.theme, cid: companies[0].company._id} || defaultTheme );
         axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
       }else{ 
         localStorage.setItem('current_dashboard', JSON.stringify({ name: companyExists.company.name, id: companyExists.company._id, theme: companyExists.company?.theme || false, subscription: companyExists.company.subscription || false  }));
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companyExists?.memberData || null))
         axios.defaults.headers.common.companyId =  companyExists.company._id || ''
-        saveTheme(companyExists.company?.theme || defaultTheme );
+        saveTheme({...companyExists.company?.theme, cid: companyExists.company._id} || defaultTheme );
         axios.defaults.headers.common.memberkey =  companyExists?.memberData?._id || ''
       }
       setAuthorization()
@@ -175,7 +175,7 @@ export function setupDashboards( companies ){
       axios.defaults.headers.common.companyId =  companies[0].company._id || ''
       localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
       axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
-      saveTheme(companies[0].company?.theme || defaultTheme );
+      saveTheme({...companies[0].company?.theme, cid: companies[0].company._id} || defaultTheme );
     } 
   }else{ 
     localStorage.removeItem('current_dashboard');

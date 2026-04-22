@@ -215,8 +215,41 @@ function DashboardPage() {
     }
   }, [selectedPost]);
 
-  const handleTextChange = ({ target: { name, value, type } }) => {
+  const handleTextChange = ({ target: { name, value } }) => {
     setFields({ ...fields, [name]: value });
+    const {
+      type,
+      content,
+      quote,
+      videoType,
+      youtubeUrl,
+      vimeoUrl
+    } = fields;
+    if (type === "text" && content.trim()?.length > 0) {
+      setError("");
+    }
+
+    if (type === "quote" && quote.trim()?.length > 0) {
+      setError("");
+    }
+
+
+    if (type === "video") {
+      if (!videoType) {
+        setError("Fields marked with an asterisk (*) are mandatory.");
+        return;
+      }
+
+      if (videoType === "youtube" && youtubeUrl.trim()?.length > 0) {
+        setError("");
+      }
+
+      if (videoType === "vimeo" && vimeoUrl.trim()?.length > 0) {
+        setError("");
+      }
+
+    }
+    
   };
   const removeFile = (index) => {
     const newFiles = [...fields.files];
@@ -1201,7 +1234,7 @@ function DashboardPage() {
             >
               <Form>
                 <Form.Group className="mb-3">
-                  <Form.Label>Add a Quote</Form.Label>
+                  <Form.Label>Add a Quote <sup className="text-danger">*</sup></Form.Label>
                   <Form.Control
                     as="textarea"
                     placeholder="Share an inspiring quote or meaningful message..."

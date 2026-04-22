@@ -25,6 +25,7 @@ import {
     PUT_USER_SUCCESS,
     PUT_USER_FAILED,
     UPDATE_PASSWORD_SUCCESS,
+    CLOSE_ACCOUNT_FAILED
 } from "../actions/types";
 import * as auth from '../../helpers/auth';
 const token = auth.getToken();
@@ -165,6 +166,13 @@ export default (state = initialState, action) => {
                 message: action.payload.message,
                 statusCode: action.payload.status
             };
+        case CLOSE_ACCOUNT_FAILED: 
+            return {
+                ...state,
+                message_variant: 'danger',
+                message: action.payload.message,
+                closseAccountfail: true
+            }
         case  VERIFY_EMAIL  :
             
             return {

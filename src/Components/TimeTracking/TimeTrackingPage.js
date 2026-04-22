@@ -3676,7 +3676,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                     <Dropdown.Menu>
                       <div className="drop--scroll">
                        
-                        {/*timeSlots.map((slot, idx) => {
+                        {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
                             slot.replace(/\s?(AM|PM)$/i, ""),
                             occupiedRanges
@@ -3707,8 +3707,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             </Dropdown.Item>
                           );
                           // }
-                        })*/}
-                        {timeSlots.map((slot, idx) => {
+                        })}
+                        {/* {timeSlots.map((slot, idx) => {
                           const selectedDate = new Date(timings.date);
                           selectedDate.setSeconds(0, 0);
 
@@ -3749,7 +3749,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                               {slot}
                             </Dropdown.Item>
                           );
-                        })}
+                        })} */}
                       </div>
                     </Dropdown.Menu>
                   </Dropdown>
@@ -3767,7 +3767,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                       <Form.Control type="text" placeholder="Search here.."  value={timings?.end_time} onChange={(e) => {handleSearchChange('end_time', 0, e.target.value)}} />
                                   </Form.Group>
                               </Form> */}
-                        {/*timeSlots.map((slot, idx) => {
+                        {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
                             slot.replace(/\s?(AM|PM)$/i, ""),
                             occupiedRanges
@@ -3794,8 +3794,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             </Dropdown.Item>
                           );
                           // }
-                        })*/}
-                        {timeSlots.map((slot, idx) => {
+                        })}
+                        {/* {timeSlots.map((slot, idx) => {
                           const selectedDate = new Date(timings.date);
                           selectedDate.setSeconds(0, 0);
 
@@ -3836,7 +3836,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                               {slot}
                             </Dropdown.Item>
                           );
-                        })}
+                        })} */}
                       </div>
                     </Dropdown.Menu>
                   </Dropdown>

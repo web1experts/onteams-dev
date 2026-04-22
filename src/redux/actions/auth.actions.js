@@ -16,6 +16,7 @@ import {
   VERIFY_OTP_FAILED,
   REGISTER_SUCCESS,
   REGISTER_FAILED,
+  CLOSE_ACCOUNT_FAILED,
   VERIFY_EMAIL,
   FORGOT_PASSWORD_SUCCESS,
   FORGOT_PASSWORD_FAILED,
@@ -198,7 +199,7 @@ export const closeAccount = () => {
       if (response.data && response.data.success) {
         await dispatch({ type: ACCOUNT_CLOSE_SUCCESS, payload: response.data });
       }else {
-        await dispatch({ type: REGISTER_FAILED, payload: response.data });
+        await dispatch({ type: CLOSE_ACCOUNT_FAILED, payload: response.data });
       }
     } catch (err) {
       errorRequest(err, dispatch);

@@ -6,11 +6,13 @@ import axios from 'axios';
 import { validateAccountPassword, validateAccountDeleteOTP } from '../../redux/actions/userActions.action';
 import { closeAccount } from '../../redux/actions/auth.actions';
 import { useToast } from '../../context/ToastContext';
+import { logout } from '../../redux/actions/auth.actions';
 export function DeleteAccount({ showdialog, toggledialog}) {
   
   const dispatch = useDispatch();
   const addToast = useToast();
   const apiResults = useSelector((state) => state.useractions);
+  const apiResultsAuth = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
   const [loader, setLoader] = useState(false);
   const [step, setStep] = useState(1);
@@ -36,6 +38,7 @@ export function DeleteAccount({ showdialog, toggledialog}) {
   const handleClose = () => {
     setOpen(false);
     toggledialog(false);
+    setStep(1)
   };
 
   // STEP 1 → STEP 2
@@ -75,6 +78,18 @@ export function DeleteAccount({ showdialog, toggledialog}) {
       },1000)
     }
   },[apiResults?.account_delelete_otp_verified])
+
+  useEffect(() => {
+    if(apiResultsAuth?.closseAccountfail === true){
+      handleClose()
+    }
+  }, [apiResultsAuth?.closseAccountfail])
+
+  useEffect(() => {
+    if(apiResultsAuth.accountDelete && apiResultsAuth.accountDelete === true){
+          dispatch(logout())
+        }
+  }, [apiResultsAuth?.accountDelete])
 
   // STEP 3 → VERIFY OTP + DELETE
   const handleVerifyOtp = async () => {
