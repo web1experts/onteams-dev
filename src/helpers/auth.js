@@ -4,6 +4,8 @@ import io from 'socket.io-client';
 import {jwtDecode} from 'jwt-decode';
 import axios from './api/instance'
 import { parseIfValidJSON, mergePermissions } from './commonfunctions';
+import { toggleTheme } from '../redux/actions/common.action';
+import { useDispatch } from 'react-redux';
 
 const secretKey = process.env.REACT_APP_SECRET_KEY
 let socket;
@@ -223,6 +225,21 @@ export function removeRemember() {
 
 export function saveTheme(theme){
   localStorage.setItem('theme', JSON.stringify(theme));
+
+
+  document.documentElement.style.setProperty(
+      '--theme-gradient',
+      theme?.color || 'linear-gradient(135deg, rgb(223 169 61), rgb(175 113 50))'
+    );
+    document.documentElement.style.setProperty(
+      '--theme-primary',
+      theme?.primaryColor || '223, 169, 61'
+    );
+    document.documentElement.style.setProperty(
+      '--theme-secondary',
+      theme?.secondaryColor || '175, 113, 50'
+    );
+
 }
 
 export function logout() {

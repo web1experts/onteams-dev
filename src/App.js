@@ -179,8 +179,55 @@ function App(props) {
     };
   }, [dispatch, props.deleteComment]);
 
- useEffect(() => {
-  let themecolor = localStorage.getItem('theme')
+//  useEffect(() => {
+//   let themecolor = localStorage.getItem('theme')
+  
+//   if( !themecolor){
+//     themecolor = JSON.stringify({
+//       color: 'linear-gradient(135deg, rgb(223 169 61), rgb(175 113 50))',
+//       primaryColor: '223, 169, 61', 
+//       secondaryColor: '175, 113, 50'
+//     })
+//     localStorage.setItem('theme', themecolor)
+//     dispatch(toggleTheme(JSON.parse(themecolor)));
+//   }
+//   const themedata = JSON.parse(themecolor)
+//   document.documentElement.style.setProperty(
+//     '--theme-gradient',
+//     themedata.color
+//   );
+//   document.documentElement.style.setProperty(
+//     '--theme-primary',
+//     themedata.primaryColor
+//   );
+//   document.documentElement.style.setProperty(
+//     '--theme-secondary',
+//     themedata.secondaryColor
+//   );
+// }, []);
+
+//  useEffect(() => {
+//   if( commonState.current_theme){
+//     document.documentElement.style.setProperty(
+//       '--theme-gradient',
+//       commonState.current_theme.color
+//     );
+
+//     document.documentElement.style.setProperty(
+//       '--theme-primary',
+//       commonState.current_theme.primaryColor
+//     );
+//     document.documentElement.style.setProperty(
+//       '--theme-secondary',
+//       commonState.current_theme.secondaryColor
+//     );
+//   }
+  
+// }, [commonState]);
+
+
+useEffect(() => {
+  let themecolor = localStorage.getItem('current_dashboard')
   
   if( !themecolor){
     themecolor = JSON.stringify({
@@ -190,24 +237,27 @@ function App(props) {
     })
     localStorage.setItem('theme', themecolor)
     dispatch(toggleTheme(JSON.parse(themecolor)));
+  }else{
+    const themedata = JSON.parse(themecolor)
+    document.documentElement.style.setProperty(
+      '--theme-gradient',
+      themedata?.theme?.color || 'linear-gradient(135deg, rgb(223 169 61), rgb(175 113 50))'
+    );
+    document.documentElement.style.setProperty(
+      '--theme-primary',
+      themedata?.theme?.primaryColor || '223, 169, 61'
+    );
+    document.documentElement.style.setProperty(
+      '--theme-secondary',
+      themedata?.theme?.secondaryColor || '175, 113, 50'
+    );
+    console.log('at initial')
   }
-  const themedata = JSON.parse(themecolor)
-  document.documentElement.style.setProperty(
-    '--theme-gradient',
-    themedata.color
-  );
-  document.documentElement.style.setProperty(
-    '--theme-primary',
-    themedata.primaryColor
-  );
-  document.documentElement.style.setProperty(
-    '--theme-secondary',
-    themedata.secondaryColor
-  );
 }, []);
 
  useEffect(() => {
   if( commonState.current_theme){
+    console.log('at change:: ', commonState.current_theme)
     document.documentElement.style.setProperty(
       '--theme-gradient',
       commonState.current_theme.color
