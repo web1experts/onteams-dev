@@ -83,6 +83,21 @@ export const roles =[
     { value: 'project-manager', label: 'Project Manager' },
 ]
 
+export const timezones = {
+    "IST": "Asia/Kolkata",
+    "GST": "Asia/Dubai",
+    "EST": "America/New_York",
+    "CST": "America/Chicago",
+    "MST": "America/Denver",
+    "PST": "America/Los_Angeles",
+    "GMT": "Europe/London",
+    "CET": "Europe/Paris",
+    "MSK": "Europe/Moscow",
+    "SGT": "Asia/Singapore",
+    "JST": "Asia/Tokyo",
+    "AEST": "Australia/Sydney"
+}
+
 export const selectboxObserver = () => {
     const selects = document.querySelectorAll('select.custom-selectbox');
      if (!selects || selects.length === 0){

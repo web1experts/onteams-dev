@@ -627,6 +627,7 @@ useEffect(() => {
         setDatePickerModal(false);
         setCurrentTask({});
         setFields({})
+        setEnableSubtaskEdit({})
     }
 
     const renderPreview = (type, preview, index) => {
@@ -896,6 +897,10 @@ const renderSubtasks = () => {
                                             [subtask._id]: e.target.value,
                                         }))
                                     }
+                                    onInput={(e) => {
+                                            e.target.style.height = "auto";
+                                            e.target.style.height = e.target.scrollHeight + "px";
+                                        }}
                                     onBlur={(e) => {
                                         if(e.target.value !== ""){
                                             handlesubtaskChange(index, subtask, e.target.value, true);
@@ -949,6 +954,10 @@ const renderSubtasks = () => {
                                         onChange={({ target: { value } }) =>
                                             handlesubtaskChange(index, subtask, value)
                                         }
+                                        onInput={(e) => {
+                                            e.target.style.height = "auto";
+                                            e.target.style.height = e.target.scrollHeight + "px";
+                                        }}
                                         onKeyDown={(event) => {
                                             if (event.key === 'Enter' && !event.shiftKey) {
                                                 event.preventDefault();

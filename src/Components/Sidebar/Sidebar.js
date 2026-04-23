@@ -128,8 +128,9 @@ function SidebarPanel() {
         localStorage.setItem('current_dashboard', JSON.stringify({name: selected.company.name, id: selected.company._id, theme: selected.company?.theme || false}));
         localStorage.setItem('mt_featureSwitches', JSON.stringify(selected?.memberData || null))
         localStorage.setItem('default_dashboard',  selected.company._id);
-        saveTheme(selected.company?.theme || defaultTheme );
+        
         setTimeout(function(){
+            saveTheme(selected.company?.theme || defaultTheme );
             window.location.reload();
         }, 1000)
     }

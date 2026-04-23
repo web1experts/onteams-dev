@@ -781,7 +781,7 @@ function DashboardPage() {
                       );
                     })}
                 </ListGroup>
-                <DateTimeCard />
+                <DateTimeCard current_dashboard={current_dashboard} />
                 
               </Col>
               <Col xl={8}>
