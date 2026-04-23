@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FiClock, FiCalendar, FiTrendingUp, FiUsers, FiTarget, FiAward, FiStar } from "react-icons/fi";
 import { LuSparkles } from 'react-icons/lu';
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { getMemberdata, timezones } from "../../helpers/commonfunctions";
+import { getMemberdata, timezones, timezonesData } from "../../helpers/commonfunctions";
 import { Card } from "react-bootstrap";
 const DateTimeCard = (props) => {
   const current_dashboard = props.current_dashboard
@@ -24,7 +24,7 @@ const DateTimeCard = (props) => {
   };
 
   const formatTime = (date) => {
-    const tymzone = timezones[current_dashboard.timezone?.toUpperCase()] || 'Asia/Kolkata'
+    const tymzone = current_dashboard.timezone || 'Asia/Kolkata'
     return new Intl.DateTimeFormat("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
@@ -88,7 +88,7 @@ const DateTimeCard = (props) => {
           <FiClock /> {formatTime(currentTime)}
         </h3>
         <p className="justify-content-start justify-content-xl-end">
-          <HiOutlineLocationMarker /> {timezones[current_dashboard.timezone?.toUpperCase()] || 'Asia/Kolkata'}
+          <HiOutlineLocationMarker /> {timezonesData[current_dashboard.timezone] || 'Asia/Kolkata'}
         </p>
         <h4>
           <FiCalendar /> {formatDate(currentTime)}

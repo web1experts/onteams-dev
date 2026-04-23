@@ -278,16 +278,7 @@ function Roles() {
   useEffect(() => {
     if (authprofile) {
       setUserProfile(authprofile);
-      // if( localStorage.hasItem('current_loggedin_user')){
-      //   const jsondata = parseIfValidJSON(localStorage.getItem('current_loggedin_user'));
-
-      //   if( jsondata){
-      //     jsondata['name'] = authprofile?.name
-      //     jsondata['avatar'] = authprofile?.avatar
-      //     jsondata['name'] = authprofile?.name
-      //     localStorage.setItem('current_loggedin_user', JSON.stringify(jsondata, secretKey));
-      //   }
-      // }
+      
     }
   }, [authprofile]);
 

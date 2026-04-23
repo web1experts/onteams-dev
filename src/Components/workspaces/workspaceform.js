@@ -7,31 +7,17 @@ import { setupworkspace, updateworkspace } from "../../redux/actions/workspace.a
 import { getFieldRules, validateField } from '../../helpers/rules';
 import { setAuthorization } from "../../helpers/api";
 import useFilledClass from "../customHooks/useFilledclass";
-import { selectboxObserver } from "../../helpers/commonfunctions";
+import { selectboxObserver, timezonesData, getUserTimezone } from "../../helpers/commonfunctions";
 const secretKey = process.env.REACT_APP_SECRET_KEY
-
-const tzMap = {
-  "Asia/Kolkata": "IST",
-  "Asia/Dubai": "GST",
-  "America/New_York": "EST",
-  "America/Chicago": "CST",
-  "America/Denver": "MST",
-  "America/Los_Angeles": "PST",
-  "Europe/London": "GMT",
-  "Europe/Paris": "CET",
-  "Europe/Moscow": "MSK",
-  "Asia/Singapore": "SGT",
-  "Asia/Tokyo": "JST",
-  "Australia/Sydney": "AEST"
-};
-
 
 function WorkspaceForm(props) {
   useFilledClass('.form-floating .form-control');
+  const usertimezone = getUserTimezone();
+  console.log('usertimezone::', usertimezone)
   const location = useLocation();
   const { pathname } = location;
     const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const [fields, setFields] = useState({ name: props.editworkspace?.name || '', industry: props.editworkspace?.industry || "", timezone: props.editworkspace?.timezone || "IST"});
+  const [fields, setFields] = useState({ name: props.editworkspace?.name || '', industry: props.editworkspace?.industry || "", timezone: props.editworkspace?.timezone || usertimezone});
   /** -- Form Fields Errors -- */
   const [errors, setErrors] = useState({ name: '', industry: "" });
   const [loader, setLoader] = useState(false);
@@ -141,18 +127,11 @@ function WorkspaceForm(props) {
         <Form.Select aria-label="Select Timezone" placeholder="Select Timezone" 
           className={errors['timezone'] && errors['timezone'] !== "" ? "form-control input-error filled custom-selectbox" : 'form-control filled custom-selectbox'} 
           onChange={handleChange} value={fields['timezone'] || ""} name="timezone">
-          <option value="IST">IST (India Standard Time)</option>
-          <option value="EST">EST (Eastern Standard Time)</option>
-          <option value="CST">CST (Central Standard Time)</option>
-          <option value="MST">MST (Mountain Standard Time)</option>
-          <option value="PST">PST (Pacific Standard Time)</option>
-          <option value="GMT">GMT (Greenwich Mean Time)</option>
-          <option value="CET">CET (Central European Time)</option>
-          <option value="MSK">MSK (Moscow Standard Time)</option>
-          <option value="GST">GST (Gulf Standard Time)</option>
-          <option value="JST">JST (Singapore Time)</option>
-          <option value="JST">JST (Japan Standard Time)</option>
-          <option value="JST">JST (Australian Eastern Standard Time)</option>
+          {
+            Object.entries(timezonesData)?.map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))
+          }
         </Form.Select>
         {showError('timezone')}
       </Form.Group>

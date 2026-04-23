@@ -26,7 +26,8 @@ import {
   showAmPmtime,
   getMemberdata,
   selectboxObserver,
-  groupSelectboxObserver
+  groupSelectboxObserver,
+  timezonesData
 } from "../../helpers/commonfunctions";
 import {
   LuFolderOpen,
@@ -174,11 +175,30 @@ function ReportsPage() {
     sort_by: "members",
     project_status: "in-progress",
     page: 1,
+    timezone: 'company'
   });
   
   const [showFilter, setFilterShow] = useState(false);
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
+
+  const crntDashboard = (() => {
+    try {
+      const data = localStorage.getItem('current_dashboard');
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  const crntUser = (() => {
+    try {
+      const data = localStorage.getItem('current_loggedin_user');
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      return null;
+    }
+  })();
 
   const saveRemarks = (project_id) => {
     setLoader(true);
@@ -1092,6 +1112,20 @@ const formattedDate = (date) => {
                         }`}
                       >
                         <LuFolderOpen /> Projects
+                      </ListGroup.Item>
+                    </ListGroup>
+                    <ListGroup>
+                      <ListGroup.Item>
+                        <Form.Select
+                          className="custom-selectbox"
+                          onChange={(event) => 
+                            handlefilterchange("timezone", event.target.value)
+                          }
+                          value={filters?.["timezone"] || "company"}
+                        >
+                          <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
+                          <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>    
+                        </Form.Select>
                       </ListGroup.Item>
                     </ListGroup>
                     {                  

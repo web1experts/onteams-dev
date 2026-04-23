@@ -79,6 +79,7 @@ import {
   generateTimeRange,
   convertSecondstoTime,
   timeStringToDate,
+  timezonesData
 } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 import "media-chrome";
@@ -193,7 +194,7 @@ function TimeTrackingPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setsearchTerm] = useState("");
   const [filters, setFilters] = useState({ status: "live",
-    member: (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true) ? 'all' : memberProfile?._id
+    member: (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true) ? 'all' : memberProfile?._id, timezone: 'company'
    });
   const filtersRef = useRef(filters);
   const [date, setDate] = useState("");
@@ -206,6 +207,25 @@ function TimeTrackingPage() {
   const [selectedScreenshots, setSelectedScreenshots] = useState({});
   const activitystate = useSelector((state) => state.activity);
   const [manualListCount, setManualListCount] = useState(0);
+
+
+  const crntDashboard = (() => {
+    try {
+      const data = localStorage.getItem('current_dashboard');
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  const crntUser = (() => {
+    try {
+      const data = localStorage.getItem('current_loggedin_user');
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      return null;
+    }
+  })();
 
   const handleFilterClose = () => setFilterShow(false);
   const handleFilterShow = () => setFilterShow(true);
@@ -423,7 +443,9 @@ useEffect(() =>{
     setActSpinner(true);
     const cleanedFilteredDate = filtereddate.filter(d => d && d.trim() !== "");
     await dispatch(
-      getRecoredActivity(currentActivity._id, "recorded", cleanedFilteredDate)
+      getRecoredActivity({
+        id: currentActivity._id, status: "recorded", date_range:cleanedFilteredDate, timezone: filters['timezone']
+      })
     );
     // setActSpinner(false);
   };
@@ -480,16 +502,19 @@ useEffect(() =>{
   };
 
   useEffect(() => {
-    if(!isScreenActive){
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen(); // Safari
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen(); // Firefox
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen(); // IE/Edge
+    if (!isScreenActive) {
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
       }
+
       setIsFullscreen(false);
     }
   }, [isScreenActive])
@@ -1283,6 +1308,7 @@ const ymd = (dateLike) => {
       setRecordedActivities([])
       handleRecordedActivity();
     }
+    selectboxObserver()
   }, [activeInnerTab]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -1662,6 +1688,21 @@ const getMembersFromTeams = (selectedTeamIds) => {
     if (activeInnerTab === "InnerRecorded") {
       return (
         <>
+          <ListGroup>
+            <ListGroup.Item>
+              <Form.Select
+                className="custom-selectbox"
+                onChange={(event) => 
+                  handlefilterchange("timezone", event.target.value)
+                }
+                value={filters?.["timezone"] || "company"}
+              >
+                <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
+                <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>    
+              </Form.Select>
+            </ListGroup.Item>
+          </ListGroup>
+           
           <ListGroup horizontal className="screens--shots">
             <ListGroup horizontal>
               <Button
@@ -1824,6 +1865,24 @@ const getMembersFromTeams = (selectedTeamIds) => {
                         <FiVideo className="me-1" /> Recorded
                       </ListGroup.Item>
                     </ListGroup>
+                    {
+                      (activeTab === "Recordings") && (
+                        <ListGroup>
+                          <ListGroup.Item>
+                            <Form.Select
+                                className="custom-selectbox"
+                                onChange={(event) => 
+                                handlefilterchange("timezone", event.target.value)
+                              }
+                              value={filters?.["timezone"] || "company"}
+                            >
+                              <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
+                              <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>   
+                            </Form.Select>
+                          </ListGroup.Item>
+                        </ListGroup>
+                      )
+                    }
                     {
                       
                         

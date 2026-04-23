@@ -9,6 +9,7 @@ import WorkspaceForm from "../workspaces/workspaceform";
 import { useToast } from "../../context/ToastContext";
 import useFilledClass from "../customHooks/useFilledclass";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { timezonesData, selectboxObserver } from "../../helpers/commonfunctions";
 const timer = 60
 
 function AccountSetup() {
@@ -115,7 +116,9 @@ function AccountSetup() {
         return hasError
     };
 
-    
+    useEffect(() => {
+        selectboxObserver()
+    },[])
 
     useEffect(() => {
         
@@ -178,6 +181,18 @@ function AccountSetup() {
                                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                                             </span>
                                             {showError('password')}
+                                        </Form.Group>
+                                        <Form.Group className="mb-0 form-group">
+                                            <Form.Select aria-label="Select Timezone" placeholder="Select Timezone" 
+                                                className={errors['timezone'] && errors['timezone'] !== "" ? "form-control input-error filled custom-selectbox" : 'form-control filled custom-selectbox'} 
+                                                onChange={handleChange} value={fields['timezone'] || "Asia/Kolkata"} name="timezone">
+                                                {
+                                                Object.entries(timezonesData)?.map(([value, label]) => (
+                                                    <option key={value} value={value}>{label}</option>
+                                                ))
+                                                }
+                                            </Form.Select>
+                                            {showError('timezone')}
                                         </Form.Group>
                                         <div className="form-check mb-3" style={{ display: 'flex', alignItems: 'center' }}>
                                             <Form.Check

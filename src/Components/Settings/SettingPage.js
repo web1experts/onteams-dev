@@ -28,7 +28,7 @@ import {
   logout
 } from "../../redux/actions/auth.actions";
 import { getFieldRules, validateField } from "../../helpers/rules";
-import { selectboxObserver } from "../../helpers/commonfunctions";
+import { selectboxObserver, timezonesData } from "../../helpers/commonfunctions";
 import ManagePlan from "../subscriptions/ManagePlan";
 import { currentMemberProfile } from "../../helpers/auth";
 import PlanOverview from "../subscriptions/PlanOverview";
@@ -224,11 +224,17 @@ function SettingPage(props) {
       setCurrentSubscription(activeSubscription)
   },[activeSubscription])
 
-  useEffect(() => {
-    if (activeTab === "Preferences") {
+  // useEffect(() => {
+  //   if (activeTab === "Profile") {
+  //     selectboxObserver();
+  //   }
+  // }, [activeTab]);
+
+    useEffect(() => {
+    
       selectboxObserver();
-    }
-  }, [activeTab]);
+    
+  }, [profile]);
 
   useEffect(() => {
     if (authAPI.success) {
@@ -242,7 +248,15 @@ function SettingPage(props) {
 
 
 
-
+const handleMetaChange = (field, value) => {
+  setProfile((prev) => ({
+    ...prev,
+    usermeta: {
+      ...prev.usermeta,
+      [field]: value
+    }
+  }));
+}
 
   const handleFieldChange = (field, value) => {
     if (field === "avatar") {
@@ -274,6 +288,7 @@ function SettingPage(props) {
       email: userProfile.email,
       name: userProfile.name,
       avatar: userProfile.avatar,
+      usermeta: userProfile.usermeta
     });
     setProfileFields({
       email: userProfile.email,
@@ -286,6 +301,7 @@ function SettingPage(props) {
       remove_avatar: false,
     });
   }, [userProfile]);
+
 
   const compareProfile = (original, edited) => {
     const changes = {};
@@ -300,7 +316,7 @@ function SettingPage(props) {
   const handleUpdateSubmit = async (event) => {
     event.preventDefault();
 
-    const changes = compareProfile(profileFields, profile);
+    const changes = compareProfile(profileFields, profile); 
     if (Object.keys(changes).length > 0) {
       setLoader(true);
 
@@ -332,11 +348,18 @@ function SettingPage(props) {
         setFieldErrors(fieldErrors);
         setLoader(false);
       } else {
-        console.log("Profile changes: ", changes);
+        
         if (Object.keys(changes).length > 0) {
           const formData = new FormData();
           for (const [key, value] of Object.entries(changes)) {
-            formData.append(key, value);
+            if(key !== 'usermeta'){
+              formData.append(key, value);
+            }else{
+                for (const [metakey, metavalue] of Object.entries(value)) {
+                  formData.append(`usermeta[${metakey}]`, metavalue);
+                }
+            }
+            
           }
           if (isEditing.remove_avatar === true) {
             formData.append("remove_avatar", true);
@@ -510,6 +533,20 @@ function SettingPage(props) {
                       onEditClick={() => handleEditClick("name")}
                       error={fieldserrors["name"] && fieldserrors["name"]}
                     />
+                    <ListGroup.Item>
+                      <strong>Timezone</strong>
+                    <Form.Group className="mb-0 form-group">
+                      <Form.Select aria-label="Select Timezone" placeholder="Select Timezone" 
+                        className={'form-control filled custom-selectbox'} 
+                        onChange={(e) => handleMetaChange("timezone",e.target.value)} value={profile?.usermeta?.timezone || "Asia/Kolkata"} name="timezone">
+                        {
+                          Object.entries(timezonesData)?.map(([value, label]) => (
+                            <option key={value} value={value}>{label}</option>
+                          ))
+                        }
+                      </Form.Select>
+                    </Form.Group>
+                    </ListGroup.Item>
                   </ListGroup>
                   
                   {

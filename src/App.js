@@ -79,6 +79,7 @@ function App(props) {
         if( jsondata){
           jsondata['name'] = authprofile?.name
           jsondata['avatar'] = authprofile?.avatar
+          jsondata['timezone'] = authprofile?.usermeta?.timezone
           localStorage.setItem('current_loggedin_user', JSON.stringify(jsondata, secretKey));
         }
       }

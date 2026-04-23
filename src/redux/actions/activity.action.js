@@ -70,12 +70,12 @@ export const getAllMembersRecordedActivity = (payload) => {
   };
 }
 
-export const getRecoredActivity = (id, status, filtereddate) => {
+export const getRecoredActivity = (payload) => {
 
   return async (dispatch) => {
     try {
 
-      const response = await API.apiPost('activity', { id: id, status: status, date_range: filtereddate })
+      const response = await API.apiPost('activity', payload)
     
       if (response.data && response.data.success) {
          await dispatch({ type: RECORDED_ACTIVITY_SUCCESS, payload: response.data });
