@@ -127,6 +127,7 @@ export default (state = initialState, action) => {
             success: true,
             createMember: initialState.createMember,
             invite: true,
+            inviteDelete: true
         }
     case INVITE_DELETE_FAILED:
         return {

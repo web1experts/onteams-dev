@@ -6,7 +6,10 @@ import {
     ATTENDANCE_SUMMARY_SUCCESS,
     ATTENDANCE_EXCEL_SUCCESS,
     ATTENDANCE_STATUS_LIST_SUCCESS,
-    ATTENDANCE_STATUS_SAVE_SUCCESS
+    ATTENDANCE_STATUS_SAVE_SUCCESS,
+    ATTENDANCE_SHIFTS_SAVE_SUCCESS,
+    ATTENDANCE_SHIFTS_GET_SUCCESS,
+    ATTENDANCE_SHIFT_DELETE_SUCCESS
  } from "../actions/types";
 
 const initialState = {
@@ -41,6 +44,25 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 memberAttendance: action.payload.attendanceData
+            }
+        case ATTENDANCE_SHIFTS_SAVE_SUCCESS: 
+            return {
+                ...state,
+                shiftDetails: action.payload.shiftDetails,
+                message: 'Shift saved successfully.',
+                message_variant: 'success',
+            }
+        case ATTENDANCE_SHIFTS_GET_SUCCESS: 
+            return {
+                ...state,
+                shiftDetails: action.payload.shiftDetails
+            }
+        case ATTENDANCE_SHIFT_DELETE_SUCCESS: 
+            return {
+                ...state,
+                shiftDetails: action.payload.shiftDetails,
+                message: 'Shift deleted successfully.',
+                message_variant: 'success',
             }
         case ATTENDANCE_EXCEL_SUCCESS: 
             return {

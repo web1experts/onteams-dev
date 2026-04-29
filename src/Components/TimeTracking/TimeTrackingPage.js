@@ -111,6 +111,7 @@ function TimeTrackingPage() {
     "last-month": "Last month",
     custom: "Custom",
   };
+  const [memberTimezone, setMemberTimezone] = useState( 'company' )
   const [selected, setSelected] = useState(null);
   const subscriptionState = useSelector((state) => state.subscription);
   const [projectFilter, setProjectFilter] = useState({ status: "in-progress" });
@@ -444,7 +445,7 @@ useEffect(() =>{
     const cleanedFilteredDate = filtereddate.filter(d => d && d.trim() !== "");
     await dispatch(
       getRecoredActivity({
-        id: currentActivity._id, status: "recorded", date_range:cleanedFilteredDate, timezone: filters['timezone']
+        id: currentActivity._id, status: "recorded", date_range:cleanedFilteredDate, timezone: memberTimezone
       })
     );
     // setActSpinner(false);
@@ -1169,6 +1170,10 @@ const ymd = (dateLike) => {
   }, [activitystate]);
 
   useEffect(() => {
+    groupSelectboxObserver()
+  }, [activitystate?.recordedActivity])
+
+  useEffect(() => {
     let activeCount = 0;
     let pauseCount = 0;
     let inactiveCount = 0;
@@ -1192,6 +1197,12 @@ const ymd = (dateLike) => {
     });
   }, [liveactivities]);
 
+  useEffect(() => {
+    if(activeInnerTab === "InnerRecorded" && currentActivity && activeTab === "Recordings"){
+      setRecordedActivities([])
+      handleRecordedActivity();
+    }
+  }, [memberTimezone])
   // Debounced search handler
     const debouncedUpdateSearch = useMemo(
     () =>
@@ -1295,6 +1306,9 @@ const ymd = (dateLike) => {
 
   useEffect(() => {
     selectboxObserver();
+    setTimeout(() => {
+      groupSelectboxObserver()
+    }, 600);
     setFilters({ ...filters, ["status"]: activeTab.toLowerCase() });
     // if (activeTab.toLowerCase() !== "recordings") {
     //   handleLiveActivityList();
@@ -1307,8 +1321,12 @@ const ymd = (dateLike) => {
     if (activeInnerTab === "InnerRecorded" && currentActivity) {
       setRecordedActivities([])
       handleRecordedActivity();
+      setTimeout(() => {
+        groupSelectboxObserver()
+      }, 900);
     }
     selectboxObserver()
+    
   }, [activeInnerTab]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -1691,14 +1709,21 @@ const getMembersFromTeams = (selectedTeamIds) => {
           <ListGroup>
             <ListGroup.Item>
               <Form.Select
-                className="custom-selectbox"
+                className="custom-group-selectbox"
                 onChange={(event) => 
-                  handlefilterchange("timezone", event.target.value)
+                  setMemberTimezone(event.target.value)
                 }
                 value={filters?.["timezone"] || "company"}
               >
-                <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
-                <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>    
+                <optgroup label="Organization time zone">
+                  <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option> 
+                </optgroup>  
+                <optgroup label="Member's time zone">
+                  <option value={'member'}>{timezonesData[currentActivity?.usermeta?.timezone] || 'Asia/Kolkata'}</option> 
+                </optgroup> 
+                <optgroup label="My time zone">
+                  <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>  
+                </optgroup>  
               </Form.Select>
             </ListGroup.Item>
           </ListGroup>
@@ -1865,24 +1890,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                         <FiVideo className="me-1" /> Recorded
                       </ListGroup.Item>
                     </ListGroup>
-                    {
-                      (activeTab === "Recordings") && (
-                        <ListGroup>
-                          <ListGroup.Item>
-                            <Form.Select
-                                className="custom-selectbox"
-                                onChange={(event) => 
-                                handlefilterchange("timezone", event.target.value)
-                              }
-                              value={filters?.["timezone"] || "company"}
-                            >
-                              <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
-                              <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>   
-                            </Form.Select>
-                          </ListGroup.Item>
-                        </ListGroup>
-                      )
-                    }
+                    
                     {
                       
                         
@@ -1948,7 +1956,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             >
                                 <>
                                   {/* MEMBERS GROUP */}
-                                  <optgroup label="Members">
+                                  <optgroup label="Members"optgroup>
                                     <option value={memberProfile?._id} data-group="member">
                                       My Time Logs
                                     </option>
@@ -1989,6 +1997,34 @@ const getMembersFromTeams = (selectedTeamIds) => {
                     }
                     
                     {showTabs()}
+
+                    {
+                      (activeTab === "Recordings") && (
+                        <ListGroup>
+                          <ListGroup.Item>
+                            <Form.Select
+                                className="custom-group-selectbox"
+                                onChange={(event) => {
+                                  handlefilterchange("timezone", event.target.value)
+                                  setMemberTimezone(event.target.value)
+                                }
+                                
+                              }
+                              value={filters?.["timezone"] || "company"}
+                            >
+                              <optgroup label="Organization time zone">
+                                <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option> 
+                              </optgroup>  
+                              <optgroup label="My time zone">
+                                <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>  
+                              </optgroup>  
+                              {/* <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
+                              <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>    */}
+                            </Form.Select>
+                          </ListGroup.Item>
+                        </ListGroup>
+                      )
+                    }
                     
                     {activeTab === "Live" && (
                       <ListGroup.Item

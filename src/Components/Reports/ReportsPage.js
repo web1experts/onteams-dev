@@ -51,6 +51,7 @@ import {
   getReportsByMember,
   gerReportsByProject,
   addRemarkstoProject,
+  getSingleMemberReport,
   getActivityMeta,
   getRemarks,
   deleteRemarks,
@@ -71,6 +72,7 @@ function ReportsPage() {
   const [activeMemberTab, setActiveViewTab] = useState("members");
   const commonState = useSelector((state) => state.common);
   const apiPermission = useSelector((state) => state.permissions);
+  const [singleMember, setSingleMember] = useState( false )
   const dispatch = useDispatch();
   const memberProfile = currentMemberProfile();
   const datePickerRef = useRef(null);
@@ -229,6 +231,22 @@ function ReportsPage() {
     dispatch(updateremark(payload));
   }
 
+  const handleSingleMemberReport = () => {
+    setSingleMemberReport({})
+    setSpinner( true )
+    dispatch(getSingleMemberReport({
+      memberId: singleMember?._id,
+      timezone: filters?.["timezone"] || 'company',
+      date_range: filters['date_range']
+    }))
+  }
+
+  useEffect(() => {
+    if(singleMember){
+      handleSingleMemberReport()
+    }
+  }, [singleMember])
+
   const handlefilterchange = (name, value) => {
     // setFilters({ ...filters, [name]: value });
     setFilters((prev) => {
@@ -357,10 +375,16 @@ function ReportsPage() {
 
   const handleReports = async () => {
     setSpinner(true);
+    let payload = {...filters}
+    if(filters['sort_by'] === 'projects'){
+        payload['selected_member'] =  selectedReport?._id
+    }else{
+        payload['selected_member'] = singleMemberReport?.member?._id;
+    }
     if (filters["sort_by"] === "members") {
-      await dispatch(getReportsByMember(filters));
+      await dispatch(getReportsByMember(payload));
     } else {
-      await dispatch(gerReportsByProject(filters));
+      await dispatch(gerReportsByProject(payload));
     }
     setSpinner(false);
   };
@@ -403,7 +427,11 @@ function ReportsPage() {
   // Helper function to calculate time ranges
 
   useEffect(() => {
-    handleReports();
+    if(isActive !== 1){
+      handleReports();
+    }else{
+      handleSingleMemberReport()
+    }
   }, [filters]);
 
   useEffect(() => {
@@ -470,7 +498,13 @@ function ReportsPage() {
       setEditRemark({})
       setProjectRemarks(reportState.remarks)
     }
+    setSpinner( false )
   }, [reportState]);
+
+  useEffect(() => {
+    setSingleMemberReport(reportState?.memberReportData)
+    setSpinner( false )
+  }, [reportState?.memberReportData])
 
   // useEffect(() => {
   //   if (memberFeed && memberFeed.memberData) {
@@ -1114,20 +1148,7 @@ const formattedDate = (date) => {
                         <LuFolderOpen /> Projects
                       </ListGroup.Item>
                     </ListGroup>
-                    <ListGroup>
-                      <ListGroup.Item>
-                        <Form.Select
-                          className="custom-selectbox"
-                          onChange={(event) => 
-                            handlefilterchange("timezone", event.target.value)
-                          }
-                          value={filters?.["timezone"] || "company"}
-                        >
-                          <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
-                          <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>    
-                        </Form.Select>
-                      </ListGroup.Item>
-                    </ListGroup>
+                    
                     {                  
                       ( memberProfile?.role?.permissions?.reports?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===  true && filters["sort_by"] === "members") ? 
                         (
@@ -1327,7 +1348,29 @@ const formattedDate = (date) => {
                         )}
                       </Form>
                     </ListGroup.Item>
-
+                    {
+                      (filters['sort_by'] === 'members') && (
+                        <ListGroup>
+                          <ListGroup.Item>
+                            <Form.Select
+                              className="custom-group-selectbox"
+                              onChange={(event) => 
+                                handlefilterchange("timezone", event.target.value)
+                              }
+                              value={filters?.["timezone"] || "company"}
+                            >
+                              <optgroup label="Organization time zone">
+                                <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option> 
+                              </optgroup> 
+                              <optgroup label="My time zone">
+                                <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>  
+                              </optgroup>  
+                                  
+                            </Form.Select>
+                          </ListGroup.Item>
+                        </ListGroup>
+                      )
+                    }
                     <ListGroup
                       horizontal
                       className="bg-white expand--icon d-flex"
@@ -1588,7 +1631,7 @@ const formattedDate = (date) => {
                                       variant="dark"
                                       className="mt-0 mt-xl-0 px-3 py-2 d-inline-flex align-items-center gap-2"
                                       onClick={() => {
-                                        setSingleMemberReport(report);
+                                        setSingleMember(report?.member);
                                         setIsActive(1);
                                       }}
                                     >
@@ -1633,12 +1676,12 @@ const formattedDate = (date) => {
                     <>
                     <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
                       <div className="title--initial">
-                        {singleMemberReport?.member?.name?.charAt(0)}
+                       {singleMember?.name?.charAt(0)}
                       </div>
                       <div className="title--span flex-column align-items-start gap-0">
                         <h3>
-                          <strong>{singleMemberReport?.member?.name}</strong>
-                          <span>{singleMemberReport?.member?.role}</span>
+                          <strong>{singleMember?.name}</strong>
+                          <span>{singleMember?.role}</span>
                         </h3>
                       </div>
                       </button>
@@ -1647,12 +1690,12 @@ const formattedDate = (date) => {
                   <>
                   <Dropdown.Toggle variant="link" id="dropdown-basic">
                     <div className="title--initial">
-                      {singleMemberReport?.member?.name?.charAt(0)}
+                      {singleMember?.name?.charAt(0)}
                     </div>
                     <div className="title--span flex-column align-items-start gap-0">
                       <h3>
-                        <strong>{singleMemberReport?.member?.name}</strong>
-                        <span>{singleMemberReport?.member?.role}</span>
+                        <strong>{singleMember?.name}</strong>
+                        <span>{singleMember?.role}</span>
                       </h3>
                     </div>
                   </Dropdown.Toggle>
@@ -1664,7 +1707,8 @@ const formattedDate = (date) => {
                           return (
                             <Dropdown.Item
                               onClick={() => {
-                                setSingleMemberReport(report);
+                                // setSingleMemberReport(report);
+                                setSingleMember(report.member)
                                 setIsActive(1);
                               }}
                               className={
@@ -1775,6 +1819,34 @@ const formattedDate = (date) => {
                 </Form>
               </ListGroup.Item>
             </ListGroup>
+            {
+              (filters['sort_by'] === 'members') && (
+                <ListGroup>
+                  <ListGroup.Item>
+                    <Form.Select
+                      className="custom-group-selectbox"
+                      onChange={(event) => {
+                        handlefilterchange("timezone", event.target.value)
+                      }
+                      }
+                      value={filters?.["timezone"] || "company"}
+                    >
+                      <optgroup label="Organization time zone">
+                        <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option> 
+                      </optgroup>  
+                      <optgroup label="Member's time zone">
+                        <option value={'member'}>{timezonesData[singleMemberReport?.member?.usermeta?.timezone] || 'Asia/Kolkata'}</option> 
+                      </optgroup> 
+                      <optgroup label="My time zone">
+                        <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>  
+                      </optgroup>  
+                          
+                    </Form.Select>
+                  </ListGroup.Item>
+                </ListGroup>
+              )
+            }
+            
             <ListGroup.Item
               onClick={handleToggles}
               className="d-none d-lg-flex ms-1"
@@ -1786,7 +1858,9 @@ const formattedDate = (date) => {
               key={`closekey`}
               onClick={() => {
                 setIsActive(0);
+                setSingleMember( false )
                 dispatch(toggleSidebarSmall(false));
+
               }}
             >
               <MdOutlineClose />

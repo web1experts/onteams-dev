@@ -13,6 +13,7 @@ import {
   MANUAL_TIME_LIST,
   MANUAL_ENTRY_DATA,
   REPORTS_META_SUCCESS,
+  MEMBER_REPORT_SUCCESS
 } from "./types";
 // console.log('Environment : ', process.env.NODE_ENV)
 const config = {
@@ -46,6 +47,24 @@ export const getReportsByMember = (filters) => {
       if (response.data && response.data.success) {
         await dispatch({
           type: MEMBER_REPORTS_LIST_SUCCESS,
+          payload: response.data,
+        });
+      } else {
+        await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+};
+
+export const getSingleMemberReport = (payload) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGetByKey("reports",`/member`, payload);
+      if (response.data && response.data.success) {
+        await dispatch({
+          type: MEMBER_REPORT_SUCCESS,
           payload: response.data,
         });
       } else {

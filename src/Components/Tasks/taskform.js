@@ -99,7 +99,14 @@ export const TaskForm = (props) => {
         setComments(event.target.value);
     }
 
-
+    const crntDashboard = (() => {
+        try {
+        const data = localStorage.getItem('current_dashboard');
+        return data ? JSON.parse(data) : null;
+        } catch (e) {
+        return null;
+        }
+    })();
 
     const [search, setSearch] = useState('');
     const handleSearchChange = (e) => {
@@ -1206,14 +1213,46 @@ const renderSubtasks = () => {
 
         )
     };
+    // const formatDate = (dateString) => {
+    //     const timezone = crntDashboard?.timezone || 'Asia/Kolkata'
+    //     const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+    //     const date = new Date(dateString);
+
+    //     // Format the time part
+    //     const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+    //     const formattedDate = date.toLocaleDateString('en-US', options).replace(',', '');
+    //     const formattedTime = date.toLocaleTimeString('en-US', timeOptions).toLowerCase();
+
+    //     return `${formattedDate} | ${formattedTime}`;
+    // };
+
     const formatDate = (dateString) => {
-        const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+        const timezone = crntDashboard?.timezone || 'Asia/Kolkata';
+
         const date = new Date(dateString);
 
-        // Format the time part
-        const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-        const formattedDate = date.toLocaleDateString('en-US', options).replace(',', '');
-        const formattedTime = date.toLocaleTimeString('en-US', timeOptions).toLowerCase();
+        const dateOptions = {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            timeZone: timezone
+        };
+
+        const timeOptions = {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: timezone
+        };
+
+        const formattedDate = date
+            .toLocaleDateString('en-US', dateOptions)
+            .replace(',', '');
+
+        const formattedTime = date
+            .toLocaleTimeString('en-US', timeOptions)
+            .toLowerCase();
 
         return `${formattedDate} | ${formattedTime}`;
     };

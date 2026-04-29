@@ -18,7 +18,8 @@ import { currentMemberProfile } from "../../helpers/auth";
 import MonthHeader from "./monthheader";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import AttendanceStatusManager from "../modals/attendanceStatus";
+// import AttendanceStatusManager from "../modals/attendanceStatus";
+import AttendanceSettingsModal from "../modals/attendanceSettings";
 import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 const today = new Date();
 
@@ -1027,7 +1028,11 @@ useEffect(() => {
         </Modal.Body>
       </Modal>
       { showAttendanceStatus && 
-        <AttendanceStatusManager show={showAttendanceStatus} toggle={toggleAttendanceStatus} />
+        // <AttendanceStatusManager show={showAttendanceStatus} toggle={toggleAttendanceStatus} />
+        <AttendanceSettingsModal
+          show={showAttendanceStatus}
+          toggle={toggleAttendanceStatus}
+        />
       }
     </>
   );

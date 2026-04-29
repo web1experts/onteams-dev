@@ -93,7 +93,7 @@ export const getMemberRecoredActivity = (id, status, filtereddate) => {
   return async (dispatch) => {
     try {
 
-      const response = await API.apiPost('activity', { id: id, status: status, date_range: filtereddate })
+      const response = await API.apiPostUrl('activity','/single-day', { id: id, status: status, date_range: filtereddate })
     
       if (response.data && response.data.success) {
          await dispatch({ type: CURRENT_RECORDED_ACTIVITY_SUCCESS, payload: response.data });

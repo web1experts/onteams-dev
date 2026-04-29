@@ -365,7 +365,7 @@ if (endMinutes - startMinutes < 1) {
 
   return (
     <>
-      <Modal show={show} onHide={toggle} centered size="lg" className="status--modal rules--modal">
+      {/* <Modal show={show} onHide={toggle} centered size="lg" className="status--modal rules--modal">
         <Modal.Header closeButton className="border-bottom">
           <Modal.Title>
             <strong>
@@ -379,17 +379,32 @@ if (endMinutes - startMinutes < 1) {
             </Button>
           )}
         </Modal.Header>
-        <Modal.Body>
-          {attendanceStatus.map((item, index) => (
-            <AttendanceCard
-              key={index}
-              {...item}
-              index={index}
-              total={attendanceStatus?.length}
-            />
-          ))}
-        </Modal.Body>
-      </Modal>
+        <Modal.Body> */}
+        <Card>
+          <Card.Header>
+            <strong>
+              Attendance Rules{" "}
+              <small>Add time ranges and attendance categories</small>
+            </strong>
+            {attendanceStatus?.length < 7 && (
+              <Button variant="primary" onClick={handleRulesShow}>
+                <FiPlus /> Add Rule
+              </Button>
+            )}
+          </Card.Header>
+          <Card.Body>
+            {attendanceStatus.map((item, index) => (
+              <AttendanceCard
+                key={index}
+                {...item}
+                index={index}
+                total={attendanceStatus?.length}
+              />
+            ))}
+          </Card.Body>
+        </Card>
+        {/* </Modal.Body>
+      </Modal> */}
 
       <Modal show={showRules} centered onHide={handleRulesClose} backdrop="static" keyboard={false} size="md">
         <Modal.Header className="pb-0">

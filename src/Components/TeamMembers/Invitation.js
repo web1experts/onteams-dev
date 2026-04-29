@@ -15,6 +15,7 @@ import {
 } from "react-bootstrap";
 import { useToast } from "../../context/ToastContext";
 import { currentMemberProfile } from "../../helpers/auth";
+import { getShifts } from "../../redux/actions/attendance.action";
 import {
   permissionModules,
   permissionsLabel,
@@ -63,6 +64,7 @@ function Invitation(props) {
   const memberProfile = currentMemberProfile();
   const [isActive, setIsActive] = useState(0);
   const [loader, setLoader] = useState(false);
+  const [shifts, setShifts] = useState([]);
   const [showPasswordFields, setShowPasswordFields] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [showBadges, setShowBadges] = useState(null);
@@ -78,6 +80,7 @@ function Invitation(props) {
   const [errors, setErrors] = useState([]);
   const [selectedInvitation, setSelectedInvitation] = useState(null);
   const memberstate = useSelector((state) => state.member);
+  const attendancesApi = useSelector((state) => state.attendance)
   const memberFeed = useSelector((state) => state.member.members);
   const invitationsFeed = useSelector((state) => state.member.invitations);
   const teamsState = useSelector((state) => state.teams);
@@ -201,11 +204,13 @@ function Invitation(props) {
     });
 
     setPermissions(prm);
-
+    dispatch(getShifts())
     dispatch(getTeams());
   }, []);
 
-  
+  useEffect(() => {
+    setShifts(attendancesApi?.shiftDetails)
+  },[attendancesApi?.shiftDetails])
 
   useEffect(() => {
     if (teamsState && teamsState.teams) {
@@ -531,7 +536,15 @@ function Invitation(props) {
       setSelectedInvitation(memberstate?.udpatedInvite);
       setIsEditing(false)
     }
+    
   }, [memberstate]);
+
+  useEffect(() => {
+    if(memberstate?.inviteDelete){
+      handleTableToggle(null)
+      setIsActive(false);
+    }
+  }, [memberstate?.inviteDelete])
 
   useEffect(() => {
     if (apiCustomfields.customFields) {
@@ -992,6 +1005,20 @@ function Invitation(props) {
                           })}
                         </p>
                       </ListGroup.Item>
+                      <ListGroup.Item>
+                        <p> <small>Working Shift</small>
+                        {shifts?.map((shift) => {
+                            if (selectedInvitation?.custom_fields?.working_shift === shift?._id) {
+                              return (
+                                <Badge bg="primary" className="me-2" key={shift?._id}>{shift?.name}</Badge>
+                                
+                              );
+                            }
+
+                            return null;
+                        })}
+                        </p>
+                      </ListGroup.Item>
                     </ListGroup>
                   </Card.Text>
                   <Card.Text>
@@ -1036,26 +1063,7 @@ function Invitation(props) {
                             <small>Role</small>
                             {selectedInvitation?.role?.name}
                           </p>
-                          {/* <Form.Group className="mb-0 form-group pb-0">
-                            <Form.Label>Role</Form.Label>
-                            <Form.Select
-                              className={
-                                errors["role"]
-                                  ? "input-error form-control custom-selectbox conditional-box"
-                                  : "form-control custom-selectbox conditional-box"
-                              }
-                              value={fields?.role || ""}
-                              onChange={handleChange}
-                              name="role"
-                            >
-                              <option value="">None</option>
-                              {roles.map((role, index) => (
-                                <option key={index} value={role._id}>
-                                  {role.name}
-                                </option>
-                              ))}
-                            </Form.Select>
-                          </Form.Group> */}
+                          
                         </ListGroup.Item>
                       )}
                     </ListGroup>
@@ -1083,6 +1091,28 @@ function Invitation(props) {
                           })
                         } 
                   </ListGroup.Item>
+                    <ListGroup.Item>
+                      <Form.Group className="mb-0 form-group pb-0">
+                        <Form.Label>Working Shift</Form.Label>
+                        <Form.Select
+                          placeholder="Select Shift"
+                          aria-label="Shift"
+                          name="working_shift"
+                          className={"form-control custom-selectbox"}
+                          value={fields?.working_shift || shifts?.[0]?._id || ""}
+                          onChange={(e) => {
+                            handleChange(e);
+                          }}
+                        >
+                          {shifts?.map((shift, shiftIndex) => (
+                            <option key={shift?._id} value={shift?._id}>
+                              {shift?.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                        
+                      </Form.Group>
+                    </ListGroup.Item>
                   </ListGroup>
                   </Card.Text>
                   <Card.Text>

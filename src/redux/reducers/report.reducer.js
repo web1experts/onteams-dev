@@ -9,7 +9,8 @@ import {
   MEMBER_REPORTS_LIST_SUCCESS,
   PROJECT_REPORTS_LIST_SUCCESS,
   CLEAR_MESSAGES,
-  REPORTS_REMARKS_SUCCESS
+  REPORTS_REMARKS_SUCCESS,
+  MEMBER_REPORT_SUCCESS
 } from "../actions/types";
 
 const initialState = {
@@ -88,6 +89,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         remarks: action.payload.remarks
+      }
+    case MEMBER_REPORT_SUCCESS: 
+      return {
+        ...state,
+        memberReportData: action.payload.memberReport
       }
     default:
       return state;

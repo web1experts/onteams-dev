@@ -35,6 +35,7 @@ import { getActiveSubscription } from "../../redux/actions/subscription.action";
 import { getTeams } from "../../redux/actions/team.action";
 import { useToast } from "../../context/ToastContext";
 import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
+import { getShifts } from "../../redux/actions/attendance.action";
 
 function TeamMembersPage() {
   const inputRef = useRef(null);
@@ -46,6 +47,7 @@ function TeamMembersPage() {
   const [activeItems, setActiveItems] = useState([]);
   const [newOwnerId, setNewOwnerId] = useState(null)
   const [hasOwnershipRequest, setHasOwnershipRequest] = useState({})
+  const [shifts, setShifts] = useState([]);
   const handleClick = (event) => {
     setIsActive((current) => !current);
   };
@@ -80,6 +82,7 @@ const [assignedTeamsOrMembers, setAssignedTeamsOrMembers] = useState({})
 const [teamfeed, setTeamFeed] = useState([]);
 const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const subscriptionState = useSelector((state) => state.subscription);
+  const attendancesApi = useSelector(state => state.attendance)
   const [invitationsTotal, setInvitationsTotal] = useState(0)
   const [activeSubscription, setActiveSubscription] = useState(null)
    const teamsState = useSelector((state) => state.teams)
@@ -116,7 +119,7 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
       setErrors({});
       setShow(false);
       setFields({
-        email: "", name: "", role: ""
+        email: "", name: "", role: "", working_shift: shifts?.[0]?._id
       })
       setDefaultMemberRole()
     });
@@ -223,6 +226,11 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
         setShowBadges(fieldIndex);
     };
 
+    useEffect(() => {
+      setShifts(attendancesApi?.shiftDetails)
+      setFields({...fields, ['working_shift']: attendancesApi?.shiftDetails?.[0]?._id})
+    },[attendancesApi?.shiftDetails])
+
   useEffect(() => {
     dispatch(getAvailableRolesByWorkspace({ fields: "_id name slug permissions" }));
     let prm = {};
@@ -234,6 +242,7 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
     });
 
     setPermissions(prm);
+    dispatch(getShifts())
 
     setTimeout(() => {
         dispatch(getActiveSubscription())
@@ -476,7 +485,8 @@ useEffect(() => {
       let fieldsSetup = {
         name: selectedMember?.name,
         role: selectedMember?.role?._id,
-        selected_teams: selectedMember?.teams || []
+        selected_teams: selectedMember?.teams || [],
+        working_shift: cleanedMeta?.working_shift?.meta_value
       };
 
       if (cleanedMeta && Object.keys(cleanedMeta).length > 0) {
@@ -489,48 +499,48 @@ useEffect(() => {
         });
       }
       setFields(fieldsSetup);
-      const merged = {};
+      // const merged = {};
 
-      // Step 1: Initialize merged with empty string values
-      permissionModules.forEach((mod) => {
-        merged[mod.slug] = {};
-        mod.permissions.forEach((p) => {
-          merged[mod.slug][p] = "";
-        });
-      });
+      // // Step 1: Initialize merged with empty string values
+      // permissionModules.forEach((mod) => {
+      //   merged[mod.slug] = {};
+      //   mod.permissions.forEach((p) => {
+      //     merged[mod.slug][p] = "";
+      //   });
+      // });
 
-      setPermissions((prev) => {
-        const newPerms = cleanedMeta?.permissions?.meta_value || {};
+      // setPermissions((prev) => {
+      //   const newPerms = cleanedMeta?.permissions?.meta_value || {};
 
-        // Clone merged to avoid mutating the original reference
-        const updated = { ...merged };
+      //   // Clone merged to avoid mutating the original reference
+      //   const updated = { ...merged };
 
-        // First, update existing keys in merged
-        for (const module in updated) {
-          updated[module] = { ...updated[module] }; // clone inner object
-          for (const key in updated[module]) {
-            if (newPerms?.[module] && key in newPerms[module]) {
-              updated[module][key] = newPerms[module][key];
-            } else {
-              updated[module][key] = false;
-            }
-          }
-        }
+      //   // First, update existing keys in merged
+      //   for (const module in updated) {
+      //     updated[module] = { ...updated[module] }; // clone inner object
+      //     for (const key in updated[module]) {
+      //       if (newPerms?.[module] && key in newPerms[module]) {
+      //         updated[module][key] = newPerms[module][key];
+      //       } else {
+      //         updated[module][key] = false;
+      //       }
+      //     }
+      //   }
 
-        // Then, add any missing modules or keys from newPerms
-        for (const module in newPerms) {
-          if (!updated[module]) {
-            updated[module] = {};
-          }
-          for (const key in newPerms[module]) {
-            if (!(key in updated[module])) {
-              updated[module][key] = newPerms[module][key];
-            }
-          }
-        }
+      //   // Then, add any missing modules or keys from newPerms
+      //   for (const module in newPerms) {
+      //     if (!updated[module]) {
+      //       updated[module] = {};
+      //     }
+      //     for (const key in newPerms[module]) {
+      //       if (!(key in updated[module])) {
+      //         updated[module][key] = newPerms[module][key];
+      //       }
+      //     }
+      //   }
 
-        return updated;
-      });
+      //   return updated;
+      // });
     }
   }, [selectedMember]);
 
@@ -1462,6 +1472,20 @@ const setDefaultMemberRole = () => {
                               })}
                             </p>
                           </ListGroup.Item>
+                          <ListGroup.Item>
+                            <p> <small>Working Shift</small>
+                            {shifts?.map((shift) => {
+                                if (selectedMember?.memberMeta?.working_shift?.meta_value  === shift?._id) {
+                                  return (
+                                    <Badge bg="primary" className="me-2" key={shift?._id}>{shift?.name}</Badge>
+                                    
+                                  );
+                                }
+    
+                                return null;
+                            })}
+                            </p>
+                          </ListGroup.Item>
                         </ListGroup>
                       </Card.Text>
                       <Card.Text>
@@ -1472,7 +1496,7 @@ const setDefaultMemberRole = () => {
                                 <ListGroup.Item key={index}>
                                   <p>
                                     <small>{field.label}</small>
-                                    <span>{selectedMember?.memberMeta?.[field.name] ?.meta_value || ""}</span>
+                                    <span>{selectedMember?.memberMeta?.[field.name]?.meta_value || ""}</span>
                                   </p>
                                 </ListGroup.Item>
                               ))}
@@ -1501,37 +1525,6 @@ const setDefaultMemberRole = () => {
                               </span>
                               <p>
                                 <small>Role</small>
-                                
-                                {/*
-                                  (memberProfile?.role?.permissions?.members?.update_permissions === true) ?
-                                  <div className="form-row pb-3" key={'row-role'}>
-                                    <Form.Group className="mb-0 form-group">
-                                      <Form.Select
-                                      placeholder="Select role"
-                                      aria-label="Role"
-                                      name="role"
-                                      className={"form-control custom-selectbox"}
-                                      value={fields?.role || roles?.[0]?._id || ""}
-                                      onChange={(e) => {
-                                        handleChange(e);
-                                      }}
-                                    >
-                                      {roles?.map((role) => (
-                                        <option key={role._id} value={role._id}>
-                                          {(() => {
-                                            const helperText = roleHelperText(role.slug);
-                                            return helperText
-                                              ? `${role.name} - ${helperText}`
-                                              : role.name;
-                                          })()}
-                                        </option>
-                                      ))}
-                                    </Form.Select>
-                                  </Form.Group>
-                                  </div>
-                                :
-                                
-                                */}
                                 {selectedMember?.role?.name}
                               </p>
                             </ListGroup.Item>
@@ -1547,36 +1540,7 @@ const setDefaultMemberRole = () => {
                             <p>
                               <small>Teams</small>
                               {
-                               /* (memberProfile?.role?.permissions?.members?.manage_teams === true) ?
-                              teamfeed?.map(
-                                (team) => (
-                                  <>
-                                  <span className="team--color" style={{ background: team?.color }}></span> 
-                                  <Form.Check
-                                    inline
-                                    label={team?.name}
-                                    name="selected_teams[]"
-                                    type="checkbox"
-                                    id={`inline-${team?._id}`}
-                                    checked={
-                                      fields?.selected_teams?.includes(team?._id)
-                                    }
-                                    onChange={(e) => {
-                                      handleChange({
-                                        target: {
-                                          name: "selected_teams[]",
-                                          value: team?._id,
-                                          type: "checkbox",
-                                          checked: e.target.checked,
-                                        },
-                                      });
-                                    }}
-                                  />
-                                  </>
-                                  
-                                ),
-                              )
-                              :*/
+                               
                               teamfeed?.map((team) => {
                                 if (selectedMember?.teams?.includes(team?._id)) {
                                   return (
@@ -1588,19 +1552,30 @@ const setDefaultMemberRole = () => {
                                 return null;
                               })
                             }
-                              
-                              {/* {teamfeed?.map((team) => {
-                                if (selectedMember?.teams?.includes(team?._id)) {
-                                  return (
-                                    <Badge bg="primary" className="me-2" key={team?._id}>{team?.name}</Badge>
-                                    
-                                  );
-                                }
-
-                                return null;
-                              })} */}
                             </p>
                             {errors["selected_teams"] || ''}  
+                          </ListGroup.Item>
+                          <ListGroup.Item>
+                            <Form.Group className="mb-0 form-group pb-0">
+                              <Form.Label>Working Shift</Form.Label>
+                              <Form.Select
+                                placeholder="Select Shift"
+                                aria-label="Shift"
+                                name="working_shift"
+                                className={"form-control custom-selectbox"}
+                                value={fields?.working_shift || shifts?.[0]?._id}
+                                onChange={(e) => {
+                                  handleChange(e);
+                                }}
+                              >
+                                {shifts?.map((shift, shiftIndex) => (
+                                  <option key={shift?._id} value={shift?._id}>
+                                    {shift?.name}
+                                  </option>
+                                ))}
+                              </Form.Select>
+                              
+                            </Form.Group>
                           </ListGroup.Item>
                         </ListGroup>
                       </Card.Text>
@@ -1751,14 +1726,14 @@ const setDefaultMemberRole = () => {
                     value={fields?.role || roles?.[0]?._id || ""}
                     onChange={(e) => {
                       handleChange(e);
-                      const matchedRole = roles?.find(
-                        (role) => role._id === e.target.value
-                      );
-                      // handleChange({ target: { name: 'rolename', value: matchedRole.name } });
-                      const matchedPermissions = matchedRole
-                        ? matchedRole.permissions
-                        : [];
-                      setPermissions(matchedPermissions);
+                      // const matchedRole = roles?.find(
+                      //   (role) => role._id === e.target.value
+                      // );
+                      // // handleChange({ target: { name: 'rolename', value: matchedRole.name } });
+                      // const matchedPermissions = matchedRole
+                      //   ? matchedRole.permissions
+                      //   : [];
+                      // setPermissions(matchedPermissions);
                     }}
                   >
                     {roles?.map((role, roleIndex) => (
@@ -1777,6 +1752,29 @@ const setDefaultMemberRole = () => {
                   </Form.Select>
                   <p className="mb-0 text-muted"><small>The role determines what permissions and access this member will have in your organization.</small></p>
                   {showError("role")}
+                </Form.Group>
+              </div>
+              <div className="form-row pb-3" key={'row-role'}>
+                <Form.Group className="mb-0 form-group pb-0">
+                  <Form.Label>Working Shift</Form.Label>
+                  <Form.Select
+                    placeholder="Select Shift"
+                    aria-label="Shift"
+                    name="working_shift"
+                    className={"form-control custom-selectbox"}
+                    value={fields?.working_shift || shifts?.[0]?._id || ""}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                  >
+                    {shifts?.map((shift, shiftIndex) => (
+                      <option key={shift?._id} value={shift?._id}>
+                        {shift?.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  
+                  {showError("shift")}
                 </Form.Group>
               </div>
               <div className="form-row" key={`row-1`}>

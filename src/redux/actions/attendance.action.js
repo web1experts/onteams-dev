@@ -8,7 +8,10 @@ import {
     ATTENDANCE_SUMMARY_SUCCESS,
     ATTENDANCE_EXCEL_SUCCESS,
     ATTENDANCE_STATUS_LIST_SUCCESS,
-    ATTENDANCE_STATUS_SAVE_SUCCESS
+    ATTENDANCE_STATUS_SAVE_SUCCESS,
+    ATTENDANCE_SHIFTS_SAVE_SUCCESS,
+    ATTENDANCE_SHIFTS_GET_SUCCESS,
+    ATTENDANCE_SHIFT_DELETE_SUCCESS
 } from "./types";
 
 const config = {
@@ -127,3 +130,58 @@ export const saveAttendanceStatuses = (payload) => {
         }
     }
 }
+
+export const handleSaveShifts = (payload) => {
+    return async (dispatch) => {
+        try{
+            const response = await API.apiPostUrl('attendance', `/shifts`, payload);
+            if(response.data && response.data.success){
+            await dispatch({ type: ATTENDANCE_SHIFTS_SAVE_SUCCESS, payload: response.data })
+            }else{
+            await dispatch({ type: ATTENDANCE_ERROR, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+}
+
+export const getShifts = () => {
+    return async (dispatch) => {
+        try{
+            const response = await API.apiGetByKey('attendance', `/shifts`);
+            if(response.data && response.data.success){
+            await dispatch({ type: ATTENDANCE_SHIFTS_GET_SUCCESS, payload: response.data })
+            }else{
+            await dispatch({ type: ATTENDANCE_ERROR, payload: response.data.message });
+            }
+        } catch (error) {
+            errorRequest(error, dispatch);
+        }
+    }
+}
+
+export const deleteShift = (shiftId) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiDeleteUrl(
+        "attendance",
+        `/shifts/${shiftId}`
+      );
+
+      if (response.data && response.data.success) {
+        await dispatch({
+          type: ATTENDANCE_SHIFT_DELETE_SUCCESS,
+          payload: response.data, // remove from store using id
+        });
+      } else {
+        await dispatch({
+          type: ATTENDANCE_ERROR,
+          payload: response.data.message,
+        });
+      }
+    } catch (error) {
+      errorRequest(error, dispatch);
+    }
+  };
+};

@@ -858,7 +858,7 @@ function ProjectsPage() {
             }
             return project;
           })
-          .filter((project) => project.status === filters["status"])
+          //.filter((project) => project.status === filters["status"])
       );
     }
   }, [apiResult]);
