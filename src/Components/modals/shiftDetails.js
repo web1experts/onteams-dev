@@ -15,6 +15,7 @@ const ShiftDetailsModal = (props) => {
   const [editingIndex, setEditingIndex] = useState(null);
     const [shiftName, setShiftName] = useState("");
   const [startTime, setStartTime] = useState("00:00");
+  const [endTime, setEndTime] = useState("00:00");
   const [error, setError] = useState("");
 
   const calculateEndTime = (startTime) => {
@@ -132,6 +133,7 @@ const ShiftDetailsModal = (props) => {
   const resetForm = () => {
     setShiftName("");
     setStartTime("00:00");
+    setEndTime("00:00");
     setEditingIndex(null);
     setShowForm(false);
     setError("");
@@ -142,6 +144,7 @@ const ShiftDetailsModal = (props) => {
     const shift = shifts[index];
     setShiftName(shift.name);
     setStartTime(shift.startTime);
+    setEndTime(shift.endTime)
     setEditingIndex(index);
     setShowForm(true);
   };
@@ -236,7 +239,8 @@ const ShiftDetailsModal = (props) => {
 
               <Col>
                 <Form.Label>Closing Time (Auto)</Form.Label>
-                <Form.Control type="time" value={endTimeFormatted} disabled />
+                <Form.Control type="time" readOnly disabled value={endTimeFormatted} //onChange={(e) => setEndTime(e.target.value)} 
+                />
               </Col>
             </Row>
 
