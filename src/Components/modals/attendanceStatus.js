@@ -337,7 +337,7 @@ if (endMinutes - startMinutes < 1) {
   const AttendanceCard = ({ index, total, color, label, from, to }) => {
     const showTrashIcon = total > 2 && index !== 0 && index !== 1;
     return (
-      <Card className="mb-3 rules--card">
+      <Card className="rules--card">
         <Card.Body>
           <Row className="align-items-center">
             <Col xs="auto">
@@ -381,10 +381,10 @@ if (endMinutes - startMinutes < 1) {
         </Modal.Header>
         <Modal.Body> */}
         <Card>
-          <Card.Header>
+          <Card.Header className="d-flex align-items-center justify-content-between">
             <strong>
               Attendance Rules{" "}
-              <small>Add time ranges and attendance categories</small>
+              <small className="fw-normal d-block">Add time ranges and attendance categories</small>
             </strong>
             {attendanceStatus?.length < 7 && (
               <Button variant="primary" onClick={handleRulesShow}>

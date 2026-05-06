@@ -157,25 +157,20 @@ const ShiftDetailsModal = (props) => {
   };
 
   return (
-    <Card>
-      <Card.Header className="d-flex justify-content-between align-items-center">
-        <strong>Shift Details</strong>
-
-        {!showForm && (
-          <Button size="sm" onClick={() => setShowForm(true)}>
-            + Add Shift
-          </Button>
-        )}
-      </Card.Header>
-
-      <Card.Body>
-        {/* ✅ LIST VIEW */}
-        {!showForm && (
-          <>
-            {shifts?.length === 0 ? (
-              <p className="text-muted">No shifts added yet.</p>
-            ) : (
-              <Table bordered hover>
+    <>
+      {!showForm && (
+        <Button variant="primary" className="mb-3" onClick={() => setShowForm(true)}>
+          + Add Shift
+        </Button>
+      )}
+      {/* ✅ LIST VIEW */}
+      {!showForm && (
+        <>
+          {shifts?.length === 0 ? (
+            <p className="text-muted">No shifts added yet.</p>
+          ) : (
+            <div className="shift--table">
+              <Table>
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -209,10 +204,12 @@ const ShiftDetailsModal = (props) => {
                   ))}
                 </tbody>
               </Table>
-            )}
-          </>
-        )}
+            </div>
+          )}
+        </>
+      )}
 
+      
         {/* ✅ FORM VIEW */}
         {showForm && (
           <>
@@ -227,35 +224,46 @@ const ShiftDetailsModal = (props) => {
                     />
                 </Col>
             </Row>
-            <Row className="mb-3">
-              <Col>
-                <Form.Label>Day Break (Start)</Form.Label>
-                <Form.Control
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                />
-              </Col>
+            <div className="shift--setting bg-light p-3 border rounded-3 mb-3">
+              <h4 className="mb-4 fs-6">Shift Settings<small className="d-block fw-normal">Define your work hours and when the attendance day resets.</small></h4>
+              <p className="fw-semibold">Shift Hours</p>
+              <Row className="mb-3">
+                <Col>
+                  <Form.Label>Start Time</Form.Label>
+                  <Form.Control
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                  />
+                </Col>
 
-              <Col>
-                <Form.Label>Closing Time (Auto)</Form.Label>
-                <Form.Control type="time" readOnly disabled value={endTimeFormatted} //onChange={(e) => setEndTime(e.target.value)} 
-                />
-              </Col>
-            </Row>
+                <Col>
+                  <Form.Label>End Time (Auto)</Form.Label>
+                  <Form.Control type="time" readOnly disabled value={endTimeFormatted} //onChange={(e) => setEndTime(e.target.value)} 
+                  />
+                </Col>
+              </Row>
 
-            {error && <Alert variant="danger">{error}</Alert>}
+              {error && <Alert variant="danger">{error}</Alert>}
 
-            <Alert variant="warning" style={{ whiteSpace: "pre-line" }}>
-              {dynamicText}
-            </Alert>
+              <p className="fw-semibold border-top pt-4 mt-4">Attendance Day Window</p>
+              <Row className="mb-3">
+                <Col>
+                  <Form.Label>When does the attendance day reset?</Form.Label>
+                  <Form.Control
+                    type="time"
+                    value={startTime}
+                  />
+                </Col>
+              </Row>
+              <Alert variant="warning" style={{ whiteSpace: "pre-line" }}>
+                {dynamicText}
+              </Alert>
+            </div>
           </>
         )}
-      </Card.Body>
-
-      <Card.Footer className="d-flex justify-content-between">
-        {showForm && (
-          <div>
+      {showForm && (
+        <Card.Footer className="d-flex justify-content-end">
             <Button
               variant="outline-secondary"
               className="me-2"
@@ -263,13 +271,12 @@ const ShiftDetailsModal = (props) => {
             >
               Cancel
             </Button>
-            <Button variant="success" onClick={handleSaveShift}>
+            <Button variant="primary" onClick={handleSaveShift}>
               {editingIndex !== null ? "Update" : "Save"}
             </Button>
-          </div>
+          </Card.Footer>
         )}
-      </Card.Footer>
-    </Card>
+      </>
   );
 };
 

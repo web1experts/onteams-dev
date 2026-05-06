@@ -162,6 +162,10 @@
     -webkit-border-radius: 0.5rem;
 }
 
+.rules--card:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
 .rules--card .card-body {
     padding: 0;
 }
@@ -313,6 +317,37 @@
     border-radius: .5rem;
     -webkit-border-radius: .5rem;
     margin-right: 2rem;
+}
+
+.attendance--setting .nav-tabs {
+    border: 0;
+    margin-bottom: 2rem;
+}
+
+.attendance--setting .nav-tabs button {
+    align-items: center;
+    background: none;
+    border: 1px solid rgb(17 24 39);
+    color: rgb(17 24 39);
+    cursor: pointer;
+    display: flex;
+    font-size: 16px;
+    height: auto;
+    justify-content: center;
+    border-radius: .5rem;
+    -webkit-border-radius: .5rem;
+    margin-right: 8px;
+    min-height: auto;
+    min-width: auto;
+    padding: 10px 20px;
+    width: auto;
+}
+
+.attendance--setting .nav-tabs button.active, .attendance--setting .nav-tabs button:hover {
+    background: linear-gradient(to right, rgba(var(--theme-secondary), 1), rgba(var(--theme-primary), 1));
+    color: #ffffff;
+    box-shadow: none;
+    border: 1px solid rgba(var(--theme-primary), 1);
 }
 
 .error {
@@ -1418,8 +1453,15 @@ select.form-error {
     border-radius: 3px;
 }
 
+.theme--modal .form-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
 .theme--modal .form-check .form-check-input {
     margin-left: 0;
+    margin-top: 0;
 }
 
 .theme--modal .new--accordion--block .form-check .form-check-input {
@@ -1429,6 +1471,43 @@ select.form-error {
 .theme--modal .form-check .form-check-label {
     display: inline-flex;
     align-items: center;
+}
+
+.shift--table {
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
+    -webkit-box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
+    border-radius: 1rem;
+    border: 1px solid rgb(226 232 240);
+    overflow: hidden;
+}
+
+.shift--table thead {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 333;
+    background: linear-gradient(to right, #f8fafc, #f1f5f9);
+    margin-bottom: -1px;
+}
+
+.shift--table tr {
+    border-bottom: 1px solid rgb(226 232 240);
+    padding: 0;
+    border-radius: 0;
+    transition: all .2s ease-in-out;
+    -webkit-transition: all .2s ease-in-out;
+    cursor: all-scroll;
+}
+
+.shift--table th, .shift--table td {
+    border: 0;
+    padding: 1rem;
+    border-right: 1px solid rgb(226 232 240);
+    border-bottom: 0;
+}
+
+.shift--table th:last-child, .shift--table td:last-child {
+    border-right: 0;
 }
 
 @media (min-width:426px) {

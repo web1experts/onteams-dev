@@ -649,7 +649,7 @@ const handleSubmit = (e) => {
                   <div className="position-relative">
                     <Form.Group className="position-relative mb-0 form-group">
                       <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                      <div className="d-flex align-items-start">
+                      <div className="d-flex">
                         {/* Country Selector */}
                         <div
                           className="border rounded px-3 py-2 d-flex align-items-center cursor-pointer me-2"
@@ -666,7 +666,7 @@ const handleSubmit = (e) => {
                     {/* Dropdown */}
                     {showDropdown && (
                       <div
-                        className="position-absolute bg-white border rounded mt-2 shadow"
+                        className="position-absolute number--list bg-white border rounded shadow"
                         style={{ width: "100%", zIndex: 1000 }}
                       >
                         
@@ -853,10 +853,9 @@ const handleSubmit = (e) => {
                 <Row>
 
                 <div className="position-relative">
-    
                   <Form.Group className="position-relative mb-0 form-group">
                       <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                      <div className="d-flex align-items-start">
+                      <div className="d-flex">
                         {/* Country Selector */}
                         <div className="border rounded px-3 py-2 d-flex align-items-center cursor-pointer" style={{ minWidth: "120px" }} onClick={() => setShowDropdown(!showDropdown)}>
                           <span className={`fi fi-${formData?.isoCode?.toLowerCase()} me-2`}></span>
@@ -870,7 +869,7 @@ const handleSubmit = (e) => {
                   {/* Dropdown */}
                   {showDropdown && (
                     <div
-                      className="position-absolute bg-white border rounded mt-2 shadow"
+                      className="position-absolute number--list bg-white border rounded shadow"
                       style={{ width: "100%", zIndex: 1000 }}
                     >
                       

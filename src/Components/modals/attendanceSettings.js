@@ -7,7 +7,7 @@ const AttendanceSettingsModal = ({ show, toggle }) => {
   const [activeTab, setActiveTab] = useState("attendance");
 
   return (
-    <Modal show={show} onHide={toggle} size="lg" centered>
+    <Modal show={show} onHide={toggle} size="lg" centered className="attendance--setting">
       <Modal.Header closeButton>
         <Modal.Title>Attendance Settings</Modal.Title>
       </Modal.Header>

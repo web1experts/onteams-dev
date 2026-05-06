@@ -55,7 +55,7 @@ const CustomDropdown = ({ items, value, extraClass, onChange }) => {
                             return (
                                 <div 
                                     key={`group-${idx}`} 
-                                    className="dropdown-group-label px-3 border-bottom pb-2"
+                                    className="dropdown-group-label px-3 border-bottom py-2"
                                 >
                                     {item.label}
                                 </div>

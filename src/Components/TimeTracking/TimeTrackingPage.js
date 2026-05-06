@@ -1706,7 +1706,6 @@ const getMembersFromTeams = (selectedTeamIds) => {
     if (activeInnerTab === "InnerRecorded") {
       return (
         <>
-          <ListGroup>
             <ListGroup.Item>
               <Form.Select
                 className="custom-group-selectbox"
@@ -1726,7 +1725,6 @@ const getMembersFromTeams = (selectedTeamIds) => {
                 </optgroup>  
               </Form.Select>
             </ListGroup.Item>
-          </ListGroup>
            
           <ListGroup horizontal className="screens--shots">
             <ListGroup horizontal>
@@ -1892,115 +1890,111 @@ const getMembersFromTeams = (selectedTeamIds) => {
                     </ListGroup>
                     
                     {
-                      
-                        
-                        ( memberProfile?.role?.permissions?.time_tracking?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===  true) ? 
-                          (
-                            <ListGroup.Item
-                              className={
-                                "ms-auto d-none d-xl-flex"
-                              }
-                              key="member-filter-list"
-                            >
-                              <Form.Select
-                                className="custom-selectbox"
-                                onChange={(event) => 
-                                  handlefilterchange("member", event.target.value)
-                                }
-                                value={filters?.["member"] || "all"}
-                                
-                              >
-                                <option
-                                  value={memberProfile?._id}
-                                  key="my-info-option"
-                                >
-                                  My Time Logs
-                                </option>
-                                
-                                {(assignedTeamsOrMembers?.members?.length > 0 ) && (
-                                  <option key={`member-info-all`} value={"all"}>
-                                    All Members
-                                  </option>
-                                )}
-                                <>   
-                                  {  assignedTeamsOrMembers?.members?.map((member, index) => (
-                                        <option
-                                          key={`member-projects-${index}`}
-                                          value={member._id}
-                                        >
-                                          {member.name}
-                                        </option>
-                                      ))
-    
-                                  }
-                                </>
-                                
-                              </Form.Select>
-                            </ListGroup.Item>
-                            )
-                            :
-                            (memberProfile?.role?.permissions?.time_tracking?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
-                                  true) ?
-                            <ListGroup.Item 
+                      ( memberProfile?.role?.permissions?.time_tracking?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===  true) ? 
+                        (
+                          <ListGroup.Item
                             className={
                               "ms-auto d-none d-xl-flex"
                             }
-                            key="teams-filter-list">
-                          <Form.Select
-                              className="custom-group-selectbox"
-                              onChange={(event) => {
-                                const group = event.target.selectedOptions[0].dataset.group;
-                                handlefilterchange(group, event.target.value);
-                              }}
+                            key="member-filter-list"
+                          >
+                            <Form.Select
+                              className="custom-selectbox"
+                              onChange={(event) => 
+                                handlefilterchange("member", event.target.value)
+                              }
                               value={filters?.["member"] || "all"}
+                              
                             >
-                                <>
-                                  {/* MEMBERS GROUP */}
-                                  <optgroup label="Members"optgroup>
-                                    <option value={memberProfile?._id} data-group="member">
-                                      My Time Logs
-                                    </option>
-                                    <option value="all" data-group="member">
-                                      All Members
-                                    </option>
-                                    {assignedTeamsOrMembers?.members?.map((member) => (
-                                          <option
-                                            key={member._id}
-                                            value={member._id}
-                                            data-group="member"
-                                          >
-                                            {member.name}
-                                          </option>
-                                        ))}
-                                        
-                                  </optgroup>
-                                  <optgroup label="Teams">
-    
-                                    {assignedTeamsOrMembers?.teams?.map((team, index) => {
-                                        return (
-                                          <option
-                                            key={`team-info-${index}`}
-                                            value={team._id}
-                                            data-group="team"
-                                          >
-                                            {team.name}
-                                          </option>
-                                        )
-                                    })}
-                                  </optgroup>
-                                </>
+                              <option
+                                value={memberProfile?._id}
+                                key="my-info-option"
+                              >
+                                My Time Logs
+                              </option>
+                              
+                              {(assignedTeamsOrMembers?.members?.length > 0 ) && (
+                                <option key={`member-info-all`} value={"all"}>
+                                  All Members
+                                </option>
+                              )}
+                              <>   
+                                {  assignedTeamsOrMembers?.members?.map((member, index) => (
+                                      <option
+                                        key={`member-projects-${index}`}
+                                        value={member._id}
+                                      >
+                                        {member.name}
+                                      </option>
+                                    ))
+  
+                                }
+                              </>
                               
                             </Form.Select>
                           </ListGroup.Item>
-                          :<></>
-                          
+                          )
+                          :
+                          (memberProfile?.role?.permissions?.time_tracking?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+                                true) ?
+                          <ListGroup.Item 
+                          className={
+                            "ms-auto d-none d-xl-flex"
+                          }
+                          key="teams-filter-list">
+                        <Form.Select
+                            className="custom-group-selectbox"
+                            onChange={(event) => {
+                              const group = event.target.selectedOptions[0].dataset.group;
+                              handlefilterchange(group, event.target.value);
+                            }}
+                            value={filters?.["member"] || "all"}
+                          >
+                              <>
+                                {/* MEMBERS GROUP */}
+                                <optgroup label="Members"optgroup>
+                                  <option value={memberProfile?._id} data-group="member">
+                                    My Time Logs
+                                  </option>
+                                  <option value="all" data-group="member">
+                                    All Members
+                                  </option>
+                                  {assignedTeamsOrMembers?.members?.map((member) => (
+                                        <option
+                                          key={member._id}
+                                          value={member._id}
+                                          data-group="member"
+                                        >
+                                          {member.name}
+                                        </option>
+                                      ))}
+                                      
+                                </optgroup>
+                                <optgroup label="Teams">
+  
+                                  {assignedTeamsOrMembers?.teams?.map((team, index) => {
+                                      return (
+                                        <option
+                                          key={`team-info-${index}`}
+                                          value={team._id}
+                                          data-group="team"
+                                        >
+                                          {team.name}
+                                        </option>
+                                      )
+                                  })}
+                                </optgroup>
+                              </>
+                            
+                          </Form.Select>
+                        </ListGroup.Item>
+                        :<></>
                     }
                     
                     {showTabs()}
 
                     {
                       (activeTab === "Recordings") && (
-                        <ListGroup>
                           <ListGroup.Item>
                             <Form.Select
                                 className="custom-group-selectbox"
@@ -2022,7 +2016,6 @@ const getMembersFromTeams = (selectedTeamIds) => {
                               <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>    */}
                             </Form.Select>
                           </ListGroup.Item>
-                        </ListGroup>
                       )
                     }
                     
@@ -4114,90 +4107,83 @@ const getMembersFromTeams = (selectedTeamIds) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Card className="work--card">
-            <Card.Body>
-              <Card.Title>
-                <FiMonitor /> Desktop App Tracking Settings
-              </Card.Title>
-              <Card className="mb-3 screenshot--card">
-                <Card.Body className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex gap-3 align-items-center">
-                    <FiCamera />
-                    <h6 className="mb-1"> Screenshots <small className="d-block">Capture 3 random screenshots every 10 minutes</small></h6>
-                  </div>
-                  <Form.Check type="switch" key={`screenshot-only`} checked={recordingSettings?.screenshot_recording === "enable"} value={"enable"} name={`custom_field[screenshot_recording]`}
-                            onChange={(event) => {
-                              setRecordingSettings({
-                                ...recordingSettings,
-                                screenshot_recording: event.target.checked ? "enable" : "disabled"
-                              })
-                              updateRecodingType({
-                                  custom_field: {
-                                      screenshot_recording: event.target.checked ? "enable" : "disabled"
-                                  }
-                              });
-                            }} />
-                </Card.Body>
-              </Card>
-
-              {/* Screen Recording */}
-              <Card className="mb-3 recording--card">
-                <Card.Body className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex gap-3 align-items-center">
-                    <FiVideo />
-                    <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording while time tracking is running</small></h6>
-                  </div>
-                  {
-                    (activeSubscription && activeSubscription?.name === 'Elite' ) ? (
-                      <Form.Check type="switch" key={`video-only`} checked={recordingSettings?.video_recording === "enable"} value={"enable"} onChange={(event) => {
-                        setRecordingSettings({
-                          ...recordingSettings,
-                          video_recording: event.target.checked ? "enable" : "disabled"
-                        })
-                        updateRecodingType({
-                            custom_field: {
-                                video_recording: event.target.checked ? "enable" : "disabled"
-                            }
-                        });
-                      }} name={`custom_field[video_recording]`} />
-                    )
-                    :
-
-                    <Form.Check type="switch" key={`video-only`} disabled checked={false} value={"disabled"} onChange={(event) => {return false;}} name={`custom_field[video_recording]`} />
-                  }
-                  
-                </Card.Body>
-              </Card>
-
-              {/* Live Screen */}
-              <Card className="mb-3 live--card">
-                <Card.Body className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex gap-3 align-items-center">
-                    <FiMonitor />
-                    <h6 className="mb-1">Live Screen <small className="d-block">Real-time screen capture and live view</small></h6>
-                  </div>
-                  <Form.Check type="switch" key={`live-only`} checked={recordingSettings?.live_streaming === "enable"} value={"enable"} onChange={(event) => {
-                              setRecordingSettings({
-                                ...recordingSettings,
-                                live_streaming: event.target.checked ? "enable" : "disabled"
-                              })
-                              updateRecodingType({
-                                  custom_field: {
-                                      live_streaming: event.target.checked ? "enable" : "disabled"
-                                  }
-                              });
-                            }}   name={`custom_field[live_streaming]`}/>
-                </Card.Body>
-              </Card>
-
-              {/* Privacy Notice */}
-              <div className="mt-3">
-                <small>
-                  <strong>Access Notice:</strong> Time tracking data is only accessible to authorized users with roles that have <strong>View Team Time</strong> permission for your assigned team.
-                </small>
+          <Card className="mb-3 screenshot--card">
+            <Card.Body className="d-flex justify-content-between align-items-center">
+              <div className="d-flex gap-3 align-items-center">
+                <FiCamera />
+                <h6 className="mb-1"> Screenshots <small className="d-block">Capture 3 random screenshots every 10 minutes</small></h6>
               </div>
+              <Form.Check type="switch" key={`screenshot-only`} checked={recordingSettings?.screenshot_recording === "enable"} value={"enable"} name={`custom_field[screenshot_recording]`}
+                        onChange={(event) => {
+                          setRecordingSettings({
+                            ...recordingSettings,
+                            screenshot_recording: event.target.checked ? "enable" : "disabled"
+                          })
+                          updateRecodingType({
+                              custom_field: {
+                                  screenshot_recording: event.target.checked ? "enable" : "disabled"
+                              }
+                          });
+                        }} />
             </Card.Body>
           </Card>
+
+          {/* Screen Recording */}
+          <Card className="mb-3 recording--card">
+            <Card.Body className="d-flex justify-content-between align-items-center">
+              <div className="d-flex gap-3 align-items-center">
+                <FiVideo />
+                <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording while time tracking is running</small></h6>
+              </div>
+              {
+                (activeSubscription && activeSubscription?.name === 'Elite' ) ? (
+                  <Form.Check type="switch" key={`video-only`} checked={recordingSettings?.video_recording === "enable"} value={"enable"} onChange={(event) => {
+                    setRecordingSettings({
+                      ...recordingSettings,
+                      video_recording: event.target.checked ? "enable" : "disabled"
+                    })
+                    updateRecodingType({
+                        custom_field: {
+                            video_recording: event.target.checked ? "enable" : "disabled"
+                        }
+                    });
+                  }} name={`custom_field[video_recording]`} />
+                )
+                :
+
+                <Form.Check type="switch" key={`video-only`} disabled checked={false} value={"disabled"} onChange={(event) => {return false;}} name={`custom_field[video_recording]`} />
+              }
+              
+            </Card.Body>
+          </Card>
+
+          {/* Live Screen */}
+          <Card className="mb-3 live--card">
+            <Card.Body className="d-flex justify-content-between align-items-center">
+              <div className="d-flex gap-3 align-items-center">
+                <FiMonitor />
+                <h6 className="mb-1">Live Screen <small className="d-block">Real-time screen capture and live view</small></h6>
+              </div>
+              <Form.Check type="switch" key={`live-only`} checked={recordingSettings?.live_streaming === "enable"} value={"enable"} onChange={(event) => {
+                          setRecordingSettings({
+                            ...recordingSettings,
+                            live_streaming: event.target.checked ? "enable" : "disabled"
+                          })
+                          updateRecodingType({
+                              custom_field: {
+                                  live_streaming: event.target.checked ? "enable" : "disabled"
+                              }
+                          });
+                        }}   name={`custom_field[live_streaming]`}/>
+            </Card.Body>
+          </Card>
+
+          {/* Privacy Notice */}
+          <div className="mt-3">
+            <small>
+              <strong>Access Notice:</strong> Time tracking data is only accessible to authorized users with roles that have <strong>View Team Time</strong> permission for your assigned team.
+            </small>
+          </div>
         </Modal.Body>
       </Modal>
     </>

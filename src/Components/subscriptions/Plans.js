@@ -653,7 +653,7 @@ const showError = (name) => {
                   <div className="position-relative">
                     <Form.Group className="position-relative mb-0 form-group">
                       <Form.Label>Phone Number <sup className="text-danger">*</sup></Form.Label>
-                      <div className="d-flex align-items-start">
+                      <div className="d-flex">
                         {/* Country Selector */}
                         <div
                           className="border rounded px-3 py-2 d-flex align-items-center cursor-pointer me-2"
@@ -670,7 +670,7 @@ const showError = (name) => {
                     {/* Dropdown */}
                     {showDropdown && (
                       <div
-                        className="position-absolute bg-white border rounded mt-2 shadow"
+                        className="position-absolute number--list bg-white border rounded shadow"
                         style={{ width: "100%", zIndex: 1000 }}
                       >
                         
@@ -805,20 +805,13 @@ const showError = (name) => {
                     <Form.Check
                       type="checkbox"
                       name="agree"
-                      className=""
+                      className="ps-0"
                       checked={formData.agree}
                       id="terms-checkbox-input-plans"
                       onChange={handleChange}
                       label={
                         <>
-                          I agree to the{" "}
-                          <a href="https://primeteams.ai/terms-and-conditions/" target="_blank" rel="noreferrer">
-                            Terms & Conditions
-                          </a>{" "}
-                          and{" "}
-                          <a href="https://primeteams.ai/cancellation-refunds/" target="_blank" rel="noreferrer">
-                            Refund Policy
-                          </a>
+                          I agree to the&nbsp;<a href="https://primeteams.ai/terms-and-conditions/" target="_blank" rel="noreferrer">Terms & Conditions</a>&nbsp;and&nbsp;<a href="https://primeteams.ai/cancellation-refunds/" target="_blank" rel="noreferrer">Refund Policy</a>
                         </>
                       }
                       required

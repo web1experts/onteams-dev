@@ -884,11 +884,12 @@ input.form-control.br-red {
 .attendance--table--list .title--span strong,
 .attendance--table--list table td h4 small {
   cursor: pointer;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  max-width: 100%;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    overflow: hidden;
 }
 
 .project--grid--new--table td.new--td {
@@ -933,7 +934,8 @@ input.form-control.br-red {
 }
 
 .page--wrapper table td.project--title--td .title--span {
-  max-width: 165px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .page--wrapper table td.project--title--td span {
@@ -2747,15 +2749,17 @@ table tr.marked-project td {
   color: rgb(17 24 39);
   cursor: pointer;
   font-size: 1rem;
-  padding: .65rem 1rem .65rem 1rem;
+  padding: .65rem 1rem;
   text-align: left;
-  display: -webkit-box;
+  display: block;
+  white-space: normal;
+  /* display: -webkit-box;
   -webkit-line-clamp: 1;
   line-clamp: 1;
   white-space: normal;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
-  overflow: hidden;
+  overflow: hidden; */
   max-width: 100%;
   position: relative;
 }
@@ -8315,6 +8319,15 @@ ul#icon-tabs .nav-link span svg {
     line-height: 1rem;
 }
 
+.number--list {
+    width: 100%;
+    left: 0;
+    max-width: calc(100% - 24px);
+    right: 0;
+    margin: 0 auto;
+    margin-top: -10px;
+}
+
 .subscription--modal .list-group {
   gap: 1rem;
 }
@@ -9603,7 +9616,6 @@ Media CSS-=-==
     -webkit-line-clamp: 1;
     line-clamp: 1;
     -webkit-box-orient: vertical;
-    white-space: normal;
     white-space: normal;
   }
 
