@@ -16,6 +16,7 @@ import {
   Modal,
   Dropdown,
   Accordion,
+  ProgressBar
 } from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
 import { FaEye, FaPlay, FaPlus, FaCheck, FaHistory } from "react-icons/fa";
@@ -97,7 +98,7 @@ import { getActiveSubscription } from "../../redux/actions/subscription.action";
 import { Listmembers, updateMemberRecordingSettings, getRecordingTypes } from "../../redux/actions/members.action";
 import { getTeams } from "../../redux/actions/team.action";
 import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
-
+import ActivityOverviewChart from "./ActivityOverviewChart";
 
 function TimeTrackingPage() {
   const inputRef = useRef(null);
@@ -131,6 +132,8 @@ function TimeTrackingPage() {
     inactiveCount: 0,
     totalHours: 0,
   });
+  const[ showEvents, setShowEvents] = useState( false )
+  const [eventsData, setEventsData] = useState( false )
   const memberState = useSelector((state) => state.member);
   //  const [allMembers, setAllmembers] = useState([]);
   const handleShow = () => setShow(true);
@@ -261,15 +264,20 @@ useEffect(() => {
   }
 }, [subscriptionState.activeSubscription])
 
-// useEffect(() => {
-//   if (memberFeed && memberFeed.memberData) {
-//     const memberarray = [];
-//     memberFeed.memberData.forEach((member) => {
-//       memberarray.push({ value: member._id, label: member.name });
-//     });
-//     setAllmembers(memberarray);
-//   }
-// }, [memberFeed, dispatch]);
+const viewEvents = (metas) => {
+  if (metas?.length > 0) {
+    const eventMeta = metas.find(
+      (item) => item.meta_key === "events_data"
+    );
+
+    if (eventMeta?.meta_value) {
+
+      
+      setEventsData(eventMeta.meta_value);
+    }
+    setShowEvents( true )
+  }
+};
 
 useEffect(() => {
   if (teamsState && teamsState.teams) {
@@ -286,6 +294,16 @@ useEffect(() =>{
     })
   }
 }, [memberState?.recordingTypes])
+
+const maxMouse = Math.max(
+  ...((eventsData?.[0]?.events_count || []).map((l) => l?.mouse_click_count || 0)),
+  1
+);
+
+const maxKeyboard = Math.max(
+  ...((eventsData?.[0]?.events_count || []).map((l) => l?.keyboard_count || 0)),
+  1
+);
 
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
@@ -1715,13 +1733,16 @@ const getMembersFromTeams = (selectedTeamIds) => {
                 value={filters?.["timezone"] || "company"}
               >
                 <optgroup label="Organization time zone">
-                  <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option> 
+                  <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
                 </optgroup>  
                 <optgroup label="Member's time zone">
-                  <option value={'member'}>{timezonesData[currentActivity?.usermeta?.timezone] || 'Asia/Kolkata'}</option> 
+                  <option value={'member'}>{timezonesData[currentActivity?.usermeta?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
                 </optgroup> 
                 <optgroup label="My time zone">
-                  <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>  
+                  <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'UTC+05:30'}</option>  
                 </optgroup>  
               </Form.Select>
             </ListGroup.Item>
@@ -2933,6 +2954,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                     </span>
                                     {recording?.project?.title}
                                   </strong>
+                                  
                                   <strong className="activity-type-text d-flex align-items-center gap-2">
                                     
                                     <HiOutlineLightningBolt /> {recording?.type}
@@ -2985,6 +3007,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             </div>
                             <Accordion.Body>
                               <div className="shots--list">
+                                <Button className="view-events" variant="primary" onClick={() => viewEvents(recording.activityMeta)}>View Events</Button>
                                 <div className="text-end">
                                   {selectedScreenshots &&
                                     Object.keys(selectedScreenshots).length >
@@ -3405,6 +3428,139 @@ const getMembersFromTeams = (selectedTeamIds) => {
           </div>
         </div>
       )}
+
+      {
+        (showEvents === true) && (
+          <Modal
+            show={showEvents}
+            onHide={() => {setShowEvents(false); setEventsData(false)}}
+            centered
+            size="xl"
+            className=""
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Activity Events</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Card>
+                <Card.Body>
+                  
+                  <ListGroup>
+                    <ListGroup.Item className="pb-5">
+                      <ActivityOverviewChart eventsData={eventsData} />
+                    </ListGroup.Item>
+                  </ListGroup>
+                    <ListGroup className="mt-2">
+                    <ListGroup.Item>
+                      Per-Minute Log
+                    </ListGroup.Item>
+                    {/* Header */}
+                      <ListGroup.Item className="bg-light fw-semibold">
+                        <Row className="align-items-center">
+                          <Col md={2}>TIME</Col>
+
+                          <Col md={4}>
+                            <div className="d-flex align-items-center gap-2">
+                              <i className="bi bi-mouse text-primary"></i>
+                              MOUSE CLICKS
+                            </div>
+                          </Col>
+
+                          <Col md={4}>
+                            <div className="d-flex align-items-center gap-2">
+                              <i className="bi bi-keyboard text-success"></i>
+                              KEYSTROKES
+                            </div>
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+                       
+                      {/* Rows */}
+                      {eventsData[0]?.events_count?.map((log, index) => (
+                        <ListGroup.Item>
+                          <Row className="align-items-center">
+
+                            {/* Time */}
+                            <Col md={2}>
+                              <span
+                                style={{
+                                  fontWeight: 700,
+                                  letterSpacing: "1px",
+                                  fontSize: "18px",
+                                }}
+                              >
+                              {log?.time
+                                ? new Date(log.time).toLocaleTimeString("en-GB", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: false,
+                                  })
+                                : ""}
+                              </span>
+                            </Col>
+
+                            <Col md={4}>
+                              <div className="d-flex align-items-center gap-3">
+                                <ProgressBar
+                                  now={(log.mouse_click_count / maxMouse) * 100}
+                                  style={{
+                                    height: "12px",
+                                    width: "220px",
+                                    borderRadius: "20px",
+                                  }}
+                                  variant="success"
+                                />
+
+                                <span
+                                  style={{
+                                    minWidth: "30px",
+                                    fontWeight: 600,
+                                    fontSize: "18px",
+                                  }}
+                                >
+                                  {log.mouse_click_count}
+                                </span>
+                              </div>
+                            </Col>
+
+                            {/* Keyboard */}
+                            <Col md={4}>
+                              <div className="d-flex align-items-center gap-3">
+                                <ProgressBar
+                                  now={(log.keyboard_count / maxKeyboard) * 100}
+                                  style={{
+                                    height: "12px",
+                                    width: "220px",
+                                    borderRadius: "20px",
+                                  }}
+                                  variant="success"
+                                />
+
+                                <span
+                                  style={{
+                                    minWidth: "30px",
+                                    fontWeight: 600,
+                                    fontSize: "18px",
+                                  }}
+                                >
+                                  {log.keyboard_count}
+                                </span>
+                              </div>
+                            </Col>
+
+                         </Row>
+                        </ListGroup.Item>
+                      ))}
+                      
+                       
+                  </ListGroup>
+                  
+                </Card.Body>
+              </Card>
+            </Modal.Body>
+            </Modal>
+        )
+      }
       {/*--=-=Filter Modal**/}
       <Modal
         show={showFilter}

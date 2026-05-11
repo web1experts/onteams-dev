@@ -837,9 +837,9 @@ const setDefaultMemberRole = () => {
         }
       });
 
-      if(fields?.selected_teams && fields?.selected_teams?.length === 0 || !fields?.selected_teams ){
-        fieldErrors["selected_teams"] = "Please select at least one team.";
-      }
+      // if(fields?.selected_teams && fields?.selected_teams?.length === 0 || !fields?.selected_teams ){
+      //   fieldErrors["selected_teams"] = "Please select at least one team.";
+      // }
 
       // Check if there are any errors
       const hasError = Object.keys(fieldErrors).length > 0;
