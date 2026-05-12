@@ -88,7 +88,8 @@ const DateTimeCard = (props) => {
           <FiClock /> {formatTime(currentTime)}
         </h3>
         <p className="justify-content-start justify-content-xl-end">
-          <HiOutlineLocationMarker /> {timezonesData[current_dashboard.timezone] || 'Asia/Kolkata'}
+          <HiOutlineLocationMarker /> {timezonesData[current_dashboard.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}
         </p>
         <h4>
           <FiCalendar /> {formatDate(currentTime)}

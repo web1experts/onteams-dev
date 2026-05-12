@@ -11,20 +11,20 @@ Sidebar CSS-=-=
 }
 
 .panel--sidebar {
-  max-width: 16rem;
+  max-width: 15rem;
   flex: 1 1 100%;
   background: linear-gradient(to bottom right, #0f172a, #1e293b);
   border-right: 1px solid rgb(239, 239, 239);
   position: fixed;
-  width: 16rem;
-  min-width: 16rem;
+  width: 15rem;
+  min-width: 15rem;
   z-index: 1;
 }
 
 .team--page {
   flex: 1 1 100%;
-  max-width: calc(100% - 16rem);
-  margin-left: 16rem;
+  max-width: calc(100% - 15rem);
+  margin-left: 15rem;
 }
 
 .navbar-brand {

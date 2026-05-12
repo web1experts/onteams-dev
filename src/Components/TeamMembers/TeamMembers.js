@@ -940,7 +940,7 @@ const setDefaultMemberRole = () => {
                 {activeTab}
                 <ListGroup horizontal className={isActive ? "d-none" : "me-2 ms-auto d-none d-xl-flex" }>
                   <ListGroup horizontal>
-                    <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</ListGroup.Item>
+                    <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Members</ListGroup.Item>
                     {(memberProfile?.role?.permissions?.members
                       ?.create_edit_delete === true) && (
                       <ListGroup.Item className="d-none d-md-flex gap-2 align-items-center" action active={activeTab === "Invitations"} onClick={() => {setsearchTerm("");setActiveTab("Invitations");}}><FiMail /> Invitations</ListGroup.Item>
@@ -1052,7 +1052,7 @@ const setDefaultMemberRole = () => {
                           
                       )
                     }
-                  <ListGroup.Item className="d-none d-xl-flex ms-3">
+                  <ListGroup.Item className="d-none d-xl-flex">
                     
                     <Form className="search-filter-list" onSubmit={(e) => {e.preventDefault();}}>
                       <Form.Group className="mb-0 form-group">
@@ -2053,7 +2053,7 @@ const setDefaultMemberRole = () => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <div className="drop--scroll">
-                    <Dropdown.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Team Members</Dropdown.Item>
+                    <Dropdown.Item className="d-flex gap-2 align-items-center dropdown-item" action active={activeTab === "Members"} onClick={() => {setsearchTerm("");setActiveTab("Members");}}><AiOutlineTeam /> Members</Dropdown.Item>
                     {(memberProfile?.role?.permissions?.members
                       ?.create_edit_delete === true ||
                       memberProfile?.role?.slug === "owner") && (

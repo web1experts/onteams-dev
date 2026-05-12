@@ -1350,7 +1350,6 @@ const formattedDate = (date) => {
                     </ListGroup.Item>
                     {
                       (filters['sort_by'] === 'members') && (
-                        <ListGroup>
                           <ListGroup.Item>
                             <Form.Select
                               className="custom-group-selectbox"
@@ -1360,20 +1359,20 @@ const formattedDate = (date) => {
                               value={filters?.["timezone"] || "company"}
                             >
                               <optgroup label="Organization time zone">
-                                <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option> 
+                                <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option> 
                               </optgroup> 
                               <optgroup label="My time zone">
-                                <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>  
+                                <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option>  
                               </optgroup>  
                                   
                             </Form.Select>
                           </ListGroup.Item>
-                        </ListGroup>
+                        
                       )
                     }
-                    <ListGroup
-                      horizontal
-                      className="bg-white expand--icon d-flex"
+                    <ListGroup horizontal className="bg-white expand--icon d-flex"
                     >
                       <ListGroup.Item
                         className="d-flex d-xxl-none"
@@ -1821,8 +1820,7 @@ const formattedDate = (date) => {
             </ListGroup>
             {
               (filters['sort_by'] === 'members') && (
-                <ListGroup>
-                  <ListGroup.Item>
+                  <ListGroup.Item className="timezone--drop">
                     <Form.Select
                       className="custom-group-selectbox"
                       onChange={(event) => {
@@ -1832,18 +1830,21 @@ const formattedDate = (date) => {
                       value={filters?.["timezone"] || "company"}
                     >
                       <optgroup label="Organization time zone">
-                        <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option> 
+                        <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option> 
                       </optgroup>  
                       <optgroup label="Member's time zone">
-                        <option value={'member'}>{timezonesData[singleMemberReport?.member?.usermeta?.timezone] || 'Asia/Kolkata'}</option> 
+                        <option value={'member'}>{timezonesData[singleMemberReport?.member?.usermeta?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option> 
                       </optgroup> 
                       <optgroup label="My time zone">
-                        <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>  
+                        <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option>  
                       </optgroup>  
                           
                     </Form.Select>
                   </ListGroup.Item>
-                </ListGroup>
+                
               )
             }
             

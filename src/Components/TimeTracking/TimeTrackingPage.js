@@ -1724,7 +1724,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
     if (activeInnerTab === "InnerRecorded") {
       return (
         <>
-            <ListGroup.Item>
+            <ListGroup.Item className="timezone--drop">
               <Form.Select
                 className="custom-group-selectbox"
                 onChange={(event) => 
@@ -2028,10 +2028,12 @@ const getMembersFromTeams = (selectedTeamIds) => {
                               value={filters?.["timezone"] || "company"}
                             >
                               <optgroup label="Organization time zone">
-                                <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option> 
+                                <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option> 
                               </optgroup>  
                               <optgroup label="My time zone">
-                                <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>  
+                                <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option>  
                               </optgroup>  
                               {/* <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
                               <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>    */}
