@@ -15,6 +15,7 @@ const ShiftDetailsModal = (props) => {
   const [editingIndex, setEditingIndex] = useState(null);
     const [shiftName, setShiftName] = useState("");
   const [startTime, setStartTime] = useState("00:00");
+  const [windowTime, setWindowTime] = useState("00:00");
   const [endTime, setEndTime] = useState("00:00");
   const [error, setError] = useState("");
 
@@ -34,8 +35,8 @@ const ShiftDetailsModal = (props) => {
     };
 
     const endTimeFormatted = useMemo(() => {
-        return calculateEndTime(startTime);
-    }, [startTime]);
+        return calculateEndTime(windowTime);
+    }, [windowTime]);
 
   const formatTime = (time) => {
     const [h, m] = time.split(":");
@@ -48,12 +49,11 @@ const ShiftDetailsModal = (props) => {
   };
 
   const dynamicText = useMemo(() => {
-    return `Attendance window: Between ${formatTime(startTime)} and ${endTimeFormatted} (next day)
-
-    Example: If shift starts at ${formatTime(
-        startTime
-    )}, all entries between ${formatTime(startTime)} and ${endTimeFormatted} are counted for the same attendance day.`;
-    }, [startTime]);
+    return `Attendance window:  
+      ${formatTime(windowTime)} -> ${endTimeFormatted}
+        All time entries within this window belong to the same attendance day.
+    `;
+    }, [windowTime]);
 
 
   useEffect(() => {
@@ -111,8 +111,9 @@ const ShiftDetailsModal = (props) => {
 
     const newShift = {
         name: shiftName,
+        windowTime,
       startTime,
-      endTime: calculateEndTime(startTime)
+      endTime//: calculateEndTime(startTime)
     };
     setLoading( true )
     if (editingIndex !== null) {
@@ -120,6 +121,7 @@ const ShiftDetailsModal = (props) => {
       updated[editingIndex]['name'] = newShift['name'];
       updated[editingIndex]['startTime'] = newShift['startTime'];
       updated[editingIndex]['endTime'] = newShift['endTime'];
+      updated[editingIndex]['windowTime'] = newShift['windowTime'];
       setShifts(updated);
       dispatch(handleSaveShifts({shifts: updated[editingIndex]}))
     } else {
@@ -145,6 +147,7 @@ const ShiftDetailsModal = (props) => {
     setShiftName(shift.name);
     setStartTime(shift.startTime);
     setEndTime(shift.endTime)
+    setWindowTime(shift.windowTime || '00:00')
     setEditingIndex(index);
     setShowForm(true);
   };
@@ -155,6 +158,23 @@ const ShiftDetailsModal = (props) => {
     setShifts(updated);
     dispatch(deleteShift(id))
   };
+
+  const getWindowEndTime = (windowTime) => {
+        const [hours, minutes] = windowTime.split(":").map(Number);
+
+        // Create date from windowTime
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+
+        // Add 23 hours 59 minutes
+        date.setHours(date.getHours() + 23);
+        date.setMinutes(date.getMinutes() + 59);
+
+        const endHours = String(date.getHours()).padStart(2, "0");
+        const endMinutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${endHours}:${endMinutes}`;
+    }
 
   return (
     <>
@@ -176,6 +196,7 @@ const ShiftDetailsModal = (props) => {
                     <th>Name</th>
                     <th>Start Time</th>
                     <th>End Time</th>
+                    <th>Break Window</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -185,6 +206,7 @@ const ShiftDetailsModal = (props) => {
                       <td>{shift?.name}</td>
                       <td>{formatTime(shift.startTime)}</td>
                       <td>{formatTime(shift.endTime)}</td>
+                      <td>{formatTime(shift?.windowTime || '00:00')} - {getWindowEndTime(shift?.windowTime || '00:00')}</td>
                       <td>
                         <BsPencil
                           style={{ cursor: "pointer", marginRight: 10 }}
@@ -238,10 +260,11 @@ const ShiftDetailsModal = (props) => {
                 </Col>
 
                 <Col>
-                  <Form.Label>End Time (Auto)</Form.Label>
-                  <Form.Control type="time" readOnly disabled value={endTimeFormatted} //onChange={(e) => setEndTime(e.target.value)} 
+                  <Form.Label>End Time</Form.Label>
+                  <Form.Control type="time" readOnly value={endTime} onChange={(e) => setEndTime(e.target.value)} 
                   />
                 </Col>
+                <p className="mt-2">Tracked to identify late arrivals, early departures, and overtime.</p>
               </Row>
 
               {error && <Alert variant="danger">{error}</Alert>}
@@ -252,12 +275,17 @@ const ShiftDetailsModal = (props) => {
                   <Form.Label>When does the attendance day reset?</Form.Label>
                   <Form.Control
                     type="time"
-                    value={startTime}
+                    value={windowTime}
+                    onChange={(e) => setWindowTime(e.target.value)}
                   />
                 </Col>
               </Row>
               <Alert variant="warning" style={{ whiteSpace: "pre-line" }}>
                 {dynamicText}
+              </Alert>
+              <Alert variant="warning" style={{ whiteSpace: "pre-line" }}>
+                Example:
+                Night Shift: Work hours 21:00–06:00, day resets at 05:00. An employee clocking in at 02:00 is counted under the previous calendar date.
               </Alert>
             </div>
           </>

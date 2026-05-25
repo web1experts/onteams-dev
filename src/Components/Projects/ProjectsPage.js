@@ -1218,7 +1218,7 @@ function ProjectsPage() {
                             My Projects
                           </option>
                          
-                          {(Object.keys(memberProfile?.role?.permissions?.assigned_teams?.selected_team_members)?.length > 0 ) && (
+                          {(memberProfile?.role?.permissions?.assigned_teams?.selected_team_members && Object.keys(memberProfile?.role?.permissions?.assigned_teams?.selected_team_members)?.length > 0 ) && (
                             <option key={`member-projects-all`} value={"all"}>
                               All Members
                             </option>

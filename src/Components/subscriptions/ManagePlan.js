@@ -172,7 +172,7 @@ export default function ManagePlan() {
       }
     }, [options])
 
-  useEffect(() => { console.log('gets plans')
+  useEffect(() => { 
     setPlans(getPlans(stripeMode))
   }, [stripeMode])
 

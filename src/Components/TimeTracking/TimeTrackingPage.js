@@ -99,6 +99,7 @@ import { Listmembers, updateMemberRecordingSettings, getRecordingTypes } from ".
 import { getTeams } from "../../redux/actions/team.action";
 import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 import ActivityOverviewChart from "./ActivityOverviewChart";
+import PaginatedList from "./PaginatedList";
 
 function TimeTrackingPage() {
   const inputRef = useRef(null);
@@ -509,10 +510,15 @@ const maxKeyboard = Math.max(
     }
 
     if (
-      reportState.manualTimeList &&
-      Object.keys(reportState.manualTimeList)?.length
+      reportState.manualTimeList 
     ) {
-      setManualListCount(Object.keys(reportState.manualTimeList)?.length);
+      // setManualListCount(Object.keys(reportState.manualTimeList)?.length);
+      setManualListCount(
+        Object.values(reportState.manualTimeList || {}).reduce(
+          (total, value) => total + (Array.isArray(value) ? value.length : 0),
+          0
+        )
+      );
     }
   }, [reportState]);
 
@@ -1752,6 +1758,15 @@ const getMembersFromTeams = (selectedTeamIds) => {
               <Button
                 variant="secondary"
                 className="btn--view"
+                key={"activity-tab-key"}
+                active={screenshotTab === "Activity"}
+                onClick={() => setScreenshotTab("Activity")}
+              >
+                <TbScreenshot className="me-1" /> Activities
+              </Button>
+              <Button
+                variant="secondary"
+                className="btn--view"
                 key={"screenshots1-tab-key"}
                 active={screenshotTab === "Screenshots"}
                 onClick={() => setScreenshotTab("Screenshots")}
@@ -1785,6 +1800,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                     <MdOutlineVideoLibrary className="me-1" /> Videos
                   </Button>
               }
+              
             </ListGroup>
           </ListGroup>
         </>
@@ -2651,7 +2667,17 @@ const getMembersFromTeams = (selectedTeamIds) => {
                   <>
                 <Dropdown.Toggle variant="link" id="dropdown-basic">
                   <div className="title--initial">
-                    {currentActivity?.name?.charAt(0)}
+                    {currentActivity?.avatar &&
+                      currentActivity?.avatar !== null ? (
+                        <span>
+                          <img
+                          src={currentActivity?.avatar}
+                          alt={"member-avatar"}
+                        />
+                      </span>
+                    ) : (
+                      currentActivity?.name?.charAt(0)
+                    )}
                     {currentActivity?.latestActivity?.status ? (
                       <p className="anim--circle">
                         <small className="status--circle active--color"></small>
@@ -2689,7 +2715,17 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             }
                           >
                             <div className="title--initial">
-                              {activity?.name?.charAt(0)}
+                              {activity?.avatar &&
+                                activity?.avatar !== null ? (
+                                  <span>
+                                    <img
+                                    src={activity?.avatar}
+                                    alt={"member-avatar"}
+                                  />
+                                </span>
+                              ) : (
+                                activity?.name?.charAt(0)
+                              )}
                                {activity?.latestActivity?.status ? (
                                   <p className="anim--circle">
                                     <small className="status--circle active--color"></small>
@@ -3009,7 +3045,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             </div>
                             <Accordion.Body>
                               <div className="shots--list">
-                                <Button className="view-events" variant="primary" onClick={() => viewEvents(recording.activityMeta)}>View Events</Button>
+                                
                                 <div className="text-end">
                                   {selectedScreenshots &&
                                     Object.keys(selectedScreenshots).length >
@@ -3406,7 +3442,228 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                           </>
                                         );
                                       }
+                                      if (
+                                        screenshotTab === "Activity" &&
+                                        meta.meta_key === "events_data" &&
+                                        meta.meta_value.length > 0
+                                      ) {
+                                        return (
+                                          <>
+                                            <div className="row">
+                                                <div className="col-md-12">
+                                                <ListGroup>
+                                                  <ListGroup.Item className="pb-5">
+                                                    <ActivityOverviewChart eventsData={meta.meta_value} />
+                                                  </ListGroup.Item>
+                                                </ListGroup>
+                                                  <ListGroup className="mt-2">
+                                                  <ListGroup.Item>
+                                                    Per-Minute Log
+                                                  </ListGroup.Item>
+                                                  {/* Header */}
+                                                    <ListGroup.Item className="bg-light fw-semibold">
+                                                      <Row className="align-items-center">
+                                                        <Col md={2}>TIME</Col>
 
+                                                        <Col md={4}>
+                                                          <div className="d-flex align-items-center gap-2">
+                                                            <i className="bi bi-mouse text-primary"></i>
+                                                            MOUSE CLICKS
+                                                          </div>
+                                                        </Col>
+
+                                                        <Col md={4}>
+                                                          <div className="d-flex align-items-center gap-2">
+                                                            <i className="bi bi-keyboard text-success"></i>
+                                                            KEYSTROKES
+                                                          </div>
+                                                        </Col>
+                                                      </Row>
+                                                    </ListGroup.Item>
+                                                    
+                                                    {/* 
+                                                    { meta.meta_value[0]?.events_count?.map((log, index) => (
+                                                      <ListGroup.Item>
+                                                        <Row className="align-items-center">
+
+                                                         
+                                                          <Col md={2}>
+                                                            <span
+                                                              style={{
+                                                                fontWeight: 700,
+                                                                letterSpacing: "1px",
+                                                                fontSize: "18px",
+                                                              }}
+                                                            >
+                                                            {log?.time
+                                                              ? new Date(log.time).toLocaleTimeString("en-GB", {
+                                                                  hour: "2-digit",
+                                                                  minute: "2-digit",
+                                                                  hour12: false,
+                                                                })
+                                                              : ""}
+                                                            </span>
+                                                          </Col>
+
+                                                          <Col md={4}>
+                                                            <div className="d-flex align-items-center gap-3">
+                                                              <ProgressBar
+                                                                now={(log.mouse_click_count / maxMouse) * 100}
+                                                                style={{
+                                                                  height: "12px",
+                                                                  width: "220px",
+                                                                  borderRadius: "20px",
+                                                                }}
+                                                                variant="success"
+                                                              />
+
+                                                              <span
+                                                                style={{
+                                                                  minWidth: "30px",
+                                                                  fontWeight: 600,
+                                                                  fontSize: "18px",
+                                                                }}
+                                                              >
+                                                                {log.mouse_click_count}
+                                                              </span>
+                                                            </div>
+                                                          </Col>
+
+                                                         
+                                                          <Col md={4}>
+                                                            <div className="d-flex align-items-center gap-3">
+                                                              <ProgressBar
+                                                                now={(log.keyboard_count / maxKeyboard) * 100}
+                                                                style={{
+                                                                  height: "12px",
+                                                                  width: "220px",
+                                                                  borderRadius: "20px",
+                                                                }}
+                                                                variant="success"
+                                                              />
+
+                                                              <span
+                                                                style={{
+                                                                  minWidth: "30px",
+                                                                  fontWeight: 600,
+                                                                  fontSize: "18px",
+                                                                }}
+                                                              >
+                                                                {log.keyboard_count}
+                                                              </span>
+                                                            </div>
+                                                          </Col>
+
+                                                      </Row>
+                                                      </ListGroup.Item>
+                                                    )) */}
+                                                    
+                                                    <PaginatedList
+                                                      data={
+                                                        meta.meta_value[0]?.events_count || []
+                                                      }
+                                                      rowsPerPage={10}
+                                                      renderItem={(log, index) => (
+                                                        <ListGroup.Item key={index}>
+                                                          <Row className="align-items-center">
+
+                                                            {/* Time */}
+                                                            <Col md={2}>
+                                                              <span
+                                                                style={{
+                                                                  fontWeight: 700,
+                                                                  letterSpacing: "1px",
+                                                                  fontSize: "18px",
+                                                                }}
+                                                              >
+                                                                {log?.time
+                                                                  ? new Date(
+                                                                      log.time
+                                                                    ).toLocaleTimeString(
+                                                                      "en-GB",
+                                                                      {
+                                                                        hour: "2-digit",
+                                                                        minute: "2-digit",
+                                                                        hour12: false,
+                                                                      }
+                                                                    )
+                                                                  : ""}
+                                                              </span>
+                                                            </Col>
+
+                                                            {/* Mouse */}
+                                                            <Col md={4}>
+                                                              <div className="d-flex align-items-center gap-3">
+
+                                                                <ProgressBar
+                                                                  now={
+                                                                    (log.mouse_click_count /
+                                                                      maxMouse) *
+                                                                    100
+                                                                  }
+                                                                  style={{
+                                                                    height: "12px",
+                                                                    width: "220px",
+                                                                    borderRadius: "20px",
+                                                                  }}
+                                                                  variant="success"
+                                                                />
+
+                                                                <span
+                                                                  style={{
+                                                                    minWidth: "30px",
+                                                                    fontWeight: 600,
+                                                                    fontSize: "18px",
+                                                                  }}
+                                                                >
+                                                                  {log.mouse_click_count}
+                                                                </span>
+
+                                                              </div>
+                                                            </Col>
+
+                                                            {/* Keyboard */}
+                                                            <Col md={4}>
+                                                              <div className="d-flex align-items-center gap-3">
+
+                                                                <ProgressBar
+                                                                  now={
+                                                                    (log.keyboard_count /
+                                                                      maxKeyboard) *
+                                                                    100
+                                                                  }
+                                                                  style={{
+                                                                    height: "12px",
+                                                                    width: "220px",
+                                                                    borderRadius: "20px",
+                                                                  }}
+                                                                  variant="success"
+                                                                />
+
+                                                                <span
+                                                                  style={{
+                                                                    minWidth: "30px",
+                                                                    fontWeight: 600,
+                                                                    fontSize: "18px",
+                                                                  }}
+                                                                >
+                                                                  {log.keyboard_count}
+                                                                </span>
+
+                                                              </div>
+                                                            </Col>
+
+                                                          </Row>
+                                                        </ListGroup.Item>
+                                                      )}
+                                                    />
+                                                    
+                                                </ListGroup>
+                                            </div>
+                                            </div>
+                                          </>
+                                        )
+                                      }
                                       return null; // Return null if no condition is met
                                     })
                                   ) : (

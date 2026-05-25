@@ -96,6 +96,20 @@ function WorkspaceForm(props) {
     selectboxObserver()
   }, []);
 
+  useEffect(() => {
+      if( workspace.success ){ 
+        if (window.gtag) {
+            window.gtag('event', 'workspace_created', {
+                method: 'website'
+            });
+        }
+        if (window.fbq) {
+          window.fbq('trackCustom', 'WorkspaceCreated');
+        }
+        
+      }
+  },[workspace])
+
   return (
     <Form onSubmit={handleSubmit}>
       {

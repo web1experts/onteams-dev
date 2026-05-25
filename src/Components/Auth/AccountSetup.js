@@ -123,10 +123,27 @@ function AccountSetup() {
     useEffect(() => {
         
         if( apiResult.token && apiResult.token !== ""){
+            if (window.gtag) {
+                window.gtag('event', 'successful_sign_up', {
+                    method: 'website'
+                });
+                // Meta Pixel Event
+                if (window.fbq) {
+                    window.fbq('track', 'CompleteRegistration');
+                }
+            }
             setCompanyForm(true)
         }
 
         if( workspace.success ){ 
+            if (window.gtag) {
+                window.gtag('event', 'workspace_created', {
+                    method: 'website'
+                });
+            }
+            if (window.gtag) {
+                window.fbq('trackCustom', 'WorkspaceCreated');
+            }
             setTimeout(function(){
                 navigate('/plans')
             },1000)
