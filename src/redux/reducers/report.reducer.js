@@ -10,7 +10,8 @@ import {
   PROJECT_REPORTS_LIST_SUCCESS,
   CLEAR_MESSAGES,
   REPORTS_REMARKS_SUCCESS,
-  MEMBER_REPORT_SUCCESS
+  MEMBER_REPORT_SUCCESS,
+  SINGLE_PROJECT_REPORTS
 } from "../actions/types";
 
 const initialState = {
@@ -77,6 +78,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         singleProjectReport: action.payload.projectReport,
+      };
+    case SINGLE_PROJECT_REPORTS:
+      return {
+        ...state,
+        singleProjectReports: action.payload.singleprojectReports,
       };
     case REPORTS_ERROR:
       return {

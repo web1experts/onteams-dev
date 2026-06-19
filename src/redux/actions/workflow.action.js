@@ -30,10 +30,10 @@ function errorRequest(err, dispatch) {
   }
 }
 
-export const ListWorkflows = (currentPage = 0, searchterm = "") => {
+export const ListWorkflows = (payload = {}) => {
     return async (dispatch) => {
         try{
-            const response = await API.apiGet('workflow', { search: searchterm, currentPage:currentPage });
+            const response = await API.apiGet('workflow', payload);
             if(response.data && response.data.success){
             await dispatch({ type: WORKFLOW_GET_SUCCESS, payload: response.data })
             }else{

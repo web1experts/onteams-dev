@@ -113,9 +113,9 @@ function Invitation(props) {
 
     // setTimeout(() => {
       if(selectedInvitation?.role?._id === roles?.[0]?._id ){
-        handleClickRoles(roles?.[0]?._id)
-      }else{
         handleClickRoles(roles?.[1]?._id)
+      }else{
+        handleClickRoles(roles?.[0]?._id)
       }
       
     // },700)
@@ -184,11 +184,13 @@ function Invitation(props) {
   const handleInvitationList = async () => {
     if (props.activeTab === "Invitations") {
       setInvitationsFeed([]);
-
+      setShowloader(true);
       await dispatch(
         listCompanyinvite(currentPage, props.listfor, props.searchTerm),
       );
-      setShowloader(false);
+      setTimeout(() => {
+        setShowloader(false);
+      }, 1500);
     }
   };
 
@@ -607,7 +609,7 @@ function Invitation(props) {
                         : "project--table new--project--rows table-responsive-xl"
                   }
                 >
-                  {invitationsFeeds && invitationsFeeds.length > 0 ? (
+                  {!showloader && invitationsFeeds && invitationsFeeds.length > 0 ? (
                     <Table>
                       <thead className="onHide">
                         <tr key="project-table-header">

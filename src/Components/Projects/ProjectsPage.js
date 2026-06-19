@@ -103,6 +103,7 @@ function ProjectsPage() {
   const inputRef = useRef(null);
   const memberProfile = currentMemberProfile();
   const [isActiveView, setIsActiveView] = useState(2);
+  const [isWorkflowSetup, setIsWorkflowSetup] = useState( false )
   const [customFields, setCustomFields] = useState([]);
   const [spinner, setSpinner] = useState(true);
   const [clientcustomFields, setClientCustomFields] = useState([]);
@@ -366,6 +367,7 @@ function ProjectsPage() {
       setselectedMembers({});
       setImagePreviews([]);
     }
+    setIsWorkflowSetup( false )
     setShow(true);
   };
 
@@ -826,15 +828,29 @@ function ProjectsPage() {
             handleListProjects();
           }
         } else {
-          setProjects((prevProjects) =>
-            prevProjects
-              .map((project) =>
-                project._id === apiResult.updatedProject._id
-                  ? apiResult.updatedProject
-                  : project
-              )
-              .filter((project) => project.status === filters["status"])
-          );
+          // setProjects((prevProjects) =>
+          //   prevProjects
+          //     .map((project) =>
+          //       project._id === apiResult.updatedProject._id
+          //         ? apiResult.updatedProject
+          //         : project
+          //     )
+          //     .filter((project) => project.status === filters["status"])
+          // );
+
+          setProjects((prevProjects) => {
+            const updatedProjects = prevProjects.map((project) =>
+              project._id === apiResult.updatedProject._id
+                ? apiResult.updatedProject
+                : project
+            );
+
+            return filters["status"] === "all"
+              ? updatedProjects
+              : updatedProjects.filter(
+                  (project) => project.status === filters["status"]
+                );
+          });
 
           setCurrentProject((prev) =>
             apiResult.updatedProject.status === filters["status"]
@@ -1377,6 +1393,7 @@ function ProjectsPage() {
                           key={`workflow-settingskey`}
                           onClick={() => {
                             dispatch(updateStateData(DIRECT_UPDATE, false));
+                            setIsWorkflowSetup(true);
                             dispatch(togglePopups("workflow", true));
                           }}
                         >
@@ -2573,6 +2590,7 @@ function ProjectsPage() {
                 key={`work-settingskey`}
                 onClick={() => {
                   dispatch(updateStateData(DIRECT_UPDATE, true));
+                  setIsWorkflowSetup( false )
                   dispatch(togglePopups("workflow", true));
                 }}
               >
@@ -2953,7 +2971,7 @@ function ProjectsPage() {
         />
       )}
       {commonState?.membersModal && <MemberModal isedit={isEdit} />}
-      {commonState?.workflowmodal && <WorkFlowModal tab={isActive === 0 ? 'new': 'current'} />}
+      {commonState?.workflowmodal && <WorkFlowModal tab={isActive === 0 ? 'new': 'current'} mod={isWorkflowSetup} />}
       {commonState?.filesmodal && <FilesModal />}
       {showPreview && (
         <FilesPreviewModal

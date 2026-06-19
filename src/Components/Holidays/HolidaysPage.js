@@ -516,7 +516,6 @@ function HolidaysPage() {
             </span>
             <strong>
               Add Holiday{" "}
-              <small>Add upcoming holidays to keep schedules aligned</small>
             </strong>
           </Modal.Title>
         </Modal.Header>

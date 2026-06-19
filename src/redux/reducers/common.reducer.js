@@ -213,7 +213,7 @@ case TASK_FORM: {
             taskmodal: action.payload
         }
     case RESET_FORMS: 
-    if(action.payload === "edit_project"){ console.log('reset project')
+    if(action.payload === "edit_project"){ 
         return {
             ...state,
             currentProject: false,

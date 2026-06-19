@@ -13,7 +13,8 @@ import {
   MANUAL_TIME_LIST,
   MANUAL_ENTRY_DATA,
   REPORTS_META_SUCCESS,
-  MEMBER_REPORT_SUCCESS
+  MEMBER_REPORT_SUCCESS,
+  SINGLE_PROJECT_REPORTS
 } from "./types";
 // console.log('Environment : ', process.env.NODE_ENV)
 const config = {
@@ -76,7 +77,25 @@ export const getSingleMemberReport = (payload) => {
   };
 };
 
-export const gerReportsByProject = (filters) => {
+export const getallReportsofProject = (filters) => {
+  return async (dispatch) => {
+    try {
+      const response = await API.apiGet("reports/project", filters);
+      if (response.data && response.data.success) {
+        await dispatch({
+          type: SINGLE_PROJECT_REPORTS,
+          payload: response.data,
+        });
+      } else {
+        await dispatch({ type: REPORTS_ERROR, payload: response.data.message });
+      }
+    } catch (err) {
+      errorRequest(err, dispatch);
+    }
+  };
+};
+
+export const getReportsByProject = (filters) => {
   return async (dispatch) => {
     try {
       const response = await API.apiGet("reports", filters);

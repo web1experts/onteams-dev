@@ -18,7 +18,7 @@ const AttendanceSettingsModal = ({ show, toggle }) => {
           onSelect={(k) => setActiveTab(k)}
           className="mb-3"
         >
-          <Tab eventKey="attendance" title="Attendance Rule">
+          <Tab eventKey="attendance" title="Attendance Rules">
             <AttendanceStatusManager />
           </Tab>
 

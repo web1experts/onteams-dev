@@ -2103,8 +2103,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                     </ListGroup.Item>
                     {(memberProfile?.role?.permissions?.time_tracking
                       ?.add_manual_time === true || memberProfile?.role?.permissions?.time_tracking
-                      ?.update_manual_time === true ||
-                      memberProfile?.role?.slug === "owner") && (
+                      ?.update_manual_time === true ) && (
                       <Dropdown className="select--dropdown manual--dropdown">
                         <Dropdown.Toggle variant="success" id="dropdown-basic">
                           <LuTimer />

@@ -27,6 +27,7 @@ import AutoLinks from "quill-auto-links";
 import { fetchCustomFields } from "../../redux/actions/customfield.action";
 import { renderDynamicField } from "../common/dynamicFields";
 import { BadgesModal } from "../modals/badges";
+import { CLEAR_MESSAGES } from '../../redux/actions/types';
 Quill.register("modules/autoLinks", AutoLinks);
 
 export const TaskForm = (props) => {
@@ -183,7 +184,7 @@ export const TaskForm = (props) => {
 
     }, [apiResult.currentTask])
     useEffect(() => {
-        
+        console.log("apiResult.UpdatedTask:: ", apiResult.UpdatedTask)
         if (apiResult.UpdatedTask &&  apiResult.UpdatedTask?._id === currentTask._id) {
             dispatch(updateStateData(CURRENT_TASK, apiResult.UpdatedTask));
         }
@@ -635,6 +636,10 @@ useEffect(() => {
         setCurrentTask({});
         setFields({})
         setEnableSubtaskEdit({})
+        dispatch({
+                type: CLEAR_MESSAGES,
+            });
+            
     }
 
     const renderPreview = (type, preview, index) => {

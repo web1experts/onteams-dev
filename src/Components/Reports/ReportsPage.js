@@ -49,7 +49,7 @@ import { TbScreenshot } from "react-icons/tb";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import {
   getReportsByMember,
-  gerReportsByProject,
+  getReportsByProject,
   addRemarkstoProject,
   getSingleMemberReport,
   getActivityMeta,
@@ -384,7 +384,7 @@ function ReportsPage() {
     if (filters["sort_by"] === "members") {
       await dispatch(getReportsByMember(payload));
     } else {
-      await dispatch(gerReportsByProject(payload));
+      await dispatch(getReportsByProject(payload));
     }
     setSpinner(false);
   };
@@ -427,11 +427,17 @@ function ReportsPage() {
   // Helper function to calculate time ranges
 
   useEffect(() => {
-    if(isActive !== 1){
+    // if(isActive !== 1){
       handleReports();
-    }else{
-      handleSingleMemberReport()
-    }
+    // }else{
+    //   if (filters["sort_by"] === "members") {
+    //    handleSingleMemberReport()
+    //   } else {
+    //     let payload = {...filters}
+    //     dispatch(getallReportsofProject(payload));
+    //   }
+      
+    // }
   }, [filters]);
 
   useEffect(() => {
@@ -1675,7 +1681,17 @@ const formattedDate = (date) => {
                     <>
                     <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
                       <div className="title--initial">
-                       {singleMember?.name?.charAt(0)}
+                        {singleMember?.avatar && singleMember?.avatar !== null ? (
+                            <span>
+                              <img
+                                src={singleMember?.avatar}
+                                alt={"member-avatar"}
+                              />
+                            </span>
+                          ) : (
+                            singleMember?.name?.substring(0, 1)
+                          )}
+                      
                       </div>
                       <div className="title--span flex-column align-items-start gap-0">
                         <h3>
@@ -1689,7 +1705,16 @@ const formattedDate = (date) => {
                   <>
                   <Dropdown.Toggle variant="link" id="dropdown-basic">
                     <div className="title--initial">
-                      {singleMember?.name?.charAt(0)}
+                       {singleMember?.avatar && singleMember?.avatar !== null ? (
+                          <span>
+                            <img
+                              src={singleMember?.avatar}
+                              alt={"member-avatar"}
+                            />
+                          </span>
+                        ) : (
+                          singleMember?.name?.substring(0, 1)
+                        )}
                     </div>
                     <div className="title--span flex-column align-items-start gap-0">
                       <h3>
@@ -1718,7 +1743,16 @@ const formattedDate = (date) => {
                               }
                             >
                               <div className="title--initial">
-                                {report?.member?.name?.charAt(0)}
+                                {report?.member?.avatar && report?.member?.avatar !== null ? (
+                                  <span>
+                                    <img
+                                      src={report?.member?.avatar}
+                                      alt={"member-avatar"}
+                                    />
+                                  </span>
+                                ) : (
+                                  report?.member?.name?.substring(0, 1)
+                                )}
                               </div>
                               <div className="title--span flex-column align-items-start gap-0">
                                 <strong>{report?.member?.name}</strong>

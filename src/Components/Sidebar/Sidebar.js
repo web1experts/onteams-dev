@@ -42,6 +42,7 @@ function SidebarPanel() {
     const location = useLocation();
     let companyname = '';
     let selectedCompId;
+    let companytheme;
     const [companies, setCompanies ] = useState([])
 
     const [showDropdown, setShowDropdown] = useState(false);
@@ -54,7 +55,8 @@ function SidebarPanel() {
     if (encryptedCompany && encryptedCompany !== "") {
         const decryptedCompany = parseIfValidJSON(encryptedCompany);
         companyname = (decryptedCompany) ? decryptedCompany.name : ''
-        selectedCompId = (decryptedCompany) ? decryptedCompany.id : ''
+        selectedCompId = (decryptedCompany) ? decryptedCompany.id : '';
+        companytheme = (decryptedCompany) ? decryptedCompany.theme : false;
     }
 
     function refreshWorskspacelist(){
@@ -197,7 +199,7 @@ function SidebarPanel() {
         { name: 'Copper Bronze', color: 'linear-gradient(135deg, rgb(234 88 12), rgb(202 138 4))', primaryColor: '234, 88, 12', secondaryColor: '202, 138, 4' },
     ];
 
-    const [selectedTheme, setSelectedTheme] = useState('Golden Brown');
+    const [selectedTheme, setSelectedTheme] = useState(companytheme?.name || 'Golden Brown');
     const [primaryColor, setPrimaryColor] = useState('#dfa93d');
     const [secondaryColor, setSecondaryColor] = useState('#af7132');
     const [themeName, setThemeName] = useState('Custom Theme');

@@ -130,7 +130,7 @@ import isEqual from "lodash/isEqual";
         case CURRENT_TASK: {
             const payload = action.payload || {};
             const updated = { ...state.currentTask };
-
+console.log('current asks::', updated)
             Object.keys(payload).forEach((key) => {
                 if (key === "subtasks") {
                     const incomingSubtasks = Array.isArray(payload.subtasks)

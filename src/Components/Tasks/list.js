@@ -33,7 +33,6 @@ const TasksList = React.memo((props) => {
   const taskFeed = useSelector((state) => state.task?.tasks);
   const [taskslists, setTasksLists] = useState([]);
   const handleTaskShow = () => {
-    console.log('trigger')
     dispatch(togglePopups("taskform", true))
   };
   const [currentProject, setCurrentProject] = useState({});

@@ -138,6 +138,11 @@ const [filteredteamfeed, setFilteredTeamFeed] = useState([])
   const handleShow = () => {
     setShow(true)
     selectboxObserver()
+    setFields({
+      email: "", name: "", role: "", working_shift: shifts?.[0]?._id
+    })
+    setDefaultMemberRole()
+    setErrors({});
   };
   const [activeTab, setActiveTab] = useState("Members");
   const handleSidebar = () =>
@@ -558,10 +563,10 @@ const setDefaultMemberRole = () => {
   if (memberRole) {
     handleChange({ target: { name: "role", value: memberRole?._id } });
 
-    setPermissions(memberRole.permissions || {});
+    // setPermissions(memberRole.permissions || {});
   }else{
       handleChange({ target: { name: "role", value: roles[0]?._id } });
-      setPermissions(roles[0]?.permissions || {});
+      // setPermissions(roles[0]?.permissions || {});
   }
 }
 
@@ -970,7 +975,7 @@ const setDefaultMemberRole = () => {
                                   value={memberProfile?._id}
                                   key="my-info-option"
                                 >
-                                  Me
+                                  My Details
                                 </option>
                                 
                                 {(assignedTeamsOrMembers?.members?.length > 0 ) && (
