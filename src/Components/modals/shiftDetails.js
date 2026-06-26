@@ -261,7 +261,7 @@ const ShiftDetailsModal = (props) => {
 
                 <Col>
                   <Form.Label>End Time</Form.Label>
-                  <Form.Control type="time" readOnly value={endTime} onChange={(e) => setEndTime(e.target.value)} 
+                  <Form.Control type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} 
                   />
                 </Col>
                 <p className="mt-2">Tracked to identify late arrivals, early departures, and overtime.</p>
