@@ -1299,7 +1299,7 @@ const setDefaultMemberRole = () => {
                 {
                   (memberFeeds && memberFeeds.length === 1 ) ? 
                     <>
-                    <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
+                    <button type="button" id="dropdown-basic-single" className="dropdown-toggle btn btn-link">
                       <div className="title--initial">
                         {(selectedMember?.avatar && selectedMember?.avatar !== null ) ? 
                           <span><img src={selectedMember?.avatar} alt={'member-avatar'} /></span>

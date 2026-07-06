@@ -1679,7 +1679,7 @@ const formattedDate = (date) => {
                 {
                   ( memberReports && memberReports.length === 1 ) ? 
                     <>
-                    <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
+                    <button type="button" id="dropdown-basic-single" className="dropdown-toggle btn btn-link">
                       <div className="title--initial">
                         {singleMember?.avatar && singleMember?.avatar !== null ? (
                             <span>
@@ -1854,7 +1854,7 @@ const formattedDate = (date) => {
             </ListGroup>
             {
               (filters['sort_by'] === 'members') && (
-                  <ListGroup.Item className="timezone--drop">
+                  <ListGroup.Item className="no--style timezone--drop">
                     <Form.Select
                       className="custom-group-selectbox"
                       onChange={(event) => {

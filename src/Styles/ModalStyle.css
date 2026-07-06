@@ -438,6 +438,7 @@
     width: 100%;
     max-width: 400px;
     border-radius: 0;
+    border: 0;
 }
 
 .modal.show {
@@ -498,6 +499,14 @@ span.form-error {
 
 .reports__Data__modal .reports__card {
     padding-bottom: 1rem !important;
+}
+
+.shots--list .progress-bar {
+    border-radius: 30px;
+}
+
+.shots--list .bg-success {
+    background-color: rgb(52 211 153) !important;
 }
 
 .reports__Data__modal .shots--list h3.no__data {

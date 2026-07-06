@@ -19,7 +19,7 @@ import {
   ProgressBar
 } from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaEye, FaPlay, FaPlus, FaCheck, FaHistory } from "react-icons/fa";
+import { FaEye, FaPlay, FaPlus, FaCheck, FaHistory, FaRegKeyboard } from "react-icons/fa";
 import { MdClose, MdFilterList } from "react-icons/md";
 import {
   FiSidebar,
@@ -43,7 +43,7 @@ import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 import { BsDash } from "react-icons/bs";
-import { LuTimer, LuUsers, LuFileText } from "react-icons/lu";
+import { LuTimer, LuUsers, LuFileText, LuMouse } from "react-icons/lu";
 import { GoPulse } from "react-icons/go";
 import {
   BsArrowsFullscreen,
@@ -1665,7 +1665,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
     // if (activeInnerTab === 'InnerRecorded') {
     return (
       <>
-        <ListGroup.Item className="no--style">
+        <ListGroup.Item className="no--style me-0 px-0">
           <Form className="d-flex align-items-center">
             <Form.Group className="mb-0 form-group pb-0">
               <FiltersDate
@@ -1726,84 +1726,121 @@ const getMembersFromTeams = (selectedTeamIds) => {
    
   };
 
+  const showTimezoneDrop = () => {
+    if (activeInnerTab === "InnerRecorded") {
+      return (
+        <ListGroup.Item className="no--style timezone--drop d-none d-xl-flex">
+          <Form.Select
+            className="custom-group-selectbox"
+            onChange={(event) => 
+              setMemberTimezone(event.target.value)
+            }
+            value={filters?.["timezone"] || "company"}
+          >
+            <optgroup label="Organization time zone">
+              <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
+            </optgroup>  
+            <optgroup label="Member's time zone">
+              <option value={'member'}>{timezonesData[currentActivity?.usermeta?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
+            </optgroup> 
+            <optgroup label="My time zone">
+              <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+?.replace(/[()]/g, "") || 'UTC+05:30'}</option>  
+            </optgroup>  
+          </Form.Select>
+        </ListGroup.Item>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const showTimezoneModal = () => {
+    if (activeInnerTab === "InnerRecorded") {
+      return (
+        <ListGroup.Item className="no--style timezone--drop d-block d-xl-none">
+          <Form.Select
+            className="custom-group-selectbox"
+            onChange={(event) => 
+              setMemberTimezone(event.target.value)
+            }
+            value={filters?.["timezone"] || "company"}
+          >
+            <optgroup label="Organization time zone">
+              <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
+            </optgroup>  
+            <optgroup label="Member's time zone">
+              <option value={'member'}>{timezonesData[currentActivity?.usermeta?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
+            </optgroup> 
+            <optgroup label="My time zone">
+              <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
+?.replace(/[()]/g, "") || 'UTC+05:30'}</option>  
+            </optgroup>  
+          </Form.Select>
+        </ListGroup.Item>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
   const showRecordedTabs = () => {
     if (activeInnerTab === "InnerRecorded") {
       return (
-        <>
-            <ListGroup.Item className="timezone--drop">
-              <Form.Select
-                className="custom-group-selectbox"
-                onChange={(event) => 
-                  setMemberTimezone(event.target.value)
-                }
-                value={filters?.["timezone"] || "company"}
-              >
-                <optgroup label="Organization time zone">
-                  <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-    ?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
-                </optgroup>  
-                <optgroup label="Member's time zone">
-                  <option value={'member'}>{timezonesData[currentActivity?.usermeta?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-    ?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
-                </optgroup> 
-                <optgroup label="My time zone">
-                  <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-    ?.replace(/[()]/g, "") || 'UTC+05:30'}</option>  
-                </optgroup>  
-              </Form.Select>
-            </ListGroup.Item>
-           
-          <ListGroup horizontal className="screens--shots">
-            <ListGroup horizontal>
-              <Button
-                variant="secondary"
-                className="btn--view"
-                key={"activity-tab-key"}
-                active={screenshotTab === "Activity"}
-                onClick={() => setScreenshotTab("Activity")}
-              >
-                <TbScreenshot className="me-1" /> Activities
-              </Button>
-              <Button
-                variant="secondary"
-                className="btn--view"
-                key={"screenshots1-tab-key"}
-                active={screenshotTab === "Screenshots"}
-                onClick={() => setScreenshotTab("Screenshots")}
-              >
-                <TbScreenshot className="me-1" /> Screenshots
-              </Button>
-              {
-                (activeSubscription && ['price_1Sm6h8SZtJkrH95eYrwqvWQx',
-                                        'price_1Sm6hhSZtJkrH95e3hAKkKBG',
-                                        'price_1Sm6hhSZtJkrH95e3hAKkKBG',
-                                        'price_1T1kNISZtJkrH95epkJdx2QN',
-                                        'price_1T1kNUSZtJkrH95eeWlP2oMU',
-                                        'price_1T1kNhSZtJkrH95eEKKOZ2LG', 'plan_ReKagUnhkdX86V'].includes(activeSubscription?.planId) ) ? (
-                  <Button
-                    variant="primary"
-                    className="btn--view"
-                    key={"videos1-tab-key"}
-                    active={screenshotTab === "Videos"}
-                    onClick={() => setScreenshotTab("Videos")}
-                  >
-                    <MdOutlineVideoLibrary className="me-1" /> Videos
-                  </Button>)
-                :
+        <ListGroup horizontal className="screens--shots">
+          <ListGroup horizontal>
+            <Button
+              variant="secondary"
+              className="btn--view"
+              key={"activity-tab-key"}
+              active={screenshotTab === "Activity"}
+              onClick={() => setScreenshotTab("Activity")}
+            >
+              <TbScreenshot className="me-1" /> Activities
+            </Button>
+            <Button
+              variant="secondary"
+              className="btn--view"
+              key={"screenshots1-tab-key"}
+              active={screenshotTab === "Screenshots"}
+              onClick={() => setScreenshotTab("Screenshots")}
+            >
+              <TbScreenshot className="me-1" /> Screenshots
+            </Button>
+            {
+              (activeSubscription && ['price_1Sm6h8SZtJkrH95eYrwqvWQx',
+                                      'price_1Sm6hhSZtJkrH95e3hAKkKBG',
+                                      'price_1Sm6hhSZtJkrH95e3hAKkKBG',
+                                      'price_1T1kNISZtJkrH95epkJdx2QN',
+                                      'price_1T1kNUSZtJkrH95eeWlP2oMU',
+                                      'price_1T1kNhSZtJkrH95eEKKOZ2LG', 'plan_ReKagUnhkdX86V'].includes(activeSubscription?.planId) ) ? (
                 <Button
-                    variant="primary"
-                    className="btn--view"
-                    key={"videos1-tab-key"}
-                    disabled
-                    onClick={() => {return false;}}
-                  >
-                    <MdOutlineVideoLibrary className="me-1" /> Videos
-                  </Button>
-              }
-              
-            </ListGroup>
+                  variant="primary"
+                  className="btn--view"
+                  key={"videos1-tab-key"}
+                  active={screenshotTab === "Videos"}
+                  onClick={() => setScreenshotTab("Videos")}
+                >
+                  <MdOutlineVideoLibrary className="me-1" /> Videos
+                </Button>)
+              :
+              <Button
+                  variant="primary"
+                  className="btn--view"
+                  key={"videos1-tab-key"}
+                  disabled
+                  onClick={() => {return false;}}
+                >
+                  <MdOutlineVideoLibrary className="me-1" /> Videos
+                </Button>
+            }
+            
           </ListGroup>
-        </>
+        </ListGroup>
       );
     } else {
       return <></>;
@@ -2637,7 +2674,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                 {
                   ( liveactivities && liveactivities.length === 1 ) ? 
                     <>
-                    <button type="button" id="dropdown-basic-single" class="dropdown-toggle btn btn-link">
+                    <button type="button" id="dropdown-basic-single" className="dropdown-toggle btn btn-link">
                       <div className="title--initial">
                         {currentActivity?.name?.charAt(0)}
                         {currentActivity?.latestActivity?.status ? (
@@ -2797,23 +2834,23 @@ const getMembersFromTeams = (selectedTeamIds) => {
               {activeInnerTab === "InnerRecorded" && showDate()}
             </ListGroup>
             <ListGroup horizontal className="p-0 ms-auto ms-xxl-0">
-              {showRecordedTabs()}
-               {
-                  (currentActivity && activeInnerTab === "InnerRecorded" || currentActivity && activeInnerTab === "InnerLive") && (
-                    <ListGroup
-                        horizontal
-                        className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center"
-                      >
-                    <ListGroup.Item onClick={
-                      () => {
-                        dispatch(getRecordingTypes(currentActivity?._id))
-                        setShowRecordSettings(true)
-                      }}>
-                      <FiSettings />
-                    </ListGroup.Item>
-                    </ListGroup>
-                  )
-                }
+              {showTimezoneDrop()}
+              {
+                (currentActivity && activeInnerTab === "InnerRecorded" || currentActivity && activeInnerTab === "InnerLive") && (
+                  <ListGroup
+                      horizontal
+                      className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center"
+                    >
+                  <ListGroup.Item onClick={
+                    () => {
+                      dispatch(getRecordingTypes(currentActivity?._id))
+                      setShowRecordSettings(true)
+                    }}>
+                    <FiSettings />
+                  </ListGroup.Item>
+                  </ListGroup>
+                )
+              }
               <ListGroup
                 horizontal
                 className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center"
@@ -2974,6 +3011,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
             )}
             {activeInnerTab === "InnerRecorded" && (
               <>
+                {showRecordedTabs()}
                 <Accordion>
                   {recordedactivities && recordedactivities.length > 0 ? (
                     recordedactivities.map((recording, index) => {
@@ -3451,29 +3489,27 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                             <div className="row">
                                                 <div className="col-md-12">
                                                 <ListGroup>
-                                                  <ListGroup.Item className="pb-5">
+                                                  <ListGroup.Item className="pb-5 p-0">
                                                     <ActivityOverviewChart eventsData={meta.meta_value} />
                                                   </ListGroup.Item>
                                                 </ListGroup>
-                                                  <ListGroup className="mt-2">
-                                                  <ListGroup.Item>
-                                                    Per-Minute Log
-                                                  </ListGroup.Item>
+                                                <ListGroup className="mt-2">
+                                                  <ListGroup.Item className="b-0 p-0 rounded-0 shadow-none text-uppercase fw-semibold fs-6">Per-Minute Log</ListGroup.Item>
                                                   {/* Header */}
-                                                    <ListGroup.Item className="bg-light fw-semibold">
-                                                      <Row className="align-items-center">
+                                                    <ListGroup.Item className="bg-light fw-semibold py-2">
+                                                      <Row className="align-items-center w-100">
                                                         <Col md={2}>TIME</Col>
 
                                                         <Col md={4}>
                                                           <div className="d-flex align-items-center gap-2">
-                                                            <i className="bi bi-mouse text-primary"></i>
+                                                            <LuMouse />
                                                             MOUSE CLICKS
                                                           </div>
                                                         </Col>
 
                                                         <Col md={4}>
                                                           <div className="d-flex align-items-center gap-2">
-                                                            <i className="bi bi-keyboard text-success"></i>
+                                                            <FaRegKeyboard />
                                                             KEYSTROKES
                                                           </div>
                                                         </Col>
@@ -3563,16 +3599,14 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                       }
                                                       rowsPerPage={10}
                                                       renderItem={(log, index) => (
-                                                        <ListGroup.Item key={index}>
-                                                          <Row className="align-items-center">
+                                                        <ListGroup.Item className="py-2" key={index}>
+                                                          <Row className="align-items-center w-100">
 
                                                             {/* Time */}
                                                             <Col md={2}>
                                                               <span
                                                                 style={{
-                                                                  fontWeight: 700,
-                                                                  letterSpacing: "1px",
-                                                                  fontSize: "18px",
+                                                                  fontWeight: 600,
                                                                 }}
                                                               >
                                                                 {log?.time
@@ -3596,16 +3630,13 @@ const getMembersFromTeams = (selectedTeamIds) => {
 
                                                                 <ProgressBar
                                                                   now={
-                                                                    (log.mouse_click_count /
-                                                                      maxMouse) *
-                                                                    100
-                                                                  }
+                                                                    (log.mouse_click_count / maxMouse)}
                                                                   style={{
-                                                                    height: "12px",
+                                                                    height: "8px",
                                                                     width: "220px",
                                                                     borderRadius: "20px",
                                                                   }}
-                                                                  variant="success"
+                                                                  variant="info"
                                                                 />
 
                                                                 <span
@@ -3627,12 +3658,10 @@ const getMembersFromTeams = (selectedTeamIds) => {
 
                                                                 <ProgressBar
                                                                   now={
-                                                                    (log.keyboard_count /
-                                                                      maxKeyboard) *
-                                                                    100
+                                                                    (log.keyboard_count / maxKeyboard)
                                                                   }
                                                                   style={{
-                                                                    height: "12px",
+                                                                    height: "8px",
                                                                     width: "220px",
                                                                     borderRadius: "20px",
                                                                   }}
@@ -3760,13 +3789,13 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             <Col md={4}>
                               <div className="d-flex align-items-center gap-3">
                                 <ProgressBar
-                                  now={(log.mouse_click_count / maxMouse) * 100}
+                                  now={(log.mouse_click_count / maxMouse)}
                                   style={{
-                                    height: "12px",
+                                    height: "8px",
                                     width: "220px",
                                     borderRadius: "20px",
                                   }}
-                                  variant="success"
+                                  variant="info"
                                 />
 
                                 <span
@@ -3785,9 +3814,9 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             <Col md={4}>
                               <div className="d-flex align-items-center gap-3">
                                 <ProgressBar
-                                  now={(log.keyboard_count / maxKeyboard) * 100}
+                                  now={(log.keyboard_count / maxKeyboard)}
                                   style={{
-                                    height: "12px",
+                                    height: "8px",
                                     width: "220px",
                                     borderRadius: "20px",
                                   }}
@@ -3900,6 +3929,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                 </Form.Group>
               </Form>
             </ListGroup.Item>
+            {showTimezoneModal()}
           </ListGroup>
         </Modal.Body>
       </Modal>
@@ -3962,8 +3992,8 @@ const getMembersFromTeams = (selectedTeamIds) => {
             </ListGroup.Item>
 
             {activeInnerTab === "InnerRecorded" && showDate()}
-
-            <ListGroup.Item>
+            {showTimezoneModal()}
+            {/* <ListGroup.Item>
               <Dropdown className="select--dropdown manual--dropdown">
                 <Dropdown.Toggle variant="success">
                   {screenshotTab}
@@ -3991,7 +4021,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                   </div>
                 </Dropdown.Menu>
               </Dropdown>
-            </ListGroup.Item>
+            </ListGroup.Item> */}
           </ListGroup>
         </Modal.Body>
       </Modal>

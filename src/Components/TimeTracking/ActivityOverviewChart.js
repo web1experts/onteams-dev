@@ -110,15 +110,10 @@ const avgActivity = Math.round(
 
         borderColor: "#0ea5e9",
 
-        backgroundColor:
-          "rgba(14,165,233,0.18)",
-
-        borderWidth: 4,
-
+        backgroundColor: "rgba(14,165,233,0.18)",
+        borderWidth: 2,
         pointRadius: 0,
-
         lineTension: 0.4,
-
         fill: true,
       },
     ],
@@ -222,17 +217,19 @@ const avgActivity = Math.round(
 
   return (
     <Row>
-      <Col>
+      <Col sm={12}>
       <div
         style={{
           display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
           alignItems: "center",
           gap: 20,
-          padding: "18px 24px",
+          padding: "8px 12px",
           border: "1px solid #e5e7eb",
-          borderRadius: 16,
+          borderRadius: 8,
           background: "#fff",
-          fontSize: 18,
+          fontSize: 15,
           fontWeight: 500,
         }}
       >
@@ -294,23 +291,23 @@ const avgActivity = Math.round(
         </span>
       </div>
       </Col>
-      <Col>
+      <Col sm={12}>
       <div
         style={{
           background: "#fff",
-          padding: "20px",
-          borderRadius: "20px",
-          height: "420px",
+          padding: "0",
+          marginTop: "20px",
+          borderRadius: "0",
+          height: "220px",
         }}
       >
-        <h4
+        <h5
           style={{
-            fontWeight: 700,
             marginBottom: "20px",
           }}
         >
           Activity Overview
-        </h4>
+        </h5>
 
         <Line
           data={data}

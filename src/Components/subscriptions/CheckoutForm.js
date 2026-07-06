@@ -44,7 +44,7 @@ export default function CheckoutForm({mode}) {
   return (
     <form onSubmit={handleSubmit}>
       <PaymentElement />
-      <button class="btn btn-primary mt-3" disabled={loader}>{ loader ? 'Please wait...': 'Subscribe'}</button>
+      <button className="btn btn-primary mt-3" disabled={loader}>{ loader ? 'Please wait...': 'Subscribe'}</button>
     </form>
   );
 }
