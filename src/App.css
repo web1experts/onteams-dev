@@ -10006,10 +10006,6 @@ Media CSS-=-==
   .holiday--table tbody tr {
     max-width: calc(100% - 0px);
   }
-
-  .accordion .shots--list .list-group-item {
-    padding: 0.5rem 0rem;
-  }
 }
 
 @media screen and (max-width:575px) {
@@ -10295,6 +10291,10 @@ Media CSS-=-==
 
   .team--page .page--title h2 {
     font-size: 1.6rem;
+  }
+
+  .accordion .shots--list .list-group-item span.text-uppercase {
+    min-width: 100px;
   }
 }
 

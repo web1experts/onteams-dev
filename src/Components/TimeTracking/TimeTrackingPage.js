@@ -3630,7 +3630,7 @@ function TimeTrackingPage() {
                                                           className="py-2"
                                                           key={index}
                                                         >
-                                                          <Row className="align-items-center w-100 gap-3 gap-md-0">
+                                                          <Row className="align-items-center w-100 gap-2 gap-md-0">
                                                             {/* Time */}
                                                             <Col md={2}>
                                                               <span className="text-uppercase text-muted d-flex d-lg-none">Time</span>
@@ -3657,31 +3657,27 @@ function TimeTrackingPage() {
 
                                                             {/* Mouse */}
                                                             <Col md={4}>
-                                                              <span className="text-uppercase text-muted d-flex d-lg-none">Mouse Clicks</span>
                                                               <div className="d-flex align-items-center gap-3">
+                                                                <span className="text-uppercase text-muted d-flex d-lg-none">Mouse Clicks</span>
                                                                 <ProgressBar
                                                                   now={
                                                                     log.mouse_click_count /
                                                                     maxMouse
                                                                   }
                                                                   style={{
-                                                                    height:
-                                                                      "5px",
-                                                                    width:
-                                                                      "220px",
-                                                                    borderRadius:
-                                                                      "20px",
+                                                                    height:"5px",
+                                                                    width:"100%",
+                                                                    maxWidth: "190px",
+                                                                    borderRadius:"20px",
                                                                   }}
                                                                   variant="info"
                                                                 />
 
                                                                 <span
                                                                   style={{
-                                                                    minWidth:
-                                                                      "30px",
+                                                                    minWidth:"22px",
                                                                     fontWeight: 600,
-                                                                    fontSize:
-                                                                      "14px",
+                                                                    fontSize:"14px",
                                                                   }}
                                                                 >
                                                                   {
@@ -3693,31 +3689,27 @@ function TimeTrackingPage() {
 
                                                             {/* Keyboard */}
                                                             <Col md={4}>
-                                                              <span className="text-uppercase text-muted d-flex d-lg-none">Keystrokes</span>
                                                               <div className="d-flex align-items-center gap-3">
+                                                                <span className="text-uppercase text-muted d-flex d-lg-none">Keystrokes</span>
                                                                 <ProgressBar
                                                                   now={
                                                                     log.keyboard_count /
                                                                     maxKeyboard
                                                                   }
                                                                   style={{
-                                                                    height:
-                                                                      "5px",
-                                                                    width:
-                                                                      "220px",
-                                                                    borderRadius:
-                                                                      "20px",
+                                                                    height:"5px",
+                                                                    width:"100%",
+                                                                    maxWidth: "190px",
+                                                                    borderRadius:"20px",
                                                                   }}
                                                                   variant="success"
                                                                 />
 
                                                                 <span
                                                                   style={{
-                                                                    minWidth:
-                                                                      "30px",
+                                                                    minWidth:"22px",
                                                                     fontWeight: 600,
-                                                                    fontSize:
-                                                                      "14px",
+                                                                    fontSize:"14px",
                                                                   }}
                                                                 >
                                                                   {
@@ -3835,7 +3827,8 @@ function TimeTrackingPage() {
                               now={log.mouse_click_count / maxMouse}
                               style={{
                                 height: "5px",
-                                width: "220px",
+                                width: "100%",
+                                maxWidth: "190px",
                                 borderRadius: "20px",
                               }}
                               variant="info"
@@ -3861,7 +3854,8 @@ function TimeTrackingPage() {
                               now={log.keyboard_count / maxKeyboard}
                               style={{
                                 height: "5px",
-                                width: "220px",
+                                width: "100%",
+                                maxWidth: "190px",
                                 borderRadius: "20px",
                               }}
                               variant="success"
