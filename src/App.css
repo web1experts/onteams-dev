@@ -2512,7 +2512,7 @@ table tr.marked-project td {
 .rounded--box .select--dropdown .btn:hover,
 .common--form .select--dropdown .btn:hover {
   background: #f7f7f7;
-  color: inherit;
+  color: initial;
 }
 
 .team--page .page--title .select--dropdown .btn::before,
@@ -4442,6 +4442,11 @@ Project Task View CSS=-=-=
   opacity: 1;
 }
 
+.accordion .shots--list .list-group-item {
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+}
+
 .perf--badge {
   display: flex;
   align-items: center;
@@ -5141,7 +5146,7 @@ pre {
   margin-left: .5rem;
 }
 
-.wrapper--title .no--style {
+.wrapper--title .no--style, .wrapper--title .no--style:hover {
   padding: 0;
   background: none;
   border: 1px solid transparent;
@@ -10000,6 +10005,10 @@ Media CSS-=-==
 
   .holiday--table tbody tr {
     max-width: calc(100% - 0px);
+  }
+
+  .accordion .shots--list .list-group-item {
+    padding: 0.5rem 0rem;
   }
 }
 

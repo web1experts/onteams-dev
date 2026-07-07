@@ -16,10 +16,17 @@ import {
   Modal,
   Dropdown,
   Accordion,
-  ProgressBar
+  ProgressBar,
 } from "react-bootstrap";
 import Fullscreen from "yet-another-react-lightbox/dist/plugins/fullscreen";
-import { FaEye, FaPlay, FaPlus, FaCheck, FaHistory, FaRegKeyboard } from "react-icons/fa";
+import {
+  FaEye,
+  FaPlay,
+  FaPlus,
+  FaCheck,
+  FaHistory,
+  FaRegKeyboard,
+} from "react-icons/fa";
 import { MdClose, MdFilterList } from "react-icons/md";
 import {
   FiSidebar,
@@ -37,7 +44,7 @@ import {
   FiTrash2,
   FiCheckCircle,
   FiCamera,
-  FiSettings
+  FiSettings,
 } from "react-icons/fi";
 import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
@@ -68,7 +75,10 @@ import {
   deleteRecoredActivity,
   getMemberRecoredActivity,
 } from "../../redux/actions/activity.action";
-import { selectboxObserver, groupSelectboxObserver } from "../../helpers/commonfunctions";
+import {
+  selectboxObserver,
+  groupSelectboxObserver,
+} from "../../helpers/commonfunctions";
 import {
   socket,
   refreshSocket,
@@ -80,7 +90,7 @@ import {
   generateTimeRange,
   convertSecondstoTime,
   timeStringToDate,
-  timezonesData
+  timezonesData,
 } from "../../helpers/commonfunctions";
 import DatePicker from "react-multi-date-picker";
 import "media-chrome";
@@ -95,7 +105,11 @@ import {
 } from "../../redux/actions/project.action";
 import debounce from "lodash.debounce";
 import { getActiveSubscription } from "../../redux/actions/subscription.action";
-import { Listmembers, updateMemberRecordingSettings, getRecordingTypes } from "../../redux/actions/members.action";
+import {
+  Listmembers,
+  updateMemberRecordingSettings,
+  getRecordingTypes,
+} from "../../redux/actions/members.action";
 import { getTeams } from "../../redux/actions/team.action";
 import { getAssignedTeamsOrMembersByRole } from "../../redux/actions/permission.action";
 import ActivityOverviewChart from "./ActivityOverviewChart";
@@ -113,46 +127,47 @@ function TimeTrackingPage() {
     "last-month": "Last month",
     custom: "Custom",
   };
-  const [memberTimezone, setMemberTimezone] = useState( 'company' )
+  const [memberTimezone, setMemberTimezone] = useState("company");
   const [selected, setSelected] = useState(null);
   const subscriptionState = useSelector((state) => state.subscription);
   const [projectFilter, setProjectFilter] = useState({ status: "in-progress" });
   const apiPermission = useSelector((state) => state.permissions);
-  const [showRecordSettings, setShowRecordSettings] = useState( false )
+  const [showRecordSettings, setShowRecordSettings] = useState(false);
   const memberProfile = currentMemberProfile();
-  const [recordingSettings, setRecordingSettings] = useState({})
+  const [recordingSettings, setRecordingSettings] = useState({});
   let totalhours = 0;
   let totalProjecthours = 0;
   const currentMember = getMemberdata();
   const [spinner, setSpinner] = useState(true);
   const [activityspinner, setActSpinner] = useState(false);
-  const [ streamError, setStreamError] = useState('')
+  const [streamError, setStreamError] = useState("");
   const [cardNumbers, setCardNumbers] = useState({
     activeCount: 0,
     pauseCount: 0,
     inactiveCount: 0,
     totalHours: 0,
   });
-  const[ showEvents, setShowEvents] = useState( false )
-  const [eventsData, setEventsData] = useState( false )
+  const [showEvents, setShowEvents] = useState(false);
+  const [eventsData, setEventsData] = useState(false);
   const memberState = useSelector((state) => state.member);
   //  const [allMembers, setAllmembers] = useState([]);
   const handleShow = () => setShow(true);
   const [totalTaskDuration, setTotalTaskDuration] = useState(0);
-  const handleProjectShow = () => {setProjectShow(true)
+  const handleProjectShow = () => {
+    setProjectShow(true);
   };
 
   const handleRecordSettingsClose = () => {
-    setShowRecordSettings( false )
-  }
+    setShowRecordSettings(false);
+  };
   const [showSelect, setProjectShow] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const MemberprojectFeed = useSelector(
-    (state) => state.project.memberProjects
+    (state) => state.project.memberProjects,
   );
-  const teamsState = useSelector((state) => state.teams)
+  const teamsState = useSelector((state) => state.teams);
   const [teamfeed, setTeamFeed] = useState([]);
-  const [assignedTeamsOrMembers, setAssignedTeamsOrMembers] = useState({})
+  const [assignedTeamsOrMembers, setAssignedTeamsOrMembers] = useState({});
   const [isActiveView, setIsActiveView] = useState(2);
   const [liveStreaming, setLiveStreaming] = useState({});
   const [isScreenActive, setIsScreenActive] = useState(false);
@@ -166,18 +181,24 @@ function TimeTrackingPage() {
   const dispatch = useDispatch();
   const fullscreenRef = React.useRef(null);
   const datePickerRef = useRef(null);
-  const datePickerRefto = useRef(null)
+  const datePickerRefto = useRef(null);
   const [activeTab, setActiveTab] = useState("Live");
   const [screenshotTab, setScreenshotTab] = useState("Screenshots");
   const [activeInnerTab, setActiveInnerTab] = useState("InnerLive");
   const [open, setOpen] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [entries, setEntries] = useState([]);
-  const [timings, setTimings] = useState({ start_time: "", end_time: "", date: "" });
+  const [timings, setTimings] = useState({
+    start_time: "",
+    end_time: "",
+    date: "",
+  });
   const [memberprojects, setMemberProjects] = useState([]);
   const [occupiedRanges, setOccupiedRanges] = useState([]);
   const [timeSlots, setTimeslots] = useState([]);
-  const [fields, setFields] = useState({ date: new Date().toLocaleDateString("en-CA") });
+  const [fields, setFields] = useState({
+    date: new Date().toLocaleDateString("en-CA"),
+  });
   const [searchEntries, setSearchEntries] = useState([]);
   const [show, setShow] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -189,7 +210,7 @@ function TimeTrackingPage() {
   const taskFeed = useSelector((state) => state.task.tasks);
   const [taskslists, setTasksLists] = useState([]);
   const reportState = useSelector((state) => state.reports);
-  const [activeSubscription, setActiveSubscription] = useState(null)
+  const [activeSubscription, setActiveSubscription] = useState(null);
   const manuldatePickerRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postMedia, setPostMedia] = useState([]);
@@ -198,25 +219,32 @@ function TimeTrackingPage() {
   const [memberActivities, setMemberActivities] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setsearchTerm] = useState("");
-  const [filters, setFilters] = useState({ status: "live",
-    member: (memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only === true || memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only === true) ? 'all' : memberProfile?._id, timezone: 'company'
-   });
+  const [filters, setFilters] = useState({
+    status: "live",
+    member:
+      memberProfile?.role?.permissions?.assigned_teams
+        ?.specific_peoples_only === true ||
+      memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
+        true
+        ? "all"
+        : memberProfile?._id,
+    timezone: "company",
+  });
   const filtersRef = useRef(filters);
   const [date, setDate] = useState("");
   const [showFilter, setFilterShow] = useState(false);
   const [showInnerFilter, setInnerFilterShow] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("today");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [ reportPickerOpen, setReportPickerOpen] = useState(false)
+  const [reportPickerOpen, setReportPickerOpen] = useState(false);
   const [showSearch, setSearchShow] = useState(false);
   const [selectedScreenshots, setSelectedScreenshots] = useState({});
   const activitystate = useSelector((state) => state.activity);
   const [manualListCount, setManualListCount] = useState(0);
 
-
   const crntDashboard = (() => {
     try {
-      const data = localStorage.getItem('current_dashboard');
+      const data = localStorage.getItem("current_dashboard");
       return data ? JSON.parse(data) : null;
     } catch (e) {
       return null;
@@ -225,7 +253,7 @@ function TimeTrackingPage() {
 
   const crntUser = (() => {
     try {
-      const data = localStorage.getItem('current_loggedin_user');
+      const data = localStorage.getItem("current_loggedin_user");
       return data ? JSON.parse(data) : null;
     } catch (e) {
       return null;
@@ -248,63 +276,63 @@ function TimeTrackingPage() {
   const handleSearchShow = () => setSearchShow(true);
   const [projectToggle, setProjectToggle] = useState(false);
   const activeTabRef = useRef(activeTab);
-  const currentActivityTabRef = useRef(currentActivity)
+  const currentActivityTabRef = useRef(currentActivity);
 
-useEffect(() => {
-  activeTabRef.current = activeTab;
-}, [activeTab]);
+  useEffect(() => {
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
 
-useEffect(() => {
-  currentActivityTabRef.current = currentActivity;
-},[currentActivity])
+  useEffect(() => {
+    currentActivityTabRef.current = currentActivity;
+  }, [currentActivity]);
 
-useEffect(() => {
-  
-  if(subscriptionState.activeSubscription){
-    setActiveSubscription(subscriptionState.activeSubscription) 
-  }
-}, [subscriptionState.activeSubscription])
-
-const viewEvents = (metas) => {
-  if (metas?.length > 0) {
-    const eventMeta = metas.find(
-      (item) => item.meta_key === "events_data"
-    );
-
-    if (eventMeta?.meta_value) {
-
-      
-      setEventsData(eventMeta.meta_value);
+  useEffect(() => {
+    if (subscriptionState.activeSubscription) {
+      setActiveSubscription(subscriptionState.activeSubscription);
     }
-    setShowEvents( true )
-  }
-};
+  }, [subscriptionState.activeSubscription]);
 
-useEffect(() => {
-  if (teamsState && teamsState.teams) {
-    setTeamFeed(teamsState.teams);
-  }
-}, [teamsState])
+  const viewEvents = (metas) => {
+    if (metas?.length > 0) {
+      const eventMeta = metas.find((item) => item.meta_key === "events_data");
 
-useEffect(() =>{
-  if(memberState?.recordingTypes){ console.log(memberState?.recordingTypes)
-    setRecordingSettings(memberState?.recordingTypes || {
-      screenshot_recording: 'disabled',
-      video_recording: 'disabled',
-      live_streaming: 'disabled'
-    })
-  }
-}, [memberState?.recordingTypes])
+      if (eventMeta?.meta_value) {
+        setEventsData(eventMeta.meta_value);
+      }
+      setShowEvents(true);
+    }
+  };
 
-const maxMouse = Math.max(
-  ...((eventsData?.[0]?.events_count || []).map((l) => l?.mouse_click_count || 0)),
-  1
-);
+  useEffect(() => {
+    if (teamsState && teamsState.teams) {
+      setTeamFeed(teamsState.teams);
+    }
+  }, [teamsState]);
 
-const maxKeyboard = Math.max(
-  ...((eventsData?.[0]?.events_count || []).map((l) => l?.keyboard_count || 0)),
-  1
-);
+  useEffect(() => {
+    if (memberState?.recordingTypes) {
+      console.log(memberState?.recordingTypes);
+      setRecordingSettings(
+        memberState?.recordingTypes || {
+          screenshot_recording: "disabled",
+          video_recording: "disabled",
+          live_streaming: "disabled",
+        },
+      );
+    }
+  }, [memberState?.recordingTypes]);
+
+  const maxMouse = Math.max(
+    ...(eventsData?.[0]?.events_count || []).map(
+      (l) => l?.mouse_click_count || 0,
+    ),
+    1,
+  );
+
+  const maxKeyboard = Math.max(
+    ...(eventsData?.[0]?.events_count || []).map((l) => l?.keyboard_count || 0),
+    1,
+  );
 
   const handleToggles = () => {
     if (commonState.sidebar_small === false) {
@@ -320,7 +348,7 @@ const maxKeyboard = Math.max(
     setEntries([]);
     setSelectedProject("");
     setErrors([]);
-    setTimings({ start_time: "", end_time: "", date: ""  });
+    setTimings({ start_time: "", end_time: "", date: "" });
   };
   const commonState = useSelector((state) => state.common);
 
@@ -328,7 +356,7 @@ const maxKeyboard = Math.max(
     setWorkflow("");
     setSelectedProject("");
     setFilteredTasks([]);
-    setTimings({ start_time: "", end_time: "", date: ""  });
+    setTimings({ start_time: "", end_time: "", date: "" });
     setProjectShow(false);
   };
 
@@ -372,7 +400,7 @@ const maxKeyboard = Math.max(
       deleteRecoredActivity({
         type: screenshotTab.toLowerCase(),
         data: selectedScreenshots,
-      })
+      }),
     );
   };
 
@@ -382,13 +410,13 @@ const maxKeyboard = Math.max(
     if (status === true) {
       setActSpinner(true);
       setTimeout(function () {
-        setStreamError("")
+        setStreamError("");
         socket.emit(
           "watcher",
           socket.id,
           userID,
           userID,
-          currentMember.role?.slug
+          currentMember.role?.slug,
         );
       }, 800);
     }
@@ -398,16 +426,17 @@ const maxKeyboard = Math.max(
     socket.emit("leaveRoom", socket.id, room);
   }
 
-  const updateRecodingType = async(payload) => {
-      dispatch(updateMemberRecordingSettings(currentActivity?._id, payload));
-    }
+  const updateRecodingType = async (payload) => {
+    dispatch(updateMemberRecordingSettings(currentActivity?._id, payload));
+  };
 
   const handleLiveActivityListInterval = async () => {
-    
     const currentFilters = filtersRef.current;
-    
-    if (activeTabRef.current === 'Live' && currentActivityTabRef.current === false ) {
-        
+
+    if (
+      activeTabRef.current === "Live" &&
+      currentActivityTabRef.current === false
+    ) {
       // setSpinner(true);
       let selectedfilters = {
         currentPage: currentPage,
@@ -418,7 +447,6 @@ const maxKeyboard = Math.max(
         selectedfilters = { ...selectedfilters, ...currentFilters };
       }
       await dispatch(getliveActivity(selectedfilters));
-      
     }
   };
 
@@ -437,13 +465,14 @@ const maxKeyboard = Math.max(
     }
 
     await dispatch(getliveActivity(selectedfilters));
-    
   };
 
-  const handleFilteredLiveActivityList = async () => { 
-    setSpinner(true)
+  const handleFilteredLiveActivityList = async () => {
+    setSpinner(true);
     const currentFilters = filtersRef.current;
-    const cleanedFilteredDate = filtereddate.filter(d => d && d.trim() !== "");
+    const cleanedFilteredDate = filtereddate.filter(
+      (d) => d && d.trim() !== "",
+    );
     let selectedfilters = {
       currentPage: currentPage,
       date_range: cleanedFilteredDate,
@@ -454,44 +483,51 @@ const maxKeyboard = Math.max(
     }
 
     selectedfilters = { ...selectedfilters, ["status"]: "recordings" };
-    await dispatch(getliveActivity(selectedfilters)); console.log('one')
+    await dispatch(getliveActivity(selectedfilters));
+    console.log("one");
     setSpinner(false);
   };
 
-  const handleRecordedActivity = async () => { 
-    setRecordedActivities([])
+  const handleRecordedActivity = async () => {
+    setRecordedActivities([]);
     setActSpinner(true);
-    const cleanedFilteredDate = filtereddate.filter(d => d && d.trim() !== "");
+    const cleanedFilteredDate = filtereddate.filter(
+      (d) => d && d.trim() !== "",
+    );
     await dispatch(
       getRecoredActivity({
-        id: currentActivity._id, status: "recorded", date_range:cleanedFilteredDate, timezone: memberTimezone
-      })
+        id: currentActivity._id,
+        status: "recorded",
+        date_range: cleanedFilteredDate,
+        timezone: memberTimezone,
+      }),
     );
     // setActSpinner(false);
   };
 
   const memberTodaysActivity = async (date = null) => {
-    setOccupiedRanges([])
-    await dispatch(getMemberRecoredActivity(memberProfile._id, "recorded", date));
+    setOccupiedRanges([]);
+    await dispatch(
+      getMemberRecoredActivity(memberProfile._id, "recorded", date),
+    );
   };
 
   useEffect(() => {
-    // if (selectedFilter !== "custom" && isActive === true) { 
-    
-    if (selectedFilter !== "custom" &&  isActive === true) {
+    // if (selectedFilter !== "custom" && isActive === true) {
+
+    if (selectedFilter !== "custom" && isActive === true) {
       handleRecordedActivity();
-    }else if(selectedFilter !== 'custom' && activeTab === "Recordings") {
+    } else if (selectedFilter !== "custom" && activeTab === "Recordings") {
       handleFilteredLiveActivityList();
     }
   }, [filtereddate]);
-  
 
   useEffect(() => {
     handleListProjects();
-    dispatch(getActiveSubscription())
-    dispatch(getAssignedTeamsOrMembersByRole(memberProfile?.role?._id))
+    dispatch(getActiveSubscription());
+    dispatch(getAssignedTeamsOrMembersByRole(memberProfile?.role?._id));
     // dispatch(Listmembers({currentPage: 0, searchTerm: '', has_limit: false}));
-    dispatch(getTeams())
+    dispatch(getTeams());
   }, [dispatch]);
 
   useEffect(() => {
@@ -501,7 +537,6 @@ const maxKeyboard = Math.max(
     }
   }, [MemberprojectFeed]);
 
-
   useEffect(() => {
     setLoader(false);
     if (reportState.success) {
@@ -509,15 +544,13 @@ const maxKeyboard = Math.max(
       handleClose();
     }
 
-    if (
-      reportState.manualTimeList 
-    ) {
+    if (reportState.manualTimeList) {
       // setManualListCount(Object.keys(reportState.manualTimeList)?.length);
       setManualListCount(
         Object.values(reportState.manualTimeList || {}).reduce(
           (total, value) => total + (Array.isArray(value) ? value.length : 0),
-          0
-        )
+          0,
+        ),
       );
     }
   }, [reportState]);
@@ -542,7 +575,7 @@ const maxKeyboard = Math.max(
 
       setIsFullscreen(false);
     }
-  }, [isScreenActive])
+  }, [isScreenActive]);
 
   const handleListProjects = async () => {
     if (memberProfile?.role?.slug === "owner") {
@@ -554,14 +587,16 @@ const maxKeyboard = Math.max(
     await dispatch(ListMemberProjects(currentMember?._id));
   };
 
-  
   useEffect(() => {
-    setLiveStreaming({...liveStreaming, [currentActivity?._id] : currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled"});
+    setLiveStreaming({
+      ...liveStreaming,
+      [currentActivity?._id]:
+        currentActivity?.memberMeta?.live_streaming?.meta_value || "disabled",
+    });
     if (currentActivity?.latestActivity?.status === false) {
-      if(activeInnerTab === "InnerLive"){
+      if (activeInnerTab === "InnerLive") {
         setActSpinner(false);
       }
-      
     }
     if (
       (currentActivity !== false &&
@@ -572,32 +607,34 @@ const maxKeyboard = Math.max(
         recordedRefresh === true)
     ) {
       // setActiveInnerTab("InnerRecorded")
-      setRecordedActivities([])
+      setRecordedActivities([]);
       handleRecordedActivity();
     }
-    
+
     // else{
     //   updateStream()
     // }
   }, [currentActivity]);
 
   useEffect(() => {
-    if(liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] !== 'disabled'){
-      updateStream()
+    if (
+      liveStreaming[currentActivity?._id] &&
+      liveStreaming[currentActivity?._id] !== "disabled"
+    ) {
+      updateStream();
     }
   }, [liveStreaming]);
 
   useEffect(() => {
     if (Object.keys(filters).length > 0 && !showFilter) {
-      
       filtersRef.current = filters;
       handleLiveActivityList();
     }
   }, [filters]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (memberActivities) {
-      const data = calculateOccupiedRanges(memberActivities)
+      const data = calculateOccupiedRanges(memberActivities);
       setOccupiedRanges(data);
     }
   }, [memberActivities]);
@@ -610,16 +647,18 @@ const maxKeyboard = Math.max(
         liveStreaming[currentActivity?._id] === "enable") ||
       (currentActivity !== false &&
         activeInnerTab === "InnerLive" &&
-        liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "enable")
-    ) { 
-      leaveRoom(currentActivity?._id);console.log('two')
+        liveStreaming[currentActivity?._id] &&
+        liveStreaming[currentActivity?._id] === "enable")
+    ) {
+      leaveRoom(currentActivity?._id);
+      console.log("two");
       setSpinner(false);
       startsharing(
         currentActivity._id,
-        currentActivity?.latestActivity?.status
+        currentActivity?.latestActivity?.status,
       );
     }
-  }
+  };
 
   const calculateOccupiedRangesOLd = (data) => {
     return data.map((item) => {
@@ -658,96 +697,95 @@ const maxKeyboard = Math.max(
 
   useEffect(() => {
     setTimeslots(generateTimeSlots(10));
-  }, [timings.date])
+  }, [timings.date]);
 
   const generateTimeSlots = (intervalMinutes = 10) => {
-  const slots = [];
+    const slots = [];
 
-  const selectedDate =
-    timings?.date && timings?.date !== ""
-      ? new Date(timings.date)
-      : new Date();
+    const selectedDate =
+      timings?.date && timings?.date !== ""
+        ? new Date(timings.date)
+        : new Date();
 
-  const startOfDay = new Date(selectedDate);
-  startOfDay.setHours(0, 0, 0, 0);
+    const startOfDay = new Date(selectedDate);
+    startOfDay.setHours(0, 0, 0, 0);
 
-  const now = new Date();
+    const now = new Date();
 
-  let endTime;
-  const isToday =
-    selectedDate.toDateString() === now.toDateString();
+    let endTime;
+    const isToday = selectedDate.toDateString() === now.toDateString();
 
-  if (isToday) {
-    endTime = now;
-  } else {
-    endTime = new Date(startOfDay);
-    endTime.setHours(23, 59, 59, 999);
-  }
+    if (isToday) {
+      endTime = now;
+    } else {
+      endTime = new Date(startOfDay);
+      endTime.setHours(23, 59, 59, 999);
+    }
 
-  let current = new Date(startOfDay);
+    let current = new Date(startOfDay);
 
-  while (current <= endTime) {
-    const hours24 = current.getHours().toString().padStart(2, "0");
-    const minutes = current.getMinutes().toString().padStart(2, "0");
+    while (current <= endTime) {
+      const hours24 = current.getHours().toString().padStart(2, "0");
+      const minutes = current.getMinutes().toString().padStart(2, "0");
 
-    const ampm = current.getHours() >= 12 ? "PM" : "AM";
+      const ampm = current.getHours() >= 12 ? "PM" : "AM";
 
-    // 24-hour format WITH AM/PM
-    slots.push(`${hours24}:${minutes} ${ampm}`);
+      // 24-hour format WITH AM/PM
+      slots.push(`${hours24}:${minutes} ${ampm}`);
 
-    current.setMinutes(current.getMinutes() + intervalMinutes);
-  }
+      current.setMinutes(current.getMinutes() + intervalMinutes);
+    }
 
-  return slots;
-};
+    return slots;
+  };
 
   const generateTimeSlotsNew = (intervalMinutes = 10) => {
-  const slots = [];
+    const slots = [];
 
-  const selectedDate = (timings?.date && timings?.date !== "")
-    ? new Date(timings.date)
-    : new Date();
+    const selectedDate =
+      timings?.date && timings?.date !== ""
+        ? new Date(timings.date)
+        : new Date();
 
-  // Start of selected day
-  const startOfDay = new Date(selectedDate);
-  startOfDay.setHours(0, 0, 0, 0);
+    // Start of selected day
+    const startOfDay = new Date(selectedDate);
+    startOfDay.setHours(0, 0, 0, 0);
 
-  // Current real time
-  const now = new Date();
+    // Current real time
+    const now = new Date();
 
-  // Determine end time
-  let endTime;
+    // Determine end time
+    let endTime;
 
-  const isToday =
-    selectedDate.toDateString() === now.toDateString();
+    const isToday = selectedDate.toDateString() === now.toDateString();
 
-  if (isToday) {
-    // If selected date is today → stop at current time
-    endTime = now;
-  } else {
-    // If past date → allow full day
-    endTime = new Date(startOfDay);
-    endTime.setHours(23, 59, 59, 999);
-  }
+    if (isToday) {
+      // If selected date is today → stop at current time
+      endTime = now;
+    } else {
+      // If past date → allow full day
+      endTime = new Date(startOfDay);
+      endTime.setHours(23, 59, 59, 999);
+    }
 
-  let current = new Date(startOfDay);
+    let current = new Date(startOfDay);
 
-  while (current <= endTime) {
-    let hours = current.getHours();
-    const minutes = current.getMinutes().toString().padStart(2, "0");
+    while (current <= endTime) {
+      let hours = current.getHours();
+      const minutes = current.getMinutes().toString().padStart(2, "0");
 
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
+      const ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12;
 
-    const formattedHours = hours.toString().padStart(2, "0");
+      const formattedHours = hours.toString().padStart(2, "0");
 
-    slots.push(`${formattedHours}:${minutes} ${ampm}`);
+      slots.push(`${formattedHours}:${minutes} ${ampm}`);
 
-    current.setMinutes(current.getMinutes() + intervalMinutes);
-  }
+      current.setMinutes(current.getMinutes() + intervalMinutes);
+    }
 
-  return slots;
-};
+    return slots;
+  };
 
   // Generate time slots for the day
   const generateTimeSlotsOld = (intervalMinutes = 10) => {
@@ -799,37 +837,41 @@ const maxKeyboard = Math.max(
   // };
 
   const isTimeSlotOccupied = (time, ranges) => {
-  if (!ranges || ranges.length === 0) {
-    return false; // no ranges → slot is free
-  }
-
-  // Determine base date: timings.date or today
-  const baseDate = timings?.date ? new Date(timings.date) : new Date();
-
-  // Create timeDate from baseDate + HH:mm
-  const [hours, minutes] = time.split(":");
-  const timeDate = new Date(baseDate);
-  timeDate.setHours(hours, minutes, 0, 0);
-
-  return ranges.some(({ start, end }) => {
-    const startTime = new Date(start);
-    const endTime = end ? new Date(end) : null;
-
-    // Normalize start and end to the baseDate
-    const startDate = new Date(baseDate);
-    startDate.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
-
-    const endDate = endTime
-      ? new Date(baseDate).setHours(endTime.getHours(), endTime.getMinutes(), 0, 0)
-      : null;
-
-    if (endDate) {
-      return timeDate >= startDate && timeDate < endDate;
+    if (!ranges || ranges.length === 0) {
+      return false; // no ranges → slot is free
     }
-    return timeDate >= startDate;
-  });
-};
 
+    // Determine base date: timings.date or today
+    const baseDate = timings?.date ? new Date(timings.date) : new Date();
+
+    // Create timeDate from baseDate + HH:mm
+    const [hours, minutes] = time.split(":");
+    const timeDate = new Date(baseDate);
+    timeDate.setHours(hours, minutes, 0, 0);
+
+    return ranges.some(({ start, end }) => {
+      const startTime = new Date(start);
+      const endTime = end ? new Date(end) : null;
+
+      // Normalize start and end to the baseDate
+      const startDate = new Date(baseDate);
+      startDate.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+
+      const endDate = endTime
+        ? new Date(baseDate).setHours(
+            endTime.getHours(),
+            endTime.getMinutes(),
+            0,
+            0,
+          )
+        : null;
+
+      if (endDate) {
+        return timeDate >= startDate && timeDate < endDate;
+      }
+      return timeDate >= startDate;
+    });
+  };
 
   useEffect(() => {
     const totalTaskDuration = entries.reduce((total, entry) => {
@@ -842,18 +884,18 @@ const maxKeyboard = Math.max(
     setTotalTaskDuration(totalTaskDuration);
   }, [entries]);
 
-// Helper: normalize any date-like to "YYYY-MM-DD"
-const ymd = (dateLike) => {
-  if (!dateLike) return null;
-  const str = String(dateLike);
-  const m = str.match(/^(\d{4}-\d{2}-\d{2})/);
-  if (m) return m[1]; // already YYYY-MM-DD
-  const d = new Date(dateLike);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toISOString().slice(0, 10);
-};
+  // Helper: normalize any date-like to "YYYY-MM-DD"
+  const ymd = (dateLike) => {
+    if (!dateLike) return null;
+    const str = String(dateLike);
+    const m = str.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (m) return m[1]; // already YYYY-MM-DD
+    const d = new Date(dateLike);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toISOString().slice(0, 10);
+  };
 
-// Helper: HH:mm on a given date → Date (local)
+  // Helper: HH:mm on a given date → Date (local)
   const parseTimeOnDate = (time, dateLike) => {
     const day = ymd(dateLike);
     if (!day) return null;
@@ -862,10 +904,8 @@ const ymd = (dateLike) => {
     return new Date(Y, M - 1, D, h, m, 0, 0);
   };
 
-
   const handleReportSubmit = async (e) => {
     e.preventDefault();
-    
 
     const errors = entries.map((entry, index) => {
       const entryErrors = {};
@@ -884,7 +924,7 @@ const ymd = (dateLike) => {
       const entryDay = ymd(entry.date);
       if (entry.start_time && entry.end_time && entryDay) {
         const currentStart = parseTimeOnDate(entry.start_time, entry.date);
-        const currentEnd   = parseTimeOnDate(entry.end_time, entry.date);
+        const currentEnd = parseTimeOnDate(entry.end_time, entry.date);
 
         if (currentStart >= currentEnd) {
           entryErrors.end_time = "End time must be greater than start time.";
@@ -898,66 +938,80 @@ const ymd = (dateLike) => {
             otherEntry.end_time &&
             ymd(otherEntry.date) === entryDay
           ) {
-            const otherStart = parseTimeOnDate(otherEntry.start_time, otherEntry.date);
-            const otherEnd   = parseTimeOnDate(otherEntry.end_time, otherEntry.date);
+            const otherStart = parseTimeOnDate(
+              otherEntry.start_time,
+              otherEntry.date,
+            );
+            const otherEnd = parseTimeOnDate(
+              otherEntry.end_time,
+              otherEntry.date,
+            );
 
-            if (otherStart && otherEnd && currentStart < otherEnd && currentEnd > otherStart) {
-              entryErrors.start_time = "Time range overlaps with another entry.";
-              entryErrors.end_time   = "Time range overlaps with another entry.";
+            if (
+              otherStart &&
+              otherEnd &&
+              currentStart < otherEnd &&
+              currentEnd > otherStart
+            ) {
+              entryErrors.start_time =
+                "Time range overlaps with another entry.";
+              entryErrors.end_time = "Time range overlaps with another entry.";
             }
           }
         });
       }
 
-    return entryErrors;
-  });
+      return entryErrors;
+    });
 
     const hasErrors = errors.some(
-      (entryErrors) => Object.keys(entryErrors).length > 0
+      (entryErrors) => Object.keys(entryErrors).length > 0,
     );
 
     if (hasErrors) {
       setErrors(errors); // Update the errors state to show errors below each field
       return false; // Prevent form submission
-    }else{
-       setErrors([]);
-        setLoader(true);
-        const payload = { entries };
-        
-        dispatch(addManualTime({ ...payload, ...fields }));
+    } else {
+      setErrors([]);
+      setLoader(true);
+      const payload = { entries };
+
+      dispatch(addManualTime({ ...payload, ...fields }));
     }
-   
   };
 
   useEffect(() => {
-    if(apiPermission?.assignedTeamsOrMembers){
-      setAssignedTeamsOrMembers(apiPermission?.assignedTeamsOrMembers)
+    if (apiPermission?.assignedTeamsOrMembers) {
+      setAssignedTeamsOrMembers(apiPermission?.assignedTeamsOrMembers);
       setTimeout(() => {
-        groupSelectboxObserver()
-      },700)
+        groupSelectboxObserver();
+      }, 700);
     }
-  }, [apiPermission?.assignedTeamsOrMembers])
+  }, [apiPermission?.assignedTeamsOrMembers]);
 
   useEffect(() => {
     refreshSocket();
     selectboxObserver();
     setTimeout(() => {
-      groupSelectboxObserver()
+      groupSelectboxObserver();
     }, 600);
     // handleLiveActivityList();
 
     socket.on("receive_record_types", async (record_types = {}) => {
       if (activeTab === "Live") {
         // setLiveStreaming(record_types?.live_streaming || "disabled");
-         setLiveStreaming({...liveStreaming, [currentActivity?._id] : record_types?.live_streaming || "disabled"});
+        setLiveStreaming({
+          ...liveStreaming,
+          [currentActivity?._id]: record_types?.live_streaming || "disabled",
+        });
       }
     });
 
-    socket.on('streamingError', (roomId, message) => {
-      if(roomId === currentActivity?._id){
-        setStreamError(message)
+    socket.on("streamingError", (roomId, message) => {
+      if (roomId === currentActivity?._id) {
+        setStreamError(message);
       }
-    })
+    });
 
     socket.on("trackerstateUpdate", (memberData, status = false) => {
       setRecordedRefresh(false);
@@ -992,47 +1046,44 @@ const ymd = (dateLike) => {
       // });
 
       setLiveactivities((prevActivities) => {
-      if (memberData?._id && prevActivities?.length > 0) {
-        return prevActivities.map((activity) => {
-          if (activity._id === memberData._id) {
-            return {
-              ...activity,
-              ...memberData,
-              latestActivity: {
-                ...activity.latestActivity,
-                ...memberData.latestActivity,
-                status, // always update status
-              },
-            };
-          }
-          return activity;
-        });
-      }
-      return prevActivities;
-    });
+        if (memberData?._id && prevActivities?.length > 0) {
+          return prevActivities.map((activity) => {
+            if (activity._id === memberData._id) {
+              return {
+                ...activity,
+                ...memberData,
+                latestActivity: {
+                  ...activity.latestActivity,
+                  ...memberData.latestActivity,
+                  status, // always update status
+                },
+              };
+            }
+            return activity;
+          });
+        }
+        return prevActivities;
+      });
 
-    setCurrentActivity((prev) => {
-      if (prev && prev._id === memberData._id) {
-        return {
-          ...prev,
-          ...memberData,
-          latestActivity: {
-            ...prev.latestActivity,
-            ...memberData.latestActivity,
-            status,
-          },
-        };
-      }
-      return prev;
-    });
-
+      setCurrentActivity((prev) => {
+        if (prev && prev._id === memberData._id) {
+          return {
+            ...prev,
+            ...memberData,
+            latestActivity: {
+              ...prev.latestActivity,
+              ...memberData.latestActivity,
+              status,
+            },
+          };
+        }
+        return prev;
+      });
 
       // handleLiveActivityList() if required
     });
 
-    
-
-    socket.on("offer", function (id, description, roomId) { 
+    socket.on("offer", function (id, description, roomId) {
       if (peerConnections[id]) {
         peerConnections[id].close();
         delete peerConnections[id];
@@ -1060,7 +1111,7 @@ const ymd = (dateLike) => {
             "answer",
             id,
             peerConnections[id].localDescription,
-            roomId
+            roomId,
           );
         });
       peerConnections[id].onaddstream = function (event) {
@@ -1093,14 +1144,24 @@ const ymd = (dateLike) => {
       // });
 
       peerConnections[id].onconnectionstatechange = () => {
-        console.log('Connection state changed:', peerConnections[id].connectionState);
-        if( peerConnections[id].connectionState === 'failed' || peerConnections[id].connectionState === 'disconnected'){
-          setStreamError("Unable to connect with the desktop app. Please try later.");
-            if(activeInnerTab === "InnerLive"){
-            
+        console.log(
+          "Connection state changed:",
+          peerConnections[id].connectionState,
+        );
+        if (
+          peerConnections[id].connectionState === "failed" ||
+          peerConnections[id].connectionState === "disconnected"
+        ) {
+          setStreamError(
+            "Unable to connect with the desktop app. Please try later.",
+          );
+          if (activeInnerTab === "InnerLive") {
           }
-          socket.emit('tracker-status-update', {userID: currentActivity?._id, status: false });
-        }else if(peerConnections[id].connectionState === 'connected'){
+          socket.emit("tracker-status-update", {
+            userID: currentActivity?._id,
+            status: false,
+          });
+        } else if (peerConnections[id].connectionState === "connected") {
           setStreamError("");
         }
       };
@@ -1118,9 +1179,11 @@ const ymd = (dateLike) => {
       // });
 
       peerConnections[id].oniceconnectionstatechange = () => {
-          console.log('ICE connection state changed:', peerConnections[id].iceConnectionState);
+        console.log(
+          "ICE connection state changed:",
+          peerConnections[id].iceConnectionState,
+        );
       };
-
     });
 
     socket.on("candidate", function (id, candidate, roomId) {
@@ -1152,50 +1215,49 @@ const ymd = (dateLike) => {
   }, []);
 
   useEffect(() => {
-    
-    
     if (activitystate?.liveactivities?.memberData) {
       setLiveactivities(activitystate.liveactivities.memberData);
-      if (currentActivity && activeTab === "Live" && activeInnerTab !== 'InnerLive') {
+      if (
+        currentActivity &&
+        activeTab === "Live" &&
+        activeInnerTab !== "InnerLive"
+      ) {
         const updatedActivity = activitystate.liveactivities.memberData.find(
-          (m) => m._id.toString() === currentActivity._id.toString()
+          (m) => m._id.toString() === currentActivity._id.toString(),
         );
         setCurrentActivity(updatedActivity);
       }
-      setTimeout(() => { 
+      setTimeout(() => {
         setActSpinner(false);
-        setSpinner( false )
+        setSpinner(false);
       }, 2500);
     }
 
     if (activitystate?.recordedActivity) {
       setSelectedScreenshots({});
       setRecordedActivities(activitystate?.recordedActivity);
-      setTimeout(() => { 
+      setTimeout(() => {
         setActSpinner(false);
-        setSpinner( false )
+        setSpinner(false);
       }, 2500);
     }
 
     if (activitystate?.MemberrecordedActivity) {
-      
       setMemberActivities(activitystate.MemberrecordedActivity);
       setTimeout(() => {
         setActSpinner(false);
-        setSpinner( false )
+        setSpinner(false);
       }, 2500);
     }
 
     if (activitystate.success) {
       handleRecordedActivity();
     }
-
-    
   }, [activitystate]);
 
   useEffect(() => {
-    groupSelectboxObserver()
-  }, [activitystate?.recordedActivity])
+    groupSelectboxObserver();
+  }, [activitystate?.recordedActivity]);
 
   useEffect(() => {
     let activeCount = 0;
@@ -1222,34 +1284,38 @@ const ymd = (dateLike) => {
   }, [liveactivities]);
 
   useEffect(() => {
-    if(activeInnerTab === "InnerRecorded" && currentActivity && activeTab === "Recordings"){
-      setRecordedActivities([])
+    if (
+      activeInnerTab === "InnerRecorded" &&
+      currentActivity &&
+      activeTab === "Recordings"
+    ) {
+      setRecordedActivities([]);
       handleRecordedActivity();
     }
-  }, [memberTimezone])
+  }, [memberTimezone]);
   // Debounced search handler
-    const debouncedUpdateSearch = useMemo(
+  const debouncedUpdateSearch = useMemo(
     () =>
       debounce((value) => {
         setFilters((prev) => ({ ...prev, search: value }));
       }, 1000), // 1 sec debounce
-    []
+    [],
   );
 
   const handlefilterchange = (name, value) => {
     if (name === "search") {
       // only debounce search
       debouncedUpdateSearch(value);
-    } else  {
+    } else {
       setFilters((prev) => {
         const updated = { ...prev };
 
         if (name === "member") {
-          delete updated.team;   // remove team when member changes
+          delete updated.team; // remove team when member changes
         }
 
         if (name === "team") {
-          delete updated.member;    // remove member when team changes
+          delete updated.member; // remove member when team changes
         }
 
         updated[name] = value;
@@ -1271,7 +1337,7 @@ const ymd = (dateLike) => {
       project_title: selectedproject?.title,
       start_time: timings?.start_time,
       end_time: timings?.end_time,
-      date: timings?.date
+      date: timings?.date,
     });
 
     setEntries(updatedEntries);
@@ -1331,7 +1397,7 @@ const ymd = (dateLike) => {
   useEffect(() => {
     selectboxObserver();
     setTimeout(() => {
-      groupSelectboxObserver()
+      groupSelectboxObserver();
     }, 600);
     setFilters({ ...filters, ["status"]: activeTab.toLowerCase() });
     // if (activeTab.toLowerCase() !== "recordings") {
@@ -1343,14 +1409,13 @@ const ymd = (dateLike) => {
     // setActSpinner( false );
     // setSpinner( false)
     if (activeInnerTab === "InnerRecorded" && currentActivity) {
-      setRecordedActivities([])
+      setRecordedActivities([]);
       handleRecordedActivity();
       setTimeout(() => {
-        groupSelectboxObserver()
+        groupSelectboxObserver();
       }, 900);
     }
-    selectboxObserver()
-    
+    selectboxObserver();
   }, [activeInnerTab]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -1386,8 +1451,8 @@ const ymd = (dateLike) => {
   };
 
   useEffect(() => {
-    setSelectedScreenshots({})
-  }, [screenshotTab])
+    setSelectedScreenshots({});
+  }, [screenshotTab]);
 
   const handleRemoveEntry = (index) => {
     setEntries(entries.filter((_, i) => i !== index));
@@ -1411,7 +1476,7 @@ const ymd = (dateLike) => {
       setWorkflow(project.workflow.tabs[0]?._id);
     }
     setFilteredTasks([]);
-    setSelectedTask({})
+    setSelectedTask({});
     await dispatch(ListTasks(project?._id));
     await dispatch(getSingleProjectReport(project?._id));
   };
@@ -1426,11 +1491,11 @@ const ymd = (dateLike) => {
 
   const isMemberSelected = (selectedTeamMembers = {}, memberId) => {
     return Object.values(selectedTeamMembers).some((membersArray) =>
-      membersArray.includes(memberId)
+      membersArray.includes(memberId),
     );
   };
 
-const getMembersFromTeams = (selectedTeamIds) => { 
+  const getMembersFromTeams = (selectedTeamIds) => {
     if (!Array.isArray(teamfeed) || !Array.isArray(selectedTeamIds)) {
       return [];
     }
@@ -1551,7 +1616,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
     const lastMonthStart = new Date(
       today.getFullYear(),
       today.getMonth() - 1,
-      2
+      2,
     );
     const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0); // Last day of the last month
     lastMonthEnd.setHours(23, 59, 59, 999); // Ensure full-day inclusion for the last day
@@ -1649,7 +1714,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
               onClick={(e) => {
                 setSelectedFilter("custom");
                 setTimeout(() => {
-                  setFilteredDate([])
+                  setFilteredDate([]);
                 }, 700);
               }}
             >
@@ -1677,53 +1742,50 @@ const getMembersFromTeams = (selectedTeamIds) => {
             </Form.Group>
             {selectedFilter === "custom" && (
               <>
-              <Form.Group className="mb-0 form-group ms-2">
-                <DatePicker
-                  key={"date-filter"}
-                  ref={datePickerRef}
-                  name="date"
-                  weekStartDayIndex={1}
-                  id="datepicker-filter"
-                  value={filtereddate}
-                  format="YYYY-MM-DD"
-                  range
-                  multiple={false}
-                  numberOfMonths={2}
-                  dateSeparator=" - "
-                  onChange={async (value) => {
-                    const formatDate = (date) => {
-                      const d = new Date(date);
-                      const year = d.getFullYear();
-                      const month = String(d.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
-                      const day = String(d.getDate()).padStart(2, "0");
-                      return `${year}-${month}-${day}`;
-                    };
+                <Form.Group className="mb-0 form-group ms-2">
+                  <DatePicker
+                    key={"date-filter"}
+                    ref={datePickerRef}
+                    name="date"
+                    weekStartDayIndex={1}
+                    id="datepicker-filter"
+                    value={filtereddate}
+                    format="YYYY-MM-DD"
+                    range
+                    multiple={false}
+                    numberOfMonths={2}
+                    dateSeparator=" - "
+                    onChange={async (value) => {
+                      const formatDate = (date) => {
+                        const d = new Date(date);
+                        const year = d.getFullYear();
+                        const month = String(d.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+                        const day = String(d.getDate()).padStart(2, "0");
+                        return `${year}-${month}-${day}`;
+                      };
 
-                    if (Array.isArray(value)) {
-                      const formatted = value.map(formatDate);
-                      setFilteredDate(formatted);
-                    } else {
-                      const formatted = formatDate(value);
-                      setFilteredDate(formatted);
-                      
-                    }
-                  }}
-                  className="form-control"
-                  placeholder="dd/mm/yyyy"
-                  open={isPickerOpen} // Control visibility with state
-                  onOpen={() => setIsPickerOpen(true)} // Update state when opened
-                  onClose={() => setIsPickerOpen(false)} // Update state when closed
-                  plugins={[<FilterButton position="bottom" />]}
-                />
-              </Form.Group>
-              
+                      if (Array.isArray(value)) {
+                        const formatted = value.map(formatDate);
+                        setFilteredDate(formatted);
+                      } else {
+                        const formatted = formatDate(value);
+                        setFilteredDate(formatted);
+                      }
+                    }}
+                    className="form-control"
+                    placeholder="dd/mm/yyyy"
+                    open={isPickerOpen} // Control visibility with state
+                    onOpen={() => setIsPickerOpen(true)} // Update state when opened
+                    onClose={() => setIsPickerOpen(false)} // Update state when closed
+                    plugins={[<FilterButton position="bottom" />]}
+                  />
+                </Form.Group>
               </>
             )}
           </Form>
         </ListGroup.Item>
       </>
     );
-   
   };
 
   const showTimezoneDrop = () => {
@@ -1732,23 +1794,30 @@ const getMembersFromTeams = (selectedTeamIds) => {
         <ListGroup.Item className="no--style timezone--drop d-none d-xl-flex">
           <Form.Select
             className="custom-group-selectbox"
-            onChange={(event) => 
-              setMemberTimezone(event.target.value)
-            }
+            onChange={(event) => setMemberTimezone(event.target.value)}
             value={filters?.["timezone"] || "company"}
           >
             <optgroup label="Organization time zone">
-              <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
-            </optgroup>  
+              <option value={"company"}>
+                {timezonesData[crntDashboard?.timezone]
+                  ?.match(/\(UTC[^\)]+\)/)?.[0]
+                  ?.replace(/[()]/g, "") || "UTC+05:30"}
+              </option>
+            </optgroup>
             <optgroup label="Member's time zone">
-              <option value={'member'}>{timezonesData[currentActivity?.usermeta?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
-            </optgroup> 
+              <option value={"member"}>
+                {timezonesData[currentActivity?.usermeta?.timezone]
+                  ?.match(/\(UTC[^\)]+\)/)?.[0]
+                  ?.replace(/[()]/g, "") || "UTC+05:30"}
+              </option>
+            </optgroup>
             <optgroup label="My time zone">
-              <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-?.replace(/[()]/g, "") || 'UTC+05:30'}</option>  
-            </optgroup>  
+              <option value={"user"}>
+                {timezonesData[crntUser?.timezone]
+                  ?.match(/\(UTC[^\)]+\)/)?.[0]
+                  ?.replace(/[()]/g, "") || "UTC+05:30"}
+              </option>
+            </optgroup>
           </Form.Select>
         </ListGroup.Item>
       );
@@ -1763,23 +1832,30 @@ const getMembersFromTeams = (selectedTeamIds) => {
         <ListGroup.Item className="no--style timezone--drop d-block d-xl-none">
           <Form.Select
             className="custom-group-selectbox"
-            onChange={(event) => 
-              setMemberTimezone(event.target.value)
-            }
+            onChange={(event) => setMemberTimezone(event.target.value)}
             value={filters?.["timezone"] || "company"}
           >
             <optgroup label="Organization time zone">
-              <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
-            </optgroup>  
+              <option value={"company"}>
+                {timezonesData[crntDashboard?.timezone]
+                  ?.match(/\(UTC[^\)]+\)/)?.[0]
+                  ?.replace(/[()]/g, "") || "UTC+05:30"}
+              </option>
+            </optgroup>
             <optgroup label="Member's time zone">
-              <option value={'member'}>{timezonesData[currentActivity?.usermeta?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-?.replace(/[()]/g, "") || 'UTC+05:30'}</option> 
-            </optgroup> 
+              <option value={"member"}>
+                {timezonesData[currentActivity?.usermeta?.timezone]
+                  ?.match(/\(UTC[^\)]+\)/)?.[0]
+                  ?.replace(/[()]/g, "") || "UTC+05:30"}
+              </option>
+            </optgroup>
             <optgroup label="My time zone">
-              <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-?.replace(/[()]/g, "") || 'UTC+05:30'}</option>  
-            </optgroup>  
+              <option value={"user"}>
+                {timezonesData[crntUser?.timezone]
+                  ?.match(/\(UTC[^\)]+\)/)?.[0]
+                  ?.replace(/[()]/g, "") || "UTC+05:30"}
+              </option>
+            </optgroup>
           </Form.Select>
         </ListGroup.Item>
       );
@@ -1811,34 +1887,38 @@ const getMembersFromTeams = (selectedTeamIds) => {
             >
               <TbScreenshot className="me-1" /> Screenshots
             </Button>
-            {
-              (activeSubscription && ['price_1Sm6h8SZtJkrH95eYrwqvWQx',
-                                      'price_1Sm6hhSZtJkrH95e3hAKkKBG',
-                                      'price_1Sm6hhSZtJkrH95e3hAKkKBG',
-                                      'price_1T1kNISZtJkrH95epkJdx2QN',
-                                      'price_1T1kNUSZtJkrH95eeWlP2oMU',
-                                      'price_1T1kNhSZtJkrH95eEKKOZ2LG', 'plan_ReKagUnhkdX86V'].includes(activeSubscription?.planId) ) ? (
-                <Button
-                  variant="primary"
-                  className="btn--view"
-                  key={"videos1-tab-key"}
-                  active={screenshotTab === "Videos"}
-                  onClick={() => setScreenshotTab("Videos")}
-                >
-                  <MdOutlineVideoLibrary className="me-1" /> Videos
-                </Button>)
-              :
+            {activeSubscription &&
+            [
+              "price_1Sm6h8SZtJkrH95eYrwqvWQx",
+              "price_1Sm6hhSZtJkrH95e3hAKkKBG",
+              "price_1Sm6hhSZtJkrH95e3hAKkKBG",
+              "price_1T1kNISZtJkrH95epkJdx2QN",
+              "price_1T1kNUSZtJkrH95eeWlP2oMU",
+              "price_1T1kNhSZtJkrH95eEKKOZ2LG",
+              "plan_ReKagUnhkdX86V",
+            ].includes(activeSubscription?.planId) ? (
               <Button
-                  variant="primary"
-                  className="btn--view"
-                  key={"videos1-tab-key"}
-                  disabled
-                  onClick={() => {return false;}}
-                >
-                  <MdOutlineVideoLibrary className="me-1" /> Videos
-                </Button>
-            }
-            
+                variant="primary"
+                className="btn--view"
+                key={"videos1-tab-key"}
+                active={screenshotTab === "Videos"}
+                onClick={() => setScreenshotTab("Videos")}
+              >
+                <MdOutlineVideoLibrary className="me-1" /> Videos
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                className="btn--view"
+                key={"videos1-tab-key"}
+                disabled
+                onClick={() => {
+                  return false;
+                }}
+              >
+                <MdOutlineVideoLibrary className="me-1" /> Videos
+              </Button>
+            )}
           </ListGroup>
         </ListGroup>
       );
@@ -1944,7 +2024,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             setCurrentActivity(cact);
                           }
                           setActiveTab("Live");
-                          setActiveInnerTab('InnerLive')
+                          setActiveInnerTab("InnerLive");
                         }}
                       >
                         <FiMonitor className="me-1" /> Live
@@ -1954,147 +2034,151 @@ const getMembersFromTeams = (selectedTeamIds) => {
                         active={activeTab === "Recordings"}
                         onClick={() => {
                           setActSpinner(false);
-                          setSpinner(false)
+                          setSpinner(false);
                           setActiveTab("Recordings");
-                          setActiveInnerTab('InnerRecorded')
+                          setActiveInnerTab("InnerRecorded");
                         }}
                       >
                         <FiVideo className="me-1" /> Recorded
                       </ListGroup.Item>
                     </ListGroup>
-                    
-                    {
-                      ( memberProfile?.role?.permissions?.time_tracking?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_peoples_only ===  true) ? 
-                        (
-                          <ListGroup.Item
-                            className={
-                              "ms-auto d-none d-xl-flex"
-                            }
-                            key="member-filter-list"
+
+                    {memberProfile?.role?.permissions?.time_tracking
+                      ?.view_others === true &&
+                    memberProfile?.role?.permissions?.assigned_teams
+                      ?.specific_peoples_only === true ? (
+                      <ListGroup.Item
+                        className={"ms-auto d-none d-xl-flex"}
+                        key="member-filter-list"
+                      >
+                        <Form.Select
+                          className="custom-selectbox"
+                          onChange={(event) =>
+                            handlefilterchange("member", event.target.value)
+                          }
+                          value={filters?.["member"] || "all"}
+                        >
+                          <option
+                            value={memberProfile?._id}
+                            key="my-info-option"
                           >
-                            <Form.Select
-                              className="custom-selectbox"
-                              onChange={(event) => 
-                                handlefilterchange("member", event.target.value)
-                              }
-                              value={filters?.["member"] || "all"}
-                              
-                            >
+                            My Time Logs
+                          </option>
+
+                          {assignedTeamsOrMembers?.members?.length > 0 && (
+                            <option key={`member-info-all`} value={"all"}>
+                              All Members
+                            </option>
+                          )}
+                          <>
+                            {assignedTeamsOrMembers?.members?.map(
+                              (member, index) => (
+                                <option
+                                  key={`member-projects-${index}`}
+                                  value={member._id}
+                                >
+                                  {member.name}
+                                </option>
+                              ),
+                            )}
+                          </>
+                        </Form.Select>
+                      </ListGroup.Item>
+                    ) : memberProfile?.role?.permissions?.time_tracking
+                        ?.view_others === true &&
+                      memberProfile?.role?.permissions?.assigned_teams
+                        ?.specific_teams_only === true ? (
+                      <ListGroup.Item
+                        className={"ms-auto d-none d-xl-flex"}
+                        key="teams-filter-list"
+                      >
+                        <Form.Select
+                          className="custom-group-selectbox"
+                          onChange={(event) => {
+                            const group =
+                              event.target.selectedOptions[0].dataset.group;
+                            handlefilterchange(group, event.target.value);
+                          }}
+                          value={filters?.["member"] || "all"}
+                        >
+                          <>
+                            {/* MEMBERS GROUP */}
+                            <optgroup label="Members" optgroup>
                               <option
                                 value={memberProfile?._id}
-                                key="my-info-option"
+                                data-group="member"
                               >
                                 My Time Logs
                               </option>
-                              
-                              {(assignedTeamsOrMembers?.members?.length > 0 ) && (
-                                <option key={`member-info-all`} value={"all"}>
-                                  All Members
-                                </option>
+                              <option value="all" data-group="member">
+                                All Members
+                              </option>
+                              {assignedTeamsOrMembers?.members?.map(
+                                (member) => (
+                                  <option
+                                    key={member._id}
+                                    value={member._id}
+                                    data-group="member"
+                                  >
+                                    {member.name}
+                                  </option>
+                                ),
                               )}
-                              <>   
-                                {  assignedTeamsOrMembers?.members?.map((member, index) => (
-                                      <option
-                                        key={`member-projects-${index}`}
-                                        value={member._id}
-                                      >
-                                        {member.name}
-                                      </option>
-                                    ))
-  
-                                }
-                              </>
-                              
-                            </Form.Select>
-                          </ListGroup.Item>
-                          )
-                          :
-                          (memberProfile?.role?.permissions?.time_tracking?.view_others === true && memberProfile?.role?.permissions?.assigned_teams?.specific_teams_only ===
-                                true) ?
-                          <ListGroup.Item 
-                          className={
-                            "ms-auto d-none d-xl-flex"
-                          }
-                          key="teams-filter-list">
-                        <Form.Select
-                            className="custom-group-selectbox"
-                            onChange={(event) => {
-                              const group = event.target.selectedOptions[0].dataset.group;
-                              handlefilterchange(group, event.target.value);
-                            }}
-                            value={filters?.["member"] || "all"}
-                          >
-                              <>
-                                {/* MEMBERS GROUP */}
-                                <optgroup label="Members"optgroup>
-                                  <option value={memberProfile?._id} data-group="member">
-                                    My Time Logs
-                                  </option>
-                                  <option value="all" data-group="member">
-                                    All Members
-                                  </option>
-                                  {assignedTeamsOrMembers?.members?.map((member) => (
-                                        <option
-                                          key={member._id}
-                                          value={member._id}
-                                          data-group="member"
-                                        >
-                                          {member.name}
-                                        </option>
-                                      ))}
-                                      
-                                </optgroup>
-                                <optgroup label="Teams">
-  
-                                  {assignedTeamsOrMembers?.teams?.map((team, index) => {
-                                      return (
-                                        <option
-                                          key={`team-info-${index}`}
-                                          value={team._id}
-                                          data-group="team"
-                                        >
-                                          {team.name}
-                                        </option>
-                                      )
-                                  })}
-                                </optgroup>
-                              </>
-                            
-                          </Form.Select>
-                        </ListGroup.Item>
-                        :<></>
-                    }
-                    
+                            </optgroup>
+                            <optgroup label="Teams">
+                              {assignedTeamsOrMembers?.teams?.map(
+                                (team, index) => {
+                                  return (
+                                    <option
+                                      key={`team-info-${index}`}
+                                      value={team._id}
+                                      data-group="team"
+                                    >
+                                      {team.name}
+                                    </option>
+                                  );
+                                },
+                              )}
+                            </optgroup>
+                          </>
+                        </Form.Select>
+                      </ListGroup.Item>
+                    ) : (
+                      <></>
+                    )}
+
                     {showTabs()}
 
-                    {
-                      (activeTab === "Recordings") && (
-                          <ListGroup.Item>
-                            <Form.Select
-                                className="custom-group-selectbox"
-                                onChange={(event) => {
-                                  handlefilterchange("timezone", event.target.value)
-                                  setMemberTimezone(event.target.value)
-                                }
-                                
-                              }
-                              value={filters?.["timezone"] || "company"}
-                            >
-                              <optgroup label="Organization time zone">
-                                <option value={'company'}>{timezonesData[crntDashboard?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option> 
-                              </optgroup>  
-                              <optgroup label="My time zone">
-                                <option value={'user'}>{timezonesData[crntUser?.timezone]?.match(/\(UTC[^\)]+\)/)?.[0]
-    ?.replace(/[()]/g, "") || 'Asia/Kolkata'}</option>  
-                              </optgroup>  
-                              {/* <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
+                    {activeTab === "Recordings" && (
+                      <ListGroup.Item>
+                        <Form.Select
+                          className="custom-group-selectbox"
+                          onChange={(event) => {
+                            handlefilterchange("timezone", event.target.value);
+                            setMemberTimezone(event.target.value);
+                          }}
+                          value={filters?.["timezone"] || "company"}
+                        >
+                          <optgroup label="Organization time zone">
+                            <option value={"company"}>
+                              {timezonesData[crntDashboard?.timezone]
+                                ?.match(/\(UTC[^\)]+\)/)?.[0]
+                                ?.replace(/[()]/g, "") || "Asia/Kolkata"}
+                            </option>
+                          </optgroup>
+                          <optgroup label="My time zone">
+                            <option value={"user"}>
+                              {timezonesData[crntUser?.timezone]
+                                ?.match(/\(UTC[^\)]+\)/)?.[0]
+                                ?.replace(/[()]/g, "") || "Asia/Kolkata"}
+                            </option>
+                          </optgroup>
+                          {/* <option value={'company'}>{timezonesData[crntDashboard?.timezone] || 'Asia/Kolkata'}</option>    
                               <option value={'user'}>{timezonesData[crntUser?.timezone] || 'Asia/Kolkata'}</option>    */}
-                            </Form.Select>
-                          </ListGroup.Item>
-                      )
-                    }
-                    
+                        </Form.Select>
+                      </ListGroup.Item>
+                    )}
+
                     {activeTab === "Live" && (
                       <ListGroup.Item
                         key="filter-key-6"
@@ -2105,7 +2189,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                           onChange={(event) =>
                             handlefilterchange(
                               "tracker_status",
-                              event.target.value
+                              event.target.value,
                             )
                           }
                           value={filters["tracker_status"] || "all"}
@@ -2139,33 +2223,35 @@ const getMembersFromTeams = (selectedTeamIds) => {
                       </Form>
                     </ListGroup.Item>
                     {(memberProfile?.role?.permissions?.time_tracking
-                      ?.add_manual_time === true || memberProfile?.role?.permissions?.time_tracking
-                      ?.update_manual_time === true ) && (
+                      ?.add_manual_time === true ||
+                      memberProfile?.role?.permissions?.time_tracking
+                        ?.update_manual_time === true) && (
                       <Dropdown className="select--dropdown manual--dropdown">
                         <Dropdown.Toggle variant="success" id="dropdown-basic">
                           <LuTimer />
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                           {memberProfile?.role?.permissions?.time_tracking
+                          {memberProfile?.role?.permissions?.time_tracking
                             ?.add_manual_time === true && (
-                              <Dropdown.Item onClick={handleShow}>
-                                Manual Time
-                              </Dropdown.Item>
-                            )}
-                          {(memberProfile?.role?.permissions?.time_tracking
-                            ?.update_manual_time === true && memberProfile?.role?.permissions?.time_tracking?.view_others === true) && (
-                            <Dropdown.Item
-                              onClick={handleNewShow}
-                              to="/manual-time"
-                            >
-                              Manual Time Approval
+                            <Dropdown.Item onClick={handleShow}>
+                              Manual Time
                             </Dropdown.Item>
                           )}
+                          {memberProfile?.role?.permissions?.time_tracking
+                            ?.update_manual_time === true &&
+                            memberProfile?.role?.permissions?.time_tracking
+                              ?.view_others === true && (
+                              <Dropdown.Item
+                                onClick={handleNewShow}
+                                to="/manual-time"
+                              >
+                                Manual Time Approval
+                              </Dropdown.Item>
+                            )}
                         </Dropdown.Menu>
                       </Dropdown>
                     )}
-                   
-                    
+
                     <ListGroup horizontal className="bg-white expand--icon">
                       <ListGroup.Item
                         className="d-flex d-xl-none"
@@ -2180,7 +2266,11 @@ const getMembersFromTeams = (selectedTeamIds) => {
                         <GrExpand />
                       </ListGroup.Item>
                       <ListGroup.Item className="refresh--btn btn btn-primary d-none d-md-flex">
-                        <BsArrowClockwise onClick={() => {handleLiveActivityList()}} />
+                        <BsArrowClockwise
+                          onClick={() => {
+                            handleLiveActivityList();
+                          }}
+                        />
                       </ListGroup.Item>
                     </ListGroup>
                   </ListGroup>
@@ -2326,7 +2416,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                           leaveRoom(currentActivity?._id);
                                           socket.emit(
                                             "get-tracker-status-update",
-                                            { userID: activity._id }
+                                            { userID: activity._id },
                                           );
                                           setCurrentActivity(activity);
                                         } else if (
@@ -2410,7 +2500,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                         <LuTimer className="me-1" />{" "}
                                         {convertSecondstoTime(
                                           activity?.latestActivity?.duration ||
-                                            0
+                                            0,
                                         ) || "00:00"}
                                       </div>
                                     </td>
@@ -2424,7 +2514,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                       <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
                                         <FiClock className="me-1" />{" "}
                                         {convertSecondstoTime(
-                                          activity?.totalDuration || 0
+                                          activity?.totalDuration || 0,
                                         ) || "00:00"}
                                       </span>
                                     </td>
@@ -2468,16 +2558,15 @@ const getMembersFromTeams = (selectedTeamIds) => {
                           </tbody>
                         </Table>
                       ) : (
-                        <></>)
-                      }
-                      {
-                        (!spinner &&
+                        <></>
+                      )}
+                      {!spinner &&
                         liveactivities &&
-                        liveactivities.length === 0) && (
+                        liveactivities.length === 0 && (
                           <div className="mt-2 text-center py-3">
                             <h2>No Activities Found</h2>
                           </div>
-                      )}
+                        )}
                     </div>
                   </div>
                 </>
@@ -2518,7 +2607,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                           <tbody>
                             {liveactivities.map((activity, index) => {
                               totalhours += Number(
-                                activity?.totalTaskDuration || 0
+                                activity?.totalTaskDuration || 0,
                               );
 
                               return (
@@ -2550,7 +2639,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                           leaveRoom(currentActivity?._id);
                                           socket.emit(
                                             "get-tracker-status-update",
-                                            { userID: activity._id }
+                                            { userID: activity._id },
                                           );
                                           setCurrentActivity(activity);
                                         } else if (
@@ -2621,7 +2710,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                       <span className="total--time--badge bg--blue px-2 py-1 rounded-3 d-inline-flex gap-2 align-items-center">
                                         <FiClock className="me-1" />{" "}
                                         {convertSecondstoTime(
-                                          activity?.totalDuration || 0
+                                          activity?.totalDuration || 0,
                                         ) || "00:00"}
                                       </span>
                                     </td>
@@ -2671,17 +2760,21 @@ const getMembersFromTeams = (selectedTeamIds) => {
             </span>
             <div className="projecttitle">
               <Dropdown>
-                {
-                  ( liveactivities && liveactivities.length === 1 ) ? 
-                    <>
-                    <button type="button" id="dropdown-basic-single" className="dropdown-toggle btn btn-link">
+                {liveactivities && liveactivities.length === 1 ? (
+                  <>
+                    <button
+                      type="button"
+                      id="dropdown-basic-single"
+                      className="dropdown-toggle btn btn-link"
+                    >
                       <div className="title--initial">
                         {currentActivity?.name?.charAt(0)}
                         {currentActivity?.latestActivity?.status ? (
                           <p className="anim--circle">
                             <small className="status--circle active--color"></small>
                           </p>
-                        ) : currentActivity?.latestActivity?.status === false ? (
+                        ) : currentActivity?.latestActivity?.status ===
+                          false ? (
                           <p className="anim--circle">
                             <small className="status--circle idle--color"></small>
                           </p>
@@ -2698,95 +2791,97 @@ const getMembersFromTeams = (selectedTeamIds) => {
                         </h3>
                       </div>
                     </button>
-                    </>
-                  :
+                  </>
+                ) : (
                   <>
-                <Dropdown.Toggle variant="link" id="dropdown-basic">
-                  <div className="title--initial">
-                    {currentActivity?.avatar &&
-                      currentActivity?.avatar !== null ? (
-                        <span>
-                          <img
-                          src={currentActivity?.avatar}
-                          alt={"member-avatar"}
-                        />
-                      </span>
-                    ) : (
-                      currentActivity?.name?.charAt(0)
-                    )}
-                    {currentActivity?.latestActivity?.status ? (
-                      <p className="anim--circle">
-                        <small className="status--circle active--color"></small>
-                      </p>
-                    ) : currentActivity?.latestActivity?.status === false ? (
-                      <p className="anim--circle">
-                        <small className="status--circle idle--color"></small>
-                      </p>
-                    ) : (
-                      <p className="anim--circle">
-                        <small className="status--circle inactive--color"></small>
-                      </p>
-                    )}
-                  </div>
-                  <div className="title--span flex-column align-items-start gap-0">
-                    <h3>
-                      <strong>{currentActivity?.name}</strong>
-                      <span>{currentActivity?.role?.name || ""}</span>
-                    </h3>
-                  </div>
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <div className="drop--scroll">
-                    {liveactivities.length > 0 &&
-                      liveactivities.map((activity, index) => {
-                        return (
-                          <Dropdown.Item
-                            onClick={() => {
-                              handleClick(activity);
-                            }}
-                            className={
-                              currentActivity?._id === activity?._id
-                                ? "active-project"
-                                : ""
-                            }
-                          >
-                            <div className="title--initial">
-                              {activity?.avatar &&
-                                activity?.avatar !== null ? (
-                                  <span>
-                                    <img
-                                    src={activity?.avatar}
-                                    alt={"member-avatar"}
-                                  />
-                                </span>
-                              ) : (
-                                activity?.name?.charAt(0)
-                              )}
-                               {activity?.latestActivity?.status ? (
-                                  <p className="anim--circle">
-                                    <small className="status--circle active--color"></small>
-                                  </p>
-                                ) : activity?.latestActivity?.status === false ? (
-                                  <p className="anim--circle">
-                                    <small className="status--circle idle--color"></small>
-                                  </p>
-                                ) : (
-                                  <p className="anim--circle">
-                                    <small className="status--circle inactive--color"></small>
-                                  </p>
-                                )}
-                            </div>
-                            <div className="title--span flex-column align-items-start gap-0">
-                              <strong>{activity?.name}</strong>
-                              <span>{activity?.role?.name || ""}</span>
-                            </div>
-                          </Dropdown.Item>
-                        );
-                      })}
-                  </div>
-                </Dropdown.Menu>
-                </>
-              }
+                    <Dropdown.Toggle variant="link" id="dropdown-basic">
+                      <div className="title--initial">
+                        {currentActivity?.avatar &&
+                        currentActivity?.avatar !== null ? (
+                          <span>
+                            <img
+                              src={currentActivity?.avatar}
+                              alt={"member-avatar"}
+                            />
+                          </span>
+                        ) : (
+                          currentActivity?.name?.charAt(0)
+                        )}
+                        {currentActivity?.latestActivity?.status ? (
+                          <p className="anim--circle">
+                            <small className="status--circle active--color"></small>
+                          </p>
+                        ) : currentActivity?.latestActivity?.status ===
+                          false ? (
+                          <p className="anim--circle">
+                            <small className="status--circle idle--color"></small>
+                          </p>
+                        ) : (
+                          <p className="anim--circle">
+                            <small className="status--circle inactive--color"></small>
+                          </p>
+                        )}
+                      </div>
+                      <div className="title--span flex-column align-items-start gap-0">
+                        <h3>
+                          <strong>{currentActivity?.name}</strong>
+                          <span>{currentActivity?.role?.name || ""}</span>
+                        </h3>
+                      </div>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <div className="drop--scroll">
+                        {liveactivities.length > 0 &&
+                          liveactivities.map((activity, index) => {
+                            return (
+                              <Dropdown.Item
+                                onClick={() => {
+                                  handleClick(activity);
+                                }}
+                                className={
+                                  currentActivity?._id === activity?._id
+                                    ? "active-project"
+                                    : ""
+                                }
+                              >
+                                <div className="title--initial">
+                                  {activity?.avatar &&
+                                  activity?.avatar !== null ? (
+                                    <span>
+                                      <img
+                                        src={activity?.avatar}
+                                        alt={"member-avatar"}
+                                      />
+                                    </span>
+                                  ) : (
+                                    activity?.name?.charAt(0)
+                                  )}
+                                  {activity?.latestActivity?.status ? (
+                                    <p className="anim--circle">
+                                      <small className="status--circle active--color"></small>
+                                    </p>
+                                  ) : activity?.latestActivity?.status ===
+                                    false ? (
+                                    <p className="anim--circle">
+                                      <small className="status--circle idle--color"></small>
+                                    </p>
+                                  ) : (
+                                    <p className="anim--circle">
+                                      <small className="status--circle inactive--color"></small>
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="title--span flex-column align-items-start gap-0">
+                                  <strong>{activity?.name}</strong>
+                                  <span>{activity?.role?.name || ""}</span>
+                                </div>
+                              </Dropdown.Item>
+                            );
+                          })}
+                      </div>
+                    </Dropdown.Menu>
+                  </>
+                )}
               </Dropdown>
             </div>
             <ListGroup
@@ -2807,7 +2902,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                       setTimeout(() => {
                         startsharing(
                           currentActivity?._id,
-                          currentActivity?.latestActivity?.status
+                          currentActivity?.latestActivity?.status,
                         );
                       }, 700);
                     }
@@ -2835,22 +2930,22 @@ const getMembersFromTeams = (selectedTeamIds) => {
             </ListGroup>
             <ListGroup horizontal className="p-0 ms-auto ms-xxl-0">
               {showTimezoneDrop()}
-              {
-                (currentActivity && activeInnerTab === "InnerRecorded" || currentActivity && activeInnerTab === "InnerLive") && (
-                  <ListGroup
-                      horizontal
-                      className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center"
-                    >
-                  <ListGroup.Item onClick={
-                    () => {
-                      dispatch(getRecordingTypes(currentActivity?._id))
-                      setShowRecordSettings(true)
-                    }}>
+              {((currentActivity && activeInnerTab === "InnerRecorded") ||
+                (currentActivity && activeInnerTab === "InnerLive")) && (
+                <ListGroup
+                  horizontal
+                  className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center"
+                >
+                  <ListGroup.Item
+                    onClick={() => {
+                      dispatch(getRecordingTypes(currentActivity?._id));
+                      setShowRecordSettings(true);
+                    }}
+                  >
                     <FiSettings />
                   </ListGroup.Item>
-                  </ListGroup>
-                )
-              }
+                </ListGroup>
+              )}
               <ListGroup
                 horizontal
                 className="bg-white expand--icon p-0 b-0 rounded-0 align-items-center"
@@ -2868,7 +2963,11 @@ const getMembersFromTeams = (selectedTeamIds) => {
                   <GrExpand />
                 </ListGroup.Item>
                 <ListGroup.Item className="list-group-item refresh--btn list-group-item-action d-none d-md-flex">
-                  <BsArrowClockwise onClick={() => {handleRecordedActivity()}} />
+                  <BsArrowClockwise
+                    onClick={() => {
+                      handleRecordedActivity();
+                    }}
+                  />
                 </ListGroup.Item>
                 <ListGroup.Item
                   className="btn btn-primary"
@@ -2878,9 +2977,9 @@ const getMembersFromTeams = (selectedTeamIds) => {
                     setCurrentActivity(false);
                     setIsActive(false);
                     dispatch(toggleSidebarSmall(false));
-                    if(activeInnerTab === "InnerLive"){
-                      setActiveTab('Live')
-                    }else{
+                    if (activeInnerTab === "InnerLive") {
+                      setActiveTab("Live");
+                    } else {
                       setActiveTab("Recordings");
                     }
                   }}
@@ -2897,7 +2996,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                 : "rounded--box activity--box"
             }
           >
-            {(activityspinner) && (
+            {activityspinner && (
               <div className="loading-bar">
                 <img src="images/OnTeam-icon-gray.png" className="flipchar" />
               </div>
@@ -2909,27 +3008,25 @@ const getMembersFromTeams = (selectedTeamIds) => {
                   key={`activity-${currentActivity?._id}`}
                 >
                   <div className="timer--task">
-                    {
-                      (currentActivity?.latestActivity?._id) && (
-                        <h5
-                          key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}
-                        >
-                          {currentActivity?.latestActivity?.project?.title || (
+                    {currentActivity?.latestActivity?._id && (
+                      <h5
+                        key={`project-task-title-for-${currentActivity?.latestActivity?._id}`}
+                      >
+                        {currentActivity?.latestActivity?.project?.title || (
+                          <BsDash />
+                        )}{" "}
+                        {currentActivity?.latestActivity?.project?.client?.name
+                          ? `[${currentActivity.latestActivity.project.client.name}]`
+                          : ""}
+                        -{" "}
+                        <small>
+                          {currentActivity?.latestActivity?.task?.title || (
                             <BsDash />
-                          )}{" "}
-                          {currentActivity?.latestActivity?.project?.client?.name
-                            ? `[${currentActivity.latestActivity.project.client.name}]`
-                            : ""}
-                          -{" "}
-                          <small>
-                            {currentActivity?.latestActivity?.task?.title || (
-                              <BsDash />
-                            )}
-                          </small>
-                        </h5>
-                      )
-                    }
-                    
+                          )}
+                        </small>
+                      </h5>
+                    )}
+
                     {/* <span className="ms-md-3">
                       {currentActivity?.latestActivity?.app_version}
                     </span> */}
@@ -2937,7 +3034,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                       <span>
                         <strong>
                           {convertSecondstoTime(
-                            currentActivity?.totalDuration
+                            currentActivity?.totalDuration,
                           ) || "00:00"}
                         </strong>
                       </span>
@@ -2970,17 +3067,13 @@ const getMembersFromTeams = (selectedTeamIds) => {
                       </Button>
                     </div>
                   </div>
-                 
-                  {
-                    currentActivity?.latestActivity?.status === false ? (
-                      <p className="text-center">The member is on break.</p>
-                    )
-                    :
-                    (streamError !== "") ? (
-                        <p className="text-center">{streamError}</p>
-                      )
-                    :
-                  liveStreaming[currentActivity?._id] && liveStreaming[currentActivity?._id] === "disabled" ? (
+
+                  {currentActivity?.latestActivity?.status === false ? (
+                    <p className="text-center">The member is on break.</p>
+                  ) : streamError !== "" ? (
+                    <p className="text-center">{streamError}</p>
+                  ) : liveStreaming[currentActivity?._id] &&
+                    liveStreaming[currentActivity?._id] === "disabled" ? (
                     <p className="text-center">Live streaming is disabled.</p>
                   ) : currentActivity?.latestActivity?.status ? (
                     <video
@@ -2990,12 +3083,14 @@ const getMembersFromTeams = (selectedTeamIds) => {
                       className="video"
                       onLoadedData={() => {
                         setActSpinner(false);
-                        setStreamError("")
+                        setStreamError("");
                       }}
                       preload="auto"
                       autoPlay
                       muted
-                      onError={() => setStreamError("Live stream failed to load")}
+                      onError={() =>
+                        setStreamError("Live stream failed to load")
+                      }
                     >
                       Live video is not available right now.
                     </video>
@@ -3013,490 +3108,495 @@ const getMembersFromTeams = (selectedTeamIds) => {
               <>
                 {showRecordedTabs()}
                 <Accordion>
-                  {recordedactivities && recordedactivities.length > 0 ? (
-                    recordedactivities.map((recording, index) => {
-                      return (
-                        <>
-                          <Accordion.Item
-                            eventKey={`screenshot-${recording?._id}-${index}`}
-                          >
-                            <div className="screens--tabs">
-                              <Accordion.Header>
-                                <h4 className="d-flex align-items-center gap-3 justify-content-between">
-                                  <strong>
-                                    <span>
-                                      <LuFileText />
-                                    </span>
-                                    {recording?.project?.title}
-                                  </strong>
-                                  
-                                  <strong className="activity-type-text d-flex align-items-center gap-2">
-                                    
-                                    <HiOutlineLightningBolt /> {recording?.type}
-                                    {
-                                      recording?.type === 'manual' && recording.is_approved === true ? 
-                                      (
+                  {recordedactivities && recordedactivities.length > 0
+                    ? recordedactivities.map((recording, index) => {
+                        return (
+                          <>
+                            <Accordion.Item
+                              eventKey={`screenshot-${recording?._id}-${index}`}
+                            >
+                              <div className="screens--tabs">
+                                <Accordion.Header>
+                                  <h4 className="d-flex align-items-center gap-3 justify-content-between">
+                                    <strong>
+                                      <span>
+                                        <LuFileText />
+                                      </span>
+                                      {recording?.project?.title}
+                                    </strong>
+
+                                    <strong className="activity-type-text d-flex align-items-center gap-2">
+                                      <HiOutlineLightningBolt />{" "}
+                                      {recording?.type}
+                                      {recording?.type === "manual" &&
+                                      recording.is_approved === true ? (
                                         <>
                                           <FaCheck /> Approved
                                         </>
-                                      )
-                                      :
-                                      recording?.type === 'manual' &&  recording.is_approved === false ?
-                                      <>
-                                        <FaCheck /> Pending
-                                      </>
-                                      : <></>
-                                    }
-                                  </strong>
-                                </h4>
-                                <p>
-                                  <small className="d-flex align-items-center gap-2">
-                                    <FiUser />{" "}
-                                    {recording?.project?.client?.name}
-                                  </small>
-                                </p>
-                                <ListGroup horizontal>
-                                  <ListGroup.Item>
-                                    <FiCalendar className="me-2" />{" "}
-                                    {new Date(
-                                      recording?.createdAt
-                                    ).toLocaleDateString("en-GB", options)}
-                                  </ListGroup.Item>
-                                  <ListGroup.Item>
-                                    <FiClock className="me-2" />{" "}
-                                    {generateTimeRange(
-                                      recording?.createdAt,
-                                      recording?.duration || 0
-                                    )}
-                                  </ListGroup.Item>
-                                  {
-                                    (recording?.type === 'tracker') && (
+                                      ) : recording?.type === "manual" &&
+                                        recording.is_approved === false ? (
+                                        <>
+                                          <FaCheck /> Pending
+                                        </>
+                                      ) : (
+                                        <></>
+                                      )}
+                                    </strong>
+                                  </h4>
+                                  <p>
+                                    <small className="d-flex align-items-center gap-2">
+                                      <FiUser />{" "}
+                                      {recording?.project?.client?.name}
+                                    </small>
+                                  </p>
+                                  <ListGroup horizontal>
+                                    <ListGroup.Item>
+                                      <FiCalendar className="me-2" />{" "}
+                                      {new Date(
+                                        recording?.createdAt,
+                                      ).toLocaleDateString("en-GB", options)}
+                                    </ListGroup.Item>
+                                    <ListGroup.Item>
+                                      <FiClock className="me-2" />{" "}
+                                      {generateTimeRange(
+                                        recording?.createdAt,
+                                        recording?.duration || 0,
+                                      )}
+                                    </ListGroup.Item>
+                                    {recording?.type === "tracker" && (
                                       <ListGroup.Item>
-                                        <FaHistory className="me-2" />{" "}
-                                        Version: {recording?.app_version}
+                                        <FaHistory className="me-2" /> Version:{" "}
+                                        {recording?.app_version}
                                       </ListGroup.Item>
-                                    )
-                                  }
-                                </ListGroup>
-                              </Accordion.Header>
-                            </div>
-                            <Accordion.Body>
-                              <div className="shots--list">
-                                
-                                <div className="text-end">
-                                  {selectedScreenshots &&
-                                    Object.keys(selectedScreenshots).length >
-                                      0 &&
-                                    Object.values(selectedScreenshots).some(
-                                      (arr) => arr.length > 0
-                                    ) && (
-                                      <Button
-                                        variant="secondary"
-                                        className="btn--view mb-3"
-                                        key={"delete-group"}
-                                        active={true}
-                                        onClick={() => deleteRecordedData()}
-                                      >
-                                        Delete Selected
-                                      </Button>
                                     )}
-                                </div>
-                                <CardGroup>
-                                  {recording?.activityMeta &&
-                                  recording.activityMeta.length > 0 ? (
-                                    recording.activityMeta.map((meta, i) => {
-                                      // Handle screenshots tab
-                                      if (
-                                        screenshotTab === "Screenshots" &&
-                                        meta.meta_key === "screenshots" &&
-                                        meta.meta_value.length > 0
-                                      ) {
-                                        return meta.meta_value.map(
-                                          (screenshotData, j) => (
-                                            <Card
-                                              key={`screenshot-card-${i}-${j}`}
-                                            >
-                                              <Card.Body>
-                                                {screenshotData?.is_deleted !==
-                                                  true &&
-                                                  memberProfile?.role?.permissions
-                                                    ?.time_tracking
-                                                    ?.delete_recordings ===
+                                  </ListGroup>
+                                </Accordion.Header>
+                              </div>
+                              <Accordion.Body>
+                                <div className="shots--list">
+                                  <div className="text-end">
+                                    {selectedScreenshots &&
+                                      Object.keys(selectedScreenshots).length >
+                                        0 &&
+                                      Object.values(selectedScreenshots).some(
+                                        (arr) => arr.length > 0,
+                                      ) && (
+                                        <Button
+                                          variant="secondary"
+                                          className="btn--view mb-3"
+                                          key={"delete-group"}
+                                          active={true}
+                                          onClick={() => deleteRecordedData()}
+                                        >
+                                          Delete Selected
+                                        </Button>
+                                      )}
+                                  </div>
+                                  <CardGroup>
+                                    {recording?.activityMeta &&
+                                    recording.activityMeta.length > 0 ? (
+                                      recording.activityMeta.map((meta, i) => {
+                                        // Handle screenshots tab
+                                        if (
+                                          screenshotTab === "Screenshots" &&
+                                          meta.meta_key === "screenshots" &&
+                                          meta.meta_value.length > 0
+                                        ) {
+                                          return meta.meta_value.map(
+                                            (screenshotData, j) => (
+                                              <Card
+                                                key={`screenshot-card-${i}-${j}`}
+                                              >
+                                                <Card.Body>
+                                                  {screenshotData?.is_deleted !==
                                                     true &&
-                                                  memberProfile?._id ===
-                                                    recording?.member && 
-                                                    (
-                                                    <div className="card--checkbox">
-                                                      <Form.Check
-                                                        type="checkbox"
-                                                        checked={
-                                                          selectedScreenshots[
-                                                            recording?._id
-                                                          ]?.includes(j) ||
-                                                          false
-                                                        }
-                                                        key={`screenshot-id-${recording?._id}`}
-                                                        onChange={() =>
-                                                          handleSelectRecording(
-                                                            recording?._id,
-                                                            j
-                                                          )
-                                                        }
-                                                      />
-                                                    </div>
-                                                  )}
-                                                <img
-                                                  className="card-img-top"
-                                                  src={screenshotData?.url}
-                                                  alt="screenshot"
+                                                    memberProfile?.role
+                                                      ?.permissions
+                                                      ?.time_tracking
+                                                      ?.delete_recordings ===
+                                                      true &&
+                                                    memberProfile?._id ===
+                                                      recording?.member && (
+                                                      <div className="card--checkbox">
+                                                        <Form.Check
+                                                          type="checkbox"
+                                                          checked={
+                                                            selectedScreenshots[
+                                                              recording?._id
+                                                            ]?.includes(j) ||
+                                                            false
+                                                          }
+                                                          key={`screenshot-id-${recording?._id}`}
+                                                          onChange={() =>
+                                                            handleSelectRecording(
+                                                              recording?._id,
+                                                              j,
+                                                            )
+                                                          }
+                                                        />
+                                                      </div>
+                                                    )}
+                                                  <img
+                                                    className="card-img-top"
+                                                    src={screenshotData?.url}
+                                                    alt="screenshot"
+                                                    onClick={() =>
+                                                      handleLightBox(
+                                                        "screenshot",
+                                                        meta.meta_value,
+                                                        j,
+                                                      )
+                                                    }
+                                                  />
+                                                  <p>
+                                                    <strong>Task Name:</strong>{" "}
+                                                    {
+                                                      screenshotData?.task_data
+                                                        ?.title
+                                                    }{" "}
+                                                  </p>
+                                                  <p>
+                                                    <strong>Time:</strong>{" "}
+                                                    {showAmPmtime(
+                                                      screenshotData?.taken_time,
+                                                    )}
+                                                  </p>
+                                                  <p>
+                                                    <strong>Date: </strong>
+                                                    {screenshotData?.taken_time
+                                                      ? new Date(
+                                                          screenshotData.taken_time,
+                                                        ).toLocaleDateString(
+                                                          "en-GB",
+                                                          {
+                                                            day: "numeric",
+                                                            month: "long",
+                                                            year: "numeric",
+                                                          },
+                                                        )
+                                                      : ""}
+                                                  </p>
+                                                </Card.Body>
+                                              </Card>
+                                            ),
+                                          );
+                                        }
+
+                                        // Handle videos tab
+                                        if (
+                                          screenshotTab === "Videos" &&
+                                          meta.meta_key === "videos" &&
+                                          meta.meta_value.length > 0
+                                        ) {
+                                          return (
+                                            <>
+                                              {meta.meta_value
+                                                .slice(
+                                                  ((currentVideoPage[
+                                                    recording?._id
+                                                  ] || 1) -
+                                                    1) *
+                                                    videosPerPage,
+                                                  (currentVideoPage[
+                                                    recording?._id
+                                                  ] || 1) * videosPerPage,
+                                                )
+                                                .map((videoData, j) =>
+                                                  videoData?.is_deleted ===
+                                                  true ? (
+                                                    <Card
+                                                      key={`blank-card-${
+                                                        recording?._id
+                                                      }-${
+                                                        currentVideoPage[
+                                                          recording?._id
+                                                        ] || 1
+                                                      }-${j}`}
+                                                    >
+                                                      <Card.Body>
+                                                        <img
+                                                          className="card-img-top"
+                                                          src={videoData.url}
+                                                          alt="screenshot"
+                                                        />
+                                                        <p>
+                                                          <strong>
+                                                            Task Name:
+                                                          </strong>{" "}
+                                                          {
+                                                            videoData?.task_data
+                                                              ?.title
+                                                          }{" "}
+                                                        </p>
+                                                        <p>
+                                                          <strong>Time:</strong>{" "}
+                                                          {
+                                                            videoData?.start_time
+                                                          }{" "}
+                                                          to{" "}
+                                                          {videoData?.end_time}
+                                                        </p>
+                                                        <p>
+                                                          <strong>Date:</strong>
+                                                          {videoData?.createdAt
+                                                            ? new Date(
+                                                                videoData.createdAt,
+                                                              ).toLocaleDateString(
+                                                                "en-GB",
+                                                                {
+                                                                  day: "numeric",
+                                                                  month: "long",
+                                                                  year: "numeric",
+                                                                },
+                                                              )
+                                                            : ""}
+                                                        </p>
+                                                      </Card.Body>
+                                                    </Card>
+                                                  ) : videoData?.url ===
+                                                    "video_disabled" ? (
+                                                    <Card
+                                                      key={`blank-card-${
+                                                        recording?._id
+                                                      }-${
+                                                        currentVideoPage[
+                                                          recording?._id
+                                                        ] || 1
+                                                      }-${j}`}
+                                                    >
+                                                      <Card.Body>
+                                                        <img
+                                                          className="card-img-top"
+                                                          src="https://app.primeteams.ai/images/5H2J6.jpg"
+                                                          alt="screenshot"
+                                                        />
+                                                        <p>
+                                                          <strong>
+                                                            Task Name:
+                                                          </strong>{" "}
+                                                          {
+                                                            videoData?.task_data
+                                                              ?.title
+                                                          }{" "}
+                                                        </p>
+                                                        <p>
+                                                          <strong>Time:</strong>{" "}
+                                                          {
+                                                            videoData?.start_time
+                                                          }{" "}
+                                                          to{" "}
+                                                          {videoData?.end_time}
+                                                        </p>
+                                                        <p>
+                                                          <strong>Date:</strong>
+                                                          {videoData?.createdAt
+                                                            ? new Date(
+                                                                videoData.createdAt,
+                                                              ).toLocaleDateString(
+                                                                "en-GB",
+                                                                {
+                                                                  day: "numeric",
+                                                                  month: "long",
+                                                                  year: "numeric",
+                                                                },
+                                                              )
+                                                            : ""}
+                                                        </p>
+                                                      </Card.Body>
+                                                    </Card>
+                                                  ) : (
+                                                    <Card
+                                                      key={`video-card-${
+                                                        recording?._id
+                                                      }-${
+                                                        currentVideoPage[
+                                                          recording?._id
+                                                        ] || 1
+                                                      }-${j}`}
+                                                    >
+                                                      <Card.Body>
+                                                        {videoData?.is_deleted !==
+                                                          true &&
+                                                          memberProfile?.role
+                                                            ?.permissions
+                                                            ?.time_tracking
+                                                            ?.delete_recordings ===
+                                                            true &&
+                                                          memberProfile?._id ===
+                                                            recording?.member && (
+                                                            <div className="card--checkbox">
+                                                              <Form.Check
+                                                                type="checkbox"
+                                                                checked={
+                                                                  selectedScreenshots[
+                                                                    recording
+                                                                      ?._id
+                                                                  ]?.includes(
+                                                                    j,
+                                                                  ) || false
+                                                                }
+                                                                onChange={() =>
+                                                                  handleSelectRecording(
+                                                                    recording?._id,
+                                                                    j,
+                                                                  )
+                                                                }
+                                                              />
+                                                            </div>
+                                                          )}
+                                                        <video
+                                                          onClick={() =>
+                                                            handleLightBox(
+                                                              "video",
+                                                              meta.meta_value,
+                                                              j,
+                                                            )
+                                                          }
+                                                          height="175px"
+                                                          preload="metadata"
+                                                          muted
+                                                          onLoadedMetadata={(
+                                                            e,
+                                                          ) =>
+                                                            (e.target.currentTime = 0.1)
+                                                          }
+                                                          controls={false}
+                                                        >
+                                                          <source
+                                                            src={videoData?.url}
+                                                            type="video/webm"
+                                                          />
+                                                          Your browser does not
+                                                          support the video tag.
+                                                        </video>
+                                                        <p>
+                                                          <strong>
+                                                            Task Name:
+                                                          </strong>{" "}
+                                                          {
+                                                            videoData?.task_data
+                                                              ?.title
+                                                          }{" "}
+                                                        </p>
+                                                        <p>
+                                                          <strong>Time:</strong>{" "}
+                                                          {
+                                                            videoData?.start_time
+                                                          }{" "}
+                                                          to{" "}
+                                                          {videoData?.end_time}
+                                                        </p>
+                                                        <p>
+                                                          <strong>Date:</strong>{" "}
+                                                          {videoData?.createdAt
+                                                            ? new Date(
+                                                                videoData?.createdAt,
+                                                              )
+                                                                .toISOString()
+                                                                .split("T")[0]
+                                                            : ""}
+                                                        </p>
+                                                      </Card.Body>
+                                                    </Card>
+                                                  ),
+                                                )}
+
+                                              {/* Pagination Controls */}
+                                              <div
+                                                style={{
+                                                  marginTop: "10px",
+                                                  textAlign: "center",
+                                                }}
+                                              >
+                                                <Button
+                                                  variant="outline-primary"
+                                                  disabled={
+                                                    (currentVideoPage[
+                                                      recording?._id
+                                                    ] || 1) === 1
+                                                  }
                                                   onClick={() =>
-                                                    handleLightBox(
-                                                      "screenshot",
-                                                      meta.meta_value,
-                                                      j
+                                                    setCurrentVideoPage(
+                                                      (prev) => ({
+                                                        ...prev,
+                                                        [recording?._id]:
+                                                          (prev[
+                                                            recording?._id
+                                                          ] || 1) - 1,
+                                                      }),
                                                     )
                                                   }
-                                                />
-                                                <p>
-                                                  <strong>Task Name:</strong>{" "}
-                                                  {
-                                                    screenshotData?.task_data
-                                                      ?.title
-                                                  }{" "}
-                                                </p>
-                                                <p>
-                                                  <strong>Time:</strong>{" "}
-                                                  {showAmPmtime(
-                                                    screenshotData?.taken_time
-                                                  )}
-                                                </p>
-                                                <p>
-                                                  <strong>Date: </strong>
-                                                  {screenshotData?.taken_time
-                                                    ? new Date(
-                                                        screenshotData.taken_time
-                                                      ).toLocaleDateString(
-                                                        "en-GB",
-                                                        {
-                                                          day: "numeric",
-                                                          month: "long",
-                                                          year: "numeric",
-                                                        }
-                                                      )
-                                                    : ""}
-                                                </p>
-                                              </Card.Body>
-                                            </Card>
-                                          )
-                                        );
-                                      }
+                                                >
+                                                  <BsArrowLeftCircleFill />
+                                                </Button>
 
-                                      // Handle videos tab
-                                      if (
-                                        screenshotTab === "Videos" &&
-                                        meta.meta_key === "videos" &&
-                                        meta.meta_value.length > 0
-                                      ) {
-                                        return (
-                                          <>
-                                            {meta.meta_value
-                                              .slice(
-                                                ((currentVideoPage[
-                                                  recording?._id
-                                                ] || 1) -
-                                                  1) *
-                                                  videosPerPage,
-                                                (currentVideoPage[
-                                                  recording?._id
-                                                ] || 1) * videosPerPage
-                                              )
-                                              .map((videoData, j) =>
-                                                videoData?.is_deleted ===
-                                                true ? (
-                                                  <Card
-                                                    key={`blank-card-${
-                                                      recording?._id
-                                                    }-${
-                                                      currentVideoPage[
-                                                        recording?._id
-                                                      ] || 1
-                                                    }-${j}`}
-                                                  >
-                                                    <Card.Body>
-                                                      <img
-                                                        className="card-img-top"
-                                                        src={videoData.url}
-                                                        alt="screenshot"
-                                                      />
-                                                      <p>
-                                                        <strong>
-                                                          Task Name:
-                                                        </strong>{" "}
-                                                        {
-                                                          videoData?.task_data
-                                                            ?.title
-                                                        }{" "}
-                                                      </p>
-                                                      <p>
-                                                        <strong>
-                                                          Time:
-                                                        </strong>{" "}
-                                                        {videoData?.start_time}{" "}
-                                                        to {videoData?.end_time}
-                                                      </p>
-                                                      <p>
-                                                        <strong>Date:</strong>
-                                                        {videoData?.createdAt
-                                                          ? new Date(
-                                                              videoData.createdAt
-                                                            ).toLocaleDateString(
-                                                              "en-GB",
-                                                              {
-                                                                day: "numeric",
-                                                                month: "long",
-                                                                year: "numeric",
-                                                              }
-                                                            )
-                                                          : ""}
-                                                      </p>
-                                                    </Card.Body>
-                                                  </Card>
-                                                ) : videoData?.url ===
-                                                  "video_disabled" ? (
-                                                  <Card
-                                                    key={`blank-card-${
-                                                      recording?._id
-                                                    }-${           
-                                                      currentVideoPage[
-                                                        recording?._id
-                                                      ] || 1
-                                                    }-${j}`}
-                                                  >
-                                                    <Card.Body>
-                                                      <img
-                                                        className="card-img-top"
-                                                        src="https://app.primeteams.ai/images/5H2J6.jpg"
-                                                        alt="screenshot"
-                                                      />
-                                                      <p>
-                                                        <strong>
-                                                          Task Name:
-                                                        </strong>{" "}
-                                                        {
-                                                          videoData?.task_data
-                                                            ?.title
-                                                        }{" "}
-                                                      </p>
-                                                      <p>
-                                                        <strong>
-                                                          Time:
-                                                        </strong>{" "}
-                                                        {videoData?.start_time}{" "}
-                                                        to {videoData?.end_time}
-                                                      </p>
-                                                      <p>
-                                                        <strong>Date:</strong>
-                                                        {videoData?.createdAt
-                                                          ? new Date(
-                                                              videoData.createdAt
-                                                            ).toLocaleDateString(
-                                                              "en-GB",
-                                                              {
-                                                                day: "numeric",
-                                                                month: "long",
-                                                                year: "numeric",
-                                                              }
-                                                            )
-                                                          : ""}
-                                                      </p>
-                                                    </Card.Body>
-                                                  </Card>
-                                                ) : (
-                                                  <Card
-                                                    key={`video-card-${
-                                                      recording?._id
-                                                    }-${
-                                                      currentVideoPage[
-                                                        recording?._id
-                                                      ] || 1
-                                                    }-${j}`}
-                                                  >
-                                                    <Card.Body
-                                                      
-                                                    >
-                                                      {videoData?.is_deleted !==
-                                                        true &&
-                                                        memberProfile
-                                                          ?.role?.permissions
-                                                          ?.time_tracking
-                                                          ?.delete_recordings ===
-                                                          true &&
-                                                        memberProfile?._id ===
-                                                          recording?.member && 
-                                                          (
-                                                          <div className="card--checkbox">
-                                                            <Form.Check
-                                                              type="checkbox"
-                                                              checked={
-                                                                selectedScreenshots[
-                                                                  recording?._id
-                                                                ]?.includes(
-                                                                  j
-                                                                ) || false
-                                                              }
-                                                              onChange={() =>
-                                                                handleSelectRecording(
-                                                                  recording?._id,
-                                                                  j
-                                                                )
-                                                              }
-                                                            />
-                                                          </div>
-                                                        )}
-                                                      <video
-                                                        onClick={() =>
-                                                          handleLightBox(
-                                                            "video",
-                                                            meta.meta_value,
-                                                            j
-                                                          )
-                                                        }
-                                                        height="175px"
-                                                        preload="metadata"
-                                                        muted
-                                                        onLoadedMetadata={(e) =>
-                                                          (e.target.currentTime = 0.1)
-                                                        }
-                                                        controls={false}
-                                                      >
-                                                        <source
-                                                          src={videoData?.url}
-                                                          type="video/webm"
-                                                        />
-                                                        Your browser does not
-                                                        support the video tag.
-                                                      </video>
-                                                      <p>
-                                                        <strong>
-                                                          Task Name:
-                                                        </strong>{" "}
-                                                        {
-                                                          videoData?.task_data
-                                                            ?.title
-                                                        }{" "}
-                                                      </p>
-                                                      <p>
-                                                        <strong>
-                                                          Time:
-                                                        </strong>{" "}
-                                                        {videoData?.start_time}{" "}
-                                                        to {videoData?.end_time}
-                                                      </p>
-                                                      <p>
-                                                        <strong>
-                                                          Date:
-                                                        </strong>{" "}
-                                                        {videoData?.createdAt
-                                                          ? new Date(
-                                                              videoData?.createdAt
-                                                            )
-                                                              .toISOString()
-                                                              .split("T")[0]
-                                                          : ""}
-                                                      </p>
-                                                    </Card.Body>
-                                                  </Card>
-                                                )
-                                              )}
-
-                                            {/* Pagination Controls */}
-                                            <div
-                                              style={{
-                                                marginTop: "10px",
-                                                textAlign: "center",
-                                              }}
-                                            >
-                                              <Button
-                                                variant="outline-primary"
-                                                disabled={
-                                                  (currentVideoPage[
+                                                <span
+                                                  style={{ margin: "0 10px" }}
+                                                >
+                                                  Page{" "}
+                                                  {currentVideoPage[
                                                     recording?._id
-                                                  ] || 1) === 1
-                                                }
-                                                onClick={() =>
-                                                  setCurrentVideoPage(
-                                                    (prev) => ({
-                                                      ...prev,
-                                                      [recording?._id]:
-                                                        (prev[recording?._id] ||
-                                                          1) - 1,
-                                                    })
-                                                  )
-                                                }
-                                              >
-                                                <BsArrowLeftCircleFill />
-                                              </Button>
-
-                                              <span
-                                                style={{ margin: "0 10px" }}
-                                              >
-                                                Page{" "}
-                                                {currentVideoPage[
-                                                  recording?._id
-                                                ] || 1}{" "}
-                                                of{" "}
-                                                {Math.ceil(
-                                                  meta.meta_value.length /
-                                                    videosPerPage
-                                                )}
-                                              </span>
-
-                                              <Button
-                                                variant="outline-primary"
-                                                disabled={
-                                                  (currentVideoPage[
-                                                    recording?._id
-                                                  ] || 1) >=
-                                                  Math.ceil(
+                                                  ] || 1}{" "}
+                                                  of{" "}
+                                                  {Math.ceil(
                                                     meta.meta_value.length /
-                                                      videosPerPage
-                                                  )
-                                                }
-                                                onClick={() =>
-                                                  setCurrentVideoPage(
-                                                    (prev) => ({
-                                                      ...prev,
-                                                      [recording?._id]:
-                                                        (prev[recording?._id] ||
-                                                          1) + 1,
-                                                    })
-                                                  )
-                                                }
-                                              >
-                                                <BsArrowRightCircleFill />
-                                              </Button>
-                                            </div>
-                                          </>
-                                        );
-                                      }
-                                      if (
-                                        screenshotTab === "Activity" &&
-                                        meta.meta_key === "events_data" &&
-                                        meta.meta_value.length > 0
-                                      ) {
-                                        return (
-                                          <>
-                                            <div className="row">
+                                                      videosPerPage,
+                                                  )}
+                                                </span>
+
+                                                <Button
+                                                  variant="outline-primary"
+                                                  disabled={
+                                                    (currentVideoPage[
+                                                      recording?._id
+                                                    ] || 1) >=
+                                                    Math.ceil(
+                                                      meta.meta_value.length /
+                                                        videosPerPage,
+                                                    )
+                                                  }
+                                                  onClick={() =>
+                                                    setCurrentVideoPage(
+                                                      (prev) => ({
+                                                        ...prev,
+                                                        [recording?._id]:
+                                                          (prev[
+                                                            recording?._id
+                                                          ] || 1) + 1,
+                                                      }),
+                                                    )
+                                                  }
+                                                >
+                                                  <BsArrowRightCircleFill />
+                                                </Button>
+                                              </div>
+                                            </>
+                                          );
+                                        }
+                                        if (
+                                          screenshotTab === "Activity" &&
+                                          meta.meta_key === "events_data" &&
+                                          meta.meta_value.length > 0
+                                        ) {
+                                          return (
+                                            <>
+                                              <div className="row">
                                                 <div className="col-md-12">
-                                                <ListGroup>
-                                                  <ListGroup.Item className="pb-5 p-0">
-                                                    <ActivityOverviewChart eventsData={meta.meta_value} />
-                                                  </ListGroup.Item>
-                                                </ListGroup>
-                                                <ListGroup className="mt-2">
-                                                  <ListGroup.Item className="b-0 p-0 rounded-0 shadow-none text-uppercase fw-semibold fs-6">Per-Minute Log</ListGroup.Item>
-                                                  {/* Header */}
-                                                    <ListGroup.Item className="bg-light fw-semibold py-2">
+                                                  <ListGroup>
+                                                    <ListGroup.Item className="pb-5 p-0">
+                                                      <ActivityOverviewChart
+                                                        eventsData={
+                                                          meta.meta_value
+                                                        }
+                                                      />
+                                                    </ListGroup.Item>
+                                                  </ListGroup>
+                                                  <ListGroup className="mt-2">
+                                                    <ListGroup.Item className="b-0 p-0 rounded-0 shadow-none text-uppercase fw-semibold fs-6">
+                                                      Per-Minute Log
+                                                    </ListGroup.Item>
+                                                    {/* Header */}
+                                                    <ListGroup.Item className="bg-light fw-semibold d-none d-lg-flex py-2">
                                                       <Row className="align-items-center w-100">
                                                         <Col md={2}>TIME</Col>
 
@@ -3515,95 +3615,25 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                         </Col>
                                                       </Row>
                                                     </ListGroup.Item>
-                                                    
-                                                    {/* 
-                                                    { meta.meta_value[0]?.events_count?.map((log, index) => (
-                                                      <ListGroup.Item>
-                                                        <Row className="align-items-center">
 
-                                                         
-                                                          <Col md={2}>
-                                                            <span
-                                                              style={{
-                                                                fontWeight: 700,
-                                                                letterSpacing: "1px",
-                                                                fontSize: "18px",
-                                                              }}
-                                                            >
-                                                            {log?.time
-                                                              ? new Date(log.time).toLocaleTimeString("en-GB", {
-                                                                  hour: "2-digit",
-                                                                  minute: "2-digit",
-                                                                  hour12: false,
-                                                                })
-                                                              : ""}
-                                                            </span>
-                                                          </Col>
-
-                                                          <Col md={4}>
-                                                            <div className="d-flex align-items-center gap-3">
-                                                              <ProgressBar
-                                                                now={(log.mouse_click_count / maxMouse) * 100}
-                                                                style={{
-                                                                  height: "12px",
-                                                                  width: "220px",
-                                                                  borderRadius: "20px",
-                                                                }}
-                                                                variant="success"
-                                                              />
-
-                                                              <span
-                                                                style={{
-                                                                  minWidth: "30px",
-                                                                  fontWeight: 600,
-                                                                  fontSize: "18px",
-                                                                }}
-                                                              >
-                                                                {log.mouse_click_count}
-                                                              </span>
-                                                            </div>
-                                                          </Col>
-
-                                                         
-                                                          <Col md={4}>
-                                                            <div className="d-flex align-items-center gap-3">
-                                                              <ProgressBar
-                                                                now={(log.keyboard_count / maxKeyboard) * 100}
-                                                                style={{
-                                                                  height: "12px",
-                                                                  width: "220px",
-                                                                  borderRadius: "20px",
-                                                                }}
-                                                                variant="success"
-                                                              />
-
-                                                              <span
-                                                                style={{
-                                                                  minWidth: "30px",
-                                                                  fontWeight: 600,
-                                                                  fontSize: "18px",
-                                                                }}
-                                                              >
-                                                                {log.keyboard_count}
-                                                              </span>
-                                                            </div>
-                                                          </Col>
-
-                                                      </Row>
-                                                      </ListGroup.Item>
-                                                    )) */}
-                                                    
                                                     <PaginatedList
                                                       data={
-                                                        meta.meta_value[0]?.events_count || []
+                                                        meta.meta_value[0]
+                                                          ?.events_count || []
                                                       }
                                                       rowsPerPage={10}
-                                                      renderItem={(log, index) => (
-                                                        <ListGroup.Item className="py-2" key={index}>
-                                                          <Row className="align-items-center w-100">
-
+                                                      renderItem={(
+                                                        log,
+                                                        index,
+                                                      ) => (
+                                                        <ListGroup.Item
+                                                          className="py-2"
+                                                          key={index}
+                                                        >
+                                                          <Row className="align-items-center w-100 gap-3 gap-md-0">
                                                             {/* Time */}
                                                             <Col md={2}>
+                                                              <span className="text-uppercase text-muted d-flex d-lg-none">Time</span>
                                                               <span
                                                                 style={{
                                                                   fontWeight: 600,
@@ -3611,14 +3641,15 @@ const getMembersFromTeams = (selectedTeamIds) => {
                                                               >
                                                                 {log?.time
                                                                   ? new Date(
-                                                                      log.time
+                                                                      log.time,
                                                                     ).toLocaleTimeString(
                                                                       "en-GB",
                                                                       {
                                                                         hour: "2-digit",
-                                                                        minute: "2-digit",
+                                                                        minute:
+                                                                          "2-digit",
                                                                         hour12: false,
-                                                                      }
+                                                                      },
                                                                     )
                                                                   : ""}
                                                               </span>
@@ -3626,89 +3657,102 @@ const getMembersFromTeams = (selectedTeamIds) => {
 
                                                             {/* Mouse */}
                                                             <Col md={4}>
+                                                              <span className="text-uppercase text-muted d-flex d-lg-none">Mouse Clicks</span>
                                                               <div className="d-flex align-items-center gap-3">
-
                                                                 <ProgressBar
                                                                   now={
-                                                                    (log.mouse_click_count / maxMouse)}
+                                                                    log.mouse_click_count /
+                                                                    maxMouse
+                                                                  }
                                                                   style={{
-                                                                    height: "8px",
-                                                                    width: "220px",
-                                                                    borderRadius: "20px",
+                                                                    height:
+                                                                      "5px",
+                                                                    width:
+                                                                      "220px",
+                                                                    borderRadius:
+                                                                      "20px",
                                                                   }}
                                                                   variant="info"
                                                                 />
 
                                                                 <span
                                                                   style={{
-                                                                    minWidth: "30px",
+                                                                    minWidth:
+                                                                      "30px",
                                                                     fontWeight: 600,
-                                                                    fontSize: "18px",
+                                                                    fontSize:
+                                                                      "14px",
                                                                   }}
                                                                 >
-                                                                  {log.mouse_click_count}
+                                                                  {
+                                                                    log.mouse_click_count
+                                                                  }
                                                                 </span>
-
                                                               </div>
                                                             </Col>
 
                                                             {/* Keyboard */}
                                                             <Col md={4}>
+                                                              <span className="text-uppercase text-muted d-flex d-lg-none">Keystrokes</span>
                                                               <div className="d-flex align-items-center gap-3">
-
                                                                 <ProgressBar
                                                                   now={
-                                                                    (log.keyboard_count / maxKeyboard)
+                                                                    log.keyboard_count /
+                                                                    maxKeyboard
                                                                   }
                                                                   style={{
-                                                                    height: "8px",
-                                                                    width: "220px",
-                                                                    borderRadius: "20px",
+                                                                    height:
+                                                                      "5px",
+                                                                    width:
+                                                                      "220px",
+                                                                    borderRadius:
+                                                                      "20px",
                                                                   }}
                                                                   variant="success"
                                                                 />
 
                                                                 <span
                                                                   style={{
-                                                                    minWidth: "30px",
+                                                                    minWidth:
+                                                                      "30px",
                                                                     fontWeight: 600,
-                                                                    fontSize: "18px",
+                                                                    fontSize:
+                                                                      "14px",
                                                                   }}
                                                                 >
-                                                                  {log.keyboard_count}
+                                                                  {
+                                                                    log.keyboard_count
+                                                                  }
                                                                 </span>
-
                                                               </div>
                                                             </Col>
-
                                                           </Row>
                                                         </ListGroup.Item>
                                                       )}
                                                     />
-                                                    
-                                                </ListGroup>
-                                            </div>
-                                            </div>
-                                          </>
-                                        )
-                                      }
-                                      return null; // Return null if no condition is met
-                                    })
-                                  ) : (
-                                    <div>No data available</div> // Display if no data is available
-                                  )}
-                                </CardGroup>
-                              </div>
-                            </Accordion.Body>
-                          </Accordion.Item>
-                        </>
-                      );
-                    })
-                  ) : (
-                    (activityspinner === false) && (
-                      <p className="text-center mt-5">No activity available.</p>
-                    )
-                  )}
+                                                  </ListGroup>
+                                                </div>
+                                              </div>
+                                            </>
+                                          );
+                                        }
+                                        return null; // Return null if no condition is met
+                                      })
+                                    ) : (
+                                      <div>No data available</div> // Display if no data is available
+                                    )}
+                                  </CardGroup>
+                                </div>
+                              </Accordion.Body>
+                            </Accordion.Item>
+                          </>
+                        );
+                      })
+                    : activityspinner === false && (
+                        <p className="text-center mt-5">
+                          No activity available.
+                        </p>
+                      )}
                 </Accordion>
               </>
             )}
@@ -3716,138 +3760,133 @@ const getMembersFromTeams = (selectedTeamIds) => {
         </div>
       )}
 
-      {
-        (showEvents === true) && (
-          <Modal
-            show={showEvents}
-            onHide={() => {setShowEvents(false); setEventsData(false)}}
-            centered
-            size="xl"
-            className=""
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>Activity Events</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Card>
-                <Card.Body>
-                  
-                  <ListGroup>
-                    <ListGroup.Item className="pb-5">
-                      <ActivityOverviewChart eventsData={eventsData} />
-                    </ListGroup.Item>
-                  </ListGroup>
-                    <ListGroup className="mt-2">
+      {showEvents === true && (
+        <Modal
+          show={showEvents}
+          onHide={() => {
+            setShowEvents(false);
+            setEventsData(false);
+          }}
+          centered
+          size="xl"
+          className=""
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Activity Events</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Card>
+              <Card.Body>
+                <ListGroup>
+                  <ListGroup.Item className="pb-5">
+                    <ActivityOverviewChart eventsData={eventsData} />
+                  </ListGroup.Item>
+                </ListGroup>
+                <ListGroup className="mt-2">
+                  <ListGroup.Item>Per-Minute Log</ListGroup.Item>
+                  {/* Header */}
+                  <ListGroup.Item className="bg-light fw-semibold d-none d-lg-flex">
+                    <Row className="d-none d-lg-flex align-items-center">
+                      <Col md={2}>TIME</Col>
+
+                      <Col md={4}>
+                        <div className="d-flex align-items-center gap-2">
+                          <LuMouse />
+                          MOUSE CLICKS
+                        </div>
+                      </Col>
+
+                      <Col md={4}>
+                        <div className="d-flex align-items-center gap-2">
+                          <FaRegKeyboard />
+                          KEYSTROKES
+                        </div>
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
+
+                  {/* Rows */}
+                  {eventsData[0]?.events_count?.map((log, index) => (
                     <ListGroup.Item>
-                      Per-Minute Log
+                      <Row className="d-flex align-items-center gap-3 gap-md-0">
+                        {/* Time */}
+                        <Col md={2}>
+                        <span className="text-uppercase text-muted d-flex d-lg-none">Time</span>
+                          <span
+                            style={{
+                              fontWeight: 700,
+                              fontSize: "14px",
+                            }}
+                          >
+                            {log?.time
+                              ? new Date(log.time).toLocaleTimeString("en-GB", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: false,
+                                })
+                              : ""}
+                          </span>
+                        </Col>
+
+                        <Col md={4}>
+                          <span className="text-uppercase text-muted d-flex d-lg-none">Mouse clicks</span>
+                          <div className="d-flex align-items-center gap-3">
+                            <ProgressBar
+                              now={log.mouse_click_count / maxMouse}
+                              style={{
+                                height: "5px",
+                                width: "220px",
+                                borderRadius: "20px",
+                              }}
+                              variant="info"
+                            />
+
+                            <span
+                              style={{
+                                minWidth: "30px",
+                                fontWeight: 600,
+                                fontSize: "14px",
+                              }}
+                            >
+                              {log.mouse_click_count}
+                            </span>
+                          </div>
+                        </Col>
+
+                        {/* Keyboard */}
+                        <Col md={4}>
+                          <span className="text-uppercase text-muted d-flex d-lg-none">Keystrokes</span>
+                          <div className="d-flex align-items-center gap-3">
+                            <ProgressBar
+                              now={log.keyboard_count / maxKeyboard}
+                              style={{
+                                height: "5px",
+                                width: "220px",
+                                borderRadius: "20px",
+                              }}
+                              variant="success"
+                            />
+
+                            <span
+                              style={{
+                                minWidth: "30px",
+                                fontWeight: 600,
+                                fontSize: "14px",
+                              }}
+                            >
+                              {log.keyboard_count}
+                            </span>
+                          </div>
+                        </Col>
+                      </Row>
                     </ListGroup.Item>
-                    {/* Header */}
-                      <ListGroup.Item className="bg-light fw-semibold">
-                        <Row className="align-items-center">
-                          <Col md={2}>TIME</Col>
-
-                          <Col md={4}>
-                            <div className="d-flex align-items-center gap-2">
-                              <i className="bi bi-mouse text-primary"></i>
-                              MOUSE CLICKS
-                            </div>
-                          </Col>
-
-                          <Col md={4}>
-                            <div className="d-flex align-items-center gap-2">
-                              <i className="bi bi-keyboard text-success"></i>
-                              KEYSTROKES
-                            </div>
-                          </Col>
-                        </Row>
-                      </ListGroup.Item>
-                       
-                      {/* Rows */}
-                      {eventsData[0]?.events_count?.map((log, index) => (
-                        <ListGroup.Item>
-                          <Row className="align-items-center">
-
-                            {/* Time */}
-                            <Col md={2}>
-                              <span
-                                style={{
-                                  fontWeight: 700,
-                                  letterSpacing: "1px",
-                                  fontSize: "18px",
-                                }}
-                              >
-                              {log?.time
-                                ? new Date(log.time).toLocaleTimeString("en-GB", {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: false,
-                                  })
-                                : ""}
-                              </span>
-                            </Col>
-
-                            <Col md={4}>
-                              <div className="d-flex align-items-center gap-3">
-                                <ProgressBar
-                                  now={(log.mouse_click_count / maxMouse)}
-                                  style={{
-                                    height: "8px",
-                                    width: "220px",
-                                    borderRadius: "20px",
-                                  }}
-                                  variant="info"
-                                />
-
-                                <span
-                                  style={{
-                                    minWidth: "30px",
-                                    fontWeight: 600,
-                                    fontSize: "18px",
-                                  }}
-                                >
-                                  {log.mouse_click_count}
-                                </span>
-                              </div>
-                            </Col>
-
-                            {/* Keyboard */}
-                            <Col md={4}>
-                              <div className="d-flex align-items-center gap-3">
-                                <ProgressBar
-                                  now={(log.keyboard_count / maxKeyboard)}
-                                  style={{
-                                    height: "8px",
-                                    width: "220px",
-                                    borderRadius: "20px",
-                                  }}
-                                  variant="success"
-                                />
-
-                                <span
-                                  style={{
-                                    minWidth: "30px",
-                                    fontWeight: 600,
-                                    fontSize: "18px",
-                                  }}
-                                >
-                                  {log.keyboard_count}
-                                </span>
-                              </div>
-                            </Col>
-
-                         </Row>
-                        </ListGroup.Item>
-                      ))}
-                      
-                       
-                  </ListGroup>
-                  
-                </Card.Body>
-              </Card>
-            </Modal.Body>
-            </Modal>
-        )
-      }
+                  ))}
+                </ListGroup>
+              </Card.Body>
+            </Card>
+          </Modal.Body>
+        </Modal>
+      )}
       {/*--=-=Filter Modal**/}
       <Modal
         show={showFilter}
@@ -3965,7 +4004,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                           leaveRoom(currentActivity?._id);
                           startsharing(
                             currentActivity?._id,
-                            currentActivity?.latestActivity?.status
+                            currentActivity?.latestActivity?.status,
                           );
                         }
                       }}
@@ -4091,7 +4130,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
               <LuTimer />
             </span>
             <strong>
-              Add Manual Time {" "}
+              Add Manual Time{" "}
               <small>Add time entries manually for completed work.</small>
             </strong>
           </Modal.Title>
@@ -4107,14 +4146,11 @@ const getMembersFromTeams = (selectedTeamIds) => {
             {entries?.length > 0 &&
               entries.map((entry, i) => {
                 const baseDate = new Date(entry.date);
-                const startTime = timeStringToDate(
-                  entry.start_time,
-                  baseDate
-                );
+                const startTime = timeStringToDate(entry.start_time, baseDate);
                 const endTime = timeStringToDate(entry.end_time, baseDate);
                 const taskDurationInMilliseconds = endTime - startTime;
                 const taskDuration = Math.round(
-                  taskDurationInMilliseconds / 1000
+                  taskDurationInMilliseconds / 1000,
                 );
                 return (
                   <Card className="p-3 shadow-sm rounded-4 mb-2">
@@ -4136,11 +4172,9 @@ const getMembersFromTeams = (selectedTeamIds) => {
                       <Card.Text className="text-success mb-0">
                         <strong>{convertSecondstoTime(taskDuration)}</strong>
                       </Card.Text>
-                      
+
                       {errors[i]?.start_time && (
-                        <span className="error">
-                          {errors[i].start_time}
-                        </span>
+                        <span className="error">{errors[i].start_time}</span>
                       )}
                       {errors[i]?.end_time && (
                         <span className="error">{errors[i].end_time}</span>
@@ -4181,16 +4215,15 @@ const getMembersFromTeams = (selectedTeamIds) => {
                         return `${year}-${month}-${day}`;
                       };
                       const formatted = formatDate(value);
-                      memberTodaysActivity([formatted])
+                      memberTodaysActivity([formatted]);
                       setTimings({
                         ...timings, // keep other fields if any
                         date: formatted,
                         start_time: "", // reset start_time
-                        end_time: "",   // reset end_time
+                        end_time: "", // reset end_time
                       });
 
                       // handleTimeChange("date", formatted)
-                      
                     }}
                     className="form-control"
                     placeholder="YYYY-MM-DD"
@@ -4200,26 +4233,31 @@ const getMembersFromTeams = (selectedTeamIds) => {
                   />
                 </Col>
                 <Col md={6} className="mb-3 mb-md-0">
-                  
-                  <Dropdown className="select--dropdown" key={`dropdown-${timings?.start_time}-${timeSlots.length}`}>
-                    <Dropdown.Toggle variant="success" key={'start-timing'}>
+                  <Dropdown
+                    className="select--dropdown"
+                    key={`dropdown-${timings?.start_time}-${timeSlots.length}`}
+                  >
+                    <Dropdown.Toggle variant="success" key={"start-timing"}>
                       {timings?.start_time || "Start Time"}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       <div className="drop--scroll">
-                       
                         {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
                             slot.replace(/\s?(AM|PM)$/i, ""),
-                            occupiedRanges
+                            occupiedRanges,
                           );
                           if (!isOccupied) {
                             isOccupied = entries.some((entry) => {
                               return (
-                                (slot.replace(/\s?(AM|PM)$/i, "") >= entry.start_time &&
-                                  slot.replace(/\s?(AM|PM)$/i, "") <= entry.end_time) || // Between
-                                slot.replace(/\s?(AM|PM)$/i, "") === entry.start_time || // Equal to start
-                                slot.replace(/\s?(AM|PM)$/i, "") === entry.end_time // Equal to end
+                                (slot.replace(/\s?(AM|PM)$/i, "") >=
+                                  entry.start_time &&
+                                  slot.replace(/\s?(AM|PM)$/i, "") <=
+                                    entry.end_time) || // Between
+                                slot.replace(/\s?(AM|PM)$/i, "") ===
+                                  entry.start_time || // Equal to start
+                                slot.replace(/\s?(AM|PM)$/i, "") ===
+                                  entry.end_time // Equal to end
                               );
                             });
                           }
@@ -4227,7 +4265,10 @@ const getMembersFromTeams = (selectedTeamIds) => {
                             <Dropdown.Item
                               key={`slot-${slot}-${idx}`}
                               onClick={() =>
-                                handleTimeChange("start_time", slot.replace(/\s?(AM|PM)$/i, ""))
+                                handleTimeChange(
+                                  "start_time",
+                                  slot.replace(/\s?(AM|PM)$/i, ""),
+                                )
                               }
                               disabled={isOccupied}
                               style={{
@@ -4302,20 +4343,24 @@ const getMembersFromTeams = (selectedTeamIds) => {
                         {timeSlots.map((slot, idx) => {
                           let isOccupied = isTimeSlotOccupied(
                             slot.replace(/\s?(AM|PM)$/i, ""),
-                            occupiedRanges
+                            occupiedRanges,
                           );
                           if (!isOccupied) {
-                            isOccupied = (
-                                (
-                                  slot.replace(/\s?(AM|PM)$/i, "") <= timings?.start_time) || // Between
-                                slot.replace(/\s?(AM|PM)$/i, "") === timings?.start_time
-                              );
-                            
+                            isOccupied =
+                              slot.replace(/\s?(AM|PM)$/i, "") <=
+                                timings?.start_time || // Between
+                              slot.replace(/\s?(AM|PM)$/i, "") ===
+                                timings?.start_time;
                           }
                           return (
                             <Dropdown.Item
                               key={`end-slot-${slot}-${idx}`}
-                              onClick={() => handleTimeChange("end_time", slot.replace(/\s?(AM|PM)$/i, ""))}
+                              onClick={() =>
+                                handleTimeChange(
+                                  "end_time",
+                                  slot.replace(/\s?(AM|PM)$/i, ""),
+                                )
+                              }
                               disabled={isOccupied}
                               style={{
                                 pointerEvents: isOccupied ? "none" : "auto",
@@ -4379,12 +4424,17 @@ const getMembersFromTeams = (selectedTeamIds) => {
             }
             <Row>
               <Col md={12} className="mt-3 text-end">
-                <Button variant="dark" onClick={handleProjectShow} disabled={
+                <Button
+                  variant="dark"
+                  onClick={handleProjectShow}
+                  disabled={
                     !timings?.start_time ||
                     !timings?.end_time ||
-                    timings.end_time === "00:00" || 
-                    !timings?.date || timings?.date === ""
-                  }>
+                    timings.end_time === "00:00" ||
+                    !timings?.date ||
+                    timings?.date === ""
+                  }
+                >
                   Select Project
                 </Button>
               </Col>
@@ -4470,7 +4520,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
                       .filter(
                         (project) =>
                           project.status ===
-                          (projectFilter?.status || "in-progress")
+                          (projectFilter?.status || "in-progress"),
                       )
                       .map((project, index) => (
                         <ListGroup.Item
@@ -4527,7 +4577,11 @@ const getMembersFromTeams = (selectedTeamIds) => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" disabled={Object.keys(selectedTask).length === 0} onClick={handleEntryChange}>
+          <Button
+            variant="primary"
+            disabled={Object.keys(selectedTask).length === 0}
+            onClick={handleEntryChange}
+          >
             Save
           </Button>
         </Modal.Footer>
@@ -4545,9 +4599,7 @@ const getMembersFromTeams = (selectedTeamIds) => {
             <span className="nav--item--icon">
               <LuTimer />
             </span>
-            <strong>
-              Desktop App Tracking Settings
-            </strong>
+            <strong>Desktop App Tracking Settings</strong>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -4555,20 +4607,36 @@ const getMembersFromTeams = (selectedTeamIds) => {
             <Card.Body className="d-flex justify-content-between align-items-center">
               <div className="d-flex gap-3 align-items-center">
                 <FiCamera />
-                <h6 className="mb-1"> Screenshots <small className="d-block">Capture 3 random screenshots every 10 minutes</small></h6>
+                <h6 className="mb-1">
+                  {" "}
+                  Screenshots{" "}
+                  <small className="d-block">
+                    Capture 3 random screenshots every 10 minutes
+                  </small>
+                </h6>
               </div>
-              <Form.Check type="switch" key={`screenshot-only`} checked={recordingSettings?.screenshot_recording === "enable"} value={"enable"} name={`custom_field[screenshot_recording]`}
-                        onChange={(event) => {
-                          setRecordingSettings({
-                            ...recordingSettings,
-                            screenshot_recording: event.target.checked ? "enable" : "disabled"
-                          })
-                          updateRecodingType({
-                              custom_field: {
-                                  screenshot_recording: event.target.checked ? "enable" : "disabled"
-                              }
-                          });
-                        }} />
+              <Form.Check
+                type="switch"
+                key={`screenshot-only`}
+                checked={recordingSettings?.screenshot_recording === "enable"}
+                value={"enable"}
+                name={`custom_field[screenshot_recording]`}
+                onChange={(event) => {
+                  setRecordingSettings({
+                    ...recordingSettings,
+                    screenshot_recording: event.target.checked
+                      ? "enable"
+                      : "disabled",
+                  });
+                  updateRecodingType({
+                    custom_field: {
+                      screenshot_recording: event.target.checked
+                        ? "enable"
+                        : "disabled",
+                    },
+                  });
+                }}
+              />
             </Card.Body>
           </Card>
 
@@ -4577,27 +4645,49 @@ const getMembersFromTeams = (selectedTeamIds) => {
             <Card.Body className="d-flex justify-content-between align-items-center">
               <div className="d-flex gap-3 align-items-center">
                 <FiVideo />
-                <h6 className="mb-1">Screen Recording <small className="d-block">Continuous screen recording while time tracking is running</small></h6>
+                <h6 className="mb-1">
+                  Screen Recording{" "}
+                  <small className="d-block">
+                    Continuous screen recording while time tracking is running
+                  </small>
+                </h6>
               </div>
-              {
-                (activeSubscription && activeSubscription?.name === 'Elite' ) ? (
-                  <Form.Check type="switch" key={`video-only`} checked={recordingSettings?.video_recording === "enable"} value={"enable"} onChange={(event) => {
+              {activeSubscription && activeSubscription?.name === "Elite" ? (
+                <Form.Check
+                  type="switch"
+                  key={`video-only`}
+                  checked={recordingSettings?.video_recording === "enable"}
+                  value={"enable"}
+                  onChange={(event) => {
                     setRecordingSettings({
                       ...recordingSettings,
-                      video_recording: event.target.checked ? "enable" : "disabled"
-                    })
-                    updateRecodingType({
-                        custom_field: {
-                            video_recording: event.target.checked ? "enable" : "disabled"
-                        }
+                      video_recording: event.target.checked
+                        ? "enable"
+                        : "disabled",
                     });
-                  }} name={`custom_field[video_recording]`} />
-                )
-                :
-
-                <Form.Check type="switch" key={`video-only`} disabled checked={false} value={"disabled"} onChange={(event) => {return false;}} name={`custom_field[video_recording]`} />
-              }
-              
+                    updateRecodingType({
+                      custom_field: {
+                        video_recording: event.target.checked
+                          ? "enable"
+                          : "disabled",
+                      },
+                    });
+                  }}
+                  name={`custom_field[video_recording]`}
+                />
+              ) : (
+                <Form.Check
+                  type="switch"
+                  key={`video-only`}
+                  disabled
+                  checked={false}
+                  value={"disabled"}
+                  onChange={(event) => {
+                    return false;
+                  }}
+                  name={`custom_field[video_recording]`}
+                />
+              )}
             </Card.Body>
           </Card>
 
@@ -4606,26 +4696,44 @@ const getMembersFromTeams = (selectedTeamIds) => {
             <Card.Body className="d-flex justify-content-between align-items-center">
               <div className="d-flex gap-3 align-items-center">
                 <FiMonitor />
-                <h6 className="mb-1">Live Screen <small className="d-block">Real-time screen capture and live view</small></h6>
+                <h6 className="mb-1">
+                  Live Screen{" "}
+                  <small className="d-block">
+                    Real-time screen capture and live view
+                  </small>
+                </h6>
               </div>
-              <Form.Check type="switch" key={`live-only`} checked={recordingSettings?.live_streaming === "enable"} value={"enable"} onChange={(event) => {
-                          setRecordingSettings({
-                            ...recordingSettings,
-                            live_streaming: event.target.checked ? "enable" : "disabled"
-                          })
-                          updateRecodingType({
-                              custom_field: {
-                                  live_streaming: event.target.checked ? "enable" : "disabled"
-                              }
-                          });
-                        }}   name={`custom_field[live_streaming]`}/>
+              <Form.Check
+                type="switch"
+                key={`live-only`}
+                checked={recordingSettings?.live_streaming === "enable"}
+                value={"enable"}
+                onChange={(event) => {
+                  setRecordingSettings({
+                    ...recordingSettings,
+                    live_streaming: event.target.checked
+                      ? "enable"
+                      : "disabled",
+                  });
+                  updateRecodingType({
+                    custom_field: {
+                      live_streaming: event.target.checked
+                        ? "enable"
+                        : "disabled",
+                    },
+                  });
+                }}
+                name={`custom_field[live_streaming]`}
+              />
             </Card.Body>
           </Card>
 
           {/* Privacy Notice */}
           <div className="mt-3">
             <small>
-              <strong>Access Notice:</strong> Time tracking data is only accessible to authorized users with roles that have <strong>View Team Time</strong> permission for your assigned team.
+              <strong>Access Notice:</strong> Time tracking data is only
+              accessible to authorized users with roles that have{" "}
+              <strong>View Team Time</strong> permission for your assigned team.
             </small>
           </div>
         </Modal.Body>
