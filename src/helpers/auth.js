@@ -116,6 +116,7 @@ export function isAuth() {
 export async function login(token,  current_loggedin_user = false, companies = [], activeSubscription = null) {
   localStorage.setItem('accessToken', token);
   localStorage.setItem('current_loggedin_user', JSON.stringify(current_loggedin_user, secretKey));
+  localStorage.setItem('default_dashboard',  current_loggedin_user.default_company || null);
   // localStorage.setItem('active_subscription', JSON.stringify(activeSubscription))
   setupDashboards( companies)
   setAuthorization();
@@ -153,31 +154,109 @@ export function setupDashboards( companies ){
       // const companyExists = companies.some(company => company._id === current_dashboard.id);
       let companyExists = false
       for( let i = 0; i < companies.length; i++){
-        if(companies[i].company._id === parsedata.id || companies[i].company._id === default_dashboard){
+        if(companies[i].company._id === parsedata.id && companies[i].company._id === default_dashboard){
           companyExists = companies[i];
         }
       }
 
       if (!companyExists) { 
-        localStorage.setItem('current_dashboard', JSON.stringify({ name: companies[0].company.name, timezone: companies[0].company?.timezone || 'IST', id: companies[0].company._id, theme: companies[0].company?.theme || false, subscription: companies[0].company.subscription || false }));
-        axios.defaults.headers.common.companyId =  companies[0].company._id || ''
-        localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
-        saveTheme({...companies[0].company?.theme, cid: companies[0].company._id} || defaultTheme );
-        axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
-      }else{ 
-        localStorage.setItem('current_dashboard', JSON.stringify({ name: companyExists.company.name, timezone: companyExists.company?.timezone || 'IST', id: companyExists.company._id, theme: companyExists.company?.theme || false, subscription: companyExists.company.subscription || false  }));
+        const selectedCompany = companies.find(item => item.company?._id === default_dashboard) || companies[0];
+        localStorage.setItem(
+            'mt_featureSwitches',
+            JSON.stringify(selectedCompany?.memberData || null)
+        );
+
+        localStorage.setItem(
+            'current_dashboard',
+            JSON.stringify({
+                name: selectedCompany.company.name,
+                timezone: selectedCompany.company?.timezone || 'Asia/Kolkata',
+                id: selectedCompany.company._id,
+                theme: selectedCompany.company?.theme || false,
+                subscription: selectedCompany.company.subscription || false,
+            })
+        );
+
+        axios.defaults.headers.common.companyId = selectedCompany.company._id || '';
+
+        
+        saveTheme(
+            selectedCompany.company?.theme
+                ? { ...selectedCompany.company.theme, cid: selectedCompany.company._id }
+                : defaultTheme
+        );
+
+        axios.defaults.headers.common.memberkey =
+            selectedCompany?.memberData?._id || '';
+      }else if(companyExists?.company?._id === default_dashboard){ 
         localStorage.setItem('mt_featureSwitches', JSON.stringify(companyExists?.memberData || null))
+        localStorage.setItem('current_dashboard', JSON.stringify({ name: companyExists.company.name, timezone: companyExists.company?.timezone || 'Asia/Kolkata', id: companyExists.company._id, theme: companyExists.company?.theme || false, subscription: companyExists.company.subscription || false  }));
+        
         axios.defaults.headers.common.companyId =  companyExists.company._id || ''
         saveTheme({...companyExists.company?.theme, cid: companyExists.company._id} || defaultTheme );
         axios.defaults.headers.common.memberkey =  companyExists?.memberData?._id || ''
+      }else{
+        const selectedCompany = companies[0];
+          localStorage.setItem(
+              'mt_featureSwitches',
+              JSON.stringify(selectedCompany?.memberData || null)
+          );
+          localStorage.setItem(
+              'current_dashboard',
+              JSON.stringify({
+                  name: selectedCompany.company.name,
+                  timezone: selectedCompany.company?.timezone || 'Asia/Kolkata',
+                  id: selectedCompany.company._id,
+                  theme: selectedCompany.company?.theme || false,
+                  subscription: selectedCompany.company.subscription || false,
+              })
+          );
+
+          axios.defaults.headers.common.companyId = selectedCompany.company._id || '';
+
+          
+
+          saveTheme(
+              selectedCompany.company?.theme
+                  ? { ...selectedCompany.company.theme, cid: selectedCompany.company._id }
+                  : defaultTheme
+          );
+
+          axios.defaults.headers.common.memberkey =
+              selectedCompany?.memberData?._id || '';
       }
       setAuthorization()
     }else{ 
-      localStorage.setItem('current_dashboard', JSON.stringify({name: companies[0].company.name, timezone: companies[0].company?.timezone || 'IST', id: companies[0].company._id, theme: companies[0].company?.theme || false, subscription: companies[0].company.subscription || false }));
-      axios.defaults.headers.common.companyId =  companies[0].company._id || ''
-      localStorage.setItem('mt_featureSwitches', JSON.stringify(companies[0]?.memberData || null))
-      axios.defaults.headers.common.memberkey =  companies[0]?.memberData?._id || ''
-      saveTheme({...companies[0].company?.theme, cid: companies[0].company._id} || defaultTheme );
+     
+      const selectedCompany =
+          companies.find(item => item.company?._id === default_dashboard) || companies[0];
+      localStorage.setItem(
+          'mt_featureSwitches',
+          JSON.stringify(selectedCompany?.memberData || null)
+      );
+      localStorage.setItem(
+          'current_dashboard',
+          JSON.stringify({
+              name: selectedCompany.company.name,
+              timezone: selectedCompany.company?.timezone || 'Asia/Kolkata',
+              id: selectedCompany.company._id,
+              theme: selectedCompany.company?.theme || false,
+              subscription: selectedCompany.company.subscription || false,
+          })
+      );
+
+      axios.defaults.headers.common.companyId = selectedCompany.company._id || '';
+
+      
+
+      saveTheme(
+          selectedCompany.company?.theme
+              ? { ...selectedCompany.company.theme, cid: selectedCompany.company._id }
+              : defaultTheme
+      );
+
+      axios.defaults.headers.common.memberkey =
+          selectedCompany?.memberData?._id || '';
     } 
   }else{ 
     localStorage.removeItem('current_dashboard');

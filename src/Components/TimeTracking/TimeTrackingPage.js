@@ -1791,7 +1791,7 @@ function TimeTrackingPage() {
   const showTimezoneDrop = () => {
     if (activeInnerTab === "InnerRecorded") {
       return (
-        <ListGroup.Item className="no--style timezone--drop d-none d-xl-flex">
+        <ListGroup.Item className="no--style timezone--drop d-none d-xl-flex timezone--dropdown">
           <Form.Select
             className="custom-group-selectbox"
             onChange={(event) => setMemberTimezone(event.target.value)}
@@ -2089,7 +2089,7 @@ function TimeTrackingPage() {
                       memberProfile?.role?.permissions?.assigned_teams
                         ?.specific_teams_only === true ? (
                       <ListGroup.Item
-                        className={"ms-auto d-none d-xl-flex"}
+                        className={"ms-auto d-none d-xl-flex timezone--dropdown"}
                         key="teams-filter-list"
                       >
                         <Form.Select
@@ -2150,7 +2150,7 @@ function TimeTrackingPage() {
                     {showTabs()}
 
                     {activeTab === "Recordings" && (
-                      <ListGroup.Item>
+                      <ListGroup.Item className="timezone--dropdown">
                         <Form.Select
                           className="custom-group-selectbox"
                           onChange={(event) => {

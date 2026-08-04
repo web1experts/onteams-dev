@@ -37,7 +37,7 @@ const CustomDropdown = ({ items, value, extraClass, onChange }) => {
                 <div className="drop--scroll">
                     {
                         
-                        <Form>
+                        <Form className="search--input-form" >
                             <Form.Group className="form-group mb-3">
                                 <Form.Control
                                     type="text"

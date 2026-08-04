@@ -17,8 +17,9 @@ import { toggleTheme } from "../../redux/actions/common.action";
 import { saveTheme } from "../../helpers/auth";
 import { toggleSidebarSmall } from "../../redux/actions/common.action";
 import { logout } from '../../redux/actions/auth.actions';
-import { updateWorkSpaceTheme } from "../../redux/actions/workspace.action";
+import { updateWorkSpaceTheme, updateworkspace } from "../../redux/actions/workspace.action";
 import SettingPage from "../Settings/SettingPage";
+import {updateDefaultCompany} from "../../redux/actions/auth.actions";
 
 function SidebarPanel() {
     const secretKey = process.env.REACT_APP_SECRET_KEY
@@ -126,6 +127,7 @@ function SidebarPanel() {
     }
 
     const handleClick = (selectedvalue) => { 
+        dispatch(updateDefaultCompany(selectedvalue));
         const selected = companies.find(company => company.company._id === selectedvalue);
         localStorage.setItem('current_dashboard', JSON.stringify({name: selected.company.name, id: selected.company._id, theme: selected.company?.theme || false}));
         localStorage.setItem('mt_featureSwitches', JSON.stringify(selected?.memberData || null))

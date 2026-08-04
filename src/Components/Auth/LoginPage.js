@@ -117,7 +117,7 @@ function LoginPage() {
                                 <h2>Login to your account</h2>
                                 <Form.Group className="mb-3 form-group">
                                     <FloatingLabel label="Email address *">
-                                        <Form.Control placeholder='Email address' className={error['email'] ? "input-error" : ''} type="text" name="email" onChange={handleChangeInput} readonly={paramsObject['email'] ? true : false}
+                                        <Form.Control placeholder='Email address' className={error['email'] ? "input-error" : ''} type="text" name="email" onChange={handleChangeInput} readOnly={paramsObject['email'] ? true : false}
                                             disabled={paramsObject['email'] ? true : false} value={paramsObject['email'] || singinfields.email || ''} />
                                     </FloatingLabel>
                                     {showError('email')}

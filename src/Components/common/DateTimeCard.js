@@ -24,7 +24,7 @@ const DateTimeCard = (props) => {
   };
 
   const formatTime = (date) => {
-    const tymzone = current_dashboard.timezone || 'Asia/Kolkata'
+    const tymzone = current_dashboard.timezone === 'IST' ? 'Asia/Kolkata' : current_dashboard.timezone || 'Asia/Kolkata'
     return new Intl.DateTimeFormat("en-IN", {
       hour: "2-digit",
       minute: "2-digit",

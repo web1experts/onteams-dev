@@ -1560,6 +1560,9 @@ ul#subtasks-ul .form-group .quill--editor svg {
     width: 4rem;
     height: 4rem;
 }
+.timezone--dropdown.list-group-item .search--input-form {
+    display: none;
+}
 
 @media (max-width:1199px) {
   .project--form {

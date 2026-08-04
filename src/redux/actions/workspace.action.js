@@ -47,6 +47,7 @@ export const setupworkspace = (payload) => {
         const response = await API.apiPost('workspace', payload, config)
   
         if (response.data && response.data.success) {
+          localStorage.setItem('default_dashboard',  response.data?.default_company || null);
           await auth.setupDashboards( response.data.companies)
           await dispatch({ type: WORKSPACE_CREATE_SUCCESS, payload: response.data });
           dispatch(refreshUserWorkspace())

@@ -478,7 +478,79 @@ export function MemberModal( props){
             }
 
           </ListGroup>
-          <ListGroup className="status--list">
+          {
+            ( commonState.active_formtype === "task_edit" && currentTask && Object.keys(currentTask).length > 0 ) ?
+
+              <ListGroup className="status--list">
+              {/* Project Members */}
+              <ListGroup.Item className="list-heading text-bold" disabled>
+                Members assigned to this project
+              </ListGroup.Item>
+
+              {filteredMembers
+                ?.filter(member =>
+                  currentProject?.members?.some(pm => pm._id === member._id)
+                )
+                .map(member => (
+                  <ListGroup.Item
+                    key={member._id}
+                    onClick={() => handleMemberSelect(member)}
+                    className={
+                      membersModalState?.selectedMembers?.[member._id]
+                        ? "status--active"
+                        : ""
+                    }
+                  >
+                    <span>
+                      <img
+                        src={member?.avatar || "../images/default.jpg"}
+                        alt={member?.name || "Default"}
+                      />
+                    </span>
+                    <p>
+                      {member.name}
+                      {membersModalState?.selectedMembers?.[member._id] && <FaCheck />}
+                    </p>
+                  </ListGroup.Item>
+                ))}
+
+              {/* Other Members */}
+              <ListGroup.Item className="list-heading" disabled>
+                Other Members
+              </ListGroup.Item>
+
+              {filteredMembers
+                ?.filter(
+                  member =>
+                    !currentProject?.members?.some(pm => pm._id === member._id)
+                )
+                .map(member => (
+                  <ListGroup.Item
+                    key={member._id}
+                    onClick={() => handleMemberSelect(member)}
+                    className={
+                      membersModalState?.selectedMembers?.[member._id]
+                        ? "status--active"
+                        : ""
+                    }
+                  >
+                    <span>
+                      <img
+                        src={member?.avatar || "../images/default.jpg"}
+                        alt={member?.name || "Default"}
+                      />
+                    </span>
+                    <p>
+                      {member.name}
+                      {membersModalState?.selectedMembers?.[member._id] && <FaCheck />}
+                    </p>
+                  </ListGroup.Item>
+                ))}
+            </ListGroup>
+
+            :
+
+            <ListGroup className="status--list">
             {filteredMembers && filteredMembers.length > 0 && (
               filteredMembers.map((member) => (
                 <ListGroup.Item  
@@ -496,6 +568,9 @@ export function MemberModal( props){
               ))
             )}
           </ListGroup>
+
+          }
+          
 
       </Modal.Body>
       <Modal.Footer>

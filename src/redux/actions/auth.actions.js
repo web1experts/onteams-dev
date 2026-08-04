@@ -26,7 +26,8 @@ import {
   USER_WORKSPACE_LIST_FAILED,
   PROFILE_SUCCESS,
   PUT_USER_SUCCESS,
-  PUT_USER_FAILED
+  PUT_USER_FAILED,
+  DEFAULT_COMPANY_UPDATE_SUCCESS
 } from "./types";
 // console.log('Environment : ', process.env.NODE_ENV)
 const config = {
@@ -67,7 +68,7 @@ export const login = (payload) => {
     
       if (response.data && response.data.accessToken) {
         await auth.login(response.data.accessToken, response.data.userDetails, response.data.companies, response.data?.activeSubscription);
-
+        
         await dispatch({ type: LOGIN_SUCCESS, payload: response.data });
 
       } else if (response.data.email_verification === false) {
@@ -247,6 +248,7 @@ export const refreshUserWorkspace = () => {
       const response = await API.apiGet('user_workspaces')
       
       if (response.data && response.data.success) {
+        localStorage.setItem('default_dashboard',  response.data?.default_company || null);
         await auth.setupDashboards( response.data.companies)
        
         await dispatch({ type: USER_WORKSPACE_LIST_SUCCESS, payload: response.data });
@@ -292,4 +294,19 @@ export const updateProfile = (userId, payload) => {
         errorRequest(err, dispatch);
     }
 }
+}
+
+export const updateDefaultCompany = (companyId) => {
+  return async (dispatch) => {
+    try {
+        const response = await API.apiPutUrl('profile', '/update-default-company', { companyId });
+        if (response.data && response.data.success) {
+            await dispatch({ type: DEFAULT_COMPANY_UPDATE_SUCCESS, payload: response.data });
+        } else {
+            await dispatch({ type: LOGIN_COMMON_ERROR, payload: response.data.message });
+        }
+    } catch (err) {
+        errorRequest(err, dispatch);
+    }
+  };
 }

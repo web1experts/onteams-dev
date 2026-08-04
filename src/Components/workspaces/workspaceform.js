@@ -102,6 +102,7 @@ function WorkspaceForm(props) {
             window.gtag('event', 'workspace_created', {
                 method: 'website'
             });
+            window.gtag('event', 'conversion', {'send_to': 'AW-17701060394/CBgGCKzVl9scEKr-wvhB'})
         }
         if (window.fbq) {
           window.fbq('trackCustom', 'WorkspaceCreated');
