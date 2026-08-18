@@ -1323,7 +1323,7 @@ function DashboardPage() {
                           size="sm"
                           variant="danger"
                           onClick={() => removeFile(idx)}
-                          className="position-absolute top-0 end-0 p-1"
+                          className="position-absolute top-0 end-0 btn--clear"
                         >
                           <FiX size={14} />
                         </Button>
@@ -1343,7 +1343,7 @@ function DashboardPage() {
                           size="sm"
                           variant="danger"
                           onClick={() => removeExistingFile()}
-                          className="position-absolute top-0 end-0 p-1"
+                          className="position-absolute top-0 end-0 btn--clear"
                         >
                           <FiX size={14} />
                         </Button>
@@ -1513,7 +1513,7 @@ function DashboardPage() {
                               size="sm"
                               variant="danger"
                               onClick={() => removeExistingFile()}
-                              className="position-absolute top-0 end-0 p-1"
+                              className="position-absolute top-0 end-0 btn--clear"
                             >
                               <FiX size={14} />
                             </Button>

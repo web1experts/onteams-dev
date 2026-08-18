@@ -141,8 +141,8 @@ Sidebar CSS-=-=
   -webkit-box-shadow: 0 25px 50px -12px rgb(0 0 0 / .25);
   padding: .5rem;
   background: rgb(30 41 59);
-  width: calc(100% - 40px);
-  min-width: calc(100% - 40px);
+  width: calc(100% - 28px);
+  min-width: calc(100% - 28px);
   left: 0;
   right: 0;
   margin: auto;
@@ -266,10 +266,10 @@ Sidebar CSS-=-=
   color: rgb(203 213 225);
 }
 
-.panel--sidebar .dropdown .dropdown-item svg {
-  font-size: 20px;
-  margin-right: .5rem;
+.panel--sidebar .dropdown a.active-workspace .space--tick {
+  font-size: 16px;
   min-width: 22px;
+  padding-left: .25rem;
 }
 
 .panel--sidebar .dropdown .dropdown-item .initial--name {
@@ -611,6 +611,14 @@ Sidebar CSS-=-=
 .panel--sidebar .current--workspace .create--space:hover {
   background: #33415580;
   color: #ffffff;
+}
+
+.panel--sidebar .dropdown .dropdown-item .space--tick {
+  display: none;
+}
+
+.panel--sidebar .dropdown a.active-workspace .space--tick {
+  display: block;
 }
 
 .panel--sidebar .current--workspace .dropdown .dropdown-item svg {

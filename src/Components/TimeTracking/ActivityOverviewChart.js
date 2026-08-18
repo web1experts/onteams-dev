@@ -219,6 +219,7 @@ const avgActivity = Math.round(
     <Row>
       <Col sm={12}>
       <div
+        className="activity--grid"
         style={{
           display: "flex",
           flexDirection: "row",
@@ -234,32 +235,36 @@ const avgActivity = Math.round(
         }}
       >
         <span>
+          <span className="d-block d-md-none act--label">Minutes Tracked</span>
           <strong>{totalTrackedMinutes}</strong>{" "}
-          minutes tracked
+          <span className="d-none d-md-inline-block">minutes tracked</span>
         </span>
 
         <span style={{ color: "#d1d5db" }}>|</span>
 
         <span>
+          <span className="d-block d-md-none act--label">Active</span>
           <strong style={{ color: "#16a34a" }}>
             {activeMinutes}
           </strong>{" "}
-          active
+          <span className="d-none d-md-inline-block">active</span>
         </span>
 
         <span style={{ color: "#d1d5db" }}>|</span>
 
         <span>
+          <span className="d-block d-md-none act--label">Idle</span>
           <strong style={{ color: "#f59e0b" }}>
             {idleMinutes}
           </strong>{" "}
-          idle
+          <span className="d-none d-md-inline-block">idle</span>
         </span>
 
         <span style={{ color: "#d1d5db" }}>|</span>
 
         <span>
-          Avg activity:{" "}
+          <span className="d-block d-md-none act--label">Avg Activity</span>
+          <span className="d-none d-md-inline-block">Avg activity: {" "}</span>
           <strong style={{ color: "#2563eb" }}>
             {avgActivity}%
           </strong>
@@ -268,7 +273,8 @@ const avgActivity = Math.round(
         <span style={{ color: "#d1d5db" }}>|</span>
 
         <span>
-          Mouse:{" "}
+          <span className="d-block d-md-none act--label">Mouse</span>
+          <span className="d-none d-md-inline-block">Mouse: {" "}</span>
           <strong>
             {totalMouseClicks}
           </strong>
@@ -277,7 +283,8 @@ const avgActivity = Math.round(
         <span style={{ color: "#d1d5db" }}>|</span>
 
         <span>
-          Keyboard:{" "}
+          <span className="d-block d-md-none act--label">Keyboard</span>
+          <span className="d-none d-md-inline-block">Keyboard: {" "}</span>
           <strong>
             {totalKeyboardClicks}
           </strong>
@@ -286,7 +293,8 @@ const avgActivity = Math.round(
         <span style={{ color: "#d1d5db" }}>|</span>
 
         <span>
-          Total Clicks:{" "}
+          <span className="d-block d-md-none act--label">Total Clicks</span>
+          <span className="d-none d-md-inline-block">Total Clicks: {" "}</span>
           <strong>{totalClicks}</strong>
         </span>
       </div>

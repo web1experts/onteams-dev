@@ -559,7 +559,7 @@ useEffect(() => {
                                   <tr>
                                     <td className="project--title--td sticky">
                                       <div className="d-flex justify-content-between">
-                                        <div className="project--name d-flex justify-content-start gap-3 align-items-center border-end">
+                                        <div className="project--name d-flex justify-content-start gap-3 align-items-center border-end border-bottom">
                                             <div className="title--initial">{
                                                (data?.avatar && data?.avatar !== null ) ? 
                                                 <span><img src={data?.avatar} alt={'member-avatar'} /></span>

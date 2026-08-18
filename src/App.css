@@ -899,8 +899,28 @@ input.form-control.br-red {
     -webkit-line-clamp: 1;
     line-clamp: 1;
     -webkit-box-orient: vertical;
-    white-space: normal;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.btn--clear {
+    background: #454545;
+    color: #ffffff;
+    padding: 0;
+    margin: .25rem .25rem 0 0;
+    border: 0;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.log--span {
+    flex: auto;
+    min-width: 100px;
+    flex-grow: 1;
 }
 
 .project--grid--new--table td.new--td {
@@ -946,7 +966,8 @@ input.form-control.br-red {
 
 .page--wrapper table td.project--title--td .title--span {
   width: 100%;
-  max-width: 100%;
+  max-width: calc(100% - 110px);
+  flex: 1 1;
 }
 
 .page--wrapper table td.project--title--td span {
@@ -1039,8 +1060,15 @@ table.draggable--table {
   gap: 15px;
   padding: 1rem;
   flex: 1 1;
-  min-height: 75px;
+  min-height: 80px;
   width: calc(100% - 120px);
+  flex-wrap: wrap;
+}
+
+.activity--grid .act--label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: gray;
 }
 
 .time-tracking--page .new--project--rows .project--title--td .project--name {
@@ -2663,6 +2691,11 @@ table tr.marked-project td {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.1) #ffffff;
+}
+
+.dropdown-group-label {
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .wrapper--title .drop--scroll {
@@ -6189,7 +6222,6 @@ ul#icon-tabs .nav-link span svg {
 .dashboard--page .inner--card video,
 .dashboard--page .inner--card iframe {
   max-width: 100%;
-  width: 100%;
 }
 
 .dashboard--page .inner--card .update--image img {
@@ -8632,6 +8664,27 @@ ul#icon-tabs .nav-link span svg {
 .subscription--modal .text-emerald {
   color: rgb(4 120 87);
 }
+
+.pagination-control {
+    flex: 1 1 100%;
+    position: sticky;
+    bottom: 0;
+    position: -webkit-sticky;
+    background: #ffffff;
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-control .btn.disabled, .pagination-control .btn:disabled {
+    background-color: transparent;
+    border-color: transparent;
+    opacity: 1;
+}
+
+
+
 /*-=-=-=-==-=-
 Media CSS-=-==
 ==-=-=-=-=-*/
@@ -10106,6 +10159,10 @@ Media CSS-=-==
     margin-left: 0;
   }
 
+  .activity--grid {
+    gap: 12px !important;
+  }
+
   .daily--reports .accordion ul li {
     flex-flow: row wrap;
   }
@@ -10217,7 +10274,7 @@ Media CSS-=-==
   }
 
   .accordion-button::after {
-    right: 0;
+    right: 15px;
   }
 
   .screens--tabs .accordion-button .list-group .list-group-item {

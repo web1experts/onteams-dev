@@ -1007,6 +1007,13 @@ Add Project Modal CSS-=-=-
   border: 0;
 }
 
+.status--modal .status--list .list-heading {
+  background: none;
+  border-radius: 0;
+  font-weight: 600;
+  padding: 0;
+}
+
 .status--modal .status--list .list-group-item span {
     display: flex;
     align-items: center;

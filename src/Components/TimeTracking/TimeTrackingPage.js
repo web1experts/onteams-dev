@@ -50,7 +50,7 @@ import { GrExpand } from "react-icons/gr";
 import { TbScreenshot } from "react-icons/tb";
 import { HiOutlineLightningBolt } from "react-icons/hi";
 import { BsDash } from "react-icons/bs";
-import { LuTimer, LuUsers, LuFileText, LuMouse } from "react-icons/lu";
+import { LuTimer, LuUsers, LuFileText, LuMouse, LuChevronsLeft, LuChevronsRight } from "react-icons/lu";
 import { GoPulse } from "react-icons/go";
 import {
   BsArrowsFullscreen,
@@ -2485,7 +2485,7 @@ function TimeTrackingPage() {
                                       >
                                         {activity?.latestActivity?.project
                                           ?.title || (
-                                          <FiClock className="text-muted" />
+                                          <FiBriefcase className="text-muted" />
                                         )}
                                       </span>
                                     </td>
@@ -3499,17 +3499,18 @@ function TimeTrackingPage() {
                                                       </Card.Body>
                                                     </Card>
                                                   ),
-                                                )}
+                                                )
+                                              }
 
                                               {/* Pagination Controls */}
                                               <div
+                                                className="pagination-control"
                                                 style={{
-                                                  marginTop: "10px",
                                                   textAlign: "center",
                                                 }}
                                               >
                                                 <Button
-                                                  variant="outline-primary"
+                                                  variant="link"
                                                   disabled={
                                                     (currentVideoPage[
                                                       recording?._id
@@ -3527,7 +3528,7 @@ function TimeTrackingPage() {
                                                     )
                                                   }
                                                 >
-                                                  <BsArrowLeftCircleFill />
+                                                  <LuChevronsLeft />
                                                 </Button>
 
                                                 <span
@@ -3545,7 +3546,7 @@ function TimeTrackingPage() {
                                                 </span>
 
                                                 <Button
-                                                  variant="outline-primary"
+                                                  variant="link"
                                                   disabled={
                                                     (currentVideoPage[
                                                       recording?._id
@@ -3567,7 +3568,7 @@ function TimeTrackingPage() {
                                                     )
                                                   }
                                                 >
-                                                  <BsArrowRightCircleFill />
+                                                  <LuChevronsRight />
                                                 </Button>
                                               </div>
                                             </>
@@ -3600,14 +3601,14 @@ function TimeTrackingPage() {
                                                       <Row className="align-items-center w-100">
                                                         <Col md={2}>TIME</Col>
 
-                                                        <Col md={4}>
+                                                        <Col md={5}>
                                                           <div className="d-flex align-items-center gap-2">
                                                             <LuMouse />
                                                             MOUSE CLICKS
                                                           </div>
                                                         </Col>
 
-                                                        <Col md={4}>
+                                                        <Col md={5}>
                                                           <div className="d-flex align-items-center gap-2">
                                                             <FaRegKeyboard />
                                                             KEYSTROKES
@@ -3633,7 +3634,7 @@ function TimeTrackingPage() {
                                                           <Row className="align-items-center w-100 gap-2 gap-md-0">
                                                             {/* Time */}
                                                             <Col md={2}>
-                                                              <span className="text-uppercase text-muted d-flex d-lg-none">Time</span>
+                                                              <span className="log--span text-uppercase text-muted d-flex d-lg-none">Time</span>
                                                               <span
                                                                 style={{
                                                                   fontWeight: 600,
@@ -3656,9 +3657,9 @@ function TimeTrackingPage() {
                                                             </Col>
 
                                                             {/* Mouse */}
-                                                            <Col md={4}>
+                                                            <Col md={5}>
                                                               <div className="d-flex align-items-center gap-3">
-                                                                <span className="text-uppercase text-muted d-flex d-lg-none">Mouse Clicks</span>
+                                                                <span className="log--span text-uppercase text-muted d-flex d-lg-none">Mouse Clicks</span>
                                                                 <ProgressBar
                                                                   now={
                                                                     log.mouse_click_count /
@@ -3688,9 +3689,9 @@ function TimeTrackingPage() {
                                                             </Col>
 
                                                             {/* Keyboard */}
-                                                            <Col md={4}>
+                                                            <Col md={5}>
                                                               <div className="d-flex align-items-center gap-3">
-                                                                <span className="text-uppercase text-muted d-flex d-lg-none">Keystrokes</span>
+                                                                <span className="log--span text-uppercase text-muted d-flex d-lg-none">Keystrokes</span>
                                                                 <ProgressBar
                                                                   now={
                                                                     log.keyboard_count /
@@ -3803,7 +3804,7 @@ function TimeTrackingPage() {
                       <Row className="d-flex align-items-center gap-3 gap-md-0">
                         {/* Time */}
                         <Col md={2}>
-                        <span className="text-uppercase text-muted d-flex d-lg-none">Time</span>
+                        <span className="log--span text-uppercase text-muted d-flex d-lg-none">Time</span>
                           <span
                             style={{
                               fontWeight: 700,
@@ -3821,7 +3822,7 @@ function TimeTrackingPage() {
                         </Col>
 
                         <Col md={4}>
-                          <span className="text-uppercase text-muted d-flex d-lg-none">Mouse clicks</span>
+                          <span className="log--span text-uppercase text-muted d-flex d-lg-none">Mouse clicks</span>
                           <div className="d-flex align-items-center gap-3">
                             <ProgressBar
                               now={log.mouse_click_count / maxMouse}
@@ -3848,7 +3849,7 @@ function TimeTrackingPage() {
 
                         {/* Keyboard */}
                         <Col md={4}>
-                          <span className="text-uppercase text-muted d-flex d-lg-none">Keystrokes</span>
+                          <span className="log--span text-uppercase text-muted d-flex d-lg-none">Keystrokes</span>
                           <div className="d-flex align-items-center gap-3">
                             <ProgressBar
                               now={log.keyboard_count / maxKeyboard}
