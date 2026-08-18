@@ -1759,29 +1759,35 @@ const setDefaultMemberRole = () => {
                   {showError("role")}
                 </Form.Group>
               </div>
-              <div className="form-row pb-3" key={'row-role'}>
-                <Form.Group className="mb-0 form-group pb-0">
-                  <Form.Label>Working Shift</Form.Label>
-                  <Form.Select
-                    placeholder="Select Shift"
-                    aria-label="Shift"
-                    name="working_shift"
-                    className={"form-control custom-selectbox"}
-                    value={fields?.working_shift || shifts?.[0]?._id || ""}
-                    onChange={(e) => {
-                      handleChange(e);
-                    }}
-                  >
-                    {shifts?.map((shift, shiftIndex) => (
-                      <option key={shift?._id} value={shift?._id}>
-                        {shift?.name}
-                      </option>
-                    ))}
-                  </Form.Select>
-                  
-                  {showError("shift")}
-                </Form.Group>
-              </div>
+              {
+                (shifts?.length > 0) && (
+                  <div className="form-row pb-3" key={'row-role'}>
+                    <Form.Group className="mb-0 form-group pb-0">
+                      <Form.Label>Working Shift</Form.Label>
+                      <Form.Select
+                        placeholder="Select Shift"
+                        aria-label="Shift"
+                        name="working_shift"
+                        className={"form-control custom-selectbox"}
+                        value={fields?.working_shift || shifts?.[0]?._id || ""}
+                        onChange={(e) => {
+                          handleChange(e);
+                        }}
+                      >
+                        {shifts?.map((shift, shiftIndex) => (
+                          <option key={shift?._id} value={shift?._id}>
+                            {shift?.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      
+                      {showError("shift")}
+                    </Form.Group>
+                  </div>
+
+                )
+              }
+              
               <div className="form-row" key={`row-1`}>
                 <Form.Group className="mb-0 form-group other__fields">
                   {customFields.length > 0 && (

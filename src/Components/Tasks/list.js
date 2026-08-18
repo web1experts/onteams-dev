@@ -81,7 +81,7 @@ const TasksList = React.memo((props) => {
           tasks: [
             apiResult.newTask,
             ...taskslists[apiResult.newTask?.tab]?.tasks?.filter(
-              (task) => task._id !== apiResult.newTask._id
+              (task) => task._id && task._id !== apiResult.newTask._id
             ),
           ],
         },
@@ -352,14 +352,26 @@ const TasksList = React.memo((props) => {
       setLoader(false);
       setErrors(fieldErrors);
     } else {
-      const formData = new FormData();
-      for (const [key, value] of Object.entries(fields)) {
-        formData.append(key, value);
-      }
-      let payload = formData;
+      // const formData = new FormData();
+      // for (const [key, value] of Object.entries(fields)) {
+      //   formData.append(key, value);
+      // }
+      // let payload = formData;
+      closetask(fields["tab"]);
+      setTasksLists({
+        ...taskslists,
+        [fields?.tab]: {
+          ...taskslists[fields?.tab],
+          tasks: [
+            fields,
+            ...taskslists[fields?.tab]?.tasks
+          ],
+        },
+      });
+      
       await dispatch(createTask(fields));
       setLoader(false);
-      closetask(fields["tab"]);
+      
     }
   };
 
@@ -482,8 +494,11 @@ const TasksList = React.memo((props) => {
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
                                     key={`${task._id}--item-${index}-${tab._id}`}
-                                    className="task--button"
+                                    className={`task--button ${!task?._id ? "opacity-50" : ""}`}
                                     onClick={async () => {
+                                      if(!task?._id){
+                                        return;
+                                      }
                                       setSpinner(true)
                                       dispatch(getTaskById(task?._id))
                                       setSpinner(false)
@@ -609,8 +624,11 @@ const TasksList = React.memo((props) => {
                         taskslists[tab._id]?.tasks?.length > 0 &&
                         taskslists[tab._id]?.tasks?.map((task, index) => (
                           <li
-                            className="task--button"
+                            className={`task--button ${!task?._id ? "opacity-50" : ""}`}
                             onClick={async () => {
+                              if(!task?._id){
+                                return;
+                              }
                               setSelectedTask(task)
                               await dispatch(
                                 updateStateData(ACTIVE_FORM_TYPE, "task_edit")
@@ -705,7 +723,11 @@ const TasksList = React.memo((props) => {
                               >
                                 {(provided, snapshot) => (
                                   <li
+                                    className={`task--button ${!task?._id ? "opacity-50" : ""}`}
                                     onClick={async () => {
+                                      if(!task?._id){
+                                        return;
+                                      }
                                       setSelectedTask(task)
                                       await dispatch(
                                         updateStateData(
@@ -806,8 +828,11 @@ const TasksList = React.memo((props) => {
                         taskslists[tab._id]?.tasks?.length > 0 &&
                         taskslists[tab._id]?.tasks?.map((task, index) => (
                           <li
-                            className="task--button"
+                            className={`task--button ${!task?._id ? "opacity-50" : ""}`}
                             onClick={async () => {
+                              if(!task?._id){
+                                return;
+                              }
                               setSelectedTask(task)
                               await dispatch(
                                 updateStateData(ACTIVE_FORM_TYPE, "task_edit")
